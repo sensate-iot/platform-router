@@ -1,3 +1,10 @@
+/*
+ * .NET core entry point.
+ *
+ * @author: Michel Megens
+ * @email:  dev@bietje.net
+ */
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,16 +17,16 @@ using Microsoft.Extensions.Logging;
 
 namespace sensate_service
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            BuildWebHost(args).Run();
-        }
+	public class Program
+	{
+		public static void Main(string[] args)
+		{
+			BuildWebHost(args).Run();
+		}
 
-        public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .Build();
-    }
+		public static IWebHost BuildWebHost(string[] args) =>
+			WebHost.CreateDefaultBuilder(args)
+				.UseStartup<Startup>()
+				.Build();
+	}
 }
