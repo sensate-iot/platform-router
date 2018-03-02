@@ -16,14 +16,13 @@ namespace SensateService.Models
 {
 	public class Measurement
 	{
-		[BsonId, BsonRequired, JsonIgnore]
+		[BsonId, BsonRequired]
 		public ObjectId InternalId {get;set;}
 		public long Id {get;set;}
 		public decimal Data {get;set;}
 		public double Longitude {get;set;}
 		public double Latitude {get;set;}
 		public DateTime CreatedAt {get;set;}
-		[JsonIgnore]
 		public ObjectId CreatedBy {get;set;}
 
 		public string ToJson()

@@ -120,6 +120,11 @@ namespace sensate_service
 
 			/* Add repositories */
 			if(this.Configuration["Cache"] == "true") {
+				if(this.Configuration["CacheType"] == "Distributed")
+					services.AddScoped<ICacheStrategy<string>, DistributedCacheStrategy>();
+				else
+					services.AddScoped<ICacheStrategy<string>, MemoryCacheStrategy>();
+
 				Debug.WriteLine("Caching enabled!");
 				services.AddScoped<IMeasurementRepository, CachedMeasurementRepository>();
 			} else {
@@ -162,7 +167,7 @@ namespace sensate_service
 			cached = repo as CachedMeasurementRepository;
 			cached.ReceiveMeasurement(sensor, m.ToString());
 
-			var data = repo.TryGetBetween(sensor, DateTime.Now.AddDays(-2), DateTime.Now.AddHours(-3));
+			var data = repo.TryGetBetween(sensor, DateTime.Now.AddDays(-2), DateTime.Now);
 			//var data = repo.GetMeasurementsBySensor(sensor);
 			var json = data.ToJson();
 			Debug.WriteLine(json);

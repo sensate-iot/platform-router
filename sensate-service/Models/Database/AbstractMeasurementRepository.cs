@@ -61,6 +61,8 @@ namespace SensateService.Models.Database
 			id += y;
 			id *= rand;
 			id += x;
+
+			id = (long) ((ulong)id) & 0x7FFFFFFFFFFFFFFFL;
 			return id;
 		}
 

@@ -24,7 +24,7 @@ namespace SensateService.Models.Database
 {
 	public class CachedMeasurementRepository : AbstractMeasurementRepository, IMeasurementRepository
 	{
-		private IDistributedCache _cache;
+		private ICacheStrategy<string> _cache;
 
 		public const int CacheTimeout = 10;
 		public const int CacheTimeoutShort = 1;
@@ -32,27 +32,19 @@ namespace SensateService.Models.Database
 		public CachedMeasurementRepository(
 			SensateContext context,
 			ILogger<AbstractMeasurementRepository> logger,
-			IDistributedCache cache) : base(context, logger)
+			ICacheStrategy<string> cache) : base(context, logger)
 		{
 			this._cache = cache;
 		}
 
 		public override void Commit(Measurement obj)
 		{
-			this._cache.SetString(obj.Id.ToString(), 
-				obj.ToJson(),
-				new DistributedCacheEntryOptions()
-					.SetSlidingExpiration(TimeSpan.FromMinutes(CacheTimeout))
-			);
+			this._cache.Set(obj.Id.ToString(), obj.ToJson());
 		}
 
 		public override async Task CommitAsync(Measurement obj)
 		{
-			await this._cache.SetStringAsync(obj.Id.ToString(), 
-				obj.ToJson(),
-				new DistributedCacheEntryOptions()
-					.SetSlidingExpiration(TimeSpan.FromMinutes(CacheTimeout))
-			);
+			await this._cache.SetAsync(obj.Id.ToString(), obj.ToJson(), CacheTimeout);
 		}
 
 		public override bool Delete(long id)
@@ -68,14 +60,10 @@ namespace SensateService.Models.Database
 
 		private void CacheData(string key, string json)
 		{
-			DistributedCacheEntryOptions options;
-
 			if(key == null || json == null)
 				return;
 
-			options = new DistributedCacheEntryOptions()
-				.SetSlidingExpiration(TimeSpan.FromMinutes(CacheTimeout));
-			this._cache.SetString(key, json, options);
+			this._cache.Set(key, json, CacheTimeout);
 		}
 
 		private async Task CacheDataAsync(string key, object data, int tmo)
@@ -85,14 +73,10 @@ namespace SensateService.Models.Database
 
 		private async Task CacheDataAsync(string key, string json, int tmo)
 		{
-			DistributedCacheEntryOptions options;
-
 			if(key == null || json == null)
 				return;
 
-			options = new DistributedCacheEntryOptions()
-				.SetSlidingExpiration(TimeSpan.FromMinutes(tmo));
-			await this._cache.SetStringAsync(key, json, options);
+			await this._cache.SetAsync(key, json, tmo);
 		}
 
 		public override Measurement GetById(long id)
@@ -100,7 +84,7 @@ namespace SensateService.Models.Database
 			Measurement m;
 			string data;
 
-			data = this._cache.GetString(id.ToString());
+			data = this._cache.Get(id.ToString());
 			if(data == null)
 				return base.GetById(id);
 
@@ -115,11 +99,7 @@ namespace SensateService.Models.Database
 
 		public override bool Replace(Measurement obj1, Measurement obj2)
 		{
-			this._cache.SetString(obj1.Id.ToString(), JsonConvert.SerializeObject(obj2),
-				new DistributedCacheEntryOptions().SetSlidingExpiration(
-					TimeSpan.FromMinutes(CacheTimeout))
-			);
-
+			this._cache.Set(obj1.Id.ToString(), JsonConvert.SerializeObject(obj2), CacheTimeout);
 			return base.Replace(obj1, obj2);
 		}
 
@@ -145,11 +125,7 @@ namespace SensateService.Models.Database
 
 		public override bool Update(Measurement obj)
 		{
-			this._cache.SetString(obj.Id.ToString(), JsonConvert.SerializeObject(obj),
-				new DistributedCacheEntryOptions().SetSlidingExpiration(
-					TimeSpan.FromMinutes(CacheTimeout))
-			);
-
+			this._cache.Set(obj.Id.ToString(), JsonConvert.SerializeObject(obj), CacheTimeout);
 			return base.Update(obj);
 		}
 
@@ -160,7 +136,7 @@ namespace SensateService.Models.Database
 			IEnumerable<Measurement> measurements;
 
 			if(key != null)
-				data = await this._cache.GetStringAsync(key);
+				data = await this._cache.GetAsync(key);
 
 			if(data == null) {
 				measurements = await base.TryGetMeasurementsAsync(key, expression);
@@ -184,7 +160,7 @@ namespace SensateService.Models.Database
 			Measurement m;
 
 			if(key != null)
-				data = this._cache.GetString(key);
+				data = this._cache.Get(key);
 
 			if(data == null) {
 				m = base.TryGetMeasurement(key, expression);
@@ -202,7 +178,7 @@ namespace SensateService.Models.Database
 			Measurement m;
 
 			if(key != null)
-				data = await this._cache.GetStringAsync(key);
+				data = await this._cache.GetAsync(key);
 
 			if(data == null) {
 				m = await base.TryGetMeasurementAsync(key, expression);
@@ -221,7 +197,7 @@ namespace SensateService.Models.Database
 			IEnumerable<Measurement> measurements;
 
 			if(key != null)
-				data = this._cache.GetString(key);
+				data = this._cache.Get(key);
 
 			if(data == null) {
 				measurements = base.TryGetMeasurements(key, selector);
@@ -250,7 +226,7 @@ namespace SensateService.Models.Database
 			IEnumerable<Measurement> measurements;
 
 			key = $"{sensor.Secret}::{start.ToString()}::{end.ToString()}";
-			data = this._cache.GetString(key);
+			data = this._cache.Get(key);
 
 			if(data == null) {
 				measurements = base.TryGetBetween(sensor, start, end);
@@ -267,8 +243,7 @@ namespace SensateService.Models.Database
 			IEnumerable<Measurement> measurements;
 
 			key = $"{sensor.Secret}::{start.ToString()}::{end.ToString()}";
-			data = this._cache.GetString(key);
-			data = await this._cache.GetStringAsync(key);
+			data = await this._cache.GetAsync(key);
 
 			if(data == null) {
 				measurements = await base.TryGetBetweenAsync(sensor, start, end);
