@@ -18,11 +18,13 @@ namespace SensateService.Models
 	{
 		[BsonId, BsonRequired]
 		public ObjectId InternalId {get;set;}
-		public long Id {get;set;}
+		[BsonRequired]
 		public decimal Data {get;set;}
 		public double Longitude {get;set;}
 		public double Latitude {get;set;}
+		[BsonRequired]
 		public DateTime CreatedAt {get;set;}
+		[BsonRequired]
 		public ObjectId CreatedBy {get;set;}
 
 		public string ToJson()

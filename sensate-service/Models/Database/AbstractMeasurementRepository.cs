@@ -28,7 +28,7 @@ namespace SensateService.Models.Database
 		public string CreatedBySecret {get;set;}
 	}
 
-	public abstract class AbstractMeasurementRepository : AbstractDocumentRepository<Measurement>
+	public abstract class AbstractMeasurementRepository : AbstractDocumentRepository<string, Measurement>
 	{
 		public event OnMeasurementReceived MeasurementReceived;
 
@@ -44,32 +44,14 @@ namespace SensateService.Models.Database
 			this._logger = logger;
 		}
 
-		protected long GenerateId(DateTime ts)
+		protected ObjectId ToInternalId(string id)
 		{
-			long id;
-			int x, y;
-			long rand;
+			ObjectId internalId;
 
-			id = ts.Ticks;
-			this.GenerateId(out x, out y);
-			rand = x << 32;;
-			rand |= (long)y;
+			if(!ObjectId.TryParse(id, out internalId))
+				internalId = ObjectId.Empty;
 
-			/*
-			 * Randomize the tick value
-			 */
-			id += y;
-			id *= rand;
-			id += x;
-
-			id = (long) ((ulong)id) & 0x7FFFFFFFFFFFFFFFL;
-			return id;
-		}
-
-		private void GenerateId(out int x, out int y)
-		{
-			x = this._random.Next();
-			y = this._random.Next();
+			return internalId;
 		}
 
 		public override bool Update(Measurement obj)
@@ -81,7 +63,7 @@ namespace SensateService.Models.Database
 
 			try {
 				var result = this._measurements.FindOneAndUpdate(
-					x => x.Id == obj.Id,
+					x => x.InternalId == obj.InternalId,
 					update
 				);
 
@@ -123,18 +105,17 @@ namespace SensateService.Models.Database
 			throw new NotImplementedException();
 		}
 
-		public override bool Delete(long id)
+		public override bool Delete(string id)
 		{
-			var result = this._measurements.DeleteOne(
-				x => x.Id == id ||
-				x.InternalId == ToInternalId(id)
+			var result = this._measurements.DeleteOne(x =>
+				x.InternalId == this.ToInternalId(id)
 			);
 			return result.DeletedCount > 0;
 		}
 
-		public override Measurement GetById(long id)
+		public override Measurement GetById(string id)
 		{
-			var result = this._measurements.Find(x => x.Id == id);
+			var result = this._measurements.Find(x => x.InternalId == this.ToInternalId(id));
 			return result.FirstOrDefault();
 		}
 
@@ -148,7 +129,7 @@ namespace SensateService.Models.Database
 
 			try {
 				result = this._measurements.UpdateOne(
-					x => x.Id == obj2.Id || x.InternalId == obj2.InternalId,
+					x => x.InternalId == obj2.InternalId,
 					update
 				);
 			} catch (Exception ex) {
@@ -293,10 +274,18 @@ namespace SensateService.Models.Database
 				Longitude = raw.Longitude,
 				Latitude = raw.Latitude,
 				CreatedBy = sensor.InternalId,
-				Id = this.GenerateId(now),
-				InternalId = ObjectId.GenerateNewId(now)
+				InternalId = base.GenerateId(now)
 			};
 
+			try {
+				var opts = new InsertOneOptions();
+				opts.BypassDocumentValidation = true;
+				await this._measurements.InsertOneAsync(m, opts);
+				await this.CommitAsync(m);
+			} catch(Exception ex) {
+				this._logger.LogWarning($"Unable to insert measurement: {ex.Message}");
+				return null;
+			}
 			await this._measurements.InsertOneAsync(m);
 			await this.CommitAsync(m);
 

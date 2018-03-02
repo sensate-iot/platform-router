@@ -39,17 +39,17 @@ namespace SensateService.Models.Database
 
 		public override void Commit(Measurement obj)
 		{
-			this._cache.Set(obj.Id.ToString(), obj.ToJson());
+			this._cache.Set(obj.InternalId.ToString(), obj.ToJson());
 		}
 
 		public override async Task CommitAsync(Measurement obj)
 		{
-			await this._cache.SetAsync(obj.Id.ToString(), obj.ToJson(), CacheTimeout);
+			await this._cache.SetAsync(obj.InternalId.ToString(), obj.ToJson(), CacheTimeout);
 		}
 
-		public override bool Delete(long id)
+		public override bool Delete(string id)
 		{
-			this._cache.Remove(id.ToString());
+			this._cache.Remove(id);
 			return base.Delete(id);
 		}
 
@@ -79,12 +79,12 @@ namespace SensateService.Models.Database
 			await this._cache.SetAsync(key, json, tmo);
 		}
 
-		public override Measurement GetById(long id)
+		public override Measurement GetById(string id)
 		{
 			Measurement m;
 			string data;
 
-			data = this._cache.Get(id.ToString());
+			data = this._cache.Get(id);
 			if(data == null)
 				return base.GetById(id);
 
@@ -99,7 +99,9 @@ namespace SensateService.Models.Database
 
 		public override bool Replace(Measurement obj1, Measurement obj2)
 		{
-			this._cache.Set(obj1.Id.ToString(), JsonConvert.SerializeObject(obj2), CacheTimeout);
+			this._cache.Set(obj1.InternalId.ToString(),
+				JsonConvert.SerializeObject(obj2), CacheTimeout
+			);
 			return base.Replace(obj1, obj2);
 		}
 
@@ -125,7 +127,8 @@ namespace SensateService.Models.Database
 
 		public override bool Update(Measurement obj)
 		{
-			this._cache.Set(obj.Id.ToString(), JsonConvert.SerializeObject(obj), CacheTimeout);
+			this._cache.Set(obj.InternalId.ToString(),
+				JsonConvert.SerializeObject(obj), CacheTimeout);
 			return base.Update(obj);
 		}
 

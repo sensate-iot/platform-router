@@ -70,7 +70,8 @@ namespace sensate_service
 
 			pgsql = this.Secrets.GetValue<string>("PgSqlConnectionString");
 			mongo = this.Secrets.GetValue<string>("MongoDbConnectionString");
-			services.AddEntityFrameworkNpgsql().AddDbContext<SensateService.Models.Database.SensateSqlContext>(options => {
+			services.AddEntityFrameworkNpgsql()
+					.AddDbContext<SensateService.Models.Database.SensateSqlContext>(options => {
 				options.UseNpgsql(pgsql);
 			});
 
@@ -127,50 +128,19 @@ namespace sensate_service
 
 				Debug.WriteLine("Caching enabled!");
 				services.AddScoped<IMeasurementRepository, CachedMeasurementRepository>();
+				services.AddScoped<ISensorRepository, CachedSensorRepository>();
 			} else {
 				Debug.WriteLine("Caching disabled!");
 				services.AddScoped<IMeasurementRepository, StandardMeasurementRepository>();
+				services.AddScoped<ISensorRepository, StandardSensorRepository>();
 			}
 
 			services.AddMvc();
-
-			var scope = services.BuildServiceProvider().CreateScope();
-			var repo = scope.ServiceProvider.GetRequiredService<IMeasurementRepository>();
-			this.testRepo(repo);
 
 			this._service = new MqttService();
 			this._service.ConnectAsync().ContinueWith(t => {
 				result = t.Result;
 			}).Wait();
-		}
-
-		private void testRepo(IMeasurementRepository repo)
-		{
-			Sensor sensor;
-			CachedMeasurementRepository cached;
-
-			sensor = new Sensor {
-				CreatedAt = DateTime.Now,
-				UpdatedAt = DateTime.Now,
-				InternalId = ObjectId.GenerateNewId(),
-				Secret = "yolo",
-				Name = "Test sensor",
-				Unit = "W"
-			};
-
-			dynamic m = new JObject();
-			m.Data = 12.11255;
-			m.Longitude = 54.2111;
-			m.Latitude = 1.232411;
-			m.CreatedBySecret = "yolo";
-
-			cached = repo as CachedMeasurementRepository;
-			cached.ReceiveMeasurement(sensor, m.ToString());
-
-			var data = repo.TryGetBetween(sensor, DateTime.Now.AddDays(-2), DateTime.Now);
-			//var data = repo.GetMeasurementsBySensor(sensor);
-			var json = data.ToJson();
-			Debug.WriteLine(json);
 		}
 
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
