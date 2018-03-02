@@ -163,8 +163,9 @@ namespace sensate_service
 			cached.ReceiveMeasurement(sensor, m.ToString());
 
 			//var data = repo.TryGetBetween(sensor, DateTime.Now.AddHours(-5), DateTime.Now.AddHours(-3));
-			//var json = data.ToJson();
-			//Debug.WriteLine(json);
+			var data = repo.GetMeasurementsBySensor(sensor);
+			var json = data.ToJson();
+			Debug.WriteLine(json);
 		}
 
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env)

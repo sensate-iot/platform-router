@@ -18,10 +18,16 @@ namespace SensateService.Models.Repositories
 		IEnumerable<Measurement> TryGetMeasurements(string key, Expression<Func<Measurement, bool>> selector);
 		Measurement GetMeasurement(string key, Expression<Func<Measurement, bool>> selector);
 		IEnumerable<Measurement> GetMeasurementsBySensor(Sensor sensor);
+		IEnumerable<Measurement> GetBefore(Sensor sensor, DateTime pit);
+		IEnumerable<Measurement> GetAfter(Sensor sensor, DateTime pit);
 
 		Task<IEnumerable<Measurement>> TryGetBetweenAsync(Sensor sensor, DateTime start, DateTime end);
 		Task<IEnumerable<Measurement>> TryGetMeasurementsAsync(string key, Expression<Func<Measurement, bool>> selector);
 		Task<Measurement> GetMeasurementAsync(string key, Expression<Func<Measurement, bool>> selector);
 		Task<IEnumerable<Measurement>> GetMeasurementsBySensorAsync(Sensor sensor);
+		Task<IEnumerable<Measurement>> GetBeforeAsync(Sensor sensor, DateTime pit);
+		Task<IEnumerable<Measurement>> GetAfterAsync(Sensor sensor, DateTime pit);
+
+		void ReceiveMeasurement(Sensor sender, string measurement);
 	}
 }

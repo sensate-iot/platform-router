@@ -44,6 +44,11 @@ namespace SensateService.Models.Database
 			this._logger = logger;
 		}
 
+		protected long GenerateId(DateTime ts)
+		{
+			return this.GenerateId();
+		}
+
 		protected long GenerateId()
 		{
 			long id;
@@ -74,7 +79,7 @@ namespace SensateService.Models.Database
 			}
 		}
 
-		public async Task<IEnumerable<Measurement>> GetMeasurementsBySensorAsync(Sensor sensor)
+		public virtual async Task<IEnumerable<Measurement>> GetMeasurementsBySensorAsync(Sensor sensor)
 		{
 			var query = Builders<Measurement>.Filter.Eq("CreatedBy", sensor.InternalId);
 
@@ -87,7 +92,7 @@ namespace SensateService.Models.Database
 			}
 		}
 
-		public IEnumerable<Measurement> GetMeasurementsBySensor(Sensor sensor)
+		public virtual IEnumerable<Measurement> GetMeasurementsBySensor(Sensor sensor)
 		{
 			var query = Builders<Measurement>.Filter.Eq("CreatedBy", sensor.InternalId);
 
@@ -177,6 +182,7 @@ namespace SensateService.Models.Database
 		public virtual IEnumerable<Measurement> TryGetBetween(Sensor sensor, DateTime start, DateTime end)
 		{
 			return this.TryGetMeasurements(null, x =>
+				x.CreatedBy == sensor.InternalId &&
 				x.CreatedAt.CompareTo(start) >= 0 && x.CreatedAt.CompareTo(end) <= 0
 			);
 		}
@@ -186,6 +192,7 @@ namespace SensateService.Models.Database
 		)
 		{
 			return await this.TryGetMeasurementsAsync(null, x =>
+				x.CreatedBy == sensor.InternalId &&
 				x.CreatedAt.CompareTo(start) >= 0 && x.CreatedAt.CompareTo(end) <= 0
 			);
 		}
@@ -208,6 +215,7 @@ namespace SensateService.Models.Database
 		{
 			Measurement m;
 			RawMeasurement raw;
+			DateTime now;
 
 			if(json == null || sensor == null)
 				return null;
@@ -222,8 +230,9 @@ namespace SensateService.Models.Database
 				return null;
 			}
 
+			now = DateTime.Now;
 			if(raw.CreatedAt == null || raw.CreatedAt.CompareTo(DateTime.MinValue) <= 0)
-				raw.CreatedAt = DateTime.Now;
+				raw.CreatedAt = now;
 
 			m = new Measurement {
 				Data = raw.Data,
@@ -231,8 +240,8 @@ namespace SensateService.Models.Database
 				Longitude = raw.Longitude,
 				Latitude = raw.Latitude,
 				CreatedBy = sensor.InternalId,
-				Id = this.GenerateId(),
-				InternalId = ObjectId.GenerateNewId(DateTime.Now)
+				Id = this.GenerateId(now),
+				InternalId = ObjectId.GenerateNewId(now)
 			};
 
 			await this._measurements.InsertOneAsync(m);

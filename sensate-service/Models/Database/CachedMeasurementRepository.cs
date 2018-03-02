@@ -27,6 +27,7 @@ namespace SensateService.Models.Database
 		private IDistributedCache _cache;
 
 		public const int CacheTimeout = 10;
+		public const int CacheTimeoutShort = 1;
 
 		public CachedMeasurementRepository(
 			SensateContext context,
@@ -77,12 +78,12 @@ namespace SensateService.Models.Database
 			this._cache.SetString(key, json, options);
 		}
 
-		private async Task CacheDataAsync(string key, object data)
+		private async Task CacheDataAsync(string key, object data, int tmo)
 		{
-			await this.CacheDataAsync(key, data.ToJson());
+			await this.CacheDataAsync(key, data.ToJson(), tmo);
 		}
 
-		private async Task CacheDataAsync(string key, string json)
+		private async Task CacheDataAsync(string key, string json, int tmo)
 		{
 			DistributedCacheEntryOptions options;
 
@@ -90,7 +91,7 @@ namespace SensateService.Models.Database
 				return;
 
 			options = new DistributedCacheEntryOptions()
-				.SetSlidingExpiration(TimeSpan.FromMinutes(CacheTimeout));
+				.SetSlidingExpiration(TimeSpan.FromMinutes(tmo));
 			await this._cache.SetStringAsync(key, json, options);
 		}
 
@@ -122,6 +123,26 @@ namespace SensateService.Models.Database
 			return base.Replace(obj1, obj2);
 		}
 
+		public override async Task<IEnumerable<Measurement>> GetMeasurementsBySensorAsync(Sensor sensor)
+		{
+			string key;
+
+			key = $"{sensor.InternalId.ToString()}::{sensor.Secret}";
+			return await this.TryGetMeasurementsAsync(key, x =>
+				x.CreatedBy == sensor.InternalId, CacheTimeoutShort
+			);
+		}
+
+		public override IEnumerable<Measurement> GetMeasurementsBySensor(Sensor sensor)
+		{
+			string key;
+
+			key = $"{sensor.InternalId.ToString()}::{sensor.Secret}";
+			return this.TryGetMeasurements(key, x =>
+				x.CreatedBy == sensor.InternalId, CacheTimeoutShort
+			);
+		}
+
 		public override bool Update(Measurement obj)
 		{
 			this._cache.SetString(obj.Id.ToString(), JsonConvert.SerializeObject(obj),
@@ -132,8 +153,8 @@ namespace SensateService.Models.Database
 			return base.Update(obj);
 		}
 
-		public async override Task<IEnumerable<Measurement>> TryGetMeasurementsAsync(
-			string key, Expression<Func<Measurement, bool>> expression)
+		private async Task<IEnumerable<Measurement>> TryGetMeasurementsAsync(
+			string key, Expression<Func<Measurement, bool>> expression, int tmo)
 		{
 			string data = null;
 			IEnumerable<Measurement> measurements;
@@ -143,11 +164,17 @@ namespace SensateService.Models.Database
 
 			if(data == null) {
 				measurements = await base.TryGetMeasurementsAsync(key, expression);
-				await this.CacheDataAsync(key, measurements);
+				await this.CacheDataAsync(key, measurements, tmo);
 				return measurements;
 			}
 
 			return JsonConvert.DeserializeObject<IEnumerable<Measurement>>(data);
+		}
+
+		public async override Task<IEnumerable<Measurement>> TryGetMeasurementsAsync(
+			string key, Expression<Func<Measurement, bool>> expression)
+		{
+			return await this.TryGetMeasurementsAsync(key, expression, CacheTimeout);
 		}
 
 		public override Measurement TryGetMeasurement(
@@ -179,16 +206,15 @@ namespace SensateService.Models.Database
 
 			if(data == null) {
 				m = await base.TryGetMeasurementAsync(key, expression);
-				await this.CacheDataAsync(key, m);
+				await this.CacheDataAsync(key, m, CacheTimeout);
 				return m;
 			}
 
 			return JsonConvert.DeserializeObject<Measurement>(data);
 		}
 
-
-		public override IEnumerable<Measurement> TryGetMeasurements(
-			string key, Expression<Func<Measurement, bool>> selector
+		private IEnumerable<Measurement> TryGetMeasurements(
+			string key, Expression<Func<Measurement, bool>> selector, int tmo
 		)
 		{
 			string data = null;
@@ -204,6 +230,13 @@ namespace SensateService.Models.Database
 			}
 
 			return JsonConvert.DeserializeObject<IEnumerable<Measurement>>(data);
+		}
+
+		public override IEnumerable<Measurement> TryGetMeasurements(
+			string key, Expression<Func<Measurement, bool>> selector
+		)
+		{
+			return this.TryGetMeasurements(key, selector, CacheTimeout);
 		}
 
 		public Measurement GetMeasurement(string key, Expression<Func<Measurement, bool>> selector)
@@ -239,7 +272,7 @@ namespace SensateService.Models.Database
 
 			if(data == null) {
 				measurements = await base.TryGetBetweenAsync(sensor, start, end);
-				await this.CacheDataAsync(key, measurements.ToJson());
+				await this.CacheDataAsync(key, measurements.ToJson(), CacheTimeout);
 				return measurements;
 			}
 
@@ -250,6 +283,46 @@ namespace SensateService.Models.Database
 		public async Task<Measurement> GetMeasurementAsync(string key, Expression<Func<Measurement, bool>> selector)
 		{
 			return await this.TryGetMeasurementAsync(key, selector);
+		}
+
+		public IEnumerable<Measurement> GetBefore(Sensor sensor, DateTime pit)
+		{
+			string key;
+
+			key = $"{sensor.Secret}::before::{pit.ToString()}";
+			return this.TryGetMeasurements(key, x =>
+				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) <= 0
+			);
+		}
+
+		public IEnumerable<Measurement> GetAfter(Sensor sensor, DateTime pit)
+		{
+			string key;
+
+			key = $"{sensor.Secret}::after::{pit.ToString()}";
+			return this.TryGetMeasurements(key, x =>
+				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) >= 0
+			);
+		}
+
+		public async Task<IEnumerable<Measurement>> GetBeforeAsync(Sensor sensor, DateTime pit)
+		{
+			string key;
+
+			key = $"{sensor.Secret}::before::{pit.ToString()}";
+			return await this.TryGetMeasurementsAsync(key, x =>
+				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) <= 0
+			);
+		}
+
+		public async Task<IEnumerable<Measurement>> GetAfterAsync(Sensor sensor, DateTime pit)
+		{
+			string key;
+
+			key = $"{sensor.Secret}::after::{pit.ToString()}";
+			return await this.TryGetMeasurementsAsync(key, x =>
+				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) >= 0
+			);
 		}
 	}
 }
