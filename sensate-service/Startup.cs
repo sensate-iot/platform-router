@@ -162,8 +162,8 @@ namespace sensate_service
 			cached = repo as CachedMeasurementRepository;
 			cached.ReceiveMeasurement(sensor, m.ToString());
 
-			//var data = repo.TryGetBetween(sensor, DateTime.Now.AddHours(-5), DateTime.Now.AddHours(-3));
-			var data = repo.GetMeasurementsBySensor(sensor);
+			var data = repo.TryGetBetween(sensor, DateTime.Now.AddDays(-2), DateTime.Now.AddHours(-3));
+			//var data = repo.GetMeasurementsBySensor(sensor);
 			var json = data.ToJson();
 			Debug.WriteLine(json);
 		}

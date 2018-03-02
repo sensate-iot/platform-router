@@ -33,31 +33,41 @@ namespace SensateService.Models.Database
 		public event OnMeasurementReceived MeasurementReceived;
 
 		private readonly IMongoCollection<Measurement> _measurements;
-		private readonly Random random;
+		private readonly Random _random;
 		private ILogger<AbstractMeasurementRepository> _logger;
 
 		public AbstractMeasurementRepository(SensateContext context,
 			ILogger<AbstractMeasurementRepository> logger) : base(context)
 		{
 			this._measurements = context.Measurements;
-			this.random = new Random();
+			this._random = new Random();
 			this._logger = logger;
 		}
 
 		protected long GenerateId(DateTime ts)
 		{
-			return this.GenerateId();
+			long id;
+			int x, y;
+			long rand;
+
+			id = ts.Ticks;
+			this.GenerateId(out x, out y);
+			rand = x << 32;;
+			rand |= (long)y;
+
+			/*
+			 * Randomize the tick value
+			 */
+			id += y;
+			id *= rand;
+			id += x;
+			return id;
 		}
 
-		protected long GenerateId()
+		private void GenerateId(out int x, out int y)
 		{
-			long id;
-
-			id = this.random.Next();
-			id <<= 32;
-			id |= (long)this.random.Next();
-
-			return id;
+			x = this._random.Next();
+			y = this._random.Next();
 		}
 
 		public override bool Update(Measurement obj)
@@ -74,7 +84,8 @@ namespace SensateService.Models.Database
 				);
 
 				return result != null;
-			} catch(Exception) {
+			} catch(Exception ex) {
+				this._logger.LogInformation($"Failed to update measurement: {ex.Message}");
 				return false;
 			}
 		}
@@ -209,6 +220,46 @@ namespace SensateService.Models.Database
 		{
 			var result = this._measurements.Find(expression);
 			return result.ToEnumerable();
+		}
+
+		public virtual IEnumerable<Measurement> GetBefore(Sensor sensor, DateTime pit)
+		{
+			string key;
+
+			key = $"{sensor.Secret}::before::{pit.ToString()}";
+			return this.TryGetMeasurements(key, x =>
+				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) <= 0
+			);
+		}
+
+		public virtual IEnumerable<Measurement> GetAfter(Sensor sensor, DateTime pit)
+		{
+			string key;
+
+			key = $"{sensor.Secret}::after::{pit.ToString()}";
+			return this.TryGetMeasurements(key, x =>
+				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) >= 0
+			);
+		}
+
+		public virtual async Task<IEnumerable<Measurement>> GetBeforeAsync(Sensor sensor, DateTime pit)
+		{
+			string key;
+
+			key = $"{sensor.Secret}::before::{pit.ToString()}";
+			return await this.TryGetMeasurementsAsync(key, x =>
+				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) <= 0
+			);
+		}
+
+		public virtual async Task<IEnumerable<Measurement>> GetAfterAsync(Sensor sensor, DateTime pit)
+		{
+			string key;
+
+			key = $"{sensor.Secret}::after::{pit.ToString()}";
+			return await this.TryGetMeasurementsAsync(key, x =>
+				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) >= 0
+			);
 		}
 
 		private async Task<Measurement> StoreMeasurement(Sensor sensor, string json)

@@ -51,33 +51,5 @@ namespace SensateService.Models.Database
 		{
 			return await base.TryGetMeasurementAsync(key, selector);
 		}
-
-		public IEnumerable<Measurement> GetBefore(Sensor sensor, DateTime pit)
-		{
-			return this.TryGetMeasurements(null, x =>
-				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) <= 0
-			);
-		}
-
-		public IEnumerable<Measurement> GetAfter(Sensor sensor, DateTime pit)
-		{
-			return this.TryGetMeasurements(null, x =>
-				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) >= 0
-			);
-		}
-
-		public async Task<IEnumerable<Measurement>> GetBeforeAsync(Sensor sensor, DateTime pit)
-		{
-			return await this.TryGetMeasurementsAsync(null, x =>
-				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) <= 0
-			);
-		}
-
-		public async Task<IEnumerable<Measurement>> GetAfterAsync(Sensor sensor, DateTime pit)
-		{
-			return await this.TryGetMeasurementsAsync(null, x =>
-				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) >= 0
-			);
-		}
 	}
 }

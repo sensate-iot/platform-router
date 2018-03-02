@@ -284,45 +284,5 @@ namespace SensateService.Models.Database
 		{
 			return await this.TryGetMeasurementAsync(key, selector);
 		}
-
-		public IEnumerable<Measurement> GetBefore(Sensor sensor, DateTime pit)
-		{
-			string key;
-
-			key = $"{sensor.Secret}::before::{pit.ToString()}";
-			return this.TryGetMeasurements(key, x =>
-				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) <= 0
-			);
-		}
-
-		public IEnumerable<Measurement> GetAfter(Sensor sensor, DateTime pit)
-		{
-			string key;
-
-			key = $"{sensor.Secret}::after::{pit.ToString()}";
-			return this.TryGetMeasurements(key, x =>
-				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) >= 0
-			);
-		}
-
-		public async Task<IEnumerable<Measurement>> GetBeforeAsync(Sensor sensor, DateTime pit)
-		{
-			string key;
-
-			key = $"{sensor.Secret}::before::{pit.ToString()}";
-			return await this.TryGetMeasurementsAsync(key, x =>
-				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) <= 0
-			);
-		}
-
-		public async Task<IEnumerable<Measurement>> GetAfterAsync(Sensor sensor, DateTime pit)
-		{
-			string key;
-
-			key = $"{sensor.Secret}::after::{pit.ToString()}";
-			return await this.TryGetMeasurementsAsync(key, x =>
-				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) >= 0
-			);
-		}
 	}
 }
