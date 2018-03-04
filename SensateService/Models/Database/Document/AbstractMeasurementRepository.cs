@@ -144,7 +144,7 @@ namespace SensateService.Models.Database.Document
 			return result.ModifiedCount > 0;
 		}
 
-		public async void ReceiveMeasurement(Sensor sender, string measurement)
+		public async Task ReceiveMeasurement(Sensor sender, string measurement)
 		{
 			MeasurementReceivedEventArgs args;
 			Measurement m;
@@ -177,24 +177,6 @@ namespace SensateService.Models.Database.Document
 			return await result.FirstOrDefaultAsync();
 		}
 
-		public virtual IEnumerable<Measurement> TryGetBetween(Sensor sensor, DateTime start, DateTime end)
-		{
-			return this.TryGetMeasurements(null, x =>
-				x.CreatedBy == sensor.InternalId &&
-				x.CreatedAt.CompareTo(start) >= 0 && x.CreatedAt.CompareTo(end) <= 0
-			);
-		}
-
-		public virtual async Task<IEnumerable<Measurement>> TryGetBetweenAsync(
-			Sensor sensor, DateTime start, DateTime end
-		)
-		{
-			return await this.TryGetMeasurementsAsync(null, x =>
-				x.CreatedBy == sensor.InternalId &&
-				x.CreatedAt.CompareTo(start) >= 0 && x.CreatedAt.CompareTo(end) <= 0
-			);
-		}
-
 		public async virtual Task<IEnumerable<Measurement>> TryGetMeasurementsAsync(
 			string key, Expression<Func<Measurement, bool>> expression)
 		{
@@ -207,46 +189,6 @@ namespace SensateService.Models.Database.Document
 		{
 			var result = this._measurements.Find(expression);
 			return result.ToEnumerable();
-		}
-
-		public virtual IEnumerable<Measurement> GetBefore(Sensor sensor, DateTime pit)
-		{
-			string key;
-
-			key = $"{sensor.Secret}::before::{pit.ToString()}";
-			return this.TryGetMeasurements(key, x =>
-				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) <= 0
-			);
-		}
-
-		public virtual IEnumerable<Measurement> GetAfter(Sensor sensor, DateTime pit)
-		{
-			string key;
-
-			key = $"{sensor.Secret}::after::{pit.ToString()}";
-			return this.TryGetMeasurements(key, x =>
-				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) >= 0
-			);
-		}
-
-		public virtual async Task<IEnumerable<Measurement>> GetBeforeAsync(Sensor sensor, DateTime pit)
-		{
-			string key;
-
-			key = $"{sensor.Secret}::before::{pit.ToString()}";
-			return await this.TryGetMeasurementsAsync(key, x =>
-				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) <= 0
-			);
-		}
-
-		public virtual async Task<IEnumerable<Measurement>> GetAfterAsync(Sensor sensor, DateTime pit)
-		{
-			string key;
-
-			key = $"{sensor.Secret}::after::{pit.ToString()}";
-			return await this.TryGetMeasurementsAsync(key, x =>
-				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) >= 0
-			);
 		}
 
 		private async Task<Measurement> StoreMeasurement(Sensor sensor, string json)
@@ -292,6 +234,64 @@ namespace SensateService.Models.Database.Document
 			}
 
 			return m;
+		}
+
+		public virtual IEnumerable<Measurement> TryGetBetween(Sensor sensor, DateTime start, DateTime end)
+		{
+			return this.TryGetMeasurements(null, x =>
+				x.CreatedBy == sensor.InternalId &&
+				x.CreatedAt.CompareTo(start) >= 0 && x.CreatedAt.CompareTo(end) <= 0
+			);
+		}
+
+		public virtual async Task<IEnumerable<Measurement>> TryGetBetweenAsync(
+			Sensor sensor, DateTime start, DateTime end
+		)
+		{
+			return await this.TryGetMeasurementsAsync(null, x =>
+				x.CreatedBy == sensor.InternalId &&
+				x.CreatedAt.CompareTo(start) >= 0 && x.CreatedAt.CompareTo(end) <= 0
+			);
+		}
+
+		public virtual IEnumerable<Measurement> GetBefore(Sensor sensor, DateTime pit)
+		{
+			string key;
+
+			key = $"{sensor.Secret}::before::{pit.ToString()}";
+			return this.TryGetMeasurements(key, x =>
+				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) <= 0
+			);
+		}
+
+		public virtual IEnumerable<Measurement> GetAfter(Sensor sensor, DateTime pit)
+		{
+			string key;
+
+			key = $"{sensor.Secret}::after::{pit.ToString()}";
+			return this.TryGetMeasurements(key, x =>
+				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) >= 0
+			);
+		}
+
+		public virtual async Task<IEnumerable<Measurement>> GetBeforeAsync(Sensor sensor, DateTime pit)
+		{
+			string key;
+
+			key = $"{sensor.Secret}::before::{pit.ToString()}";
+			return await this.TryGetMeasurementsAsync(key, x =>
+				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) <= 0
+			);
+		}
+
+		public virtual async Task<IEnumerable<Measurement>> GetAfterAsync(Sensor sensor, DateTime pit)
+		{
+			string key;
+
+			key = $"{sensor.Secret}::after::{pit.ToString()}";
+			return await this.TryGetMeasurementsAsync(key, x =>
+				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) >= 0
+			);
 		}
 	}
 }

@@ -20,12 +20,18 @@ using SensateService.Controllers;
 using SensateService.Models;
 using SensateService.Models.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace SensateService.Tests.UnitTests
 {
 	[TestFixture]
 	public class SensorsControllerTests
 	{
+		public SensorsControllerTests(IDistributedCache cache)
+		{
+		}
+
 		private Mock<ISensorRepository> _sensors;
 
 		[SetUp]

@@ -28,6 +28,6 @@ namespace SensateService.Models.Repositories
 		Task<IEnumerable<Measurement>> GetBeforeAsync(Sensor sensor, DateTime pit);
 		Task<IEnumerable<Measurement>> GetAfterAsync(Sensor sensor, DateTime pit);
 
-		void ReceiveMeasurement(Sensor sender, string measurement);
+		Task ReceiveMeasurement(Sensor sender, string measurement);
 	}
 }
