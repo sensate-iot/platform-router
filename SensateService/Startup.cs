@@ -34,7 +34,6 @@ using SensateService.Models.Repositories;
 using SensateService.Models.Database.Sql;
 using SensateService.Models.Database.Document;
 using SensateService.Models.Database.Cache;
-using SensateService.Middleware;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json.Linq;
@@ -43,8 +42,6 @@ namespace sensate_service
 {
 	public class Startup
 	{
-		private MqttService _service;
-
 		public Startup(IConfiguration configuration, IHostingEnvironment environment)
 		{
 			var builder = new ConfigurationBuilder()
@@ -68,7 +65,6 @@ namespace sensate_service
 		public void ConfigureServices(IServiceCollection services)
 		{
 			string pgsql, mongo;
-			bool result;
 
 			pgsql = this.Secrets.GetValue<string>("PgSqlConnectionString");
 			mongo = this.Secrets.GetValue<string>("MongoDbConnectionString");
@@ -138,11 +134,6 @@ namespace sensate_service
 			}
 
 			services.AddMvc();
-
-			this._service = new MqttService();
-			this._service.ConnectAsync().ContinueWith(t => {
-				result = t.Result;
-			}).Wait();
 		}
 
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
