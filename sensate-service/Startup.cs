@@ -31,7 +31,9 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 
 using SensateService.Models;
 using SensateService.Models.Repositories;
-using SensateService.Models.Database;
+using SensateService.Models.Database.Sql;
+using SensateService.Models.Database.Document;
+using SensateService.Models.Database.Cache;
 using SensateService.Middleware;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -71,7 +73,7 @@ namespace sensate_service
 			pgsql = this.Secrets.GetValue<string>("PgSqlConnectionString");
 			mongo = this.Secrets.GetValue<string>("MongoDbConnectionString");
 			services.AddEntityFrameworkNpgsql()
-					.AddDbContext<SensateService.Models.Database.SensateSqlContext>(options => {
+					.AddDbContext<SensateService.Models.Database.Sql.SensateSqlContext>(options => {
 				options.UseNpgsql(pgsql);
 			});
 
@@ -92,7 +94,7 @@ namespace sensate_service
 			 * Setup user authentication
 			 */
 			services.AddIdentity<SensateUser, IdentityRole>()
-				.AddEntityFrameworkStores<SensateService.Models.Database.SensateSqlContext>()
+				.AddEntityFrameworkStores<SensateService.Models.Database.Sql.SensateSqlContext>()
 				.AddDefaultTokenProviders();
 			JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
 			services.AddAuthentication(options => {

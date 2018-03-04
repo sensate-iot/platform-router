@@ -19,8 +19,9 @@ using Newtonsoft.Json;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using SensateService.Models.Repositories;
+using SensateService.Models.Database.Cache;
 
-namespace SensateService.Models.Database
+namespace SensateService.Models.Database.Document
 {
 	public class CachedSensorRepository : StandardSensorRepository
 	{
@@ -39,12 +40,12 @@ namespace SensateService.Models.Database
 
 		public override void Commit(Sensor obj)
 		{
-			this._cache.Set(obj.Secret, obj.ToJson());
+			this._cache.Set(obj.InternalId.ToString(), obj.ToJson());
 		}
 
 		public async override Task CommitAsync(Sensor obj)
 		{
-			await this._cache.SetAsync(obj.Secret, obj.ToJson());
+			await this._cache.SetAsync(obj.InternalId.ToString(), obj.ToJson());
 		}
 
 		public override Sensor Get(string id)
@@ -91,19 +92,19 @@ namespace SensateService.Models.Database
 
 		public override bool Replace(Sensor obj1, Sensor obj2)
 		{
-			this._cache.Set(obj1.Secret, obj2.ToJson());
+			this._cache.Set(obj1.InternalId.ToString(), obj2.ToJson());
 			return base.Replace(obj1, obj2);
 		}
 
 		public override bool Update(Sensor obj)
 		{
-			this._cache.Set(obj.Secret, obj.ToJson());
+			this._cache.Set(obj.InternalId.ToString(), obj.ToJson());
 			return base.Update(obj);
 		}
 
 		public override async Task<Boolean> UpdateAsync(Sensor sensor)
 		{
-			await this._cache.SetAsync(sensor.Secret, sensor.ToJson());
+			await this._cache.SetAsync(sensor.InternalId.ToString(), sensor.ToJson());
 			return await base.UpdateAsync(sensor);
 		}
 

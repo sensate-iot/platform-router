@@ -11,12 +11,13 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 using Newtonsoft.Json;
+using SensateService.Converters;
 
 namespace SensateService.Models
 {
 	public class Measurement
 	{
-		[BsonId, BsonRequired]
+		[BsonId, BsonRequired, JsonConverter(typeof(ObjectIdJsonConverter))]
 		public ObjectId InternalId {get;set;}
 		[BsonRequired]
 		public decimal Data {get;set;}
@@ -26,6 +27,12 @@ namespace SensateService.Models
 		public DateTime CreatedAt {get;set;}
 		[BsonRequired]
 		public ObjectId CreatedBy {get;set;}
+
+		public Measurement()
+		{
+			this.InternalId = ObjectId.Empty;
+			this.CreatedBy = ObjectId.Empty;
+		}
 
 		public string ToJson()
 		{

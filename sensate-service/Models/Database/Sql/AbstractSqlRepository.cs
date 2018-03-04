@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
-namespace SensateService.Models.Database
+namespace SensateService.Models.Database.Sql
 {
 	public abstract class AbstractSqlRepository<TKey, T> : IRepository<TKey, T> where T : class
 	{

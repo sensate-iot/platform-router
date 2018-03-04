@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using MongoDB.Bson;
 
-namespace SensateService.Models.Database
+namespace SensateService.Models.Database.Document
 {
 	public abstract class AbstractDocumentRepository<TKey, T> : IRepository<TKey, T> where T : class
 	{

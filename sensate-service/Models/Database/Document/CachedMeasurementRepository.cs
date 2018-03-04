@@ -19,8 +19,9 @@ using Newtonsoft.Json;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using SensateService.Models.Repositories;
+using SensateService.Models.Database.Cache;
 
-namespace SensateService.Models.Database
+namespace SensateService.Models.Database.Document
 {
 	public class CachedMeasurementRepository : AbstractMeasurementRepository, IMeasurementRepository
 	{

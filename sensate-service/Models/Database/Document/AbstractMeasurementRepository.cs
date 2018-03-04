@@ -17,7 +17,7 @@ using Newtonsoft.Json;
 using MongoDB.Driver;
 using MongoDB.Bson;
 
-namespace SensateService.Models.Database
+namespace SensateService.Models.Database.Document
 {
 	internal class RawMeasurement
 	{
@@ -107,15 +107,19 @@ namespace SensateService.Models.Database
 
 		public override bool Delete(string id)
 		{
+			ObjectId oid;
+
+			oid = this.ToInternalId(id);
 			var result = this._measurements.DeleteOne(x =>
-				x.InternalId == this.ToInternalId(id)
+				x.InternalId == oid
 			);
 			return result.DeletedCount > 0;
 		}
 
 		public override Measurement GetById(string id)
 		{
-			var result = this._measurements.Find(x => x.InternalId == this.ToInternalId(id));
+			ObjectId oid = this.ToInternalId(id);
+			var result = this._measurements.Find(x => x.InternalId == oid);
 			return result.FirstOrDefault();
 		}
 
@@ -286,8 +290,6 @@ namespace SensateService.Models.Database
 				this._logger.LogWarning($"Unable to insert measurement: {ex.Message}");
 				return null;
 			}
-			await this._measurements.InsertOneAsync(m);
-			await this.CommitAsync(m);
 
 			return m;
 		}

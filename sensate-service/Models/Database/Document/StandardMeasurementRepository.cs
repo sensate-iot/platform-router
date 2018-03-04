@@ -20,7 +20,7 @@ using MongoDB.Driver;
 using MongoDB.Bson;
 using SensateService.Models.Repositories;
 
-namespace SensateService.Models.Database
+namespace SensateService.Models.Database.Document
 {
 	public class StandardMeasurementRepository : AbstractMeasurementRepository, IMeasurementRepository
 	{

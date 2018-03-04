@@ -8,7 +8,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace SensateService.Models.Database
+namespace SensateService.Models.Database.Cache
 {
 	public interface ICacheStrategy<T> where T : class
 	{

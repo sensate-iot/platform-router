@@ -14,7 +14,7 @@ using MongoDB.Driver;
 using MongoDB.Bson;
 using SensateService.Models.Repositories;
 
-namespace SensateService.Models.Database
+namespace SensateService.Models.Database.Document
 {
 	public class StandardSensorRepository : AbstractDocumentRepository<string, Sensor>, ISensorRepository
 	{
@@ -41,6 +41,12 @@ namespace SensateService.Models.Database
 
 		public override bool Create(Sensor obj)
 		{
+			DateTime now;
+
+			now = DateTime.Now;
+			obj.CreatedAt = now;
+			obj.UpdatedAt = now;
+			obj.InternalId = base.GenerateId(now);
 			this._sensors.InsertOne(obj);
 			this.Commit(obj);
 			return true;
@@ -48,6 +54,11 @@ namespace SensateService.Models.Database
 
 		public async Task<Boolean> CreateAsync(Sensor sensor)
 		{
+			var now = DateTime.Now;
+
+			sensor.CreatedAt = now;
+			sensor.UpdatedAt = now;
+			sensor.InternalId = base.GenerateId(now);
 			await this._sensors.InsertOneAsync(sensor);
 			await this.CommitAsync(sensor);
 			return true;
@@ -60,12 +71,15 @@ namespace SensateService.Models.Database
 
 		public virtual Sensor Get(string id)
 		{
-			return this._sensors.Find(x => x.Secret == id).FirstOrDefault();
+			ObjectId oid = new ObjectId(id);
+			return this._sensors.Find(x => x.InternalId == oid).FirstOrDefault();
 		}
 
 		public virtual async Task<Sensor> GetAsync(string id)
 		{
-			var result = await this._sensors.FindAsync(x => x.Secret == id);
+			ObjectId oid = new ObjectId(id);
+			var filter = Builders<Sensor>.Filter.Where(x => x.InternalId == oid);
+			var result = await this._sensors.FindAsync(filter);
 			return await result.FirstOrDefaultAsync();
 		}
 
@@ -109,13 +123,16 @@ namespace SensateService.Models.Database
 
 		public override bool Delete(string id)
 		{
-			var result = this._sensors.DeleteOne(x => x.Secret == id);
+			ObjectId oid = new ObjectId(id);
+			var result = this._sensors.DeleteOne(x => x.InternalId == oid);
 			return result.DeletedCount == 1;
 		}
 
 		public override Sensor GetById(string id)
 		{
-			return this._sensors.Find(x => x.Secret == id).FirstOrDefault();
+			ObjectId oid = new ObjectId(id);
+			return this._sensors.Find(x => x.InternalId == oid).FirstOrDefault();
 		}
+
 	}
 }
