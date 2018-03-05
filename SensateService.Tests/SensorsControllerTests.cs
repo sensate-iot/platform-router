@@ -28,10 +28,6 @@ namespace SensateService.Tests.UnitTests
 	[TestFixture]
 	public class SensorsControllerTests
 	{
-		public SensorsControllerTests(IDistributedCache cache)
-		{
-		}
-
 		private Mock<ISensorRepository> _sensors;
 
 		[SetUp]

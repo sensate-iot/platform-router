@@ -34,7 +34,7 @@ namespace SensateService.Models.Database.Document
 
 		private readonly IMongoCollection<Measurement> _measurements;
 		private readonly Random _random;
-		private ILogger<AbstractMeasurementRepository> _logger;
+		private readonly ILogger<AbstractMeasurementRepository> _logger;
 
 		public AbstractMeasurementRepository(SensateContext context,
 			ILogger<AbstractMeasurementRepository> logger) : base(context)
@@ -102,7 +102,14 @@ namespace SensateService.Models.Database.Document
 
 		public sealed override bool Create(Measurement m)
 		{
-			throw new NotImplementedException();
+			if(m.CreatedBy == null || m.CreatedBy == ObjectId.Empty)
+				return false;
+
+			m.CreatedAt = DateTime.Now;
+			m.InternalId = this.GenerateId(DateTime.Now);
+			this._measurements.InsertOne(m);
+
+			return true;
 		}
 
 		public override bool Delete(string id)

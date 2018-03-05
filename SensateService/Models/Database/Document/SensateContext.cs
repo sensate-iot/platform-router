@@ -33,21 +33,27 @@ namespace SensateService.Models.Database.Document
 			}
 		}
 
-		public SensateContext(IOptions<MongoDBSettings> settings)
+		public SensateContext(IOptions<MongoDBSettings> settings) :
+			this(settings.Value)
+		{
+		}
+
+		public SensateContext(MongoDBSettings settings)
 		{
 			MongoClient client;
 
 			try {
 				MongoClientSettings mongosettings = MongoClientSettings.FromUrl(new MongoUrl(
-					settings.Value.ConnectionString
+					settings.ConnectionString
 				));
 				client = new MongoClient(mongosettings);
 				this._client = client;
-				this._db = client.GetDatabase(settings.Value.DatabaseName);
+				this._db = client.GetDatabase(settings.DatabaseName);
 			} catch(Exception ex) {
 				Console.WriteLine("Unable to connect to MongoDB!");
 				throw ex;
 			}
+
 		}
 
 		public IMongoCollection<T> Set<T>(string name)
