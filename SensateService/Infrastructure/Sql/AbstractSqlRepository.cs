@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
-namespace SensateService.Models.Database.Sql
+namespace SensateService.Infrastructure.Sql
 {
 	public abstract class AbstractSqlRepository<TKey, T> : IRepository<TKey, T> where T : class
 	{
@@ -24,7 +24,7 @@ namespace SensateService.Models.Database.Sql
 			this.Data = context.Set<T>();
 		}
 
-		public abstract bool Create(T obj);
+		public abstract void Create(T obj);
 		public abstract bool Replace(T obj1, T obj2);
 		public abstract bool Update(T obj);
 		public abstract void Commit(T obj);

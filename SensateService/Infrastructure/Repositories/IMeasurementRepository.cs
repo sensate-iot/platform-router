@@ -10,7 +10,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
 
-namespace SensateService.Models.Repositories
+using SensateService.Models;
+
+namespace SensateService.Infrastructure.Repositories
 {
 	public interface IMeasurementRepository
 	{
@@ -28,6 +30,7 @@ namespace SensateService.Models.Repositories
 		Task<IEnumerable<Measurement>> GetBeforeAsync(Sensor sensor, DateTime pit);
 		Task<IEnumerable<Measurement>> GetAfterAsync(Sensor sensor, DateTime pit);
 
+		void Create(Measurement m);
 		Task ReceiveMeasurement(Sensor sender, string measurement);
 	}
 }

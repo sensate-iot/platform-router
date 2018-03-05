@@ -12,7 +12,9 @@ using MongoDB.Driver;
 using MongoDB.Bson;
 using MongoDB.Driver.Core.Servers;
 
-namespace SensateService.Models.Database.Document
+using SensateService.Models;
+
+namespace SensateService.Infrastructure.Document
 {
 	public sealed class SensateContext
 	{

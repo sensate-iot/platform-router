@@ -14,7 +14,9 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using MongoDB.Bson;
 
-namespace SensateService.Models.Database.Document
+using SensateService.Infrastructure;
+
+namespace SensateService.Infrastructure.Document
 {
 	public abstract class AbstractDocumentRepository<TKey, T> : IRepository<TKey, T> where T : class
 	{
@@ -27,7 +29,7 @@ namespace SensateService.Models.Database.Document
 
 		public abstract void Commit(T obj);
 		public abstract Task CommitAsync(T obj);
-		public abstract bool Create(T obj);
+		public abstract void Create(T obj);
 		public abstract bool Delete(TKey id);
 		public abstract T GetById(TKey id);
 		public abstract bool Replace(T obj1, T obj2);

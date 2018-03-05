@@ -5,7 +5,7 @@
  * @email:  dev@bietje.net
  */
 
-namespace SensateService.Models.Database.Document
+namespace SensateService.Infrastructure.Document
 {
 	public class MongoDBSettings
 	{

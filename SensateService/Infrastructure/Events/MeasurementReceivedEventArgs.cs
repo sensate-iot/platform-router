@@ -9,7 +9,9 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SensateService.Models.Database
+using SensateService.Models;
+
+namespace SensateService.Infrastructure.Events
 {
 	public delegate Task OnMeasurementReceived(object sender, MeasurementReceivedEventArgs e);
 

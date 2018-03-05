@@ -12,7 +12,7 @@ using System.Threading;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Caching;
 
-namespace SensateService.Models.Database.Cache
+namespace SensateService.Infrastructure.Cache
 {
 	public sealed class MemoryCacheStrategy : AbstractCacheStrategy
 	{

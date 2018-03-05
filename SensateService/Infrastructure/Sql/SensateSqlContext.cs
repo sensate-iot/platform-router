@@ -11,7 +11,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
-namespace SensateService.Models.Database.Sql
+namespace SensateService.Infrastructure.Sql
 {
 	public sealed class SensateSqlContext : IdentityDbContext
 	{

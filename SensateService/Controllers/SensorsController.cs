@@ -14,7 +14,7 @@ using System.Diagnostics;
 
 using Microsoft.AspNetCore.Mvc;
 using SensateService.Models;
-using SensateService.Models.Repositories;
+using SensateService.Infrastructure.Repositories;
 
 namespace SensateService.Controllers
 {

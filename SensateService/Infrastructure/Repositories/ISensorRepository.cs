@@ -10,11 +10,13 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
 
-namespace SensateService.Models.Repositories
+using SensateService.Models;
+
+namespace SensateService.Infrastructure.Repositories
 {
 	public interface ISensorRepository
 	{
-		bool Create(Sensor sensor);
+		void Create(Sensor sensor);
 		Sensor Get(string id);
 		void Remove(string secret);
 		bool Update(Sensor obj2);

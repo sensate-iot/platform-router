@@ -18,9 +18,12 @@ using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using MongoDB.Driver;
 using MongoDB.Bson;
-using SensateService.Models.Repositories;
 
-namespace SensateService.Models.Database.Document
+using SensateService.Infrastructure.Repositories;
+using SensateService.Models;
+using SensateService.Infrastructure;
+
+namespace SensateService.Infrastructure.Document
 {
 	public class StandardMeasurementRepository : AbstractMeasurementRepository, IMeasurementRepository
 	{

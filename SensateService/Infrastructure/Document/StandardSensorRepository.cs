@@ -12,9 +12,11 @@ using System.Threading;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MongoDB.Bson;
-using SensateService.Models.Repositories;
 
-namespace SensateService.Models.Database.Document
+using SensateService.Infrastructure.Repositories;
+using SensateService.Models;
+
+namespace SensateService.Infrastructure.Document
 {
 	public class StandardSensorRepository : AbstractDocumentRepository<string, Sensor>, ISensorRepository
 	{
@@ -39,7 +41,7 @@ namespace SensateService.Models.Database.Document
 			return Task.CompletedTask;
 		}
 
-		public override bool Create(Sensor obj)
+		public override void Create(Sensor obj)
 		{
 			DateTime now;
 
@@ -49,7 +51,7 @@ namespace SensateService.Models.Database.Document
 			obj.InternalId = base.GenerateId(now);
 			this._sensors.InsertOne(obj);
 			this.Commit(obj);
-			return true;
+			return;
 		}
 
 		public async Task<Boolean> CreateAsync(Sensor sensor)

@@ -17,7 +17,11 @@ using Newtonsoft.Json;
 using MongoDB.Driver;
 using MongoDB.Bson;
 
-namespace SensateService.Models.Database.Document
+using SensateService.Infrastructure.Cache;
+using SensateService.Infrastructure.Events;
+using SensateService.Models;
+
+namespace SensateService.Infrastructure.Document
 {
 	internal class RawMeasurement
 	{
@@ -100,16 +104,16 @@ namespace SensateService.Models.Database.Document
 
 		}
 
-		public sealed override bool Create(Measurement m)
+		public override void Create(Measurement m)
 		{
 			if(m.CreatedBy == null || m.CreatedBy == ObjectId.Empty)
-				return false;
+				return;
 
 			m.CreatedAt = DateTime.Now;
 			m.InternalId = this.GenerateId(DateTime.Now);
 			this._measurements.InsertOne(m);
 
-			return true;
+			return;
 		}
 
 		public override bool Delete(string id)
