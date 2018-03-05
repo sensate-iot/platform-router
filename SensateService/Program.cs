@@ -5,23 +5,43 @@
  * @email:  dev@bietje.net
  */
 
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Builder;
 
-namespace sensate_service
+using SensateService.Services;
+
+namespace SensateService
 {
 	public class Program
 	{
+		public static MqttService MqttClient;
+
+		public const string ApiVersionString = "v1";
+
 		public static void Main(string[] args)
 		{
-			BuildWebHost(args).Run();
+			var wh = new WebHostBuilder()
+				.UseKestrel()
+				.UseContentRoot(Directory.GetCurrentDirectory())
+				.ConfigureAppConfiguration((hostingContext, config) => {
+					var env = hostingContext.HostingEnvironment;
+					config.AddJsonFile("appsettings.json", optional:false, reloadOnChange:true)
+						 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional:true, reloadOnChange:true);
+					config.AddEnvironmentVariables();
+				})
+				.ConfigureLogging((hostingContext, logging) => {
+					logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
+					logging.AddConsole();
+					logging.AddDebug();
+				})
+				.UseStartup<Startup>();
+
+			wh.Build().Run();
 		}
 
 		public static IWebHost BuildWebHost(string[] args) =>

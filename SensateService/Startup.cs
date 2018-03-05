@@ -34,12 +34,13 @@ using SensateService.Infrastructure.Sql;
 using SensateService.Infrastructure.Document;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Infrastructure.Cache;
+using SensateService.Services;
 
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json.Linq;
 
-namespace sensate_service
+namespace SensateService
 {
 	public class Startup
 	{
@@ -133,6 +134,24 @@ namespace sensate_service
 				services.AddScoped<IMeasurementRepository, StandardMeasurementRepository>();
 				services.AddScoped<ISensorRepository, StandardSensorRepository>();
 			}
+
+			var mqttopts = new MqttOptions();
+
+			mqttopts.Ssl = Configuration["MqttSsl"] == "true";
+			mqttopts.Host = Configuration["MqttHost"];
+			mqttopts.Port = Int32.Parse(Configuration["MqttPort"]);
+			mqttopts.Username = Secrets["MqttUsername"];
+			mqttopts.Password = Secrets["MqttPassword"];
+			mqttopts.Id = Guid.NewGuid().ToString();
+			mqttopts.Topic = $"sensate/{Configuration["InstanceName"]}/{Program.ApiVersionString}";
+
+			Program.MqttClient = MqttServiceFactory.CreateMqttService(
+				services.BuildServiceProvider().CreateScope().ServiceProvider,
+				mqttopts
+			);
+
+			var result = Program.MqttClient.ConnectAsync();
+			result.Wait();
 
 			services.AddMvc();
 		}
