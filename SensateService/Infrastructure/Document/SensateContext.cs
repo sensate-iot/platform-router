@@ -9,8 +9,6 @@ using System;
 
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using MongoDB.Bson;
-using MongoDB.Driver.Core.Servers;
 
 using SensateService.Models;
 

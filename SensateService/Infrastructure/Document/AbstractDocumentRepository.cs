@@ -6,15 +6,9 @@
  */
 
 using System;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
-using MongoDB.Driver;
 using MongoDB.Bson;
-
-using SensateService.Infrastructure;
 
 namespace SensateService.Infrastructure.Document
 {

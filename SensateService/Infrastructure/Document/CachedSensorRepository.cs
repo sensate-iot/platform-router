@@ -6,20 +6,11 @@
  */
 
 using System;
-using System.Text;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
-using MongoDB.Driver;
-using MongoDB.Bson;
 
-using SensateService.Infrastructure.Repositories;
 using SensateService.Infrastructure.Cache;
 using SensateService.Models;
 

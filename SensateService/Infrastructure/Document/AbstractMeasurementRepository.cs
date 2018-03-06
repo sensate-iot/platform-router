@@ -9,15 +9,14 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using MongoDB.Driver;
 using MongoDB.Bson;
 
-using SensateService.Infrastructure.Cache;
+using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
+
 using SensateService.Infrastructure.Events;
 using SensateService.Models;
 
