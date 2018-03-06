@@ -5,7 +5,12 @@
  * @email:  dev@bietje.net
  */
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
+
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 
@@ -17,29 +22,38 @@ namespace SensateService.Infrastructure.Sql
 		{
 		}
 
-		public override void Commit(SensateUser obj)
-		{
-			throw new System.NotImplementedException();
-		}
-
-		public override Task CommitAsync(SensateUser obj)
-		{
-			throw new System.NotImplementedException();
-		}
-
 		public override void Create(SensateUser obj)
 		{
-			throw new System.NotImplementedException();
+			throw new SystemException("UserRepository.Create is forbidden!");
 		}
 
 		public override bool Delete(string id)
 		{
-			throw new System.NotImplementedException();
+			var obj = this.Get(id);
+
+			if(obj == null)
+				return false;
+
+			this.Data.Remove(obj);
+			this.Commit(obj);
+			return true;
 		}
 
 		public override SensateUser GetById(string id)
 		{
-			throw new System.NotImplementedException();
+			return this.Data.FirstOrDefault(x => x.Id == id);
+		}
+
+		public SensateUser GetByEmail(string email)
+		{
+			return this.Data.FirstOrDefault(x => x.Email == email);
+		}
+
+		public async Task<SensateUser> GetByEmailAsync(string email)
+		{
+			return await Task.Run(() => {
+				return this.Data.FirstOrDefault(x => x.Email == email);
+			});
 		}
 
 		public SensateUser Get(string key)
@@ -58,12 +72,16 @@ namespace SensateService.Infrastructure.Sql
 
 		public override bool Replace(SensateUser obj1, SensateUser obj2)
 		{
-			throw new System.NotImplementedException();
+			return false;
 		}
 
 		public override bool Update(SensateUser obj)
 		{
-			throw new System.NotImplementedException();
+			var orig = this.GetByEmail(obj.Email);
+
+			this.Data.Update(obj);
+			this.Commit(obj);
+			return true;
 		}
 	}
 }

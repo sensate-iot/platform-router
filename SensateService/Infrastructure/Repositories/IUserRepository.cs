@@ -15,5 +15,7 @@ namespace SensateService.Infrastructure.Repositories
 	{
 		SensateUser Get(string key);
 		Task<SensateUser> GetAsync(string key);
+		SensateUser GetByEmail(string key);
+		Task<SensateUser> GetByEmailAsync(string key);
 	}
 }

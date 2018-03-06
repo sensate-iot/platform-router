@@ -24,11 +24,19 @@ namespace SensateService.Infrastructure.Sql
 			this.Data = context.Set<T>();
 		}
 
+		public virtual void Commit(T obj)
+		{
+			this._sqlContext.SaveChanges();
+		}
+
+		public async virtual Task CommitAsync(T obj)
+		{
+			await this._sqlContext.SaveChangesAsync();
+		}
+
 		public abstract void Create(T obj);
 		public abstract bool Replace(T obj1, T obj2);
 		public abstract bool Update(T obj);
-		public abstract void Commit(T obj);
-		public abstract Task CommitAsync(T obj);
 		public abstract T GetById(TKey id);
 		public abstract bool Delete(TKey id);
 	}
