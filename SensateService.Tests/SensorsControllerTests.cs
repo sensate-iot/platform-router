@@ -17,6 +17,7 @@ using Moq.Language;
 using MongoDB.Bson;
 using NUnit.Framework;
 using SensateService.Controllers;
+using SensateService.Controllers.V1;
 using SensateService.Models;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Infrastructure.Document;

@@ -35,6 +35,7 @@ using SensateService.Infrastructure.Document;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Infrastructure.Cache;
 using SensateService.Services;
+using SensateService.Controllers;
 
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -80,6 +81,12 @@ namespace SensateService
 				options.DatabaseName = Secrets["MongoDbDatabaseName"];
 			});
 
+			services.Configure<UserAccountSettings>(options => {
+				options.JwtKey = this.Secrets["JwtKey"];
+				options.JwtIssuer = this.Secrets["JwtIssuer"];
+				options.JwtExpireDays = Int32.Parse(this.Secrets["JwtExpireDays"]);
+			});
+
 			services.AddTransient<SensateContext>();
 			
 			services.AddApiVersioning(options => {
@@ -120,6 +127,7 @@ namespace SensateService
 			});
 
 			/* Add repositories */
+			services.AddScoped<IUserRepository, UserRepository>();
 			if(this.Configuration["Cache"] == "true") {
 				if(this.Configuration["CacheType"] == "Distributed")
 					services.AddScoped<ICacheStrategy<string>, DistributedCacheStrategy>();

@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 using SensateService.Models;
 using SensateService.Infrastructure.Repositories;
 
-namespace SensateService.Controllers
+namespace SensateService.Controllers.V1
 {
 	[Route("v{version:apiVersion}/[controller]")]
 	[ApiVersion("1")]
