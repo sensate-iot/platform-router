@@ -5,14 +5,15 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
+using Microsoft.EntityFrameworkCore.ValueGeneration;
 using SensateService.Infrastructure.Sql;
 using System;
 
-namespace sensateservice.Migrations
+namespace SensateService.Migrations
 {
     [DbContext(typeof(SensateSqlContext))]
-    [Migration("20180226122112_CreateUsers")]
-    partial class CreateUsers
+    [Migration("20180306110428_CreateSensorUser")]
+    partial class CreateSensorUser
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -73,6 +74,9 @@ namespace sensateservice.Migrations
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired();
+
                     b.Property<string>("Email")
                         .HasMaxLength(256);
 
@@ -111,6 +115,8 @@ namespace sensateservice.Migrations
                         .HasName("UserNameIndex");
 
                     b.ToTable("AspNetUsers");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("IdentityUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -176,6 +182,32 @@ namespace sensateservice.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
+                });
+
+            modelBuilder.Entity("SensateService.Models.UserSensor", b =>
+                {
+                    b.Property<string>("SensorId");
+
+                    b.Property<string>("UserId");
+
+                    b.Property<bool>("Owner");
+
+                    b.HasKey("SensorId", "UserId");
+
+                    b.ToTable("UserSensors");
+                });
+
+            modelBuilder.Entity("SensateService.Models.SensateUser", b =>
+                {
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
+
+                    b.Property<string>("FirstName");
+
+                    b.Property<string>("LastName");
+
+                    b.ToTable("SensateUser");
+
+                    b.HasDiscriminator().HasValue("SensateUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

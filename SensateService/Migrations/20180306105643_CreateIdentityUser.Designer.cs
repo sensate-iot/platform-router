@@ -12,9 +12,10 @@ using System;
 namespace SensateService.Migrations
 {
     [DbContext(typeof(SensateSqlContext))]
-    partial class SensateSqlContextModelSnapshot : ModelSnapshot
+    [Migration("20180306105643_CreateIdentityUser")]
+    partial class CreateIdentityUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -181,19 +182,6 @@ namespace SensateService.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
-                });
-
-            modelBuilder.Entity("SensateService.Models.UserSensor", b =>
-                {
-                    b.Property<string>("SensorId");
-
-                    b.Property<string>("UserId");
-
-                    b.Property<bool>("Owner");
-
-                    b.HasKey("SensorId", "UserId");
-
-                    b.ToTable("UserSensors");
                 });
 
             modelBuilder.Entity("SensateService.Models.SensateUser", b =>
