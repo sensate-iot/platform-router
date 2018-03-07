@@ -102,6 +102,21 @@ namespace SensateService
 				.AddEntityFrameworkStores<SensateSqlContext>()
 				.AddDefaultTokenProviders();
 			JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
+
+			services.Configure<IdentityOptions>(options => {
+				options.Password.RequireDigit = true;
+				options.Password.RequireLowercase = true;
+				options.Password.RequireUppercase = true;
+				options.Password.RequiredLength = 8;
+				options.Password.RequiredUniqueChars = 5;
+
+				options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+				options.Lockout.MaxFailedAccessAttempts = 5;
+				options.Lockout.AllowedForNewUsers = true;
+
+				options.User.RequireUniqueEmail = true;
+			});
+
 			services.AddAuthentication(options => {
 				options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
 				options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -113,7 +128,7 @@ namespace SensateService
 				cfg.TokenValidationParameters = new TokenValidationParameters
 				{
 					ValidIssuer = Secrets["JwtIssuer"],
-					ValidAudience = Secrets["JwtIsuer"],
+					ValidAudience = Secrets["JwtIssuer"],
 					IssuerSigningKey = new SymmetricSecurityKey(
 						Encoding.UTF8.GetBytes(Secrets["JwtKey"])
 					),
@@ -151,7 +166,7 @@ namespace SensateService
 			mqttopts.Username = Secrets["MqttUsername"];
 			mqttopts.Password = Secrets["MqttPassword"];
 			mqttopts.Id = Guid.NewGuid().ToString();
-			mqttopts.Topic = $"sensate/{Configuration["InstanceName"]}/{Program.ApiVersionString}";
+			mqttopts.Topic = Configuration["MqttShareTopic"];
 
 			Program.MqttClient = MqttServiceFactory.CreateMqttService(
 				services.BuildServiceProvider().CreateScope().ServiceProvider,

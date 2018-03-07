@@ -10,6 +10,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Security.Claims;
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Mvc;
 
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
@@ -18,8 +25,11 @@ namespace SensateService.Infrastructure.Sql
 {
 	public class UserRepository : AbstractSqlRepository<string, SensateUser>, IUserRepository
 	{
-		public UserRepository(SensateSqlContext context) : base(context)
+		private readonly UserManager<SensateUser> _manager;
+
+		public UserRepository(SensateSqlContext context, UserManager<SensateUser> manager) : base(context)
 		{
+			this._manager = manager;
 		}
 
 		public override void Create(SensateUser obj)
@@ -82,6 +92,22 @@ namespace SensateService.Infrastructure.Sql
 			this.Data.Update(obj);
 			this.Commit(obj);
 			return true;
+		}
+
+		public SensateUser GetCurrentUser(ClaimsPrincipal cp)
+		{
+			string email;
+
+			email = this._manager.GetUserId(cp);
+			return this.GetByEmail(email);
+		}
+
+		public async Task<SensateUser> GetCurrentUserAsync(ClaimsPrincipal cp)
+		{
+			string email;
+
+			email = this._manager.GetUserId(cp);
+			return await this.GetByEmailAsync(email);
 		}
 	}
 }
