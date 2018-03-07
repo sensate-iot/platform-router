@@ -35,7 +35,8 @@ namespace SensateService.Services
 		private readonly ISensorRepository sensors;
 		private readonly IMeasurementRepository measurements;
 
-		public MqttService(ISensorRepository srepo, IMeasurementRepository mrepo, MqttOptions options)
+		public MqttService(ISensorRepository srepo,
+			IMeasurementRepository mrepo, MqttOptions options)
 		{
 			var factory = new MqttFactory();
 			MqttClientOptionsBuilder builder;
@@ -93,7 +94,7 @@ namespace SensateService.Services
 				sensor = await this.sensors.GetAsync(id);
 				await this.measurements.ReceiveMeasurement(sensor, json);
 			} catch(Exception) {
-				Debug.WriteLine("Buggy MQTT message received!\n");
+				Debug.WriteLine($"Buggy MQTT message received!\n");
 			}
 		}
 
