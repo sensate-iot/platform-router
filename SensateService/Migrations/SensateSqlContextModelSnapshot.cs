@@ -3,10 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.EntityFrameworkCore.Storage.Internal;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
-using SensateService.Enums;
 using SensateService.Infrastructure.Sql;
 using System;
 
@@ -187,8 +184,6 @@ namespace SensateService.Migrations
             modelBuilder.Entity("SensateService.Models.SensateUser", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
-
-                    b.Property<sbyte>("AccessLevel");
 
                     b.Property<string>("FirstName");
 

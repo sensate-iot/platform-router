@@ -19,6 +19,7 @@ using Newtonsoft.Json;
 
 using SensateService.Infrastructure.Events;
 using SensateService.Models;
+using SensateService.Exceptions;
 
 namespace SensateService.Infrastructure.Document
 {
@@ -37,7 +38,7 @@ namespace SensateService.Infrastructure.Document
 
 		private readonly IMongoCollection<Measurement> _measurements;
 		private readonly Random _random;
-		private readonly ILogger<AbstractMeasurementRepository> _logger;
+		protected readonly ILogger<AbstractMeasurementRepository> _logger;
 
 		public AbstractMeasurementRepository(SensateContext context,
 			ILogger<AbstractMeasurementRepository> logger) : base(context)
@@ -240,7 +241,7 @@ namespace SensateService.Infrastructure.Document
 				await this.CommitAsync(m);
 			} catch(Exception ex) {
 				this._logger.LogWarning($"Unable to insert measurement: {ex.Message}");
-				return null;
+				throw new DatabaseException($"Unable to store message: {ex.Message}", "Measurements", ex);
 			}
 
 			return m;

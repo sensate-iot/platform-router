@@ -17,6 +17,7 @@ using MongoDB.Bson;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Infrastructure.Cache;
 using SensateService.Models;
+using SensateService.Exceptions;
 
 
 namespace SensateService.Infrastructure.Document
@@ -38,12 +39,28 @@ namespace SensateService.Infrastructure.Document
 
 		public override void Commit(Measurement obj)
 		{
-			this._cache.Set(obj.InternalId.ToString(), obj.ToJson());
+			try {
+				this._cache.Set(obj.InternalId.ToString(), obj.ToJson());
+			} catch(Exception ex) {
+				this._logger.LogWarning($"Unable to cache measurement {ex.Message}");
+				throw new CachingException(
+					$"Unable to cache measurement: {ex.Message}",
+					obj.InternalId.ToString(), ex
+				);
+			}
 		}
 
 		public override async Task CommitAsync(Measurement obj)
 		{
-			await this._cache.SetAsync(obj.InternalId.ToString(), obj.ToJson(), CacheTimeout);
+			try {
+				await this._cache.SetAsync(obj.InternalId.ToString(), obj.ToJson(), CacheTimeout);
+			} catch(Exception ex) {
+				this._logger.LogWarning($"Unable to log measurement {ex.Message}");
+				throw new CachingException(
+					$"Unable to cache measurement: {ex.Message}",
+					obj.InternalId.ToString(), ex
+				);
+			}
 		}
 
 		public override void Delete(string id)

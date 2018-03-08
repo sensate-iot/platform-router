@@ -158,8 +158,12 @@ namespace SensateService
 				mqttopts
 			);
 
-			var result = Program.MqttClient.ConnectAsync();
-			result.Wait();
+			try {
+				var result = Program.MqttClient.ConnectAsync();
+				result.Wait();
+			} catch(Exception ex) {
+				Debug.WriteLine($"Potential MQTT error: {ex.Message}");
+			}
 
 			services.AddMvc();
 		}
