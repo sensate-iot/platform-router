@@ -17,6 +17,7 @@ namespace SensateService.Infrastructure.Sql
 	public class SensateSqlContext : IdentityDbContext
 	{
 		public new DbSet<SensateUser> Users { get; set; }
+		public DbSet<AuditLog> AuditLogs { get; set; }
 
 		public SensateSqlContext(DbContextOptions<SensateSqlContext> options) :
 			base(options)
