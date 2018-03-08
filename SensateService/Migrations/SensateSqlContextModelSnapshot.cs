@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
+using SensateService.Enums;
 using SensateService.Infrastructure.Sql;
 using System;
 
@@ -183,22 +184,11 @@ namespace SensateService.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("SensateService.Models.UserSensor", b =>
-                {
-                    b.Property<string>("SensorId");
-
-                    b.Property<string>("UserId");
-
-                    b.Property<bool>("Owner");
-
-                    b.HasKey("SensorId", "UserId");
-
-                    b.ToTable("UserSensors");
-                });
-
             modelBuilder.Entity("SensateService.Models.SensateUser", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
+
+                    b.Property<sbyte>("AccessLevel");
 
                     b.Property<string>("FirstName");
 

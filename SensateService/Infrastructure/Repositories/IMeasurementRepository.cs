@@ -31,6 +31,7 @@ namespace SensateService.Infrastructure.Repositories
 		Task<IEnumerable<Measurement>> GetAfterAsync(Sensor sensor, DateTime pit);
 
 		void Create(Measurement m);
+		Task CreateAsync(Measurement m);
 		Task ReceiveMeasurement(Sensor sender, string measurement);
 	}
 }

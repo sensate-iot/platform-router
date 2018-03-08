@@ -17,13 +17,13 @@ namespace SensateService.Infrastructure.Repositories
 	public interface ISensorRepository
 	{
 		void Create(Sensor sensor);
+		Task CreateAsync(Sensor sensor);
 		Sensor Get(string id);
 		void Remove(string secret);
-		bool Update(Sensor obj2);
+		void Update(Sensor obj2);
 
-		Task<Boolean> CreateAsync(Sensor sensor);
 		Task<Sensor> GetAsync(string id);
 		Task RemoveAsync(string id);
-		Task<Boolean> UpdateAsync(Sensor sensor);
+		Task UpdateAsync(Sensor sensor);
 	}
 }

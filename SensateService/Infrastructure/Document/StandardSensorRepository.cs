@@ -6,6 +6,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
@@ -50,10 +51,9 @@ namespace SensateService.Infrastructure.Document
 			obj.InternalId = base.GenerateId(now);
 			this._sensors.InsertOne(obj);
 			this.Commit(obj);
-			return;
 		}
 
-		public async Task<Boolean> CreateAsync(Sensor sensor)
+		public override async Task CreateAsync(Sensor sensor)
 		{
 			var now = DateTime.Now;
 
@@ -62,7 +62,6 @@ namespace SensateService.Infrastructure.Document
 			sensor.InternalId = base.GenerateId(now);
 			await this._sensors.InsertOneAsync(sensor);
 			await this.CommitAsync(sensor);
-			return true;
 		}
 
 		public virtual void Remove(string secret)
@@ -89,13 +88,7 @@ namespace SensateService.Infrastructure.Document
 			await Task.Run(() => this.Delete(id));
 		}
 
-		public override bool Replace(Sensor obj1, Sensor obj2)
-		{
-			obj2.InternalId = obj1.InternalId;
-			return this.Update(obj2);
-		}
-
-		public override bool Update(Sensor obj)
+		public override void Update(Sensor obj)
 		{
 			var update = Builders<Sensor>.Update
 				.Set(x => x.UpdatedAt, DateTime.Now)
@@ -111,22 +104,24 @@ namespace SensateService.Infrastructure.Document
 				);
 			} catch(Exception ex) {
 				this._logger.LogInformation($"Unable to update sensor: {ex.Message}");
-				return false;
 			}
-
-			return true;
 		}
 
-		public virtual async Task<Boolean> UpdateAsync(Sensor sensor)
+		public virtual async Task UpdateAsync(Sensor sensor)
 		{
-			return await Task.Run(() => this.Update(sensor));
+			await Task.Run(() => this.Update(sensor));
 		}
 
-		public override bool Delete(string id)
+		public override void Delete(string id)
 		{
 			ObjectId oid = new ObjectId(id);
-			var result = this._sensors.DeleteOne(x => x.InternalId == oid);
-			return result.DeletedCount == 1;
+			this._sensors.DeleteOne(x => x.InternalId == oid);
+		}
+
+		public override async Task DeleteAsync(string id)
+		{
+			ObjectId oid = new ObjectId(id);
+			await this._sensors.DeleteOneAsync(x => x.InternalId == oid);
 		}
 
 		public override Sensor GetById(string id)
@@ -134,6 +129,5 @@ namespace SensateService.Infrastructure.Document
 			ObjectId oid = new ObjectId(id);
 			return this._sensors.Find(x => x.InternalId == oid).FirstOrDefault();
 		}
-
 	}
 }

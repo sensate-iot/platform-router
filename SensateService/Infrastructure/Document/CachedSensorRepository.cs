@@ -83,28 +83,28 @@ namespace SensateService.Infrastructure.Document
 			await base.RemoveAsync(id);
 		}
 
-		public override bool Replace(Sensor obj1, Sensor obj2)
-		{
-			this._cache.Set(obj1.InternalId.ToString(), obj2.ToJson());
-			return base.Replace(obj1, obj2);
-		}
-
-		public override bool Update(Sensor obj)
+		public override void Update(Sensor obj)
 		{
 			this._cache.Set(obj.InternalId.ToString(), obj.ToJson());
-			return base.Update(obj);
+			base.Update(obj);
 		}
 
-		public override async Task<Boolean> UpdateAsync(Sensor sensor)
+		public override async Task UpdateAsync(Sensor sensor)
 		{
 			await this._cache.SetAsync(sensor.InternalId.ToString(), sensor.ToJson());
-			return await base.UpdateAsync(sensor);
+			await base.UpdateAsync(sensor);
 		}
 
-		public override bool Delete(string id)
+		public override void Delete(string id)
 		{
 			this._cache.Remove(id);
-			return base.Delete(id);
+			base.Delete(id);
+		}
+
+		public override async Task DeleteAsync(string id)
+		{
+			await this._cache.RemoveAsync(id);
+			await base.DeleteAsync(id);
 		}
 
 		public override Sensor GetById(string id)

@@ -50,7 +50,7 @@ namespace SensateService.Controllers.V1
 		{
 			try {
 				if(ModelState.IsValid) {
-					var result = await this._repo.CreateAsync(sensor);
+					await this._repo.CreateAsync(sensor);
 					return CreatedAtRoute("GetSensor", new {Id = sensor.Secret},
 						sensor);
 				} else {

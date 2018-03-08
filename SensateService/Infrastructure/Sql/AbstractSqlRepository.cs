@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace SensateService.Infrastructure.Sql
@@ -34,10 +35,21 @@ namespace SensateService.Infrastructure.Sql
 			await this._sqlContext.SaveChangesAsync();
 		}
 
+		public async virtual Task CommitAsync()
+		{
+			await this._sqlContext.SaveChangesAsync();
+		}
+
+		public virtual void Commit()
+		{
+			this._sqlContext.SaveChanges();
+		}
+
 		public abstract void Create(T obj);
-		public abstract bool Replace(T obj1, T obj2);
-		public abstract bool Update(T obj);
+		public abstract void Update(T obj);
 		public abstract T GetById(TKey id);
-		public abstract bool Delete(TKey id);
+		public abstract void Delete(TKey id);
+		public abstract Task CreateAsync(T obj);
+		public abstract Task DeleteAsync(TKey id);
 	}
 }

@@ -11,11 +11,11 @@ using System.Linq.Expressions;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+using Microsoft.Extensions.Logging;
+
 using MongoDB.Driver;
 using MongoDB.Bson;
-
 using Newtonsoft.Json;
-using Microsoft.Extensions.Logging;
 
 using SensateService.Infrastructure.Events;
 using SensateService.Models;
@@ -57,7 +57,7 @@ namespace SensateService.Infrastructure.Document
 			return internalId;
 		}
 
-		public override bool Update(Measurement obj)
+		public override void Update(Measurement obj)
 		{
 			var update = Builders<Measurement>.Update
 				.Set(x => x.Data, obj.Data)
@@ -65,15 +65,13 @@ namespace SensateService.Infrastructure.Document
 				.Set(x => x.Longitude, obj.Longitude);
 
 			try {
-				var result = this._measurements.FindOneAndUpdate(
+				this._measurements.FindOneAndUpdate(
 					x => x.InternalId == obj.InternalId,
 					update
 				);
 
-				return result != null;
 			} catch(Exception ex) {
 				this._logger.LogInformation($"Failed to update measurement: {ex.Message}");
-				return false;
 			}
 		}
 
@@ -100,7 +98,6 @@ namespace SensateService.Infrastructure.Document
 				this._logger.LogWarning(ex.Message);
 				return null;
 			}
-
 		}
 
 		public override void Create(Measurement m)
@@ -111,47 +108,50 @@ namespace SensateService.Infrastructure.Document
 			m.CreatedAt = DateTime.Now;
 			m.InternalId = this.GenerateId(DateTime.Now);
 			this._measurements.InsertOne(m);
-
-			return;
+			this.Commit(m);
 		}
 
-		public override bool Delete(string id)
+		public async override Task CreateAsync(Measurement obj)
+		{
+			if(obj.CreatedBy == null || obj.CreatedBy == ObjectId.Empty)
+				return;
+
+			obj.CreatedAt = DateTime.Now;
+			obj.InternalId = this.GenerateId(DateTime.Now);
+			await this._measurements.InsertOneAsync(obj);
+			await this.CommitAsync(obj);
+		}
+
+		public override void Delete(string id)
 		{
 			ObjectId oid;
 
 			oid = this.ToInternalId(id);
-			var result = this._measurements.DeleteOne(x =>
+			if(oid == null)
+				return;
+
+			this._measurements.DeleteOne(x =>
 				x.InternalId == oid
 			);
-			return result.DeletedCount > 0;
+		}
+
+		public override async Task DeleteAsync(string id)
+		{
+			ObjectId objectId;
+
+			objectId = this.ToInternalId(id);
+			if(objectId == null)
+				return;
+
+			await this._measurements.DeleteOneAsync(x => x.InternalId == objectId);
 		}
 
 		public override Measurement GetById(string id)
 		{
 			ObjectId oid = this.ToInternalId(id);
 			var result = this._measurements.Find(x => x.InternalId == oid);
+
 			return result.FirstOrDefault();
-		}
-
-		public override bool Replace(Measurement obj1, Measurement obj2)
-		{
-			UpdateResult result;
-			var update = Builders<Measurement>.Update
-				.Set(x => x.Data, obj2.Data)
-				.Set(x => x.Latitude, obj2.Latitude)
-				.Set(x => x.Longitude, obj2.Longitude);
-
-			try {
-				result = this._measurements.UpdateOne(
-					x => x.InternalId == obj2.InternalId,
-					update
-				);
-			} catch (Exception ex) {
-				this._logger.LogInformation($"Failed to update measurement: {ex.Message}");
-				return false;
-			}
-
-			return result.ModifiedCount > 0;
 		}
 
 		public async Task ReceiveMeasurement(Sensor sender, string measurement)

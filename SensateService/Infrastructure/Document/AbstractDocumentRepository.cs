@@ -24,10 +24,7 @@ namespace SensateService.Infrastructure.Document
 		public abstract void Commit(T obj);
 		public abstract Task CommitAsync(T obj);
 		public abstract void Create(T obj);
-		public abstract bool Delete(TKey id);
 		public abstract T GetById(TKey id);
-		public abstract bool Replace(T obj1, T obj2);
-		public abstract bool Update(T obj);
 
 		protected virtual ObjectId ToInternalId(long id)
 		{
@@ -48,5 +45,10 @@ namespace SensateService.Infrastructure.Document
 		{
 			return this.GenerateId(DateTime.Now);
 		}
+
+		public abstract Task CreateAsync(T obj);
+		public abstract Task DeleteAsync(TKey id);
+		public abstract void Update(T obj);
+		public abstract void Delete(TKey id);
 	}
 }

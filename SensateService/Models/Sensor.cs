@@ -25,11 +25,14 @@ namespace SensateService.Models
 		public string Secret {get;set;}
 		[BsonRequired]
 		public string Name {get;set;}
+		public string Description {get;set;}
 		public string Unit {get;set;}
 		[BsonRequired]
 		public DateTime CreatedAt {get;set;}
 		[BsonRequired]
 		public DateTime UpdatedAt {get;set;}
+		[BsonRequired]
+		public string Owner {get;set;}
 
 		public string ToJson()
 		{

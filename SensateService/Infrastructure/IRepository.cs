@@ -14,9 +14,10 @@ namespace SensateService.Infrastructure
 	{
 		T GetById(TKey id);
 		void Create(T obj);
-		bool Replace(T obj1, T obj2);
-		bool Update(T obj);
-		bool Delete(TKey id);
+		Task CreateAsync(T obj);
+		void Update(T obj);
+		void Delete(TKey id);
+		Task DeleteAsync(TKey id);
 		void Commit(T obj);
 		Task CommitAsync(T obj);
 	}

@@ -11,6 +11,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
 
+using Microsoft.EntityFrameworkCore;
+
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 
@@ -27,16 +29,15 @@ namespace SensateService.Infrastructure.Sql
 			throw new SystemException("UserRepository.Create is forbidden!");
 		}
 
-		public override bool Delete(string id)
+		public override void Delete(string id)
 		{
 			var obj = this.Get(id);
 
 			if(obj == null)
-				return false;
+				return;
 
 			this.Data.Remove(obj);
 			this.Commit(obj);
-			return true;
 		}
 
 		public override SensateUser GetById(string id)
@@ -70,18 +71,28 @@ namespace SensateService.Infrastructure.Sql
 			return user;
 		}
 
-		public override bool Replace(SensateUser obj1, SensateUser obj2)
-		{
-			return false;
-		}
-
-		public override bool Update(SensateUser obj)
+		public override void Update(SensateUser obj)
 		{
 			var orig = this.GetByEmail(obj.Email);
 
 			this.Data.Update(obj);
 			this.Commit(obj);
-			return true;
+		}
+
+		public override Task CreateAsync(SensateUser obj)
+		{
+			throw new SystemException("UserRepository.CreateAsync is forbidden!");
+		}
+
+		public override async Task DeleteAsync(string id)
+		{
+			var obj = this.Get(id);
+
+			if(obj == null)
+				return;
+
+			this.Data.Remove(obj);
+			await this.CommitAsync();
 		}
 	}
 }

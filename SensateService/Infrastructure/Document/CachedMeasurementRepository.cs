@@ -46,10 +46,16 @@ namespace SensateService.Infrastructure.Document
 			await this._cache.SetAsync(obj.InternalId.ToString(), obj.ToJson(), CacheTimeout);
 		}
 
-		public override bool Delete(string id)
+		public override void Delete(string id)
 		{
 			this._cache.Remove(id);
-			return base.Delete(id);
+			base.Delete(id);
+		}
+
+		public override async Task DeleteAsync(string id)
+		{
+			await this._cache.RemoveAsync(id);
+			await base.DeleteAsync(id);
 		}
 
 		private void CacheData(string key, object data)
@@ -96,14 +102,6 @@ namespace SensateService.Infrastructure.Document
 			return m;
 		}
 
-		public override bool Replace(Measurement obj1, Measurement obj2)
-		{
-			this._cache.Set(obj1.InternalId.ToString(),
-				JsonConvert.SerializeObject(obj2), CacheTimeout
-			);
-			return base.Replace(obj1, obj2);
-		}
-
 		public override async Task<IEnumerable<Measurement>> GetMeasurementsBySensorAsync(Sensor sensor)
 		{
 			string key;
@@ -124,11 +122,11 @@ namespace SensateService.Infrastructure.Document
 			);
 		}
 
-		public override bool Update(Measurement obj)
+		public override void Update(Measurement obj)
 		{
 			this._cache.Set(obj.InternalId.ToString(),
 				JsonConvert.SerializeObject(obj), CacheTimeout);
-			return base.Update(obj);
+			base.Update(obj);
 		}
 
 		private async Task<IEnumerable<Measurement>> TryGetMeasurementsAsync(
