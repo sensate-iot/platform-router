@@ -26,12 +26,17 @@ namespace SensateService
 
 		public static void Main(string[] args)
 		{
+			BuildWebHost(args).Run();
+		}
+
+		public static IWebHost BuildWebHost(string[] args)
+		{
 			var conf = new ConfigurationBuilder()
 						.SetBasePath(Directory.GetCurrentDirectory())
 						.AddJsonFile("hosting.json")
 						.Build();
 
-			var wh = new WebHostBuilder()
+			var wh = WebHost.CreateDefaultBuilder(args)
 				.UseConfiguration(conf)
 				.UseKestrel()
 				.UseContentRoot(Directory.GetCurrentDirectory())
@@ -47,8 +52,7 @@ namespace SensateService
 					logging.AddDebug();
 				})
 				.UseStartup<Startup>();
-
-			wh.Build().Run();
+			return wh.Build();
 		}
 	}
 }

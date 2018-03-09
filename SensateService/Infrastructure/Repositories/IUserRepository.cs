@@ -7,6 +7,8 @@
 
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Security.Claims;
+
 using SensateService.Models;
 
 namespace SensateService.Infrastructure.Repositories
@@ -17,5 +19,8 @@ namespace SensateService.Infrastructure.Repositories
 		Task<SensateUser> GetAsync(string key);
 		SensateUser GetByEmail(string key);
 		Task<SensateUser> GetByEmailAsync(string key);
+
+		SensateUser GetCurrentUser(ClaimsPrincipal cp);
+		Task<SensateUser> GetCurrentUserAsync(ClaimsPrincipal cp);
 	}
 }

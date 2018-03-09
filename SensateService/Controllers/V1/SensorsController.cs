@@ -6,15 +6,15 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Threading;
-using System.Linq;
 using System.Diagnostics;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SensateService.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+
 using SensateService.Infrastructure.Repositories;
+using SensateService.Models;
 
 namespace SensateService.Controllers.V1
 {
@@ -30,6 +30,7 @@ namespace SensateService.Controllers.V1
 		}
 
 		[HttpGet("{id}", Name = "GetSensor")]
+		[Authorize]
 		public async Task<IActionResult> GetById(string id)
 		{
 			try {
