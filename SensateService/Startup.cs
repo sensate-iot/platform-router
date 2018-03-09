@@ -28,6 +28,11 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+
+using MongoDB.Bson;
+using MongoDB.Driver;
+using Newtonsoft.Json.Linq;
 
 using SensateService.Models;
 using SensateService.Infrastructure.Sql;
@@ -36,10 +41,7 @@ using SensateService.Infrastructure.Repositories;
 using SensateService.Infrastructure.Cache;
 using SensateService.Services;
 using SensateService.Controllers;
-
-using MongoDB.Bson;
-using MongoDB.Driver;
-using Newtonsoft.Json.Linq;
+using System.Net;
 
 namespace SensateService
 {
@@ -143,15 +145,15 @@ namespace SensateService
 				services.AddScoped<ISensorRepository, StandardSensorRepository>();
 			}
 
-			var mqttopts = new MqttOptions();
-
-			mqttopts.Ssl = Configuration["MqttSsl"] == "true";
-			mqttopts.Host = Configuration["MqttHost"];
-			mqttopts.Port = Int32.Parse(Configuration["MqttPort"]);
-			mqttopts.Username = Secrets["MqttUsername"];
-			mqttopts.Password = Secrets["MqttPassword"];
-			mqttopts.Id = Guid.NewGuid().ToString();
-			mqttopts.Topic = $"sensate/{Configuration["InstanceName"]}/{Program.ApiVersionString}";
+			var mqttopts = new MqttOptions {
+				Ssl = Configuration["MqttSsl"] == "true",
+				Host = Configuration["MqttHost"],
+				Port = Int32.Parse(Configuration["MqttPort"]),
+				Username = Secrets["MqttUsername"],
+				Password = Secrets["MqttPassword"],
+				Id = Guid.NewGuid().ToString(),
+				Topic = $"$share/sensate/sensate/measurements"
+			};
 
 			Program.MqttClient = MqttServiceFactory.CreateMqttService(
 				services.BuildServiceProvider().CreateScope().ServiceProvider,

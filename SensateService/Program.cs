@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Builder;
 
 using SensateService.Services;
+using System.Net;
 
 namespace SensateService
 {
@@ -25,13 +26,19 @@ namespace SensateService
 
 		public static void Main(string[] args)
 		{
+			var conf = new ConfigurationBuilder()
+						.SetBasePath(Directory.GetCurrentDirectory())
+						.AddJsonFile("hosting.json")
+						.Build();
+
 			var wh = new WebHostBuilder()
+				.UseConfiguration(conf)
 				.UseKestrel()
 				.UseContentRoot(Directory.GetCurrentDirectory())
 				.ConfigureAppConfiguration((hostingContext, config) => {
 					var env = hostingContext.HostingEnvironment;
-					config.AddJsonFile("appsettings.json", optional:false, reloadOnChange:true)
-						 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional:true, reloadOnChange:true);
+					config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+						 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
 					config.AddEnvironmentVariables();
 				})
 				.ConfigureLogging((hostingContext, logging) => {
@@ -43,10 +50,5 @@ namespace SensateService
 
 			wh.Build().Run();
 		}
-
-		public static IWebHost BuildWebHost(string[] args) =>
-			WebHost.CreateDefaultBuilder(args)
-				.UseStartup<Startup>()
-				.Build();
 	}
 }
