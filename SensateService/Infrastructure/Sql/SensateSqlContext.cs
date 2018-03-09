@@ -14,7 +14,7 @@ using SensateService.Models;
 
 namespace SensateService.Infrastructure.Sql
 {
-	public class SensateSqlContext : IdentityDbContext
+	public class SensateSqlContext : IdentityDbContext<SensateUser, SensateRole, string>
 	{
 		public new DbSet<SensateUser> Users { get; set; }
 		public DbSet<AuditLog> AuditLogs { get; set; }

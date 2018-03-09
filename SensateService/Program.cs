@@ -14,7 +14,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Builder;
 
 using SensateService.Services;
-using System.Net;
 
 namespace SensateService
 {

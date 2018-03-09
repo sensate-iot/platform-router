@@ -7,32 +7,18 @@
 
 using System;
 using System.Text;
-using System.Collections.Generic;
-using System.Linq;
 using System.IdentityModel.Tokens.Jwt;
-using System.IdentityModel;
-using System.Threading.Tasks;
 using System.Diagnostics;
 
-using Microsoft.IdentityModel;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Mvc.Versioning;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
-
-using MongoDB.Bson;
-using MongoDB.Driver;
-using Newtonsoft.Json.Linq;
 
 using SensateService.Models;
 using SensateService.Infrastructure.Sql;
@@ -41,7 +27,6 @@ using SensateService.Infrastructure.Repositories;
 using SensateService.Infrastructure.Cache;
 using SensateService.Services;
 using SensateService.Controllers;
-using System.Net;
 
 namespace SensateService
 {
@@ -100,7 +85,7 @@ namespace SensateService
 			/*
 			 * Setup user authentication
 			 */
-			services.AddIdentity<SensateUser, IdentityRole>()
+			services.AddIdentity<SensateUser, SensateRole>()
 				.AddEntityFrameworkStores<SensateSqlContext>()
 				.AddDefaultTokenProviders();
 			JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
