@@ -7,12 +7,11 @@
 
 using System;
 using System.Text;
-using System.Linq;
 using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Diagnostics;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
@@ -22,9 +21,11 @@ using Microsoft.AspNetCore.Mvc;
 
 using Newtonsoft.Json.Linq;
 
+using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Models.Json;
+using SensateService.Services;
 
 namespace SensateService.Controllers
 {
@@ -36,18 +37,21 @@ namespace SensateService.Controllers
 		private readonly SignInManager<SensateUser> _siManager;
 		private readonly UserManager<SensateUser> _manager;
 		private readonly IUserRepository _users;
+		private readonly IEmailSender _mailer;
 
 		public AccountsController(
 			IUserRepository repo,
 			SignInManager<SensateUser> manager,
 			UserManager<SensateUser> userManager,
-			IOptions<UserAccountSettings> options
+			IOptions<UserAccountSettings> options,
+			IEmailSender emailer
 		)
 		{
 			this._users = repo;
 			this._siManager = manager;
 			this._settings = options.Value;
 			this._manager = userManager;
+			this._mailer = emailer;
 		}
 
 		[HttpPost("login")]
@@ -64,7 +68,6 @@ namespace SensateService.Controllers
 				var user = await this._users.GetByEmailAsync(loginModel.Email);
 				return this.GenerateJwtToken(loginModel.Email, user);
 			}
-
 
 			return NotFound();
 		}
@@ -97,8 +100,13 @@ namespace SensateService.Controllers
 			var result = await this._manager.CreateAsync(user, register.Password);
 
 			if(result.Succeeded) {
-				await this._siManager.SignInAsync(user, false);
-				return this.GenerateJwtToken(register.Email, user);
+				user = await this._users.GetAsync(user.Id);
+				var code = await this._manager.GenerateEmailConfirmationTokenAsync(user);
+				code = Base64UrlEncoder.Encode(code);
+				var url = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
+				Debug.WriteLine($"Confirmation URL: {url}");
+				await this._mailer.SendEmailAsync(user.Email, "Confirm email!", url);
+				return Ok();
 			}
 
 			return BadRequest();
@@ -119,9 +127,34 @@ namespace SensateService.Controllers
 			jobj.FirstName = user.FirstName;
 			jobj.LastName = user.LastName;
 			jobj.Email = user.Email;
-			jobj.PhoneNumber = user.PhoneNumber == null ? "" : user.PhoneNumber;
+			jobj.PhoneNumber = user.PhoneNumber ?? "";
 
 			return new ObjectResult(jobj);
+		}
+
+		[HttpGet("confirm/{id}/{code}")]
+		public async Task<IActionResult> ConfirmEmail(string id, string code)
+		{
+			SensateUser user;
+
+			if(id == null || code == null) {
+				return BadRequest();
+			}
+
+			user = await this._users.GetAsync(id);
+			if(user == null)
+				return NotFound();
+
+			/*
+			 * For some moronic reason we need to encode and decode to
+			 * Base64. The + sign gets * mangled to a ' ' if we don't.
+			 */
+			code = Base64UrlEncoder.Decode(code);
+			var result = await this._manager.ConfirmEmailAsync(user, code);
+			if(!result.Succeeded)
+				return Unauthorized();
+
+			return this.Ok();
 		}
 
 		private object GenerateJwtToken(string email, SensateUser user)

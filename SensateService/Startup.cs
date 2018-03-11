@@ -85,9 +85,12 @@ namespace SensateService
 			/*
 			 * Setup user authentication
 			 */
-			services.AddIdentity<SensateUser, SensateRole>()
-				.AddEntityFrameworkStores<SensateSqlContext>()
-				.AddDefaultTokenProviders();
+			services.AddIdentity<SensateUser, SensateRole>(config => {
+				config.SignIn.RequireConfirmedEmail = true;
+			})
+			.AddEntityFrameworkStores<SensateSqlContext>()
+			.AddDefaultTokenProviders();
+
 			JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
 
 			services.Configure<IdentityOptions>(options => {
@@ -166,6 +169,14 @@ namespace SensateService
 			} catch(Exception ex) {
 				Debug.WriteLine($"Potential MQTT error: {ex.Message}");
 			}
+
+			services.AddSingleton<IEmailSender, EmailSender>();
+			services.Configure<MessageSenderAuthOptions>(opts => {
+				opts.FromName = Configuration["EmailFromName"];
+				opts.From = Configuration["EmailFrom"];
+				opts.Key = Secrets["SendGridKey"];
+				opts.Username = Secrets["SendGridUser"];
+			});
 
 			services.AddMvc();
 		}

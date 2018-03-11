@@ -26,7 +26,7 @@ namespace SensateService.Init
 				"Administrators", "Users"
 			};
 
-			if(ctx.Roles.Any())
+			if(ctx.Roles.Any() || ctx.Users.Any() || ctx.UserRoles.Any())
 				return;
 
 			var uroles = new SensateRole[] {
@@ -58,6 +58,7 @@ namespace SensateService.Init
 			};
 
 			user.UserName = user.Email;
+			user.EmailConfirmed = true;
 			await manager.CreateAsync(user, "Root1234#xD");
 			ctx.SaveChanges();
 			user = await manager.FindByEmailAsync("root@example.com");
