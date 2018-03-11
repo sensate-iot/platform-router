@@ -5,6 +5,8 @@
  * @email:  dev@bietje.net
  */
 
+using System;
+using System.Linq;
 using System.IO;
 
 using Microsoft.AspNetCore;
@@ -12,8 +14,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Identity;
 
 using SensateService.Services;
+using SensateService.Infrastructure.Sql;
+using SensateService.Init;
+using SensateService.Models;
 
 namespace SensateService
 {
@@ -23,9 +30,38 @@ namespace SensateService
 
 		public const string ApiVersionString = "v1";
 
+		public static void CreateUserRoles(IWebHost wh)
+		{
+			ILogger<Program> logger;
+			SensateSqlContext ctx;
+
+			using(var scope = wh.Services.CreateScope()) {
+				var services = scope.ServiceProvider;
+				logger = services.GetRequiredService<ILogger<Program>>();
+
+				try {
+					logger.LogInformation("Creating user roles..");
+					ctx = services.GetRequiredService<SensateSqlContext>();
+					var roles = services.GetRequiredService<RoleManager<SensateRole>>();
+					var manager = services.GetRequiredService<UserManager<SensateUser>>();
+
+					if(ctx.Roles.Any())
+						return;
+
+					var tsk = UserRoleSeed.Initialize(ctx, roles, manager);
+					tsk.Wait();
+				} catch(Exception ex) {
+					logger.LogError($"Unable to create user roles: {ex.Message}");
+				}
+			}
+		}
+
 		public static void Main(string[] args)
 		{
-			BuildWebHost(args).Run();
+			IWebHost wh = Program.BuildWebHost(args);
+
+			Program.CreateUserRoles(wh);
+			wh.Run();
 		}
 
 		public static IWebHost BuildWebHost(string[] args)
