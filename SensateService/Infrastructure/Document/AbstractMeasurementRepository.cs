@@ -235,8 +235,10 @@ namespace SensateService.Infrastructure.Document
 			};
 
 			try {
-				var opts = new InsertOneOptions();
-				opts.BypassDocumentValidation = true;
+				var opts = new InsertOneOptions {
+					BypassDocumentValidation = true
+				};
+
 				await this._measurements.InsertOneAsync(m, opts);
 				await this.CommitAsync(m);
 			} catch(Exception ex) {
