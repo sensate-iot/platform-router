@@ -25,8 +25,7 @@ namespace SensateService.Services
 
 		public async Task SendEmailAsync(string recip, string subj, string body)
 		{
-			Response resp = await this.Execute(this._options.Key, recip, subj, body);
-			Debug.WriteLine(resp.ToString());
+			await this.Execute(this._options.Key, recip, subj, body);
 		}
 
 		private Task<Response> Execute(string key, string recip, string subj, string body)
