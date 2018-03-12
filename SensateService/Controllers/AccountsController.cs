@@ -154,6 +154,7 @@ namespace SensateService.Controllers
 				code = Base64UrlEncoder.Encode(code);
 				var url = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
 				Debug.WriteLine($"Confirmation URL: {url}");
+				await this._manager.AddToRoleAsync(user, "Users");
 				await this._mailer.SendEmailAsync(user.Email, "Confirm email!", url);
 				return Ok();
 			}
