@@ -21,6 +21,7 @@ using SensateService.Services;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
 using SensateService.Models;
+using System.Diagnostics;
 
 namespace SensateService
 {

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
+using SensateService.Exceptions;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 
@@ -22,12 +22,14 @@ namespace SensateService.Infrastructure.Sql
 	{
 		private readonly DbSet<IdentityUserRole<string>> _userRoles;
 		private readonly IUserRepository _users;
+		private readonly RoleManager<SensateRole> _roles;
 
-		public SensateRoleRepository(SensateSqlContext context, IUserRepository urepo) :
+		public SensateRoleRepository(SensateSqlContext context, IUserRepository urepo, RoleManager<SensateRole> roles) :
 			base(context)
 		{
 			this._users = urepo;
 			this._userRoles = context.UserRoles;
+			this._roles = roles;
 		}
 
 		public void Create(string name, string description)
@@ -41,8 +43,9 @@ namespace SensateService.Infrastructure.Sql
 
 		public override void Create(SensateRole obj)
 		{
-			this.Data.Add(obj);
-			this.Commit(obj);
+			var result = this._roles.CreateAsync(obj).Result;
+			if(!result.Succeeded)
+				throw new DatabaseException("Unable to create user role!");
 		}
 
 		public async Task CreateAsync(string name, string description)
@@ -56,14 +59,15 @@ namespace SensateService.Infrastructure.Sql
 
 		public override async Task CreateAsync(SensateRole obj)
 		{
-			this.Data.Add(obj);
-			await this.CommitAsync(obj);
+			var result = await this._roles.CreateAsync(obj);
+			if(!result.Succeeded)
+				throw new DatabaseException("Unable to create user role!");
 		}
 
 		public override void Delete(string id)
 		{
 			var role = this.GetById(id);
-			this.Data.Remove(role);
+			this._roles.DeleteAsync(role);
 		}
 
 		public override async Task DeleteAsync(string id)
