@@ -23,5 +23,17 @@ namespace SensateService.Helpers
 
 			return action;
 		}
+
+		public static string PasswordResetLink(this IUrlHelper url, string id, string code, string scheme)
+		{
+			var action = url.Action(
+				action: nameof(AccountsController.Resetpassword),
+				controller: "accounts",
+				values: new { id, code },
+				protocol: scheme
+				);
+
+			return action;
+		}
     }
 }

@@ -18,6 +18,7 @@ namespace SensateService.Infrastructure.Sql
 	{
 		public new DbSet<SensateUser> Users { get; set; }
 		public DbSet<AuditLog> AuditLogs { get; set; }
+		public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
 		public SensateSqlContext(DbContextOptions<SensateSqlContext> options) :
 			base(options)
@@ -26,6 +27,9 @@ namespace SensateService.Infrastructure.Sql
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
 			base.OnModelCreating(builder);
+			builder.Entity<PasswordResetToken>().HasKey(
+				k => k.UserToken
+			);
 		}
 	}
 }

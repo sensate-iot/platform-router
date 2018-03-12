@@ -6,6 +6,7 @@
  */
 
 using System;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -38,13 +39,15 @@ namespace SensateService.Controllers
 		private readonly UserManager<SensateUser> _manager;
 		private readonly IUserRepository _users;
 		private readonly IEmailSender _mailer;
+		private readonly IPasswordResetTokenRepository _tokens;
 
 		public AccountsController(
 			IUserRepository repo,
 			SignInManager<SensateUser> manager,
 			UserManager<SensateUser> userManager,
 			IOptions<UserAccountSettings> options,
-			IEmailSender emailer
+			IEmailSender emailer,
+			IPasswordResetTokenRepository tokens
 		)
 		{
 			this._users = repo;
@@ -52,6 +55,52 @@ namespace SensateService.Controllers
 			this._settings = options.Value;
 			this._manager = userManager;
 			this._mailer = emailer;
+			this._tokens = tokens;
+		}
+
+		[HttpPost("forgot-password")]
+		public async Task<IActionResult> ForgotPassword([FromBody] UserForgotPasswordModel model)
+		{
+			SensateUser user;
+			string usertoken;
+
+			user = await this._users.GetByEmailAsync(model.Email);
+			if(user == null || !user.EmailConfirmed)
+				return NotFound();
+
+			var token = await this._manager.GeneratePasswordResetTokenAsync(user);
+			token = Base64UrlEncoder.Encode(token);
+			usertoken = this._tokens.Create(token);
+
+			if(usertoken == null)
+				return this.StatusCode(500);
+
+			Debug.WriteLine($"Password reset URL: {usertoken}");
+			return Ok();
+		}
+
+		[HttpPost("reset-password")]
+		public async Task<IActionResult> Resetpassword([FromBody] UserChangePasswordModel model)
+		{
+			SensateUser user;
+			PasswordResetToken token;
+
+			if(model.Email == null || model.Password == null || model.Token == null)
+				return BadRequest();
+
+			user = await this._users.GetByEmailAsync(model.Email);
+			token = this._tokens.GetById(model.Token);
+
+			if(user == null || token == null)
+				return NotFound();
+
+			token.IdentityToken = Base64UrlEncoder.Decode(token.IdentityToken);
+			var result = await this._manager.ResetPasswordAsync(user, token.IdentityToken, model.Password);
+
+			if(result.Succeeded)
+				return Ok();
+
+			return new NotFoundObjectResult(new {Message = result.Errors});
 		}
 
 		[HttpPost("login")]
