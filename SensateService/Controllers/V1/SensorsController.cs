@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
+using SensateService.Helpers;
 
 namespace SensateService.Controllers.V1
 {
@@ -23,10 +24,14 @@ namespace SensateService.Controllers.V1
 	public class SensorsController : Controller
 	{
 		private ISensorRepository _repo;
+		private readonly Random random;
+		private IUserRepository _users;
 
-		public SensorsController(ISensorRepository repository)
+		public SensorsController(ISensorRepository repository, IUserRepository users)
 		{
 			this._repo = repository;
+			this._users = users;
+			this.random = new Random();
 		}
 
 		[HttpGet("{id}", Name = "GetSensor")]
@@ -35,7 +40,6 @@ namespace SensateService.Controllers.V1
 		{
 			try {
 				var result = await this._repo.GetAsync(id);
-				Debug.WriteLine($"Found sensor {result.InternalId.ToString()}");
 				if(result == null)
 					return NotFound();
 
@@ -47,10 +51,20 @@ namespace SensateService.Controllers.V1
 		}
 
 		[HttpPost("create", Name = "CreateSensor")]
+		[Authorize]
 		public async Task<IActionResult> Create([FromBody] Sensor sensor)
 		{
 			try {
 				if(ModelState.IsValid) {
+					var user = this._users.GetCurrentUser(this.User);
+					if(user == null)
+						return Unauthorized();
+
+					sensor.Owner = user.Id;
+
+					if(sensor.Secret == null)
+						sensor.Secret = this.random.NextString(Sensor.SecretLength);
+
 					await this._repo.CreateAsync(sensor);
 					return CreatedAtRoute("GetSensor", new {Id = sensor.Secret},
 						sensor);

@@ -19,9 +19,11 @@ namespace SensateService.Models
 {
 	public class Sensor
 	{
+		public const int SecretLength = 256;
+
 		[BsonId, BsonRequired, JsonConverter(typeof(ObjectIdJsonConverter))]
 		public ObjectId InternalId {get;set;}
-		[BsonRequired, StringLength(128, MinimumLength = 4)]
+		[BsonRequired, StringLength(256, MinimumLength = 4)]
 		public string Secret {get;set;}
 		[BsonRequired]
 		public string Name {get;set;}

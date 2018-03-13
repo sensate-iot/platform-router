@@ -77,7 +77,7 @@ namespace SensateService.Tests.UnitTests
 		{
 			SensorsController controller;
 
-			controller = new SensorsController(this._sensors.Object);
+			controller = new SensorsController(this._sensors.Object, null);
 			var result = await controller.GetById("abcde");
 			Assert.IsTrue(result.GetType() == typeof(ObjectResult), "Unable to get sensor!");
 		}
