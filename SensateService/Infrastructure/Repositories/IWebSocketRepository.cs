@@ -18,6 +18,7 @@ namespace SensateService.Infrastructure.Repositories
 		void Add(WebSocket socket);
 		void Remove(string id);
 		Task RemoveAsync(string id);
+		void ForceRemove(WebSocket ws);
 		IEnumerable<WebSocket> GetAll();
 	}
 }

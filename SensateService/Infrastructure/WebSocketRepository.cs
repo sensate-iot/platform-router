@@ -78,5 +78,15 @@ namespace SensateService.Infrastructure
 				cancellationToken: CancellationToken.None
 			);
 		}
+
+		public void ForceRemove(WebSocket ws)
+		{
+			WebSocket socket;
+			string key;
+
+			key = this._sockets.FirstOrDefault(x => x.Value == ws).Key;
+			this._sockets.TryRemove(key, out socket);
+			socket.Dispose();
+		}
 	}
 }

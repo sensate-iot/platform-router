@@ -35,6 +35,11 @@ namespace SensateService.Middleware
 			await this._sockets.RemoveAsync(id);
 		}
 
+		public virtual void OnForceClose(WebSocket socket)
+		{
+			this._sockets.ForceRemove(socket);
+		}
+
 		public async Task SendMessage(WebSocket socket, string message)
 		{
 			if(socket.State != WebSocketState.Open)

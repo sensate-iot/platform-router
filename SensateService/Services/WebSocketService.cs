@@ -6,6 +6,7 @@
  */
 
 using System;
+using System.Diagnostics;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,18 +38,28 @@ namespace SensateService.Services
 			socket = await ctx.WebSockets.AcceptWebSocketAsync();
 			this._handler.OnConnected(socket);
 
-			await this.Receive(socket, async(result, buffer) => {
-				if(result.MessageType == WebSocketMessageType.Text) {
-					await this._handler.Receive(socket, result, buffer);
-					return;
-				} else if(result.MessageType == WebSocketMessageType.Close) {
-					await this._handler.OnDisconnected(socket);
-					return;
-				}
-			});
+			try {
+				await this.Receive(socket, async(result, buffer) => {
+					if(result.MessageType == WebSocketMessageType.Text) {
+						await this._handler.Receive(socket, result, buffer);
+						return;
+					} else if(result.MessageType == WebSocketMessageType.Close) {
+						await this._handler.OnDisconnected(socket);
+						return;
+					}
+				});
+			} catch(WebSocketException) {
+				Debug.WriteLine($"Websocket error occurred! {socket.State}");
+				this._handler.OnForceClose(socket);
+				return;
+			}
 
-			if(this._next != null)
-				await this._next.Invoke(context: ctx);
+			try {
+				if(this._next != null)
+					await this._next.Invoke(context: ctx);
+			} catch(Exception) {
+				return;
+			}
 		}
 
 		private async Task Receive(WebSocket socket, Action<WebSocketReceiveResult, byte[]> handleMessage)
