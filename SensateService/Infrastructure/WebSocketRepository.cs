@@ -16,13 +16,14 @@ using Microsoft.Extensions.Logging;
 
 using SensateService.Infrastructure.Repositories;
 using System;
+using System.Threading;
 
 namespace SensateService.Infrastructure
 {
 	public class WebSocketRepository : IWebSocketRepository
 	{
 		private readonly ILogger<WebSocketRepository> _logger;
-		private readonly IDictionary<string, WebSocket> _sockets;
+		private readonly ConcurrentDictionary<string, WebSocket> _sockets;
 
 		public WebSocketRepository(ILogger<WebSocketRepository> logger)
 		{
@@ -32,7 +33,7 @@ namespace SensateService.Infrastructure
 
 		public void Add(WebSocket socket)
 		{
-			this._sockets.Add(this.CreateConnectionId(), socket);
+			this._sockets.TryAdd(this.CreateConnectionId(), socket);
 		}
 
 		private string CreateConnectionId()
@@ -57,14 +58,25 @@ namespace SensateService.Infrastructure
 
 		public void Remove(string id)
 		{
-			this._sockets.Remove(id);
+			WebSocket webSocket;
+
+			this._sockets.TryRemove(id, out webSocket);
+			var result = webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure,
+											  "Closed by SensateService",
+											  cancellationToken: CancellationToken.None);
+			result.RunSynchronously();
 		}
 
 		public Task RemoveAsync(string id)
 		{
-			return Task.Run(() => {
-				this.Remove(id);
-			});
+			WebSocket socket;
+
+			this._sockets.TryRemove(id, out socket);
+			return socket.CloseAsync(
+				WebSocketCloseStatus.NormalClosure,
+				"Closed by SensateService",
+				cancellationToken: CancellationToken.None
+			);
 		}
 	}
 }
