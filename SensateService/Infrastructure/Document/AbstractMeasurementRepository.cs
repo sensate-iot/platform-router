@@ -20,6 +20,7 @@ using Newtonsoft.Json;
 using SensateService.Infrastructure.Events;
 using SensateService.Models;
 using SensateService.Exceptions;
+using System.Threading;
 
 namespace SensateService.Infrastructure.Document
 {
@@ -239,7 +240,7 @@ namespace SensateService.Infrastructure.Document
 					BypassDocumentValidation = true
 				};
 
-				await this._measurements.InsertOneAsync(m, opts);
+				await this._measurements.InsertOneAsync(m, opts, CancellationToken.None);
 				await this.CommitAsync(m);
 			} catch(Exception ex) {
 				this._logger.LogWarning($"Unable to insert measurement: {ex.Message}");
