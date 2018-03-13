@@ -25,8 +25,10 @@ using SensateService.Infrastructure.Sql;
 using SensateService.Infrastructure.Document;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Infrastructure.Cache;
+using SensateService.Init;
 using SensateService.Services;
 using SensateService.Controllers;
+using SensateService.Middleware;
 
 namespace SensateService
 {
@@ -138,10 +140,11 @@ namespace SensateService
 			services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 
 			if(this.Configuration["Cache"] == "true") {
-				if(this.Configuration["CacheType"] == "Distributed")
+				if(this.Configuration["CacheType"] == "Distributed") {
 					services.AddScoped<ICacheStrategy<string>, DistributedCacheStrategy>();
-				else
+				} else {
 					services.AddScoped<ICacheStrategy<string>, MemoryCacheStrategy>();
+				}
 
 				Debug.WriteLine("Caching enabled!");
 				services.AddScoped<IMeasurementRepository, CachedMeasurementRepository>();
@@ -182,15 +185,18 @@ namespace SensateService
 				opts.Username = Secrets["SendGridUser"];
 			});
 
+			services.AddWebSocketService();
 			services.AddMvc();
 		}
 
-		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider sp)
 		{
 			if (env.IsDevelopment()) {
 				app.UseDeveloperExceptionPage();
 			}
 
+			app.UseWebSockets();
+			app.MapWebSocketService("/measurement", sp.GetService<WebSocketMeasurementHandler>());
 			app.UseAuthentication();
 			app.UseMvc();
 		}
