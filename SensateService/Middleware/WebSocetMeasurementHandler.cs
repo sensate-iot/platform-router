@@ -12,7 +12,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
+using SensateService.Exceptions;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 
@@ -47,10 +49,21 @@ namespace SensateService.Middleware
 
 				var sensor = await this._sensors.GetAsync(id);
 				await this._measurements.ReceiveMeasurement(sensor, msg);
-				await this.SendMessage(socket, new {status = 200}.ToString());
+
+				jobj = new JObject();
+				jobj.status = 200;
+
+				await this.SendMessage(socket, jobj.ToString());
+			} catch(InvalidRequestException ex) {
+				Debug.WriteLine($"Unable to store measurement: {ex.Message}");
+				jobj = new JObject();
+				jobj.status = ex.ErrorCode;
+				await this.SendMessage(socket, jobj.ToString());
 			} catch(Exception ex) {
 				Debug.WriteLine($"Unable to store measurement: {ex.Message}");
-				await this.SendMessage(socket, new {status = 400}.ToString());
+				jobj = new JObject();
+				jobj.status = 500;
+				await this.SendMessage(socket, jobj.ToString());
 			}
 		}
 	}

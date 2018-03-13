@@ -1,5 +1,5 @@
 /*
- * Abstract measurement repository
+ * Abstract measurement repository.
  *
  * @author: Michel Megens
  * @email:  dev@bietje.net
@@ -35,11 +35,12 @@ namespace SensateService.Infrastructure.Document
 
 	public abstract class AbstractMeasurementRepository : AbstractDocumentRepository<string, Measurement>
 	{
-		public event OnMeasurementReceived MeasurementReceived;
-
 		private readonly IMongoCollection<Measurement> _measurements;
 		private readonly Random _random;
 		protected readonly ILogger<AbstractMeasurementRepository> _logger;
+
+		public const int JsonError = 300;
+		public const int IncorrectSecretError = 301;
 
 		public AbstractMeasurementRepository(SensateContext context,
 			ILogger<AbstractMeasurementRepository> logger) : base(context)
@@ -151,9 +152,13 @@ namespace SensateService.Infrastructure.Document
 		public override Measurement GetById(string id)
 		{
 			ObjectId oid = this.ToInternalId(id);
-			var result = this._measurements.Find(x => x.InternalId == oid);
+			var find = Builders<Measurement>.Filter.Eq("InternalId", oid);
+			var result = this._measurements.Find(find);
 
-			return result.FirstOrDefault();
+			if(result != null)
+				return result.FirstOrDefault();
+
+			return null;
 		}
 
 		public async Task ReceiveMeasurement(Sensor sender, string measurement)
@@ -167,8 +172,7 @@ namespace SensateService.Infrastructure.Document
 					Measurement = m
 				};
 
-				if(this.MeasurementReceived != null)
-					await this.MeasurementReceived(sender, args);
+				await MeasurementEvents.OnMeasurementReceived(sender, args);
 			}
 		}
 
@@ -215,11 +219,15 @@ namespace SensateService.Infrastructure.Document
 			try {
 				raw = JsonConvert.DeserializeObject<RawMeasurement>(json);
 
-				if(raw == null || raw.CreatedBySecret != sensor.Secret)
-					return null;
+				if(raw == null || raw.CreatedBySecret != sensor.Secret) {
+					throw new InvalidRequestException(
+						AbstractMeasurementRepository.IncorrectSecretError,
+						"Sensor secret doesn't match sensor ID!"
+					);
+				}
 			} catch(JsonSerializationException ex) {
 				this._logger.LogInformation($"Bad measurement received: ${ex.Message}");
-				return null;
+				throw new InvalidRequestException(AbstractMeasurementRepository.JsonError);
 			}
 
 			now = DateTime.Now;

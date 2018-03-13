@@ -10,7 +10,9 @@ using System.Diagnostics;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Http;
+
 using SensateService.Middleware;
 
 namespace SensateService.Services

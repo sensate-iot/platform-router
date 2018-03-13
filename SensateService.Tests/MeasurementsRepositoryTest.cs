@@ -65,7 +65,7 @@ namespace SensateService.Tests
 			ctx = new SensateContext(settings);
 			var repo = new StandardMeasurementRepository(ctx, logger);
 			this._repo = repo;
-			repo.MeasurementReceived += OnMeasurementReceived_Handler;
+			MeasurementEvents.MeasurementReceived += OnMeasurementReceived_Handler;
 		}
 
 		[TearDown]
