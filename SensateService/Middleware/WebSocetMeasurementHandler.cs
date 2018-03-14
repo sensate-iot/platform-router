@@ -17,6 +17,7 @@ using Newtonsoft.Json;
 using SensateService.Exceptions;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
+using SensateService.Infrastructure.Events;
 
 namespace SensateService.Middleware
 {
@@ -30,6 +31,19 @@ namespace SensateService.Middleware
 		{
 			this._measurements = measurements;
 			this._sensors = sensors;
+			MeasurementEvents.MeasurementReceived += OnMeasurementReceived_Handler;
+		}
+
+		private Task OnMeasurementReceived_Handler(object s, MeasurementReceivedEventArgs e)
+		{
+			Sensor sensor = s as Sensor;
+			DateTime pit = DateTime.Parse("14/03/2018 20:34:08");
+
+			var measurements = this._measurements.GetAfter(sensor, pit);
+			foreach(var x in measurements) {
+				Debug.WriteLine(x.InternalId.ToString());
+			}
+			return Task.CompletedTask;
 		}
 
 		public override async Task Receive(WebSocket socket, WebSocketReceiveResult result, byte[] buffer)

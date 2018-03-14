@@ -28,6 +28,7 @@ namespace SensateService.Infrastructure.Document
 
 		public const int CacheTimeout = 10;
 		public const int CacheTimeoutShort = 1;
+		public const int CacheTimeoutMedium = 4;
 
 		public CachedMeasurementRepository(
 			SensateContext context,
@@ -75,30 +76,30 @@ namespace SensateService.Infrastructure.Document
 			await base.DeleteAsync(id);
 		}
 
-		private void CacheData(string key, object data)
+		private void CacheData(string key, object data, int tmo, bool slide = true)
 		{
-			this.CacheData(key, JsonConvert.SerializeObject(data));
+			this.CacheData(key, JsonConvert.SerializeObject(data), tmo, slide);
 		}
 
-		private void CacheData(string key, string json)
+		private void CacheData(string key, string json, int tmo, bool slide = true)
 		{
 			if(key == null || json == null)
 				return;
 
-			this._cache.Set(key, json, CacheTimeout);
+			this._cache.Set(key, json, tmo, slide);
 		}
 
-		private async Task CacheDataAsync(string key, object data, int tmo)
+		private async Task CacheDataAsync(string key, object data, int tmo, bool slide = true)
 		{
-			await this.CacheDataAsync(key, JsonConvert.SerializeObject(data), tmo);
+			await this.CacheDataAsync(key, JsonConvert.SerializeObject(data), tmo, slide);
 		}
 
-		private async Task CacheDataAsync(string key, string json, int tmo)
+		private async Task CacheDataAsync(string key, string json, int tmo, bool slide = true)
 		{
 			if(key == null || json == null)
 				return;
 
-			await this._cache.SetAsync(key, json, tmo);
+			await this._cache.SetAsync(key, json, tmo, slide);
 		}
 
 		public override Measurement GetById(string id)
@@ -181,7 +182,7 @@ namespace SensateService.Infrastructure.Document
 
 			if(data == null) {
 				m = base.TryGetMeasurement(key, expression);
-				this.CacheData(key, m);
+				this.CacheData(key, m, CacheTimeout);
 				return m;
 			}
 
@@ -218,7 +219,7 @@ namespace SensateService.Infrastructure.Document
 
 			if(data == null) {
 				measurements = base.TryGetMeasurements(key, selector);
-				this.CacheData(key, measurements);
+				this.CacheData(key, measurements, CacheTimeout);
 				return measurements;
 			}
 
@@ -237,6 +238,41 @@ namespace SensateService.Infrastructure.Document
 			return TryGetMeasurement(key, selector);
 		}
 
+		public override async Task<IEnumerable<Measurement>> GetAfterAsync(Sensor sensor, DateTime pit)
+		{
+			string key;
+			IEnumerable<Measurement> measurements;
+
+			key = $"{sensor.Secret}::after::{pit.ToString()}";
+			var data = await this._cache.GetAsync(key);
+
+			if(data == null) {
+				measurements = await base.GetAfterAsync(sensor, pit);
+				await this.CacheDataAsync(key, measurements, CacheTimeoutMedium, false);
+				return measurements;
+			}
+
+			return JsonConvert.DeserializeObject<IEnumerable<Measurement>>(data);
+		}
+
+		public override IEnumerable<Measurement> GetAfter(Sensor sensor, DateTime pit)
+		{
+			string key;
+			IEnumerable<Measurement> measurements;
+
+			key = $"{sensor.Secret}::after::{pit.ToString()}";
+			var data = this._cache.Get(key);
+
+			if(data == null) {
+				measurements = base.GetAfter(sensor, pit);
+				this.CacheData(key, measurements, CacheTimeoutMedium, false);
+				return measurements;
+			}
+
+			return JsonConvert.DeserializeObject<IEnumerable<Measurement>>(data);
+
+		}
+
 		public override IEnumerable<Measurement> TryGetBetween(Sensor sensor, DateTime start, DateTime end)
 		{
 			string key, data;
@@ -247,7 +283,7 @@ namespace SensateService.Infrastructure.Document
 
 			if(data == null) {
 				measurements = base.TryGetBetween(sensor, start, end);
-				this.CacheData(key, measurements);
+				this.CacheData(key, measurements, CacheTimeout);
 				return measurements;
 			}
 

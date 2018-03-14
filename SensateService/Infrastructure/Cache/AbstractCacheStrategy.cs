@@ -23,8 +23,8 @@ namespace SensateService.Infrastructure.Cache
 		public abstract void Remove(string key);
 		public abstract Task RemoveAsync(string key);
 		public abstract void Set(string key, string obj);
-		public abstract void Set(string key, string obj, int tmo);
+		public abstract void Set(string key, string obj, int tmo, bool slide = true);
 		public abstract Task SetAsync(string key, string obj);
-		public abstract Task SetAsync(string key, string obj, int tmo);
+		public abstract Task SetAsync(string key, string obj, int tmo, bool slide = true);
 	}
 }

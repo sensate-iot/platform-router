@@ -14,11 +14,11 @@ namespace SensateService.Infrastructure.Cache
 	{
 		T Get(string key);
 		void Set(string key, T obj);
-		void Set(string key, T obj, int tmo);
+		void Set(string key, T obj, int tmo, bool slide = true);
 
 		Task<T> GetAsync(string key);
 		Task SetAsync(string key, T obj);
-		Task SetAsync(string key, T obj, int tmo);
+		Task SetAsync(string key, T obj, int tmo, bool slide = true);
 
 		Task RemoveAsync(string key);
 		void Remove(string key);

@@ -48,10 +48,18 @@ namespace SensateService.Infrastructure.Cache
 			this.Set(key, obj, CacheTimeout);
 		}
 
-		public override void Set(string key, string obj, int tmo)
+		public override void Set(string key, string obj, int tmo, bool slide = true)
 		{
-			this._cache.SetString(key, obj, new DistributedCacheEntryOptions()
-				.SetSlidingExpiration(TimeSpan.FromMinutes(tmo)));
+			DistributedCacheEntryOptions options;
+
+			options = new DistributedCacheEntryOptions();
+			if(slide) {
+				options.SetSlidingExpiration(TimeSpan.FromMinutes(tmo));
+			} else {
+				options.SetAbsoluteExpiration(TimeSpan.FromMinutes(tmo));
+			}
+
+			this._cache.SetString(key, obj, options);
 		}
 
 		public async override Task SetAsync(string key, string obj)
@@ -59,10 +67,17 @@ namespace SensateService.Infrastructure.Cache
 			await this.SetAsync(key, obj, CacheTimeout);
 		}
 
-		public async override Task SetAsync(string key, string obj, int tmo)
+		public async override Task SetAsync(string key, string obj, int tmo, bool slide = true)
 		{
-			await this._cache.SetStringAsync(key, obj,
-				new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(tmo)));
+			var options = new DistributedCacheEntryOptions();
+
+			if(slide) {
+				options.SetSlidingExpiration(TimeSpan.FromMinutes(tmo));
+			} else {
+				options.SetAbsoluteExpiration(TimeSpan.FromMinutes(tmo));
+			}
+
+			await this._cache.SetStringAsync(key, obj, options);
 		}
 	}
 }

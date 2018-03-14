@@ -50,7 +50,7 @@ namespace SensateService.Infrastructure.Cache
 			this.Set(key, obj, CacheTimeout);
 		}
 
-		public override void Set(string key, string obj, int tmo)
+		public override void Set(string key, string obj, int tmo, bool slide = true)
 		{
 			this._cache.Set(key, obj, new MemoryCacheEntryOptions()
 				.SetSlidingExpiration(TimeSpan.FromMinutes(tmo)));
@@ -61,7 +61,7 @@ namespace SensateService.Infrastructure.Cache
 			await this.SetAsync(key, obj, CacheTimeout);
 		}
 
-		public override async Task SetAsync(string key, string obj, int tmo)
+		public override async Task SetAsync(string key, string obj, int tmo, bool slide = true)
 		{
 			await Task.Run(() => this._cache.Set(
 				key, obj,

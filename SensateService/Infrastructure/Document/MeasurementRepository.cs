@@ -17,15 +17,15 @@ using Microsoft.Extensions.Logging;
 
 using MongoDB.Driver;
 using MongoDB.Bson;
+using MongoDB.Bson.IO;
+
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 using SensateService.Infrastructure.Events;
 using SensateService.Models;
 using SensateService.Exceptions;
 using SensateService.Infrastructure.Repositories;
-using MongoDB.Bson.IO;
-using Newtonsoft.Json.Linq;
-using System.Diagnostics;
 
 namespace SensateService.Infrastructure.Document
 {
@@ -259,7 +259,10 @@ namespace SensateService.Infrastructure.Document
 				await this.CommitAsync(m);
 			} catch(Exception ex) {
 				this._logger.LogWarning($"Unable to insert measurement: {ex.Message}");
-				throw new DatabaseException($"Unable to store message: {ex.Message}", "Measurements", ex);
+				throw new DatabaseException(
+					$"Unable to store message: {ex.Message}",
+					"Measurements", ex
+				);
 			}
 
 			return m;
@@ -295,12 +298,9 @@ namespace SensateService.Infrastructure.Document
 
 		public virtual IEnumerable<Measurement> GetAfter(Sensor sensor, DateTime pit)
 		{
-			string key;
-
-			key = $"{sensor.Secret}::after::{pit.ToString()}";
-			return this.TryGetMeasurements(key, x =>
+			return this._measurements.Find(x =>
 				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) >= 0
-			);
+			).ToEnumerable();
 		}
 
 		public virtual async Task<IEnumerable<Measurement>> GetBeforeAsync(Sensor sensor, DateTime pit)
@@ -315,12 +315,10 @@ namespace SensateService.Infrastructure.Document
 
 		public virtual async Task<IEnumerable<Measurement>> GetAfterAsync(Sensor sensor, DateTime pit)
 		{
-			string key;
-
-			key = $"{sensor.Secret}::after::{pit.ToString()}";
-			return await this.TryGetMeasurementsAsync(key, x =>
+			var result = await this._measurements.FindAsync(x =>
 				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) >= 0
 			);
+			return result.ToEnumerable();
 		}
 
 		public virtual Measurement GetMeasurement(string key, Expression<Func<Measurement, bool>> selector)
