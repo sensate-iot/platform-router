@@ -1,15 +1,17 @@
 /*
- * Abstract measurement repository.
+ * MongoDB measurement repository implementation.
  *
- * @author: Michel Megens
- * @email:  dev@bietje.net
+ * @author Michel Megens
+ * @email  dev@bietje.net
  */
+
 
 using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Threading;
 
 using Microsoft.Extensions.Logging;
 
@@ -20,30 +22,25 @@ using Newtonsoft.Json;
 using SensateService.Infrastructure.Events;
 using SensateService.Models;
 using SensateService.Exceptions;
-using System.Threading;
+using SensateService.Infrastructure.Repositories;
+using MongoDB.Bson.IO;
+using Newtonsoft.Json.Linq;
+using System.Diagnostics;
 
 namespace SensateService.Infrastructure.Document
 {
-	internal class RawMeasurement
-	{
-		public decimal Data {get;set;}
-		public double Longitude {get;set;}
-		public double Latitude {get;set;}
-		public DateTime CreatedAt {get;set;}
-		public string CreatedBySecret {get;set;}
-	}
-
-	public abstract class AbstractMeasurementRepository : AbstractDocumentRepository<string, Measurement>
+	public class MeasurementRepository : AbstractDocumentRepository<string, Measurement>, IMeasurementRepository
 	{
 		private readonly IMongoCollection<Measurement> _measurements;
 		private readonly Random _random;
-		protected readonly ILogger<AbstractMeasurementRepository> _logger;
+		protected readonly ILogger<MeasurementRepository> _logger;
 
 		public const int JsonError = 300;
 		public const int IncorrectSecretError = 301;
+		public const int InvalidDataError = 302;
 
-		public AbstractMeasurementRepository(SensateContext context,
-			ILogger<AbstractMeasurementRepository> logger) : base(context)
+		public MeasurementRepository(SensateContext context, ILogger<MeasurementRepository> logger)
+			: base(context)
 		{
 			this._measurements = context.Measurements;
 			this._random = new Random();
@@ -58,6 +55,16 @@ namespace SensateService.Infrastructure.Document
 				internalId = ObjectId.Empty;
 
 			return internalId;
+		}
+
+		public override void Commit(Measurement obj)
+		{
+			return;
+		}
+
+		public async override Task CommitAsync(Measurement obj)
+		{
+			await Task.CompletedTask;
 		}
 
 		public override void Update(Measurement obj)
@@ -217,17 +224,17 @@ namespace SensateService.Infrastructure.Document
 				return null;
 
 			try {
-				raw = JsonConvert.DeserializeObject<RawMeasurement>(json);
+				raw = Newtonsoft.Json.JsonConvert.DeserializeObject<RawMeasurement>(json);
 
 				if(raw == null || raw.CreatedBySecret != sensor.Secret) {
 					throw new InvalidRequestException(
-						AbstractMeasurementRepository.IncorrectSecretError,
+						MeasurementRepository.IncorrectSecretError,
 						"Sensor secret doesn't match sensor ID!"
 					);
 				}
 			} catch(JsonSerializationException ex) {
 				this._logger.LogInformation($"Bad measurement received: ${ex.Message}");
-				throw new InvalidRequestException(AbstractMeasurementRepository.JsonError);
+				throw new InvalidRequestException(MeasurementRepository.JsonError);
 			}
 
 			now = DateTime.Now;
@@ -235,7 +242,7 @@ namespace SensateService.Infrastructure.Document
 				raw.CreatedAt = now;
 
 			m = new Measurement {
-				Data = raw.Data,
+				Data = BsonDocument.Parse(raw.Data.ToString()),
 				CreatedAt = raw.CreatedAt,
 				Longitude = raw.Longitude,
 				Latitude = raw.Latitude,
@@ -315,5 +322,24 @@ namespace SensateService.Infrastructure.Document
 				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) >= 0
 			);
 		}
+
+		public virtual Measurement GetMeasurement(string key, Expression<Func<Measurement, bool>> selector)
+		{
+			return this.TryGetMeasurement(key, selector);
+		}
+
+		public virtual async Task<Measurement> GetMeasurementAsync(string key, Expression<Func<Measurement, bool>> selector)
+		{
+			return await this.TryGetMeasurementAsync(key, selector);
+		}
+	}
+
+	internal class RawMeasurement
+	{
+		public JObject Data {get;set;}
+		public double Longitude {get;set;}
+		public double Latitude {get;set;}
+		public DateTime CreatedAt {get;set;}
+		public string CreatedBySecret {get;set;}
 	}
 }

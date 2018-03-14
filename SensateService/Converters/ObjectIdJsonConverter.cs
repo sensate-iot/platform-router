@@ -31,7 +31,7 @@ namespace SensateService.Converters
 
 			if(token.Type == JTokenType.Array) {
 				foreach(var i in token.ToObject<string[]>()) {
-					if(ObjectId.TryParse(i, out id))
+					if(!ObjectId.TryParse(i, out id))
 						continue;
 
 					ids.Add(id);

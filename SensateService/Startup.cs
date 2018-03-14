@@ -151,7 +151,7 @@ namespace SensateService
 				services.AddScoped<ISensorRepository, CachedSensorRepository>();
 			} else {
 				Debug.WriteLine("Caching disabled!");
-				services.AddScoped<IMeasurementRepository, StandardMeasurementRepository>();
+				services.AddScoped<IMeasurementRepository, MeasurementRepository>();
 				services.AddScoped<ISensorRepository, StandardSensorRepository>();
 			}
 

@@ -28,9 +28,16 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.IO;
 
 namespace SensateService.Tests
 {
+	public class TestMeasurement
+	{
+		public decimal y { get; set; }
+		public string  x { get; set; }
+	}
+
 	[TestFixture]
 	public class MeasurementsRepositoryTests
 	{
@@ -50,20 +57,32 @@ namespace SensateService.Tests
 			};
 		}
 
+		[OneTimeSetUp]
+		public void SetUpOnce()
+		{
+			Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
+		}
+
+		[OneTimeTearDown]
+		public void TearDownOnce()
+		{
+			Trace.Flush();
+		}
+
 		[SetUp]
 		public void SetUp()
 		{
 			MongoDBSettings settings;
-			ILogger<AbstractMeasurementRepository> logger;
+			ILogger<MeasurementRepository> logger;
 			SensateContext ctx;
 
 			this._receivedMeasurement = null;
 			settings = new MongoDBSettings();
 			settings.DatabaseName = "SensateUnitTests";
 			settings.ConnectionString = "mongodb://SensateUnitTests:Sensate@localhost:27017/SensateUnitTests";
-			logger = new LoggerFactory().CreateLogger<AbstractMeasurementRepository>();
+			logger = new LoggerFactory().CreateLogger<MeasurementRepository>();
 			ctx = new SensateContext(settings);
-			var repo = new StandardMeasurementRepository(ctx, logger);
+			var repo = new MeasurementRepository(ctx, logger);
 			this._repo = repo;
 			MeasurementEvents.MeasurementReceived += OnMeasurementReceived_Handler;
 		}
@@ -83,8 +102,14 @@ namespace SensateService.Tests
 		public async Task CanGetById()
 		{
 			Measurement m;
+			TestMeasurement testMeasurement;
 
-			m = await this._repo.GetMeasurementAsync(null, x => x.CreatedBy == _sensor.InternalId);
+			m = await this._repo.GetMeasurementAsync(null, x => x.CreatedBy == this._sensor.InternalId);
+			testMeasurement = m.ConvertData<TestMeasurement>();
+
+			Assert.IsFalse(testMeasurement == null, "Unable to create TestMeasurement object!");
+			Assert.IsTrue(testMeasurement.x == "FooBar!", "Invalid Testmeasurement!");
+			Assert.IsTrue(testMeasurement.y == 12351.1234567890M, "Invalid Testmeasurement!");
 			Assert.IsFalse(m == null, "Unable to perform ID lookup!");
 		}
 
@@ -92,9 +117,13 @@ namespace SensateService.Tests
 		public async Task CanCreateMeasurement()
 		{
 			dynamic obj;
+			TestMeasurement m = new TestMeasurement {
+				y = 12351.1234567890M,
+				x = "FooBar!"
+			};
 
 			obj = new JObject();
-			obj.Data = 12.3456D;
+			obj.Data = JToken.Parse(m.ToJson());
 			obj.Longitude = 1.1234;
 			obj.Latitude = 22.1165;
 			obj.CreatedBySecret = "TestingSecret";

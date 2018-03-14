@@ -22,7 +22,7 @@ using SensateService.Exceptions;
 
 namespace SensateService.Infrastructure.Document
 {
-	public class CachedMeasurementRepository : AbstractMeasurementRepository, IMeasurementRepository
+	public class CachedMeasurementRepository : MeasurementRepository
 	{
 		private ICacheStrategy<string> _cache;
 
@@ -31,7 +31,7 @@ namespace SensateService.Infrastructure.Document
 
 		public CachedMeasurementRepository(
 			SensateContext context,
-			ILogger<AbstractMeasurementRepository> logger,
+			ILogger<MeasurementRepository> logger,
 			ICacheStrategy<string> cache) : base(context, logger)
 		{
 			this._cache = cache;
@@ -77,7 +77,7 @@ namespace SensateService.Infrastructure.Document
 
 		private void CacheData(string key, object data)
 		{
-			this.CacheData(key, data.ToJson());
+			this.CacheData(key, JsonConvert.SerializeObject(data));
 		}
 
 		private void CacheData(string key, string json)
@@ -90,7 +90,7 @@ namespace SensateService.Infrastructure.Document
 
 		private async Task CacheDataAsync(string key, object data, int tmo)
 		{
-			await this.CacheDataAsync(key, data.ToJson(), tmo);
+			await this.CacheDataAsync(key, JsonConvert.SerializeObject(data), tmo);
 		}
 
 		private async Task CacheDataAsync(string key, string json, int tmo)
@@ -232,7 +232,7 @@ namespace SensateService.Infrastructure.Document
 			return this.TryGetMeasurements(key, selector, CacheTimeout);
 		}
 
-		public Measurement GetMeasurement(string key, Expression<Func<Measurement, bool>> selector)
+		public override Measurement GetMeasurement(string key, Expression<Func<Measurement, bool>> selector)
 		{
 			return TryGetMeasurement(key, selector);
 		}
@@ -264,7 +264,7 @@ namespace SensateService.Infrastructure.Document
 
 			if(data == null) {
 				measurements = await base.TryGetBetweenAsync(sensor, start, end);
-				await this.CacheDataAsync(key, measurements.ToJson(), CacheTimeout);
+				await this.CacheDataAsync(key, JsonConvert.SerializeObject(measurements), CacheTimeout);
 				return measurements;
 			}
 
@@ -272,7 +272,7 @@ namespace SensateService.Infrastructure.Document
 			return JsonConvert.DeserializeObject<IEnumerable<Measurement>>(data);
 		}
 
-		public async Task<Measurement> GetMeasurementAsync(string key, Expression<Func<Measurement, bool>> selector)
+		public override async Task<Measurement> GetMeasurementAsync(string key, Expression<Func<Measurement, bool>> selector)
 		{
 			return await this.TryGetMeasurementAsync(key, selector);
 		}
