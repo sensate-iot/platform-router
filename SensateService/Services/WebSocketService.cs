@@ -51,7 +51,7 @@ namespace SensateService.Services
 					}
 				});
 			} catch(WebSocketException) {
-				Debug.WriteLine($"Websocket error occurred! {socket.State}");
+				Debug.WriteLine($"Websocket error occurred! Socket state: {socket.State}");
 				this._handler.OnForceClose(socket);
 				return;
 			}
