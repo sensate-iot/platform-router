@@ -68,11 +68,13 @@ namespace SensateService.Controllers
 		{
 			SensateUser user;
 			string usertoken;
+			BodyBuilder mail;
 
 			user = await this._users.GetByEmailAsync(model.Email);
 			if(user == null || !user.EmailConfirmed)
 				return NotFound();
 
+			mail = await this.ReadMailTemplate("Confirm_Password_Reset.html", "Confirm_Password_Reset.txt");
 			var token = await this._manager.GeneratePasswordResetTokenAsync(user);
 			token = Base64UrlEncoder.Encode(token);
 			usertoken = this._tokens.Create(token);
@@ -80,7 +82,9 @@ namespace SensateService.Controllers
 			if(usertoken == null)
 				return this.StatusCode(500);
 
-			Debug.WriteLine($"Password reset URL: {usertoken}");
+			mail.HtmlBody = mail.HtmlBody.Replace("%%TOKEN%%", usertoken);
+			mail.TextBody = String.Format(mail.TextBody, usertoken);
+			await this._mailer.SendEmailAsync(user.Email, "Reset password token", mail);
 			return Ok();
 		}
 
