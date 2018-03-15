@@ -17,7 +17,6 @@ using Microsoft.Extensions.Logging;
 
 using MongoDB.Driver;
 using MongoDB.Bson;
-using MongoDB.Bson.IO;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
