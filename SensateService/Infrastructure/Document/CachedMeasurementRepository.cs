@@ -1,5 +1,5 @@
 /*
- * Abstract measurement repository
+ * Cached measurement repository
  *
  * @author: Michel Megens
  * @email:  dev@bietje.net
