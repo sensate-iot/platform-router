@@ -152,7 +152,7 @@ namespace SensateService
 			} else {
 				Debug.WriteLine("Caching disabled!");
 				services.AddScoped<IMeasurementRepository, MeasurementRepository>();
-				services.AddScoped<ISensorRepository, StandardSensorRepository>();
+				services.AddScoped<ISensorRepository, SensorRepository>();
 			}
 
 			var mqttopts = new MqttOptions {

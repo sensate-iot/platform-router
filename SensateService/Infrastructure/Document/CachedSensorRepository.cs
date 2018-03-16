@@ -16,7 +16,7 @@ using SensateService.Models;
 
 namespace SensateService.Infrastructure.Document
 {
-	public class CachedSensorRepository : StandardSensorRepository
+	public class CachedSensorRepository : SensorRepository
 	{
 		private ICacheStrategy<string> _cache;
 
@@ -25,7 +25,7 @@ namespace SensateService.Infrastructure.Document
 
 		public CachedSensorRepository(
 			SensateContext context,
-			ILogger<StandardSensorRepository> logger,
+			ILogger<SensorRepository> logger,
 			ICacheStrategy<string> cache) : base(context, logger)
 		{
 			this._cache = cache;
