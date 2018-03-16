@@ -51,5 +51,15 @@ namespace SensateService.Infrastructure.Sql
 		public abstract void Delete(TKey id);
 		public abstract Task CreateAsync(T obj);
 		public abstract Task DeleteAsync(TKey id);
+
+		public virtual void StartUpdate(T obj)
+		{
+			this._sqlContext.Update(obj);
+		}
+
+		public virtual async Task EndUpdateAsync()
+		{
+			await this._sqlContext.SaveChangesAsync();
+		}
 	}
 }

@@ -20,7 +20,7 @@ namespace SensateService.Infrastructure.Repositories
 		Task CreateAsync(Sensor sensor);
 		Sensor Get(string id);
 		void Remove(string secret);
-		void Update(Sensor obj2);
+		void Update(Sensor obj);
 
 		Task<Sensor> GetAsync(string id);
 		Task RemoveAsync(string id);

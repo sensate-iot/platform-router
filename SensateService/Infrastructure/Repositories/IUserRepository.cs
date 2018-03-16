@@ -22,5 +22,8 @@ namespace SensateService.Infrastructure.Repositories
 
 		SensateUser GetCurrentUser(ClaimsPrincipal cp);
 		Task<SensateUser> GetCurrentUserAsync(ClaimsPrincipal cp);
+
+		void StartUpdate(SensateUser user);
+		Task EndUpdateAsync();
 	}
 }
