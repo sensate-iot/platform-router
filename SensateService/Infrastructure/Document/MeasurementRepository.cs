@@ -218,6 +218,7 @@ namespace SensateService.Infrastructure.Document
 			Measurement m;
 			RawMeasurement raw;
 			DateTime now;
+			BsonDocument document;
 
 			if(json == null || sensor == null)
 				return null;
@@ -241,13 +242,21 @@ namespace SensateService.Infrastructure.Document
 				raw.CreatedAt = now;
 
 			m = new Measurement {
-				Data = BsonDocument.Parse(raw.Data.ToString()),
 				CreatedAt = raw.CreatedAt,
 				Longitude = raw.Longitude,
 				Latitude = raw.Latitude,
 				CreatedBy = sensor.InternalId,
 				InternalId = base.GenerateId(now)
 			};
+
+			if(BsonDocument.TryParse(raw.Data.ToString(), out document)) {
+				m.Data = document;
+			} else {
+				throw new InvalidRequestException(
+					MeasurementRepository.InvalidDataError,
+					"Unable to parse data"
+				);
+			}
 
 			try {
 				var opts = new InsertOneOptions {
