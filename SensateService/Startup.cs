@@ -29,6 +29,7 @@ using SensateService.Init;
 using SensateService.Services;
 using SensateService.Controllers;
 using SensateService.Middleware;
+using Microsoft.Extensions.Hosting;
 
 namespace SensateService
 {
@@ -155,17 +156,21 @@ namespace SensateService
 				services.AddScoped<ISensorRepository, SensorRepository>();
 			}
 
-			var mqttopts = new MqttOptions {
-				Ssl = Configuration["MqttSsl"] == "true",
-				Host = Configuration["MqttHost"],
-				Port = Int32.Parse(Configuration["MqttPort"]),
-				Username = Secrets["MqttUsername"],
-				Password = Secrets["MqttPassword"],
-				Id = Guid.NewGuid().ToString(),
-				Topic = Configuration["MqttShareTopic"]
-			};
+			services.AddMqttService(options => {
+				options.Ssl = Configuration["MqttSsl"] == "true";
+				options.Host = Configuration["MqttHost"];
+				options.Port = Int32.Parse(Configuration["MqttPort"]);
+				options.Username = Secrets["MqttUsername"];
+				options.Password = Secrets["MqttPassword"];
+				options.Id = Guid.NewGuid().ToString();
+				options.TopicShare = "$share/sensate/";
+			});
 
-			Program.MqttClient = MqttServiceFactory.CreateMqttService(
+
+			/*var mqttopts = new MqttOptions {
+			};*/
+
+			/*Program.MqttClient = MqttServiceFactory.CreateMqttService(
 				services.BuildServiceProvider().CreateScope().ServiceProvider,
 				mqttopts
 			);
@@ -175,8 +180,7 @@ namespace SensateService
 				result.Wait();
 			} catch(Exception ex) {
 				Debug.WriteLine($"Potential MQTT error: {ex.Message}");
-			}
-
+			}*/
 			services.AddSingleton<IEmailSender, EmailSender>();
 			services.Configure<MessageSenderAuthOptions>(opts => {
 				opts.FromName = Configuration["EmailFromName"];
@@ -195,6 +199,7 @@ namespace SensateService
 				app.UseDeveloperExceptionPage();
 			}
 
+			app.MapMqttTopic<MqttMeasurementHandler>(sp, Configuration["MqttShareTopic"]);
 			app.UseWebSockets();
 			app.MapWebSocketService("/measurement", sp.GetService<WebSocketMeasurementHandler>());
 			app.UseAuthentication();

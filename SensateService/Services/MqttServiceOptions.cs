@@ -5,9 +5,12 @@
  * @email:  dev@bietje.net
  */
 
+using System;
+using System.Collections.Generic;
+
 namespace SensateService.Services
 {
-	public class MqttOptions
+	public class MqttServiceOptions
 	{
 		public string Host {get;set;}
 		public int Port {get;set;}
@@ -15,6 +18,6 @@ namespace SensateService.Services
 		public string Id {get;set;}
 		public string Username {get;set;}
 		public string Password {get;set;}
-		public string Topic {get;set;}
+		public string TopicShare {get;set;}
 	}
 }

@@ -27,7 +27,7 @@ namespace SensateService
 {
 	public class Program
 	{
-		public static MqttService MqttClient;
+		//public static MqttService MqttClient;
 
 		public const string ApiVersionString = "v1";
 
