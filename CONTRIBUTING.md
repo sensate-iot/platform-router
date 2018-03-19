@@ -96,11 +96,12 @@ Please try and follow the style guides below at all times. Keep in mind that pat
 **can be rejected** based on style errors.
 
 ### Git commit messages
-  * Use the present tense ("Add feature", not "Added feature").
-  * On the first line, include subsystem (and module) your patch belongs to (e.g.
-    "sched: core: optimize __schedule_need_resched()").
-  * Limit the first line to 72 characters or less
-  * If applicable, include references to issue's and pull requests.
+
+* Use the present tense ("Add feature", not "Added feature").
+* On the first line, include subsystem (and module) your patch belongs to (e.g. 
+  "sched: core: optimize __schedule_need_resched()").
+* Limit the first line to 72 characters or less
+* If applicable, include references to issue's and pull requests.
 
 ### C
 
