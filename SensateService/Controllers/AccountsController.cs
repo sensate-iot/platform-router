@@ -40,6 +40,7 @@ namespace SensateService.Controllers
 		private readonly IUserRepository _users;
 		private readonly IEmailSender _mailer;
 		private readonly IPasswordResetTokenRepository _tokens;
+		private readonly IChangeEmailTokenRepository _email_tokens;
 
 		public AccountsController(
 			IUserRepository repo,
@@ -47,7 +48,8 @@ namespace SensateService.Controllers
 			UserManager<SensateUser> userManager,
 			IOptions<UserAccountSettings> options,
 			IEmailSender emailer,
-			IPasswordResetTokenRepository tokens
+			IPasswordResetTokenRepository tokens,
+			IChangeEmailTokenRepository emailTokens
 		)
 		{
 			this._users = repo;
@@ -56,6 +58,7 @@ namespace SensateService.Controllers
 			this._manager = userManager;
 			this._mailer = emailer;
 			this._tokens = tokens;
+			this._email_tokens = emailTokens;
 		}
 
 		[HttpPost("forgot-password")]
@@ -101,6 +104,57 @@ namespace SensateService.Controllers
 				return Ok();
 
 			return new NotFoundObjectResult(new {Message = result.Errors});
+		}
+
+		[HttpPost("confirm-update-email")]
+		[Authorize]
+		public async Task<IActionResult> ConfirmChangeEmail([FromBody] ChangeEmailModel changeEmail)
+		{
+			ChangeEmailToken token;
+
+			if(changeEmail.Email == null || changeEmail.Email.Length == 0 ||
+				changeEmail.Token == null || changeEmail.Token.Length == 0) {
+				return BadRequest();
+			}
+
+			var user = await this._users.GetCurrentUserAsync(User);
+			token = this._email_tokens.GetById(changeEmail.Token);
+
+			if(token == null)
+				return NotFound();
+	
+			var result = await this._manager.ChangeEmailAsync(user, token.Email, token.IdentityToken);
+			await this._manager.SetUserNameAsync(user, token.Email);
+
+			if(!result.Succeeded) {
+				return this.StatusCode(500);
+			}
+
+			return this.Ok();
+		}
+
+		[HttpPost("update-email")]
+		[Authorize]
+		public async Task<IActionResult> UpdateEmail([FromBody] ChangeEmailModel changeEmailModel)
+		{
+			string token;
+			string resetToken;
+			SensateUser user;
+
+			if(changeEmailModel.Email == null || changeEmailModel.NewEmail == null ||
+				changeEmailModel.Email.Length == 0 || changeEmailModel.NewEmail.Length == 0) {
+				return BadRequest();
+			}
+
+			user = await this._users.GetCurrentUserAsync(User);
+			if(user == null)
+				return BadRequest();
+
+			resetToken = await this._manager.GenerateChangeEmailTokenAsync(user, changeEmailModel.NewEmail);
+			token = this._email_tokens.Create(resetToken, changeEmailModel.NewEmail);
+
+			Debug.WriteLine($"Change email token: {token}");
+			return this.Ok();
 		}
 
 		[HttpPost("login")]

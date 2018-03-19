@@ -136,6 +136,7 @@ namespace SensateService
 
 			/* Add repositories */
 			services.AddScoped<IUserRepository, UserRepository>();
+			services.AddScoped<IChangeEmailTokenRepository, ChangeEmailTokenRepository>();
 			services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
 			services.AddScoped<ISensateRoleRepository, SensateRoleRepository>();
 			services.AddScoped<IAuditLogRepository, AuditLogRepository>();
