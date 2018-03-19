@@ -19,8 +19,10 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Hosting;
 
 using Newtonsoft.Json.Linq;
+using MimeKit;
 
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
@@ -41,6 +43,7 @@ namespace SensateService.Controllers
 		private readonly IEmailSender _mailer;
 		private readonly IPasswordResetTokenRepository _tokens;
 		private readonly IChangeEmailTokenRepository _email_tokens;
+		private readonly IHostingEnvironment _env;
 
 		public AccountsController(
 			IUserRepository repo,
@@ -49,7 +52,8 @@ namespace SensateService.Controllers
 			IOptions<UserAccountSettings> options,
 			IEmailSender emailer,
 			IPasswordResetTokenRepository tokens,
-			IChangeEmailTokenRepository emailTokens
+			IChangeEmailTokenRepository emailTokens,
+			IHostingEnvironment env
 		)
 		{
 			this._users = repo;
@@ -59,6 +63,7 @@ namespace SensateService.Controllers
 			this._mailer = emailer;
 			this._tokens = tokens;
 			this._email_tokens = emailTokens;
+			this._env = env;
 		}
 
 		[HttpPost("forgot-password")]
@@ -66,11 +71,13 @@ namespace SensateService.Controllers
 		{
 			SensateUser user;
 			string usertoken;
+			BodyBuilder mail;
 
 			user = await this._users.GetByEmailAsync(model.Email);
 			if(user == null || !user.EmailConfirmed)
 				return NotFound();
 
+			mail = await this.ReadMailTemplate("Confirm_Password_Reset.html", "Confirm_Password_Reset.txt");
 			var token = await this._manager.GeneratePasswordResetTokenAsync(user);
 			token = Base64UrlEncoder.Encode(token);
 			usertoken = this._tokens.Create(token);
@@ -78,7 +85,9 @@ namespace SensateService.Controllers
 			if(usertoken == null)
 				return this.StatusCode(500);
 
-			Debug.WriteLine($"Password reset URL: {usertoken}");
+			mail.HtmlBody = mail.HtmlBody.Replace("%%TOKEN%%", usertoken);
+			mail.TextBody = String.Format(mail.TextBody, usertoken);
+			await this._mailer.SendEmailAsync(user.Email, "Reset password token", mail);
 			return Ok();
 		}
 
@@ -186,9 +195,30 @@ namespace SensateService.Controllers
 			return true;
 		}
 
+		private async Task<BodyBuilder> ReadMailTemplate(string html, string text)
+		{
+			BodyBuilder body;
+			string path;
+
+			body = new BodyBuilder();
+			path = this._env.GetTemplatePath(html);
+
+			using(var reader = System.IO.File.OpenText(path)) {
+				body.HtmlBody = await reader.ReadToEndAsync();
+			}
+
+			path = this._env.GetTemplatePath(text);
+			using(var reader = System.IO.File.OpenText(path)) {
+				body.TextBody = await reader.ReadToEndAsync();
+			}
+
+			return body;
+		}
+
 		[HttpPost("register")]
 		public async Task<object> Register([FromBody] RegisterModel register)
 		{
+			BodyBuilder mail;
 			var user = new SensateUser {
 				UserName = register.Email,
 				Email = register.Email,
@@ -203,13 +233,16 @@ namespace SensateService.Controllers
 			var result = await this._manager.CreateAsync(user, register.Password);
 
 			if(result.Succeeded) {
+				mail = await this.ReadMailTemplate("Confirm_Account_Registration.html", "Confirm_Account_Registration.txt");
 				user = await this._users.GetAsync(user.Id);
 				var code = await this._manager.GenerateEmailConfirmationTokenAsync(user);
 				code = Base64UrlEncoder.Encode(code);
 				var url = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
-				Debug.WriteLine($"Confirmation URL: {url}");
+				mail.HtmlBody = mail.HtmlBody.Replace("%%URL%%", url);
+				mail.TextBody = String.Format(mail.TextBody, url);
+
 				await this._manager.AddToRoleAsync(user, "Users");
-				await this._mailer.SendEmailAsync(user.Email, "Confirm email!", url);
+				await this._mailer.SendEmailAsync(user.Email, "Sensate email confirmation", mail);
 				return Ok();
 			}
 

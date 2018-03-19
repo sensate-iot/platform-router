@@ -1,0 +1,10 @@
+Hi there!
+
+Thanks for signing up with Sensate! In order to complete your
+registration you need to confirm your email. Please click on the
+URL below in order to do so:
+
+{0}
+
+Good luck,
+The Sensate team
