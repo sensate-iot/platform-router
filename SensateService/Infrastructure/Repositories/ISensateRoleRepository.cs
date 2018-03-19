@@ -1,0 +1,32 @@
+﻿/*
+ * Identity role repository interface.
+ * 
+ * @author Michel Megens
+ * @email  dev@bietje.net
+ */
+
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+using SensateService.Models;
+
+namespace SensateService.Infrastructure.Repositories
+{
+    public interface ISensateRoleRepository
+    {
+		void Create(SensateRole role);
+		Task CreateAsync(SensateRole role);
+		void Create(string name, string description);
+		Task CreateAsync(string name, string description);
+
+		void Delete(string name);
+		Task DeleteAsync(string name);
+
+		Task UpdateAsync(string name, SensateRole role);
+		void Update(string name, SensateRole role);
+
+		SensateRole GetById(string id);
+		SensateRole GetByName(string name);
+		IEnumerable<SensateUser> GetUsers(string id);
+    }
+}
