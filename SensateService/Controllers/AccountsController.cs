@@ -186,7 +186,7 @@ namespace SensateService.Controllers
 
 			if(result.Succeeded) {
 				var user = await this._users.GetByEmailAsync(loginModel.Email);
-				return this.GenerateJwtToken(loginModel.Email, user);
+				return await this.GenerateJwtToken(loginModel.Email, user);
 			}
 
 			return NotFound();
@@ -302,16 +302,22 @@ namespace SensateService.Controllers
 			return this.Ok();
 		}
 
-		private object GenerateJwtToken(string email, SensateUser user)
+		private async Task<object> GenerateJwtToken(string email, SensateUser user)
 		{
 			List<Claim> claims;
 			JwtSecurityToken token;
+			List<string> roles;
 
 			claims = new List<Claim> {
 				new Claim(JwtRegisteredClaimNames.Sub, email),
 				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
 				new Claim(ClaimTypes.NameIdentifier, user.Id)
 			};
+
+			roles = await this._users.GetRolesAsync(user) as List<string>;
+			roles.ForEach(x => {
+				claims.Add(new Claim(ClaimTypes.Role, x));
+			});
 
 			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this._settings.JwtKey));
 			var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
