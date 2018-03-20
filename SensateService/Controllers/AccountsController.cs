@@ -34,7 +34,7 @@ namespace SensateService.Controllers
 {
 	[Route("v{version:apiVersion}/[controller]")]
 	[ApiVersion("1")]
-	public class AccountsController : Controller
+	public class AccountsController : AbstractController
 	{
 		private readonly UserAccountSettings _settings;
 		private readonly SignInManager<SensateUser> _siManager;
@@ -321,7 +321,7 @@ namespace SensateService.Controllers
 
 			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this._settings.JwtKey));
 			var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-			var expires = DateTime.Now.AddDays(this._settings.JwtExpireDays);
+			var expires = DateTime.Now.AddMinutes(this._settings.JwtExpireMinutes);
 			token = new JwtSecurityToken(
 				issuer: this._settings.JwtIssuer,
 				audience: this._settings.JwtIssuer,

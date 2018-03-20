@@ -21,7 +21,7 @@ namespace SensateService.Controllers.V1
 {
 	[Route("v{version:apiVersion}/[controller]")]
 	[ApiVersion("1")]
-	public class SensorsController : Controller
+	public class SensorsController : AbstractController
 	{
 		private ISensorRepository _repo;
 		private readonly Random random;

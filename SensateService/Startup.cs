@@ -74,7 +74,7 @@ namespace SensateService
 			services.Configure<UserAccountSettings>(options => {
 				options.JwtKey = this.Secrets["JwtKey"];
 				options.JwtIssuer = this.Secrets["JwtIssuer"];
-				options.JwtExpireDays = Int32.Parse(this.Secrets["JwtExpireDays"]);
+				options.JwtExpireMinutes = Int32.Parse(this.Secrets["JwtExpireMinutes"]);
 			});
 
 			services.AddTransient<SensateContext>();
