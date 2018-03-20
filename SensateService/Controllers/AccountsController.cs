@@ -148,6 +148,7 @@ namespace SensateService.Controllers
 		{
 			string token;
 			string resetToken;
+			BodyBuilder mail;
 			SensateUser user;
 
 			if(changeEmailModel.Email == null || changeEmailModel.NewEmail == null ||
@@ -161,8 +162,15 @@ namespace SensateService.Controllers
 
 			resetToken = await this._manager.GenerateChangeEmailTokenAsync(user, changeEmailModel.NewEmail);
 			token = this._email_tokens.Create(resetToken, changeEmailModel.NewEmail);
+			mail = await this.ReadMailTemplate("Confirm_Update_Email.html", "Confirm_Update_Email.txt");
 
-			Debug.WriteLine($"Change email token: {token}");
+			if(mail == null)
+				return this.StatusCode(500);
+
+			mail.HtmlBody = mail.HtmlBody.Replace("%%TOKEN%%", token);
+			mail.TextBody = String.Format(mail.TextBody, token);
+			await this._mailer.SendEmailAsync(changeEmailModel.NewEmail, "Confirm your new mail", mail);
+
 			return this.Ok();
 		}
 
