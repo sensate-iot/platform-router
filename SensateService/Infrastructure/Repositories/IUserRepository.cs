@@ -25,5 +25,7 @@ namespace SensateService.Infrastructure.Repositories
 
 		void StartUpdate(SensateUser user);
 		Task EndUpdateAsync();
+		IEnumerable<string> GetRoles(SensateUser user);
+		Task<IEnumerable<string>> GetRolesAsync(SensateUser user);
 	}
 }

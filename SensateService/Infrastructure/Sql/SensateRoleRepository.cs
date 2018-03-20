@@ -89,6 +89,16 @@ namespace SensateService.Infrastructure.Sql
 					select role).Single<SensateRole>();
 		}
 
+		public IEnumerable<string> GetRolesFor(SensateUser user)
+		{
+			return this._users.GetRoles(user);
+		}
+
+		public async Task<IEnumerable<string>> GetRolesForAsync(SensateUser user)
+		{
+			return await this._users.GetRolesAsync(user);
+		}
+
 		public IEnumerable<SensateUser> GetUsers(string name)
 		{
 			IEnumerable<IdentityUserRole<string>> roles;

@@ -120,5 +120,18 @@ namespace SensateService.Infrastructure.Sql
 			email = this._manager.GetUserId(cp);
 			return await this.GetByEmailAsync(email);
 		}
+
+		public IEnumerable<string> GetRoles(SensateUser user)
+		{
+			var result = this._manager.GetRolesAsync(user);
+			result.Wait();
+
+			return result.Result;
+		}
+
+		public async Task<IEnumerable<string>> GetRolesAsync(SensateUser user)
+		{
+			return await this._manager.GetRolesAsync(user);
+		}
 	}
 }

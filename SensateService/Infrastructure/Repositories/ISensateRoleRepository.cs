@@ -28,5 +28,7 @@ namespace SensateService.Infrastructure.Repositories
 		SensateRole GetById(string id);
 		SensateRole GetByName(string name);
 		IEnumerable<SensateUser> GetUsers(string id);
+		IEnumerable<string> GetRolesFor(SensateUser user);
+		Task<IEnumerable<string>> GetRolesForAsync(SensateUser user);
     }
 }
