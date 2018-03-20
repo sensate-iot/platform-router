@@ -7,7 +7,7 @@
 
 namespace SensateService.Models.Json
 {
-	public class UserForgotPasswordModel
+	public class ForgotPassword
 	{
 		public string Email {get;set;}
 	}
