@@ -7,6 +7,7 @@
 
 using System;
 using System.Reflection;
+using System.Linq;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.Hosting;
 
 using SensateService.Middleware;
 using SensateService.Services;
+using System.Collections.Generic;
 
 namespace SensateService.Init
 {
@@ -44,7 +46,7 @@ namespace SensateService.Init
 		) where T : MqttHandler
 		{
 			MqttService mqtt;
-			var services = sp.GetServices<IHostedService>();
+			List<IHostedService> services;
 
 			/*
 			 * If anybody knows a cleaner way of going about
@@ -54,12 +56,9 @@ namespace SensateService.Init
 			 * we need. I'm truly sorry you are a witness to this savage
 			 * piece of SWE.
 			 */
-			foreach(var service in services) {
-				if(service is MqttService) {
-					mqtt = service as MqttService;
-					mqtt.MapTopicHandler<T>(topic);
-				}
-			}
+			services = sp.GetServices<IHostedService>().ToList();
+			mqtt = services.Find(x => x.GetType() == typeof(MqttService)) as MqttService;
+			mqtt.MapTopicHandler<T>(topic);
 		}
 	}
 }
