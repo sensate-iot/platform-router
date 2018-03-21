@@ -20,6 +20,7 @@ namespace SensateService.Infrastructure.Sql
 		public DbSet<AuditLog> AuditLogs { get; set; }
 		public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 		public DbSet<ChangeEmailToken> ChangeEmailTokens { get; set; }
+		public new DbSet<SensateUserToken> UserTokens { get; set; }
 
 		public SensateSqlContext(DbContextOptions<SensateSqlContext> options) :
 			base(options)
