@@ -4,7 +4,7 @@
 
 namespace SensateService.Models.Json
 {
-	public class ChangeEmailModel
+	public class UpdateEmail
 	{
 		public string Email { get; set; }
 		public string NewEmail { get; set; }

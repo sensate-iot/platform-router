@@ -34,7 +34,7 @@ namespace SensateService.Controllers
 {
 	[Route("v{version:apiVersion}/[controller]")]
 	[ApiVersion("1")]
-	public class AccountsController : Controller
+	public class AccountsController : AbstractController
 	{
 		private readonly UserAccountSettings _settings;
 		private readonly SignInManager<SensateUser> _siManager;
@@ -67,7 +67,7 @@ namespace SensateService.Controllers
 		}
 
 		[HttpPost("forgot-password")]
-		public async Task<IActionResult> ForgotPassword([FromBody] UserForgotPasswordModel model)
+		public async Task<IActionResult> ForgotPassword([FromBody] ForgotPassword model)
 		{
 			SensateUser user;
 			string usertoken;
@@ -92,7 +92,7 @@ namespace SensateService.Controllers
 		}
 
 		[HttpPost("reset-password")]
-		public async Task<IActionResult> Resetpassword([FromBody] UserChangePasswordModel model)
+		public async Task<IActionResult> Resetpassword([FromBody] ResetPassword model)
 		{
 			SensateUser user;
 			PasswordResetToken token;
@@ -117,7 +117,7 @@ namespace SensateService.Controllers
 
 		[HttpPost("confirm-update-email")]
 		[Authorize]
-		public async Task<IActionResult> ConfirmChangeEmail([FromBody] ChangeEmailModel changeEmail)
+		public async Task<IActionResult> ConfirmChangeEmail([FromBody] UpdateEmail changeEmail)
 		{
 			ChangeEmailToken token;
 
@@ -144,7 +144,7 @@ namespace SensateService.Controllers
 
 		[HttpPost("update-email")]
 		[Authorize]
-		public async Task<IActionResult> UpdateEmail([FromBody] ChangeEmailModel changeEmailModel)
+		public async Task<IActionResult> UpdateEmail([FromBody] UpdateEmail changeEmailModel)
 		{
 			string token;
 			string resetToken;
@@ -175,7 +175,7 @@ namespace SensateService.Controllers
 		}
 
 		[HttpPost("login")]
-		public async Task<object> Login([FromBody] LoginModel loginModel)
+		public async Task<object> Login([FromBody] Login loginModel)
 		{
 			var result = await this._siManager.PasswordSignInAsync(
 				loginModel.Email,
@@ -224,7 +224,7 @@ namespace SensateService.Controllers
 		}
 
 		[HttpPost("register")]
-		public async Task<object> Register([FromBody] RegisterModel register)
+		public async Task<object> Register([FromBody] Register register)
 		{
 			BodyBuilder mail;
 			var user = new SensateUser {
@@ -321,7 +321,7 @@ namespace SensateService.Controllers
 
 			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this._settings.JwtKey));
 			var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-			var expires = DateTime.Now.AddDays(this._settings.JwtExpireDays);
+			var expires = DateTime.Now.AddMinutes(this._settings.JwtExpireMinutes);
 			token = new JwtSecurityToken(
 				issuer: this._settings.JwtIssuer,
 				audience: this._settings.JwtIssuer,

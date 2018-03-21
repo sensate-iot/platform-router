@@ -9,7 +9,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SensateService.Models.Json
 {
-	public class LoginModel
+	public class Login
 	{
 		[Required]
 		public string Email { get; set; }
