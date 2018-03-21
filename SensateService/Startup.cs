@@ -140,6 +140,7 @@ namespace SensateService
 			services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
 			services.AddScoped<ISensateRoleRepository, SensateRoleRepository>();
 			services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+			services.AddScoped<ISensateUserTokenRepository, SensateUserTokenRepository>();
 
 			if(this.Configuration["Cache"] == "true") {
 				if(this.Configuration["CacheType"] == "Distributed") {
