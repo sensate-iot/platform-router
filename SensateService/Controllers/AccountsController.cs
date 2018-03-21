@@ -40,7 +40,8 @@ namespace SensateService.Controllers
 		private readonly SignInManager<SensateUser> _siManager;
 		private readonly UserManager<SensateUser> _manager;
 		private readonly IEmailSender _mailer;
-		private readonly IPasswordResetTokenRepository _tokens;
+		private readonly IPasswordResetTokenRepository _passwd_tokens;
+		private readonly ISensateUserTokenRepository _auth_tokens;
 		private readonly IChangeEmailTokenRepository _email_tokens;
 		private readonly IHostingEnvironment _env;
 
@@ -52,6 +53,7 @@ namespace SensateService.Controllers
 			IEmailSender emailer,
 			IPasswordResetTokenRepository tokens,
 			IChangeEmailTokenRepository emailTokens,
+			ISensateUserTokenRepository authTokens,
 			IHostingEnvironment env
 		) : base(repo)
 		{
@@ -59,9 +61,10 @@ namespace SensateService.Controllers
 			this._settings = options.Value;
 			this._manager = userManager;
 			this._mailer = emailer;
-			this._tokens = tokens;
+			this._passwd_tokens = tokens;
 			this._email_tokens = emailTokens;
 			this._env = env;
+			this._auth_tokens = authTokens;
 		}
 
 		[HttpPost("forgot-password")]
@@ -78,7 +81,7 @@ namespace SensateService.Controllers
 			mail = await this.ReadMailTemplate("Confirm_Password_Reset.html", "Confirm_Password_Reset.txt");
 			var token = await this._manager.GeneratePasswordResetTokenAsync(user);
 			token = Base64UrlEncoder.Encode(token);
-			usertoken = this._tokens.Create(token);
+			usertoken = this._passwd_tokens.Create(token);
 
 			if(usertoken == null)
 				return this.StatusCode(500);
@@ -99,7 +102,7 @@ namespace SensateService.Controllers
 				return BadRequest();
 
 			user = await this._users.GetByEmailAsync(model.Email);
-			token = this._tokens.GetById(model.Token);
+			token = this._passwd_tokens.GetById(model.Token);
 
 			if(user == null || token == null)
 				return NotFound();
@@ -184,7 +187,8 @@ namespace SensateService.Controllers
 
 			if(result.Succeeded) {
 				var user = await this._users.GetByEmailAsync(loginModel.Email);
-				return await this.GenerateJwtToken(loginModel.Email, user);
+				var roles = await this._users.GetRolesAsync(user);
+				return this._auth_tokens.GenerateJwtToken(user, roles, this._settings);
 			}
 
 			return NotFound();
@@ -298,37 +302,6 @@ namespace SensateService.Controllers
 				return Unauthorized();
 
 			return this.Ok();
-		}
-
-		private async Task<object> GenerateJwtToken(string email, SensateUser user)
-		{
-			List<Claim> claims;
-			JwtSecurityToken token;
-			List<string> roles;
-
-			claims = new List<Claim> {
-				new Claim(JwtRegisteredClaimNames.Sub, email),
-				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-				new Claim(ClaimTypes.NameIdentifier, user.Id)
-			};
-
-			roles = await this._users.GetRolesAsync(user) as List<string>;
-			roles.ForEach(x => {
-				claims.Add(new Claim(ClaimTypes.Role, x));
-			});
-
-			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this._settings.JwtKey));
-			var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-			var expires = DateTime.Now.AddMinutes(this._settings.JwtExpireMinutes);
-			token = new JwtSecurityToken(
-				issuer: this._settings.JwtIssuer,
-				audience: this._settings.JwtIssuer,
-				claims: claims,
-				expires: expires,
-				signingCredentials: creds
-			);
-
-			return new JwtSecurityTokenHandler().WriteToken(token);
 		}
 	}
 }
