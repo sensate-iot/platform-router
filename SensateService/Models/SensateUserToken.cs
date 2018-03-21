@@ -7,15 +7,23 @@
  */
 
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 
 namespace SensateService.Models
 {
-	public class SensateUserToken : IdentityUserToken<string>
+	[Table("AspNetAuthTokens")]
+	public class SensateUserToken
 	{
 		public bool Valid { get; set; }
 		public DateTime CreatedAt { get; set; }
 		public DateTime ExpiresAt { get; set; }
+		public string Value { get; set; }
+		public string LoginProvider { get; set; }
+
+		[ForeignKey("User")]
+		public string UserId { get; set; }
+		public SensateUser User { get; set; }
 
 		public SensateUserToken()
 		{

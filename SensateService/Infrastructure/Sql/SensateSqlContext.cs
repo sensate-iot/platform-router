@@ -11,6 +11,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using SensateService.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace SensateService.Infrastructure.Sql
 {
@@ -29,9 +30,14 @@ namespace SensateService.Infrastructure.Sql
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
 			base.OnModelCreating(builder);
+
 			builder.Entity<PasswordResetToken>().HasKey(
 				k => k.UserToken
 			);
+
+			builder.Entity<SensateUserToken>().HasKey(k => new {
+				k.UserId, k.Value
+			});
 		}
 	}
 }
