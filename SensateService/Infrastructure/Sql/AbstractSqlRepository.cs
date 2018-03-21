@@ -61,5 +61,10 @@ namespace SensateService.Infrastructure.Sql
 		{
 			await this._sqlContext.SaveChangesAsync();
 		}
+
+		public virtual void EndUpdate()
+		{
+			this._sqlContext.SaveChanges();
+		}
 	}
 }

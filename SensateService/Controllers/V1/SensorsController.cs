@@ -56,7 +56,7 @@ namespace SensateService.Controllers.V1
 		{
 			try {
 				if(ModelState.IsValid) {
-					var user = this._users.GetCurrentUser(this.User);
+					var user = this._users.GetByClaimsPrinciple(this.User);
 					if(user == null)
 						return Unauthorized();
 
