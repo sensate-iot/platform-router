@@ -80,5 +80,39 @@ namespace SensateService.Infrastructure.Sql
 		{
 			throw new NotAllowedException("Unable to delete user token!");
 		}
+
+		public void InvalidateToken(SensateUserToken token)
+		{
+			this.StartUpdate(token);
+			token.Valid = false;
+			this.EndUpdate();
+		}
+
+		public async Task InvalidateTokenAsync(SensateUserToken token)
+		{
+			this.StartUpdate(token);
+			token.Valid = false;
+			await this.EndUpdateAsync();
+		}
+
+		public void InvalidateToken(SensateUser user, string value)
+		{
+			var token = this.GetById(user, value);
+
+			if(token == null)
+				return;
+
+			this.InvalidateToken(token);
+		}
+
+		public async Task InvalidateTokenAsync(SensateUser user, string value)
+		{
+			var token = this.GetById(user, value);
+
+			if(token == null)
+				return;
+
+			await this.InvalidateTokenAsync(token);
+		}
 	}
 }

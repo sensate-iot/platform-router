@@ -21,5 +21,11 @@ namespace SensateService.Infrastructure.Repositories
 		IEnumerable<SensateUserToken> GetByUser(SensateUser user);
 		SensateUserToken GetById(SensateUser user, string value);
 		SensateUserToken GetById(Tuple<SensateUser, string> id);
+
+		void InvalidateToken(SensateUserToken token);
+		void InvalidateToken(SensateUser user, string value);
+
+		Task InvalidateTokenAsync(SensateUserToken token);
+		Task InvalidateTokenAsync(SensateUser user, string value);
 	}
 }
