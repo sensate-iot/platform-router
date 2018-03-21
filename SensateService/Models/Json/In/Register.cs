@@ -7,7 +7,7 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace SensateService.Models.Json
+namespace SensateService.Models.Json.In
 {
 	public class Register
 	{

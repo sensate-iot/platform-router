@@ -27,8 +27,8 @@ using MimeKit;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
-using SensateService.Models.Json;
 using SensateService.Services;
+using SensateService.Models.Json.In;
 
 namespace SensateService.Controllers
 {

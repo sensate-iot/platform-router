@@ -2,7 +2,7 @@
  * Email change (JSON) viewmodel.
  */
 
-namespace SensateService.Models.Json
+namespace SensateService.Models.Json.In
 {
 	public class UpdateEmail
 	{

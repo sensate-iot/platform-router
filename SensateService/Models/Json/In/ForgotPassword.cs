@@ -5,12 +5,10 @@
  * @email   dev@bietje.net
  */
 
-namespace SensateService.Models.Json
+namespace SensateService.Models.Json.In
 {
-	public class ResetPassword
+	public class ForgotPassword
 	{
 		public string Email {get;set;}
-		public string Password {get;set;}
-		public string Token {get;set;}
 	}
 }
