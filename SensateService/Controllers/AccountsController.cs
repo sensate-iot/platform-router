@@ -126,7 +126,7 @@ namespace SensateService.Controllers
 				return BadRequest();
 			}
 
-			var user = await this._users.GetCurrentUserAsync(User);
+			var user = await this._users.GetByClaimsPrincipleAsync(User);
 			token = this._email_tokens.GetById(changeEmail.Token);
 
 			if(token == null)
@@ -156,7 +156,7 @@ namespace SensateService.Controllers
 				return BadRequest();
 			}
 
-			user = await this._users.GetCurrentUserAsync(User);
+			user = await this._users.GetByClaimsPrincipleAsync(User);
 			if(user == null)
 				return BadRequest();
 
@@ -262,7 +262,7 @@ namespace SensateService.Controllers
 		public async Task<IActionResult> Show()
 		{
 			dynamic jobj;
-			var user = await this._users.GetCurrentUserAsync(this.User);
+			var user = await this._users.GetByClaimsPrincipleAsync(User);
 
 			if(user == null)
 				return NotFound();

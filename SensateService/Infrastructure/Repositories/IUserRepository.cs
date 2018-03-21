@@ -20,8 +20,8 @@ namespace SensateService.Infrastructure.Repositories
 		SensateUser GetByEmail(string key);
 		Task<SensateUser> GetByEmailAsync(string key);
 
-		SensateUser GetCurrentUser(ClaimsPrincipal cp);
-		Task<SensateUser> GetCurrentUserAsync(ClaimsPrincipal cp);
+		SensateUser GetByClaimsPrinciple(ClaimsPrincipal cp);
+		Task<SensateUser> GetByClaimsPrincipleAsync(ClaimsPrincipal cp);
 
 		void StartUpdate(SensateUser user);
 		Task EndUpdateAsync();

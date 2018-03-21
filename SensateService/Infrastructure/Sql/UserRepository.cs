@@ -105,7 +105,7 @@ namespace SensateService.Infrastructure.Sql
 			await this.CommitAsync();
 		}
 
-		public SensateUser GetCurrentUser(ClaimsPrincipal cp)
+		public SensateUser GetByClaimsPrinciple(ClaimsPrincipal cp)
 		{
 			string email;
 
@@ -113,7 +113,7 @@ namespace SensateService.Infrastructure.Sql
 			return this.GetByEmail(email);
 		}
 
-		public async Task<SensateUser> GetCurrentUserAsync(ClaimsPrincipal cp)
+		public async Task<SensateUser> GetByClaimsPrincipleAsync(ClaimsPrincipal cp)
 		{
 			string email;
 
