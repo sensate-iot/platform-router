@@ -135,27 +135,9 @@ namespace SensateService
 			});
 
 			/* Add repositories */
-			services.AddScoped<IUserRepository, UserRepository>();
-			services.AddScoped<IChangeEmailTokenRepository, ChangeEmailTokenRepository>();
-			services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
-			services.AddScoped<ISensateRoleRepository, SensateRoleRepository>();
-			services.AddScoped<IAuditLogRepository, AuditLogRepository>();
-
-			if(this.Configuration["Cache"] == "true") {
-				if(this.Configuration["CacheType"] == "Distributed") {
-					services.AddScoped<ICacheStrategy<string>, DistributedCacheStrategy>();
-				} else {
-					services.AddScoped<ICacheStrategy<string>, MemoryCacheStrategy>();
-				}
-
-				Debug.WriteLine("Caching enabled!");
-				services.AddScoped<IMeasurementRepository, CachedMeasurementRepository>();
-				services.AddScoped<ISensorRepository, CachedSensorRepository>();
-			} else {
-				Debug.WriteLine("Caching disabled!");
-				services.AddScoped<IMeasurementRepository, MeasurementRepository>();
-				services.AddScoped<ISensorRepository, SensorRepository>();
-			}
+			services.AddSqlRepositories();
+			services.AddCacheStrategy(Configuration["CacheType"]);
+			services.AddMongoDbRepositories(Configuration["Cache"] == "true");
 
 			services.AddMqttService(options => {
 				options.Ssl = Configuration["MqttSsl"] == "true";
@@ -167,21 +149,6 @@ namespace SensateService
 				options.TopicShare = "$share/sensate/";
 			});
 
-
-			/*var mqttopts = new MqttOptions {
-			};*/
-
-			/*Program.MqttClient = MqttServiceFactory.CreateMqttService(
-				services.BuildServiceProvider().CreateScope().ServiceProvider,
-				mqttopts
-			);
-
-			try {
-				var result = Program.MqttClient.ConnectAsync();
-				result.Wait();
-			} catch(Exception ex) {
-				Debug.WriteLine($"Potential MQTT error: {ex.Message}");
-			}*/
 			services.AddSingleton<IEmailSender, EmailSender>();
 			services.Configure<MessageSenderAuthOptions>(opts => {
 				opts.FromName = Configuration["EmailFromName"];
