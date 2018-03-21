@@ -39,7 +39,6 @@ namespace SensateService.Controllers
 		private readonly UserAccountSettings _settings;
 		private readonly SignInManager<SensateUser> _siManager;
 		private readonly UserManager<SensateUser> _manager;
-		private readonly IUserRepository _users;
 		private readonly IEmailSender _mailer;
 		private readonly IPasswordResetTokenRepository _tokens;
 		private readonly IChangeEmailTokenRepository _email_tokens;
@@ -54,9 +53,8 @@ namespace SensateService.Controllers
 			IPasswordResetTokenRepository tokens,
 			IChangeEmailTokenRepository emailTokens,
 			IHostingEnvironment env
-		)
+		) : base(repo)
 		{
-			this._users = repo;
 			this._siManager = manager;
 			this._settings = options.Value;
 			this._manager = userManager;
@@ -126,7 +124,7 @@ namespace SensateService.Controllers
 				return BadRequest();
 			}
 
-			var user = await this._users.GetByClaimsPrincipleAsync(User);
+			var user = await this.GetCurrentUserAsync();
 			token = this._email_tokens.GetById(changeEmail.Token);
 
 			if(token == null)
@@ -156,7 +154,7 @@ namespace SensateService.Controllers
 				return BadRequest();
 			}
 
-			user = await this._users.GetByClaimsPrincipleAsync(User);
+			user = await this.GetCurrentUserAsync();
 			if(user == null)
 				return BadRequest();
 
@@ -262,7 +260,7 @@ namespace SensateService.Controllers
 		public async Task<IActionResult> Show()
 		{
 			dynamic jobj;
-			var user = await this._users.GetByClaimsPrincipleAsync(User);
+			var user = await this.GetCurrentUserAsync();
 
 			if(user == null)
 				return NotFound();

@@ -6,7 +6,11 @@
  * @email:  dev@bietje.net
  */
 
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+
+using SensateService.Infrastructure.Repositories;
+using SensateService.Models;
 
 namespace SensateService.Controllers
 {
@@ -16,8 +20,20 @@ namespace SensateService.Controllers
 		public const int ServerFaultBadGateway = 502;
 		public const int ServerFaultUnavailable = 503;
 
-		protected AbstractController() : base()
+		protected readonly IUserRepository _users;
+
+		public SensateUser CurrentUser {
+			get {
+				if(this.User == null)
+					return null;
+
+				return this._users.GetByClaimsPrinciple(this.User);
+			}
+		}
+
+		protected AbstractController(IUserRepository users) : base()
 		{
+			this._users = users;
 		}
 
 		protected StatusCodeResult ServerFault()
@@ -33,6 +49,14 @@ namespace SensateService.Controllers
 		protected StatusCodeResult ServiceUnavailable()
 		{
 			return this.StatusCode(ServerFaultUnavailable);
+		}
+
+		protected async Task<SensateUser> GetCurrentUserAsync()
+		{
+			if(base.User == null)
+				return null;
+
+			return await this._users.GetByClaimsPrincipleAsync(base.User);
 		}
 	}
 }

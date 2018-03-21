@@ -25,12 +25,10 @@ namespace SensateService.Controllers.V1
 	{
 		private ISensorRepository _repo;
 		private readonly Random random;
-		private IUserRepository _users;
 
-		public SensorsController(ISensorRepository repository, IUserRepository users)
+		public SensorsController(ISensorRepository repository, IUserRepository users) : base(users)
 		{
 			this._repo = repository;
-			this._users = users;
 			this.random = new Random();
 		}
 
@@ -56,7 +54,7 @@ namespace SensateService.Controllers.V1
 		{
 			try {
 				if(ModelState.IsValid) {
-					var user = this._users.GetByClaimsPrinciple(this.User);
+					var user = this.CurrentUser;
 					if(user == null)
 						return Unauthorized();
 
