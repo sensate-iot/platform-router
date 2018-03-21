@@ -64,14 +64,7 @@ namespace SensateService.Controllers
 			if(!signInResult.Succeeded)
 				return new UnauthorizedResult();
 
-			token = new SensateUserToken {
-				UserId = user.Id,
-				User = user,
-				ExpiresAt = DateTime.Now.AddMinutes(this._settings.JwtRefreshExpireMinutes),
-				LoginProvider = SensateUserTokenRepository.JwtRefreshTokenProvider,
-				Value = this._tokens.GenerateRefreshToken()
-			};
-
+			token = this.CreateUserTokenEntry(user);
 			await this._tokens.CreateAsync(token);
 
 			var roles = this._users.GetRoles(user);
@@ -87,8 +80,43 @@ namespace SensateService.Controllers
 		[HttpPost("refresh")]
 		public async Task<ActionResult> RefreshToken([FromBody] RefreshLogin login)
 		{
-			await Task.CompletedTask;
-			return this.NotFound();
+			var user = await this._users.GetByEmailAsync(login.Email);
+			var token = this._tokens.GetById(user, login.RefreshToken);
+			TokenRequestReply reply;
+
+			if(token == null || !token.Valid)
+				return Unauthorized();
+
+			if(token.ExpiresAt < DateTime.Now) {
+				await this._tokens.InvalidateTokenAsync(token);
+				return Unauthorized();
+			}
+
+			reply = new TokenRequestReply();
+			var newToken = this.CreateUserTokenEntry(user);
+			await this._tokens.CreateAsync(newToken);
+			await this._tokens.InvalidateTokenAsync(token);
+
+			reply.RefreshToken = newToken.Value;
+			reply.ExpiresInMinutes = this._settings.JwtRefreshExpireMinutes;
+			reply.JwtToken = this._tokens.GenerateJwtToken(
+				user, this._users.GetRoles(user), this._settings
+			);
+
+			return new OkObjectResult(reply);
+		}
+
+		private SensateUserToken CreateUserTokenEntry(SensateUser user)
+		{
+			var token = new SensateUserToken {
+				UserId = user.Id,
+				User = user,
+				ExpiresAt = DateTime.Now.AddMinutes(this._settings.JwtRefreshExpireMinutes),
+				LoginProvider = SensateUserTokenRepository.JwtRefreshTokenProvider,
+				Value = this._tokens.GenerateRefreshToken()
+			};
+
+			return token;
 		}
 	}
 }
