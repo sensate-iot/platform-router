@@ -40,6 +40,7 @@ namespace SensateService.Controllers
 		}
 
 		[HttpPost("request")]
+		[ValidateModel]
 		public async Task<ActionResult> RequestToken([FromBody] Login login)
 		{
 			var user = await this._users.GetByEmailAsync(login.Email);
@@ -78,6 +79,7 @@ namespace SensateService.Controllers
 		}
 
 		[HttpPost("refresh")]
+		[ValidateModel]
 		public async Task<ActionResult> RefreshToken([FromBody] RefreshLogin login)
 		{
 			var user = await this._users.GetByEmailAsync(login.Email);
