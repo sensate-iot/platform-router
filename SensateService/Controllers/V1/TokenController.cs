@@ -6,12 +6,16 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
+
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 using SensateService.Attributes;
 using SensateService.Infrastructure.Repositories;
@@ -19,6 +23,7 @@ using SensateService.Infrastructure.Sql;
 using SensateService.Models;
 using SensateService.Models.Json.In;
 using SensateService.Models.Json.Out;
+using SensateService.Helpers;
 
 namespace SensateService.Controllers.V1
 {
@@ -91,8 +96,13 @@ namespace SensateService.Controllers.V1
 		public async Task<ActionResult> RefreshToken([FromBody] RefreshLogin login)
 		{
 			var user = await this._users.GetByEmailAsync(login.Email);
-			var token = this._tokens.GetById(user, login.RefreshToken);
 			TokenRequestReply reply;
+			UserToken token;
+
+			if(user == null)
+				return Unauthorized();
+
+			token = this._tokens.GetById(user, login.RefreshToken);
 
 			if(token == null || !token.Valid)
 				return Unauthorized();
@@ -114,6 +124,26 @@ namespace SensateService.Controllers.V1
 			);
 
 			return new OkObjectResult(reply);
+		}
+
+		[HttpDelete("{token}", Name = "RevokeToken")]
+		[NormalUser]
+		[ProducesResponseType(typeof(Status), 404)]
+		[SwaggerResponse(200)]
+		public async Task<IActionResult> Revoke(string token)
+		{
+			UserToken authToken;
+			var user = await this.GetCurrentUserAsync();
+
+			authToken = this._tokens.GetById(user, token);
+			if(authToken == null)
+				return this.NotFoundInputResult("Token not found!");
+
+			if(!authToken.Valid)
+				return this.InvalidInputResult("Token already invalid!");
+
+			await this._tokens.InvalidateTokenAsync(authToken);
+			return Ok();
 		}
 
 		private UserToken CreateUserTokenEntry(SensateUser user)
