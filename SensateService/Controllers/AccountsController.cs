@@ -32,6 +32,7 @@ using SensateService.Services;
 
 namespace SensateService.Controllers
 {
+	[Produces("application/json")]
 	[Route("v{version:apiVersion}/[controller]")]
 	[ApiVersion("1")]
 	public class AccountsController : AbstractController

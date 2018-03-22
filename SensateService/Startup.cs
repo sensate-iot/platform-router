@@ -19,6 +19,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.Extensions.Hosting;
+
+using Swashbuckle.AspNetCore.Swagger;
 
 using SensateService.Models;
 using SensateService.Infrastructure.Sql;
@@ -29,7 +32,6 @@ using SensateService.Init;
 using SensateService.Services;
 using SensateService.Controllers;
 using SensateService.Middleware;
-using Microsoft.Extensions.Hosting;
 
 namespace SensateService
 {
@@ -157,12 +159,24 @@ namespace SensateService
 				opts.Username = Secrets["SendGridUser"];
 			});
 
+			services.AddSwaggerGen(c => {
+				c.SwaggerDoc("v1", new Info {
+					Title = "Sensate API - Version 1",
+					Version = "v1"
+				});
+			});
+
 			services.AddWebSocketService();
 			services.AddMvc();
 		}
 
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider sp)
 		{
+			app.UseSwagger();
+			app.UseSwaggerUI(c => {
+				c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sensate API - Version 1");
+			});
+
 			if (env.IsDevelopment()) {
 				app.UseDeveloperExceptionPage();
 			}

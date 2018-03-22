@@ -24,6 +24,7 @@
     <PackageReference Include="mqttnet" Version="2.7.0" />
     <PackageReference Include="Newtonsoft.json" Version="11.0.1" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.0.1" />
+    <PackageReference Include="swashbuckle.aspnetcore" Version="2.3.0" />
   </ItemGroup>
 
   <ItemGroup>

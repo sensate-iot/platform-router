@@ -19,6 +19,7 @@ using SensateService.Helpers;
 
 namespace SensateService.Controllers.V1
 {
+	[Produces("application/json")]
 	[Route("v{version:apiVersion}/[controller]")]
 	[ApiVersion("1")]
 	public class SensorsController : AbstractController
