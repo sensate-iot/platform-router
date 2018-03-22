@@ -33,7 +33,7 @@ using SensateService.Attributes;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using SensateService.Models.Json.Out;
 
-namespace SensateService.Controllers
+namespace SensateService.Controllers.V1
 {
 	[Produces("application/json")]
 	[Route("v{version:apiVersion}/[controller]")]
@@ -45,7 +45,6 @@ namespace SensateService.Controllers
 		private readonly UserManager<SensateUser> _manager;
 		private readonly IEmailSender _mailer;
 		private readonly IPasswordResetTokenRepository _passwd_tokens;
-		private readonly ISensateUserTokenRepository _auth_tokens;
 		private readonly IChangeEmailTokenRepository _email_tokens;
 		private readonly IHostingEnvironment _env;
 
@@ -57,7 +56,6 @@ namespace SensateService.Controllers
 			IEmailSender emailer,
 			IPasswordResetTokenRepository tokens,
 			IChangeEmailTokenRepository emailTokens,
-			ISensateUserTokenRepository authTokens,
 			IHostingEnvironment env
 		) : base(repo)
 		{
@@ -68,7 +66,6 @@ namespace SensateService.Controllers
 			this._passwd_tokens = tokens;
 			this._email_tokens = emailTokens;
 			this._env = env;
-			this._auth_tokens = authTokens;
 		}
 
 		[HttpPost("forgot-password")]
