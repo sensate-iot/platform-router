@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 using SensateService.Models.Json.Out;
 
-namespace SensateService
+namespace SensateService.Attributes
 {
 	public class ValidateModelAttribute : ActionFilterAttribute
 	{

@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
+
+using SensateService.Attributes;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Infrastructure.Sql;
 using SensateService.Models;
