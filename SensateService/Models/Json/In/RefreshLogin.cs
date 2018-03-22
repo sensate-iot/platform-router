@@ -1,5 +1,5 @@
 /*
- * Json model to login.
+ * Json model to refresh a JWT token.
  *
  * @author Michel Megens
  * @email   dev@bietje.net
@@ -7,13 +7,13 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace SensateService.Models.Json
+namespace SensateService.Models.Json.In
 {
-	public class Login
+	public class RefreshLogin
 	{
 		[Required]
 		public string Email { get; set; }
 		[Required]
-		public string Password { get; set; }
+		public string RefreshToken { get; set; }
 	}
 }

@@ -8,7 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
+using SensateService.Controllers;
 using SensateService.Models;
 
 namespace SensateService.Infrastructure.Repositories
@@ -21,6 +21,9 @@ namespace SensateService.Infrastructure.Repositories
 		IEnumerable<SensateUserToken> GetByUser(SensateUser user);
 		SensateUserToken GetById(SensateUser user, string value);
 		SensateUserToken GetById(Tuple<SensateUser, string> id);
+
+		string GenerateJwtToken(SensateUser user, IEnumerable<string> roles, UserAccountSettings settings);
+		string GenerateRefreshToken();
 
 		void InvalidateToken(SensateUserToken token);
 		void InvalidateToken(SensateUser user, string value);

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
+using SensateService.Models.Json.Out;
 
 namespace SensateService.Controllers
 {
@@ -57,6 +58,21 @@ namespace SensateService.Controllers
 				return null;
 
 			return await this._users.GetByClaimsPrincipleAsync(base.User);
+		}
+
+		protected IActionResult InvalidInputResult()
+		{
+			return this.InvalidInputResult("Invalid input!");
+		}
+
+		protected IActionResult InvalidInputResult(string msg)
+		{
+			var status = new Status();
+
+			status.Message = msg;
+			status.ErrorCode = 400;
+
+			return new BadRequestObjectResult(status);
 		}
 	}
 }

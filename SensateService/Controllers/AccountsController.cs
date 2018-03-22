@@ -27,8 +27,9 @@ using MimeKit;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
-using SensateService.Models.Json;
 using SensateService.Services;
+using SensateService.Models.Json.In;
+using SensateService.Attributes;
 
 namespace SensateService.Controllers
 {
@@ -41,7 +42,8 @@ namespace SensateService.Controllers
 		private readonly SignInManager<SensateUser> _siManager;
 		private readonly UserManager<SensateUser> _manager;
 		private readonly IEmailSender _mailer;
-		private readonly IPasswordResetTokenRepository _tokens;
+		private readonly IPasswordResetTokenRepository _passwd_tokens;
+		private readonly ISensateUserTokenRepository _auth_tokens;
 		private readonly IChangeEmailTokenRepository _email_tokens;
 		private readonly IHostingEnvironment _env;
 
@@ -53,6 +55,7 @@ namespace SensateService.Controllers
 			IEmailSender emailer,
 			IPasswordResetTokenRepository tokens,
 			IChangeEmailTokenRepository emailTokens,
+			ISensateUserTokenRepository authTokens,
 			IHostingEnvironment env
 		) : base(repo)
 		{
@@ -60,9 +63,10 @@ namespace SensateService.Controllers
 			this._settings = options.Value;
 			this._manager = userManager;
 			this._mailer = emailer;
-			this._tokens = tokens;
+			this._passwd_tokens = tokens;
 			this._email_tokens = emailTokens;
 			this._env = env;
+			this._auth_tokens = authTokens;
 		}
 
 		[HttpPost("forgot-password")]
@@ -79,7 +83,7 @@ namespace SensateService.Controllers
 			mail = await this.ReadMailTemplate("Confirm_Password_Reset.html", "Confirm_Password_Reset.txt");
 			var token = await this._manager.GeneratePasswordResetTokenAsync(user);
 			token = Base64UrlEncoder.Encode(token);
-			usertoken = this._tokens.Create(token);
+			usertoken = this._passwd_tokens.Create(token);
 
 			if(usertoken == null)
 				return this.StatusCode(500);
@@ -100,7 +104,7 @@ namespace SensateService.Controllers
 				return BadRequest();
 
 			user = await this._users.GetByEmailAsync(model.Email);
-			token = this._tokens.GetById(model.Token);
+			token = this._passwd_tokens.GetById(model.Token);
 
 			if(user == null || token == null)
 				return NotFound();
@@ -171,24 +175,6 @@ namespace SensateService.Controllers
 			await this._mailer.SendEmailAsync(changeEmailModel.NewEmail, "Confirm your new mail", mail);
 
 			return this.Ok();
-		}
-
-		[HttpPost("login")]
-		public async Task<object> Login([FromBody] Login loginModel)
-		{
-			var result = await this._siManager.PasswordSignInAsync(
-				loginModel.Email,
-				loginModel.Password,
-				false,
-				false
-			);
-
-			if(result.Succeeded) {
-				var user = await this._users.GetByEmailAsync(loginModel.Email);
-				return await this.GenerateJwtToken(loginModel.Email, user);
-			}
-
-			return NotFound();
 		}
 
 		private bool ValidateUser(SensateUser user)
@@ -291,7 +277,7 @@ namespace SensateService.Controllers
 
 			/*
 			 * For some moronic reason we need to encode and decode to
-			 * Base64. The + sign gets * mangled to a ' ' if we don't.
+			 * Base64. The + sign gets mangled to a space if we don't.
 			 */
 			code = Base64UrlEncoder.Decode(code);
 			var result = await this._manager.ConfirmEmailAsync(user, code);
@@ -301,35 +287,37 @@ namespace SensateService.Controllers
 			return this.Ok();
 		}
 
-		private async Task<object> GenerateJwtToken(string email, SensateUser user)
+		[ValidateModel]
+		[NormalUser]
+		[HttpPatch("update")]
+		public async Task<IActionResult> UpdateUser([FromBody] UpdateUser userUpdate)
 		{
-			List<Claim> claims;
-			JwtSecurityToken token;
-			List<string> roles;
+			var user = this.CurrentUser;
 
-			claims = new List<Claim> {
-				new Claim(JwtRegisteredClaimNames.Sub, email),
-				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-				new Claim(ClaimTypes.NameIdentifier, user.Id)
-			};
+			if(userUpdate.Password != null) {
+				if(userUpdate.CurrentPassword == null)
+					return this.InvalidInputResult("Current password not given");
 
-			roles = await this._users.GetRolesAsync(user) as List<string>;
-			roles.ForEach(x => {
-				claims.Add(new Claim(ClaimTypes.Role, x));
-			});
+				var result = await this._manager.ChangePasswordAsync(user,
+					userUpdate.CurrentPassword, userUpdate.Password);
+				if(!result.Succeeded)
+					return this.InvalidInputResult(result.Errors.First().Description);
+			}
 
-			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this._settings.JwtKey));
-			var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-			var expires = DateTime.Now.AddMinutes(this._settings.JwtExpireMinutes);
-			token = new JwtSecurityToken(
-				issuer: this._settings.JwtIssuer,
-				audience: this._settings.JwtIssuer,
-				claims: claims,
-				expires: expires,
-				signingCredentials: creds
-			);
+			this._users.StartUpdate(user);
 
-			return new JwtSecurityTokenHandler().WriteToken(token);
+			if(userUpdate.FirstName != null)
+				user.FirstName = userUpdate.FirstName;
+
+			if(userUpdate.LastName != null)
+				user.LastName = userUpdate.LastName;
+
+			await this._users.EndUpdateAsync();
+
+			if(userUpdate.PhoneNumber != null)
+				await this._manager.SetPhoneNumberAsync(user, userUpdate.PhoneNumber);
+
+			return Ok();
 		}
 	}
 }
