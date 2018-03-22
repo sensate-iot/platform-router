@@ -30,6 +30,8 @@ using SensateService.Models;
 using SensateService.Services;
 using SensateService.Models.Json.In;
 using SensateService.Attributes;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using SensateService.Models.Json.Out;
 
 namespace SensateService.Controllers
 {
@@ -70,6 +72,7 @@ namespace SensateService.Controllers
 		}
 
 		[HttpPost("forgot-password")]
+		[SwaggerResponse(200)]
 		public async Task<IActionResult> ForgotPassword([FromBody] ForgotPassword model)
 		{
 			SensateUser user;
@@ -95,6 +98,8 @@ namespace SensateService.Controllers
 		}
 
 		[HttpPost("reset-password")]
+		[SwaggerResponse(200)]
+		[SwaggerResponse(404)]
 		public async Task<IActionResult> Resetpassword([FromBody] ResetPassword model)
 		{
 			SensateUser user;
@@ -120,6 +125,8 @@ namespace SensateService.Controllers
 
 		[HttpPost("confirm-update-email")]
 		[Authorize]
+		[SwaggerResponse(200)]
+		[SwaggerResponse(400)]
 		public async Task<IActionResult> ConfirmChangeEmail([FromBody] UpdateEmail changeEmail)
 		{
 			ChangeEmailToken token;
@@ -146,6 +153,8 @@ namespace SensateService.Controllers
 		}
 
 		[HttpPost("update-email")]
+		[SwaggerResponse(200)]
+		[SwaggerResponse(400)]
 		[Authorize]
 		public async Task<IActionResult> UpdateEmail([FromBody] UpdateEmail changeEmailModel)
 		{
@@ -209,6 +218,8 @@ namespace SensateService.Controllers
 		}
 
 		[HttpPost("register")]
+		[SwaggerResponse(200)]
+		[SwaggerResponse(400)]
 		public async Task<object> Register([FromBody] Register register)
 		{
 			BodyBuilder mail;
@@ -243,6 +254,8 @@ namespace SensateService.Controllers
 		}
 
 		[HttpGet("show")]
+		[SwaggerResponse(404)]
+		[SwaggerResponse(200)]
 		[Authorize]
 		public async Task<IActionResult> Show()
 		{
@@ -263,6 +276,8 @@ namespace SensateService.Controllers
 		}
 
 		[HttpGet("confirm/{id}/{code}")]
+		[SwaggerResponse(200)]
+		[SwaggerResponse(401)]
 		public async Task<IActionResult> ConfirmEmail(string id, string code)
 		{
 			SensateUser user;
@@ -290,6 +305,8 @@ namespace SensateService.Controllers
 		[ValidateModel]
 		[NormalUser]
 		[HttpPatch("update")]
+		[ProducesResponseType(typeof(Status), 400)]
+		[SwaggerResponse(200)]
 		public async Task<IActionResult> UpdateUser([FromBody] UpdateUser userUpdate)
 		{
 			var user = this.CurrentUser;

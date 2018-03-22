@@ -22,6 +22,7 @@ using SensateService.Models.Json.Out;
 
 namespace SensateService.Controllers
 {
+	[Produces("application/json")]
 	[Route(template: "[controller]")]
 	public class TokensController : AbstractController
 	{
@@ -43,6 +44,8 @@ namespace SensateService.Controllers
 
 		[HttpPost("request")]
 		[ValidateModel]
+		[ProducesResponseType(typeof(Status), 400)]
+		[ProducesResponseType(typeof(TokenRequestReply), 400)]
 		public async Task<ActionResult> RequestToken([FromBody] Login login)
 		{
 			var user = await this._users.GetByEmailAsync(login.Email);
@@ -82,6 +85,8 @@ namespace SensateService.Controllers
 
 		[HttpPost("refresh")]
 		[ValidateModel]
+		[ProducesResponseType(typeof(Status), 400)]
+		[ProducesResponseType(typeof(TokenRequestReply), 400)]
 		public async Task<ActionResult> RefreshToken([FromBody] RefreshLogin login)
 		{
 			var user = await this._users.GetByEmailAsync(login.Email);
