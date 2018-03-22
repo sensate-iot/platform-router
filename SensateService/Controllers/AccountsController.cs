@@ -175,25 +175,6 @@ namespace SensateService.Controllers
 			return this.Ok();
 		}
 
-		[HttpPost("login")]
-		public async Task<object> Login([FromBody] Login loginModel)
-		{
-			var result = await this._siManager.PasswordSignInAsync(
-				loginModel.Email,
-				loginModel.Password,
-				false,
-				false
-			);
-
-			if(result.Succeeded) {
-				var user = await this._users.GetByEmailAsync(loginModel.Email);
-				var roles = await this._users.GetRolesAsync(user);
-				return this._auth_tokens.GenerateJwtToken(user, roles, this._settings);
-			}
-
-			return NotFound();
-		}
-
 		private bool ValidateUser(SensateUser user)
 		{
 			if(user.FirstName == null || user.FirstName.Length == 0)
@@ -294,7 +275,7 @@ namespace SensateService.Controllers
 
 			/*
 			 * For some moronic reason we need to encode and decode to
-			 * Base64. The + sign gets * mangled to a ' ' if we don't.
+			 * Base64. The + sign gets mangled to a space if we don't.
 			 */
 			code = Base64UrlEncoder.Decode(code);
 			var result = await this._manager.ConfirmEmailAsync(user, code);
