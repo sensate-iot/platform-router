@@ -20,10 +20,11 @@ using SensateService.Models;
 using SensateService.Models.Json.In;
 using SensateService.Models.Json.Out;
 
-namespace SensateService.Controllers
+namespace SensateService.Controllers.V1
 {
 	[Produces("application/json")]
-	[Route(template: "[controller]")]
+	[Route("v{version:apiVersion}/[controller]")]
+	[ApiVersion("1")]
 	public class TokensController : AbstractController
 	{
 		private readonly ISensateUserTokenRepository _tokens;

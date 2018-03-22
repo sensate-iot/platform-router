@@ -69,6 +69,7 @@ namespace SensateService.Controllers.V1
 		}
 
 		[HttpPost("forgot-password")]
+		[ValidateModel]
 		[SwaggerResponse(200)]
 		public async Task<IActionResult> ForgotPassword([FromBody] ForgotPassword model)
 		{
@@ -97,13 +98,11 @@ namespace SensateService.Controllers.V1
 		[HttpPost("reset-password")]
 		[SwaggerResponse(200)]
 		[SwaggerResponse(404)]
+		[ValidateModel]
 		public async Task<IActionResult> Resetpassword([FromBody] ResetPassword model)
 		{
 			SensateUser user;
 			PasswordResetToken token;
-
-			if(model.Email == null || model.Password == null || model.Token == null)
-				return BadRequest();
 
 			user = await this._users.GetByEmailAsync(model.Email);
 			token = this._passwd_tokens.GetById(model.Token);
@@ -122,14 +121,14 @@ namespace SensateService.Controllers.V1
 
 		[HttpPost("confirm-update-email")]
 		[Authorize]
+		[ValidateModel]
 		[SwaggerResponse(200)]
 		[SwaggerResponse(400)]
-		public async Task<IActionResult> ConfirmChangeEmail([FromBody] UpdateEmail changeEmail)
+		public async Task<IActionResult> ConfirmChangeEmail([FromBody] ConfirmUpdateEmail changeEmail)
 		{
 			ChangeEmailToken token;
 
-			if(changeEmail.Email == null || changeEmail.Email.Length == 0 ||
-				changeEmail.Token == null || changeEmail.Token.Length == 0) {
+			if(changeEmail.Token == null || changeEmail.Token.Length == 0) {
 				return BadRequest();
 			}
 
@@ -150,6 +149,7 @@ namespace SensateService.Controllers.V1
 		}
 
 		[HttpPost("update-email")]
+		[ValidateModel]
 		[SwaggerResponse(200)]
 		[SwaggerResponse(400)]
 		[Authorize]
@@ -160,8 +160,7 @@ namespace SensateService.Controllers.V1
 			BodyBuilder mail;
 			SensateUser user;
 
-			if(changeEmailModel.Email == null || changeEmailModel.NewEmail == null ||
-				changeEmailModel.Email.Length == 0 || changeEmailModel.NewEmail.Length == 0) {
+			if(changeEmailModel.NewEmail == null || changeEmailModel.NewEmail.Length == 0) {
 				return BadRequest();
 			}
 
@@ -215,6 +214,7 @@ namespace SensateService.Controllers.V1
 		}
 
 		[HttpPost("register")]
+		[ValidateModel]
 		[SwaggerResponse(200)]
 		[SwaggerResponse(400)]
 		public async Task<object> Register([FromBody] Register register)
