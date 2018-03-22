@@ -22,26 +22,26 @@ using SensateService.Controllers;
 
 namespace SensateService.Infrastructure.Sql
 {
-	public class SensateUserTokenRepository :
-		AbstractSqlRepository<Tuple<SensateUser, string>, SensateUserToken>, ISensateUserTokenRepository
+	public class UserTokenRepository :
+		AbstractSqlRepository<Tuple<SensateUser, string>, UserToken>, IUserTokenRepository
 	{
 		private Random _rng;
 		private const int JwtRefreshTokenLength = 64;
 		public const string JwtRefreshTokenProvider = "JWTrt";
 		public const string JwtTokenProvider = "JWT";
 
-		public SensateUserTokenRepository(SensateSqlContext context) : base(context)
+		public UserTokenRepository(SensateSqlContext context) : base(context)
 		{
 			this._rng = new Random();
 		}
 
-		public override void Create(SensateUserToken obj)
+		public override void Create(UserToken obj)
 		{
 			var asyncResult = this.CreateAsync(obj);
 			asyncResult.Wait();
 		}
 
-		public override async Task CreateAsync(SensateUserToken obj)
+		public override async Task CreateAsync(UserToken obj)
 		{
 			if(obj.Value == null && obj.LoginProvider == JwtRefreshTokenProvider)
 				obj.Value = this.GenerateRefreshToken();
@@ -53,18 +53,18 @@ namespace SensateService.Infrastructure.Sql
 		}
 
 
-		public override SensateUserToken GetById(Tuple<SensateUser, string> id) => this.GetById(id.Item1, id.Item2);
+		public override UserToken GetById(Tuple<SensateUser, string> id) => this.GetById(id.Item1, id.Item2);
 
-		public SensateUserToken GetById(SensateUser user, string value)
+		public UserToken GetById(SensateUser user, string value)
 		{
 			return this.Data.FirstOrDefault(
 				x => x.UserId == user.Id && x.Value == value
 			);
 		}
 
-		public IEnumerable<SensateUserToken> GetByUser(SensateUser user)
+		public IEnumerable<UserToken> GetByUser(SensateUser user)
 		{
-			IEnumerable<SensateUserToken> data;
+			IEnumerable<UserToken> data;
 
 			data = from token in this.Data
 				   where token.UserId == user.Id
@@ -74,7 +74,7 @@ namespace SensateService.Infrastructure.Sql
 		}
 
 
-		public override void Update(SensateUserToken obj)
+		public override void Update(UserToken obj)
 		{
 			throw new NotAllowedException("Unable to update user token!");
 		}
@@ -89,14 +89,14 @@ namespace SensateService.Infrastructure.Sql
 			throw new NotAllowedException("Unable to delete user token!");
 		}
 
-		public void InvalidateToken(SensateUserToken token)
+		public void InvalidateToken(UserToken token)
 		{
 			this.StartUpdate(token);
 			token.Valid = false;
 			this.EndUpdate();
 		}
 
-		public async Task InvalidateTokenAsync(SensateUserToken token)
+		public async Task InvalidateTokenAsync(UserToken token)
 		{
 			this.StartUpdate(token);
 			token.Valid = false;

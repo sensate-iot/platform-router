@@ -91,7 +91,7 @@ namespace SensateService
 			/*
 			 * Setup user authentication
 			 */
-			services.AddIdentity<SensateUser, SensateRole>(config => {
+			services.AddIdentity<SensateUser, UserRole>(config => {
 				config.SignIn.RequireConfirmedEmail = true;
 			})
 			.AddEntityFrameworkStores<SensateSqlContext>()

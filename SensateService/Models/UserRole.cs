@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace SensateService.Models
 {
-	public class SensateRole : IdentityRole
+	public class UserRole : IdentityRole
 	{
 		public string Description { get; set; }
 	}

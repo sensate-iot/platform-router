@@ -13,22 +13,22 @@ using SensateService.Models;
 
 namespace SensateService.Infrastructure.Repositories
 {
-	public interface ISensateUserTokenRepository
+	public interface IUserTokenRepository
 	{
-		void Create(SensateUserToken token);
-		Task CreateAsync(SensateUserToken token);
+		void Create(UserToken token);
+		Task CreateAsync(UserToken token);
 
-		IEnumerable<SensateUserToken> GetByUser(SensateUser user);
-		SensateUserToken GetById(SensateUser user, string value);
-		SensateUserToken GetById(Tuple<SensateUser, string> id);
+		IEnumerable<UserToken> GetByUser(SensateUser user);
+		UserToken GetById(SensateUser user, string value);
+		UserToken GetById(Tuple<SensateUser, string> id);
 
 		string GenerateJwtToken(SensateUser user, IEnumerable<string> roles, UserAccountSettings settings);
 		string GenerateRefreshToken();
 
-		void InvalidateToken(SensateUserToken token);
+		void InvalidateToken(UserToken token);
 		void InvalidateToken(SensateUser user, string value);
 
-		Task InvalidateTokenAsync(SensateUserToken token);
+		Task InvalidateTokenAsync(UserToken token);
 		Task InvalidateTokenAsync(SensateUser user, string value);
 	}
 }

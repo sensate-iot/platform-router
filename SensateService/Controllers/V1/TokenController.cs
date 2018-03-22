@@ -27,12 +27,12 @@ namespace SensateService.Controllers.V1
 	[ApiVersion("1")]
 	public class TokensController : AbstractController
 	{
-		private readonly ISensateUserTokenRepository _tokens;
+		private readonly IUserTokenRepository _tokens;
 		private readonly SignInManager<SensateUser> _signin_manager;
 		private readonly UserAccountSettings _settings;
 
 		public TokensController(
-			ISensateUserTokenRepository tokens,
+			IUserTokenRepository tokens,
 			IOptions<UserAccountSettings> options,
 			IUserRepository users,
 			SignInManager<SensateUser> signInManager
@@ -52,7 +52,7 @@ namespace SensateService.Controllers.V1
 			var user = await this._users.GetByEmailAsync(login.Email);
 			bool result;
 			Microsoft.AspNetCore.Identity.SignInResult signInResult;
-			SensateUserToken token;
+			UserToken token;
 
 			if(user == null)
 				return NotFound();
@@ -116,13 +116,13 @@ namespace SensateService.Controllers.V1
 			return new OkObjectResult(reply);
 		}
 
-		private SensateUserToken CreateUserTokenEntry(SensateUser user)
+		private UserToken CreateUserTokenEntry(SensateUser user)
 		{
-			var token = new SensateUserToken {
+			var token = new UserToken {
 				UserId = user.Id,
 				User = user,
 				ExpiresAt = DateTime.Now.AddMinutes(this._settings.JwtRefreshExpireMinutes),
-				LoginProvider = SensateUserTokenRepository.JwtRefreshTokenProvider,
+				LoginProvider = UserTokenRepository.JwtRefreshTokenProvider,
 				Value = this._tokens.GenerateRefreshToken()
 			};
 
