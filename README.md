@@ -2,9 +2,9 @@
 
 ![header]
 
-Sensate is an opensource Internet of Things data broker. It enables simplified management 
-of devices, data and data analysis through a well documented RESTful API. The backend scales extremely 
-well, both vertically and horizontally. High availability and performance is ensured through 
+Sensate is an opensource Internet of Things data broker. It enables simplified management
+of devices, data and data analysis through a well documented RESTful API. The backend scales extremely
+well, both vertically and horizontally. High availability and performance is ensured through
 clever use of caches and document stores.
 
 [header]: https://sensate.bietje.net/assets/images/sensate-usage.png "Sensate IoT"
