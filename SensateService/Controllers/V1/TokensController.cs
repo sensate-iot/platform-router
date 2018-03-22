@@ -6,12 +6,16 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
+
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 using SensateService.Attributes;
 using SensateService.Infrastructure.Repositories;
@@ -19,19 +23,21 @@ using SensateService.Infrastructure.Sql;
 using SensateService.Models;
 using SensateService.Models.Json.In;
 using SensateService.Models.Json.Out;
+using SensateService.Helpers;
 
-namespace SensateService.Controllers
+namespace SensateService.Controllers.V1
 {
 	[Produces("application/json")]
-	[Route(template: "[controller]")]
+	[Route("v{version:apiVersion}/[controller]")]
+	[ApiVersion("1")]
 	public class TokensController : AbstractController
 	{
-		private readonly ISensateUserTokenRepository _tokens;
+		private readonly IUserTokenRepository _tokens;
 		private readonly SignInManager<SensateUser> _signin_manager;
 		private readonly UserAccountSettings _settings;
 
 		public TokensController(
-			ISensateUserTokenRepository tokens,
+			IUserTokenRepository tokens,
 			IOptions<UserAccountSettings> options,
 			IUserRepository users,
 			SignInManager<SensateUser> signInManager
@@ -51,7 +57,7 @@ namespace SensateService.Controllers
 			var user = await this._users.GetByEmailAsync(login.Email);
 			bool result;
 			Microsoft.AspNetCore.Identity.SignInResult signInResult;
-			SensateUserToken token;
+			UserToken token;
 
 			if(user == null)
 				return NotFound();
@@ -90,8 +96,13 @@ namespace SensateService.Controllers
 		public async Task<ActionResult> RefreshToken([FromBody] RefreshLogin login)
 		{
 			var user = await this._users.GetByEmailAsync(login.Email);
-			var token = this._tokens.GetById(user, login.RefreshToken);
 			TokenRequestReply reply;
+			UserToken token;
+
+			if(user == null)
+				return Unauthorized();
+
+			token = this._tokens.GetById(user, login.RefreshToken);
 
 			if(token == null || !token.Valid)
 				return Unauthorized();
@@ -115,13 +126,46 @@ namespace SensateService.Controllers
 			return new OkObjectResult(reply);
 		}
 
-		private SensateUserToken CreateUserTokenEntry(SensateUser user)
+		[HttpDelete("{token}", Name = "RevokeToken")]
+		[NormalUser]
+		[ProducesResponseType(typeof(Status), 404)]
+		[SwaggerResponse(200)]
+		public async Task<IActionResult> Revoke(string token)
 		{
-			var token = new SensateUserToken {
+			UserToken authToken;
+			var user = await this.GetCurrentUserAsync();
+
+			authToken = this._tokens.GetById(user, token);
+			if(authToken == null)
+				return this.NotFoundInputResult("Token not found!");
+
+			if(!authToken.Valid)
+				return this.InvalidInputResult("Token already invalid!");
+
+			await this._tokens.InvalidateTokenAsync(authToken);
+			return Ok();
+		}
+
+		[HttpDelete(Name = "RevokeAll")]
+		[NormalUser]
+		[SwaggerResponse(200)]
+		public async Task<IActionResult> RevokeAll()
+		{
+			IEnumerable<UserToken> tokens;
+			var user = await this.GetCurrentUserAsync();
+
+			tokens = this._tokens.GetByUser(user);
+			await this._tokens.InvalidateManyAsync(tokens);
+			return Ok();
+		}
+
+		private UserToken CreateUserTokenEntry(SensateUser user)
+		{
+			var token = new UserToken {
 				UserId = user.Id,
 				User = user,
 				ExpiresAt = DateTime.Now.AddMinutes(this._settings.JwtRefreshExpireMinutes),
-				LoginProvider = SensateUserTokenRepository.JwtRefreshTokenProvider,
+				LoginProvider = UserTokenRepository.JwtRefreshTokenProvider,
 				Value = this._tokens.GenerateRefreshToken()
 			};
 

@@ -6,7 +6,7 @@
  */
 
 using Microsoft.AspNetCore.Mvc;
-using SensateService.Controllers;
+using SensateService.Controllers.V1;
 
 namespace SensateService.Helpers
 {

@@ -15,13 +15,13 @@ using Microsoft.AspNetCore.Identity;
 
 namespace SensateService.Infrastructure.Sql
 {
-	public class SensateSqlContext : IdentityDbContext<SensateUser, SensateRole, string>
+	public class SensateSqlContext : IdentityDbContext<SensateUser, UserRole, string>
 	{
 		public new DbSet<SensateUser> Users { get; set; }
 		public DbSet<AuditLog> AuditLogs { get; set; }
 		public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 		public DbSet<ChangeEmailToken> ChangeEmailTokens { get; set; }
-		public new DbSet<SensateUserToken> UserTokens { get; set; }
+		public new DbSet<UserToken> UserTokens { get; set; }
 
 		public SensateSqlContext(DbContextOptions<SensateSqlContext> options) :
 			base(options)
@@ -35,7 +35,7 @@ namespace SensateService.Infrastructure.Sql
 				k => k.UserToken
 			);
 
-			builder.Entity<SensateUserToken>().HasKey(k => new {
+			builder.Entity<UserToken>().HasKey(k => new {
 				k.UserId, k.Value
 			});
 		}

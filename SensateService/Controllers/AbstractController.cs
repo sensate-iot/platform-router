@@ -74,5 +74,15 @@ namespace SensateService.Controllers
 
 			return new BadRequestObjectResult(status);
 		}
+
+		protected IActionResult NotFoundInputResult(string msg)
+		{
+			var status = new Status();
+
+			status.Message = msg;
+			status.ErrorCode = 404;
+
+			return new NotFoundObjectResult(status);
+		}
 	}
 }

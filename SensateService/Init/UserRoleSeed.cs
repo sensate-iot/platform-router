@@ -18,7 +18,7 @@ namespace SensateService.Init
 	public static class UserRoleSeed
 	{
 		public async static Task Initialize(SensateSqlContext ctx,
-			RoleManager<SensateRole> roles, UserManager<SensateUser> manager)
+			RoleManager<UserRole> roles, UserManager<SensateUser> manager)
 		{
 			SensateUser user;
 			ctx.Database.EnsureCreated();
@@ -29,18 +29,18 @@ namespace SensateService.Init
 			if(ctx.Roles.Any() || ctx.Users.Any() || ctx.UserRoles.Any())
 				return;
 
-			var uroles = new SensateRole[] {
-				new SensateRole {
+			var uroles = new UserRole[] {
+				new UserRole {
 					Name = "Administrators",
 					Description = "System administrators",
 				},
 
-				new SensateRole {
+				new UserRole {
 					Name = "Users",
 					Description = "Normal users"
 				},
 
-				new SensateRole {
+				new UserRole {
 					Name = "Banned",
 					Description = "Banned users"
 				}

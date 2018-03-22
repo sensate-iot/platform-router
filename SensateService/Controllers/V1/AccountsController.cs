@@ -33,7 +33,7 @@ using SensateService.Attributes;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using SensateService.Models.Json.Out;
 
-namespace SensateService.Controllers
+namespace SensateService.Controllers.V1
 {
 	[Produces("application/json")]
 	[Route("v{version:apiVersion}/[controller]")]
@@ -45,7 +45,6 @@ namespace SensateService.Controllers
 		private readonly UserManager<SensateUser> _manager;
 		private readonly IEmailSender _mailer;
 		private readonly IPasswordResetTokenRepository _passwd_tokens;
-		private readonly ISensateUserTokenRepository _auth_tokens;
 		private readonly IChangeEmailTokenRepository _email_tokens;
 		private readonly IHostingEnvironment _env;
 
@@ -57,7 +56,6 @@ namespace SensateService.Controllers
 			IEmailSender emailer,
 			IPasswordResetTokenRepository tokens,
 			IChangeEmailTokenRepository emailTokens,
-			ISensateUserTokenRepository authTokens,
 			IHostingEnvironment env
 		) : base(repo)
 		{
@@ -68,11 +66,12 @@ namespace SensateService.Controllers
 			this._passwd_tokens = tokens;
 			this._email_tokens = emailTokens;
 			this._env = env;
-			this._auth_tokens = authTokens;
 		}
 
 		[HttpPost("forgot-password")]
+		[ValidateModel]
 		[SwaggerResponse(200)]
+		[SwaggerResponse(404)]
 		public async Task<IActionResult> ForgotPassword([FromBody] ForgotPassword model)
 		{
 			SensateUser user;
@@ -100,13 +99,11 @@ namespace SensateService.Controllers
 		[HttpPost("reset-password")]
 		[SwaggerResponse(200)]
 		[SwaggerResponse(404)]
+		[ValidateModel]
 		public async Task<IActionResult> Resetpassword([FromBody] ResetPassword model)
 		{
 			SensateUser user;
 			PasswordResetToken token;
-
-			if(model.Email == null || model.Password == null || model.Token == null)
-				return BadRequest();
 
 			user = await this._users.GetByEmailAsync(model.Email);
 			token = this._passwd_tokens.GetById(model.Token);
@@ -125,14 +122,14 @@ namespace SensateService.Controllers
 
 		[HttpPost("confirm-update-email")]
 		[Authorize]
+		[ValidateModel]
 		[SwaggerResponse(200)]
 		[SwaggerResponse(400)]
-		public async Task<IActionResult> ConfirmChangeEmail([FromBody] UpdateEmail changeEmail)
+		public async Task<IActionResult> ConfirmChangeEmail([FromBody] ConfirmUpdateEmail changeEmail)
 		{
 			ChangeEmailToken token;
 
-			if(changeEmail.Email == null || changeEmail.Email.Length == 0 ||
-				changeEmail.Token == null || changeEmail.Token.Length == 0) {
+			if(changeEmail.Token == null || changeEmail.Token.Length == 0) {
 				return BadRequest();
 			}
 
@@ -153,6 +150,7 @@ namespace SensateService.Controllers
 		}
 
 		[HttpPost("update-email")]
+		[ValidateModel]
 		[SwaggerResponse(200)]
 		[SwaggerResponse(400)]
 		[Authorize]
@@ -163,8 +161,7 @@ namespace SensateService.Controllers
 			BodyBuilder mail;
 			SensateUser user;
 
-			if(changeEmailModel.Email == null || changeEmailModel.NewEmail == null ||
-				changeEmailModel.Email.Length == 0 || changeEmailModel.NewEmail.Length == 0) {
+			if(changeEmailModel.NewEmail == null || changeEmailModel.NewEmail.Length == 0) {
 				return BadRequest();
 			}
 
@@ -218,6 +215,7 @@ namespace SensateService.Controllers
 		}
 
 		[HttpPost("register")]
+		[ValidateModel]
 		[SwaggerResponse(200)]
 		[SwaggerResponse(400)]
 		public async Task<object> Register([FromBody] Register register)
@@ -255,29 +253,30 @@ namespace SensateService.Controllers
 
 		[HttpGet("show")]
 		[SwaggerResponse(404)]
-		[SwaggerResponse(200)]
-		[Authorize]
+		[ProducesResponseType(typeof(User), 200)]
+		[NormalUser]
 		public async Task<IActionResult> Show()
 		{
-			dynamic jobj;
+			User viewuser;
 			var user = await this.GetCurrentUserAsync();
 
 			if(user == null)
 				return NotFound();
 
-			jobj = new JObject();
+			viewuser = new User {
+				Email = user.Email,
+				FirstName = user.FirstName,
+				LastName = user.LastName,
+				PhoneNumber = user.PhoneNumber
+			};
 
-			jobj.FirstName = user.FirstName;
-			jobj.LastName = user.LastName;
-			jobj.Email = user.Email;
-			jobj.PhoneNumber = user.PhoneNumber ?? "";
-
-			return new ObjectResult(jobj);
+			return new ObjectResult(viewuser);
 		}
 
 		[HttpGet("confirm/{id}/{code}")]
 		[SwaggerResponse(200)]
 		[SwaggerResponse(401)]
+		[SwaggerResponse(404)]
 		public async Task<IActionResult> ConfirmEmail(string id, string code)
 		{
 			SensateUser user;

@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Identity;
 namespace SensateService.Models
 {
 	[Table("AspNetAuthTokens")]
-	public class SensateUserToken
+	public class UserToken
 	{
 		public bool Valid { get; set; }
 		public DateTime CreatedAt { get; set; }
@@ -25,13 +25,13 @@ namespace SensateService.Models
 		public string UserId { get; set; }
 		public SensateUser User { get; set; }
 
-		public SensateUserToken()
+		public UserToken()
 		{
 			this.Valid = true;
 			this.CreatedAt = DateTime.Now;
 		}
 
-		public SensateUserToken(TimeSpan expiresIn) : this()
+		public UserToken(TimeSpan expiresIn) : this()
 		{
 			this.ExpiresAt = DateTime.Now.Add(expiresIn);
 		}

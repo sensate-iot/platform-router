@@ -22,9 +22,9 @@ namespace SensateService.Init
 			services.AddScoped<IUserRepository, UserRepository>();
 			services.AddScoped<IChangeEmailTokenRepository, ChangeEmailTokenRepository>();
 			services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
-			services.AddScoped<ISensateRoleRepository, SensateRoleRepository>();
+			services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 			services.AddScoped<IAuditLogRepository, AuditLogRepository>();
-			services.AddScoped<ISensateUserTokenRepository, SensateUserTokenRepository>();
+			services.AddScoped<IUserTokenRepository, UserTokenRepository>();
 
 			return services;
 		}
