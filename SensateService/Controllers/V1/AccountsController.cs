@@ -71,6 +71,7 @@ namespace SensateService.Controllers.V1
 		[HttpPost("forgot-password")]
 		[ValidateModel]
 		[SwaggerResponse(200)]
+		[SwaggerResponse(404)]
 		public async Task<IActionResult> ForgotPassword([FromBody] ForgotPassword model)
 		{
 			SensateUser user;
@@ -252,29 +253,30 @@ namespace SensateService.Controllers.V1
 
 		[HttpGet("show")]
 		[SwaggerResponse(404)]
-		[SwaggerResponse(200)]
-		[Authorize]
+		[ProducesResponseType(typeof(User), 200)]
+		[NormalUser]
 		public async Task<IActionResult> Show()
 		{
-			dynamic jobj;
+			User viewuser;
 			var user = await this.GetCurrentUserAsync();
 
 			if(user == null)
 				return NotFound();
 
-			jobj = new JObject();
+			viewuser = new User {
+				Email = user.Email,
+				FirstName = user.FirstName,
+				LastName = user.LastName,
+				PhoneNumber = user.PhoneNumber
+			};
 
-			jobj.FirstName = user.FirstName;
-			jobj.LastName = user.LastName;
-			jobj.Email = user.Email;
-			jobj.PhoneNumber = user.PhoneNumber ?? "";
-
-			return new ObjectResult(jobj);
+			return new ObjectResult(viewuser);
 		}
 
 		[HttpGet("confirm/{id}/{code}")]
 		[SwaggerResponse(200)]
 		[SwaggerResponse(401)]
+		[SwaggerResponse(404)]
 		public async Task<IActionResult> ConfirmEmail(string id, string code)
 		{
 			SensateUser user;
