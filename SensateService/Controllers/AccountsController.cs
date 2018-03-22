@@ -29,6 +29,7 @@ using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Services;
 using SensateService.Models.Json.In;
+using SensateService.Attributes;
 
 namespace SensateService.Controllers
 {
@@ -283,6 +284,39 @@ namespace SensateService.Controllers
 				return Unauthorized();
 
 			return this.Ok();
+		}
+
+		[ValidateModel]
+		[NormalUser]
+		[HttpPatch("update")]
+		public async Task<IActionResult> UpdateUser([FromBody] UpdateUser userUpdate)
+		{
+			var user = this.CurrentUser;
+
+			if(userUpdate.Password != null) {
+				if(userUpdate.CurrentPassword == null)
+					return this.InvalidInputResult("Current password not given");
+
+				var result = await this._manager.ChangePasswordAsync(user,
+					userUpdate.CurrentPassword, userUpdate.Password);
+				if(!result.Succeeded)
+					return this.InvalidInputResult(result.Errors.First().Description);
+			}
+
+			this._users.StartUpdate(user);
+
+			if(userUpdate.FirstName != null)
+				user.FirstName = userUpdate.FirstName;
+
+			if(userUpdate.LastName != null)
+				user.LastName = userUpdate.LastName;
+
+			await this._users.EndUpdateAsync();
+
+			if(userUpdate.PhoneNumber != null)
+				await this._manager.SetPhoneNumberAsync(user, userUpdate.PhoneNumber);
+
+			return Ok();
 		}
 	}
 }
