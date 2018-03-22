@@ -146,6 +146,19 @@ namespace SensateService.Controllers.V1
 			return Ok();
 		}
 
+		[HttpDelete(Name = "RevokeAll")]
+		[NormalUser]
+		[SwaggerResponse(200)]
+		public async Task<IActionResult> RevokeAll()
+		{
+			IEnumerable<UserToken> tokens;
+			var user = await this.GetCurrentUserAsync();
+
+			tokens = this._tokens.GetByUser(user);
+			await this._tokens.InvalidateManyAsync(tokens);
+			return Ok();
+		}
+
 		private UserToken CreateUserTokenEntry(SensateUser user)
 		{
 			var token = new UserToken {

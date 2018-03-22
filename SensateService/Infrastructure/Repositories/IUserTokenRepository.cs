@@ -29,6 +29,7 @@ namespace SensateService.Infrastructure.Repositories
 		void InvalidateToken(SensateUser user, string value);
 
 		Task InvalidateTokenAsync(UserToken token);
+		Task InvalidateManyAsync(IEnumerable<UserToken> tokens);
 		Task InvalidateTokenAsync(SensateUser user, string value);
 	}
 }

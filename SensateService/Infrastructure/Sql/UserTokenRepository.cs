@@ -156,5 +156,18 @@ namespace SensateService.Infrastructure.Sql
 		{
 			return this._rng.NextString(JwtRefreshTokenLength);
 		}
+
+		public async Task InvalidateManyAsync(IEnumerable<UserToken> tokens)
+		{
+			List<UserToken> _tokens;
+
+			_tokens = tokens.ToList();
+			_tokens.ForEach(x => {
+				this.StartUpdate(x);
+				x.Valid = false;
+			});
+
+			await this.CommitAsync();
+		}
 	}
 }
