@@ -67,15 +67,35 @@ namespace SensateService.Infrastructure.Document
 
 		public override void Update(Measurement obj)
 		{
-			var update = Builders<Measurement>.Update
-				.Set(x => x.Data, obj.Data)
-				.Set(x => x.Latitude, obj.Latitude)
-				.Set(x => x.Longitude, obj.Longitude);
+			bool updating;
+			var update = Builders<Measurement>.Update;
+			UpdateDefinition<Measurement> updateDefinition = null;
+
+
+			updating = false;
+			if(obj.Longitude != 0.0D && obj.Latitude != 0.0D) {
+				updateDefinition = update.Set(x => x.Latitude, obj.Latitude)
+				                         .Set(x => x.Longitude, obj.Longitude);
+				updating = true;
+			}
+
+			if(obj.Data != null) {
+				if(updateDefinition == null)
+					updateDefinition = update.Set(x => x.Data, obj.Data);
+				else
+					updateDefinition = updateDefinition.Set(x => x.Data, obj.Data);
+
+				updating = true;
+			}
+
+
+			if(!updating)
+				return;
 
 			try {
 				this._measurements.FindOneAndUpdate(
 					x => x.InternalId == obj.InternalId,
-					update
+					updateDefinition
 				);
 
 			} catch(Exception ex) {
