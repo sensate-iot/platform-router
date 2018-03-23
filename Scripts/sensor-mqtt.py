@@ -33,8 +33,11 @@ class MqttSensor(object):
 		measurement['Latitude']  =  51.58307
 		measurement['CreatedById'] = self.sensor
 		measurement['CreatedBySecret'] = self.secret
-		measurement['Data'] = {}
-		measurement['Data']['Volts'] = random() * 100
+		measurement['Data'] = [
+			{'Name' : 'x', 'Value' : random() * 10},
+			{'Name' : 'y', 'Value' : random() * 100},
+			{'Name' : 'z', 'Value' : random() * 20}
+		]
 		return measurement
 
 	def run(self):
