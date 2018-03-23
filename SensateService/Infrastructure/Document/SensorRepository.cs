@@ -91,10 +91,14 @@ namespace SensateService.Infrastructure.Document
 		public override void Update(Sensor obj)
 		{
 			var update = Builders<Sensor>.Update
-				.Set(x => x.UpdatedAt, DateTime.Now)
-				.Set(x => x.Name, obj.Name)
-				.Set(x => x.Description, obj.Description)
-				.Set(x => x.Secret, obj.Secret);
+				.Set(x => x.UpdatedAt, DateTime.Now);
+
+			if(obj.Name != null)
+				update.Set(x => x.Name, obj.Name);
+			if(obj.Description != null)
+				update.Set(x => x.Description, obj.Description);
+			if(obj.Secret != null)
+				update.Set(x => x.Secret, obj.Secret);
 
 			try {
 				this._sensors.FindOneAndUpdate(
