@@ -77,7 +77,7 @@ namespace SensateService
 				options.DatabaseName = Secrets["MongoDbDatabaseName"];
 			});
 
-			BsonSerializer.RegisterSerializationProvider(new BsonDecimalSerializationProvider	());
+			BsonSerializer.RegisterSerializationProvider(new BsonDecimalSerializationProvider());
 
 			services.Configure<UserAccountSettings>(options => {
 				options.JwtKey = this.Secrets["JwtKey"];
