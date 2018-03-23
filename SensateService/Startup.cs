@@ -179,6 +179,12 @@ namespace SensateService
 
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider sp)
 		{
+			using(var scope = sp.CreateScope()) {
+				var ctx = scope.ServiceProvider.GetRequiredService<SensateSqlContext>();
+				ctx.Database.EnsureCreated();
+				ctx.Database.Migrate();
+			}
+
 			app.UseSwagger();
 			app.UseSwaggerUI(c => {
 				c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sensate API - Version 1");
