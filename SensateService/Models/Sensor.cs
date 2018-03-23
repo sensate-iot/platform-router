@@ -28,7 +28,6 @@ namespace SensateService.Models
 		[BsonRequired]
 		public string Name {get;set;}
 		public string Description {get;set;}
-		public string Unit {get;set;}
 		[BsonRequired]
 		public DateTime CreatedAt {get;set;}
 		[BsonRequired]

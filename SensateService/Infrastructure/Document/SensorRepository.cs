@@ -93,8 +93,8 @@ namespace SensateService.Infrastructure.Document
 			var update = Builders<Sensor>.Update
 				.Set(x => x.UpdatedAt, DateTime.Now)
 				.Set(x => x.Name, obj.Name)
-				.Set(x => x.Secret, obj.Secret)
-				.Set(x => x.Unit, obj.Unit);
+				.Set(x => x.Description, obj.Description)
+				.Set(x => x.Secret, obj.Secret);
 
 			try {
 				this._sensors.FindOneAndUpdate(

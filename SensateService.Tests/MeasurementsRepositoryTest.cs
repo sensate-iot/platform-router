@@ -29,15 +29,12 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
+using SensateService.Converters;
 
 namespace SensateService.Tests
 {
-	public class TestMeasurement
-	{
-		public decimal y { get; set; }
-		public string  x { get; set; }
-	}
-
 	[TestFixture]
 	public class MeasurementsRepositoryTests
 	{
@@ -50,7 +47,7 @@ namespace SensateService.Tests
 			_sensor = new Sensor {
 				CreatedAt = DateTime.Now,
 				UpdatedAt = DateTime.Now,
-				Unit = "V",
+				Description = "Unit testing sensor",
 				Secret = "TestingSecret",
 				InternalId = ObjectId.GenerateNewId(),
 				Name = "Test Sensor"
@@ -76,6 +73,7 @@ namespace SensateService.Tests
 			ILogger<MeasurementRepository> logger;
 			SensateContext ctx;
 
+			BsonSerializer.RegisterSerializationProvider(new BsonDecimalSerializationProvider());
 			this._receivedMeasurement = null;
 			settings = new MongoDBSettings();
 			settings.DatabaseName = "SensateUnitTests";
@@ -102,33 +100,48 @@ namespace SensateService.Tests
 		public async Task CanGetById()
 		{
 			Measurement m;
-			TestMeasurement testMeasurement;
 
 			m = await this._repo.GetMeasurementAsync(null, x => x.CreatedBy == this._sensor.InternalId);
-			testMeasurement = m.ConvertData<TestMeasurement>();
+			var list = m.Data as List<DataPoint>;
 
-			Assert.IsFalse(testMeasurement == null, "Unable to create TestMeasurement object!");
-			Assert.IsTrue(testMeasurement.x == "FooBar!", "Invalid Testmeasurement!");
-			Assert.IsTrue(testMeasurement.y == 12351.1234567890M, "Invalid Testmeasurement!");
-			Assert.IsFalse(m == null, "Unable to perform ID lookup!");
+			Assert.True(list[0].Name == "z");
+			Assert.True(list[1].Name == "x");
+			Assert.True(list[2].Name == "y");
 		}
 
 		[Test, Order(1)]
 		public async Task CanCreateMeasurement()
 		{
-			dynamic obj;
-			TestMeasurement m = new TestMeasurement {
-				y = 12351.1234567890M,
-				x = "FooBar!"
-			};
+			dynamic obj, measurement;
+			JArray array;
+
+			var x = typeof(decimal);
+			var y = typeof(decimal?);
+
+			measurement = new JObject();
+			array = new JArray();
 
 			obj = new JObject();
-			obj.Data = JToken.Parse(m.ToJson());
-			obj.Longitude = 1.1234;
-			obj.Latitude = 22.1165;
-			obj.CreatedBySecret = "TestingSecret";
+			obj.Value = 22.3949988317M;
+			obj.Name = "z";
+			array.Add(obj);
 
-			await this._repo.ReceiveMeasurement(_sensor, obj.ToString());
+			obj = new JObject();
+			obj.Value = 3.143611234211M;
+			obj.Name = "x";
+			array.Add(obj);
+
+			obj = new JObject();
+			obj.Value = 9.8136986919M;
+			obj.Name = "y";
+			array.Add(obj);
+
+			measurement.Longitude = 1.1234;
+			measurement.Latitude = 22.1165;
+			measurement.Data = array;
+			measurement.CreatedBySecret = "TestingSecret";
+
+			await this._repo.ReceiveMeasurement(_sensor, measurement.ToString());
 			Assert.IsTrue(this._receivedMeasurement != null);
 		}
 	}

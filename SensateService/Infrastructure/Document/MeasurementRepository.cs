@@ -89,7 +89,7 @@ namespace SensateService.Infrastructure.Document
 
 			try {
 				var result = await this._measurements.FindAsync(query);
-				return result.ToEnumerable();
+				return await result.ToListAsync();
 			} catch (Exception ex) {
 				this._logger.LogWarning(ex.Message);
 				return null;
@@ -101,7 +101,7 @@ namespace SensateService.Infrastructure.Document
 			var query = Builders<Measurement>.Filter.Eq("CreatedBy", sensor.InternalId);
 
 			try {
-				return this._measurements.Find(query).ToEnumerable();
+				return this._measurements.Find(query).ToList();
 			} catch (Exception ex) {
 				this._logger.LogWarning(ex.Message);
 				return null;
@@ -202,22 +202,22 @@ namespace SensateService.Infrastructure.Document
 			string key, Expression<Func<Measurement, bool>> expression)
 		{
 			var result = await this._measurements.FindAsync(expression);
-			return result.ToEnumerable();
+			return await result.ToListAsync();
 		}
 
 		public virtual IEnumerable<Measurement> TryGetMeasurements(
 			string key, Expression<Func<Measurement, bool>> expression)
 		{
 			var result = this._measurements.Find(expression);
-			return result.ToEnumerable();
+			return result.ToList();
 		}
 
 		private async Task<Measurement> StoreMeasurement(Sensor sensor, string json)
 		{
-			Measurement m;
+			Measurement measurement;
 			RawMeasurement raw;
 			DateTime now;
-			BsonDocument document;
+			IEnumerable<DataPoint> datapoints;
 
 			if(json == null || sensor == null)
 				return null;
@@ -240,7 +240,7 @@ namespace SensateService.Infrastructure.Document
 			if(raw.CreatedAt == null || raw.CreatedAt.CompareTo(DateTime.MinValue) <= 0)
 				raw.CreatedAt = now;
 
-			m = new Measurement {
+			measurement = new Measurement {
 				CreatedAt = raw.CreatedAt,
 				Longitude = raw.Longitude,
 				Latitude = raw.Latitude,
@@ -248,8 +248,8 @@ namespace SensateService.Infrastructure.Document
 				InternalId = base.GenerateId(now)
 			};
 
-			if(BsonDocument.TryParse(raw.Data.ToString(), out document)) {
-				m.Data = document;
+			if(Measurement.TryParseData(raw.Data, out datapoints)) {
+				measurement.Data = datapoints;
 			} else {
 				throw new InvalidRequestException(
 					MeasurementRepository.InvalidDataError,
@@ -262,8 +262,8 @@ namespace SensateService.Infrastructure.Document
 					BypassDocumentValidation = true
 				};
 
-				await this._measurements.InsertOneAsync(m, opts, CancellationToken.None);
-				await this.CommitAsync(m);
+				await this._measurements.InsertOneAsync(measurement, opts, CancellationToken.None);
+				await this.CommitAsync(measurement);
 			} catch(Exception ex) {
 				this._logger.LogWarning($"Unable to insert measurement: {ex.Message}");
 				throw new DatabaseException(
@@ -272,7 +272,7 @@ namespace SensateService.Infrastructure.Document
 				);
 			}
 
-			return m;
+			return measurement;
 		}
 
 		public virtual IEnumerable<Measurement> TryGetBetween(Sensor sensor, DateTime start, DateTime end)
@@ -307,7 +307,7 @@ namespace SensateService.Infrastructure.Document
 		{
 			return this._measurements.Find(x =>
 				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) >= 0
-			).ToEnumerable();
+			).ToList();
 		}
 
 		public virtual async Task<IEnumerable<Measurement>> GetBeforeAsync(Sensor sensor, DateTime pit)
@@ -325,7 +325,7 @@ namespace SensateService.Infrastructure.Document
 			var result = await this._measurements.FindAsync(x =>
 				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) >= 0
 			);
-			return result.ToEnumerable();
+			return await result.ToListAsync();
 		}
 
 		public virtual Measurement GetMeasurement(string key, Expression<Func<Measurement, bool>> selector)
@@ -341,7 +341,7 @@ namespace SensateService.Infrastructure.Document
 
 	internal class RawMeasurement
 	{
-		public JObject Data {get;set;}
+		public JContainer Data {get;set;}
 		public double Longitude {get;set;}
 		public double Latitude {get;set;}
 		public DateTime CreatedAt {get;set;}

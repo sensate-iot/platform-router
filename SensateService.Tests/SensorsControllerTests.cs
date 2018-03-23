@@ -43,7 +43,6 @@ namespace SensateService.Tests.UnitTests
 			s1 = new Sensor {
 				CreatedAt = DateTime.Now,
 				UpdatedAt = DateTime.Now,
-				Unit = "V",
 				Secret = "Yolo",
 				InternalId = ObjectId.GenerateNewId(),
 				Name = "Test Sensor"
@@ -56,7 +55,6 @@ namespace SensateService.Tests.UnitTests
 			s2 = new Sensor {
 				CreatedAt = DateTime.Now,
 				UpdatedAt = DateTime.Now,
-				Unit = "V",
 				Secret = "Yolo",
 				InternalId = ObjectId.GenerateNewId(),
 				Name = "Test Sensor"
