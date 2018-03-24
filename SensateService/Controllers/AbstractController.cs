@@ -12,15 +12,12 @@ using Microsoft.AspNetCore.Mvc;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Models.Json.Out;
+using SensateService.Enums;
 
 namespace SensateService.Controllers
 {
 	public abstract class AbstractController : Controller
 	{
-		public const int ServerFaultCode = 500;
-		public const int ServerFaultBadGateway = 502;
-		public const int ServerFaultUnavailable = 503;
-
 		protected readonly IUserRepository _users;
 
 		public SensateUser CurrentUser {
@@ -39,17 +36,17 @@ namespace SensateService.Controllers
 
 		protected StatusCodeResult ServerFault()
 		{
-			return this.StatusCode(ServerFaultCode);
+			return this.StatusCode(Error.ServerFaultGeneric);
 		}
 
 		protected StatusCodeResult BadGateway()
 		{
-			return this.StatusCode(ServerFaultBadGateway);
+			return this.StatusCode(Error.ServerFaultBadGateway);
 		}
 
 		protected StatusCodeResult ServiceUnavailable()
 		{
-			return this.StatusCode(ServerFaultUnavailable);
+			return this.StatusCode(Error.ServerFaultUnavailable);
 		}
 
 		protected async Task<SensateUser> GetCurrentUserAsync()

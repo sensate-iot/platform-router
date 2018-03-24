@@ -24,6 +24,7 @@ using SensateService.Infrastructure.Events;
 using SensateService.Models;
 using SensateService.Exceptions;
 using SensateService.Infrastructure.Repositories;
+using SensateService.Enums;
 
 namespace SensateService.Infrastructure.Document
 {
@@ -32,10 +33,6 @@ namespace SensateService.Infrastructure.Document
 		private readonly IMongoCollection<Measurement> _measurements;
 		private readonly Random _random;
 		protected readonly ILogger<MeasurementRepository> _logger;
-
-		public const int JsonError = 300;
-		public const int IncorrectSecretError = 301;
-		public const int InvalidDataError = 302;
 
 		public MeasurementRepository(SensateContext context, ILogger<MeasurementRepository> logger)
 			: base(context)
@@ -247,13 +244,13 @@ namespace SensateService.Infrastructure.Document
 
 				if(raw == null || raw.CreatedBySecret != sensor.Secret) {
 					throw new InvalidRequestException(
-						MeasurementRepository.IncorrectSecretError,
+						Error.IncorrectSecretError,
 						"Sensor secret doesn't match sensor ID!"
 					);
 				}
 			} catch(JsonSerializationException ex) {
 				this._logger.LogInformation($"Bad measurement received: ${ex.Message}");
-				throw new InvalidRequestException(MeasurementRepository.JsonError);
+				throw new InvalidRequestException(Error.JsonError);
 			}
 
 			now = DateTime.Now;
@@ -272,7 +269,7 @@ namespace SensateService.Infrastructure.Document
 				measurement.Data = datapoints;
 			} else {
 				throw new InvalidRequestException(
-					MeasurementRepository.InvalidDataError,
+					Error.InvalidDataError,
 					"Unable to parse data"
 				);
 			}
