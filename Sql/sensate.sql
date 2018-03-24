@@ -125,3 +125,69 @@ CREATE TABLE "PasswordResetTokens" (
 INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
 VALUES ('20180312130835_CreatePasswordResetToken', '2.0.1-rtm-125');
 
+CREATE TABLE "ChangeEmailTokens" (
+    "IdentityToken" text NOT NULL,
+    "Email" text NULL,
+    "UserToken" text NULL,
+    CONSTRAINT "PK_ChangeEmailTokens" PRIMARY KEY ("IdentityToken")
+);
+
+INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+VALUES ('20180319171541_AddChangeEmailToken', '2.0.1-rtm-125');
+
+ALTER TABLE "AspNetUserTokens" ADD "Discriminator" text NOT NULL DEFAULT '';
+
+ALTER TABLE "AspNetUserTokens" ADD "CreatedAt" timestamp NULL;
+
+ALTER TABLE "AspNetUserTokens" ADD "ExpiresAt" timestamp NULL;
+
+ALTER TABLE "AspNetUserTokens" ADD "Valid" bool NULL;
+
+INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+VALUES ('20180321085901_AddSensateUserToken', '2.0.1-rtm-125');
+
+ALTER TABLE "AspNetUserTokens" DROP CONSTRAINT "PK_AspNetUserTokens";
+
+ALTER TABLE "AspNetUserTokens" ALTER COLUMN "Value" TYPE text;
+ALTER TABLE "AspNetUserTokens" ALTER COLUMN "Value" SET NOT NULL;
+ALTER TABLE "AspNetUserTokens" ALTER COLUMN "Value" DROP DEFAULT;
+
+ALTER TABLE "AspNetUserTokens" ADD CONSTRAINT "PK_AspNetUserTokens" PRIMARY KEY ("Value", "UserId");
+
+ALTER TABLE "AspNetUserTokens" ADD CONSTRAINT "AK_AspNetUserTokens_UserId_LoginProvider_Name" UNIQUE ("UserId", "LoginProvider", "Name");
+
+INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+VALUES ('20180321092407_AlterSensateUserTokenPK', '2.0.1-rtm-125');
+
+ALTER TABLE "AspNetUserTokens" DROP CONSTRAINT "PK_AspNetUserTokens";
+
+ALTER TABLE "AspNetUserTokens" DROP CONSTRAINT "AK_AspNetUserTokens_UserId_LoginProvider_Name";
+
+ALTER TABLE "AspNetUserTokens" DROP COLUMN "Discriminator";
+
+ALTER TABLE "AspNetUserTokens" DROP COLUMN "CreatedAt";
+
+ALTER TABLE "AspNetUserTokens" DROP COLUMN "ExpiresAt";
+
+ALTER TABLE "AspNetUserTokens" DROP COLUMN "Valid";
+
+ALTER TABLE "AspNetUserTokens" ALTER COLUMN "Value" TYPE text;
+ALTER TABLE "AspNetUserTokens" ALTER COLUMN "Value" DROP NOT NULL;
+ALTER TABLE "AspNetUserTokens" ALTER COLUMN "Value" DROP DEFAULT;
+
+ALTER TABLE "AspNetUserTokens" ADD CONSTRAINT "PK_AspNetUserTokens" PRIMARY KEY ("UserId", "LoginProvider", "Name");
+
+CREATE TABLE "AspNetAuthTokens" (
+    "UserId" text NOT NULL,
+    "Value" text NOT NULL,
+    "CreatedAt" timestamp NOT NULL,
+    "ExpiresAt" timestamp NOT NULL,
+    "LoginProvider" text NULL,
+    "Valid" bool NOT NULL,
+    CONSTRAINT "PK_AspNetAuthTokens" PRIMARY KEY ("UserId", "Value"),
+    CONSTRAINT "FK_AspNetAuthTokens_AspNetUsers_UserId" FOREIGN KEY ("UserId") REFERENCES "AspNetUsers" ("Id") ON DELETE CASCADE
+);
+
+INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+VALUES ('20180321094920_AlterSensateUserTokenTableName', '2.0.1-rtm-125');
+
