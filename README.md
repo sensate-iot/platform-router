@@ -1,4 +1,6 @@
-﻿# Sensate IoT ![logo]
+﻿<img style="float: right;padding-top:40px" height="170px" src="https://i.imgur.com/x11RuE5.png" />
+
+# Sensate IoT
 
 ![header]
 
@@ -8,7 +10,7 @@ well, both vertically and horizontally. High availability and performance is ens
 clever use of caches and document stores.
 
 [header]: https://sensate.bietje.net/assets/images/sensate-usage.png "Sensate IoT"
-[logo]: sensate.png
+[logo]: https://i.imgur.com/x11RuE5.png
 
 ## Sensor communication
 
