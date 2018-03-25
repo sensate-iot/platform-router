@@ -12,9 +12,10 @@ using System;
 namespace SensateService.Migrations
 {
     [DbContext(typeof(SensateSqlContext))]
-    partial class SensateSqlContextModelSnapshot : ModelSnapshot
+    [Migration("20180324232847_RenameAuditLogToAspNetAuditLogs")]
+    partial class RenameAuditLogToAspNetAuditLogs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

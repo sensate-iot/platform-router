@@ -13,6 +13,7 @@ using System.Linq;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Exceptions;
+using SensateService.Enums;
 
 namespace SensateService.Infrastructure.Sql
 {
@@ -22,11 +23,12 @@ namespace SensateService.Infrastructure.Sql
 		{
 		}
 
-		public void Create(string route, SensateUser user = null)
+		public void Create(string route, RequestMethod method, SensateUser user = null)
 		{
 			var al = new AuditLog() {
 				Author = user,
 				Route = route,
+				Method = method,
 				Timestamp = DateTime.Now
 			};
 
@@ -39,13 +41,14 @@ namespace SensateService.Infrastructure.Sql
 			this.Commit(obj);
 		}
 
-		public async Task CreateAsync(string route, SensateUser user = null)
+		public async Task CreateAsync(string route, RequestMethod method, SensateUser user = null)
 		{
 			AuditLog al;
 
 			al = new AuditLog() {
 				Author = user,
 				Route = route,
+				Method = method,
 				Timestamp = DateTime.Now
 			};
 			await this.CreateAsync(al);

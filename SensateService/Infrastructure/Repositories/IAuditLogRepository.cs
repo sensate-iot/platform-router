@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+using SensateService.Enums;
 using SensateService.Models;
 
 namespace SensateService.Infrastructure.Repositories
@@ -28,7 +29,7 @@ namespace SensateService.Infrastructure.Repositories
 		AuditLog GetById(long id);
 		Task<AuditLog> GetAsync(long id);
 
-		void Create(string route, SensateUser user = null);
-		Task CreateAsync(string route, SensateUser user = null);
+		void Create(string route, RequestMethod method, SensateUser user = null);
+		Task CreateAsync(string route, RequestMethod method, SensateUser user = null);
     }
 }

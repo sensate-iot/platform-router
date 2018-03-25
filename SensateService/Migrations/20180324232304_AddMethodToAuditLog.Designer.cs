@@ -12,9 +12,10 @@ using System;
 namespace SensateService.Migrations
 {
     [DbContext(typeof(SensateSqlContext))]
-    partial class SensateSqlContextModelSnapshot : ModelSnapshot
+    [Migration("20180324232304_AddMethodToAuditLog")]
+    partial class AddMethodToAuditLog
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -123,7 +124,7 @@ namespace SensateService.Migrations
 
                     b.HasIndex("AuthorId");
 
-                    b.ToTable("AspNetAuditLogs");
+                    b.ToTable("AuditLogs");
                 });
 
             modelBuilder.Entity("SensateService.Models.ChangeEmailToken", b =>
