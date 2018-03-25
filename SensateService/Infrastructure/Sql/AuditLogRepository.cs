@@ -14,6 +14,7 @@ using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Exceptions;
 using SensateService.Enums;
+using System.Net;
 
 namespace SensateService.Infrastructure.Sql
 {
@@ -23,12 +24,16 @@ namespace SensateService.Infrastructure.Sql
 		{
 		}
 
-		public void Create(string route, RequestMethod method, SensateUser user = null)
+		public void Create(
+			string route, RequestMethod method,
+			IPAddress address, SensateUser user = null
+		)
 		{
 			var al = new AuditLog() {
 				Author = user,
 				Route = route,
 				Method = method,
+				Address = address,
 				Timestamp = DateTime.Now
 			};
 
@@ -41,7 +46,10 @@ namespace SensateService.Infrastructure.Sql
 			this.Commit(obj);
 		}
 
-		public async Task CreateAsync(string route, RequestMethod method, SensateUser user = null)
+		public async Task CreateAsync(
+			string route, RequestMethod method,
+			IPAddress address, SensateUser user = null
+		)
 		{
 			AuditLog al;
 
@@ -49,8 +57,10 @@ namespace SensateService.Infrastructure.Sql
 				Author = user,
 				Route = route,
 				Method = method,
+				Address = address,
 				Timestamp = DateTime.Now
 			};
+
 			await this.CreateAsync(al);
 		}
 

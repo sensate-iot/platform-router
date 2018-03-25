@@ -79,11 +79,19 @@ namespace SensateService.Controllers.V1
 			signInResult = await this._signin_manager.PasswordSignInAsync(user, login.Password, false, false);
 
 			if(!signInResult.Succeeded) {
-				await this._audit_log.CreateAsync(this.CurrentRoute(), RequestMethod.HttpPost, null);
+				await this._audit_log.CreateAsync(
+					this.CurrentRoute(), RequestMethod.HttpPost,
+					GetRemoteAddress(), null
+				);
+
 				return new UnauthorizedResult();
 			}
 
-			await this._audit_log.CreateAsync(this.CurrentRoute(), RequestMethod.HttpPost, user);
+			await this._audit_log.CreateAsync(
+				this.CurrentRoute(), RequestMethod.HttpPost,
+				GetRemoteAddress(), user
+			);
+
 			token = this.CreateUserTokenEntry(user);
 			await this._tokens.CreateAsync(token);
 
@@ -111,7 +119,8 @@ namespace SensateService.Controllers.V1
 				return Unauthorized();
 
 			token = this._tokens.GetById(user, login.RefreshToken);
-			await this._audit_log.CreateAsync(this.CurrentRoute(), RequestMethod.HttpPost, user);
+			await this._audit_log.CreateAsync(this.CurrentRoute(),
+				RequestMethod.HttpPost, GetRemoteAddress(), user);
 
 			if(token == null || !token.Valid)
 				return Unauthorized();
@@ -147,7 +156,9 @@ namespace SensateService.Controllers.V1
 			authToken = this._tokens.GetById(user, token);
 			await this._audit_log.CreateAsync(
 				this.CurrentRoute(),
-				RequestMethod.HttpPost,user
+				RequestMethod.HttpDelete,
+				GetRemoteAddress(),
+				user
 			);
 
 			if(authToken == null)
@@ -169,6 +180,10 @@ namespace SensateService.Controllers.V1
 			var user = await this.GetCurrentUserAsync();
 
 			tokens = this._tokens.GetByUser(user);
+			await this._audit_log.CreateAsync(
+				this.CurrentRoute(), RequestMethod.HttpDelete,
+				GetRemoteAddress(), user
+			);
 			await this._tokens.InvalidateManyAsync(tokens);
 			return Ok();
 		}

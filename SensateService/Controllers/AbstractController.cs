@@ -15,6 +15,7 @@ using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Models.Json.Out;
 using SensateService.Enums;
+using System.Net;
 
 namespace SensateService.Controllers
 {
@@ -95,6 +96,11 @@ namespace SensateService.Controllers
 				return null;
 
 			return String.Format("{0}#{1}", controller.ToString(), action.ToString());
+		}
+
+		protected IPAddress GetRemoteAddress()
+		{
+			return this.HttpContext.Connection.RemoteIpAddress;
 		}
 	}
 }

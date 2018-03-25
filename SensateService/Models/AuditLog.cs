@@ -6,6 +6,7 @@
  */
 
 using System;
+using System.Net;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -22,6 +23,8 @@ namespace SensateService.Models
 		public string Route { get; set; }
 		[Required]
 		public RequestMethod Method { get; set; }
+		[Required]
+		public IPAddress Address { get; set; }
 		public SensateUser Author { get; set; }
 		public DateTime Timestamp { get; set; }
 	}
