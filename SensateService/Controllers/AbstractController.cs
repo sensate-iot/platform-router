@@ -6,7 +6,9 @@
  * @email:  dev@bietje.net
  */
 
+using System;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Mvc;
 
 using SensateService.Infrastructure.Repositories;
@@ -80,6 +82,19 @@ namespace SensateService.Controllers
 			status.ErrorCode = 404;
 
 			return new NotFoundObjectResult(status);
+		}
+
+		protected string CurrentRoute()
+		{
+			object controller, action;
+
+			if(!this.RouteData.Values.TryGetValue("controller", out controller))
+				return null;
+
+			if(!this.RouteData.Values.TryGetValue("action", out action))
+				return null;
+
+			return String.Format("{0}#{1}", controller.ToString(), action.ToString());
 		}
 	}
 }
