@@ -6,25 +6,14 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Diagnostics;
 
 using Moq;
-using Moq.Language;
-
 using MongoDB.Bson;
 using NUnit.Framework;
-using SensateService.Controllers;
-using SensateService.Controllers.V1;
+
 using SensateService.Models;
 using SensateService.Infrastructure.Repositories;
-using SensateService.Infrastructure.Document;
-using SensateService.Infrastructure.Events;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Caching.Distributed;
 
 namespace SensateService.Tests.UnitTests
 {
@@ -73,12 +62,6 @@ namespace SensateService.Tests.UnitTests
 		[Test]
 		public async Task CanGetSensorById()
 		{
-			/*SensorsController controller;
-
-			controller = new SensorsController(this._sensors.Object, null);
-			var result = await controller.GetById("abcde");
-			Assert.IsTrue(result.GetType() == typeof(ObjectResult), "Unable to get sensor!");
-			*/
 			Assert.IsTrue(true);
 			await Task.CompletedTask;
 		}

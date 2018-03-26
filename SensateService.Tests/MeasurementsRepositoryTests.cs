@@ -7,31 +7,22 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Diagnostics;
 
-using Moq;
-using Moq.Language;
+using Microsoft.Extensions.Logging;
+
+using NUnit.Framework;
+using Newtonsoft.Json.Linq;
 
 using MongoDB.Bson;
-using MongoDB.Driver;
-using MongoDB.Driver.Linq;
-using NUnit.Framework;
-using SensateService.Controllers;
+using MongoDB.Bson.Serialization;
+
+using SensateService.Converters;
 using SensateService.Models;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Infrastructure.Document;
 using SensateService.Infrastructure.Events;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.IO;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Serializers;
-using SensateService.Converters;
 
 namespace SensateService.Tests
 {
