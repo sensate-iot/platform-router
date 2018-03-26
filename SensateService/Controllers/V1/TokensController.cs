@@ -71,13 +71,13 @@ namespace SensateService.Controllers.V1
 
 			if(!result) {
 				var status = new Status();
-				status.ErrorCode = 401;
+				status.ErrorCode = ReplyCode.NotAllowed;
 				status.Message = "Not allowed to sign in!";
 				return new BadRequestObjectResult(status);
 			}
 
 			signInResult = await this._signin_manager.PasswordSignInAsync(user, login.Password, false, false);
-
+			
 			if(!signInResult.Succeeded) {
 				await this._audit_log.CreateAsync(
 					this.CurrentRoute(), RequestMethod.HttpPost,
@@ -152,6 +152,12 @@ namespace SensateService.Controllers.V1
 		{
 			UserToken authToken;
 			var user = await this.GetCurrentUserAsync();
+
+			if(user == null)
+				return Unauthorized();
+
+			if(token == null || token.Length == 0)
+				return InvalidInputResult("Token not found!");
 
 			authToken = this._tokens.GetById(user, token);
 			await this._audit_log.CreateAsync(

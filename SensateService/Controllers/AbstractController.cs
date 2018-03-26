@@ -8,6 +8,7 @@
 
 using System;
 using System.Threading.Tasks;
+using System.Net;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,7 +16,6 @@ using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Models.Json.Out;
 using SensateService.Enums;
-using System.Net;
 
 namespace SensateService.Controllers
 {
@@ -70,7 +70,7 @@ namespace SensateService.Controllers
 			var status = new Status();
 
 			status.Message = msg;
-			status.ErrorCode = 400;
+			status.ErrorCode = ReplyCode.BadInput;
 
 			return new BadRequestObjectResult(status);
 		}
@@ -80,7 +80,7 @@ namespace SensateService.Controllers
 			var status = new Status();
 
 			status.Message = msg;
-			status.ErrorCode = 404;
+			status.ErrorCode = ReplyCode.NotFound;
 
 			return new NotFoundObjectResult(status);
 		}
