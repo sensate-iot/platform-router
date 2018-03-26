@@ -108,28 +108,6 @@ namespace SensateService.Infrastructure.Document
 			}
 		}
 
-		public override void Create(Measurement m)
-		{
-			if(m.CreatedBy == null || m.CreatedBy == ObjectId.Empty)
-				return;
-
-			m.CreatedAt = DateTime.Now;
-			m.InternalId = this.GenerateId(DateTime.Now);
-			this._measurements.InsertOne(m);
-			this.Commit(m);
-		}
-
-		public async override Task CreateAsync(Measurement obj)
-		{
-			if(obj.CreatedBy == null || obj.CreatedBy == ObjectId.Empty)
-				return;
-
-			obj.CreatedAt = DateTime.Now;
-			obj.InternalId = this.GenerateId(DateTime.Now);
-			await this._measurements.InsertOneAsync(obj);
-			await this.CommitAsync(obj);
-		}
-
 		public override void Delete(string id)
 		{
 			ObjectId oid;
@@ -154,32 +132,7 @@ namespace SensateService.Infrastructure.Document
 			await this._measurements.DeleteOneAsync(x => x.InternalId == objectId);
 		}
 
-		public override Measurement GetById(string id)
-		{
-			ObjectId oid = this.ToInternalId(id);
-			var find = Builders<Measurement>.Filter.Eq("InternalId", oid);
-			var result = this._measurements.Find(find);
-
-			if(result != null)
-				return result.FirstOrDefault();
-
-			return null;
-		}
-
-		public async Task ReceiveMeasurement(Sensor sender, string measurement)
-		{
-			MeasurementReceivedEventArgs args;
-			Measurement m;
-
-			m = await this.StoreMeasurement(sender, measurement);
-			if(m != null) {
-				args = new MeasurementReceivedEventArgs() {
-					Measurement = m
-				};
-
-				await MeasurementEvents.OnMeasurementReceived(sender, args);
-			}
-		}
+#region Linq getters
 
 		public virtual Measurement TryGetMeasurement(
 			string key,
@@ -210,6 +163,59 @@ namespace SensateService.Infrastructure.Document
 		{
 			var result = this._measurements.Find(expression);
 			return result.ToEnumerable();
+		}
+
+#endregion
+
+		public override Measurement GetById(string id)
+		{
+			ObjectId oid = this.ToInternalId(id);
+			var find = Builders<Measurement>.Filter.Eq("InternalId", oid);
+			var result = this._measurements.Find(find);
+
+			if(result != null)
+				return result.FirstOrDefault();
+
+			return null;
+		}
+
+#region Measurement creation
+
+		public async Task ReceiveMeasurement(Sensor sender, string measurement)
+		{
+			MeasurementReceivedEventArgs args;
+			Measurement m;
+
+			m = await this.StoreMeasurement(sender, measurement);
+			if(m != null) {
+				args = new MeasurementReceivedEventArgs() {
+					Measurement = m
+				};
+
+				await MeasurementEvents.OnMeasurementReceived(sender, args);
+			}
+		}
+
+		public override void Create(Measurement m)
+		{
+			if(m.CreatedBy == null || m.CreatedBy == ObjectId.Empty)
+				return;
+
+			m.CreatedAt = DateTime.Now;
+			m.InternalId = this.GenerateId(DateTime.Now);
+			this._measurements.InsertOne(m);
+			this.Commit(m);
+		}
+
+		public async override Task CreateAsync(Measurement obj)
+		{
+			if(obj.CreatedBy == null || obj.CreatedBy == ObjectId.Empty)
+				return;
+
+			obj.CreatedAt = DateTime.Now;
+			obj.InternalId = this.GenerateId(DateTime.Now);
+			await this._measurements.InsertOneAsync(obj);
+			await this.CommitAsync(obj);
 		}
 
 		private async Task<Measurement> StoreMeasurement(Sensor sensor, string json)
@@ -274,6 +280,8 @@ namespace SensateService.Infrastructure.Document
 
 			return m;
 		}
+
+#endregion
 
 		public virtual IEnumerable<Measurement> TryGetBetween(Sensor sensor, DateTime start, DateTime end)
 		{
