@@ -119,4 +119,5 @@ available containing the entire C/C++ style guide.
 #### C#.NET
 
 C# follows the rules mentioned above, with the exception of the naming convention. In
-the naming convention the C# standard is followed, which is CamelCase.
+the naming convention the C# standard is followed, which is CamelCase. The full code style
+can be found in CODESTYLE.md.
