@@ -80,7 +80,7 @@ namespace SensateService.Controllers.V1
 			
 			if(!signInResult.Succeeded) {
 				await this._audit_log.CreateAsync(
-					this.CurrentRoute(), RequestMethod.HttpPost,
+					this.GetCurrentRoute(), RequestMethod.HttpPost,
 					GetRemoteAddress(), null
 				);
 
@@ -88,7 +88,7 @@ namespace SensateService.Controllers.V1
 			}
 
 			await this._audit_log.CreateAsync(
-				this.CurrentRoute(), RequestMethod.HttpPost,
+				this.GetCurrentRoute(), RequestMethod.HttpPost,
 				GetRemoteAddress(), user
 			);
 
@@ -119,7 +119,7 @@ namespace SensateService.Controllers.V1
 				return Unauthorized();
 
 			token = this._tokens.GetById(user, login.RefreshToken);
-			await this._audit_log.CreateAsync(this.CurrentRoute(),
+			await this._audit_log.CreateAsync(this.GetCurrentRoute(),
 				RequestMethod.HttpPost, GetRemoteAddress(), user);
 
 			if(token == null || !token.Valid)
@@ -161,7 +161,7 @@ namespace SensateService.Controllers.V1
 
 			authToken = this._tokens.GetById(user, token);
 			await this._audit_log.CreateAsync(
-				this.CurrentRoute(),
+				this.GetCurrentRoute(),
 				RequestMethod.HttpDelete,
 				GetRemoteAddress(),
 				user
@@ -187,7 +187,7 @@ namespace SensateService.Controllers.V1
 
 			tokens = this._tokens.GetByUser(user);
 			await this._audit_log.CreateAsync(
-				this.CurrentRoute(), RequestMethod.HttpDelete,
+				this.GetCurrentRoute(), RequestMethod.HttpDelete,
 				GetRemoteAddress(), user
 			);
 			await this._tokens.InvalidateManyAsync(tokens);

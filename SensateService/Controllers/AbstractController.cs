@@ -85,7 +85,7 @@ namespace SensateService.Controllers
 			return new NotFoundObjectResult(status);
 		}
 
-		protected string CurrentRoute()
+		protected string GetCurrentRoute()
 		{
 			object controller, action;
 

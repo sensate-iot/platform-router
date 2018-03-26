@@ -32,6 +32,7 @@ using SensateService.Models.Json.In;
 using SensateService.Attributes;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using SensateService.Models.Json.Out;
+using SensateService.Enums;
 
 namespace SensateService.Controllers.V1
 {
@@ -41,12 +42,12 @@ namespace SensateService.Controllers.V1
 	public class AccountsController : AbstractController
 	{
 		private readonly UserAccountSettings _settings;
-		private readonly SignInManager<SensateUser> _siManager;
 		private readonly UserManager<SensateUser> _manager;
 		private readonly IEmailSender _mailer;
 		private readonly IPasswordResetTokenRepository _passwd_tokens;
 		private readonly IChangeEmailTokenRepository _email_tokens;
 		private readonly IHostingEnvironment _env;
+		private readonly IAuditLogRepository _audit_logs;
 
 		public AccountsController(
 			IUserRepository repo,
@@ -56,16 +57,17 @@ namespace SensateService.Controllers.V1
 			IEmailSender emailer,
 			IPasswordResetTokenRepository tokens,
 			IChangeEmailTokenRepository emailTokens,
+			IAuditLogRepository auditLogs,
 			IHostingEnvironment env
 		) : base(repo)
 		{
-			this._siManager = manager;
 			this._settings = options.Value;
 			this._manager = userManager;
 			this._mailer = emailer;
 			this._passwd_tokens = tokens;
 			this._email_tokens = emailTokens;
 			this._env = env;
+			this._audit_logs = auditLogs;
 		}
 
 		[HttpPost("forgot-password")]
@@ -79,6 +81,8 @@ namespace SensateService.Controllers.V1
 			BodyBuilder mail;
 
 			user = await this._users.GetByEmailAsync(model.Email);
+			await this.Log(RequestMethod.HttpPost, user);
+
 			if(user == null || !user.EmailConfirmed)
 				return NotFound();
 
@@ -107,6 +111,7 @@ namespace SensateService.Controllers.V1
 
 			user = await this._users.GetByEmailAsync(model.Email);
 			token = this._passwd_tokens.GetById(model.Token);
+			await this.Log(RequestMethod.HttpPost, user);
 
 			if(user == null || token == null)
 				return NotFound();
@@ -130,10 +135,12 @@ namespace SensateService.Controllers.V1
 			ChangeEmailToken token;
 
 			if(changeEmail.Token == null || changeEmail.Token.Length == 0) {
+				await this.Log(RequestMethod.HttpPost);
 				return BadRequest();
 			}
 
 			var user = await this.GetCurrentUserAsync();
+			await this.Log(RequestMethod.HttpPost, user);
 			token = this._email_tokens.GetById(changeEmail.Token);
 
 			if(token == null)
@@ -162,10 +169,13 @@ namespace SensateService.Controllers.V1
 			SensateUser user;
 
 			if(changeEmailModel.NewEmail == null || changeEmailModel.NewEmail.Length == 0) {
+				await this.Log(RequestMethod.HttpPost);
 				return BadRequest();
 			}
 
 			user = await this.GetCurrentUserAsync();
+			await this.Log(RequestMethod.HttpPost, user);
+
 			if(user == null)
 				return BadRequest();
 
@@ -229,6 +239,7 @@ namespace SensateService.Controllers.V1
 				PhoneNumber = register.PhoneNumber
 			};
 
+			await this.Log(RequestMethod.HttpPost);
 			if(!this.ValidateUser(user))
 				return BadRequest();
 
@@ -260,6 +271,8 @@ namespace SensateService.Controllers.V1
 			User viewuser;
 			var user = await this.GetCurrentUserAsync();
 
+			await this.Log(RequestMethod.HttpGet, user);
+
 			if(user == null)
 				return NotFound();
 
@@ -280,6 +293,8 @@ namespace SensateService.Controllers.V1
 		public async Task<IActionResult> ConfirmEmail(string id, string code)
 		{
 			SensateUser user;
+
+			await this.Log(RequestMethod.HttpGet);
 
 			if(id == null || code == null) {
 				return BadRequest();
@@ -310,6 +325,8 @@ namespace SensateService.Controllers.V1
 		{
 			var user = this.CurrentUser;
 
+			await this.Log(RequestMethod.HttpPatch, user);
+
 			if(userUpdate.Password != null) {
 				if(userUpdate.CurrentPassword == null)
 					return this.InvalidInputResult("Current password not given");
@@ -334,6 +351,14 @@ namespace SensateService.Controllers.V1
 				await this._manager.SetPhoneNumberAsync(user, userUpdate.PhoneNumber);
 
 			return Ok();
+		}
+
+		private async Task Log(RequestMethod method, SensateUser user = null)
+		{
+			await this._audit_logs.CreateAsync(
+				this.GetCurrentRoute(), method,
+				this.GetRemoteAddress(), user
+			);
 		}
 	}
 }
