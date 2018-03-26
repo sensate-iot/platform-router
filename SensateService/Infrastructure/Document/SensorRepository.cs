@@ -80,6 +80,10 @@ namespace SensateService.Infrastructure.Document
 			ObjectId oid = new ObjectId(id);
 			var filter = Builders<Sensor>.Filter.Where(x => x.InternalId == oid);
 			var result = await this._sensors.FindAsync(filter);
+
+			if(result == null)
+				return null;
+
 			return await result.FirstOrDefaultAsync();
 		}
 
@@ -131,7 +135,12 @@ namespace SensateService.Infrastructure.Document
 		public override Sensor GetById(string id)
 		{
 			ObjectId oid = new ObjectId(id);
-			return this._sensors.Find(x => x.InternalId == oid).FirstOrDefault();
+			var result = this._sensors.Find(x => x.InternalId == oid);
+
+			if(result == null)
+				return null;
+
+			return result.FirstOrDefault();
 		}
 	}
 }

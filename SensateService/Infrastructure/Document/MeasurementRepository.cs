@@ -203,7 +203,12 @@ namespace SensateService.Infrastructure.Document
 			Expression<Func<Measurement, bool>> expression
 		)
 		{
-			return this._measurements.FindSync(expression).FirstOrDefault();
+			var result = this._measurements.FindSync(expression);
+
+			if(result == null)
+				return null;
+
+			return result.FirstOrDefault();
 		}
 
 		public async virtual Task<Measurement> TryGetMeasurementAsync(
@@ -212,6 +217,10 @@ namespace SensateService.Infrastructure.Document
 			IAsyncCursor<Measurement> result;
 
 			result = await this._measurements.FindAsync(expression);
+
+			if(result == null)
+				return null;
+
 			return await result.FirstOrDefaultAsync();
 		}
 
@@ -219,6 +228,10 @@ namespace SensateService.Infrastructure.Document
 			string key, Expression<Func<Measurement, bool>> expression)
 		{
 			var result = await this._measurements.FindAsync(expression);
+
+			if(result == null)
+				return null;
+
 			return await result.ToListAsync();
 		}
 
@@ -226,6 +239,10 @@ namespace SensateService.Infrastructure.Document
 			string key, Expression<Func<Measurement, bool>> expression)
 		{
 			var result = this._measurements.Find(expression);
+
+			if(result == null)
+				return null;
+
 			return result.ToList();
 		}
 
@@ -322,9 +339,14 @@ namespace SensateService.Infrastructure.Document
 
 		public virtual IEnumerable<Measurement> GetAfter(Sensor sensor, DateTime pit)
 		{
-			return this._measurements.Find(x =>
+			var result = this._measurements.Find(x =>
 				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) >= 0
-			).ToList();
+			);
+
+			if(result == null)
+				return null;
+
+			return result.ToList();
 		}
 
 		public virtual async Task<IEnumerable<Measurement>> GetBeforeAsync(Sensor sensor, DateTime pit)
@@ -342,6 +364,10 @@ namespace SensateService.Infrastructure.Document
 			var result = await this._measurements.FindAsync(x =>
 				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) >= 0
 			);
+
+			if(result == null)
+				return null;
+
 			return await result.ToListAsync();
 		}
 
