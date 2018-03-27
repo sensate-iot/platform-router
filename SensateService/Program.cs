@@ -27,8 +27,6 @@ namespace SensateService
 {
 	public class Program
 	{
-		//public static MqttService MqttClient;
-
 		public const string ApiVersionString = "v1";
 
 		public static void CreateUserRoles(IWebHost wh)
