@@ -6,21 +6,21 @@
  * @email:  dev@bietje.net
  */
 
+using System;
 using System.Threading.Tasks;
+using System.Net;
+
 using Microsoft.AspNetCore.Mvc;
 
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Models.Json.Out;
+using SensateService.Enums;
 
 namespace SensateService.Controllers
 {
 	public abstract class AbstractController : Controller
 	{
-		public const int ServerFaultCode = 500;
-		public const int ServerFaultBadGateway = 502;
-		public const int ServerFaultUnavailable = 503;
-
 		protected readonly IUserRepository _users;
 
 		public SensateUser CurrentUser {
@@ -39,17 +39,17 @@ namespace SensateService.Controllers
 
 		protected StatusCodeResult ServerFault()
 		{
-			return this.StatusCode(ServerFaultCode);
+			return this.StatusCode(Error.ServerFaultGeneric);
 		}
 
 		protected StatusCodeResult BadGateway()
 		{
-			return this.StatusCode(ServerFaultBadGateway);
+			return this.StatusCode(Error.ServerFaultBadGateway);
 		}
 
 		protected StatusCodeResult ServiceUnavailable()
 		{
-			return this.StatusCode(ServerFaultUnavailable);
+			return this.StatusCode(Error.ServerFaultUnavailable);
 		}
 
 		protected async Task<SensateUser> GetCurrentUserAsync()
@@ -70,7 +70,7 @@ namespace SensateService.Controllers
 			var status = new Status();
 
 			status.Message = msg;
-			status.ErrorCode = 400;
+			status.ErrorCode = ReplyCode.BadInput;
 
 			return new BadRequestObjectResult(status);
 		}
@@ -80,9 +80,27 @@ namespace SensateService.Controllers
 			var status = new Status();
 
 			status.Message = msg;
-			status.ErrorCode = 404;
+			status.ErrorCode = ReplyCode.NotFound;
 
 			return new NotFoundObjectResult(status);
+		}
+
+		protected string GetCurrentRoute()
+		{
+			object controller, action;
+
+			if(!this.RouteData.Values.TryGetValue("controller", out controller))
+				return null;
+
+			if(!this.RouteData.Values.TryGetValue("action", out action))
+				return null;
+
+			return String.Format("{0}#{1}", controller.ToString(), action.ToString());
+		}
+
+		protected IPAddress GetRemoteAddress()
+		{
+			return this.HttpContext.Connection.RemoteIpAddress;
 		}
 	}
 }

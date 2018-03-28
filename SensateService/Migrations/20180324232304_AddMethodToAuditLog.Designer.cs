@@ -8,14 +8,14 @@ using Microsoft.EntityFrameworkCore.Storage.Internal;
 using SensateService.Enums;
 using SensateService.Infrastructure.Sql;
 using System;
-using System.Net;
 
 namespace SensateService.Migrations
 {
     [DbContext(typeof(SensateSqlContext))]
-    partial class SensateSqlContextModelSnapshot : ModelSnapshot
+    [Migration("20180324232304_AddMethodToAuditLog")]
+    partial class AddMethodToAuditLog
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -111,9 +111,6 @@ namespace SensateService.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<IPAddress>("Address")
-                        .IsRequired();
-
                     b.Property<string>("AuthorId");
 
                     b.Property<int>("Method");
@@ -127,7 +124,7 @@ namespace SensateService.Migrations
 
                     b.HasIndex("AuthorId");
 
-                    b.ToTable("AspNetAuditLogs");
+                    b.ToTable("AuditLogs");
                 });
 
             modelBuilder.Entity("SensateService.Models.ChangeEmailToken", b =>

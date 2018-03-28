@@ -5,11 +5,13 @@
  * @email   dev@bietje.net
  */
 
+using SensateService.Enums;
+
 namespace SensateService.Models.Json.Out
 {
 	public class Status
 	{
-		public int ErrorCode { get; set; }
+		public ReplyCode ErrorCode { get; set; }
 		public string Message { get; set; }
 	}
 }

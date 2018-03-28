@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Hosting;
 
 using Swashbuckle.AspNetCore.Swagger;
+using MongoDB.Bson.Serialization;
 
 using SensateService.Models;
 using SensateService.Infrastructure.Sql;
@@ -32,6 +33,9 @@ using SensateService.Init;
 using SensateService.Services;
 using SensateService.Controllers;
 using SensateService.Middleware;
+using SensateService.Converters;
+using MongoDB.Bson.Serialization.Serializers;
+using MongoDB.Bson;
 
 namespace SensateService
 {
@@ -72,6 +76,8 @@ namespace SensateService
 				options.ConnectionString = Secrets["MongoDbConnectionString"];
 				options.DatabaseName = Secrets["MongoDbDatabaseName"];
 			});
+
+			BsonSerializer.RegisterSerializationProvider(new BsonDecimalSerializationProvider());
 
 			services.Configure<UserAccountSettings>(options => {
 				options.JwtKey = this.Secrets["JwtKey"];
@@ -173,6 +179,12 @@ namespace SensateService
 
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider sp)
 		{
+			using(var scope = sp.CreateScope()) {
+				var ctx = scope.ServiceProvider.GetRequiredService<SensateSqlContext>();
+				ctx.Database.EnsureCreated();
+				ctx.Database.Migrate();
+			}
+
 			app.UseSwagger();
 			app.UseSwaggerUI(c => {
 				c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sensate API - Version 1");

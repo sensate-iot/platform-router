@@ -80,6 +80,10 @@ namespace SensateService.Infrastructure.Document
 			ObjectId oid = new ObjectId(id);
 			var filter = Builders<Sensor>.Filter.Where(x => x.InternalId == oid);
 			var result = await this._sensors.FindAsync(filter);
+
+			if(result == null)
+				return null;
+
 			return await result.FirstOrDefaultAsync();
 		}
 
@@ -91,10 +95,14 @@ namespace SensateService.Infrastructure.Document
 		public override void Update(Sensor obj)
 		{
 			var update = Builders<Sensor>.Update
-				.Set(x => x.UpdatedAt, DateTime.Now)
-				.Set(x => x.Name, obj.Name)
-				.Set(x => x.Secret, obj.Secret)
-				.Set(x => x.Unit, obj.Unit);
+				.Set(x => x.UpdatedAt, DateTime.Now);
+
+			if(obj.Name != null)
+				update.Set(x => x.Name, obj.Name);
+			if(obj.Description != null)
+				update.Set(x => x.Description, obj.Description);
+			if(obj.Secret != null)
+				update.Set(x => x.Secret, obj.Secret);
 
 			try {
 				this._sensors.FindOneAndUpdate(
@@ -127,7 +135,12 @@ namespace SensateService.Infrastructure.Document
 		public override Sensor GetById(string id)
 		{
 			ObjectId oid = new ObjectId(id);
-			return this._sensors.Find(x => x.InternalId == oid).FirstOrDefault();
+			var result = this._sensors.Find(x => x.InternalId == oid);
+
+			if(result == null)
+				return null;
+
+			return result.FirstOrDefault();
 		}
 	}
 }

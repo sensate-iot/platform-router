@@ -8,14 +8,14 @@ using Microsoft.EntityFrameworkCore.Storage.Internal;
 using SensateService.Enums;
 using SensateService.Infrastructure.Sql;
 using System;
-using System.Net;
 
 namespace SensateService.Migrations
 {
     [DbContext(typeof(SensateSqlContext))]
-    partial class SensateSqlContextModelSnapshot : ModelSnapshot
+    [Migration("20180324232847_RenameAuditLogToAspNetAuditLogs")]
+    partial class RenameAuditLogToAspNetAuditLogs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -110,9 +110,6 @@ namespace SensateService.Migrations
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd();
-
-                    b.Property<IPAddress>("Address")
-                        .IsRequired();
 
                     b.Property<string>("AuthorId");
 

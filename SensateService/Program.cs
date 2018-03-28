@@ -16,19 +16,14 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Identity;
-
-using SensateService.Services;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
 using SensateService.Models;
-using System.Diagnostics;
 
 namespace SensateService
 {
 	public class Program
 	{
-		//public static MqttService MqttClient;
-
 		public const string ApiVersionString = "v1";
 
 		public static void CreateUserRoles(IWebHost wh)

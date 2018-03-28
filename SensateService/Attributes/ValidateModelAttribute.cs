@@ -9,6 +9,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
+using SensateService.Enums;
 using SensateService.Models.Json.Out;
 
 namespace SensateService.Attributes
@@ -23,7 +24,7 @@ namespace SensateService.Attributes
 
 			if(!context.ModelState.IsValid) {
 				status = new Status {
-					ErrorCode = 400,
+					ErrorCode = ReplyCode.BadInput,
 					Message = "Invalid request"
 				};
 

@@ -24,6 +24,7 @@ using SensateService.Infrastructure.Events;
 using SensateService.Models;
 using SensateService.Exceptions;
 using SensateService.Infrastructure.Repositories;
+using SensateService.Enums;
 
 namespace SensateService.Infrastructure.Document
 {
@@ -32,10 +33,6 @@ namespace SensateService.Infrastructure.Document
 		private readonly IMongoCollection<Measurement> _measurements;
 		private readonly Random _random;
 		protected readonly ILogger<MeasurementRepository> _logger;
-
-		public const int JsonError = 300;
-		public const int IncorrectSecretError = 301;
-		public const int InvalidDataError = 302;
 
 		public MeasurementRepository(SensateContext context, ILogger<MeasurementRepository> logger)
 			: base(context)
@@ -67,15 +64,35 @@ namespace SensateService.Infrastructure.Document
 
 		public override void Update(Measurement obj)
 		{
-			var update = Builders<Measurement>.Update
-				.Set(x => x.Data, obj.Data)
-				.Set(x => x.Latitude, obj.Latitude)
-				.Set(x => x.Longitude, obj.Longitude);
+			bool updating;
+			var update = Builders<Measurement>.Update;
+			UpdateDefinition<Measurement> updateDefinition = null;
+
+
+			updating = false;
+			if(obj.Longitude != 0.0D && obj.Latitude != 0.0D) {
+				updateDefinition = update.Set(x => x.Latitude, obj.Latitude)
+				                         .Set(x => x.Longitude, obj.Longitude);
+				updating = true;
+			}
+
+			if(obj.Data != null) {
+				if(updateDefinition == null)
+					updateDefinition = update.Set(x => x.Data, obj.Data);
+				else
+					updateDefinition = updateDefinition.Set(x => x.Data, obj.Data);
+
+				updating = true;
+			}
+
+
+			if(!updating)
+				return;
 
 			try {
 				this._measurements.FindOneAndUpdate(
 					x => x.InternalId == obj.InternalId,
-					update
+					updateDefinition
 				);
 
 			} catch(Exception ex) {
@@ -89,7 +106,7 @@ namespace SensateService.Infrastructure.Document
 
 			try {
 				var result = await this._measurements.FindAsync(query);
-				return result.ToEnumerable();
+				return await result.ToListAsync();
 			} catch (Exception ex) {
 				this._logger.LogWarning(ex.Message);
 				return null;
@@ -101,7 +118,7 @@ namespace SensateService.Infrastructure.Document
 			var query = Builders<Measurement>.Filter.Eq("CreatedBy", sensor.InternalId);
 
 			try {
-				return this._measurements.Find(query).ToEnumerable();
+				return this._measurements.Find(query).ToList();
 			} catch (Exception ex) {
 				this._logger.LogWarning(ex.Message);
 				return null;
@@ -139,7 +156,12 @@ namespace SensateService.Infrastructure.Document
 			Expression<Func<Measurement, bool>> expression
 		)
 		{
-			return this._measurements.FindSync(expression).FirstOrDefault();
+			var result = this._measurements.FindSync(expression);
+
+			if(result == null)
+				return null;
+
+			return result.FirstOrDefault();
 		}
 
 		public async virtual Task<Measurement> TryGetMeasurementAsync(
@@ -148,6 +170,10 @@ namespace SensateService.Infrastructure.Document
 			IAsyncCursor<Measurement> result;
 
 			result = await this._measurements.FindAsync(expression);
+
+			if(result == null)
+				return null;
+
 			return await result.FirstOrDefaultAsync();
 		}
 
@@ -155,14 +181,22 @@ namespace SensateService.Infrastructure.Document
 			string key, Expression<Func<Measurement, bool>> expression)
 		{
 			var result = await this._measurements.FindAsync(expression);
-			return result.ToEnumerable();
+
+			if(result == null)
+				return null;
+
+			return await result.ToListAsync();
 		}
 
 		public virtual IEnumerable<Measurement> TryGetMeasurements(
 			string key, Expression<Func<Measurement, bool>> expression)
 		{
 			var result = this._measurements.Find(expression);
-			return result.ToEnumerable();
+
+			if(result == null)
+				return null;
+
+			return result.ToList();
 		}
 
 #endregion
@@ -220,10 +254,10 @@ namespace SensateService.Infrastructure.Document
 
 		private async Task<Measurement> StoreMeasurement(Sensor sensor, string json)
 		{
-			Measurement m;
+			Measurement measurement;
 			RawMeasurement raw;
 			DateTime now;
-			BsonDocument document;
+			IEnumerable<DataPoint> datapoints;
 
 			if(json == null || sensor == null)
 				return null;
@@ -233,20 +267,20 @@ namespace SensateService.Infrastructure.Document
 
 				if(raw == null || raw.CreatedBySecret != sensor.Secret) {
 					throw new InvalidRequestException(
-						MeasurementRepository.IncorrectSecretError,
+						Error.IncorrectSecretError,
 						"Sensor secret doesn't match sensor ID!"
 					);
 				}
 			} catch(JsonSerializationException ex) {
 				this._logger.LogInformation($"Bad measurement received: ${ex.Message}");
-				throw new InvalidRequestException(MeasurementRepository.JsonError);
+				throw new InvalidRequestException(Error.JsonError);
 			}
 
 			now = DateTime.Now;
 			if(raw.CreatedAt == null || raw.CreatedAt.CompareTo(DateTime.MinValue) <= 0)
 				raw.CreatedAt = now;
 
-			m = new Measurement {
+			measurement = new Measurement {
 				CreatedAt = raw.CreatedAt,
 				Longitude = raw.Longitude,
 				Latitude = raw.Latitude,
@@ -254,11 +288,11 @@ namespace SensateService.Infrastructure.Document
 				InternalId = base.GenerateId(now)
 			};
 
-			if(BsonDocument.TryParse(raw.Data.ToString(), out document)) {
-				m.Data = document;
+			if(Measurement.TryParseData(raw.Data, out datapoints)) {
+				measurement.Data = datapoints;
 			} else {
 				throw new InvalidRequestException(
-					MeasurementRepository.InvalidDataError,
+					Error.InvalidDataError,
 					"Unable to parse data"
 				);
 			}
@@ -268,8 +302,8 @@ namespace SensateService.Infrastructure.Document
 					BypassDocumentValidation = true
 				};
 
-				await this._measurements.InsertOneAsync(m, opts, CancellationToken.None);
-				await this.CommitAsync(m);
+				await this._measurements.InsertOneAsync(measurement, opts, CancellationToken.None);
+				await this.CommitAsync(measurement);
 			} catch(Exception ex) {
 				this._logger.LogWarning($"Unable to insert measurement: {ex.Message}");
 				throw new DatabaseException(
@@ -278,7 +312,7 @@ namespace SensateService.Infrastructure.Document
 				);
 			}
 
-			return m;
+			return measurement;
 		}
 
 #endregion
@@ -313,9 +347,14 @@ namespace SensateService.Infrastructure.Document
 
 		public virtual IEnumerable<Measurement> GetAfter(Sensor sensor, DateTime pit)
 		{
-			return this._measurements.Find(x =>
+			var result = this._measurements.Find(x =>
 				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) >= 0
-			).ToEnumerable();
+			);
+
+			if(result == null)
+				return null;
+
+			return result.ToList();
 		}
 
 		public virtual async Task<IEnumerable<Measurement>> GetBeforeAsync(Sensor sensor, DateTime pit)
@@ -333,7 +372,11 @@ namespace SensateService.Infrastructure.Document
 			var result = await this._measurements.FindAsync(x =>
 				x.CreatedBy == sensor.InternalId && x.CreatedAt.CompareTo(pit) >= 0
 			);
-			return result.ToEnumerable();
+
+			if(result == null)
+				return null;
+
+			return await result.ToListAsync();
 		}
 
 		public virtual Measurement GetMeasurement(string key, Expression<Func<Measurement, bool>> selector)
@@ -349,7 +392,7 @@ namespace SensateService.Infrastructure.Document
 
 	internal class RawMeasurement
 	{
-		public JObject Data {get;set;}
+		public JContainer Data {get;set;}
 		public double Longitude {get;set;}
 		public double Latitude {get;set;}
 		public DateTime CreatedAt {get;set;}
