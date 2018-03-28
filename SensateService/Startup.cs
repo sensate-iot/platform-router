@@ -67,6 +67,8 @@ namespace SensateService
 
 			pgsql = this.Secrets.GetValue<string>("PgSqlConnectionString");
 			mongo = this.Secrets.GetValue<string>("MongoDbConnectionString");
+
+			services.AddCors();
 			services.AddEntityFrameworkNpgsql()
 					.AddDbContext<SensateSqlContext>(options => {
 				options.UseNpgsql(pgsql);
@@ -179,6 +181,13 @@ namespace SensateService
 
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider sp)
 		{
+			app.UseCors(p => {
+				p.AllowAnyOrigin()
+				 .AllowAnyHeader()
+				 .AllowAnyMethod()
+				 .AllowCredentials();
+			});
+
 			using(var scope = sp.CreateScope()) {
 				var ctx = scope.ServiceProvider.GetRequiredService<SensateSqlContext>();
 				ctx.Database.EnsureCreated();
