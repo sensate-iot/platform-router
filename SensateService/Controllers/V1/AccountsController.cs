@@ -33,6 +33,7 @@ using SensateService.Attributes;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using SensateService.Models.Json.Out;
 using SensateService.Enums;
+using Newtonsoft.Json;
 
 namespace SensateService.Controllers.V1
 {
@@ -191,6 +192,23 @@ namespace SensateService.Controllers.V1
 			await this._mailer.SendEmailAsync(changeEmailModel.NewEmail, "Confirm your new mail", mail);
 
 			return this.Ok();
+		}
+
+		[HttpGet("roles")]
+		[NormalUser]
+		[ProducesResponseType(typeof(UserRoles), 200)]
+		public async Task<IActionResult> GetRoles()
+		{
+			var user = await this.GetCurrentUserAsync();
+			IList<string> roles;
+
+			roles = await this._users.GetRolesAsync(user) as IList<string>;
+			var reply = new UserRoles {
+				Roles = roles,
+				Email = user.Email
+			};
+
+			return new OkObjectResult(reply);
 		}
 
 		private bool ValidateUser(SensateUser user)
