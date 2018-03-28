@@ -59,8 +59,10 @@ namespace SensateService
 
 		public static void Main(string[] args)
 		{
-			IWebHost wh = Program.BuildWebHost(args);
+			IWebHost wh;
 
+			Console.WriteLine($"Starting {Version.VersionString}");
+			wh = Program.BuildWebHost(args);
 			Program.CreateUserRoles(wh);
 			wh.Run();
 		}
