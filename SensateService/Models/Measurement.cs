@@ -44,12 +44,6 @@ namespace SensateService.Models
 			return JsonConvert.SerializeObject(this);
 		}
 
-		public T ConvertData<T>()
-		{
-			string json = this.Data.ToJson(BsonDocumentConverter.JsonWriterSettings);
-			return JsonConvert.DeserializeObject<T>(json);
-		}
-
 		public static bool TryParseData(string obj, out IEnumerable<DataPoint> result)
 		{
 			result = null;
