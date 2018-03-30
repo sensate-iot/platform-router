@@ -306,7 +306,6 @@ namespace SensateService.Controllers.V1
 
 		[HttpGet("confirm/{id}/{code}")]
 		[SwaggerResponse(200)]
-		[SwaggerResponse(401)]
 		[SwaggerResponse(404)]
 		public async Task<IActionResult> ConfirmEmail(string id, string code)
 		{
@@ -329,7 +328,7 @@ namespace SensateService.Controllers.V1
 			code = Base64UrlEncoder.Decode(code);
 			var result = await this._manager.ConfirmEmailAsync(user, code);
 			if(!result.Succeeded)
-				return Unauthorized();
+				return this.InvalidInputResult();
 
 			return this.Ok();
 		}
