@@ -99,7 +99,8 @@ namespace SensateService.Controllers.V1
 			var reply = new TokenRequestReply {
 				RefreshToken = token.Value,
 				ExpiresInMinutes = this._settings.JwtRefreshExpireMinutes,
-				JwtToken = this._tokens.GenerateJwtToken(user, roles, _settings)
+				JwtToken = this._tokens.GenerateJwtToken(user, roles, _settings),
+				JwtExpiresInMinutes = this._settings.JwtExpireMinutes
 			};
 
 			return new OkObjectResult(reply);
