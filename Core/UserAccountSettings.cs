@@ -7,7 +7,7 @@
 
 using System;
 
-namespace SensateService.Controllers
+namespace SensateService
 {
 	public class UserAccountSettings
 	{

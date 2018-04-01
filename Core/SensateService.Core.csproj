@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GenerateUserSecretsAttribute>false</GenerateUserSecretsAttribute>
+    <RootNamespace>SensateService</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="2.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.WebSockets" Version="2.0.1" />
+
+    <PackageReference Include="mimekit" Version="2.0.2" />
+    <PackageReference Include="MongoDB.Driver" Version="2.5.0" />
+    <PackageReference Include="mqttnet" Version="2.7.2" />
+    <PackageReference Include="Sendgrid" Version="9.9.0" />
+    <PackageReference Include="Newtonsoft.json" Version="11.0.1" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.0.1" />
+  </ItemGroup>
+
+</Project>

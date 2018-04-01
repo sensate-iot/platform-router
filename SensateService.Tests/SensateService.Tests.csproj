@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SensateService\SensateService.csproj" />
+    <ProjectReference Include="..\Core\SensateService.Core.csproj" />
   </ItemGroup>
 
 </Project>

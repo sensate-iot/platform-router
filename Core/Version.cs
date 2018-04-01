@@ -15,7 +15,7 @@ namespace SensateService
 		{
 			get {
 				return String.Format(
-					"Sensate Service {0}.{1}.{2}",
+					"Sensate Core {0}.{1}.{2}",
 					Major, Minor, PatchLevel
 				);
 			}

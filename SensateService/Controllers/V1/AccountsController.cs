@@ -22,7 +22,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Hosting;
 
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+
 using MimeKit;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
@@ -30,10 +33,8 @@ using SensateService.Models;
 using SensateService.Services;
 using SensateService.Models.Json.In;
 using SensateService.Attributes;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using SensateService.Models.Json.Out;
 using SensateService.Enums;
-using Newtonsoft.Json;
 
 namespace SensateService.Controllers.V1
 {
