@@ -26,6 +26,7 @@ using SensateService.Exceptions;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Enums;
 using SensateService.Helpers;
+using SensateService.Models.Json.In;
 
 namespace SensateService.Infrastructure.Document
 {
@@ -216,7 +217,7 @@ namespace SensateService.Infrastructure.Document
 
 #region Measurement creation
 
-		public async Task ReceiveMeasurement(Sensor sender, JToken measurement)
+		public async Task ReceiveMeasurement(Sensor sender, RawMeasurement measurement)
 		{
 			MeasurementReceivedEventArgs args;
 			Measurement m;
@@ -253,39 +254,34 @@ namespace SensateService.Infrastructure.Document
 			await this.CommitAsync(obj);
 		}
 
-		private async Task<Measurement> StoreMeasurement(Sensor sensor, JToken json)
+		private async Task<Measurement> StoreMeasurement(Sensor sensor, RawMeasurement raw)
 		{
-			RawMeasurement raw;
 			IEnumerable<DataPoint> data;
 			Measurement m;
 			DateTime now;
 
-			try {
-				raw = json.ToObject<RawMeasurement>();
+			if(sensor == null || raw == null)
+				return null;
 
-				if(raw == null || !raw.CreatedBy(sensor)) {
-					throw new InvalidRequestException(
-						Error.IncorrectSecretError,
-						"Sensor secret doesn't match sensor ID!"
-					);
-				}
-			} catch(JsonSerializationException ex) {
-				this._logger.LogInformation($"Unable to parse measurement: {ex.Message}");
-				throw new InvalidRequestException(Error.JsonError, ex);
+			if(!raw.CreatedBy(sensor)) {
+				throw new InvalidRequestException(
+					Error.IncorrectSecretError,
+					"Sensor secret doesn't match sensor ID!"
+				);
 			}
 
 			now = DateTime.Now;
+			m = new Measurement();
+
 			if(raw.CreatedAt == null || raw.CreatedAt.IsNever())
 				raw.CreatedAt = now;
 
 			try {
-				m = new Measurement() {
-					CreatedAt = raw.CreatedAt,
-					CreatedBy = sensor.InternalId,
-					Latitude = raw.Latitude,
-					Longitude = raw.Longitude,
-					InternalId = base.GenerateId(now)
-				};
+				m.CreatedAt = raw.CreatedAt;
+				m.CreatedBy = sensor.InternalId;
+				m.Latitude = raw.Latitude;
+				m.Longitude = raw.Longitude;
+				m.InternalId = base.GenerateId(now);
 
 				if(Measurement.TryParseData(raw.Data, out data)) {
 					m.Data = data;
@@ -392,16 +388,5 @@ namespace SensateService.Infrastructure.Document
 		{
 			return await this.TryGetMeasurementAsync(key, selector);
 		}
-	}
-
-	internal class RawMeasurement
-	{
-		public JContainer Data {get;set;}
-		public double Longitude {get;set;}
-		public double Latitude {get;set;}
-		public DateTime CreatedAt {get;set;}
-		public string CreatedBySecret {get;set;}
-
-		public bool CreatedBy(Sensor sensor) => this.CreatedBySecret == sensor.Secret;
 	}
 }

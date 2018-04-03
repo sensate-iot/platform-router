@@ -18,6 +18,7 @@ using SensateService.Exceptions;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Infrastructure.Events;
+using SensateService.Models.Json.In;
 
 namespace SensateService.Middleware
 {
@@ -36,20 +37,21 @@ namespace SensateService.Middleware
 		public override async Task Receive(WebSocket socket, WebSocketReceiveResult result, byte[] buffer)
 		{
 			string msg, id;
-			JObject obj;
+			RawMeasurement raw;
 
 			msg = Encoding.UTF8.GetString(buffer, 0, result.Count);
 
 			try {
-				obj = JObject.Parse(msg);
-				id = obj.GetValue("CreatedById").Value<string>();
+				raw = JsonConvert.DeserializeObject<RawMeasurement>(msg);
+				id = raw.CreatedById;
+
 				if(id == null) {
 					await this.SendMessage(socket, new {status = 404}.ToString());
 					return;
 				}
 
 				var sensor = await this._sensors.GetAsync(id);
-				await this._measurements.ReceiveMeasurement(sensor, msg);
+				await this._measurements.ReceiveMeasurement(sensor, raw);
 
 				dynamic jobj = new JObject();
 				jobj.status = 200;
