@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Linq.Expressions;
 
 using SensateService.Models;
+using Newtonsoft.Json.Linq;
 
 namespace SensateService.Infrastructure.Repositories
 {
@@ -32,6 +33,6 @@ namespace SensateService.Infrastructure.Repositories
 
 		void Create(Measurement m);
 		Task CreateAsync(Measurement m);
-		Task ReceiveMeasurement(Sensor sender, string measurement);
+		Task ReceiveMeasurement(Sensor sender, JToken measurement);
 	}
 }

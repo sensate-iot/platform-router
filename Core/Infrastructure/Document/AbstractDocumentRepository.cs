@@ -26,16 +26,6 @@ namespace SensateService.Infrastructure.Document
 		public abstract void Create(T obj);
 		public abstract T GetById(TKey id);
 
-		protected virtual ObjectId ToInternalId(long id)
-		{
-			ObjectId internalId;
-
-			if(!ObjectId.TryParse(id.ToString(), out internalId))
-				internalId = ObjectId.Empty;
-
-			return internalId;
-		}
-
 		protected virtual ObjectId GenerateId(DateTime ts)
 		{
 			return ObjectId.GenerateNewId(ts);

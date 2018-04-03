@@ -17,7 +17,6 @@ using SensateService.Infrastructure.Cache;
 using SensateService.Models;
 using SensateService.Exceptions;
 
-
 namespace SensateService.Infrastructure.Document
 {
 	public class CachedMeasurementRepository : MeasurementRepository

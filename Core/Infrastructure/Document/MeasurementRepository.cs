@@ -25,6 +25,7 @@ using SensateService.Models;
 using SensateService.Exceptions;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Enums;
+using SensateService.Helpers;
 
 namespace SensateService.Infrastructure.Document
 {
@@ -215,7 +216,7 @@ namespace SensateService.Infrastructure.Document
 
 #region Measurement creation
 
-		public async Task ReceiveMeasurement(Sensor sender, string measurement)
+		public async Task ReceiveMeasurement(Sensor sender, JToken measurement)
 		{
 			MeasurementReceivedEventArgs args;
 			Measurement m;
@@ -252,67 +253,70 @@ namespace SensateService.Infrastructure.Document
 			await this.CommitAsync(obj);
 		}
 
-		private async Task<Measurement> StoreMeasurement(Sensor sensor, string json)
+		private async Task<Measurement> StoreMeasurement(Sensor sensor, JToken json)
 		{
-			Measurement measurement;
 			RawMeasurement raw;
+			IEnumerable<DataPoint> data;
+			Measurement m;
 			DateTime now;
-			IEnumerable<DataPoint> datapoints;
-
-			if(json == null || sensor == null)
-				return null;
 
 			try {
-				raw = Newtonsoft.Json.JsonConvert.DeserializeObject<RawMeasurement>(json);
+				raw = json.ToObject<RawMeasurement>();
 
-				if(raw == null || raw.CreatedBySecret != sensor.Secret) {
+				if(raw == null || !raw.CreatedBy(sensor)) {
 					throw new InvalidRequestException(
 						Error.IncorrectSecretError,
 						"Sensor secret doesn't match sensor ID!"
 					);
 				}
 			} catch(JsonSerializationException ex) {
-				this._logger.LogInformation($"Bad measurement received: ${ex.Message}");
-				throw new InvalidRequestException(Error.JsonError);
+				this._logger.LogInformation($"Unable to parse measurement: {ex.Message}");
+				throw new InvalidRequestException(Error.JsonError, ex);
 			}
 
 			now = DateTime.Now;
-			if(raw.CreatedAt == null || raw.CreatedAt.CompareTo(DateTime.MinValue) <= 0)
+			if(raw.CreatedAt == null || raw.CreatedAt.IsNever())
 				raw.CreatedAt = now;
 
-			measurement = new Measurement {
-				CreatedAt = raw.CreatedAt,
-				Longitude = raw.Longitude,
-				Latitude = raw.Latitude,
-				CreatedBy = sensor.InternalId,
-				InternalId = base.GenerateId(now)
-			};
-
-			if(Measurement.TryParseData(raw.Data, out datapoints)) {
-				measurement.Data = datapoints;
-			} else {
-				throw new InvalidRequestException(
-					Error.InvalidDataError,
-					"Unable to parse data"
-				);
-			}
-
 			try {
-				var opts = new InsertOneOptions {
-					BypassDocumentValidation = true
+				m = new Measurement() {
+					CreatedAt = raw.CreatedAt,
+					CreatedBy = sensor.InternalId,
+					Latitude = raw.Latitude,
+					Longitude = raw.Longitude,
+					InternalId = base.GenerateId(now)
 				};
 
-				await this._measurements.InsertOneAsync(measurement, opts, CancellationToken.None);
-				await this.CommitAsync(measurement);
+				if(Measurement.TryParseData(raw.Data, out data)) {
+					m.Data = data;
+				} else {
+					throw new InvalidRequestException(
+						Error.InvalidDataError,
+						"Unable to parse datapoints!"
+					);
+				}
+
+				var options = new InsertOneOptions {
+					BypassDocumentValidation = true,
+				};
+
+				await this._measurements.InsertOneAsync(m, options, CancellationToken.None);
+				await this.CommitAsync(m);
+			} catch(InvalidRequestException ex) {
+				this._logger.LogWarning(ex.Message);
+				return null;
 			} catch(Exception ex) {
-				this._logger.LogWarning($"Unable to insert measurement: {ex.Message}");
+				this._logger.LogWarning($"Unable to create measurement: ${ex.Message}");
+				if(ex is CachingException)
+					throw ex;
+
 				throw new DatabaseException(
-					$"Unable to store message: {ex.Message}",
+					$"Failed to store measurement ${ex.Message}",
 					"Measurements", ex
 				);
 			}
 
-			return measurement;
+			return m;
 		}
 
 #endregion
@@ -397,5 +401,7 @@ namespace SensateService.Infrastructure.Document
 		public double Latitude {get;set;}
 		public DateTime CreatedAt {get;set;}
 		public string CreatedBySecret {get;set;}
+
+		public bool CreatedBy(Sensor sensor) => this.CreatedBySecret == sensor.Secret;
 	}
 }

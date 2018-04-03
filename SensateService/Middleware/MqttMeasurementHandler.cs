@@ -33,18 +33,18 @@ namespace SensateService.Middleware
 		public override async Task OnMessageAsync(string topic, string message)
 		{
 			Sensor sensor;
-			dynamic obj;
 			string id;
+			JObject obj;
 
 			try {
 				obj = JObject.Parse(message);
-				id = obj.CreatedById;
+				id = obj.GetValue("CreatedById").Value<string>();
 
 				if(id == null)
 					return;
 
 				sensor = await this.sensors.GetAsync(id);
-				await this.measurements.ReceiveMeasurement(sensor, message);
+				await this.measurements.ReceiveMeasurement(sensor, obj as JObject);
 			} catch(Exception ex) {
 				Debug.WriteLine($"Error: {ex.Message}");
 				Debug.WriteLine($"Received a buggy MQTT message: {message}");
