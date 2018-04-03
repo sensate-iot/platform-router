@@ -316,6 +316,7 @@ namespace SensateService.Infrastructure.Document
 		}
 
 #endregion
+#region Time based getters
 
 		public virtual IEnumerable<Measurement> TryGetBetween(Sensor sensor, DateTime start, DateTime end)
 		{
@@ -378,6 +379,7 @@ namespace SensateService.Infrastructure.Document
 
 			return await result.ToListAsync();
 		}
+#endregion
 
 		public virtual Measurement GetMeasurement(string key, Expression<Func<Measurement, bool>> selector)
 		{
