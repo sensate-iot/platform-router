@@ -26,6 +26,7 @@ namespace SensateService
 			});
 
 			BsonSerializer.RegisterSerializationProvider(new BsonDecimalSerializationProvider());
+			services.AddTransient<SensateContext>();
 		}
 
 		public static void AddPostgres(this IServiceCollection services, string conn)
@@ -34,8 +35,6 @@ namespace SensateService
 					.AddDbContext<SensateSqlContext>(options => {
 				options.UseNpgsql(conn);
 			});
-
-			services.AddTransient<SensateContext>();
 		}
 	}
 }

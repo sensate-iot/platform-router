@@ -40,8 +40,7 @@ namespace SensateService.Init
 		}
 
 		public static void MapMqttTopic<T>(
-			this IApplicationBuilder app,
-			IServiceProvider sp,
+			this IServiceProvider sp,
 			string topic
 		) where T : MqttHandler
 		{

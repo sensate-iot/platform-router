@@ -136,17 +136,7 @@ namespace SensateService
 			/* Add repositories */
 			services.AddSqlRepositories();
 			services.AddCacheStrategy(Configuration["CacheType"]);
-			services.AddMongoDbRepositories(Configuration["Cache"] == "true");
-
-			services.AddMqttService(options => {
-				options.Ssl = Configuration["MqttSsl"] == "true";
-				options.Host = Configuration["MqttHost"];
-				options.Port = Int32.Parse(Configuration["MqttPort"]);
-				options.Username = Secrets["MqttUsername"];
-				options.Password = Secrets["MqttPassword"];
-				options.Id = Guid.NewGuid().ToString();
-				options.TopicShare = "$share/sensate/";
-			});
+			services.AddDocumentRepositories(Configuration["Cache"] == "true");
 
 			services.AddSingleton<IEmailSender, EmailSender>();
 			services.Configure<MessageSenderAuthOptions>(opts => {
@@ -191,7 +181,6 @@ namespace SensateService
 				app.UseDeveloperExceptionPage();
 			}
 
-			app.MapMqttTopic<MqttMeasurementHandler>(sp, Configuration["MqttShareTopic"]);
 			app.UseWebSockets();
 			app.MapWebSocketService("/measurement", sp.GetService<WebSocketMeasurementHandler>());
 			app.UseAuthentication();
