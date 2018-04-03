@@ -63,23 +63,13 @@ namespace SensateService
 
 		public void ConfigureServices(IServiceCollection services)
 		{
-			string pgsql, mongo;
+			string pgsql;
 
 			pgsql = this.Secrets.GetValue<string>("PgSqlConnectionString");
-			mongo = this.Secrets.GetValue<string>("MongoDbConnectionString");
-
 			services.AddCors();
-			services.AddEntityFrameworkNpgsql()
-					.AddDbContext<SensateSqlContext>(options => {
-				options.UseNpgsql(pgsql);
-			});
 
-			services.Configure<MongoDBSettings>(options => {
-				options.ConnectionString = Secrets["MongoDbConnectionString"];
-				options.DatabaseName = Secrets["MongoDbDatabaseName"];
-			});
-
-			BsonSerializer.RegisterSerializationProvider(new BsonDecimalSerializationProvider());
+			services.AddPostgres(pgsql);
+			services.AddDocumentStore(Secrets["MongoDbConnectionString"], Secrets["MongoDbDatabaseName"]);
 
 			services.Configure<UserAccountSettings>(options => {
 				options.JwtKey = this.Secrets["JwtKey"];
@@ -88,8 +78,6 @@ namespace SensateService
 				options.JwtRefreshExpireMinutes = Int32.Parse(this.Secrets["JwtRefreshExpireMinutes"]);
 			});
 
-			services.AddTransient<SensateContext>();
-			
 			services.AddApiVersioning(options => {
 				options.ApiVersionReader = new QueryStringApiVersionReader();
 				options.AssumeDefaultVersionWhenUnspecified = true;
