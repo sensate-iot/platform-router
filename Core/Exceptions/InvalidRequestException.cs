@@ -28,6 +28,11 @@ namespace SensateService.Exceptions
 			this._error_code = error;
 		}
 
+		public InvalidRequestException(int error, Exception inner) : base(inner.Message, inner)
+		{
+			this._error_code = error;
+		}
+
 		public InvalidRequestException(int error, string msg) : base(msg)
 		{
 			this._error_code = error;

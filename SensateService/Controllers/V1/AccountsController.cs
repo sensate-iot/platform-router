@@ -24,7 +24,6 @@ using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 
-using MimeKit;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 using SensateService.Helpers;
@@ -80,7 +79,7 @@ namespace SensateService.Controllers.V1
 		{
 			SensateUser user;
 			string usertoken;
-			BodyBuilder mail;
+			EmailBody mail;
 
 			user = await this._users.GetByEmailAsync(model.Email);
 			await this.Log(RequestMethod.HttpPost, user);
@@ -167,8 +166,8 @@ namespace SensateService.Controllers.V1
 		{
 			string token;
 			string resetToken;
-			BodyBuilder mail;
 			SensateUser user;
+			EmailBody mail;
 
 			if(changeEmailModel.NewEmail == null || changeEmailModel.NewEmail.Length == 0) {
 				await this.Log(RequestMethod.HttpPost);
@@ -209,12 +208,13 @@ namespace SensateService.Controllers.V1
 			return new OkObjectResult(reply);
 		}
 
-		private async Task<BodyBuilder> ReadMailTemplate(string html, string text)
+
+		private async Task<EmailBody> ReadMailTemplate(string html, string text)
 		{
-			BodyBuilder body;
+			EmailBody body;
 			string path;
 
-			body = new BodyBuilder();
+			body = new EmailBody();
 			path = this._env.GetTemplatePath(html);
 
 			using(var reader = System.IO.File.OpenText(path)) {
@@ -235,7 +235,7 @@ namespace SensateService.Controllers.V1
 		[SwaggerResponse(400)]
 		public async Task<object> Register([FromBody] Register register)
 		{
-			BodyBuilder mail;
+			EmailBody mail;
 			var user = new SensateUser {
 				UserName = register.Email,
 				Email = register.Email,

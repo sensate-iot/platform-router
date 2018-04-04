@@ -16,8 +16,6 @@ namespace SensateService.Infrastructure.Cache
 {
 	public abstract class AbstractCacheStrategy : ICacheStrategy<string>
 	{
-		public const int CacheTimeout = 10;
-
 		public abstract string Get(string key);
 		public abstract Task<string> GetAsync(string key);
 		public abstract void Remove(string key);

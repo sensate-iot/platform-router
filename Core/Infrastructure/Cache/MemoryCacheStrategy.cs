@@ -12,6 +12,8 @@ using System.Threading;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Caching;
 
+using SensateService.Helpers;
+
 namespace SensateService.Infrastructure.Cache
 {
 	public sealed class MemoryCacheStrategy : AbstractCacheStrategy
@@ -47,7 +49,7 @@ namespace SensateService.Infrastructure.Cache
 
 		public override void Set(string key, string obj)
 		{
-			this.Set(key, obj, CacheTimeout);
+			this.Set(key, obj, CacheTimeout.Timeout.ToInt());
 		}
 
 		public override void Set(string key, string obj, int tmo, bool slide = true)
@@ -58,7 +60,7 @@ namespace SensateService.Infrastructure.Cache
 
 		public override async Task SetAsync(string key, string obj)
 		{
-			await this.SetAsync(key, obj, CacheTimeout);
+			await this.SetAsync(key, obj, CacheTimeout.Timeout.ToInt());
 		}
 
 		public override async Task SetAsync(string key, string obj, int tmo, bool slide = true)

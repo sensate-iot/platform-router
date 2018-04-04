@@ -8,11 +8,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Linq;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
 
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -23,7 +21,6 @@ using SensateService.Infrastructure.Sql;
 using SensateService.Models;
 using SensateService.Models.Json.In;
 using SensateService.Models.Json.Out;
-using SensateService.Helpers;
 using SensateService.Enums;
 
 namespace SensateService.Controllers.V1

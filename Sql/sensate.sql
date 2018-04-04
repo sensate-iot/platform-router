@@ -93,7 +93,7 @@ CREATE INDEX "EmailIndex" ON "AspNetUsers" ("NormalizedEmail");
 CREATE UNIQUE INDEX "UserNameIndex" ON "AspNetUsers" ("NormalizedUserName");
 
 INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-VALUES ('20180306105643_CreateIdentityUser', '2.0.1-rtm-125');
+VALUES ('20180306105643_CreateIdentityUser', '2.0.2-rtm-10011');
 
 CREATE TABLE "AuditLogs" (
     "Id" bigserial NOT NULL,
@@ -107,14 +107,14 @@ CREATE TABLE "AuditLogs" (
 CREATE INDEX "IX_AuditLogs_AuthorId" ON "AuditLogs" ("AuthorId");
 
 INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-VALUES ('20180308104550_CreateAuditLog', '2.0.1-rtm-125');
+VALUES ('20180308104550_CreateAuditLog', '2.0.2-rtm-10011');
 
 ALTER TABLE "AspNetUsers" DROP COLUMN "Discriminator";
 
 ALTER TABLE "AspNetRoles" ADD "Description" text NULL;
 
 INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-VALUES ('20180309192000_AddIdentityRole', '2.0.1-rtm-125');
+VALUES ('20180309192000_AddIdentityRole', '2.0.2-rtm-10011');
 
 CREATE TABLE "PasswordResetTokens" (
     "UserToken" text NOT NULL,
@@ -123,7 +123,7 @@ CREATE TABLE "PasswordResetTokens" (
 );
 
 INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-VALUES ('20180312130835_CreatePasswordResetToken', '2.0.1-rtm-125');
+VALUES ('20180312130835_CreatePasswordResetToken', '2.0.2-rtm-10011');
 
 CREATE TABLE "ChangeEmailTokens" (
     "IdentityToken" text NOT NULL,
@@ -133,7 +133,7 @@ CREATE TABLE "ChangeEmailTokens" (
 );
 
 INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-VALUES ('20180319171541_AddChangeEmailToken', '2.0.1-rtm-125');
+VALUES ('20180319171541_AddChangeEmailToken', '2.0.2-rtm-10011');
 
 ALTER TABLE "AspNetUserTokens" ADD "Discriminator" text NOT NULL DEFAULT '';
 
@@ -144,7 +144,7 @@ ALTER TABLE "AspNetUserTokens" ADD "ExpiresAt" timestamp NULL;
 ALTER TABLE "AspNetUserTokens" ADD "Valid" bool NULL;
 
 INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-VALUES ('20180321085901_AddSensateUserToken', '2.0.1-rtm-125');
+VALUES ('20180321085901_AddSensateUserToken', '2.0.2-rtm-10011');
 
 ALTER TABLE "AspNetUserTokens" DROP CONSTRAINT "PK_AspNetUserTokens";
 
@@ -157,7 +157,7 @@ ALTER TABLE "AspNetUserTokens" ADD CONSTRAINT "PK_AspNetUserTokens" PRIMARY KEY 
 ALTER TABLE "AspNetUserTokens" ADD CONSTRAINT "AK_AspNetUserTokens_UserId_LoginProvider_Name" UNIQUE ("UserId", "LoginProvider", "Name");
 
 INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-VALUES ('20180321092407_AlterSensateUserTokenPK', '2.0.1-rtm-125');
+VALUES ('20180321092407_AlterSensateUserTokenPK', '2.0.2-rtm-10011');
 
 ALTER TABLE "AspNetUserTokens" DROP CONSTRAINT "PK_AspNetUserTokens";
 
@@ -189,5 +189,30 @@ CREATE TABLE "AspNetAuthTokens" (
 );
 
 INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-VALUES ('20180321094920_AlterSensateUserTokenTableName', '2.0.1-rtm-125');
+VALUES ('20180321094920_AlterSensateUserTokenTableName', '2.0.2-rtm-10011');
+
+ALTER TABLE "AuditLogs" ADD "Method" int4 NOT NULL DEFAULT 0;
+
+INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+VALUES ('20180324232304_AddMethodToAuditLog', '2.0.2-rtm-10011');
+
+ALTER TABLE "AuditLogs" DROP CONSTRAINT "FK_AuditLogs_AspNetUsers_AuthorId";
+
+ALTER TABLE "AuditLogs" DROP CONSTRAINT "PK_AuditLogs";
+
+ALTER TABLE "AuditLogs" RENAME TO "AspNetAuditLogs";
+
+ALTER INDEX "IX_AuditLogs_AuthorId" RENAME TO "IX_AspNetAuditLogs_AuthorId";
+
+ALTER TABLE "AspNetAuditLogs" ADD CONSTRAINT "PK_AspNetAuditLogs" PRIMARY KEY ("Id");
+
+ALTER TABLE "AspNetAuditLogs" ADD CONSTRAINT "FK_AspNetAuditLogs_AspNetUsers_AuthorId" FOREIGN KEY ("AuthorId") REFERENCES "AspNetUsers" ("Id") ON DELETE RESTRICT;
+
+INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+VALUES ('20180324232847_RenameAuditLogToAspNetAuditLogs', '2.0.2-rtm-10011');
+
+ALTER TABLE "AspNetAuditLogs" ADD "Address" inet NOT NULL;
+
+INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+VALUES ('20180325192036_AddRemoteAddressToAuditLog', '2.0.2-rtm-10011');
 

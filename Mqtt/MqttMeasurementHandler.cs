@@ -8,11 +8,15 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using SensateService.Infrastructure.Repositories;
-using SensateService.Models;
 
-namespace SensateService.Middleware
+using SensateService.Infrastructure.Repositories;
+using SensateService.Middleware;
+using SensateService.Models;
+using SensateService.Models.Json.In;
+
+namespace SensateService.Mqtt
 {
 	public class MqttMeasurementHandler : MqttHandler
 	{
@@ -33,18 +37,16 @@ namespace SensateService.Middleware
 		public override async Task OnMessageAsync(string topic, string message)
 		{
 			Sensor sensor;
-			dynamic obj;
-			string id;
+			RawMeasurement raw;
 
 			try {
-				obj = JObject.Parse(message);
-				id = obj.CreatedById;
+				raw = JsonConvert.DeserializeObject<RawMeasurement>(message);
 
-				if(id == null)
+				if(raw.CreatedById == null)
 					return;
 
-				sensor = await this.sensors.GetAsync(id);
-				await this.measurements.ReceiveMeasurement(sensor, message);
+				sensor = await this.sensors.GetAsync(raw.CreatedById);
+				await this.measurements.ReceiveMeasurement(sensor, raw);
 			} catch(Exception ex) {
 				Debug.WriteLine($"Error: {ex.Message}");
 				Debug.WriteLine($"Received a buggy MQTT message: {message}");

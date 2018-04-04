@@ -44,17 +44,6 @@ namespace SensateService.Models
 			return JsonConvert.SerializeObject(this);
 		}
 
-		public static bool TryParseData(string obj, out IEnumerable<DataPoint> result)
-		{
-			result = null;
-
-			try {
-				return TryParseData(JObject.Parse(obj), out result);
-			} catch(JsonSerializationException) {
-				return false;
-			}
-		}
-
 		public static bool TryParseData(JToken obj, out IEnumerable<DataPoint> result)
 		{
 			IEnumerable<DataPoint> dataPoints;

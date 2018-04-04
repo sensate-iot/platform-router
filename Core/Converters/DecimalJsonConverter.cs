@@ -36,7 +36,7 @@ namespace SensateService.Converters
 			decimal v = (decimal) value;
 			string raw;
 
-			if(v == Decimal.MinValue) {
+			if(v == Decimal.MinValue || value == null) {
 				writer.WriteValue(String.Empty);
 			} else {
 				raw = v.ToString(CultureInfo.InvariantCulture);

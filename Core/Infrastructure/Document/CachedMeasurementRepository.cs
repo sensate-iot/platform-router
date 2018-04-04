@@ -16,17 +16,13 @@ using Newtonsoft.Json;
 using SensateService.Infrastructure.Cache;
 using SensateService.Models;
 using SensateService.Exceptions;
-
+using SensateService.Helpers;
 
 namespace SensateService.Infrastructure.Document
 {
 	public class CachedMeasurementRepository : MeasurementRepository
 	{
 		private ICacheStrategy<string> _cache;
-
-		public const int CacheTimeout = 10;
-		public const int CacheTimeoutShort = 1;
-		public const int CacheTimeoutMedium = 4;
 
 		public CachedMeasurementRepository(
 			SensateContext context,
@@ -52,7 +48,7 @@ namespace SensateService.Infrastructure.Document
 		public override async Task CommitAsync(Measurement obj)
 		{
 			try {
-				await this._cache.SetAsync(obj.InternalId.ToString(), obj.ToJson(), CacheTimeout);
+				await this._cache.SetAsync(obj.InternalId.ToString(), obj.ToJson(), CacheTimeout.Timeout.ToInt());
 			} catch(Exception ex) {
 				this._logger.LogWarning($"Unable to log measurement {ex.Message}");
 				throw new CachingException(
@@ -122,9 +118,9 @@ namespace SensateService.Infrastructure.Document
 		{
 			string key;
 
-			key = $"{sensor.InternalId.ToString()}::{sensor.Secret}";
+			key = String.Format("Measurements::{0}", sensor.InternalId.ToString());
 			return await this.TryGetMeasurementsAsync(key, x =>
-				x.CreatedBy == sensor.InternalId, CacheTimeoutShort
+				x.CreatedBy == sensor.InternalId, CacheTimeout.TimeoutShort.ToInt()
 			);
 		}
 
@@ -132,16 +128,16 @@ namespace SensateService.Infrastructure.Document
 		{
 			string key;
 
-			key = $"{sensor.InternalId.ToString()}::{sensor.Secret}";
+			key = String.Format("Measurements::{0}", sensor.InternalId.ToString());
 			return this.TryGetMeasurements(key, x =>
-				x.CreatedBy == sensor.InternalId, CacheTimeoutShort
+				x.CreatedBy == sensor.InternalId, CacheTimeout.TimeoutShort.ToInt()
 			);
 		}
 
 		public override void Update(Measurement obj)
 		{
 			this._cache.Set(obj.InternalId.ToString(),
-				JsonConvert.SerializeObject(obj), CacheTimeout);
+				JsonConvert.SerializeObject(obj), CacheTimeout.Timeout.ToInt());
 			base.Update(obj);
 		}
 
@@ -166,7 +162,7 @@ namespace SensateService.Infrastructure.Document
 		public async override Task<IEnumerable<Measurement>> TryGetMeasurementsAsync(
 			string key, Expression<Func<Measurement, bool>> expression)
 		{
-			return await this.TryGetMeasurementsAsync(key, expression, CacheTimeout);
+			return await this.TryGetMeasurementsAsync(key, expression, CacheTimeout.Timeout.ToInt());
 		}
 
 		public override Measurement TryGetMeasurement(
@@ -180,7 +176,7 @@ namespace SensateService.Infrastructure.Document
 
 			if(data == null) {
 				m = base.TryGetMeasurement(key, expression);
-				this.CacheData(key, m, CacheTimeout);
+				this.CacheData(key, m, CacheTimeout.Timeout.ToInt());
 				return m;
 			}
 
@@ -198,7 +194,7 @@ namespace SensateService.Infrastructure.Document
 
 			if(data == null) {
 				m = await base.TryGetMeasurementAsync(key, expression);
-				await this.CacheDataAsync(key, m, CacheTimeout);
+				await this.CacheDataAsync(key, m, CacheTimeout.Timeout.ToInt());
 				return m;
 			}
 
@@ -217,7 +213,7 @@ namespace SensateService.Infrastructure.Document
 
 			if(data == null) {
 				measurements = base.TryGetMeasurements(key, selector);
-				this.CacheData(key, measurements, CacheTimeout);
+				this.CacheData(key, measurements, CacheTimeout.Timeout.ToInt());
 				return measurements;
 			}
 
@@ -228,7 +224,7 @@ namespace SensateService.Infrastructure.Document
 			string key, Expression<Func<Measurement, bool>> selector
 		)
 		{
-			return this.TryGetMeasurements(key, selector, CacheTimeout);
+			return this.TryGetMeasurements(key, selector, CacheTimeout.Timeout.ToInt());
 		}
 
 		public override Measurement GetMeasurement(string key, Expression<Func<Measurement, bool>> selector)
@@ -241,12 +237,12 @@ namespace SensateService.Infrastructure.Document
 			string key;
 			IEnumerable<Measurement> measurements;
 
-			key = $"{sensor.Secret}::after::{pit.ToString()}";
+			key = $"{sensor.InternalId.ToString()}::after::{pit.ToString()}";
 			var data = await this._cache.GetAsync(key);
 
 			if(data == null) {
 				measurements = await base.GetAfterAsync(sensor, pit);
-				await this.CacheDataAsync(key, measurements, CacheTimeoutMedium, false);
+				await this.CacheDataAsync(key, measurements, CacheTimeout.TimeoutMedium.ToInt(), false);
 				return measurements;
 			}
 
@@ -258,12 +254,12 @@ namespace SensateService.Infrastructure.Document
 			string key;
 			IEnumerable<Measurement> measurements;
 
-			key = $"{sensor.Secret}::after::{pit.ToString()}";
+			key = $"{sensor.InternalId.ToString()}::after::{pit.ToString()}";
 			var data = this._cache.Get(key);
 
 			if(data == null) {
 				measurements = base.GetAfter(sensor, pit);
-				this.CacheData(key, measurements, CacheTimeoutMedium, false);
+				this.CacheData(key, measurements, CacheTimeout.TimeoutMedium.ToInt(), false);
 				return measurements;
 			}
 
@@ -276,12 +272,12 @@ namespace SensateService.Infrastructure.Document
 			string key, data;
 			IEnumerable<Measurement> measurements;
 
-			key = $"{sensor.Secret}::{start.ToString()}::{end.ToString()}";
+			key = $"{sensor.InternalId.ToString()}::{start.ToString()}::{end.ToString()}";
 			data = this._cache.Get(key);
 
 			if(data == null) {
 				measurements = base.TryGetBetween(sensor, start, end);
-				this.CacheData(key, measurements, CacheTimeout);
+				this.CacheData(key, measurements, CacheTimeout.Timeout.ToInt());
 				return measurements;
 			}
 
@@ -293,12 +289,12 @@ namespace SensateService.Infrastructure.Document
 			string key, data;
 			IEnumerable<Measurement> measurements;
 
-			key = $"{sensor.Secret}::{start.ToString()}::{end.ToString()}";
+			key = $"{sensor.InternalId.ToString()}::{start.ToString()}::{end.ToString()}";
 			data = await this._cache.GetAsync(key);
 
 			if(data == null) {
 				measurements = await base.TryGetBetweenAsync(sensor, start, end);
-				await this.CacheDataAsync(key, JsonConvert.SerializeObject(measurements), CacheTimeout);
+				await this.CacheDataAsync(key, JsonConvert.SerializeObject(measurements), CacheTimeout.Timeout.ToInt());
 				return measurements;
 			}
 

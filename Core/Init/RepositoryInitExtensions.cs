@@ -29,7 +29,7 @@ namespace SensateService.Init
 			return services;
 		}
 
-		public static IServiceCollection AddMongoDbRepositories(
+		public static IServiceCollection AddDocumentRepositories(
 			this IServiceCollection services, bool cache
 		)
 		{

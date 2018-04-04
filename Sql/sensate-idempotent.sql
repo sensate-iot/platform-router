@@ -167,7 +167,7 @@ DO $$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20180306105643_CreateIdentityUser') THEN
     INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-    VALUES ('20180306105643_CreateIdentityUser', '2.0.1-rtm-125');
+    VALUES ('20180306105643_CreateIdentityUser', '2.0.2-rtm-10011');
     END IF;
 END $$;
 
@@ -196,7 +196,7 @@ DO $$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20180308104550_CreateAuditLog') THEN
     INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-    VALUES ('20180308104550_CreateAuditLog', '2.0.1-rtm-125');
+    VALUES ('20180308104550_CreateAuditLog', '2.0.2-rtm-10011');
     END IF;
 END $$;
 
@@ -218,7 +218,7 @@ DO $$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20180309192000_AddIdentityRole') THEN
     INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-    VALUES ('20180309192000_AddIdentityRole', '2.0.1-rtm-125');
+    VALUES ('20180309192000_AddIdentityRole', '2.0.2-rtm-10011');
     END IF;
 END $$;
 
@@ -237,7 +237,7 @@ DO $$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20180312130835_CreatePasswordResetToken') THEN
     INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-    VALUES ('20180312130835_CreatePasswordResetToken', '2.0.1-rtm-125');
+    VALUES ('20180312130835_CreatePasswordResetToken', '2.0.2-rtm-10011');
     END IF;
 END $$;
 
@@ -257,7 +257,7 @@ DO $$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20180319171541_AddChangeEmailToken') THEN
     INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-    VALUES ('20180319171541_AddChangeEmailToken', '2.0.1-rtm-125');
+    VALUES ('20180319171541_AddChangeEmailToken', '2.0.2-rtm-10011');
     END IF;
 END $$;
 
@@ -293,7 +293,7 @@ DO $$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20180321085901_AddSensateUserToken') THEN
     INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-    VALUES ('20180321085901_AddSensateUserToken', '2.0.1-rtm-125');
+    VALUES ('20180321085901_AddSensateUserToken', '2.0.2-rtm-10011');
     END IF;
 END $$;
 
@@ -331,7 +331,7 @@ DO $$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20180321092407_AlterSensateUserTokenPK') THEN
     INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-    VALUES ('20180321092407_AlterSensateUserTokenPK', '2.0.1-rtm-125');
+    VALUES ('20180321092407_AlterSensateUserTokenPK', '2.0.2-rtm-10011');
     END IF;
 END $$;
 
@@ -413,6 +413,86 @@ DO $$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20180321094920_AlterSensateUserTokenTableName') THEN
     INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-    VALUES ('20180321094920_AlterSensateUserTokenTableName', '2.0.1-rtm-125');
+    VALUES ('20180321094920_AlterSensateUserTokenTableName', '2.0.2-rtm-10011');
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20180324232304_AddMethodToAuditLog') THEN
+    ALTER TABLE "AuditLogs" ADD "Method" int4 NOT NULL DEFAULT 0;
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20180324232304_AddMethodToAuditLog') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20180324232304_AddMethodToAuditLog', '2.0.2-rtm-10011');
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20180324232847_RenameAuditLogToAspNetAuditLogs') THEN
+    ALTER TABLE "AuditLogs" DROP CONSTRAINT "FK_AuditLogs_AspNetUsers_AuthorId";
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20180324232847_RenameAuditLogToAspNetAuditLogs') THEN
+    ALTER TABLE "AuditLogs" DROP CONSTRAINT "PK_AuditLogs";
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20180324232847_RenameAuditLogToAspNetAuditLogs') THEN
+    ALTER TABLE "AuditLogs" RENAME TO "AspNetAuditLogs";
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20180324232847_RenameAuditLogToAspNetAuditLogs') THEN
+    ALTER INDEX "IX_AuditLogs_AuthorId" RENAME TO "IX_AspNetAuditLogs_AuthorId";
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20180324232847_RenameAuditLogToAspNetAuditLogs') THEN
+    ALTER TABLE "AspNetAuditLogs" ADD CONSTRAINT "PK_AspNetAuditLogs" PRIMARY KEY ("Id");
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20180324232847_RenameAuditLogToAspNetAuditLogs') THEN
+    ALTER TABLE "AspNetAuditLogs" ADD CONSTRAINT "FK_AspNetAuditLogs_AspNetUsers_AuthorId" FOREIGN KEY ("AuthorId") REFERENCES "AspNetUsers" ("Id") ON DELETE RESTRICT;
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20180324232847_RenameAuditLogToAspNetAuditLogs') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20180324232847_RenameAuditLogToAspNetAuditLogs', '2.0.2-rtm-10011');
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20180325192036_AddRemoteAddressToAuditLog') THEN
+    ALTER TABLE "AspNetAuditLogs" ADD "Address" inet NOT NULL;
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20180325192036_AddRemoteAddressToAuditLog') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20180325192036_AddRemoteAddressToAuditLog', '2.0.2-rtm-10011');
     END IF;
 END $$;

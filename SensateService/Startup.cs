@@ -63,23 +63,13 @@ namespace SensateService
 
 		public void ConfigureServices(IServiceCollection services)
 		{
-			string pgsql, mongo;
+			string pgsql;
 
 			pgsql = this.Secrets.GetValue<string>("PgSqlConnectionString");
-			mongo = this.Secrets.GetValue<string>("MongoDbConnectionString");
-
 			services.AddCors();
-			services.AddEntityFrameworkNpgsql()
-					.AddDbContext<SensateSqlContext>(options => {
-				options.UseNpgsql(pgsql);
-			});
 
-			services.Configure<MongoDBSettings>(options => {
-				options.ConnectionString = Secrets["MongoDbConnectionString"];
-				options.DatabaseName = Secrets["MongoDbDatabaseName"];
-			});
-
-			BsonSerializer.RegisterSerializationProvider(new BsonDecimalSerializationProvider());
+			services.AddPostgres(pgsql);
+			services.AddDocumentStore(Secrets["MongoDbConnectionString"], Secrets["MongoDbDatabaseName"]);
 
 			services.Configure<UserAccountSettings>(options => {
 				options.JwtKey = this.Secrets["JwtKey"];
@@ -88,8 +78,6 @@ namespace SensateService
 				options.JwtRefreshExpireMinutes = Int32.Parse(this.Secrets["JwtRefreshExpireMinutes"]);
 			});
 
-			services.AddTransient<SensateContext>();
-			
 			services.AddApiVersioning(options => {
 				options.ApiVersionReader = new QueryStringApiVersionReader();
 				options.AssumeDefaultVersionWhenUnspecified = true;
@@ -148,17 +136,7 @@ namespace SensateService
 			/* Add repositories */
 			services.AddSqlRepositories();
 			services.AddCacheStrategy(Configuration["CacheType"]);
-			services.AddMongoDbRepositories(Configuration["Cache"] == "true");
-
-			services.AddMqttService(options => {
-				options.Ssl = Configuration["MqttSsl"] == "true";
-				options.Host = Configuration["MqttHost"];
-				options.Port = Int32.Parse(Configuration["MqttPort"]);
-				options.Username = Secrets["MqttUsername"];
-				options.Password = Secrets["MqttPassword"];
-				options.Id = Guid.NewGuid().ToString();
-				options.TopicShare = "$share/sensate/";
-			});
+			services.AddDocumentRepositories(Configuration["Cache"] == "true");
 
 			services.AddSingleton<IEmailSender, EmailSender>();
 			services.Configure<MessageSenderAuthOptions>(opts => {
@@ -203,7 +181,6 @@ namespace SensateService
 				app.UseDeveloperExceptionPage();
 			}
 
-			app.MapMqttTopic<MqttMeasurementHandler>(sp, Configuration["MqttShareTopic"]);
 			app.UseWebSockets();
 			app.MapWebSocketService("/measurement", sp.GetService<WebSocketMeasurementHandler>());
 			app.UseAuthentication();

@@ -25,6 +25,8 @@ using SensateService.Models;
 using SensateService.Exceptions;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Enums;
+using SensateService.Helpers;
+using SensateService.Models.Json.In;
 
 namespace SensateService.Infrastructure.Document
 {
@@ -215,7 +217,7 @@ namespace SensateService.Infrastructure.Document
 
 #region Measurement creation
 
-		public async Task ReceiveMeasurement(Sensor sender, string measurement)
+		public async Task ReceiveMeasurement(Sensor sender, RawMeasurement measurement)
 		{
 			MeasurementReceivedEventArgs args;
 			Measurement m;
@@ -252,67 +254,65 @@ namespace SensateService.Infrastructure.Document
 			await this.CommitAsync(obj);
 		}
 
-		private async Task<Measurement> StoreMeasurement(Sensor sensor, string json)
+		private async Task<Measurement> StoreMeasurement(Sensor sensor, RawMeasurement raw)
 		{
-			Measurement measurement;
-			RawMeasurement raw;
+			IEnumerable<DataPoint> data;
+			Measurement m;
 			DateTime now;
-			IEnumerable<DataPoint> datapoints;
 
-			if(json == null || sensor == null)
+			if(sensor == null || raw == null)
 				return null;
 
-			try {
-				raw = Newtonsoft.Json.JsonConvert.DeserializeObject<RawMeasurement>(json);
-
-				if(raw == null || raw.CreatedBySecret != sensor.Secret) {
-					throw new InvalidRequestException(
-						Error.IncorrectSecretError,
-						"Sensor secret doesn't match sensor ID!"
-					);
-				}
-			} catch(JsonSerializationException ex) {
-				this._logger.LogInformation($"Bad measurement received: ${ex.Message}");
-				throw new InvalidRequestException(Error.JsonError);
-			}
-
-			now = DateTime.Now;
-			if(raw.CreatedAt == null || raw.CreatedAt.CompareTo(DateTime.MinValue) <= 0)
-				raw.CreatedAt = now;
-
-			measurement = new Measurement {
-				CreatedAt = raw.CreatedAt,
-				Longitude = raw.Longitude,
-				Latitude = raw.Latitude,
-				CreatedBy = sensor.InternalId,
-				InternalId = base.GenerateId(now)
-			};
-
-			if(Measurement.TryParseData(raw.Data, out datapoints)) {
-				measurement.Data = datapoints;
-			} else {
+			if(!raw.CreatedBy(sensor)) {
 				throw new InvalidRequestException(
-					Error.InvalidDataError,
-					"Unable to parse data"
+					ErrorCode.IncorrectSecretError.ToInt(),
+					"Sensor secret doesn't match sensor ID!"
 				);
 			}
 
+			now = DateTime.Now;
+			m = new Measurement();
+
+			if(raw.CreatedAt == null || raw.CreatedAt.IsNever())
+				raw.CreatedAt = now;
+
 			try {
-				var opts = new InsertOneOptions {
-					BypassDocumentValidation = true
+				m.CreatedAt = raw.CreatedAt;
+				m.CreatedBy = sensor.InternalId;
+				m.Latitude = raw.Latitude;
+				m.Longitude = raw.Longitude;
+				m.InternalId = base.GenerateId(now);
+
+				if(Measurement.TryParseData(raw.Data, out data)) {
+					m.Data = data;
+				} else {
+					throw new InvalidRequestException(
+						ErrorCode.InvalidDataError.ToInt(),
+						"Unable to parse datapoints!"
+					);
+				}
+
+				var options = new InsertOneOptions {
+					BypassDocumentValidation = true,
 				};
 
-				await this._measurements.InsertOneAsync(measurement, opts, CancellationToken.None);
-				await this.CommitAsync(measurement);
+				await this._measurements.InsertOneAsync(m, options, CancellationToken.None);
+				await this.CommitAsync(m);
+			} catch(InvalidRequestException ex) {
+				this._logger.LogWarning(ex.Message);
+				return null;
 			} catch(Exception ex) {
-				this._logger.LogWarning($"Unable to insert measurement: {ex.Message}");
+				this._logger.LogWarning($"Unable to create measurement: ${ex.Message}");
+				if(ex is CachingException)
+					throw ex;
+
 				throw new DatabaseException(
-					$"Unable to store message: {ex.Message}",
+					$"Failed to store measurement ${ex.Message}",
 					"Measurements", ex
 				);
 			}
 
-			return measurement;
+			return m;
 		}
 
 #endregion
@@ -390,14 +390,5 @@ namespace SensateService.Infrastructure.Document
 		{
 			return await this.TryGetMeasurementAsync(key, selector);
 		}
-	}
-
-	internal class RawMeasurement
-	{
-		public JContainer Data {get;set;}
-		public double Longitude {get;set;}
-		public double Latitude {get;set;}
-		public DateTime CreatedAt {get;set;}
-		public string CreatedBySecret {get;set;}
 	}
 }
