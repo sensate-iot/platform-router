@@ -24,7 +24,6 @@ using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 
-using MimeKit;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 using SensateService.Helpers;

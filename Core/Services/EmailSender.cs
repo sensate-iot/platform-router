@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Options;
 
-using MimeKit;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 

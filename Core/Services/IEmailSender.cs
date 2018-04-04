@@ -6,7 +6,6 @@
  */
 
 using System.Threading.Tasks;
-using MimeKit;
 
 namespace SensateService.Services
 {
