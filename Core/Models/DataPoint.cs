@@ -16,9 +16,12 @@ namespace SensateService.Models
 {
 	public class DataPoint
 	{
+		[JsonProperty(Required = Required.Always)]
+		[BsonRequired]
 		public string Name { get; set; }
 		public string Unit { get; set; }
 		[JsonConverter(typeof(DecimalJsonConverter))]
+		[JsonProperty(Required = Required.Always)]
 		[BsonRequired]
 		public decimal Value { get; set; }
 
