@@ -101,6 +101,28 @@ namespace SensateService.Controllers.V1
 			return Ok();
 		}
 
+		[HttpPost("find")]
+		[AdministratorUser]
+		[ProducesResponseType(typeof(List<User>), 200)]
+		public async Task<IActionResult> Find([FromBody] SearchQuery query)
+		{
+			List<User> users;
+			var result = await this._users.FindByEmailAsync(query.Query);
+
+			users = new List<User>();
+			foreach(SensateUser user in result) {
+				users.Add(new User {
+					Email = user.Email,
+					FirstName = user.FirstName,
+					LastName = user.LastName,
+					PhoneNumber = user.PhoneNumber,
+					Id = user.Id
+				});
+			}
+
+			return new OkObjectResult(users);			
+		}
+
 		[HttpPost("reset-password")]
 		[SwaggerResponse(200)]
 		[SwaggerResponse(404)]
