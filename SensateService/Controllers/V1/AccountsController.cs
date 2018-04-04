@@ -162,7 +162,7 @@ namespace SensateService.Controllers.V1
 		[ValidateModel]
 		[SwaggerResponse(200)]
 		[SwaggerResponse(400)]
-		[Authorize]
+		[NormalUser]
 		public async Task<IActionResult> UpdateEmail([FromBody] UpdateEmail changeEmailModel)
 		{
 			string token;
@@ -177,9 +177,6 @@ namespace SensateService.Controllers.V1
 
 			user = await this.GetCurrentUserAsync();
 			await this.Log(RequestMethod.HttpPost, user);
-
-			if(user == null)
-				return BadRequest();
 
 			resetToken = await this._manager.GenerateChangeEmailTokenAsync(user, changeEmailModel.NewEmail);
 			token = this._email_tokens.Create(resetToken, changeEmailModel.NewEmail);
@@ -291,9 +288,6 @@ namespace SensateService.Controllers.V1
 			var user = await this.GetCurrentUserAsync();
 
 			await this.Log(RequestMethod.HttpGet, user);
-
-			if(user == null)
-				return NotFound();
 
 			viewuser = new User {
 				Email = user.Email,
