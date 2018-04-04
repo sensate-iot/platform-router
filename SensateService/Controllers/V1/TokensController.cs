@@ -151,6 +151,9 @@ namespace SensateService.Controllers.V1
 			UserToken authToken;
 			var user = await this.GetCurrentUserAsync();
 
+			if(user == null)
+				return Forbid();
+
 			if(token == null || token.Length == 0)
 				return InvalidInputResult("Token not found!");
 

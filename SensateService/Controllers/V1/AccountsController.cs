@@ -208,7 +208,6 @@ namespace SensateService.Controllers.V1
 			return new OkObjectResult(reply);
 		}
 
-
 		private async Task<EmailBody> ReadMailTemplate(string html, string text)
 		{
 			EmailBody body;
@@ -264,6 +263,30 @@ namespace SensateService.Controllers.V1
 			return BadRequest();
 		}
 
+		[HttpGet("show/{uid}")]
+		[SwaggerResponse(404)]
+		[ProducesResponseType(typeof(User), 200)]
+		[AdministratorUser]
+		public async Task<IActionResult> Show(string uid)
+		{
+			User viewuser;
+			var user = this._users.Get(uid);
+
+			await this.Log(RequestMethod.HttpGet, user);
+			if(user == null)
+				return Forbid();
+
+			viewuser = new User {
+				Email = user.Email,
+				FirstName = user.FirstName,
+				LastName = user.LastName,
+				PhoneNumber = user.PhoneNumber,
+				Id = user.Id
+			};
+
+			return new ObjectResult(viewuser);
+		}
+
 		[HttpGet("show")]
 		[SwaggerResponse(404)]
 		[ProducesResponseType(typeof(User), 200)]
@@ -279,7 +302,8 @@ namespace SensateService.Controllers.V1
 				Email = user.Email,
 				FirstName = user.FirstName,
 				LastName = user.LastName,
-				PhoneNumber = user.PhoneNumber
+				PhoneNumber = user.PhoneNumber,
+				Id = user.Id
 			};
 
 			return new ObjectResult(viewuser);
