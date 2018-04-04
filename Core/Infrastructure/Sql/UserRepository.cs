@@ -133,5 +133,11 @@ namespace SensateService.Infrastructure.Sql
 		{
 			return await this._manager.GetRolesAsync(user);
 		}
+
+		public async Task<IEnumerable<SensateUser>> FindByEmailAsync(string email)
+		{
+			var result = this.Data.Where(x => x.Email.Contains(email));
+			return await result.ToListAsync();
+		}
 	}
 }

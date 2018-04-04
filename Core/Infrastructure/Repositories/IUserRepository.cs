@@ -20,6 +20,8 @@ namespace SensateService.Infrastructure.Repositories
 		SensateUser GetByEmail(string key);
 		Task<SensateUser> GetByEmailAsync(string key);
 
+		Task<IEnumerable<SensateUser>> FindByEmailAsync(string email);
+
 		SensateUser GetByClaimsPrinciple(ClaimsPrincipal cp);
 		Task<SensateUser> GetByClaimsPrincipleAsync(ClaimsPrincipal cp);
 
