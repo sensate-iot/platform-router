@@ -23,6 +23,7 @@ using SensateService.Models;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Infrastructure.Document;
 using SensateService.Infrastructure.Events;
+using SensateService.Models.Json.In;
 
 namespace SensateService.Tests
 {
@@ -98,18 +99,19 @@ namespace SensateService.Tests
 			Assert.True(list[0].Name == "z");
 			Assert.True(list[1].Name == "x");
 			Assert.True(list[2].Name == "y");
+			Assert.True(list[0].Value == 22.3949988317M);
 		}
 
 		[Test, Order(1)]
 		public async Task CanCreateMeasurement()
 		{
-			dynamic obj, measurement;
+			dynamic obj;
 			JArray array;
+			RawMeasurement m;
 
 			var x = typeof(decimal);
 			var y = typeof(decimal?);
 
-			measurement = new JObject();
 			array = new JArray();
 
 			obj = new JObject();
@@ -127,12 +129,15 @@ namespace SensateService.Tests
 			obj.Name = "y";
 			array.Add(obj);
 
-			measurement.Longitude = 1.1234;
-			measurement.Latitude = 22.1165;
-			measurement.Data = array;
-			measurement.CreatedBySecret = "TestingSecret";
+			m = new RawMeasurement {
+				CreatedBySecret = "TestingSecret",
+				CreatedById = _sensor.InternalId.ToString(),
+				Longitude = 1.1234,
+				Latitude = 22.123511,
+				Data = array
+			};
 
-			await this._repo.ReceiveMeasurement(_sensor, measurement.ToString());
+			await this._repo.ReceiveMeasurement(_sensor, m);
 			Assert.IsTrue(this._receivedMeasurement != null);
 		}
 	}
