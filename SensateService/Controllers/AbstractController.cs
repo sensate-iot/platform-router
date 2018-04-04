@@ -16,6 +16,7 @@ using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Models.Json.Out;
 using SensateService.Enums;
+using SensateService.Helpers;
 
 namespace SensateService.Controllers
 {
@@ -39,17 +40,17 @@ namespace SensateService.Controllers
 
 		protected StatusCodeResult ServerFault()
 		{
-			return this.StatusCode(Error.ServerFaultGeneric);
+			return this.StatusCode(ErrorCode.ServerFaultGeneric.ToInt());
 		}
 
 		protected StatusCodeResult BadGateway()
 		{
-			return this.StatusCode(Error.ServerFaultBadGateway);
+			return this.StatusCode(ErrorCode.ServerFaultBadGateway.ToInt());
 		}
 
 		protected StatusCodeResult ServiceUnavailable()
 		{
-			return this.StatusCode(Error.ServerFaultUnavailable);
+			return this.StatusCode(ErrorCode.ServerFaultUnavailable.ToInt());
 		}
 
 		protected async Task<SensateUser> GetCurrentUserAsync()

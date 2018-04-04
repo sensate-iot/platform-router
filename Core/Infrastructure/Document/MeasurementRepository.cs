@@ -265,7 +265,7 @@ namespace SensateService.Infrastructure.Document
 
 			if(!raw.CreatedBy(sensor)) {
 				throw new InvalidRequestException(
-					Error.IncorrectSecretError,
+					ErrorCode.IncorrectSecretError.ToInt(),
 					"Sensor secret doesn't match sensor ID!"
 				);
 			}
@@ -287,7 +287,7 @@ namespace SensateService.Infrastructure.Document
 					m.Data = data;
 				} else {
 					throw new InvalidRequestException(
-						Error.InvalidDataError,
+						ErrorCode.InvalidDataError.ToInt(),
 						"Unable to parse datapoints!"
 					);
 				}
