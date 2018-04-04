@@ -209,17 +209,6 @@ namespace SensateService.Controllers.V1
 			return new OkObjectResult(reply);
 		}
 
-		private bool ValidateUser(SensateUser user)
-		{
-			if(user.FirstName == null || user.FirstName.Length == 0)
-				return false;
-
-			if(user.LastName == null || user.LastName.Length == 0)
-				return false;
-
-			return true;
-		}
-
 		private async Task<BodyBuilder> ReadMailTemplate(string html, string text)
 		{
 			BodyBuilder body;
@@ -256,9 +245,6 @@ namespace SensateService.Controllers.V1
 			};
 
 			await this.Log(RequestMethod.HttpPost);
-			if(!this.ValidateUser(user))
-				return BadRequest();
-
 			var result = await this._manager.CreateAsync(user, register.Password);
 
 			if(result.Succeeded) {
