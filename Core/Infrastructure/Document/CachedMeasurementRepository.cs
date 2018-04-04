@@ -121,7 +121,7 @@ namespace SensateService.Infrastructure.Document
 		{
 			string key;
 
-			key = $"{sensor.InternalId.ToString()}::{sensor.Secret}";
+			key = String.Format("Measurements::{0}", sensor.InternalId.ToString());
 			return await this.TryGetMeasurementsAsync(key, x =>
 				x.CreatedBy == sensor.InternalId, CacheTimeoutShort
 			);
@@ -131,7 +131,7 @@ namespace SensateService.Infrastructure.Document
 		{
 			string key;
 
-			key = $"{sensor.InternalId.ToString()}::{sensor.Secret}";
+			key = String.Format("Measurements::{0}", sensor.InternalId.ToString());
 			return this.TryGetMeasurements(key, x =>
 				x.CreatedBy == sensor.InternalId, CacheTimeoutShort
 			);
@@ -240,7 +240,7 @@ namespace SensateService.Infrastructure.Document
 			string key;
 			IEnumerable<Measurement> measurements;
 
-			key = $"{sensor.Secret}::after::{pit.ToString()}";
+			key = $"{sensor.InternalId.ToString()}::after::{pit.ToString()}";
 			var data = await this._cache.GetAsync(key);
 
 			if(data == null) {
@@ -257,7 +257,7 @@ namespace SensateService.Infrastructure.Document
 			string key;
 			IEnumerable<Measurement> measurements;
 
-			key = $"{sensor.Secret}::after::{pit.ToString()}";
+			key = $"{sensor.InternalId.ToString()}::after::{pit.ToString()}";
 			var data = this._cache.Get(key);
 
 			if(data == null) {
@@ -275,7 +275,7 @@ namespace SensateService.Infrastructure.Document
 			string key, data;
 			IEnumerable<Measurement> measurements;
 
-			key = $"{sensor.Secret}::{start.ToString()}::{end.ToString()}";
+			key = $"{sensor.InternalId.ToString()}::{start.ToString()}::{end.ToString()}";
 			data = this._cache.Get(key);
 
 			if(data == null) {
@@ -292,7 +292,7 @@ namespace SensateService.Infrastructure.Document
 			string key, data;
 			IEnumerable<Measurement> measurements;
 
-			key = $"{sensor.Secret}::{start.ToString()}::{end.ToString()}";
+			key = $"{sensor.InternalId.ToString()}::{start.ToString()}::{end.ToString()}";
 			data = await this._cache.GetAsync(key);
 
 			if(data == null) {
