@@ -150,6 +150,32 @@ namespace SensateService.Infrastructure.Document
 			}
 		}
 
+		public virtual void DeleteBetween(Sensor sensor, DateTime start, DateTime end)
+		{
+			var builder = Builders<Measurement>.Filter;
+			FilterDefinition<Measurement> fd;
+
+			try {
+				fd = builder.Gte("CreatedAt", start) & builder.Lte("CreatedAt", end) & builder.Eq("CreatedBy", sensor.InternalId);
+				this._measurements.DeleteMany(fd, default(CancellationToken));
+			} catch(Exception ex) {
+				this._logger.LogWarning(ex.Message);
+			}
+		}
+
+		public virtual async Task DeleteBetweenAsync(Sensor sensor, DateTime start, DateTime end)
+		{
+			var builder = Builders<Measurement>.Filter;
+			FilterDefinition<Measurement> fd;
+
+			try {
+				fd = builder.Gte("CreatedAt", start) & builder.Lte("CreatedAt", end) & builder.Eq("CreatedBy", sensor.InternalId);
+				await this._measurements.DeleteManyAsync(fd, default(CancellationToken));
+			} catch(Exception ex) {
+				this._logger.LogWarning(ex.Message);
+			}
+		}
+
 		public override void Delete(string id)
 		{
 			ObjectId oid;

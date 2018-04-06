@@ -34,6 +34,8 @@ namespace SensateService.Infrastructure.Repositories
 
 		void DeleteBySensor(Sensor sensor);
 		Task DeleteBySensorAsync(Sensor sensor);
+		void DeleteBetween(Sensor sensor, DateTime start, DateTime end);
+		Task DeleteBetweenAsync(Sensor sensor, DateTime start, DateTime end);
 
 		void Create(Measurement m);
 		Task CreateAsync(Measurement m);
