@@ -127,6 +127,29 @@ namespace SensateService.Infrastructure.Document
 			}
 		}
 
+		public virtual void DeleteBySensor(Sensor sensor)
+		{
+			var query = Builders<Measurement>.Filter.Eq("CreatedBy", sensor.InternalId);
+
+			try {
+				this._measurements.DeleteMany(query, default(CancellationToken));
+			} catch(Exception e){
+				this._logger.LogWarning(e.Message);
+			}
+		}
+
+		public virtual async Task DeleteBySensorAsync(Sensor sensor)
+		{
+			FilterDefinition<Measurement> fd;
+
+			try {
+				fd = Builders<Measurement>.Filter.Eq("CreatedBy", sensor.InternalId);
+				await this._measurements.DeleteManyAsync(fd, default(CancellationToken));
+			} catch(Exception ex) {
+				this._logger.LogWarning(ex.Message);
+			}
+		}
+
 		public override void Delete(string id)
 		{
 			ObjectId oid;
