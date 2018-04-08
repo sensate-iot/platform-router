@@ -102,7 +102,6 @@ namespace SensateService.Services
 				msg = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
 				await handler.OnMessageAsync(e.ApplicationMessage.Topic, msg);
 			}
-			await Task.CompletedTask;
 		}
 
 		private void OnConnect_Handler(

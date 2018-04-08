@@ -8,15 +8,15 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 using SensateService.Infrastructure.Repositories;
 using SensateService.Middleware;
 using SensateService.Models;
 using SensateService.Models.Json.In;
 
-namespace SensateService.Mqtt
+namespace SensateService
 {
 	public class MqttMeasurementHandler : MqttHandler
 	{
