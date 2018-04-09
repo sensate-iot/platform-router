@@ -1,0 +1,43 @@
+#!/usr/bin/env node
+
+'use strict';
+
+const program = require('commander');
+const mqtt = require('../lib/mqtt');
+const websocket = require('../lib/websocket');
+
+main();
+
+function main() {
+	program.version('0.1.0', '-v, --version')
+		.option('-m, --mqtt', 'run the MQTT client')
+		.option('-w, --websocket', 'run the websocket client')
+		.option('-s, --secret <secret>', 'sensor secret key')
+		.option('-u, --user <username>', 'specifiy the MQTT broker username', undefined)
+		.option('-p, --pw <password>', 'specifiy the MQTT broker password', undefined)
+		.option('-H, --host <host>', 'server hostname', 'localhost')
+		.option('-P, --port <port>', 'server port number', '1883')
+		.option('-i, --id <sensor_id>', 'sensor id')
+		.option('-I, --interval <interval>', 'set the update interval', '1000')
+
+	program.parse(process.argv);
+
+	if(!program.mqtt && !program.websocket) {
+		program.websocket = true;
+	}
+
+	const args = {
+		username: program.user,
+		password: program.pw,
+		secret: program.secret,
+		id: program.id,
+		host: program.host,
+		port: parseInt(program.port, 10),
+		interval: parseInt(program.interval, 10)
+	}
+
+	if(program.mqtt)
+		mqtt.run(args);
+	else
+		websocket.run(args);
+}
