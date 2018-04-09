@@ -8,7 +8,6 @@
 using System;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
-using System.Diagnostics;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -19,23 +18,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Mvc.Versioning;
-using Microsoft.Extensions.Hosting;
 
 using Swashbuckle.AspNetCore.Swagger;
-using MongoDB.Bson.Serialization;
 
 using SensateService.Models;
 using SensateService.Infrastructure.Sql;
-using SensateService.Infrastructure.Document;
-using SensateService.Infrastructure.Repositories;
-using SensateService.Infrastructure.Cache;
 using SensateService.Init;
 using SensateService.Services;
-using SensateService.Controllers;
 using SensateService.Middleware;
-using SensateService.Converters;
-using MongoDB.Bson.Serialization.Serializers;
-using MongoDB.Bson;
 
 namespace SensateService
 {
@@ -138,13 +128,26 @@ namespace SensateService
 			services.AddCacheStrategy(Configuration["CacheType"]);
 			services.AddDocumentRepositories(Configuration["Cache"] == "true");
 
-			services.AddSingleton<IEmailSender, EmailSender>();
-			services.Configure<MessageSenderAuthOptions>(opts => {
-				opts.FromName = Configuration["EmailFromName"];
-				opts.From = Configuration["EmailFrom"];
-				opts.Key = Secrets["SendGridKey"];
-				opts.Username = Secrets["SendGridUser"];
-			});
+			if(Configuration["EmailProvider"] == "SendGrid") {
+				services.AddSingleton<IEmailSender, SendGridMailer>();
+				services.Configure<SendGridAuthOptions>(opts => {
+					opts.FromName = Configuration["EmailFromName"];
+					opts.From = Configuration["EmailFrom"];
+					opts.Key = Secrets["SendGridKey"];
+					opts.Username = Secrets["SendGridUser"];
+				});
+			} else if(Configuration["EmailProvider"] == "SMTP") {
+				services.AddSingleton<IEmailSender, SmtpMailer>();
+				services.Configure<SmtpAuthOptions>(opts => {
+					opts.FromName = Configuration["EmailFromName"];
+					opts.From = Configuration["EmailFrom"];
+					opts.Password = Secrets["SmtpPassword"];
+					opts.Username = Secrets["SmtpUsername"];
+					opts.Ssl = Configuration["SmtpSsl"] == "true";
+					opts.Port = Int16.Parse(Configuration["SmtpPort"]);
+					opts.Host = Configuration["SmtpHost"];
+				});
+			}
 
 			services.AddSwaggerGen(c => {
 				c.SwaggerDoc("v1", new Info {

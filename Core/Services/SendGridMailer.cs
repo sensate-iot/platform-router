@@ -15,11 +15,11 @@ using SendGrid.Helpers.Mail;
 
 namespace SensateService.Services
 {
-	public class EmailSender : IEmailSender
+	public class SendGridMailer : IEmailSender
 	{
-		private MessageSenderAuthOptions _options;
+		private SendGridAuthOptions _options;
 
-		public EmailSender(IOptions<MessageSenderAuthOptions> opts)
+		public SendGridMailer(IOptions<SendGridAuthOptions> opts)
 		{
 			this._options = opts.Value;
 		}
