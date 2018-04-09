@@ -1,0 +1,23 @@
+{
+  "name": "sensate-sensors",
+  "version": "0.1.0",
+  "description": "Fake sensors to unit test the sensate backend services.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "iot",
+    "sensors",
+    "measurements",
+    "dotnet",
+    "testing"
+  ],
+  "author": "Michel Megens",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "commander": "^2.15.1",
+    "mqtt": "^2.17.0",
+    "ws": "^5.1.1"
+  }
+}
