@@ -84,6 +84,7 @@ namespace SensateService.Mqtt
 			var services = provider.GetServices<IHostedService>().ToList();
 
 			services.ForEach(x => x.StartAsync(CancellationToken.None));
+			Console.WriteLine("MQTT client started");
 			this._reset.WaitOne();
 		}
 	}
