@@ -365,9 +365,13 @@ namespace SensateService.Controllers.V1
 		[HttpPatch("update")]
 		[ProducesResponseType(typeof(Status), 400)]
 		[SwaggerResponse(200)]
+		[SwaggerResponse(404)]
 		public async Task<IActionResult> UpdateUser([FromBody] UpdateUser userUpdate)
 		{
 			var user = this.CurrentUser;
+
+			if(user == null)
+				return NotFound();
 
 			await this.Log(RequestMethod.HttpPatch, user);
 
