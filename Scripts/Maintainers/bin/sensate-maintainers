@@ -1,0 +1,14 @@
+#!/usr/bin/env node
+
+const program = require('commander');
+const maintainer = require('../lib/maintainers')
+
+main();
+
+function main() {
+	program.version('0.1.0', '-v, --version')
+		.usage('<file ...>');
+
+	program.parse(process.argv);
+	maintainer.run(program.args);
+}
