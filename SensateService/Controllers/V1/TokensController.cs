@@ -114,18 +114,18 @@ namespace SensateService.Controllers.V1
 			UserToken token;
 
 			if(user == null)
-				return Unauthorized();
+				return Forbid();
 
 			token = this._tokens.GetById(user, login.RefreshToken);
 			await this._audit_log.CreateAsync(this.GetCurrentRoute(),
 				RequestMethod.HttpPost, GetRemoteAddress(), user);
 
 			if(token == null || !token.Valid)
-				return Unauthorized();
+				return Forbid();
 
 			if(token.ExpiresAt < DateTime.Now) {
 				await this._tokens.InvalidateTokenAsync(token);
-				return Unauthorized();
+				return Forbid();
 			}
 
 			reply = new TokenRequestReply();
