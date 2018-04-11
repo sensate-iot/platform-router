@@ -149,7 +149,7 @@ namespace SensateService.Controllers.V1
 		}
 
 		[HttpPost("confirm-update-email")]
-		[Authorize]
+		[NormalUser]
 		[ValidateModel]
 		[SwaggerResponse(200)]
 		[SwaggerResponse(400)]
@@ -167,8 +167,8 @@ namespace SensateService.Controllers.V1
 			token = this._email_tokens.GetById(changeEmail.Token);
 
 			if(token == null)
-				return NotFound();
-	
+				return this.InvalidInputResult("Token not found!");
+
 			var result = await this._manager.ChangeEmailAsync(user, token.Email, token.IdentityToken);
 			await this._manager.SetUserNameAsync(user, token.Email);
 
