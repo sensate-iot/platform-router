@@ -34,6 +34,7 @@ using SensateService.Models.Json.In;
 using SensateService.Attributes;
 using SensateService.Models.Json.Out;
 using SensateService.Enums;
+using System.Net;
 
 namespace SensateService.Controllers.V1
 {
@@ -334,9 +335,15 @@ namespace SensateService.Controllers.V1
 		[HttpGet("confirm/{id}/{code}")]
 		[SwaggerResponse(200)]
 		[SwaggerResponse(404)]
-		public async Task<IActionResult> ConfirmEmail(string id, string code)
+		public async Task<IActionResult> ConfirmEmail(string id, string code, [FromQuery(Name = "target")] string target)
 		{
 			SensateUser user;
+			string url;
+
+			if(target != null)
+				url = WebUtility.UrlDecode(target);
+			else
+				url = null;
 
 			await this.Log(RequestMethod.HttpGet);
 
@@ -357,7 +364,10 @@ namespace SensateService.Controllers.V1
 			if(!result.Succeeded)
 				return this.InvalidInputResult();
 
-			return this.Ok();
+			if(url != null)
+				return this.Redirect(url);
+			else
+				return Ok();
 		}
 
 		[ValidateModel]
