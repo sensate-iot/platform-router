@@ -50,6 +50,7 @@ namespace SensateService.Controllers.V1
 		private readonly IChangeEmailTokenRepository _email_tokens;
 		private readonly IHostingEnvironment _env;
 		private readonly IAuditLogRepository _audit_logs;
+		private readonly IUserTokenRepository _tokens;
 
 		public AccountsController(
 			IUserRepository repo,
@@ -60,6 +61,7 @@ namespace SensateService.Controllers.V1
 			IPasswordResetTokenRepository tokens,
 			IChangeEmailTokenRepository emailTokens,
 			IAuditLogRepository auditLogs,
+			IUserTokenRepository tokenRepository,
 			IHostingEnvironment env
 		) : base(repo)
 		{
@@ -70,6 +72,7 @@ namespace SensateService.Controllers.V1
 			this._email_tokens = emailTokens;
 			this._env = env;
 			this._audit_logs = auditLogs;
+			this._tokens = tokenRepository;
 		}
 
 		[HttpPost("forgot-password")]
@@ -157,6 +160,7 @@ namespace SensateService.Controllers.V1
 		public async Task<IActionResult> ConfirmChangeEmail([FromBody] ConfirmUpdateEmail changeEmail)
 		{
 			ChangeEmailToken token;
+			IEnumerable<UserToken> tokens;
 
 			if(changeEmail.Token == null || changeEmail.Token.Length == 0) {
 				await this.Log(RequestMethod.HttpPost);
@@ -166,6 +170,7 @@ namespace SensateService.Controllers.V1
 			var user = await this.GetCurrentUserAsync();
 			await this.Log(RequestMethod.HttpPost, user);
 			token = this._email_tokens.GetById(changeEmail.Token);
+			tokens = this._tokens.GetByUser(user);
 
 			if(token == null)
 				return this.InvalidInputResult("Token not found!");
@@ -176,6 +181,9 @@ namespace SensateService.Controllers.V1
 			if(!result.Succeeded) {
 				return this.StatusCode(500);
 			}
+
+			if(tokens != null)
+				await this._tokens.InvalidateManyAsync(tokens);
 
 			return this.Ok();
 		}
