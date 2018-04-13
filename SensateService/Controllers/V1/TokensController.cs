@@ -57,7 +57,6 @@ namespace SensateService.Controllers.V1
 		{
 			var user = await this._users.GetByEmailAsync(login.Email);
 			bool result;
-			var data = this.RouteData;
 			Microsoft.AspNetCore.Identity.SignInResult signInResult;
 			UserToken token;
 
@@ -67,9 +66,10 @@ namespace SensateService.Controllers.V1
 			result = await this._signin_manager.CanSignInAsync(user);
 
 			if(!result) {
-				var status = new Status();
-				status.ErrorCode = ReplyCode.NotAllowed;
-				status.Message = "Not allowed to sign in!";
+				var status = new Status {
+					ErrorCode = ReplyCode.NotAllowed,
+					Message = "Not allowed to sign in!"
+				};
 				return new BadRequestObjectResult(status);
 			}
 
@@ -78,7 +78,7 @@ namespace SensateService.Controllers.V1
 			if(!signInResult.Succeeded) {
 				await this._audit_log.CreateAsync(
 					this.GetCurrentRoute(), RequestMethod.HttpPost,
-					GetRemoteAddress(), null
+					GetRemoteAddress()
 				);
 
 				return new UnauthorizedResult();
@@ -154,7 +154,7 @@ namespace SensateService.Controllers.V1
 			if(user == null)
 				return Forbid();
 
-			if(token == null || token.Length == 0)
+			if(String.IsNullOrEmpty(token))
 				return InvalidInputResult("Token not found!");
 
 			authToken = this._tokens.GetById(user, token);

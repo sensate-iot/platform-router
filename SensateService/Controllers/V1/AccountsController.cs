@@ -7,22 +7,15 @@
 
 using System;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Diagnostics;
+using System.Net;
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Hosting;
-
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
 
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -34,7 +27,6 @@ using SensateService.Models.Json.In;
 using SensateService.Attributes;
 using SensateService.Models.Json.Out;
 using SensateService.Enums;
-using System.Net;
 
 namespace SensateService.Controllers.V1
 {
@@ -43,7 +35,6 @@ namespace SensateService.Controllers.V1
 	[ApiVersion("1")]
 	public class AccountsController : AbstractController
 	{
-		private readonly UserAccountSettings _settings;
 		private readonly UserManager<SensateUser> _manager;
 		private readonly IEmailSender _mailer;
 		private readonly IPasswordResetTokenRepository _passwd_tokens;
@@ -65,7 +56,6 @@ namespace SensateService.Controllers.V1
 			IHostingEnvironment env
 		) : base(repo)
 		{
-			this._settings = options.Value;
 			this._manager = userManager;
 			this._mailer = emailer;
 			this._passwd_tokens = tokens;
@@ -82,7 +72,7 @@ namespace SensateService.Controllers.V1
 		public async Task<IActionResult> ForgotPassword([FromBody] ForgotPassword model)
 		{
 			SensateUser user;
-			string usertoken;
+			string usertoken, token;
 			EmailBody mail;
 
 			user = await this._users.GetByEmailAsync(model.Email);
@@ -92,7 +82,7 @@ namespace SensateService.Controllers.V1
 				return NotFound();
 
 			mail = await this.ReadMailTemplate("Confirm_Password_Reset.html", "Confirm_Password_Reset.txt");
-			var token = await this._manager.GeneratePasswordResetTokenAsync(user);
+			token = await this._manager.GeneratePasswordResetTokenAsync(user);
 			token = Base64UrlEncoder.Encode(token);
 			usertoken = this._passwd_tokens.Create(token);
 
@@ -113,16 +103,13 @@ namespace SensateService.Controllers.V1
 			List<User> users;
 			var result = await this._users.FindByEmailAsync(query.Query);
 
-			users = new List<User>();
-			foreach(SensateUser user in result) {
-				users.Add(new User {
+			users = result.Select(user => new User {
 					Email = user.Email,
 					FirstName = user.FirstName,
 					LastName = user.LastName,
 					PhoneNumber = user.PhoneNumber,
 					Id = user.Id
-				});
-			}
+				}).ToList();
 
 			return new OkObjectResult(users);			
 		}
@@ -140,8 +127,11 @@ namespace SensateService.Controllers.V1
 			token = this._passwd_tokens.GetById(model.Token);
 			await this.Log(RequestMethod.HttpPost, user);
 
-			if(user == null || token == null)
-				return NotFound();
+			if(user == null)
+				return this.NotFound();
+
+			if(token == null)
+				return this.InvalidInputResult("Security token invalid!");
 
 			token.IdentityToken = Base64UrlEncoder.Decode(token.IdentityToken);
 			var result = await this._manager.ResetPasswordAsync(user, token.IdentityToken, model.Password);
@@ -149,7 +139,9 @@ namespace SensateService.Controllers.V1
 			if(result.Succeeded)
 				return Ok();
 
-			return new NotFoundObjectResult(new {Message = result.Errors});
+			var error = result.Errors.First();
+			return error != null ? this.InvalidInputResult(error.Description) :
+				new NotFoundObjectResult(new {Message = result.Errors});
 		}
 
 		[HttpPost("confirm-update-email")]
@@ -162,7 +154,7 @@ namespace SensateService.Controllers.V1
 			ChangeEmailToken token;
 			IEnumerable<UserToken> tokens;
 
-			if(changeEmail.Token == null || changeEmail.Token.Length == 0) {
+			if(String.IsNullOrEmpty(changeEmail.Token)) {
 				await this.Log(RequestMethod.HttpPost);
 				return BadRequest();
 			}
@@ -200,7 +192,7 @@ namespace SensateService.Controllers.V1
 			SensateUser user;
 			EmailBody mail;
 
-			if(changeEmailModel.NewEmail == null || changeEmailModel.NewEmail.Length == 0) {
+			if(String.IsNullOrEmpty(changeEmailModel.NewEmail)) {
 				await this.Log(RequestMethod.HttpPost);
 				return BadRequest();
 			}
@@ -348,10 +340,7 @@ namespace SensateService.Controllers.V1
 			SensateUser user;
 			string url;
 
-			if(target != null)
-				url = WebUtility.UrlDecode(target);
-			else
-				url = null;
+			url = target != null ? WebUtility.UrlDecode(target) : null;
 
 			await this.Log(RequestMethod.HttpGet);
 
