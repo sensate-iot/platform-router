@@ -111,7 +111,7 @@ namespace SensateService.Controllers.V1
 					Id = user.Id
 				}).ToList();
 
-			return new OkObjectResult(users);			
+			return new OkObjectResult(users);
 		}
 
 		[HttpPost("reset-password")]
@@ -269,21 +269,22 @@ namespace SensateService.Controllers.V1
 			await this.Log(RequestMethod.HttpPost);
 			var result = await this._manager.CreateAsync(user, register.Password);
 
-			if(result.Succeeded) {
-				mail = await this.ReadMailTemplate("Confirm_Account_Registration.html", "Confirm_Account_Registration.txt");
-				user = await this._users.GetAsync(user.Id);
-				var code = await this._manager.GenerateEmailConfirmationTokenAsync(user);
-				code = Base64UrlEncoder.Encode(code);
-				var url = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
-				mail.HtmlBody = mail.HtmlBody.Replace("%%URL%%", url);
-				mail.TextBody = String.Format(mail.TextBody, url);
+			if(!result.Succeeded)
+				return this.BadRequest();
 
-				await this._manager.AddToRoleAsync(user, "Users");
-				await this._mailer.SendEmailAsync(user.Email, "Sensate email confirmation", mail);
-				return Ok();
-			}
+			mail = await this.ReadMailTemplate("Confirm_Account_Registration.html", "Confirm_Account_Registration.txt");
+			user = await this._users.GetAsync(user.Id);
+			var code = await this._manager.GenerateEmailConfirmationTokenAsync(user);
+			code = Base64UrlEncoder.Encode(code);
+			var url = this.Url.EmailConfirmationLink(user.Id, code, this.Request.Scheme);
+			mail.HtmlBody = mail.HtmlBody.Replace("%%URL%%", url);
+			mail.TextBody = String.Format(mail.TextBody, url);
 
-			return BadRequest();
+			await this._manager.AddToRoleAsync(user, "Users");
+			await this._mailer.SendEmailAsync(user.Email, "Sensate email confirmation", mail);
+
+			return this.Ok();
+
 		}
 
 		[HttpGet("show/{uid}")]
