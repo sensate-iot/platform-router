@@ -8,4 +8,5 @@ SensateService/SensateService.csproj.user
 sensate-service.csproj.user
 .markdownlint.json
 dist/
+.idea/.idea.sensate-service/.idea/workspace.xml
 
