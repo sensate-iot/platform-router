@@ -389,7 +389,7 @@ namespace SensateService.Controllers.V1
 			var user = this.CurrentUser;
 
 			if(user == null)
-				return NotFound();
+				return BadRequest();
 
 			await this.Log(RequestMethod.HttpPatch, user);
 
@@ -411,11 +411,10 @@ namespace SensateService.Controllers.V1
 			if(userUpdate.LastName != null)
 				user.LastName = userUpdate.LastName;
 
-			await this._users.EndUpdateAsync();
-
 			if(userUpdate.PhoneNumber != null)
-				await this._manager.SetPhoneNumberAsync(user, userUpdate.PhoneNumber);
+				user.PhoneNumber = userUpdate.PhoneNumber;
 
+			await this._users.EndUpdateAsync();
 			return Ok();
 		}
 
