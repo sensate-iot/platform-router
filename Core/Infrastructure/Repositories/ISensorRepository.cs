@@ -5,11 +5,7 @@
  * @email:  dev@bietje.net
  */
 
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Linq.Expressions;
-
 using SensateService.Models;
 
 namespace SensateService.Infrastructure.Repositories
