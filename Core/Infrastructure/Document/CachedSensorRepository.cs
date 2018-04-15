@@ -5,7 +5,6 @@
  * @email:  dev@bietje.net
  */
 
-using System;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
@@ -13,6 +12,7 @@ using Newtonsoft.Json;
 
 using SensateService.Infrastructure.Cache;
 using SensateService.Models;
+using SensateService.Infrastructure.Repositories;
 
 namespace SensateService.Infrastructure.Document
 {
@@ -25,8 +25,9 @@ namespace SensateService.Infrastructure.Document
 
 		public CachedSensorRepository(
 			SensateContext context,
+			IMeasurementRepository measurements,
 			ILogger<SensorRepository> logger,
-			ICacheStrategy<string> cache) : base(context, logger)
+			ICacheStrategy<string> cache) : base(context, measurements, logger)
 		{
 			this._cache = cache;
 		}
@@ -79,8 +80,12 @@ namespace SensateService.Infrastructure.Document
 
 		public override async Task RemoveAsync(string id)
 		{
-			await this._cache.RemoveAsync(id);
-			await base.RemoveAsync(id);
+			await this.DeleteAsync(id);
+		}
+
+		public override void Remove(string id)
+		{
+			this.Delete(id);
 		}
 
 		public override void Update(Sensor obj)

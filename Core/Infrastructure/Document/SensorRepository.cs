@@ -22,14 +22,17 @@ namespace SensateService.Infrastructure.Document
 	{
 		private IMongoCollection<Sensor> _sensors;
 		private ILogger<SensorRepository> _logger;
+		private readonly IMeasurementRepository _measurements;
 
 		public SensorRepository(
 			SensateContext context,
+			IMeasurementRepository measurements,
 			ILogger<SensorRepository> logger
 		) : base(context)
 		{
 			this._sensors = context.Sensors;
 			this._logger = logger;
+			this._measurements = measurements;
 		}
 
 		public override void Commit(Sensor obj)
@@ -64,9 +67,9 @@ namespace SensateService.Infrastructure.Document
 			await this.CommitAsync(sensor);
 		}
 
-		public virtual void Remove(string secret)
+		public virtual void Remove(string id)
 		{
-			this.Delete(secret);
+			this.Delete(id);
 		}
 
 		public virtual Sensor Get(string id)
@@ -89,7 +92,7 @@ namespace SensateService.Infrastructure.Document
 
 		public async virtual Task RemoveAsync(string id)
 		{
-			await Task.Run(() => this.Delete(id));
+			await this.DeleteAsync(id);
 		}
 
 		public override void Update(Sensor obj)
@@ -122,14 +125,24 @@ namespace SensateService.Infrastructure.Document
 
 		public override void Delete(string id)
 		{
+			Sensor sensor;
 			ObjectId oid = new ObjectId(id);
-			this._sensors.DeleteOne(x => x.InternalId == oid);
+
+			sensor = this._sensors.FindOneAndDelete(x => x.InternalId == oid);
+
+			if(sensor != null)
+				this._measurements.DeleteBySensor(sensor);
 		}
 
 		public override async Task DeleteAsync(string id)
 		{
+			Sensor sensor;
 			ObjectId oid = new ObjectId(id);
-			await this._sensors.DeleteOneAsync(x => x.InternalId == oid);
+
+			sensor = await this._sensors.FindOneAndDeleteAsync(x => x.InternalId == oid);
+
+			if(sensor != null)
+				await this._measurements.DeleteBySensorAsync(sensor);
 		}
 
 		public override Sensor GetById(string id)
