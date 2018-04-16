@@ -32,5 +32,6 @@ namespace SensateService.Infrastructure.Repositories
 
 		void Create(string route, RequestMethod method, IPAddress address,  SensateUser user = null);
 		Task CreateAsync(string route, RequestMethod method, IPAddress address, SensateUser user = null);
+		Task CreateAsync(AuditLog log);
     }
 }

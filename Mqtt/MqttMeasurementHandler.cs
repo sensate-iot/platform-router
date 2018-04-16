@@ -7,10 +7,10 @@
 
 using System;
 using System.Diagnostics;
+using System.Net;
 using System.Threading.Tasks;
-
 using Newtonsoft.Json;
-
+using SensateService.Enums;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Middleware;
 using SensateService.Models;
@@ -22,11 +22,18 @@ namespace SensateService
 	{
 		private readonly ISensorRepository sensors;
 		private readonly IMeasurementRepository measurements;
+		private readonly IAuditLogRepository auditlogs;
+		private readonly IUserRepository users;
 
-		public MqttMeasurementHandler(ISensorRepository sensors, IMeasurementRepository measurements)
+		public MqttMeasurementHandler(ISensorRepository sensors,
+									  IMeasurementRepository measurements,
+									  IAuditLogRepository auditlogs,
+									  IUserRepository users)
 		{
 			this.sensors = sensors;
 			this.measurements = measurements;
+			this.auditlogs = auditlogs;
+			this.users = users;
 		}
 
 		public override void OnMessage(string topic, string msg)
@@ -38,6 +45,7 @@ namespace SensateService
 		{
 			Sensor sensor;
 			RawMeasurement raw;
+			AuditLog log;
 
 			try {
 				raw = JsonConvert.DeserializeObject<RawMeasurement>(message);
@@ -47,6 +55,18 @@ namespace SensateService
 
 				sensor = await this.sensors.GetAsync(raw.CreatedById);
 				await this.measurements.ReceiveMeasurement(sensor, raw);
+
+				var user = this.users.Get(sensor.Owner);
+				log = new AuditLog {
+					Address = IPAddress.Any,
+					Method = RequestMethod.MqttTcp,
+					Route = topic,
+					Timestamp = DateTime.Now,
+					Author = user
+				};
+
+				//await this.auditlogs.CreateAsync(topic, RequestMethod.MqttTcp, IPAddress.Any);
+				await this.auditlogs.CreateAsync(log);
 			} catch(Exception ex) {
 				Debug.WriteLine($"Error: {ex.Message}");
 				Debug.WriteLine($"Received a buggy MQTT message: {message}");

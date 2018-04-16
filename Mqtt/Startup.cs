@@ -9,13 +9,14 @@ using System;
 using System.Threading;
 using System.IO;
 using System.Linq;
-
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using SensateService.Init;
-using SensateService.Services;
 using Microsoft.Extensions.Hosting;
+using SensateService.Infrastructure.Sql;
+using SensateService.Models;
 
 namespace SensateService.Mqtt
 {
@@ -30,7 +31,7 @@ namespace SensateService.Mqtt
 			string env;
 
 			this._reset = new ManualResetEvent(false);
-			Console.CancelKeyPress += new ConsoleCancelEventHandler(CancelEvent_Handler);
+			Console.CancelKeyPress += this.CancelEvent_Handler;
 
 			builder.SetBasePath(Path.Combine(AppContext.BaseDirectory));
 			builder.AddJsonFile("appsettings.json", optional:false);
@@ -52,6 +53,17 @@ namespace SensateService.Mqtt
 
 		public void ConfigureServices(IServiceCollection services)
 		{
+			string pgsql;
+
+			pgsql = this.Configuration["PgSqlConnectionString"];
+			services.AddPostgres(pgsql);
+
+			services.AddIdentity<SensateUser, UserRole>(config => {
+				config.SignIn.RequireConfirmedEmail = true;
+			})
+			.AddEntityFrameworkStores<SensateSqlContext>()
+			.AddDefaultTokenProviders();
+
 			services.AddLogging();
 			services.AddDocumentStore(Configuration["MongoDbConnectionString"], Configuration["MongoDbDatabaseName"]);
 
@@ -62,6 +74,7 @@ namespace SensateService.Mqtt
 
 			services.AddCacheStrategy(Configuration["CacheType"]);
 			services.AddDocumentRepositories(Configuration["Cache"] == "true");
+			services.AddSqlRepositories();
 
 			services.AddMqttService(options => {
 				options.Ssl = Configuration["MqttSsl"] == "true";
