@@ -6,6 +6,7 @@
     <Authors>Michel Megens</Authors>
     <Copyright>Michel Megens &lt;dev@bietje.net&gt;</Copyright>
     <Version>0.0.1</Version>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
   </PropertyGroup>
 
   <ItemGroup>

@@ -23,6 +23,7 @@
     <OutputType>Exe</OutputType>
     <UserSecretsId>SensateService</UserSecretsId>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
   </PropertyGroup>
 
 </Project>
