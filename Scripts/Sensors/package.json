@@ -3,8 +3,7 @@
   "version": "0.1.0",
   "description": "Fake sensors to unit test the sensate backend services.",
   "main": "bin/sensate-sensor",
-  "scripts": {
-  },
+  "scripts": {},
   "keywords": [
     "iot",
     "sensors",
