@@ -19,19 +19,10 @@ namespace SensateService.Infrastructure.Document
 		private readonly IMongoDatabase _db;
 		private readonly IMongoClient _client;
 
-		public IMongoCollection<Measurement> Measurements
-		{
-			get {
-				return this._db.GetCollection<Measurement>("Measurements");
-			}
-		}
-
-		public IMongoCollection<Sensor> Sensors
-		{
-			get {
-				return this._db.GetCollection<Sensor>("Sensors");
-			}
-		}
+		public IMongoCollection<Measurement> Measurements => this._db.GetCollection<Measurement>("Measurements");
+		public IMongoCollection<Sensor> Sensors => this._db.GetCollection<Sensor>("Sensors");
+		public IMongoCollection<SensorStatisticsEntry> Statistics =>
+			this._db.GetCollection<SensorStatisticsEntry>("Statistics");
 
 		public SensateContext(IOptions<MongoDBSettings> settings) :
 			this(settings.Value)
@@ -40,25 +31,18 @@ namespace SensateService.Infrastructure.Document
 
 		public SensateContext(MongoDBSettings settings)
 		{
-			MongoClient client;
 
 			try {
 				MongoClientSettings mongosettings = MongoClientSettings.FromUrl(new MongoUrl(
 					settings.ConnectionString
 				));
-				client = new MongoClient(mongosettings);
-				this._client = client;
-				this._db = client.GetDatabase(settings.DatabaseName);
+				this._client = new MongoClient(mongosettings);
+				this._db = this._client.GetDatabase(settings.DatabaseName);
 			} catch(Exception ex) {
 				Console.WriteLine("Unable to connect to MongoDB!");
 				throw ex;
 			}
 
-		}
-
-		public IMongoCollection<T> Set<T>(string name)
-		{
-			return this._db.GetCollection<T>(name);
 		}
 	}
 }

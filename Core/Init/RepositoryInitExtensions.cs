@@ -6,8 +6,9 @@
  */
 
 using System.Diagnostics;
-using Microsoft.Extensions.Configuration;
+
 using Microsoft.Extensions.DependencyInjection;
+
 using SensateService.Infrastructure.Cache;
 using SensateService.Infrastructure.Document;
 using SensateService.Infrastructure.Repositories;
@@ -33,6 +34,8 @@ namespace SensateService.Init
 			this IServiceCollection services, bool cache
 		)
 		{
+			services.AddScoped<ISensorStatistics, SensorStatistics>();
+
 			if(cache) {
 				Debug.WriteLine("Caching enabled!");
 				services.AddScoped<IMeasurementRepository, CachedMeasurementRepository>();
@@ -42,6 +45,7 @@ namespace SensateService.Init
 				services.AddScoped<IMeasurementRepository, MeasurementRepository>();
 				services.AddScoped<ISensorRepository, SensorRepository>();
 			}
+
 			return services;
 		}
 
