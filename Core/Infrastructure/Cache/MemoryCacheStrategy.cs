@@ -10,8 +10,6 @@ using System.Threading.Tasks;
 using System.Threading;
 
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Caching;
-
 using SensateService.Helpers;
 
 namespace SensateService.Infrastructure.Cache

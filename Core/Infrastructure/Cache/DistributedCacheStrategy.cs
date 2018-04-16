@@ -10,8 +10,6 @@ using System.Threading.Tasks;
 using System.Threading;
 
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Caching;
-
 using SensateService.Helpers;
 
 namespace SensateService.Infrastructure.Cache
@@ -40,7 +38,7 @@ namespace SensateService.Infrastructure.Cache
 			this._cache.Remove(key);
 		}
 
-		public async override Task RemoveAsync(string key)
+		public override async Task RemoveAsync(string key)
 		{
 			await this._cache.RemoveAsync(key);
 		}
@@ -55,16 +53,16 @@ namespace SensateService.Infrastructure.Cache
 			DistributedCacheEntryOptions options;
 
 			options = new DistributedCacheEntryOptions();
-			if(slide) {
+
+			if(slide)
 				options.SetSlidingExpiration(TimeSpan.FromMinutes(tmo));
-			} else {
+			else
 				options.SetAbsoluteExpiration(TimeSpan.FromMinutes(tmo));
-			}
 
 			this._cache.SetString(key, obj, options);
 		}
 
-		public async override Task SetAsync(string key, string obj)
+		public override async Task SetAsync(string key, string obj)
 		{
 			await this.SetAsync(key, obj, CacheTimeout.Timeout.ToInt());
 		}
@@ -73,11 +71,10 @@ namespace SensateService.Infrastructure.Cache
 		{
 			var options = new DistributedCacheEntryOptions();
 
-			if(slide) {
+			if(slide)
 				options.SetSlidingExpiration(TimeSpan.FromMinutes(tmo));
-			} else {
+			else
 				options.SetAbsoluteExpiration(TimeSpan.FromMinutes(tmo));
-			}
 
 			await this._cache.SetStringAsync(key, obj, options);
 		}
