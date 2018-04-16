@@ -91,7 +91,7 @@ namespace SensateService.Infrastructure.Document
 			return await result.FirstOrDefaultAsync();
 		}
 
-		public async virtual Task RemoveAsync(string id)
+		public virtual async Task RemoveAsync(string id)
 		{
 			await this.DeleteAsync(id);
 		}
@@ -153,10 +153,7 @@ namespace SensateService.Infrastructure.Document
 			ObjectId oid = new ObjectId(id);
 			var result = this._sensors.Find(x => x.InternalId == oid);
 
-			if(result == null)
-				return null;
-
-			return result.FirstOrDefault();
+			return result?.FirstOrDefault();
 		}
 	}
 }
