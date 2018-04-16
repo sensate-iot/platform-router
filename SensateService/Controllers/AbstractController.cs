@@ -24,14 +24,7 @@ namespace SensateService.Controllers
 	{
 		protected readonly IUserRepository _users;
 
-		public SensateUser CurrentUser {
-			get {
-				if(this.User == null)
-					return null;
-
-				return this._users.GetByClaimsPrinciple(this.User);
-			}
-		}
+		public SensateUser CurrentUser => this.User == null ? null : this._users.GetByClaimsPrinciple(this.User);
 
 		protected AbstractController(IUserRepository users) : base()
 		{
@@ -61,12 +54,7 @@ namespace SensateService.Controllers
 			return await this._users.GetByClaimsPrincipleAsync(base.User);
 		}
 
-		protected IActionResult InvalidInputResult()
-		{
-			return this.InvalidInputResult("Invalid input!");
-		}
-
-		protected IActionResult InvalidInputResult(string msg)
+		protected IActionResult InvalidInputResult(string msg = "Invalid input!")
 		{
 			var status = new Status();
 
@@ -88,15 +76,11 @@ namespace SensateService.Controllers
 
 		protected string GetCurrentRoute()
 		{
-			object controller, action;
-
-			if(!this.RouteData.Values.TryGetValue("controller", out controller))
+			if(!this.RouteData.Values.TryGetValue("controller", out object controller))
 				return null;
 
-			if(!this.RouteData.Values.TryGetValue("action", out action))
-				return null;
-
-			return String.Format("{0}#{1}", controller.ToString(), action.ToString());
+			return !this.RouteData.Values.TryGetValue("action", out object action) ? null :
+				String.Format("/{0}#{1}", controller.ToString(), action.ToString());
 		}
 
 		protected IPAddress GetRemoteAddress()
