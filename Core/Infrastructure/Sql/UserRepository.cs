@@ -34,10 +34,7 @@ namespace SensateService.Infrastructure.Sql
 			this._manager = manager;
 		}
 
-		public override void Create(SensateUser obj)
-		{
-			throw new SystemException("UserRepository.Create is forbidden!");
-		}
+		public override void Create(SensateUser obj) => throw new SystemException("UserRepository.Create is forbidden!");
 
 		public override void Delete(string id)
 		{
@@ -50,15 +47,10 @@ namespace SensateService.Infrastructure.Sql
 			this.Commit(obj);
 		}
 
-		public override SensateUser GetById(string id)
-		{
-			return this.Data.FirstOrDefault(x => x.Id == id);
-		}
+		public override SensateUser GetById(string id) =>
+			String.IsNullOrEmpty(id) ? null : this.Data.FirstOrDefault(x => x.Id == id);
 
-		public SensateUser GetByEmail(string email)
-		{
-			return this.Data.FirstOrDefault(x => x.Email == email);
-		}
+		public SensateUser GetByEmail(string email) => this.Data.FirstOrDefault(x => x.Email == email);
 
 		public async Task<SensateUser> GetByEmailAsync(string email)
 		{
