@@ -5,12 +5,8 @@
  * @email:  dev@bietje.net
  */
 
-using System;
 using System.Threading.Tasks;
 using System.Threading;
-
-using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Caching;
 
 namespace SensateService.Infrastructure.Cache
 {
