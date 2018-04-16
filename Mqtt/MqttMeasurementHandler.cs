@@ -24,12 +24,12 @@ namespace SensateService
 		private readonly IMeasurementRepository measurements;
 		private readonly IAuditLogRepository auditlogs;
 		private readonly IUserRepository users;
-		private readonly ISensorStatistics stats;
+		private readonly ISensorStatisticsRepository stats;
 
 		public MqttMeasurementHandler(ISensorRepository sensors,
 									  IMeasurementRepository measurements,
 									  IAuditLogRepository auditlogs,
-									  ISensorStatistics stats,
+									  ISensorStatisticsRepository stats,
 									  IUserRepository users)
 		{
 			this.sensors = sensors;

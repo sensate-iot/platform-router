@@ -6,8 +6,8 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Threading;
 
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
@@ -20,19 +20,20 @@ namespace SensateService.Infrastructure.Document
 {
 	public class SensorRepository : AbstractDocumentRepository<string, Sensor>, ISensorRepository
 	{
-		private IMongoCollection<Sensor> _sensors;
-		private ILogger<SensorRepository> _logger;
+		private readonly IMongoCollection<Sensor> _sensors;
+		private readonly ILogger<SensorRepository> _logger;
 		private readonly IMeasurementRepository _measurements;
+		private readonly ISensorStatisticsRepository _stats;
 
-		public SensorRepository(
-			SensateContext context,
-			IMeasurementRepository measurements,
-			ILogger<SensorRepository> logger
-		) : base(context)
+		public SensorRepository(SensateContext context,
+								ISensorStatisticsRepository statisticsRepository,
+								IMeasurementRepository measurements,
+								ILogger<SensorRepository> logger) : base(context)
 		{
 			this._sensors = context.Sensors;
 			this._logger = logger;
 			this._measurements = measurements;
+			this._stats = statisticsRepository;
 		}
 
 		public override void Commit(Sensor obj)
@@ -141,8 +142,10 @@ namespace SensateService.Infrastructure.Document
 
 			sensor = await this._sensors.FindOneAndDeleteAsync(x => x.InternalId == oid);
 
-			if(sensor != null)
+			if(sensor != null) {
 				await this._measurements.DeleteBySensorAsync(sensor);
+				await this._stats.DeleteBySensorAsync(sensor);
+			}
 		}
 
 		public override Sensor GetById(string id)

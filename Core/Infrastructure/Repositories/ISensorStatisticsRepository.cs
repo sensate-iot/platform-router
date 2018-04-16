@@ -13,7 +13,7 @@ using SensateService.Models;
 
 namespace SensateService.Infrastructure.Repositories
 {
-	public interface ISensorStatistics
+	public interface ISensorStatisticsRepository
 	{
 		Task IncrementAsync(Sensor sensor);
 		Task<SensorStatisticsEntry> CreateForAsync(Sensor sensor);

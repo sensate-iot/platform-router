@@ -34,7 +34,7 @@ namespace SensateService.Init
 			this IServiceCollection services, bool cache
 		)
 		{
-			services.AddScoped<ISensorStatistics, SensorStatistics>();
+			services.AddScoped<ISensorStatisticsRepository, SensorStatisticsRepositoryRepository>();
 
 			if(cache) {
 				Debug.WriteLine("Caching enabled!");

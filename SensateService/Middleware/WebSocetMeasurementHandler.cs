@@ -27,13 +27,13 @@ namespace SensateService.Middleware
 	{
 		private readonly IMeasurementRepository _measurements;
 		private readonly ISensorRepository _sensors;
-		private readonly ISensorStatistics _stats;
+		private readonly ISensorStatisticsRepository _stats;
 		private readonly IServiceProvider _provider;
 
 		public WebSocketMeasurementHandler(IWebSocketRepository sockets,
 										   IMeasurementRepository measurements,
 										   ISensorRepository sensors,
-										   ISensorStatistics stats, IServiceProvider provider) : base(sockets)
+										   ISensorStatisticsRepository stats, IServiceProvider provider) : base(sockets)
 		{
 			this._sensors = sensors;
 			this._stats = stats;

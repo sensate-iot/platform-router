@@ -26,8 +26,9 @@ namespace SensateService.Infrastructure.Document
 		public CachedSensorRepository(
 			SensateContext context,
 			IMeasurementRepository measurements,
+			ISensorStatisticsRepository stats,
 			ILogger<SensorRepository> logger,
-			ICacheStrategy<string> cache) : base(context, measurements, logger)
+			ICacheStrategy<string> cache) : base(context, stats, measurements, logger)
 		{
 			this._cache = cache;
 		}

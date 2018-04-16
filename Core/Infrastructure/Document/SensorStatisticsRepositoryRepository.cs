@@ -20,12 +20,12 @@ using SensateService.Models;
 
 namespace SensateService.Infrastructure.Document
 {
-	public class SensorStatistics : AbstractDocumentRepository<string, SensorStatisticsEntry>, ISensorStatistics
+	public class SensorStatisticsRepositoryRepository : AbstractDocumentRepository<string, SensorStatisticsEntry>, ISensorStatisticsRepository
 	{
-		private readonly ILogger<SensorStatistics> _logger;
+		private readonly ILogger<SensorStatisticsRepositoryRepository> _logger;
 		private readonly IMongoCollection<SensorStatisticsEntry> _stats;
 
-		public SensorStatistics(SensateContext context, ILogger<SensorStatistics> logger) : base(context)
+		public SensorStatisticsRepositoryRepository(SensateContext context, ILogger<SensorStatisticsRepositoryRepository> logger) : base(context)
 		{
 			this._logger = logger;
 			this._stats = context.Statistics;
@@ -49,7 +49,13 @@ namespace SensateService.Infrastructure.Document
 
 		public async Task DeleteBySensorAsync(Sensor sensor)
 		{
-			await this._stats.DeleteManyAsync(x => x.SensorId == sensor.InternalId);
+			var query = Builders<SensorStatisticsEntry>.Filter.Eq("SensorId", sensor.InternalId);
+
+			try {
+				await this._stats.DeleteManyAsync(query);
+			} catch(Exception ex) {
+				this._logger.LogWarning(ex.Message);
+			}
 		}
 
 #region Entry creation
