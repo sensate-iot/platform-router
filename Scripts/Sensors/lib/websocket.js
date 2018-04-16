@@ -29,7 +29,6 @@ module.exports.run = function (args) {
 
 	ws.on('open', () => {
 		console.log('Websocket connected!');
+		setInterval(publish, args.interval, ws, args);
 	});
-
-	setInterval(publish, args.interval, ws, args);
 }
