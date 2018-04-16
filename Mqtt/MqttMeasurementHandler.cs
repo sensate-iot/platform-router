@@ -24,16 +24,19 @@ namespace SensateService
 		private readonly IMeasurementRepository measurements;
 		private readonly IAuditLogRepository auditlogs;
 		private readonly IUserRepository users;
+		private readonly ISensorStatistics stats;
 
 		public MqttMeasurementHandler(ISensorRepository sensors,
 									  IMeasurementRepository measurements,
 									  IAuditLogRepository auditlogs,
+									  ISensorStatistics stats,
 									  IUserRepository users)
 		{
 			this.sensors = sensors;
 			this.measurements = measurements;
 			this.auditlogs = auditlogs;
 			this.users = users;
+			this.stats = stats;
 		}
 
 		public override void OnMessage(string topic, string msg)
@@ -66,6 +69,7 @@ namespace SensateService
 				};
 
 				await this.auditlogs.CreateAsync(log);
+				await this.stats.IncrementAsync(sensor);
 			} catch(Exception ex) {
 				Debug.WriteLine($"Error: {ex.Message}");
 				Debug.WriteLine($"Received a buggy MQTT message: {message}");
