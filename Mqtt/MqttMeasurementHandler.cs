@@ -65,7 +65,6 @@ namespace SensateService
 					Author = user
 				};
 
-				//await this.auditlogs.CreateAsync(topic, RequestMethod.MqttTcp, IPAddress.Any);
 				await this.auditlogs.CreateAsync(log);
 			} catch(Exception ex) {
 				Debug.WriteLine($"Error: {ex.Message}");
