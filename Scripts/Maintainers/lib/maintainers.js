@@ -18,7 +18,7 @@ function findName(data) {
 }
 
 function findEmail(data) {
-	var pattern = new RegExp(/@email.([^\n]+)/);
+	var pattern = new RegExp(/@email\ +([^\n].+)/);
 
 	if(pattern.test(data))
 		return data.match(pattern)[1];
@@ -57,7 +57,7 @@ function searchFile(data, filename) {
 	console.log('--------------------------');
 	console.log('Maintainer for ' + filename + ':');
 	console.log('');
-	console.log(name + '<' + email + '>');
+	console.log(name + ' <' + email + '>');
 	console.log('--------------------------');
 	console.log('');
 }
