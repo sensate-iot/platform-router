@@ -9,12 +9,15 @@ using System;
 using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
+
 using Newtonsoft.Json;
+
 using SensateService.Enums;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Middleware;
 using SensateService.Models;
 using SensateService.Models.Json.In;
+using SensateService.Helpers;
 
 namespace SensateService
 {
@@ -49,6 +52,7 @@ namespace SensateService
 			Sensor sensor;
 			RawMeasurement raw;
 			AuditLog log;
+			Task[] tasks;
 
 			try {
 				raw = JsonConvert.DeserializeObject<RawMeasurement>(message);
@@ -56,8 +60,9 @@ namespace SensateService
 				if(raw.CreatedById == null)
 					return;
 
-				sensor = await this.sensors.GetAsync(raw.CreatedById);
-				await this.measurements.ReceiveMeasurement(sensor, raw);
+				tasks = new Task[3];
+				sensor = await this.sensors.GetAsync(raw.CreatedById).AwaitSafely();
+				tasks[0] = this.measurements.ReceiveMeasurement(sensor, raw);
 
 				var user = this.users.Get(sensor.Owner);
 				log = new AuditLog {
@@ -68,8 +73,9 @@ namespace SensateService
 					Author = user
 				};
 
-				await this.auditlogs.CreateAsync(log);
-				await this.stats.IncrementAsync(sensor);
+				tasks[1] = this.auditlogs.CreateAsync(log);
+				tasks[2] = this.stats.IncrementAsync(sensor);
+				await Task.WhenAll(tasks);
 			} catch(Exception ex) {
 				Debug.WriteLine($"Error: {ex.Message}");
 				Debug.WriteLine($"Received a buggy MQTT message: {message}");
