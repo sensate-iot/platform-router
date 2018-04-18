@@ -44,7 +44,10 @@ namespace SensateService
 
 		public override void OnMessage(string topic, string msg)
 		{
-			throw new NotImplementedException();
+			Task t;
+
+			t = this.OnMessageAsync(topic, msg);
+			t.Wait();
 		}
 
 		public override async Task OnMessageAsync(string topic, string message)
