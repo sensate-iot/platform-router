@@ -16,6 +16,7 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using SensateService.Enums;
 using SensateService.Exceptions;
+using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Infrastructure.Events;
@@ -46,6 +47,7 @@ namespace SensateService.Middleware
 			string msg, id;
 			RawMeasurement raw;
 			AuditLog log;
+			Task[] tasks;
 
 			msg = Encoding.UTF8.GetString(buffer, 0, result.Count);
 
@@ -54,15 +56,16 @@ namespace SensateService.Middleware
 				id = raw.CreatedById;
 
 				if(id == null) {
-					await this.SendMessage(socket, new {status = 404}.ToString());
+					await this.SendMessage(socket, new {status = 404}.ToString()).AwaitSafely();
 					return;
 				}
 
+                tasks = new Task[4];
 				using(var scope = this._provider.CreateScope()) {
 					var users = scope.ServiceProvider.GetRequiredService<IUserRepository>();
 					var auditlogs = scope.ServiceProvider.GetRequiredService<IAuditLogRepository>();
                     var sensor = await this._sensors.GetAsync(id);
-                    await this._measurements.ReceiveMeasurement(sensor, raw);
+                    tasks[0] = this._measurements.ReceiveMeasurement(sensor, raw);
 
 					var user = users.Get(sensor.Owner);
                     log = new AuditLog {
@@ -73,14 +76,15 @@ namespace SensateService.Middleware
                         Author = user
                     };
 
-                    await auditlogs.CreateAsync(log);
-                    await this._stats.IncrementAsync(sensor);
+                    tasks[1] = auditlogs.CreateAsync(log);
+                    tasks[2] = this._stats.IncrementAsync(sensor);
 				}
 
 				dynamic jobj = new JObject();
 				jobj.status = 200;
 
-				await this.SendMessage(socket, jobj.ToString());
+				tasks[3] = this.SendMessage(socket, jobj.ToString());
+				await Task.WhenAll(tasks);
 			} catch(InvalidRequestException ex) {
 				Debug.WriteLine($"Unable to store measurement: {ex.Message}");
 				dynamic jobj = new JObject();
