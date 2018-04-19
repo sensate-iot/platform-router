@@ -8,20 +8,19 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 using SensateService.Helpers;
 using SensateService.Exceptions;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
-using System.Diagnostics;
 
 namespace SensateService.Infrastructure.Sql
 {
 	public class PasswordResetTokenRepository : AbstractSqlRepository<string, PasswordResetToken>, IPasswordResetTokenRepository
 	{
 		private Random _rng;
-
-		public const int UserTokenLength = 12;
+		private const int UserTokenLength = 12;
 
 		public PasswordResetTokenRepository(SensateSqlContext context) : base(context)
 		{
@@ -51,10 +50,14 @@ namespace SensateService.Infrastructure.Sql
 			this.Commit();
 		}
 
-		public async override Task CreateAsync(PasswordResetToken obj)
+		public override async Task CreateAsync(PasswordResetToken obj)
 		{
-			await this.Data.AddAsync(obj);
-			await this.CommitAsync();
+			var tasks = new[] {
+				this.Data.AddAsync(obj),
+				this.CommitAsync()
+			};
+
+			await Task.WhenAll(tasks);
 		}
 
 		public override void Delete(string id)

@@ -1,6 +1,6 @@
 ﻿/*
  * AuditLog repository implementation.
- * 
+ *
  * @author Michel Megens
  * @email  dev@bietje.net
  */
@@ -9,12 +9,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Net;
 
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Exceptions;
 using SensateService.Enums;
-using System.Net;
+using SensateService.Helpers;
 
 namespace SensateService.Infrastructure.Sql
 {
@@ -61,13 +62,13 @@ namespace SensateService.Infrastructure.Sql
 				Timestamp = DateTime.Now
 			};
 
-			await this.CreateAsync(al);
+			await this.CreateAsync(al).AwaitSafely();
 		}
 
 		public override async Task CreateAsync(AuditLog obj)
 		{
 			this.Data.Add(obj);
-			await this.CommitAsync(obj);
+			await this.CommitAsync(obj).AwaitSafely();
 		}
 
 		public override void Delete(long id)
@@ -92,9 +93,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public async Task<AuditLog> GetAsync(long id)
 		{
-			return await Task.Run(() => {
-				return this.Get(id);
-			});
+			return await Task.Run(() => this.Get(id)).AwaitSafely();
 		}
 
 		public IEnumerable<AuditLog> GetBetween(DateTime start, DateTime end)
@@ -122,9 +121,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public async Task<IEnumerable<AuditLog>> GetByRouteAsync(string route)
 		{
-			return await Task.Run(() => {
-				return this.GetByRoute(route);
-			});
+			return await Task.Run(() => this.GetByRoute(route)).AwaitSafely();
 		}
 
 		public IEnumerable<AuditLog> GetByUser(SensateUser user)
@@ -137,9 +134,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public async Task<IEnumerable<AuditLog>> GetByUserAsync(SensateUser user)
 		{
-			return await Task.Run(() => {
-				return this.GetByUser(user);
-			});
+			return await Task.Run(() => this.GetByUser(user)).AwaitSafely();
 		}
 
 		public override void Update(AuditLog obj)

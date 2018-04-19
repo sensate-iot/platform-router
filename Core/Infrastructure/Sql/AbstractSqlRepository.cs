@@ -5,12 +5,12 @@
  * @email:  dev@bietje.net
  */
 
-using System;
-using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.EntityFrameworkCore;
+
+using SensateService.Helpers;
 
 namespace SensateService.Infrastructure.Sql
 {
@@ -19,25 +19,25 @@ namespace SensateService.Infrastructure.Sql
 		private SensateSqlContext _sqlContext;
 		protected DbSet<T> Data;
 
-		public AbstractSqlRepository(SensateSqlContext context)
+		protected AbstractSqlRepository(SensateSqlContext context)
 		{
 			this._sqlContext = context;
 			this.Data = context.Set<T>();
 		}
 
-		public virtual void Commit(T obj)
+		public void Commit(T obj)
 		{
 			this._sqlContext.SaveChanges();
 		}
 
-		public async virtual Task CommitAsync(T obj)
+		public async Task CommitAsync(T obj, CancellationToken ct = default(CancellationToken))
 		{
-			await this._sqlContext.SaveChangesAsync();
+			await this._sqlContext.SaveChangesAsync(ct).AwaitSafely();
 		}
 
-		public async virtual Task CommitAsync()
+		public async Task CommitAsync()
 		{
-			await this._sqlContext.SaveChangesAsync();
+			await this._sqlContext.SaveChangesAsync().AwaitSafely();
 		}
 
 		public virtual void Commit()
@@ -59,10 +59,10 @@ namespace SensateService.Infrastructure.Sql
 
 		public virtual async Task EndUpdateAsync()
 		{
-			await this._sqlContext.SaveChangesAsync();
+			await this._sqlContext.SaveChangesAsync().AwaitSafely();
 		}
 
-		public virtual void EndUpdate()
+		public void EndUpdate()
 		{
 			this._sqlContext.SaveChanges();
 		}

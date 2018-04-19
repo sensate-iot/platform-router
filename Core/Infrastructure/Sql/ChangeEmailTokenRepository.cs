@@ -20,8 +20,7 @@ namespace SensateService.Infrastructure.Sql
 	public class ChangeEmailTokenRepository : AbstractSqlRepository<string, ChangeEmailToken>, IChangeEmailTokenRepository
 	{
 		private Random _rng;
-
-		public const int UserTokenLength = 12;
+		private const int UserTokenLength = 12;
 
 		public ChangeEmailTokenRepository(SensateSqlContext context) : base(context)
 		{
@@ -52,10 +51,14 @@ namespace SensateService.Infrastructure.Sql
 			this.Commit();
 		}
 
-		public async override Task CreateAsync(ChangeEmailToken obj)
+		public override async Task CreateAsync(ChangeEmailToken obj)
 		{
-			await this.Data.AddAsync(obj);
-			await this.CommitAsync();
+			var tasks = new[] {
+				this.Data.AddAsync(obj),
+				this.CommitAsync()
+			};
+
+			await Task.WhenAll(tasks).AwaitSafely();
 		}
 
 		public override void Delete(string id)
