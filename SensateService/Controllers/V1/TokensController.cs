@@ -80,18 +80,21 @@ namespace SensateService.Controllers.V1
 				await this._audit_log.CreateAsync(
 					this.GetCurrentRoute(), RequestMethod.HttpPost,
 					GetRemoteAddress()
-				);
+				).AwaitSafely();
 
 				return new UnauthorizedResult();
 			}
 
-			await this._audit_log.CreateAsync(
-				this.GetCurrentRoute(), RequestMethod.HttpPost,
-				GetRemoteAddress(), user
-			);
 
 			token = this.CreateUserTokenEntry(user);
-			await this._tokens.CreateAsync(token).AwaitSafely();
+
+			var tasks = new[] {
+                this._audit_log.CreateAsync(
+                    this.GetCurrentRoute(), RequestMethod.HttpPost,
+                    GetRemoteAddress(), user
+                ),
+                this._tokens.CreateAsync(token)
+			};
 
 			var roles = this._users.GetRoles(user);
 			var reply = new TokenRequestReply {
@@ -101,6 +104,7 @@ namespace SensateService.Controllers.V1
 				JwtExpiresInMinutes = this._settings.JwtExpireMinutes
 			};
 
+			await Task.WhenAll(tasks).AwaitSafely();
 			return new OkObjectResult(reply);
 		}
 
@@ -118,14 +122,17 @@ namespace SensateService.Controllers.V1
 				return Forbid();
 
 			token = this._tokens.GetById(user, login.RefreshToken);
-			await this._audit_log.CreateAsync(this.GetCurrentRoute(),
-				RequestMethod.HttpPost, GetRemoteAddress(), user).AwaitSafely();
+			var logTask = this._audit_log.CreateAsync(this.GetCurrentRoute(),
+				RequestMethod.HttpPost, GetRemoteAddress(), user);
 
-			if(token == null || !token.Valid)
+			if(token == null || !token.Valid) {
+				await logTask.AwaitSafely();
 				return Forbid();
+			}
 
 			if(token.ExpiresAt < DateTime.Now) {
 				await this._tokens.InvalidateTokenAsync(token).AwaitSafely();
+				await logTask.AwaitSafely();
 				return Forbid();
 			}
 
@@ -136,13 +143,14 @@ namespace SensateService.Controllers.V1
                 this._tokens.InvalidateTokenAsync(token)
 			};
 
-			await Task.WhenAll(tasks);
-
 			reply.RefreshToken = newToken.Value;
 			reply.ExpiresInMinutes = this._settings.JwtRefreshExpireMinutes;
 			reply.JwtToken = this._tokens.GenerateJwtToken(
 				user, this._users.GetRoles(user), this._settings
 			);
+
+			await Task.WhenAll(tasks);
+            await logTask.AwaitSafely();
 
 			return new OkObjectResult(reply);
 		}
