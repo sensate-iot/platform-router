@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Net;
 using System.Text.RegularExpressions;
+
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -43,6 +44,8 @@ namespace SensateService.Controllers.V1
 		private readonly IAuditLogRepository _audit_logs;
 		private readonly IUserTokenRepository _tokens;
 		private readonly UserAccountSettings _settings;
+
+		private const string PhoneNumberRegex = "[^0-9]";
 
 		public AccountsController(
 			IUserRepository repo,
@@ -78,12 +81,14 @@ namespace SensateService.Controllers.V1
 			EmailBody mail;
 
 			user = await this._users.GetByEmailAsync(model.Email);
-			await this.Log(RequestMethod.HttpPost, user);
+			var logTask = this.Log(RequestMethod.HttpPost, user);
 
-			if(user == null || !user.EmailConfirmed)
+			if(user == null || !user.EmailConfirmed) {
+				await logTask.AwaitSafely();
 				return NotFound();
+			}
 
-			mail = await this.ReadMailTemplate("Confirm_Password_Reset.html", "Confirm_Password_Reset.txt");
+			var mailTask = this.ReadMailTemplate("Confirm_Password_Reset.html", "Confirm_Password_Reset.txt");
 			token = await this._manager.GeneratePasswordResetTokenAsync(user);
 			token = Base64UrlEncoder.Encode(token);
 			usertoken = this._passwd_tokens.Create(token);
@@ -91,6 +96,7 @@ namespace SensateService.Controllers.V1
 			if(usertoken == null)
 				return this.StatusCode(500);
 
+			mail = await mailTask.AwaitSafely();
 			mail.HtmlBody = mail.HtmlBody.Replace("%%TOKEN%%", usertoken);
 			mail.TextBody = String.Format(mail.TextBody, usertoken);
 			await this._mailer.SendEmailAsync(user.Email, "Reset password token", mail);
@@ -103,7 +109,7 @@ namespace SensateService.Controllers.V1
 		public async Task<IActionResult> Find([FromBody] SearchQuery query)
 		{
 			List<User> users;
-			var result = await this._users.FindByEmailAsync(query.Query);
+			var result = await this._users.FindByEmailAsync(query.Query).AwaitSafely();
 
 			users = result.Select(user => new User {
 					Email = user.Email,
@@ -125,7 +131,7 @@ namespace SensateService.Controllers.V1
 			SensateUser user;
 			PasswordResetToken token;
 
-			user = await this._users.GetByEmailAsync(model.Email);
+			user = await this._users.GetByEmailAsync(model.Email).AwaitSafely();
 			token = this._passwd_tokens.GetById(model.Token);
 			await this.Log(RequestMethod.HttpPost, user);
 
@@ -136,7 +142,7 @@ namespace SensateService.Controllers.V1
 				return this.InvalidInputResult("Security token invalid!");
 
 			token.IdentityToken = Base64UrlEncoder.Decode(token.IdentityToken);
-			var result = await this._manager.ResetPasswordAsync(user, token.IdentityToken, model.Password);
+			var result = await this._manager.ResetPasswordAsync(user, token.IdentityToken, model.Password).AwaitSafely();
 
 			if(result.Succeeded)
 				return Ok();
@@ -162,23 +168,29 @@ namespace SensateService.Controllers.V1
 			}
 
 			var user = await this.GetCurrentUserAsync();
-			await this.Log(RequestMethod.HttpPost, user);
+			var logTask = this.Log(RequestMethod.HttpPost, user);
 			token = this._email_tokens.GetById(changeEmail.Token);
 			tokens = this._tokens.GetByUser(user);
 
-			if(token == null)
+			if(token == null) {
+				await logTask.AwaitSafely();
 				return this.InvalidInputResult("Token not found!");
+			}
 
 			var result = await this._manager.ChangeEmailAsync(user, token.Email, token.IdentityToken);
-			await this._manager.SetUserNameAsync(user, token.Email);
+			var setTask = this._manager.SetUserNameAsync(user, token.Email);
 
 			if(!result.Succeeded) {
+				await logTask.AwaitSafely();
 				return this.StatusCode(500);
 			}
 
 			if(tokens != null)
+				await logTask.AwaitSafely();
 				await this._tokens.InvalidateManyAsync(tokens);
 
+            await logTask.AwaitSafely();
+			await setTask.AwaitSafely();
 			return this.Ok();
 		}
 
@@ -195,23 +207,23 @@ namespace SensateService.Controllers.V1
 			EmailBody mail;
 
 			if(String.IsNullOrEmpty(changeEmailModel.NewEmail)) {
-				await this.Log(RequestMethod.HttpPost);
+				await this.Log(RequestMethod.HttpPost).AwaitSafely();
 				return BadRequest();
 			}
 
-			user = await this.GetCurrentUserAsync();
-			await this.Log(RequestMethod.HttpPost, user);
+			user = await this.GetCurrentUserAsync().AwaitSafely();
+			await this.Log(RequestMethod.HttpPost, user).AwaitSafely();
 
-			resetToken = await this._manager.GenerateChangeEmailTokenAsync(user, changeEmailModel.NewEmail);
+			resetToken = await this._manager.GenerateChangeEmailTokenAsync(user, changeEmailModel.NewEmail).AwaitSafely();
 			token = this._email_tokens.Create(resetToken, changeEmailModel.NewEmail);
-			mail = await this.ReadMailTemplate("Confirm_Update_Email.html", "Confirm_Update_Email.txt");
+			mail = await this.ReadMailTemplate("Confirm_Update_Email.html", "Confirm_Update_Email.txt").AwaitSafely();
 
 			if(mail == null)
 				return this.StatusCode(500);
 
 			mail.HtmlBody = mail.HtmlBody.Replace("%%TOKEN%%", token);
 			mail.TextBody = String.Format(mail.TextBody, token);
-			await this._mailer.SendEmailAsync(changeEmailModel.NewEmail, "Confirm your new mail", mail);
+			await this._mailer.SendEmailAsync(changeEmailModel.NewEmail, "Confirm your new mail", mail).AwaitSafely();
 
 			return this.Ok();
 		}
@@ -224,7 +236,7 @@ namespace SensateService.Controllers.V1
 			var user = await this.GetCurrentUserAsync();
 			IList<string> roles;
 
-			roles = await this._users.GetRolesAsync(user) as IList<string>;
+			roles = await this._users.GetRolesAsync(user).AwaitSafely() as IList<string>;
 			var reply = new UserRoles {
 				Roles = roles,
 				Email = user.Email
@@ -242,12 +254,12 @@ namespace SensateService.Controllers.V1
 			path = this._env.GetTemplatePath(html);
 
 			using(var reader = System.IO.File.OpenText(path)) {
-				body.HtmlBody = await reader.ReadToEndAsync();
+				body.HtmlBody = await reader.ReadToEndAsync().AwaitSafely();
 			}
 
 			path = this._env.GetTemplatePath(text);
 			using(var reader = System.IO.File.OpenText(path)) {
-				body.TextBody = await reader.ReadToEndAsync();
+				body.TextBody = await reader.ReadToEndAsync().AwaitSafely();
 			}
 
 			return body;
@@ -269,7 +281,7 @@ namespace SensateService.Controllers.V1
 			};
 
 			await this.Log(RequestMethod.HttpPost).AwaitSafely();
-			if(Regex.IsMatch(register.PhoneNumber, "[^0-9]"))
+			if(Regex.IsMatch(register.PhoneNumber, PhoneNumberRegex))
 				return this.InvalidInputResult("Invalid phone number!");
 
 			var result = await this._manager.CreateAsync(user, register.Password).AwaitSafely();
@@ -277,17 +289,23 @@ namespace SensateService.Controllers.V1
 			if(!result.Succeeded)
 				return this.BadRequest();
 
-			mail = await this.ReadMailTemplate("Confirm_Account_Registration.html", "Confirm_Account_Registration.txt");
-			user = await this._users.GetAsync(user.Id);
-			var code = await this._manager.GenerateEmailConfirmationTokenAsync(user);
+			var mailTask = this.ReadMailTemplate("Confirm_Account_Registration.html",
+				"Confirm_Account_Registration.txt");
+			user = await this._users.GetAsync(user.Id).AwaitSafely();
+			var code = await this._manager.GenerateEmailConfirmationTokenAsync(user).AwaitSafely();
 			code = Base64UrlEncoder.Encode(code);
-			var url = this.Url.EmailConfirmationLink(user.Id, code, this.Request.Scheme, this._settings.ConfirmForward);
+			var url = this.Url.EmailConfirmationLink(user.Id, code, this.Request.Scheme);
+
+			mail = await mailTask.AwaitSafely();
 			mail.HtmlBody = mail.HtmlBody.Replace("%%URL%%", url);
 			mail.TextBody = String.Format(mail.TextBody, url);
 
-			await this._manager.AddToRoleAsync(user, "Users");
-			await this._mailer.SendEmailAsync(user.Email, "Sensate email confirmation", mail);
+			var updates = new[] {
+				this._manager.AddToRoleAsync(user, "Users"),
+				this._mailer.SendEmailAsync(user.Email, "Sensate email confirmation", mail)
+			};
 
+			await Task.WhenAll(updates);
 			return this.Ok();
 
 		}
@@ -406,10 +424,10 @@ namespace SensateService.Controllers.V1
 			if(userUpdate.LastName != null)
 				user.LastName = userUpdate.LastName;
 
-			if(userUpdate.PhoneNumber != null)
-				user.PhoneNumber = userUpdate.PhoneNumber;
+			if(userUpdate.PhoneNumber != null && Regex.IsMatch(userUpdate.PhoneNumber, PhoneNumberRegex))
+                user.PhoneNumber = userUpdate.PhoneNumber;
 
-			await this._users.EndUpdateAsync();
+			await this._users.EndUpdateAsync().AwaitSafely();
 			return Ok();
 		}
 
@@ -418,7 +436,7 @@ namespace SensateService.Controllers.V1
 			await this._audit_logs.CreateAsync(
 				this.GetCurrentRoute(), method,
 				this.GetRemoteAddress(), user
-			);
+			).AwaitSafely();
 		}
 	}
 }
