@@ -14,7 +14,7 @@ using Microsoft.Extensions.Logging;
 
 using MongoDB.Bson;
 using MongoDB.Driver;
-
+using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 
@@ -121,7 +121,7 @@ namespace SensateService.Infrastructure.Document
 			if(result == null)
 				return null;
 
-			return await result.FirstOrDefaultAsync();
+			return await result.FirstOrDefaultAsync().AwaitSafely();
 		}
 
 		public async Task<IEnumerable<SensorStatisticsEntry>> GetBeforeAsync(Sensor sensor, DateTime date)
@@ -135,7 +135,7 @@ namespace SensateService.Infrastructure.Document
 			if(result == null)
 				return null;
 
-			return await result.ToListAsync();
+			return await result.ToListAsync().AwaitSafely();
 		}
 
 		public async Task<IEnumerable<SensorStatisticsEntry>> GetAfterAsync(Sensor sensor, DateTime date)
@@ -149,7 +149,7 @@ namespace SensateService.Infrastructure.Document
 			if(result == null)
 				return null;
 
-			return await result.ToListAsync();
+			return await result.ToListAsync().AwaitSafely();
 		}
 
 #endregion
@@ -158,7 +158,7 @@ namespace SensateService.Infrastructure.Document
 
 		public override void Update(SensorStatisticsEntry obj)
 		{
-			throw new NotImplementedException();
+			throw new InvalidOperationException("SensorStatisticsRepository.Update is an invalid operation!");
 		}
 
 		public override void Commit(SensorStatisticsEntry obj)
@@ -174,7 +174,7 @@ namespace SensateService.Infrastructure.Document
 
 		public override SensorStatisticsEntry GetById(string id)
 		{
-			throw new NotImplementedException();
+			throw new InvalidOperationException("SensorStatisticsRepository.GetById is an invalid operation!");
 		}
 
 #endregion
