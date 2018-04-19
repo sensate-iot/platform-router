@@ -22,6 +22,7 @@ using SensateService.Models;
 using SensateService.Models.Json.In;
 using SensateService.Models.Json.Out;
 using SensateService.Enums;
+using SensateService.Helpers;
 
 namespace SensateService.Controllers.V1
 {
@@ -55,7 +56,7 @@ namespace SensateService.Controllers.V1
 		[ProducesResponseType(typeof(TokenRequestReply), 400)]
 		public async Task<ActionResult> RequestToken([FromBody] Login login)
 		{
-			var user = await this._users.GetByEmailAsync(login.Email);
+			var user = await this._users.GetByEmailAsync(login.Email).AwaitSafely();
 			bool result;
 			Microsoft.AspNetCore.Identity.SignInResult signInResult;
 			UserToken token;
@@ -74,7 +75,7 @@ namespace SensateService.Controllers.V1
 			}
 
 			signInResult = await this._signin_manager.PasswordSignInAsync(user, login.Password, false, false);
-			
+
 			if(!signInResult.Succeeded) {
 				await this._audit_log.CreateAsync(
 					this.GetCurrentRoute(), RequestMethod.HttpPost,
@@ -90,7 +91,7 @@ namespace SensateService.Controllers.V1
 			);
 
 			token = this.CreateUserTokenEntry(user);
-			await this._tokens.CreateAsync(token);
+			await this._tokens.CreateAsync(token).AwaitSafely();
 
 			var roles = this._users.GetRoles(user);
 			var reply = new TokenRequestReply {
@@ -109,7 +110,7 @@ namespace SensateService.Controllers.V1
 		[ProducesResponseType(typeof(TokenRequestReply), 400)]
 		public async Task<ActionResult> RefreshToken([FromBody] RefreshLogin login)
 		{
-			var user = await this._users.GetByEmailAsync(login.Email);
+			var user = await this._users.GetByEmailAsync(login.Email).AwaitSafely();
 			TokenRequestReply reply;
 			UserToken token;
 
@@ -118,20 +119,24 @@ namespace SensateService.Controllers.V1
 
 			token = this._tokens.GetById(user, login.RefreshToken);
 			await this._audit_log.CreateAsync(this.GetCurrentRoute(),
-				RequestMethod.HttpPost, GetRemoteAddress(), user);
+				RequestMethod.HttpPost, GetRemoteAddress(), user).AwaitSafely();
 
 			if(token == null || !token.Valid)
 				return Forbid();
 
 			if(token.ExpiresAt < DateTime.Now) {
-				await this._tokens.InvalidateTokenAsync(token);
+				await this._tokens.InvalidateTokenAsync(token).AwaitSafely();
 				return Forbid();
 			}
 
 			reply = new TokenRequestReply();
 			var newToken = this.CreateUserTokenEntry(user);
-			await this._tokens.CreateAsync(newToken);
-			await this._tokens.InvalidateTokenAsync(token);
+			var tasks = new[] {
+                this._tokens.CreateAsync(newToken),
+                this._tokens.InvalidateTokenAsync(token)
+			};
+
+			await Task.WhenAll(tasks);
 
 			reply.RefreshToken = newToken.Value;
 			reply.ExpiresInMinutes = this._settings.JwtRefreshExpireMinutes;
@@ -149,7 +154,7 @@ namespace SensateService.Controllers.V1
 		public async Task<IActionResult> Revoke(string token)
 		{
 			UserToken authToken;
-			var user = await this.GetCurrentUserAsync();
+			var user = await this.GetCurrentUserAsync().AwaitSafely();
 
 			if(user == null)
 				return Forbid();
@@ -158,7 +163,9 @@ namespace SensateService.Controllers.V1
 				return InvalidInputResult("Token not found!");
 
 			authToken = this._tokens.GetById(user, token);
-			await this._audit_log.CreateAsync(
+			var tasks = new Task[2];
+
+			tasks[0] = this._audit_log.CreateAsync(
 				this.GetCurrentRoute(),
 				RequestMethod.HttpDelete,
 				GetRemoteAddress(),
@@ -171,7 +178,8 @@ namespace SensateService.Controllers.V1
 			if(!authToken.Valid)
 				return this.InvalidInputResult("Token already invalid!");
 
-			await this._tokens.InvalidateTokenAsync(authToken);
+			tasks[1] = this._tokens.InvalidateTokenAsync(authToken);
+			await Task.WhenAll(tasks).AwaitSafely();
 			return Ok();
 		}
 
@@ -181,14 +189,18 @@ namespace SensateService.Controllers.V1
 		public async Task<IActionResult> RevokeAll()
 		{
 			IEnumerable<UserToken> tokens;
-			var user = await this.GetCurrentUserAsync();
+			var user = await this.GetCurrentUserAsync().AwaitSafely();
 
 			tokens = this._tokens.GetByUser(user);
-			await this._audit_log.CreateAsync(
-				this.GetCurrentRoute(), RequestMethod.HttpDelete,
-				GetRemoteAddress(), user
-			);
-			await this._tokens.InvalidateManyAsync(tokens);
+			var tasks = new[] {
+                this._audit_log.CreateAsync(
+                    this.GetCurrentRoute(), RequestMethod.HttpDelete,
+                    GetRemoteAddress(), user
+                ),
+                this._tokens.InvalidateManyAsync(tokens)
+			};
+
+			await Task.WhenAll(tasks).AwaitSafely();
 			return Ok();
 		}
 

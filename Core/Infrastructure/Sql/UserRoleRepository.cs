@@ -1,11 +1,10 @@
 ﻿/*
  * Identity role repository implementation.
- * 
+ *
  * @author Michel Megens
  * @email  dev@bietje.net
  */
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,6 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SensateService.Exceptions;
+using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 
@@ -54,12 +54,12 @@ namespace SensateService.Infrastructure.Sql
 				Description = description,
 				Name = name
 			};
-			await this.CreateAsync(role);
+			await this.CreateAsync(role).AwaitSafely();
 		}
 
 		public override async Task CreateAsync(UserRole obj)
 		{
-			var result = await this._roles.CreateAsync(obj);
+			var result = await this._roles.CreateAsync(obj).AwaitSafely();
 			if(!result.Succeeded)
 				throw new DatabaseException("Unable to create user role!");
 		}
@@ -72,7 +72,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public override async Task DeleteAsync(string id)
 		{
-			await Task.Run(() => this.Delete(id));
+			await Task.Run(() => this.Delete(id)).AwaitSafely();
 		}
 
 		public override UserRole GetById(string id)
@@ -96,7 +96,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public async Task<IEnumerable<string>> GetRolesForAsync(SensateUser user)
 		{
-			return await this._users.GetRolesAsync(user);
+			return await this._users.GetRolesAsync(user).AwaitSafely();
 		}
 
 		public IEnumerable<SensateUser> GetUsers(string name)
@@ -141,7 +141,7 @@ namespace SensateService.Infrastructure.Sql
 		{
 			await Task.Run(() => {
 				this.Update(name, obj);
-			});
+			}).AwaitSafely();
 		}
 	}
 }

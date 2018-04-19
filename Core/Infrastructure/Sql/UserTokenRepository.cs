@@ -6,18 +6,19 @@
  */
 
 using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+
+using Microsoft.IdentityModel.Tokens;
 
 using SensateService.Exceptions;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Helpers;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 namespace SensateService.Infrastructure.Sql
 {
@@ -44,11 +45,16 @@ namespace SensateService.Infrastructure.Sql
 		{
 			if(obj.Value == null && obj.LoginProvider == JwtRefreshTokenProvider)
 				obj.Value = this.GenerateRefreshToken();
-			else if(obj.Value == null)
+			else if(obj.Value == null) {
 				throw new DatabaseException("User token must have a value!");
+			}
 
-			await this.Data.AddAsync(obj);
-			await this.CommitAsync(obj);
+			var tasks = new[] {
+				this.Data.AddAsync(obj),
+				this.CommitAsync(obj)
+			};
+
+			await Task.WhenAll(tasks).AwaitSafely();
 		}
 
 
@@ -99,7 +105,7 @@ namespace SensateService.Infrastructure.Sql
 		{
 			this.StartUpdate(token);
 			token.Valid = false;
-			await this.EndUpdateAsync();
+			await this.EndUpdateAsync().AwaitSafely();
 		}
 
 		public void InvalidateToken(SensateUser user, string value)
@@ -119,7 +125,7 @@ namespace SensateService.Infrastructure.Sql
 			if(token == null)
 				return;
 
-			await this.InvalidateTokenAsync(token);
+			await this.InvalidateTokenAsync(token).AwaitSafely();
 		}
 
 		public string GenerateJwtToken(SensateUser user, IEnumerable<string> roles, UserAccountSettings settings)
@@ -166,7 +172,7 @@ namespace SensateService.Infrastructure.Sql
 				x.Valid = false;
 			});
 
-			await this.CommitAsync();
+			await this.CommitAsync().AwaitSafely();
 		}
 	}
 }

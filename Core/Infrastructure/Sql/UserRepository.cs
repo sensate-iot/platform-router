@@ -9,17 +9,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Threading;
 using System.Security.Claims;
 
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Mvc;
-
 using Microsoft.EntityFrameworkCore;
 
+using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 
@@ -66,10 +61,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public async Task<SensateUser> GetAsync(string key)
 		{
-			var user = await Task.Run(() => {
-				return this.GetById(key);
-			});
-
+			var user = await Task.Run(() => this.GetById(key));
 			return user;
 		}
 
@@ -116,20 +108,18 @@ namespace SensateService.Infrastructure.Sql
 		public IEnumerable<string> GetRoles(SensateUser user)
 		{
 			var result = this._manager.GetRolesAsync(user);
-			result.Wait();
-
 			return result.Result;
 		}
 
 		public async Task<IEnumerable<string>> GetRolesAsync(SensateUser user)
 		{
-			return await this._manager.GetRolesAsync(user);
+			return await this._manager.GetRolesAsync(user).AwaitSafely();
 		}
 
 		public async Task<IEnumerable<SensateUser>> FindByEmailAsync(string email)
 		{
 			var result = this.Data.Where(x => x.Email.Contains(email));
-			return await result.ToListAsync();
+			return await result.ToListAsync().AwaitSafely();
 		}
 	}
 }
