@@ -272,7 +272,7 @@ namespace SensateService.Controllers.V1
 			if(Regex.IsMatch(register.PhoneNumber, "[^0-9]"))
 				return this.InvalidInputResult("Invalid phone number!");
 
-			var result = await this._manager.CreateAsync(user, register.Password);
+			var result = await this._manager.CreateAsync(user, register.Password).AwaitSafely();
 
 			if(!result.Succeeded)
 				return this.BadRequest();

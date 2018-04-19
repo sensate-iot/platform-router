@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
@@ -153,6 +152,20 @@ namespace SensateService.Infrastructure.Document
 			return await result.ToListAsync().AwaitSafely();
 		}
 
+		public override SensorStatisticsEntry GetById(string id)
+		{
+			SensorStatisticsEntry e;
+			var fb = Builders<SensorStatisticsEntry>.Filter;
+
+			if(!ObjectId.TryParse(id, out var objId))
+				return null;
+
+			var filter = fb.Eq("InternalId", objId);
+			var result = this._stats.FindSync(filter);
+
+			return result.FirstOrDefault();
+		}
+
 #endregion
 
 #region Not implemented
@@ -161,23 +174,6 @@ namespace SensateService.Infrastructure.Document
 		{
 			throw new InvalidOperationException("SensorStatisticsRepository.Update is an invalid operation!");
 		}
-
-		public override void Commit(SensorStatisticsEntry obj)
-		{
-			throw new NotImplementedException();
-		}
-
-		public override Task CommitAsync(SensorStatisticsEntry obj, CancellationToken cto = default(CancellationToken))
-		{
-			throw new NotImplementedException();
-		}
-
-
-		public override SensorStatisticsEntry GetById(string id)
-		{
-			throw new InvalidOperationException("SensorStatisticsRepository.GetById is an invalid operation!");
-		}
-
 #endregion
 	}
 }
