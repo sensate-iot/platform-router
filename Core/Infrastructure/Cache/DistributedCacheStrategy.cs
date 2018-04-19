@@ -28,9 +28,9 @@ namespace SensateService.Infrastructure.Cache
 			return this._cache.GetString(key);
 		}
 
-		public override async Task<string> GetAsync(string key)
+		public override async Task<string> GetAsync(string key, default(CancellationToken))
 		{
-			return await this._cache.GetStringAsync(key);
+			return await this._cache.GetStringAsync(key, ct).AwaitSafely();
 		}
 
 		public override void Remove(string key)
@@ -40,7 +40,7 @@ namespace SensateService.Infrastructure.Cache
 
 		public override async Task RemoveAsync(string key)
 		{
-			await this._cache.RemoveAsync(key);
+			await this._cache.RemoveAsync(key).AwaitSafely();
 		}
 
 		public override void Set(string key, string obj)
@@ -64,10 +64,16 @@ namespace SensateService.Infrastructure.Cache
 
 		public override async Task SetAsync(string key, string obj)
 		{
-			await this.SetAsync(key, obj, CacheTimeout.Timeout.ToInt());
+			await this.SetAsync(key, obj, CacheTimeout.Timeout.ToInt()).AwaitSafely();
 		}
 
-		public async override Task SetAsync(string key, string obj, int tmo, bool slide = true)
+		public override async Task SetAsync(
+			string key,
+			string obj,
+			int tmo,
+			bool slide = true,
+			CancellationToken ct = default(CancellationToken)
+		)
 		{
 			var options = new DistributedCacheEntryOptions();
 
@@ -76,7 +82,7 @@ namespace SensateService.Infrastructure.Cache
 			else
 				options.SetAbsoluteExpiration(TimeSpan.FromMinutes(tmo));
 
-			await this._cache.SetStringAsync(key, obj, options);
+			await this._cache.SetStringAsync(key, obj, options, ct).AwaitSafely();
 		}
 	}
 }

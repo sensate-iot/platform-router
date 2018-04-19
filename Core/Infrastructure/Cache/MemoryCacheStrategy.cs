@@ -30,9 +30,10 @@ namespace SensateService.Infrastructure.Cache
 
 		public override async Task<string> GetAsync(string key)
 		{
-			return await Task.Run(() => {
-				return this._cache.Get<string>(key);
-			});
+			if(String.IsNullOrEmpty(key))
+				return null;
+
+			return await Task.Run(() => this._cache.Get<string>(key), ct).AwaitSafely();
 		}
 
 		public override void Remove(string key)
@@ -42,7 +43,7 @@ namespace SensateService.Infrastructure.Cache
 
 		public override async Task RemoveAsync(string key)
 		{
-			await Task.Run(() => this._cache.Remove(key));
+			await Task.Run(() => this._cache.Remove(key)).AwaitSafely();
 		}
 
 		public override void Set(string key, string obj)
@@ -58,15 +59,22 @@ namespace SensateService.Infrastructure.Cache
 
 		public override async Task SetAsync(string key, string obj)
 		{
-			await this.SetAsync(key, obj, CacheTimeout.Timeout.ToInt());
+			await this.SetAsync(key, obj, CacheTimeout.Timeout.ToInt()).AwaitSafely();
 		}
 
-		public override async Task SetAsync(string key, string obj, int tmo, bool slide = true)
+		public override async Task SetAsync(
+			string key,
+			string obj,
+			int tmo,
+			bool slide = true,
+			CancellationToken ct = default(CancellationToken)
+		)
 		{
 			await Task.Run(() => this._cache.Set(
 				key, obj,
-				new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(tmo)))
-			);
+				new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(tmo))),
+				ct
+			).AwaitSafely();
 		}
 	}
 }
