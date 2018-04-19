@@ -129,7 +129,7 @@ namespace SensateService.Infrastructure.Document
                 base.UpdateAsync(sensor)
 			};
 
-			await Task.WhenAll(tasks);
+			await Task.WhenAll(tasks).AwaitSafely();
 		}
 
 		public override void Delete(string id)
@@ -145,7 +145,7 @@ namespace SensateService.Infrastructure.Document
 				base.DeleteAsync(id)
 			};
 
-			await Task.WhenAll(tsk);
+			await Task.WhenAll(tsk).AwaitSafely();
 		}
 
 		public override Sensor GetById(string id)

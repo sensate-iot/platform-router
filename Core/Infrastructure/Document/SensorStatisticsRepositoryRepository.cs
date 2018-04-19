@@ -44,7 +44,7 @@ namespace SensateService.Infrastructure.Document
 			ObjectId objectId;
 
 			objectId = ObjectId.Parse(id);
-			await this._stats.DeleteOneAsync(x => x.InternalId == objectId);
+			await this._stats.DeleteOneAsync(x => x.InternalId == objectId).AwaitSafely();
 		}
 
 		public async Task DeleteBySensorAsync(Sensor sensor)
@@ -52,7 +52,7 @@ namespace SensateService.Infrastructure.Document
 			var query = Builders<SensorStatisticsEntry>.Filter.Eq("SensorId", sensor.InternalId);
 
 			try {
-				await this._stats.DeleteManyAsync(query);
+				await this._stats.DeleteManyAsync(query).AwaitSafely();
 			} catch(Exception ex) {
 				this._logger.LogWarning(ex.Message);
 			}
@@ -66,9 +66,10 @@ namespace SensateService.Infrastructure.Document
 			var update = Builders<SensorStatisticsEntry>.Update;
 			UpdateDefinition<SensorStatisticsEntry> updateDefinition;
 
-			entry = await this.GetByDateAsync(sensor, DateTime.Today) ?? await this.CreateForAsync(sensor);
+			entry = await this.GetByDateAsync(sensor, DateTime.Today).AwaitSafely() ??
+					await this.CreateForAsync(sensor).AwaitSafely();
 			updateDefinition = update.Inc(x => x.Measurements, 1);
-			await this._stats.FindOneAndUpdateAsync(x => x.InternalId == entry.InternalId, updateDefinition);
+			await this._stats.FindOneAndUpdateAsync(x => x.InternalId == entry.InternalId, updateDefinition).AwaitSafely();
 		}
 
 		public async Task<SensorStatisticsEntry> CreateForAsync(Sensor sensor)
@@ -82,7 +83,7 @@ namespace SensateService.Infrastructure.Document
 				SensorId = sensor.InternalId
 			};
 
-			await this.CreateAsync(entry);
+			await this.CreateAsync(entry).AwaitSafely();
 			return entry;
 		}
 
@@ -99,7 +100,7 @@ namespace SensateService.Infrastructure.Document
 		public override async Task CreateAsync(SensorStatisticsEntry obj)
 		{
 			try {
-				await this._stats.InsertOneAsync(obj);
+				await this._stats.InsertOneAsync(obj).AwaitSafely();
 			} catch(Exception ex) {
 				this._logger.LogWarning(ex.Message);
 				throw ex;
@@ -116,7 +117,7 @@ namespace SensateService.Infrastructure.Document
 			var filterBuilder = Builders<SensorStatisticsEntry>.Filter;
 
 			filter = filterBuilder.Eq("SensorId", sensor.InternalId) & filterBuilder.Eq("Date", date);
-			var result = await this._stats.FindAsync(filter);
+			var result = await this._stats.FindAsync(filter).AwaitSafely();
 
 			if(result == null)
 				return null;
@@ -130,7 +131,7 @@ namespace SensateService.Infrastructure.Document
 			var filterBuilder = Builders<SensorStatisticsEntry>.Filter;
 
 			filter = filterBuilder.Eq("SensorId", sensor.InternalId) & filterBuilder.Lte("Date", date);
-			var result = await this._stats.FindAsync(filter);
+			var result = await this._stats.FindAsync(filter).AwaitSafely();
 
 			if(result == null)
 				return null;
@@ -144,7 +145,7 @@ namespace SensateService.Infrastructure.Document
 			var filterBuilder = Builders<SensorStatisticsEntry>.Filter;
 
 			filter = filterBuilder.Eq("SensorId", sensor.InternalId) & filterBuilder.Gte("Date", date);
-			var result = await this._stats.FindAsync(filter);
+			var result = await this._stats.FindAsync(filter).AwaitSafely();
 
 			if(result == null)
 				return null;
