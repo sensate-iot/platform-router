@@ -84,7 +84,7 @@ namespace SensateService.Middleware
 				jobj.status = 200;
 
 				tasks[3] = this.SendMessage(socket, jobj.ToString());
-				await Task.WhenAll(tasks);
+				await Task.WhenAll(tasks).AwaitSafely();
 			} catch(InvalidRequestException ex) {
 				Debug.WriteLine($"Unable to store measurement: {ex.Message}");
 				dynamic jobj = new JObject();

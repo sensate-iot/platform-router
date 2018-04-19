@@ -78,7 +78,7 @@ namespace SensateService
 
 				tasks[1] = this.auditlogs.CreateAsync(log);
 				tasks[2] = this.stats.IncrementAsync(sensor);
-				await Task.WhenAll(tasks);
+				await Task.WhenAll(tasks).AwaitSafely();
 			} catch(Exception ex) {
 				Debug.WriteLine($"Error: {ex.Message}");
 				Debug.WriteLine($"Received a buggy MQTT message: {message}");
