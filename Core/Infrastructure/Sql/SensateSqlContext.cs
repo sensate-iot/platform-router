@@ -5,13 +5,10 @@
  * @email:  dev@bietje.net
  */
 
-using System;
-using System.Linq;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+
 using SensateService.Models;
-using Microsoft.AspNetCore.Identity;
 
 namespace SensateService.Infrastructure.Sql
 {
