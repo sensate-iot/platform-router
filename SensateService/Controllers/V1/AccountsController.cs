@@ -10,7 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Net;
-
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -268,7 +268,10 @@ namespace SensateService.Controllers.V1
 				PhoneNumber = register.PhoneNumber
 			};
 
-			await this.Log(RequestMethod.HttpPost);
+			await this.Log(RequestMethod.HttpPost).AwaitSafely();
+			if(Regex.IsMatch(register.PhoneNumber, "[^0-9]"))
+				return this.InvalidInputResult("Invalid phone number!");
+
 			var result = await this._manager.CreateAsync(user, register.Password);
 
 			if(!result.Succeeded)
