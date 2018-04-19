@@ -130,7 +130,7 @@ namespace SensateService.Infrastructure.Document
 				base.DeleteAsync(id)
 			};
 
-			await Task.WhenAll(tasks);
+			await Task.WhenAll(tasks).AwaitSafely();
 		}
 
 		private void CacheData(string key, object data, int tmo, bool slide = true)
@@ -200,7 +200,7 @@ namespace SensateService.Infrastructure.Document
 				base.DeleteBetweenAsync(sensor, start, end)
 			};
 
-			await Task.WhenAll(tasks);
+			await Task.WhenAll(tasks).AwaitSafely();
 		}
 
 		public override Measurement GetById(string id)

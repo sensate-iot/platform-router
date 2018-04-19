@@ -12,7 +12,7 @@ using System.Threading;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MongoDB.Bson;
-
+using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 
@@ -64,8 +64,7 @@ namespace SensateService.Infrastructure.Document
 			sensor.CreatedAt = now;
 			sensor.UpdatedAt = now;
 			sensor.InternalId = base.GenerateId(now);
-			await this._sensors.InsertOneAsync(sensor);
-			await this.CommitAsync(sensor);
+			await this._sensors.InsertOneAsync(sensor).AwaitSafely();
 		}
 
 		public virtual void Remove(string id)
@@ -83,17 +82,17 @@ namespace SensateService.Infrastructure.Document
 		{
 			ObjectId oid = new ObjectId(id);
 			var filter = Builders<Sensor>.Filter.Where(x => x.InternalId == oid);
-			var result = await this._sensors.FindAsync(filter);
+			var result = await this._sensors.FindAsync(filter).AwaitSafely();
 
 			if(result == null)
 				return null;
 
-			return await result.FirstOrDefaultAsync();
+			return await result.FirstOrDefaultAsync().AwaitSafely();
 		}
 
 		public virtual async Task RemoveAsync(string id)
 		{
-			await this.DeleteAsync(id);
+			await this.DeleteAsync(id).AwaitSafely();
 		}
 
 		public override void Update(Sensor obj)
@@ -121,7 +120,7 @@ namespace SensateService.Infrastructure.Document
 
 		public virtual async Task UpdateAsync(Sensor sensor)
 		{
-			await Task.Run(() => this.Update(sensor));
+			await Task.Run(() => this.Update(sensor)).AwaitSafely();
 		}
 
 		public override void Delete(string id)
@@ -140,11 +139,15 @@ namespace SensateService.Infrastructure.Document
 			Sensor sensor;
 			ObjectId oid = new ObjectId(id);
 
-			sensor = await this._sensors.FindOneAndDeleteAsync(x => x.InternalId == oid);
+			sensor = await this._sensors.FindOneAndDeleteAsync(x => x.InternalId == oid).AwaitSafely();
 
 			if(sensor != null) {
-				await this._measurements.DeleteBySensorAsync(sensor);
-				await this._stats.DeleteBySensorAsync(sensor);
+				var tasks = new[] {
+                    this._measurements.DeleteBySensorAsync(sensor),
+                    this._stats.DeleteBySensorAsync(sensor)
+				};
+
+				await Task.WhenAll(tasks).AwaitSafely();
 			}
 		}
 
