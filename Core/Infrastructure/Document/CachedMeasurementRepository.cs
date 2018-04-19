@@ -49,7 +49,12 @@ namespace SensateService.Infrastructure.Document
 		public override async Task CommitAsync(Measurement obj)
 		{
 			try {
-				await this._cache.SetAsync(obj.InternalId.ToString(), obj.ToJson(), CacheTimeout.Timeout.ToInt());
+				await _cache.SetAsync(
+					obj.InternalId.ToString(),
+					obj.ToJson(),
+					CacheTimeout.Timeout.ToInt(),
+					true,
+					ct).AwaitSafely();
 			} catch(Exception ex) {
 				this._logger.LogWarning($"Unable to log measurement {ex.Message}");
 				throw new CachingException(
@@ -65,10 +70,67 @@ namespace SensateService.Infrastructure.Document
 			base.Delete(id);
 		}
 
+		public override void Create(Measurement m)
+		{
+			base.Create(m);
+			this.Commit(m);
+		}
+
+		public override async Task CreateAsync(Measurement obj)
+		{
+			var tasks = new Task[2];
+
+			tasks[0] = base.CreateAsync(obj);
+			tasks[1] = this.CommitAsync(obj);
+
+			await Task.WhenAll(tasks).AwaitSafely();
+		}
+
+		protected override async Task<Measurement> CreateAsync(Sensor sensor, RawMeasurement raw, CancellationToken token)
+		{
+			Measurement measurement;
+			Task<Measurement> mWorker;
+			Task<string> cacheWorker;
+			string key, data;
+
+			key = String.Format("Measurements::{0}", sensor.InternalId.ToString());
+
+			try {
+				cacheWorker = this._cache.GetAsync(key, token);
+				mWorker = base.CreateAsync(sensor, raw, token);
+
+				data = await cacheWorker.AwaitSafely();
+				if(String.IsNullOrEmpty(data))
+					return await mWorker.AwaitSafely();
+
+				var measurements = JsonConvert.DeserializeObject<IEnumerable<Measurement>>(data);
+
+				if(measurements == null)
+					throw new CachingException("Unable to load cached measurements!", key);
+
+				measurement = await mWorker.AwaitSafely();
+				measurements.Append(measurement);
+				await this.CacheDataAsync(key, JsonConvert.SerializeObject(measurements),
+					CacheTimeout.TimeoutShort.ToInt()).AwaitSafely();
+			} catch(CachingException ex) {
+				this._logger.LogWarning(ex.Message);
+				throw ex;
+			} catch(Exception ex) {
+				this._logger.LogWarning($"Unable to cache measurement: {ex.Message}");
+				throw new CachingException($"Unable to load measurements {ex.Message}", key, ex);
+			}
+
+			return measurement;
+		}
+
 		public override async Task DeleteAsync(string id)
 		{
-			await this._cache.RemoveAsync(id);
-			await base.DeleteAsync(id);
+			var tasks = new[] {
+				_cache.RemoveAsync(id),
+				base.DeleteAsync(id)
+			};
+
+			await Task.WhenAll(tasks);
 		}
 
 		private void CacheData(string key, object data, int tmo, bool slide = true)
@@ -86,7 +148,7 @@ namespace SensateService.Infrastructure.Document
 
 		private async Task CacheDataAsync(string key, object data, int tmo, bool slide = true)
 		{
-			await this.CacheDataAsync(key, JsonConvert.SerializeObject(data), tmo, slide);
+			await CacheDataAsync(key, JsonConvert.SerializeObject(data), tmo, slide).AwaitSafely();
 		}
 
 		private async Task CacheDataAsync(string key, string json, int tmo, bool slide = true)
@@ -94,7 +156,51 @@ namespace SensateService.Infrastructure.Document
 			if(key == null || json == null)
 				return;
 
-			await this._cache.SetAsync(key, json, tmo, slide);
+			await _cache.SetAsync(key, json, tmo, slide).AwaitSafely();
+		}
+
+		public override void DeleteBySensor(Sensor sensor)
+		{
+			string key;
+
+			key = String.Format("Measurements::{0}", sensor.InternalId.ToString());
+			_cache.Remove(key);
+			base.DeleteBySensor(sensor);
+		}
+
+		public override async Task DeleteBySensorAsync(Sensor sensor)
+		{
+			string key;
+
+			key = String.Format("Measurements::{0}", sensor.InternalId.ToString());
+			var tasks = new[] {
+				this._cache.RemoveAsync(key),
+				base.DeleteBySensorAsync(sensor)
+			};
+
+			await Task.WhenAll(tasks).AwaitSafely();
+		}
+
+		public override void DeleteBetween(Sensor sensor, DateTime start, DateTime end)
+		{
+			string key;
+
+			key = $"{sensor.InternalId}::{start.ToString(CultureInfo.InvariantCulture)}::{end.ToString(CultureInfo.InvariantCulture)}";
+			_cache.Remove(key);
+			base.DeleteBetween(sensor, start, end);
+		}
+
+		public override async Task DeleteBetweenAsync(Sensor sensor, DateTime start, DateTime end)
+		{
+			string key;
+
+			key = $"{sensor.InternalId}::{start.ToString(CultureInfo.InvariantCulture)}::{end.ToString(CultureInfo.InvariantCulture)}";
+			var tasks = new[] {
+				this._cache.RemoveAsync(key),
+				base.DeleteBetweenAsync(sensor, start, end)
+			};
+
+			await Task.WhenAll(tasks);
 		}
 
 		public override Measurement GetById(string id)
@@ -122,7 +228,7 @@ namespace SensateService.Infrastructure.Document
 			key = String.Format("Measurements::{0}", sensor.InternalId.ToString());
 			return await this.TryGetMeasurementsAsync(key, x =>
 				x.CreatedBy == sensor.InternalId, CacheTimeout.TimeoutShort.ToInt()
-			);
+			).AwaitSafely();
 		}
 
 		public override IEnumerable<Measurement> GetMeasurementsBySensor(Sensor sensor)
@@ -149,21 +255,20 @@ namespace SensateService.Infrastructure.Document
 			IEnumerable<Measurement> measurements;
 
 			if(key != null)
-				data = await this._cache.GetAsync(key);
+				data = await _cache.GetAsync(key).AwaitSafely();
 
-			if(data == null) {
-				measurements = await base.TryGetMeasurementsAsync(key, expression);
-				await this.CacheDataAsync(key, measurements, tmo);
-				return measurements;
-			}
+			if (data != null)
+				return JsonConvert.DeserializeObject<IEnumerable<Measurement>>(data);
 
-			return JsonConvert.DeserializeObject<IEnumerable<Measurement>>(data);
+			measurements = await base.TryGetMeasurementsAsync(key, expression).AwaitSafely();
+			await CacheDataAsync(key, measurements, tmo).AwaitSafely();
+			return measurements;
 		}
 
 		public async override Task<IEnumerable<Measurement>> TryGetMeasurementsAsync(
 			string key, Expression<Func<Measurement, bool>> expression)
 		{
-			return await this.TryGetMeasurementsAsync(key, expression, CacheTimeout.Timeout.ToInt());
+			return await TryGetMeasurementsAsync(key, expression, CacheTimeout.Timeout.ToInt()).AwaitSafely();
 		}
 
 		public override Measurement TryGetMeasurement(
@@ -191,15 +296,14 @@ namespace SensateService.Infrastructure.Document
 			Measurement m;
 
 			if(key != null)
-				data = await this._cache.GetAsync(key);
+				data = await _cache.GetAsync(key).AwaitSafely();
 
-			if(data == null) {
-				m = await base.TryGetMeasurementAsync(key, expression);
-				await this.CacheDataAsync(key, m, CacheTimeout.Timeout.ToInt());
-				return m;
-			}
+			if (data != null)
+				return JsonConvert.DeserializeObject<Measurement>(data);
 
-			return JsonConvert.DeserializeObject<Measurement>(data);
+			m = await base.TryGetMeasurementAsync(key, expression).AwaitSafely();
+			await CacheDataAsync(key, m, CacheTimeout.Timeout.ToInt()).AwaitSafely();
+			return m;
 		}
 
 		private IEnumerable<Measurement> TryGetMeasurements(
@@ -238,16 +342,15 @@ namespace SensateService.Infrastructure.Document
 			string key;
 			IEnumerable<Measurement> measurements;
 
-			key = $"{sensor.InternalId.ToString()}::after::{pit.ToString()}";
-			var data = await this._cache.GetAsync(key);
+			key = $"{sensor.InternalId}::after::{pit.ToString(CultureInfo.InvariantCulture)}";
+			var data = await _cache.GetAsync(key).AwaitSafely();
 
-			if(data == null) {
-				measurements = await base.GetAfterAsync(sensor, pit);
-				await this.CacheDataAsync(key, measurements, CacheTimeout.TimeoutMedium.ToInt(), false);
-				return measurements;
-			}
+			if(data != null)
+				return JsonConvert.DeserializeObject<IEnumerable<Measurement>>(data);
 
-			return JsonConvert.DeserializeObject<IEnumerable<Measurement>>(data);
+			measurements = await base.GetAfterAsync(sensor, pit).AwaitSafely();
+			await this.CacheDataAsync(key, measurements, CacheTimeout.TimeoutMedium.ToInt(), false).AwaitSafely();
+			return measurements;
 		}
 
 		public override IEnumerable<Measurement> GetAfter(Sensor sensor, DateTime pit)
@@ -290,22 +393,20 @@ namespace SensateService.Infrastructure.Document
 			string key, data;
 			IEnumerable<Measurement> measurements;
 
-			key = $"{sensor.InternalId.ToString()}::{start.ToString()}::{end.ToString()}";
-			data = await this._cache.GetAsync(key);
+			key = $"{sensor.InternalId}::{start.ToString(CultureInfo.InvariantCulture)}::{end.ToString(CultureInfo.InvariantCulture)}";
+			data = await _cache.GetAsync(key).AwaitSafely();
 
-			if(data == null) {
-				measurements = await base.TryGetBetweenAsync(sensor, start, end);
-				await this.CacheDataAsync(key, JsonConvert.SerializeObject(measurements), CacheTimeout.Timeout.ToInt());
-				return measurements;
-			}
+			if (data != null)
+				return JsonConvert.DeserializeObject<IEnumerable<Measurement>>(data);
 
-
-			return JsonConvert.DeserializeObject<IEnumerable<Measurement>>(data);
+			measurements = await base.TryGetBetweenAsync(sensor, start, end).AwaitSafely();
+			await CacheDataAsync(key, JsonConvert.SerializeObject(measurements), CacheTimeout.Timeout.ToInt()).AwaitSafely();
+			return measurements;
 		}
 
 		public override async Task<Measurement> GetMeasurementAsync(string key, Expression<Func<Measurement, bool>> selector)
 		{
-			return await this.TryGetMeasurementAsync(key, selector);
+			return await TryGetMeasurementAsync(key, selector).AwaitSafely();
 		}
 	}
 }
