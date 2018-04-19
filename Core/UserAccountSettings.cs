@@ -5,8 +5,6 @@
  * @email:  dev@bietje.net
  */
 
-using System;
-
 namespace SensateService
 {
 	public class UserAccountSettings
@@ -15,5 +13,6 @@ namespace SensateService
 		public string JwtIssuer { get; set; }
 		public int JwtExpireMinutes { get; set; }
 		public int JwtRefreshExpireMinutes { get; set; }
+		public string ConfirmForward { get; set; }
 	}
 }

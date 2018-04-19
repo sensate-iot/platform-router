@@ -51,6 +51,7 @@ namespace SensateService
 		public IConfiguration Configuration { get; }
 		public IConfiguration Secrets {get;}
 
+		// ReSharper disable once UnusedMember.Global
 		public void ConfigureServices(IServiceCollection services)
 		{
 			string pgsql;
@@ -66,6 +67,7 @@ namespace SensateService
 				options.JwtIssuer = this.Secrets["JwtIssuer"];
 				options.JwtExpireMinutes = Int32.Parse(this.Secrets["JwtExpireMinutes"]);
 				options.JwtRefreshExpireMinutes = Int32.Parse(this.Secrets["JwtRefreshExpireMinutes"]);
+				options.ConfirmForward = this.Configuration["ConfirmForward"];
 			});
 
 			services.AddApiVersioning(options => {
@@ -160,6 +162,7 @@ namespace SensateService
 			services.AddMvc();
 		}
 
+		// ReSharper disable once UnusedMember.Global
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider sp)
 		{
 			app.UseCors(p => {
