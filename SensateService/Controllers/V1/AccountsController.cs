@@ -42,6 +42,7 @@ namespace SensateService.Controllers.V1
 		private readonly IHostingEnvironment _env;
 		private readonly IAuditLogRepository _audit_logs;
 		private readonly IUserTokenRepository _tokens;
+		private readonly UserAccountSettings _settings;
 
 		public AccountsController(
 			IUserRepository repo,
@@ -63,6 +64,7 @@ namespace SensateService.Controllers.V1
 			this._env = env;
 			this._audit_logs = auditLogs;
 			this._tokens = tokenRepository;
+			this._settings = options.Value;
 		}
 
 		[HttpPost("forgot-password")]
@@ -276,7 +278,7 @@ namespace SensateService.Controllers.V1
 			user = await this._users.GetAsync(user.Id);
 			var code = await this._manager.GenerateEmailConfirmationTokenAsync(user);
 			code = Base64UrlEncoder.Encode(code);
-			var url = this.Url.EmailConfirmationLink(user.Id, code, this.Request.Scheme);
+			var url = this.Url.EmailConfirmationLink(user.Id, code, this.Request.Scheme, this._settings.ConfirmForward);
 			mail.HtmlBody = mail.HtmlBody.Replace("%%URL%%", url);
 			mail.TextBody = String.Format(mail.TextBody, url);
 
