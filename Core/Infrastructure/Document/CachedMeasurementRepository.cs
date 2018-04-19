@@ -226,8 +226,8 @@ namespace SensateService.Infrastructure.Document
 			string key;
 
 			key = String.Format("Measurements::{0}", sensor.InternalId.ToString());
-			return await this.TryGetMeasurementsAsync(key, x =>
-				x.CreatedBy == sensor.InternalId, CacheTimeout.TimeoutShort.ToInt()
+			return await TryGetMeasurementsAsync(key, x =>
+				x.CreatedBy == sensor.InternalId, CacheTimeout.Timeout.ToInt()
 			).AwaitSafely();
 		}
 
@@ -236,8 +236,8 @@ namespace SensateService.Infrastructure.Document
 			string key;
 
 			key = String.Format("Measurements::{0}", sensor.InternalId.ToString());
-			return this.TryGetMeasurements(key, x =>
-				x.CreatedBy == sensor.InternalId, CacheTimeout.TimeoutShort.ToInt()
+			return TryGetMeasurements(key, x =>
+				x.CreatedBy == sensor.InternalId, CacheTimeout.Timeout.ToInt()
 			);
 		}
 
