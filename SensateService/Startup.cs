@@ -41,15 +41,16 @@ namespace SensateService
 			if(environment.IsDevelopment()) {
 				builder.AddUserSecrets<Startup>();
 				builder.AddApplicationInsightsSettings(developerMode: true);
+			} else if(environment.IsProduction()) {
+				builder.AddJsonFile("appsettings.secrets.json");
 			}
 
-			builder.AddEnvironmentVariables();
 			this.Secrets = builder.Build();
 			this.Configuration = configuration;
 		}
 
-		public IConfiguration Configuration { get; }
-		public IConfiguration Secrets {get;}
+		private IConfiguration Configuration { get; }
+		private IConfiguration Secrets { get; }
 
 		// ReSharper disable once UnusedMember.Global
 		public void ConfigureServices(IServiceCollection services)
