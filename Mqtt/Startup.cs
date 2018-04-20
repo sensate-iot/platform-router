@@ -15,7 +15,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
@@ -31,7 +30,6 @@ namespace SensateService.Mqtt
 		public Startup()
 		{
 			var builder = new ConfigurationBuilder();
-			string env;
 
 			this._reset = new ManualResetEvent(false);
 			Console.CancelKeyPress += this.CancelEvent_Handler;
@@ -40,14 +38,18 @@ namespace SensateService.Mqtt
 			builder.AddJsonFile("appsettings.json", optional:false);
 			builder.AddEnvironmentVariables();
 
-			env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-			if(String.IsNullOrEmpty(env) || env == "Development") {
+			if(IsDevelopment())
 				builder.AddUserSecrets<Startup>();
-			} else if(env == "Production") {
-				builder.AddJsonFile("appsettings.secrets.json");
-			}
+			else
+                builder.AddJsonFile("appsettings.secrets.json");
 
 			Configuration = builder.Build();
+		}
+
+		private static bool IsDevelopment()
+		{
+			var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+			return env == "Development";
 		}
 
 		private void CancelEvent_Handler(object sender, ConsoleCancelEventArgs e)
@@ -69,7 +71,8 @@ namespace SensateService.Mqtt
 			.AddEntityFrameworkStores<SensateSqlContext>()
 			.AddDefaultTokenProviders();
 
-			services.AddLogging();
+			services.AddLogging(builder => { builder.AddConfiguration(this.Configuration.GetSection("Logging")); });
+
 			services.AddDocumentStore(Configuration["MongoDbConnectionString"], Configuration["MongoDbDatabaseName"]);
 
 			services.AddDistributedRedisCache(opts => {
@@ -94,7 +97,13 @@ namespace SensateService.Mqtt
 
 		public void Configure(IServiceProvider provider)
 		{
+			var logging = provider.GetRequiredService<ILoggerFactory>();
+
 			provider.MapMqttTopic<MqttMeasurementHandler>(Configuration["MqttShareTopic"]);
+
+			logging.AddConsole();
+			if(IsDevelopment())
+                logging.AddDebug();
 		}
 
 		public void Run(IServiceProvider provider)
