@@ -6,6 +6,7 @@
  */
 
 using System;
+using System.Collections.Immutable;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -17,6 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc.Versioning;
 
 using Swashbuckle.AspNetCore.Swagger;
@@ -34,9 +36,9 @@ namespace SensateService
 		public Startup(IConfiguration configuration, IHostingEnvironment environment)
 		{
 			var builder = new ConfigurationBuilder()
-							.SetBasePath(environment.ContentRootPath)
-							.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-							.AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true);
+				.SetBasePath(environment.ContentRootPath)
+				.AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true)
+				.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 
 			if(environment.IsDevelopment()) {
 				builder.AddUserSecrets<Startup>();
@@ -50,7 +52,7 @@ namespace SensateService
 		}
 
 		private IConfiguration Configuration { get; }
-		private IConfiguration Secrets { get; }
+		private IConfiguration Secrets {get;}
 
 		// ReSharper disable once UnusedMember.Global
 		public void ConfigureServices(IServiceCollection services)
@@ -62,6 +64,8 @@ namespace SensateService
 
 			services.AddPostgres(pgsql);
 			services.AddDocumentStore(Secrets["MongoDbConnectionString"], Secrets["MongoDbDatabaseName"]);
+
+			services.AddLogging(builder => { builder.AddConfiguration(this.Configuration.GetSection("Logging")); });
 
 			services.Configure<UserAccountSettings>(options => {
 				options.JwtKey = this.Secrets["JwtKey"];
@@ -163,8 +167,7 @@ namespace SensateService
 			services.AddMvc();
 		}
 
-		// ReSharper disable once UnusedMember.Global
-		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider sp)
+		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider sp, ILoggerFactory logger)
 		{
 			app.UseCors(p => {
 				p.AllowAnyOrigin()
@@ -178,6 +181,10 @@ namespace SensateService
 				ctx.Database.EnsureCreated();
 				ctx.Database.Migrate();
 			}
+
+			logger.AddConsole();
+			if(env.IsDevelopment())
+				logger.AddDebug();
 
 			app.UseSwagger();
 			app.UseSwaggerUI(c => {
