@@ -9,6 +9,7 @@ sensate-service.csproj.user
 .markdownlint.json
 dist/
 .idea/.idea.sensate-service/.idea/workspace.xml
+**.DotSettings.user
 
 # User specific
 **/.idea/**/workspace.xml
