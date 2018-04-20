@@ -8,13 +8,24 @@
 
 const fs = require('fs');
 
+function matchArray(data, regex) {
+	var match = regex.exec(data);
+	var matches = [];
+
+	while(match != null) {
+		matches.push(match[1]);
+		match = regex.exec(data);
+	}
+
+	if(matches.length == 0)
+		return null;
+
+	return matches;
+}
+
 function findName(data) {
-	var pattern = new RegExp(/@author.([^\n]+)/);
-
-	if(pattern.test(data))
-		return data.match(pattern)[1];
-
-	return null;
+	var pattern = new RegExp(/@author\ +([^\n]+)/g);
+	return matchArray(data, pattern);
 }
 
 function findEmail(data) {
@@ -28,22 +39,18 @@ function findEmail(data) {
 
 function findMaintainer(data) {
 	var pattern = new RegExp(/@maintainer([^\n]+)/);
-
-	if(pattern.test(data))
-		return data.match(pattern)[1];
-
-	return null;
+	return matchArray(data, pattern);
 }
 
 function searchFile(data, filename) {
-	var name = findName(data);
+	var names = findName(data);
 	const email = findEmail(data);
-	const maintainer = findMaintainer(data);
+	const maintainers = findMaintainer(data);
 
-	if(maintainer != null)
-		name = maintainer;
+	if(maintainers != null)
+		names = maintainers;
 
-	if(name == null && maintainer == null) {
+	if(names == null && maintainers == null) {
 		/* maintainer not found */
 		console.log('--------------------------');
 		console.log('No maintainer found for ' + filename);
@@ -53,11 +60,22 @@ function searchFile(data, filename) {
 		return;
 	}
 
-
 	console.log('--------------------------');
 	console.log('Maintainer for ' + filename + ':');
 	console.log('');
-	console.log(name + ' <' + email + '>');
+
+	if(names.length > 1) {
+		names.forEach(function(name) {
+			console.log(name);
+		});
+	} else if(names.length == 1) {
+		if(email != null) {
+			console.log(names[0] + ' <' + email + '>');
+		} else {
+			console.log(names[0]);
+		}
+	}
+	
 	console.log('--------------------------');
 	console.log('');
 }
