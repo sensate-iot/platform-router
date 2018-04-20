@@ -13,17 +13,20 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-using SensateService.Init;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+
 using SensateService.Infrastructure.Sql;
+using SensateService.Init;
 using SensateService.Models;
 
 namespace SensateService.Mqtt
 {
 	public class Startup
 	{
-		public IConfiguration Configuration;
-		private ManualResetEvent _reset;
+		private readonly IConfiguration Configuration;
+		private readonly ManualResetEvent _reset;
 
 		public Startup()
 		{
@@ -40,6 +43,8 @@ namespace SensateService.Mqtt
 			env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 			if(String.IsNullOrEmpty(env) || env == "Development") {
 				builder.AddUserSecrets<Startup>();
+			} else if(env == "Production") {
+				builder.AddJsonFile("appsettings.secrets.json");
 			}
 
 			Configuration = builder.Build();

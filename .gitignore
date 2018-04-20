@@ -10,7 +10,7 @@ appsettings.secrets.json
 .markdownlint.json
 dist/
 .idea/.idea.sensate-service/.idea/workspace.xml
-**.DotSettings.user
+appsettings.secrets.json
 
 # User specific
 **/.idea/**/workspace.xml
