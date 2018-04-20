@@ -55,7 +55,9 @@ only way to contribute:
 * You can help design features by replying on existing issue's
 
 When you pick up an existing issue in order to resolve it, *please let us know*. This will
-prevent two people working on the same issue.
+prevent two people working on the same issue. If you are creating a new issue
+please use one of the supplied github templates. Section that are not applicable should
+be removed.
 
 ## Installation & support
 
