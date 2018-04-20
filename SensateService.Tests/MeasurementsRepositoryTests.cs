@@ -69,7 +69,7 @@ namespace SensateService.Tests
 			this._receivedMeasurement = null;
 			settings = new MongoDBSettings();
 			settings.DatabaseName = "SensateUnitTests";
-			settings.ConnectionString = "mongodb://SensateUnitTests:Sensate@localhost:27017/SensateUnitTests";
+			settings.ConnectionString = "mongodb://localhost:27017/SensateUnitTests";
 			logger = new LoggerFactory().CreateLogger<MeasurementRepository>();
 			ctx = new SensateContext(settings);
 			var repo = new MeasurementRepository(ctx, logger);

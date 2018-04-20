@@ -34,7 +34,9 @@ namespace SensateService.Tests.UnitTests
 				UpdatedAt = DateTime.Now,
 				Secret = "Yolo",
 				InternalId = ObjectId.GenerateNewId(),
-				Name = "Test Sensor"
+				Name = "Test Sensor",
+				Description = "Sensor for unit testing purposes",
+				Owner = "50692771-e625-4f7b-9eab-7d4e9dad1886"
 			};
 
 			this._sensors.Setup(repo => repo.GetAsync("abcdef")).Returns(
@@ -46,7 +48,9 @@ namespace SensateService.Tests.UnitTests
 				UpdatedAt = DateTime.Now,
 				Secret = "Yolo",
 				InternalId = ObjectId.GenerateNewId(),
-				Name = "Test Sensor"
+				Name = "Test Sensor",
+				Description = "Sensor for unit testing purposes",
+				Owner = "50692771-e625-4f7b-9eab-7d4e9dad1886"
 			};
 
 			this._sensors.Setup(repo => repo.GetAsync("abcde")).Returns(
