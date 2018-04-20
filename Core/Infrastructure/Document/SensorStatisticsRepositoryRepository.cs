@@ -154,7 +154,6 @@ namespace SensateService.Infrastructure.Document
 
 		public override SensorStatisticsEntry GetById(string id)
 		{
-			SensorStatisticsEntry e;
 			var fb = Builders<SensorStatisticsEntry>.Filter;
 
 			if(!ObjectId.TryParse(id, out var objId))
