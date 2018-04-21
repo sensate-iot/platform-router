@@ -15,7 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-
+using SensateService.Config;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
 using SensateService.Models;
@@ -35,13 +35,13 @@ namespace SensateService.Mqtt
 			Console.CancelKeyPress += this.CancelEvent_Handler;
 
 			builder.SetBasePath(Path.Combine(AppContext.BaseDirectory));
-			builder.AddJsonFile("appsettings.json", optional:false);
 			builder.AddEnvironmentVariables();
 
 			if(IsDevelopment())
 				builder.AddUserSecrets<Startup>();
 			else
-                builder.AddJsonFile("appsettings.secrets.json");
+                builder.AddJsonFile("appsettings.single.json", optional: false, reloadOnChange: true);
+
 
 			Configuration = builder.Build();
 		}
@@ -60,10 +60,15 @@ namespace SensateService.Mqtt
 
 		public void ConfigureServices(IServiceCollection services)
 		{
-			string pgsql;
+			var mqtt = new MqttConfig();
+			var db = new DatabaseConfig();
+			var cache = new CacheConfig();
 
-			pgsql = this.Configuration["PgSqlConnectionString"];
-			services.AddPostgres(pgsql);
+			Configuration.GetSection("Mqtt").Bind(mqtt);
+			Configuration.GetSection("Database").Bind(db);
+			Configuration.GetSection("Cache").Bind(cache);
+
+			services.AddPostgres(db.PgSQL.ConnectionString);
 
 			services.AddIdentity<SensateUser, UserRole>(config => {
 				config.SignIn.RequireConfirmedEmail = true;
@@ -73,23 +78,20 @@ namespace SensateService.Mqtt
 
 			services.AddLogging(builder => { builder.AddConfiguration(this.Configuration.GetSection("Logging")); });
 
-			services.AddDocumentStore(Configuration["MongoDbConnectionString"], Configuration["MongoDbDatabaseName"]);
 
-			services.AddDistributedRedisCache(opts => {
-				opts.Configuration = Configuration["RedisHost"];
-				opts.InstanceName = Configuration["RedisInstanceName"];
-			});
+			if(cache.Enabled)
+                services.AddCacheStrategy(cache, db);
 
-			services.AddCacheStrategy(Configuration["CacheType"]);
-			services.AddDocumentRepositories(Configuration["Cache"] == "true");
+			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName);
+			services.AddDocumentRepositories(cache.Enabled);
 			services.AddSqlRepositories();
 
 			services.AddMqttService(options => {
-				options.Ssl = Configuration["MqttSsl"] == "true";
-				options.Host = Configuration["MqttHost"];
-				options.Port = Int32.Parse(Configuration["MqttPort"]);
-				options.Username = Configuration["MqttUsername"];
-				options.Password = Configuration["MqttPassword"];
+				options.Ssl = mqtt.Ssl;
+				options.Host = mqtt.Host;
+				options.Port = mqtt.Port;
+				options.Username = mqtt.Username;
+				options.Password = mqtt.Password;
 				options.Id = Guid.NewGuid().ToString();
 				options.TopicShare = "$share/sensate/";
 			});
@@ -97,9 +99,11 @@ namespace SensateService.Mqtt
 
 		public void Configure(IServiceProvider provider)
 		{
+			var mqtt = new MqttConfig();
 			var logging = provider.GetRequiredService<ILoggerFactory>();
 
-			provider.MapMqttTopic<MqttMeasurementHandler>(Configuration["MqttShareTopic"]);
+			Configuration.GetSection("Mqtt").Bind(mqtt);
+			provider.MapMqttTopic<MqttMeasurementHandler>(mqtt.ShareTopic);
 
 			logging.AddConsole();
 			if(IsDevelopment())

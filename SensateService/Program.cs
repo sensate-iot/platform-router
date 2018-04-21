@@ -13,7 +13,6 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Identity;
 using SensateService.Infrastructure.Sql;
@@ -62,7 +61,7 @@ namespace SensateService
 			wh.Run();
 		}
 
-		public static IWebHost BuildWebHost(string[] args)
+		private static IWebHost BuildWebHost(string[] args)
 		{
 			var conf = new ConfigurationBuilder()
 						.SetBasePath(Directory.GetCurrentDirectory())
@@ -74,9 +73,10 @@ namespace SensateService
 				.UseKestrel()
 				.UseContentRoot(Directory.GetCurrentDirectory())
 				.ConfigureAppConfiguration((hostingContext, config) => {
-					var env = hostingContext.HostingEnvironment;
-					config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-						 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
+					if(hostingContext.HostingEnvironment.IsProduction())
+						config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+					else
+						config.AddUserSecrets<Startup>();
 					config.AddEnvironmentVariables();
 				})
 				.ConfigureLogging((hostingContext, logging) => {

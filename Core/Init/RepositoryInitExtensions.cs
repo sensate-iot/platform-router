@@ -8,7 +8,7 @@
 using System.Diagnostics;
 
 using Microsoft.Extensions.DependencyInjection;
-
+using SensateService.Config;
 using SensateService.Infrastructure.Cache;
 using SensateService.Infrastructure.Document;
 using SensateService.Infrastructure.Repositories;
@@ -49,11 +49,15 @@ namespace SensateService.Init
 			return services;
 		}
 
-		public static IServiceCollection AddCacheStrategy(
-			this IServiceCollection services, string type
-		)
+		public static IServiceCollection AddCacheStrategy(this IServiceCollection services,
+														  CacheConfig config, DatabaseConfig db)
 		{
-			if(type == "Distributed") {
+			if(config.Type == "Distributed") {
+                services.AddDistributedRedisCache(opts => {
+					opts.Configuration = db.Redis.Host;
+					opts.InstanceName = db.Redis.InstanceName;
+				});
+
 				services.AddScoped<ICacheStrategy<string>, DistributedCacheStrategy>();
 			} else {
 				services.AddScoped<ICacheStrategy<string>, MemoryCacheStrategy>();

@@ -20,7 +20,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc.Versioning;
-
+using SensateService.Config;
 using Swashbuckle.AspNetCore.Swagger;
 
 using SensateService.Models;
@@ -35,44 +35,37 @@ namespace SensateService
 	{
 		public Startup(IConfiguration configuration, IHostingEnvironment environment)
 		{
-			var builder = new ConfigurationBuilder()
-				.SetBasePath(environment.ContentRootPath)
-				.AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true)
-				.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-
-			if(environment.IsDevelopment()) {
-				builder.AddUserSecrets<Startup>();
-				builder.AddApplicationInsightsSettings(developerMode: true);
-			} else if(environment.IsProduction()) {
-				builder.AddJsonFile("appsettings.secrets.json");
-			}
-
-			this.Secrets = builder.Build();
-			this.Configuration = configuration;
+			this._configuration = configuration;
 		}
 
-		private IConfiguration Configuration { get; }
-		private IConfiguration Secrets {get;}
+		private readonly IConfiguration _configuration;
 
 		// ReSharper disable once UnusedMember.Global
 		public void ConfigureServices(IServiceCollection services)
 		{
-			string pgsql;
+			var cache = new CacheConfig();
+			var db = new DatabaseConfig();
+			var auth = new AuthenticationConfig();
+			var mail = new MailConfig();
 
-			pgsql = this.Secrets.GetValue<string>("PgSqlConnectionString");
+			this._configuration.GetSection("Cache").Bind(cache);
+			this._configuration.GetSection("Authentication").Bind(auth);
+			this._configuration.GetSection("Database").Bind(db);
+			this._configuration.GetSection("Mail").Bind(mail);
+
 			services.AddCors();
 
-			services.AddPostgres(pgsql);
-			services.AddDocumentStore(Secrets["MongoDbConnectionString"], Secrets["MongoDbDatabaseName"]);
+			services.AddPostgres(db.PgSQL.ConnectionString);
+			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName);
 
-			services.AddLogging(builder => { builder.AddConfiguration(this.Configuration.GetSection("Logging")); });
+			//services.AddLogging(builder => { builder.AddConfiguration(this._configuration.GetSection("Logging"));
 
 			services.Configure<UserAccountSettings>(options => {
-				options.JwtKey = this.Secrets["JwtKey"];
-				options.JwtIssuer = this.Secrets["JwtIssuer"];
-				options.JwtExpireMinutes = Int32.Parse(this.Secrets["JwtExpireMinutes"]);
-				options.JwtRefreshExpireMinutes = Int32.Parse(this.Secrets["JwtRefreshExpireMinutes"]);
-				options.ConfirmForward = this.Configuration["ConfirmForward"];
+				options.JwtKey = auth.JwtKey;
+				options.JwtIssuer = auth.JwtIssuer;
+				options.JwtExpireMinutes = auth.JwtExpireMinutes;
+				options.JwtRefreshExpireMinutes = auth.JwtRefreshExpireMinutes;
+				options.ConfirmForward = auth.ConfirmForward;
 			});
 
 			services.AddApiVersioning(options => {
@@ -116,43 +109,40 @@ namespace SensateService
 				cfg.SaveToken = true;
 				cfg.TokenValidationParameters = new TokenValidationParameters
 				{
-					ValidIssuer = Secrets["JwtIssuer"],
-					ValidAudience = Secrets["JwtIssuer"],
+					ValidIssuer = auth.JwtIssuer,
+					ValidAudience = auth.JwtIssuer,
 					IssuerSigningKey = new SymmetricSecurityKey(
-						Encoding.UTF8.GetBytes(Secrets["JwtKey"])
+						Encoding.UTF8.GetBytes(auth.JwtKey)
 					),
 					ClockSkew = TimeSpan.Zero
 				};
 			});
 
-			services.AddDistributedRedisCache(opts => {
-				opts.Configuration = Configuration["RedisHost"];
-				opts.InstanceName = Configuration["RedisInstanceName"];
-			});
+			if(cache.Enabled)
+                services.AddCacheStrategy(cache, db);
 
 			/* Add repositories */
 			services.AddSqlRepositories();
-			services.AddCacheStrategy(Configuration["CacheType"]);
-			services.AddDocumentRepositories(Configuration["Cache"] == "true");
+			services.AddDocumentRepositories(cache.Enabled);
 
-			if(Configuration["EmailProvider"] == "SendGrid") {
+			if(mail.Provider == "SendGrid") {
 				services.AddSingleton<IEmailSender, SendGridMailer>();
 				services.Configure<SendGridAuthOptions>(opts => {
-					opts.FromName = Configuration["EmailFromName"];
-					opts.From = Configuration["EmailFrom"];
-					opts.Key = Secrets["SendGridKey"];
-					opts.Username = Secrets["SendGridUser"];
+					opts.FromName = mail.FromName;
+					opts.From = mail.From;
+					opts.Key = mail.SendGrid.Key;
+					opts.Username = mail.SendGrid.Username;
 				});
-			} else if(Configuration["EmailProvider"] == "SMTP") {
+			} else if(mail.Provider == "SMTP") {
 				services.AddSingleton<IEmailSender, SmtpMailer>();
 				services.Configure<SmtpAuthOptions>(opts => {
-					opts.FromName = Configuration["EmailFromName"];
-					opts.From = Configuration["EmailFrom"];
-					opts.Password = Secrets["SmtpPassword"];
-					opts.Username = Secrets["SmtpUsername"];
-					opts.Ssl = Configuration["SmtpSsl"] == "true";
-					opts.Port = Int16.Parse(Configuration["SmtpPort"]);
-					opts.Host = Configuration["SmtpHost"];
+					opts.FromName = mail.FromName;
+					opts.From = mail.From;
+					opts.Password = mail.Smtp.Password;
+					opts.Username = mail.Smtp.Username;
+					opts.Ssl = mail.Smtp.Ssl;
+					opts.Port = mail.Smtp.Port;
+					opts.Host = mail.Smtp.Host;
 				});
 			}
 
