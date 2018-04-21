@@ -5,6 +5,7 @@
  * @email  dev@bietje.net
  */
 
+using System;
 using System.Diagnostics;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -60,6 +61,7 @@ namespace SensateService.Init
 
 				services.AddScoped<ICacheStrategy<string>, DistributedCacheStrategy>();
 			} else {
+				services.AddMemoryCache();
 				services.AddScoped<ICacheStrategy<string>, MemoryCacheStrategy>();
 			}
 
