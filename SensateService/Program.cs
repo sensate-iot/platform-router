@@ -23,9 +23,7 @@ namespace SensateService
 {
 	public class Program
 	{
-		public const string ApiVersionString = "v1";
-
-		public static void CreateUserRoles(IWebHost wh)
+		private static void CreateUserRoles(IWebHost wh)
 		{
 			ILogger<Program> logger;
 			SensateSqlContext ctx;
@@ -56,8 +54,8 @@ namespace SensateService
 			IWebHost wh;
 
 			Console.WriteLine($"Starting {Version.VersionString}");
-			wh = Program.BuildWebHost(args);
-			Program.CreateUserRoles(wh);
+			wh = BuildWebHost(args);
+			CreateUserRoles(wh);
 			wh.Run();
 		}
 
