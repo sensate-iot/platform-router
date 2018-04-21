@@ -103,13 +103,13 @@ namespace SensateService.Infrastructure.Document
 				if(String.IsNullOrEmpty(data))
 					return await mWorker.AwaitSafely();
 
-				var measurements = JsonConvert.DeserializeObject<IEnumerable<Measurement>>(data);
+				var measurements = JsonConvert.DeserializeObject<IList<Measurement>>(data);
 
 				if(measurements == null)
 					throw new CachingException("Unable to load cached measurements!", key);
 
 				measurement = await mWorker.AwaitSafely();
-				measurements.Append(measurement);
+				measurements.Add(measurement);
 				await this.CacheDataAsync(key, JsonConvert.SerializeObject(measurements),
 					CacheTimeout.TimeoutShort.ToInt()).AwaitSafely();
 			} catch(CachingException ex) {
