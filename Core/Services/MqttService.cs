@@ -14,14 +14,12 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using MQTTnet;
 using MQTTnet.Client;
 
-using SensateService.Infrastructure.Repositories;
 using SensateService.Middleware;
 
 namespace SensateService.Services
@@ -57,13 +55,11 @@ namespace SensateService.Services
 				.WithTcpServer(this.options.Host, this.options.Port)
 				.WithCleanSession();
 
-			if(this.options.Ssl) {
+			if(this.options.Ssl)
 				builder.WithTls(true);
-			}
 
-			if(this.options.Username != null) {
+			if(this.options.Username != null)
 				builder.WithCredentials(this.options.Username, this.options.Password);
-			}
 
 			this._client.Connected += OnConnect_Handler;
 			this._client.Disconnected += OnDisconnect_HandlerAsync;
@@ -75,23 +71,22 @@ namespace SensateService.Services
 
 		private async Task Connect()
 		{
-			this._logger.LogInformation($"Connecting to MQTT broker");
+			this._logger.LogInformation("Connecting to MQTT broker");
 			Debug.WriteLine("Connecting to MQTT broker");
 
 			await this._client.ConnectAsync(this._client_options);
 		}
 
-		public async void OnMessage_Handler(
+		private async void OnMessage_Handler(
 			object sender,
 			MqttApplicationMessageReceivedEventArgs e
 		)
 		{
 			MqttHandler handler;
-			Type handlerType;
 			string msg;
 
 			using(var scope = this._provider.CreateScope()) {
-				if(!this._handlers.TryGetValue(e.ApplicationMessage.Topic, out handlerType)) {
+				if(!this._handlers.TryGetValue(e.ApplicationMessage.Topic, out Type handlerType)) {
 					this._handlers.TryGetValue(
 						this.options.TopicShare + e.ApplicationMessage.Topic,
 						out handlerType
@@ -99,6 +94,10 @@ namespace SensateService.Services
 				}
 
 				handler = scope.ServiceProvider.GetRequiredService(handlerType) as MqttHandler;
+
+				if(handler == null)
+					return;
+
 				msg = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
 				await handler.OnMessageAsync(e.ApplicationMessage.Topic, msg);
 			}

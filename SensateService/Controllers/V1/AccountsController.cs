@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text.RegularExpressions;
 
-using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Mvc;
