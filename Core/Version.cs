@@ -11,18 +11,13 @@ namespace SensateService
 {
 	public static class Version
 	{
-		public static string VersionString
-		{
-			get {
-				return String.Format(
-					"Sensate Core {0}.{1}.{2}",
-					Major, Minor, PatchLevel
-				);
-			}
-		}
+		public static string VersionString => String.Format(
+			"Sensate Core {0}.{1}.{2}",
+			Major, Minor, PatchLevel
+		);
 
 		public const int Major = 0;
 		public const int Minor = 0;
-		public const int PatchLevel = 2;
+		public const int PatchLevel = 3;
 	}
 }
