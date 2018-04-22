@@ -7,6 +7,10 @@
     <Version>0.0.1</Version>
     <ServerGarbageCollection>true</ServerGarbageCollection>
   </PropertyGroup>
+ <ItemGroup>
+     <None Update="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
+ </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.6">
       <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

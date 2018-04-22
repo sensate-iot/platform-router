@@ -40,7 +40,7 @@ namespace SensateService.Mqtt
 			if(IsDevelopment())
 				builder.AddUserSecrets<Startup>();
 			else
-                builder.AddJsonFile("appsettings.single.json", optional: false, reloadOnChange: true);
+                builder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
 
 			Configuration = builder.Build();
