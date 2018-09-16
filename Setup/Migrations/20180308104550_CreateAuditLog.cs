@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using System;
 using System.Collections.Generic;
 
-namespace SensateService.Migrations
+namespace SensateService.Setup.Migrations
 {
     public partial class CreateAuditLog : Migration
     {

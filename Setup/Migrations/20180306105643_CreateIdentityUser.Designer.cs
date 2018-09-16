@@ -6,10 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SensateService.Infrastructure.Sql;
 using System;
 
-namespace SensateService.Migrations
+namespace SensateService.Setup.Migrations
 {
     [DbContext(typeof(SensateSqlContext))]
     [Migration("20180306105643_CreateIdentityUser")]

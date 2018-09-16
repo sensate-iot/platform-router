@@ -35,7 +35,8 @@ namespace SensateService.Infrastructure.Sql
 				Route = route,
 				Method = method,
 				Address = address,
-				Timestamp = DateTime.Now
+				Timestamp = DateTime.Now,
+				Id = 0L
 			};
 
 			this.Create(al);
@@ -59,7 +60,8 @@ namespace SensateService.Infrastructure.Sql
 				Route = route,
 				Method = method,
 				Address = address,
-				Timestamp = DateTime.Now
+				Timestamp = DateTime.Now,
+				Id = 0L
 			};
 
 			await this.CreateAsync(al).AwaitSafely();
@@ -67,7 +69,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public override async Task CreateAsync(AuditLog obj)
 		{
-			this.Data.Add(obj);
+			var entry = this.Data.Add(obj);
 			await this.CommitAsync(obj).AwaitSafely();
 		}
 
@@ -126,7 +128,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public IEnumerable<AuditLog> GetByUser(SensateUser user)
 		{
-			var al = from log in this.Data
+			var al = from log in this.Data.AsQueryable()
 					 where log.Author == user
 					 select log;
 			return al;

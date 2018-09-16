@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 
-namespace SensateService.Migrations
+namespace SensateService.Setup.Migrations
 {
     public partial class AddRemoteAddressToAuditLog : Migration
     {

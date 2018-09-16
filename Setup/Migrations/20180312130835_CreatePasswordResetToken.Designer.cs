@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
-using SensateService.Enums;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SensateService.Infrastructure.Sql;
 using System;
 
-namespace SensateService.Migrations
+namespace SensateService.Setup.Migrations
 {
     [DbContext(typeof(SensateSqlContext))]
-    [Migration("20180324232304_AddMethodToAuditLog")]
-    partial class AddMethodToAuditLog
+    [Migration("20180312130835_CreatePasswordResetToken")]
+    partial class CreatePasswordResetToken
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -113,8 +113,6 @@ namespace SensateService.Migrations
 
                     b.Property<string>("AuthorId");
 
-                    b.Property<int>("Method");
-
                     b.Property<string>("Route")
                         .IsRequired();
 
@@ -127,20 +125,6 @@ namespace SensateService.Migrations
                     b.ToTable("AuditLogs");
                 });
 
-            modelBuilder.Entity("SensateService.Models.ChangeEmailToken", b =>
-                {
-                    b.Property<string>("IdentityToken")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Email");
-
-                    b.Property<string>("UserToken");
-
-                    b.HasKey("IdentityToken");
-
-                    b.ToTable("ChangeEmailTokens");
-                });
-
             modelBuilder.Entity("SensateService.Models.PasswordResetToken", b =>
                 {
                     b.Property<string>("UserToken")
@@ -151,6 +135,31 @@ namespace SensateService.Migrations
                     b.HasKey("UserToken");
 
                     b.ToTable("PasswordResetTokens");
+                });
+
+            modelBuilder.Entity("SensateService.Models.SensateRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken();
+
+                    b.Property<string>("Description");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256);
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasName("RoleNameIndex");
+
+                    b.ToTable("AspNetRoles");
                 });
 
             modelBuilder.Entity("SensateService.Models.SensateUser", b =>
@@ -207,53 +216,9 @@ namespace SensateService.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("SensateService.Models.UserRole", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken();
-
-                    b.Property<string>("Description");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(256);
-
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(256);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasName("RoleNameIndex");
-
-                    b.ToTable("AspNetRoles");
-                });
-
-            modelBuilder.Entity("SensateService.Models.UserToken", b =>
-                {
-                    b.Property<string>("UserId");
-
-                    b.Property<string>("Value");
-
-                    b.Property<DateTime>("CreatedAt");
-
-                    b.Property<DateTime>("ExpiresAt");
-
-                    b.Property<string>("LoginProvider");
-
-                    b.Property<bool>("Valid");
-
-                    b.HasKey("UserId", "Value");
-
-                    b.ToTable("AspNetAuthTokens");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
-                    b.HasOne("SensateService.Models.UserRole")
+                    b.HasOne("SensateService.Models.SensateRole")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -277,7 +242,7 @@ namespace SensateService.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.HasOne("SensateService.Models.UserRole")
+                    b.HasOne("SensateService.Models.SensateRole")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -301,14 +266,6 @@ namespace SensateService.Migrations
                     b.HasOne("SensateService.Models.SensateUser", "Author")
                         .WithMany()
                         .HasForeignKey("AuthorId");
-                });
-
-            modelBuilder.Entity("SensateService.Models.UserToken", b =>
-                {
-                    b.HasOne("SensateService.Models.SensateUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SensateService.Migrations
+namespace SensateService.Setup.Migrations
 {
     public partial class AddSensateUserToken : Migration
     {

@@ -5,14 +5,16 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using SensateService.Enums;
 using SensateService.Infrastructure.Sql;
 using System;
 
-namespace SensateService.Migrations
+namespace SensateService.Setup.Migrations
 {
     [DbContext(typeof(SensateSqlContext))]
-    [Migration("20180321094920_AlterSensateUserTokenTableName")]
-    partial class AlterSensateUserTokenTableName
+    [Migration("20180324232847_RenameAuditLogToAspNetAuditLogs")]
+    partial class RenameAuditLogToAspNetAuditLogs
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -112,6 +114,8 @@ namespace SensateService.Migrations
 
                     b.Property<string>("AuthorId");
 
+                    b.Property<int>("Method");
+
                     b.Property<string>("Route")
                         .IsRequired();
 
@@ -121,7 +125,7 @@ namespace SensateService.Migrations
 
                     b.HasIndex("AuthorId");
 
-                    b.ToTable("AuditLogs");
+                    b.ToTable("AspNetAuditLogs");
                 });
 
             modelBuilder.Entity("SensateService.Models.ChangeEmailToken", b =>
@@ -148,31 +152,6 @@ namespace SensateService.Migrations
                     b.HasKey("UserToken");
 
                     b.ToTable("PasswordResetTokens");
-                });
-
-            modelBuilder.Entity("SensateService.Models.SensateRole", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken();
-
-                    b.Property<string>("Description");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(256);
-
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(256);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasName("RoleNameIndex");
-
-                    b.ToTable("AspNetRoles");
                 });
 
             modelBuilder.Entity("SensateService.Models.SensateUser", b =>
@@ -229,7 +208,32 @@ namespace SensateService.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("SensateService.Models.SensateUserToken", b =>
+            modelBuilder.Entity("SensateService.Models.UserRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken();
+
+                    b.Property<string>("Description");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256);
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasName("RoleNameIndex");
+
+                    b.ToTable("AspNetRoles");
+                });
+
+            modelBuilder.Entity("SensateService.Models.UserToken", b =>
                 {
                     b.Property<string>("UserId");
 
@@ -250,7 +254,7 @@ namespace SensateService.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
-                    b.HasOne("SensateService.Models.SensateRole")
+                    b.HasOne("SensateService.Models.UserRole")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -274,7 +278,7 @@ namespace SensateService.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.HasOne("SensateService.Models.SensateRole")
+                    b.HasOne("SensateService.Models.UserRole")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -300,7 +304,7 @@ namespace SensateService.Migrations
                         .HasForeignKey("AuthorId");
                 });
 
-            modelBuilder.Entity("SensateService.Models.SensateUserToken", b =>
+            modelBuilder.Entity("SensateService.Models.UserToken", b =>
                 {
                     b.HasOne("SensateService.Models.SensateUser", "User")
                         .WithMany()

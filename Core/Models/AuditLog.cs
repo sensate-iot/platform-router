@@ -11,6 +11,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 using SensateService.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace SensateService.Models
 {
@@ -29,5 +30,16 @@ namespace SensateService.Models
 		[ForeignKey("AuthorId")]
 		public SensateUser Author { get; set; }
 		public DateTime Timestamp { get; set; }
+
+		protected virtual void OnModelCreating(ModelBuilder builder)
+		{
+			builder.HasSequence<long>("Id")
+				.StartsAt(0)
+				.IncrementsBy(1);
+
+			builder.Entity<AuditLog>()
+				.Property(e => e.Id)
+				.HasDefaultValueSql("nextval('\"Id\"')");
+		}
 	}
 }

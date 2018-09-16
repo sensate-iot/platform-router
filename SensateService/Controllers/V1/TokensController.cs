@@ -85,16 +85,12 @@ namespace SensateService.Controllers.V1
 				return new UnauthorizedResult();
 			}
 
-
 			token = this.CreateUserTokenEntry(user);
-
-			var tasks = new[] {
-                this._audit_log.CreateAsync(
-                    this.GetCurrentRoute(), RequestMethod.HttpPost,
-                    GetRemoteAddress(), user
-                ),
-                this._tokens.CreateAsync(token)
-			};
+			await this._audit_log.CreateAsync(
+				this.GetCurrentRoute(), RequestMethod.HttpPost,
+				GetRemoteAddress(), user
+			);
+			await this._tokens.CreateAsync(token);
 
 			var roles = this._users.GetRoles(user);
 			var reply = new TokenRequestReply {
@@ -104,7 +100,6 @@ namespace SensateService.Controllers.V1
 				JwtExpiresInMinutes = this._settings.JwtExpireMinutes
 			};
 
-			await Task.WhenAll(tasks).AwaitSafely();
 			return new OkObjectResult(reply);
 		}
 
@@ -158,7 +153,7 @@ namespace SensateService.Controllers.V1
 		[HttpDelete("{token}", Name = "RevokeToken")]
 		[NormalUser]
 		[ProducesResponseType(typeof(Status), 404)]
-		[SwaggerResponse(200)]
+		[ProducesResponseType(200)]
 		public async Task<IActionResult> Revoke(string token)
 		{
 			UserToken authToken;
@@ -193,7 +188,7 @@ namespace SensateService.Controllers.V1
 
 		[HttpDelete(Name = "RevokeAll")]
 		[NormalUser]
-		[SwaggerResponse(200)]
+		[ProducesResponseType(200)]
 		public async Task<IActionResult> RevokeAll()
 		{
 			IEnumerable<UserToken> tokens;

@@ -17,8 +17,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Hosting;
 
-using Swashbuckle.AspNetCore.SwaggerGen;
-
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
@@ -71,8 +69,8 @@ namespace SensateService.Controllers.V1
 
 		[HttpPost("forgot-password")]
 		[ValidateModel]
-		[SwaggerResponse(200)]
-		[SwaggerResponse(404)]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(204)]
 		public async Task<IActionResult> ForgotPassword([FromBody] ForgotPassword model)
 		{
 			SensateUser user;
@@ -122,8 +120,8 @@ namespace SensateService.Controllers.V1
 		}
 
 		[HttpPost("reset-password")]
-		[SwaggerResponse(200)]
-		[SwaggerResponse(404)]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(204)]
 		[ValidateModel]
 		public async Task<IActionResult> Resetpassword([FromBody] ResetPassword model)
 		{
@@ -154,8 +152,8 @@ namespace SensateService.Controllers.V1
 		[HttpPost("confirm-update-email")]
 		[NormalUser]
 		[ValidateModel]
-		[SwaggerResponse(200)]
-		[SwaggerResponse(400)]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(400)]
 		public async Task<IActionResult> ConfirmChangeEmail([FromBody] ConfirmUpdateEmail changeEmail)
 		{
 			ChangeEmailToken token;
@@ -195,8 +193,8 @@ namespace SensateService.Controllers.V1
 
 		[HttpPost("update-email")]
 		[ValidateModel]
-		[SwaggerResponse(200)]
-		[SwaggerResponse(400)]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(400)]
 		[NormalUser]
 		public async Task<IActionResult> UpdateEmail([FromBody] UpdateEmail changeEmailModel)
 		{
@@ -266,8 +264,8 @@ namespace SensateService.Controllers.V1
 
 		[HttpPost("register")]
 		[ValidateModel]
-		[SwaggerResponse(200)]
-		[SwaggerResponse(400)]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(400)]
 		public async Task<object> Register([FromBody] Register register)
 		{
 			EmailBody mail;
@@ -310,7 +308,7 @@ namespace SensateService.Controllers.V1
 		}
 
 		[HttpGet("show/{uid}")]
-		[SwaggerResponse(404)]
+		[ProducesResponseType(404)]
 		[ProducesResponseType(typeof(User), 200)]
 		[AdministratorUser]
 		public async Task<IActionResult> Show(string uid)
@@ -334,7 +332,7 @@ namespace SensateService.Controllers.V1
 		}
 
 		[HttpGet("show")]
-		[SwaggerResponse(404)]
+		[ProducesResponseType(404)]
 		[ProducesResponseType(typeof(User), 200)]
 		[NormalUser]
 		public async Task<IActionResult> Show()
@@ -356,8 +354,8 @@ namespace SensateService.Controllers.V1
 		}
 
 		[HttpGet("confirm/{id}/{code}")]
-		[SwaggerResponse(200)]
-		[SwaggerResponse(404)]
+		[ProducesResponseType(404)]
+		[ProducesResponseType(200)]
 		public async Task<IActionResult> ConfirmEmail(string id, string code, [FromQuery(Name = "target")] string target)
 		{
 			SensateUser user;
@@ -394,8 +392,8 @@ namespace SensateService.Controllers.V1
 		[NormalUser]
 		[HttpPatch("update")]
 		[ProducesResponseType(typeof(Status), 400)]
-		[SwaggerResponse(200)]
-		[SwaggerResponse(404)]
+		[ProducesResponseType(404)]
+		[ProducesResponseType(200)]
 		public async Task<IActionResult> UpdateUser([FromBody] UpdateUser userUpdate)
 		{
 			var user = this.CurrentUser;

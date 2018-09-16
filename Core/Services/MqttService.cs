@@ -56,7 +56,10 @@ namespace SensateService.Services
 				.WithCleanSession();
 
 			if(this.options.Ssl)
-				builder.WithTls(true);
+				builder.WithTls(new MqttClientOptionsBuilderTlsParameters {
+					AllowUntrustedCertificates = true,
+					UseTls = true
+				});
 
 			if(this.options.Username != null)
 				builder.WithCredentials(this.options.Username, this.options.Password);

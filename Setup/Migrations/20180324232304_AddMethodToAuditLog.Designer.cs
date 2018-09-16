@@ -5,16 +5,16 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SensateService.Enums;
 using SensateService.Infrastructure.Sql;
 using System;
-using System.Net;
 
-namespace SensateService.Migrations
+namespace SensateService.Setup.Migrations
 {
     [DbContext(typeof(SensateSqlContext))]
-    [Migration("20180325192036_AddRemoteAddressToAuditLog")]
-    partial class AddRemoteAddressToAuditLog
+    [Migration("20180324232304_AddMethodToAuditLog")]
+    partial class AddMethodToAuditLog
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -112,9 +112,6 @@ namespace SensateService.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<IPAddress>("Address")
-                        .IsRequired();
-
                     b.Property<string>("AuthorId");
 
                     b.Property<int>("Method");
@@ -128,7 +125,7 @@ namespace SensateService.Migrations
 
                     b.HasIndex("AuthorId");
 
-                    b.ToTable("AspNetAuditLogs");
+                    b.ToTable("AuditLogs");
                 });
 
             modelBuilder.Entity("SensateService.Models.ChangeEmailToken", b =>
