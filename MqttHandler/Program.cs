@@ -16,7 +16,7 @@ namespace SensateService.Mqtt
         {
             IServiceCollection services;
 
-            Console.WriteLine($"Starting SensateService.Mqtt using {Version.VersionString}");
+            Console.WriteLine($"Starting Sensate MQTT client Sensate CORE {Version.VersionString}");
             services = new ServiceCollection();
             var starter = new Startup();
             starter.ConfigureServices(services);

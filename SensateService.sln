@@ -4,11 +4,11 @@ VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateService", "SensateService\SensateService.csproj", "{C41C96C6-18AD-4801-8DFF-D3BE09522517}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateService.Tests", "SensateService.Tests\SensateService.Tests.csproj", "{3744E1B4-181C-4634-BD13-ECF68842034C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{3744E1B4-181C-4634-BD13-ECF68842034C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateService.Core", "Core\SensateService.Core.csproj", "{C9A2C1FE-9179-45B9-ABDE-3336DD80A60B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{C9A2C1FE-9179-45B9-ABDE-3336DD80A60B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateService.Mqtt", "Mqtt\SensateService.Mqtt.csproj", "{8D55A3E7-8E0E-4ABB-ADEA-FFD157E9D095}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MqttHandler", "MqttHandler\MqttHandler.csproj", "{8D55A3E7-8E0E-4ABB-ADEA-FFD157E9D095}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Setup", "Setup\Setup.csproj", "{AE713298-9C5F-483D-B4BE-D335BA63B0A2}"
 EndProject
