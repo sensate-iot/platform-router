@@ -40,7 +40,6 @@ namespace SensateService.Controllers.V1
 		private readonly IHostingEnvironment _env;
 		private readonly IAuditLogRepository _audit_logs;
 		private readonly IUserTokenRepository _tokens;
-		private readonly UserAccountSettings _settings;
 
 		private const string PhoneNumberRegex = "[^0-9]";
 
@@ -48,7 +47,6 @@ namespace SensateService.Controllers.V1
 			IUserRepository repo,
 			SignInManager<SensateUser> manager,
 			UserManager<SensateUser> userManager,
-			IOptions<UserAccountSettings> options,
 			IEmailSender emailer,
 			IPasswordResetTokenRepository tokens,
 			IChangeEmailTokenRepository emailTokens,
@@ -64,7 +62,6 @@ namespace SensateService.Controllers.V1
 			this._env = env;
 			this._audit_logs = auditLogs;
 			this._tokens = tokenRepository;
-			this._settings = options.Value;
 		}
 
 		[HttpPost("forgot-password")]

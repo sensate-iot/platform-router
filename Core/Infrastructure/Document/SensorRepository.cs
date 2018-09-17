@@ -36,15 +36,6 @@ namespace SensateService.Infrastructure.Document
 			this._stats = statisticsRepository;
 		}
 
-		public override void Commit(Sensor obj)
-		{
-		}
-
-		public override Task CommitAsync(Sensor obj)
-		{
-			return Task.CompletedTask;
-		}
-
 		public override void Create(Sensor obj)
 		{
 			DateTime now;
@@ -54,7 +45,6 @@ namespace SensateService.Infrastructure.Document
 			obj.UpdatedAt = now;
 			obj.InternalId = base.GenerateId(now);
 			this._sensors.InsertOne(obj);
-			this.Commit(obj);
 		}
 
 		public override async Task CreateAsync(Sensor sensor)

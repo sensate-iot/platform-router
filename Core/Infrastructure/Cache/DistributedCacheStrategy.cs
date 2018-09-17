@@ -28,7 +28,7 @@ namespace SensateService.Infrastructure.Cache
 			return this._cache.GetString(key);
 		}
 
-		public override async Task<string> GetAsync(string key, default(CancellationToken))
+		public override async Task<string> GetAsync(string key, CancellationToken ct = default(CancellationToken))
 		{
 			return await this._cache.GetStringAsync(key, ct).AwaitSafely();
 		}

@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using System.Linq.Expressions;
 
 using SensateService.Models;
-using Newtonsoft.Json.Linq;
 using SensateService.Models.Json.In;
 
 namespace SensateService.Infrastructure.Repositories
@@ -37,8 +36,8 @@ namespace SensateService.Infrastructure.Repositories
 		void DeleteBetween(Sensor sensor, DateTime start, DateTime end);
 		Task DeleteBetweenAsync(Sensor sensor, DateTime start, DateTime end);
 
-		void Create(Measurement m);
-		Task CreateAsync(Measurement m);
 		Task ReceiveMeasurement(Sensor sender, RawMeasurement measurement);
+		void Commit(Measurement obj);
+		Task CommitAsync(Measurement obj);
 	}
 }

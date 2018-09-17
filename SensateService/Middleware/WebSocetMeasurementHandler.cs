@@ -19,7 +19,6 @@ using SensateService.Exceptions;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
-using SensateService.Infrastructure.Events;
 using SensateService.Models.Json.In;
 
 namespace SensateService.Middleware

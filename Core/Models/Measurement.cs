@@ -10,10 +10,8 @@ using System.Collections.Generic;
 
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
 using SensateService.Converters;
 
 namespace SensateService.Models
@@ -44,18 +42,23 @@ namespace SensateService.Models
 			return JsonConvert.SerializeObject(this);
 		}
 
-		public static bool TryParseData(JToken obj, out IEnumerable<DataPoint> result)
+		public static bool TryParseData(JToken data, out IEnumerable<DataPoint> output)
 		{
-			IEnumerable<DataPoint> dataPoints;
+			IEnumerable<DataPoint> datapoints;
 
-			try {
-				dataPoints = obj.ToObject<IEnumerable<DataPoint>>();
-			} catch(JsonSerializationException) {
-				result = null;
+			if(data == null) {
+				output = null;
 				return false;
 			}
 
-			result = dataPoints;
+			try {
+				datapoints = data.ToObject<IEnumerable<DataPoint>>();
+			} catch(JsonSerializationException) {
+				output = null;
+				return false;
+			}
+
+			output = datapoints;
 			return true;
 		}
 	}

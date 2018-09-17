@@ -5,6 +5,7 @@
  * @email:  dev@bietje.net
  */
 
+using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
@@ -13,15 +14,13 @@ using Newtonsoft.Json;
 using SensateService.Infrastructure.Cache;
 using SensateService.Models;
 using SensateService.Infrastructure.Repositories;
+using SensateService.Helpers;
 
 namespace SensateService.Infrastructure.Document
 {
 	public class CachedSensorRepository : SensorRepository
 	{
-		private ICacheStrategy<string> _cache;
-
-		public const int CacheTimeout = 10;
-		public const int CacheTimeoutShort = 1;
+		private readonly ICacheStrategy<string> _cache;
 
 		public CachedSensorRepository(
 			SensateContext context,
@@ -33,7 +32,7 @@ namespace SensateService.Infrastructure.Document
 			this._cache = cache;
 		}
 
-		public override void Commit(Sensor obj)
+		private void Commit(Sensor obj)
 		{
 			this._cache.Set(obj.InternalId.ToString(), obj.ToJson());
 		}

@@ -17,9 +17,6 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MongoDB.Bson;
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
 using SensateService.Infrastructure.Events;
 using SensateService.Models;
 using SensateService.Exceptions;
@@ -52,16 +49,6 @@ namespace SensateService.Infrastructure.Document
 				internalId = ObjectId.Empty;
 
 			return internalId;
-		}
-
-		public override void Commit(Measurement obj)
-		{
-			return;
-		}
-
-		public async override Task CommitAsync(Measurement obj)
-		{
-			await Task.CompletedTask;
 		}
 
 		public override void Update(Measurement obj)
@@ -289,7 +276,7 @@ namespace SensateService.Infrastructure.Document
 			m.CreatedAt = DateTime.Now;
 			m.InternalId = this.GenerateId(DateTime.Now);
 			this._measurements.InsertOne(m);
-			this.Commit(m);
+			this.Create(m);
 		}
 
 		public async override Task CreateAsync(Measurement obj)
@@ -300,7 +287,7 @@ namespace SensateService.Infrastructure.Document
 			obj.CreatedAt = DateTime.Now;
 			obj.InternalId = this.GenerateId(DateTime.Now);
 			await this._measurements.InsertOneAsync(obj);
-			await this.CommitAsync(obj);
+			await this.CreateAsync(obj);
 		}
 
 		private async Task<Measurement> StoreMeasurement(Sensor sensor, RawMeasurement raw)
@@ -312,13 +299,6 @@ namespace SensateService.Infrastructure.Document
 			if(sensor == null || raw == null)
 				return null;
 
-			if(!raw.CreatedBy(sensor)) {
-				throw new InvalidRequestException(
-					ErrorCode.IncorrectSecretError.ToInt(),
-					"Sensor secret doesn't match sensor ID!"
-				);
-			}
-
 			now = DateTime.Now;
 			m = new Measurement();
 
@@ -326,13 +306,14 @@ namespace SensateService.Infrastructure.Document
 				raw.CreatedAt = now;
 
 			try {
-				m.CreatedAt = raw.CreatedAt;
+				m.CreatedAt = raw.CreatedAt.Value;
 				m.CreatedBy = sensor.InternalId;
 				m.Latitude = raw.Latitude;
 				m.Longitude = raw.Longitude;
 				m.InternalId = base.GenerateId(now);
+				data = new List<DataPoint>();
 
-				if(Measurement.TryParseData(raw.Data, out data)) {
+				if(raw.TryParseData(out data)) {
 					m.Data = data;
 				} else {
 					throw new InvalidRequestException(
@@ -346,7 +327,7 @@ namespace SensateService.Infrastructure.Document
 				};
 
 				await this._measurements.InsertOneAsync(m, options, CancellationToken.None);
-				await this.CommitAsync(m);
+				await this.CreateAsync(m);
 			} catch(InvalidRequestException ex) {
 				this._logger.LogWarning(ex.Message);
 				return null;
@@ -438,6 +419,15 @@ namespace SensateService.Infrastructure.Document
 		public virtual async Task<Measurement> GetMeasurementAsync(string key, Expression<Func<Measurement, bool>> selector)
 		{
 			return await this.TryGetMeasurementAsync(key, selector);
+		}
+
+		public virtual void Commit(Measurement obj)
+		{
+		}
+
+		public virtual async Task CommitAsync(Measurement obj)
+		{
+			await Task.CompletedTask;
 		}
 	}
 }

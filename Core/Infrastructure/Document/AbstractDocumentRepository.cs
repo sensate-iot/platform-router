@@ -16,24 +16,20 @@ namespace SensateService.Infrastructure.Document
 	{
 		private readonly SensateContext context;
 
-		public AbstractDocumentRepository(SensateContext context)
+		protected AbstractDocumentRepository(SensateContext context)
 		{
 			this.context = context;
 		}
 
-		public abstract void Commit(T obj);
-		public abstract Task CommitAsync(T obj);
 		public abstract void Create(T obj);
 		public abstract T GetById(TKey id);
 
-		protected virtual ObjectId GenerateId(DateTime ts)
+		protected ObjectId GenerateId(DateTime? ts)
 		{
-			return ObjectId.GenerateNewId(ts);
-		}
+			DateTime timestamp;
 
-		protected virtual ObjectId GenerateId()
-		{
-			return this.GenerateId(DateTime.Now);
+			timestamp = ts ?? DateTime.Now;
+			return ObjectId.GenerateNewId(timestamp);
 		}
 
 		public abstract Task CreateAsync(T obj);

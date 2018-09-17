@@ -6,9 +6,8 @@
  */
 
 using System;
-using System.Collections.Immutable;
-using System.Text;
 using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -157,6 +156,7 @@ namespace SensateService
 			services.AddMvc();
 		}
 
+		// ReSharper disable once UnusedMember.Global
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider sp, ILoggerFactory logger)
 		{
 			app.UseCors(p => {

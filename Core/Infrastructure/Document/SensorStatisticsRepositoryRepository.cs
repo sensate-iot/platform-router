@@ -173,6 +173,7 @@ namespace SensateService.Infrastructure.Document
 		{
 			throw new InvalidOperationException("SensorStatisticsRepository.Update is an invalid operation!");
 		}
+
 #endregion
 	}
 }

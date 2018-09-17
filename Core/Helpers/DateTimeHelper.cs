@@ -15,5 +15,13 @@ namespace SensateService.Helpers
 		{
 			return time.CompareTo(DateTime.MinValue) <= 0;
 		}
+
+		public static bool IsNever(this DateTime? time)
+		{
+			if(!time.HasValue)
+				return false;
+
+			return time.Value.CompareTo(DateTime.MinValue) <= 0;
+		}
 	}
 }
