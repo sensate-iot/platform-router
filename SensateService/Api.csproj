@@ -4,8 +4,10 @@
     <UserSecretsId>SensateService</UserSecretsId>
     <Authors>Michel Megens</Authors>
     <Copyright>Michel Megens &lt;dev@bietje.net&gt;</Copyright>
-    <Version>0.0.1</Version>
+    <Version>0.0.3</Version>
     <ServerGarbageCollection>true</ServerGarbageCollection>
+    <RootNamespace>SensateService.Api</RootNamespace>
+    <AssemblyName>Api</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <None Update="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
@@ -31,6 +33,6 @@
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Core\SensateService.Core.csproj" />
+    <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
 </Project>
