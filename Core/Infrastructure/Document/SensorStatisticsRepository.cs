@@ -19,12 +19,12 @@ using SensateService.Models;
 
 namespace SensateService.Infrastructure.Document
 {
-	public class SensorStatisticsRepositoryRepository : AbstractDocumentRepository<string, SensorStatisticsEntry>, ISensorStatisticsRepository
+	public class SensorStatisticsRepository : AbstractDocumentRepository<string, SensorStatisticsEntry>, ISensorStatisticsRepository
 	{
-		private readonly ILogger<SensorStatisticsRepositoryRepository> _logger;
+		private readonly ILogger<SensorStatisticsRepository> _logger;
 		private readonly IMongoCollection<SensorStatisticsEntry> _stats;
 
-		public SensorStatisticsRepositoryRepository(SensateContext context, ILogger<SensorStatisticsRepositoryRepository> logger) : base(context)
+		public SensorStatisticsRepository(SensateContext context, ILogger<SensorStatisticsRepository> logger) : base(context)
 		{
 			this._logger = logger;
 			this._stats = context.Statistics;
