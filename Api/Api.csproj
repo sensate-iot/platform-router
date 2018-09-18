@@ -7,7 +7,7 @@
     <Version>0.0.3</Version>
     <ServerGarbageCollection>true</ServerGarbageCollection>
     <RootNamespace>SensateService.Api</RootNamespace>
-    <AssemblyName>Api</AssemblyName>
+    <AssemblyName>SensateService.Api</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <None Update="appsettings.json" CopyToOutputDirectory="PreserveNewest" />

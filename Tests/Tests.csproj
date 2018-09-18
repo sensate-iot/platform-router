@@ -2,6 +2,8 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <IsPackable>false</IsPackable>
+    <AssemblyName>SensateService.Tests</AssemblyName>
+    <RootNamespace>SensateService.Tests</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="moq" Version="4.10.0" />

@@ -5,6 +5,7 @@
     <UserSecretsId>SensateService</UserSecretsId>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <RootNamespace>SensateService.Setup</RootNamespace>
+    <AssemblyName>SensateService.Setup</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <None Update="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
