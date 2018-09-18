@@ -20,6 +20,7 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <ServerGarbageCollection>true</ServerGarbageCollection>
     <SignAssembly>false</SignAssembly>
+    <RootNamespace>SensateService.MqttHandler</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>TRACE</DefineConstants>

@@ -33,7 +33,7 @@ namespace SensateService.Init
 
 			foreach(var etype in Assembly.GetEntryAssembly().ExportedTypes) {
 				if(etype.GetTypeInfo().BaseType == typeof(MqttHandler))
-					service.AddScoped(etype);
+					service.AddSingleton(etype);
 			}
 
 			return service;

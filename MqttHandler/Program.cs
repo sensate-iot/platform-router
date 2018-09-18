@@ -8,7 +8,7 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SensateService.Mqtt
+namespace SensateService.MqttHandler
 {
     public class Program
     {

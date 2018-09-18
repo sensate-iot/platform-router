@@ -13,15 +13,15 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 using SensateService.Enums;
+using SensateService.Helpers;
+using SensateService.Infrastructure.Events;
 using SensateService.Infrastructure.Repositories;
-using SensateService.Middleware;
 using SensateService.Models;
 using SensateService.Models.Json.In;
-using SensateService.Helpers;
 
-namespace SensateService
+namespace SensateService.MqttHandler
 {
-	public class MqttMeasurementHandler : MqttHandler
+	public class MqttMeasurementHandler : Middleware.MqttHandler
 	{
 		private readonly ISensorRepository sensors;
 		private readonly IMeasurementRepository measurements;
@@ -40,6 +40,28 @@ namespace SensateService
 			this.auditlogs = auditlogs;
 			this.users = users;
 			this.stats = stats;
+
+			MeasurementEvents.MeasurementReceived += this.MeasurementReceived_Handler;
+		}
+
+		private async Task MeasurementReceived_Handler(object sender, MeasurementReceivedEventArgs e)
+		{
+			SensateUser user;
+			AuditLog log;
+
+			if(!(sender is Sensor sensor))
+				return;
+
+			user = this.users.Get(sensor.Owner);
+			log = new AuditLog {
+				Address = IPAddress.Any,
+				Method = RequestMethod.MqttTcp,
+				Route = "NA",
+				Timestamp = DateTime.Now,
+				Author = user
+			};
+
+			await this.auditlogs.CreateAsync(log);
 		}
 
 		public override void OnMessage(string topic, string msg)
@@ -54,7 +76,6 @@ namespace SensateService
 		{
 			Sensor sensor;
 			RawMeasurement raw;
-			AuditLog log;
 			Task[] tasks;
 
 			try {
@@ -63,21 +84,11 @@ namespace SensateService
 				if(raw.CreatedById == null)
 					return;
 
-				tasks = new Task[3];
+				tasks = new Task[2];
 				sensor = await this.sensors.GetAsync(raw.CreatedById).AwaitSafely();
 				tasks[0] = this.measurements.ReceiveMeasurement(sensor, raw);
+				tasks[1] = this.stats.IncrementAsync(sensor);
 
-				var user = this.users.Get(sensor.Owner);
-				log = new AuditLog {
-					Address = IPAddress.Any,
-					Method = RequestMethod.MqttTcp,
-					Route = topic,
-					Timestamp = DateTime.Now,
-					Author = user
-				};
-
-				tasks[1] = this.auditlogs.CreateAsync(log);
-				tasks[2] = this.stats.IncrementAsync(sensor);
 				await Task.WhenAll(tasks).AwaitSafely();
 			} catch(Exception ex) {
 				Debug.WriteLine($"Error: {ex.Message}");

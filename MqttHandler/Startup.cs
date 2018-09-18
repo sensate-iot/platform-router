@@ -6,21 +6,22 @@
  */
 
 using System;
-using System.Threading;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SensateService.Config;
+using SensateService.Infrastructure.Events;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
 using SensateService.Models;
 
-namespace SensateService.Mqtt
+namespace SensateService.MqttHandler
 {
 	public class Startup
 	{
@@ -115,8 +116,15 @@ namespace SensateService.Mqtt
 			var services = provider.GetServices<IHostedService>().ToList();
 
 			services.ForEach(x => x.StartAsync(CancellationToken.None));
+			MeasurementEvents.MeasurementReceived += this.MeasurementReceived;
 			Console.WriteLine("MQTT client started");
 			this._reset.WaitOne();
+		}
+
+		public async Task MeasurementReceived(object sender, MeasurementReceivedEventArgs e)
+		{
+			Console.WriteLine("Measurement received!");
+			await Task.CompletedTask;
 		}
 	}
 }
