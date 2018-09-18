@@ -91,8 +91,8 @@ namespace SensateService.MqttHandler
 
 				await Task.WhenAll(tasks).AwaitSafely();
 			} catch(Exception ex) {
-				Debug.WriteLine($"Error: {ex.Message}");
-				Debug.WriteLine($"Received a buggy MQTT message: {message}");
+				Console.WriteLine($"Error: {ex.Message}");
+				Console.WriteLine($"Received a buggy MQTT message: {message}");
 			}
 		}
 	}
