@@ -6,7 +6,6 @@
  */
 
 using System;
-using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -21,13 +20,15 @@ using SensateService.Models.Json.In;
 
 namespace SensateService.MqttHandler
 {
-	public class MqttMeasurementHandler : Middleware.MqttHandler
+	public class MqttMeasurementHandler : Middleware.MqttHandler, IDisposable
 	{
 		private readonly ISensorRepository sensors;
 		private readonly IMeasurementRepository measurements;
 		private readonly IAuditLogRepository auditlogs;
 		private readonly IUserRepository users;
 		private readonly ISensorStatisticsRepository stats;
+
+		private bool disposed;
 
 		public MqttMeasurementHandler(ISensorRepository sensors,
 									  IMeasurementRepository measurements,
@@ -41,27 +42,51 @@ namespace SensateService.MqttHandler
 			this.users = users;
 			this.stats = stats;
 
-			MeasurementEvents.MeasurementReceived += this.MeasurementReceived_Handler;
+			this.measurements.MeasurementReceived += this.MeasurementReceived_Handler;
+#if DEBUG
+			this.measurements.MeasurementReceived += this.MeasurementReceived_DebugHandler;
+#endif
+			this.disposed = false;
 		}
+
+#if DEBUG
+		public Task MeasurementReceived_DebugHandler(object sender, MeasurementReceivedEventArgs e)
+		{
+			if(!(sender is Sensor sensor))
+				return Task.CompletedTask;
+
+			Console.WriteLine($"Received measurement from {{{sensor.Name}}}:{{{sensor.InternalId}}}");
+			return Task.CompletedTask;
+		}
+#endif
 
 		private async Task MeasurementReceived_Handler(object sender, MeasurementReceivedEventArgs e)
 		{
 			SensateUser user;
 			AuditLog log;
 
+			if(this.disposed)
+				throw new ObjectDisposedException("MeasurementHandler");
+
 			if(!(sender is Sensor sensor))
 				return;
 
-			user = this.users.Get(sensor.Owner);
-			log = new AuditLog {
-				Address = IPAddress.Any,
-				Method = RequestMethod.MqttTcp,
-				Route = "NA",
-				Timestamp = DateTime.Now,
-				Author = user
-			};
+			try {
+				user = this.users.Get(sensor.Owner);
+				log = new AuditLog {
+					Address = IPAddress.Any,
+					Method = RequestMethod.MqttTcp,
+					Route = "NA",
+					Timestamp = DateTime.Now,
+					Author = user
+				};
 
-			await this.auditlogs.CreateAsync(log);
+				await this.auditlogs.CreateAsync(log);
+			} catch (Exception ex) {
+				Console.WriteLine(ex.Message);
+				Console.WriteLine("");
+				Console.WriteLine(ex.StackTrace);
+			}
 		}
 
 		public override void OnMessage(string topic, string msg)
@@ -76,7 +101,9 @@ namespace SensateService.MqttHandler
 		{
 			Sensor sensor;
 			RawMeasurement raw;
-			Task[] tasks;
+
+			if(this.disposed)
+				throw new ObjectDisposedException("MeasurementHandler");
 
 			try {
 				raw = JsonConvert.DeserializeObject<RawMeasurement>(message);
@@ -84,16 +111,35 @@ namespace SensateService.MqttHandler
 				if(raw.CreatedById == null)
 					return;
 
-				tasks = new Task[2];
 				sensor = await this.sensors.GetAsync(raw.CreatedById).AwaitSafely();
-				tasks[0] = this.measurements.ReceiveMeasurement(sensor, raw);
-				tasks[1] = this.stats.IncrementAsync(sensor);
+				await this.measurements.ReceiveMeasurementAsync(sensor, raw);
 
-				await Task.WhenAll(tasks).AwaitSafely();
+				await this.stats.IncrementAsync(sensor);
 			} catch(Exception ex) {
 				Console.WriteLine($"Error: {ex.Message}");
 				Console.WriteLine($"Received a buggy MQTT message: {message}");
 			}
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if(this.disposed)
+				return;
+
+			if(disposing) {
+#if DEBUG
+				this.measurements.MeasurementReceived -= this.MeasurementReceived_DebugHandler;
+#endif
+				this.measurements.MeasurementReceived -= this.MeasurementReceived_Handler;
+			}
+
+			this.disposed = true;
+		}
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
 		}
 	}
 }

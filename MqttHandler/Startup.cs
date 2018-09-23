@@ -7,16 +7,16 @@
 
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
+using System.Linq;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+
 using SensateService.Config;
-using SensateService.Infrastructure.Events;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
 using SensateService.Models;
@@ -50,7 +50,7 @@ namespace SensateService.MqttHandler
 		private static bool IsDevelopment()
 		{
 			var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
-			return env == "Development";
+			return env != "Development";
 		}
 
 		private void CancelEvent_Handler(object sender, ConsoleCancelEventArgs e)
@@ -116,15 +116,15 @@ namespace SensateService.MqttHandler
 			var services = provider.GetServices<IHostedService>().ToList();
 
 			services.ForEach(x => x.StartAsync(CancellationToken.None));
-			MeasurementEvents.MeasurementReceived += this.MeasurementReceived;
 			Console.WriteLine("MQTT client started");
-			this._reset.WaitOne();
-		}
 
-		public async Task MeasurementReceived(object sender, MeasurementReceivedEventArgs e)
-		{
-			Console.WriteLine("Measurement received!");
-			await Task.CompletedTask;
+			while(true) {
+				GC.Collect();
+
+				if(this._reset.WaitOne(8000)) {
+					break;
+				}
+			}
 		}
 	}
 }
