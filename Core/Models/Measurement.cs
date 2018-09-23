@@ -16,6 +16,7 @@ using SensateService.Converters;
 
 namespace SensateService.Models
 {
+	[BsonSerializer(typeof(BsonMeasurementSerializer))]
 	public class Measurement
 	{
 		[BsonId, BsonRequired, JsonConverter(typeof(ObjectIdJsonConverter))]

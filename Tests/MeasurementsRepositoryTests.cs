@@ -93,7 +93,7 @@ namespace SensateService.Tests
 		{
 			Measurement m;
 
-			m = await this._repo.GetMeasurementAsync(null, x => x.CreatedBy == this._sensor.InternalId);
+			m = await this._repo.GetMeasurementAsync(x => x.CreatedBy == this._sensor.InternalId);
 			var list = m.Data as List<DataPoint>;
 
 			Assert.True(list[0].Name == "z");
@@ -137,7 +137,7 @@ namespace SensateService.Tests
 				Data = array
 			};
 
-			await this._repo.ReceiveMeasurement(_sensor, m);
+			await this._repo.ReceiveMeasurementAsync(_sensor, m);
 			Assert.IsTrue(this._receivedMeasurement != null);
 		}
 	}

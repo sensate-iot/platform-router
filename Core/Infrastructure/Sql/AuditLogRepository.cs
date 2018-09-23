@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Net;
-
+using System.Threading;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Exceptions;
@@ -67,10 +67,15 @@ namespace SensateService.Infrastructure.Sql
 			await this.CreateAsync(al).AwaitSafely();
 		}
 
+		public async Task CreateAsync(AuditLog obj, CancellationToken ct)
+		{
+			this.Data.Add(obj);
+			await this.CommitAsync(obj, ct).AwaitSafely();
+		}
+
 		public override async Task CreateAsync(AuditLog obj)
 		{
-			var entry = this.Data.Add(obj);
-			await this.CommitAsync(obj).AwaitSafely();
+			await this.CreateAsync(obj, default(CancellationToken));
 		}
 
 		public override void Delete(long id)
@@ -87,9 +92,9 @@ namespace SensateService.Infrastructure.Sql
 		{
 			AuditLog al;
 
-			al = (from log in this.Data.AsQueryable<AuditLog>()
+			al = (from log in this.Data.AsQueryable()
 				  where log.Id == id
-				  select log).Single<AuditLog>();
+				  select log).Single();
 			return al;
 		}
 

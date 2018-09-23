@@ -6,6 +6,8 @@
  */
 
 using System;
+using SensateService.Enums;
+using SensateService.Helpers;
 
 namespace SensateService.Exceptions
 {
@@ -37,5 +39,8 @@ namespace SensateService.Exceptions
 		{
 			this._error_code = error;
 		}
+
+		public InvalidRequestException(ErrorCode error, string msg) : this(error.ToInt(), msg)
+		{ }
 	}
 }

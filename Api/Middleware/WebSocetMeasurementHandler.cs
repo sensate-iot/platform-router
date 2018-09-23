@@ -64,7 +64,7 @@ namespace SensateService.Middleware
 					var users = scope.ServiceProvider.GetRequiredService<IUserRepository>();
 					var auditlogs = scope.ServiceProvider.GetRequiredService<IAuditLogRepository>();
                     var sensor = await this._sensors.GetAsync(id);
-                    tasks[0] = this._measurements.ReceiveMeasurement(sensor, raw);
+                    tasks[0] = this._measurements.ReceiveMeasurementAsync(sensor, raw);
 
 					var user = users.Get(sensor.Owner);
                     log = new AuditLog {

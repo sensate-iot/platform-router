@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 using SensateService.Enums;
@@ -32,6 +33,6 @@ namespace SensateService.Infrastructure.Repositories
 
 		void Create(string route, RequestMethod method, IPAddress address,  SensateUser user = null);
 		Task CreateAsync(string route, RequestMethod method, IPAddress address, SensateUser user = null);
-		Task CreateAsync(AuditLog log);
+		Task CreateAsync(AuditLog log, CancellationToken ct = default(CancellationToken));
     }
 }
