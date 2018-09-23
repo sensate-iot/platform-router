@@ -74,18 +74,11 @@ namespace SensateService.Tests
 			ctx = new SensateContext(settings);
 			var repo = new MeasurementRepository(ctx, logger);
 			this._repo = repo;
-			MeasurementEvents.MeasurementReceived += OnMeasurementReceived_Handler;
 		}
 
 		[TearDown]
 		public void TearDown()
 		{
-		}
-
-		private Task OnMeasurementReceived_Handler(object s, MeasurementReceivedEventArgs e)
-		{
-			this._receivedMeasurement = e.Measurement;
-			return Task.CompletedTask;
 		}
 
 		[Test, Order(2)]
