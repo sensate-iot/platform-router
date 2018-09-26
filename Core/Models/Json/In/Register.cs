@@ -14,7 +14,6 @@ namespace SensateService.Models.Json.In
 		[Required]
 		public string Email { get; set; }
 		[Required]
-		[StringLength(64, ErrorMessage = "Password must be between 6 and 64 characters!", MinimumLength = 6)]
 		public string Password { get; set; }
 		[Required]
 		public string FirstName {get;set;}
