@@ -3,14 +3,20 @@ using Microsoft.Extensions.Configuration;
 using SensateService.Config;
 using System;
 using System.Threading;
+using Microsoft.EntityFrameworkCore;
 
 namespace SensateService.Setup
 {
 	public class Program
 	{
-		static void Main(string[] args)
+		public static void Main(string[] args)
 		{
 			Console.WriteLine("Running SensateService setup...");
+			var factory = new SensateSqlContextFactory();
+			var ctx = factory.CreateDbContext(new string[] {});
+
+			ctx.Database.EnsureCreated();
+			ctx.Database.Migrate();
 		}
 
 		public static bool IsDevelopment()
