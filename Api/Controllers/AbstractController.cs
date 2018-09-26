@@ -7,18 +7,18 @@
  */
 
 using System;
-using System.Threading.Tasks;
 using System.Net;
+using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Mvc;
 
+using SensateService.Enums;
+using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Models.Json.Out;
-using SensateService.Enums;
-using SensateService.Helpers;
 
-namespace SensateService.Controllers
+namespace SensateService.Api.Controllers
 {
 	public abstract class AbstractController : Controller
 	{

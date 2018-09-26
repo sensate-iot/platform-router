@@ -7,10 +7,10 @@
 
 using System;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.OData.Query.SemanticAst;
-using SensateService.Controllers.V1;
 
-namespace SensateService.Helpers
+using SensateService.Api.Controllers.V1;
+
+namespace SensateService.Api.Helpers
 {
     public static class UrlHelperExtensions
     {

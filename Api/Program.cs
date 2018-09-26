@@ -6,20 +6,21 @@
  */
 
 using System;
-using System.Linq;
 using System.IO;
+using System.Linq;
 
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
 using SensateService.Models;
 
-namespace SensateService
+namespace SensateService.Api
 {
 	public class Program
 	{

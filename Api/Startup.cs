@@ -9,26 +9,26 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Mvc.Versioning;
-using SensateService.Config;
-using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.IdentityModel.Tokens;
 
-using SensateService.Models;
+using SensateService.Api.Middleware;
+using SensateService.Config;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
+using SensateService.Models;
 using SensateService.Services;
-using SensateService.Middleware;
+using Swashbuckle.AspNetCore.Swagger;
 
-namespace SensateService
+namespace SensateService.Api
 {
 	public class Startup
 	{

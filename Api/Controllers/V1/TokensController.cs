@@ -2,7 +2,7 @@
  * Authentication token controller.
  *
  * @author Michel Megens
- * @email   dev@bietje.net
+ * @email  dev@bietje.net
  */
 
 using System;
@@ -13,18 +13,16 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
-using Swashbuckle.AspNetCore.SwaggerGen;
-
 using SensateService.Attributes;
+using SensateService.Enums;
+using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Infrastructure.Sql;
 using SensateService.Models;
 using SensateService.Models.Json.In;
 using SensateService.Models.Json.Out;
-using SensateService.Enums;
-using SensateService.Helpers;
 
-namespace SensateService.Controllers.V1
+namespace SensateService.Api.Controllers.V1
 {
 	[Produces("application/json")]
 	[Route("v{version:apiVersion}/[controller]")]

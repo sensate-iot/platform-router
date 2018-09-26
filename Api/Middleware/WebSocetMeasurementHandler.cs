@@ -11,17 +11,21 @@ using System.Net;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json.Linq;
+
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 using SensateService.Enums;
 using SensateService.Exceptions;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
+using SensateService.Middleware;
 using SensateService.Models;
 using SensateService.Models.Json.In;
 
-namespace SensateService.Middleware
+namespace SensateService.Api.Middleware
 {
 	public class WebSocketMeasurementHandler : WebSocketHandler
 	{

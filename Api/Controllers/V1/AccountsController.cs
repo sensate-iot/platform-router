@@ -6,27 +6,28 @@
  */
 
 using System;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
-using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
+using SensateService.Api.Helpers;
+using SensateService.Attributes;
+using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
-using SensateService.Services;
 using SensateService.Models.Json.In;
-using SensateService.Attributes;
 using SensateService.Models.Json.Out;
-using SensateService.Enums;
+using SensateService.Services;
 
-namespace SensateService.Controllers.V1
+namespace SensateService.Api.Controllers.V1
 {
 	[Produces("application/json")]
 	[Route("v{version:apiVersion}/[controller]")]
@@ -279,7 +280,6 @@ namespace SensateService.Controllers.V1
 				return this.InvalidInputResult("Invalid phone number!");
 
 			var result = await this._manager.CreateAsync(user, register.Password).AwaitSafely();
-
 			if(!result.Succeeded)
 				return this.BadRequest();
 
