@@ -6,6 +6,7 @@
  */
 
 using System;
+using System.Runtime.Serialization;
 using System.Collections.Generic;
 
 using MongoDB.Bson;
@@ -17,7 +18,8 @@ using SensateService.Converters;
 namespace SensateService.Models
 {
 	[BsonSerializer(typeof(BsonMeasurementSerializer))]
-	public class Measurement
+	[Serializable]
+	public class Measurement : ISerializable
 	{
 		[BsonId, BsonRequired, JsonConverter(typeof(ObjectIdJsonConverter))]
 		public ObjectId InternalId {get;set;}
@@ -36,6 +38,16 @@ namespace SensateService.Models
 		{
 			this.InternalId = ObjectId.Empty;
 			this.CreatedBy = ObjectId.Empty;
+		}
+
+		protected Measurement(SerializationInfo info, StreamingContext context)
+		{
+			this.InternalId = ObjectId.Parse(info.GetString("id"));
+			this.Data = info.GetValue("data", typeof(IEnumerable<DataPoint>)) as IEnumerable<DataPoint>;
+			this.Longitude = info.GetDouble("lon");
+			this.Latitude = info.GetDouble("lat");
+			this.CreatedAt = info.GetDateTime("createdat");
+			this.CreatedBy = ObjectId.Parse(info.GetString("createdby"));
 		}
 
 		public string ToJson()
@@ -61,6 +73,16 @@ namespace SensateService.Models
 
 			output = datapoints;
 			return true;
+		}
+
+		public void GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			info.AddValue("id", this.InternalId.ToString());
+			info.AddValue("data", this.Data, typeof(IEnumerable<DataPoint>));
+			info.AddValue("lon", this.Longitude);
+			info.AddValue("lat", this.Latitude);
+			info.AddValue("createdat", this.CreatedAt);
+			info.AddValue("createdby", this.CreatedBy.ToString());
 		}
 	}
 }
