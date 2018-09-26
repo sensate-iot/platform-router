@@ -81,7 +81,7 @@ namespace SensateService.MqttHandler
 					Author = user
 				};
 
-				await this.auditlogs.CreateAsync(log);
+				await this.auditlogs.CreateAsync(log, e.CancellationToken);
 			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);
 				Console.WriteLine("");

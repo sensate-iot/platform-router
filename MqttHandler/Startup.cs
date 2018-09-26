@@ -49,8 +49,13 @@ namespace SensateService.MqttHandler
 
 		private static bool IsDevelopment()
 		{
+#if DEBUG
 			var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
 			return env == "Development";
+#else
+			return false;
+#endif
+
 		}
 
 		private void CancelEvent_Handler(object sender, ConsoleCancelEventArgs e)
