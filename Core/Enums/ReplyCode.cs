@@ -11,6 +11,7 @@ namespace SensateService.Enums
 	{
 		BadInput = 400,
 		NotAllowed = 401,
-		NotFound = 402
+		NotFound = 402,
+		Ok = 200
 	}
 }

@@ -147,6 +147,37 @@ namespace SensateService.Api.Controllers.V1
 				new NotFoundObjectResult(new {Message = result.Errors});
 		}
 
+		[HttpGet("phone-confirmed")]
+		[NormalUser]
+		[ProducesResponseType(typeof(Status), 200)]
+		public async Task<IActionResult> PhoneNumberConfirmed()
+		{
+			SensateUser user;
+			Status status;
+			bool confirmed;
+
+			user = await this.GetCurrentUserAsync().AwaitSafely();
+			var worker = this.Log(RequestMethod.HttpGet, user).AwaitSafely();
+
+			if(user == null) {
+				await worker;
+				return this.Forbid();
+			}
+
+			confirmed = await this._manager.IsPhoneNumberConfirmedAsync(user).AwaitSafely();
+			status = new Status();
+
+			if(confirmed) {
+				status.ErrorCode = ReplyCode.Ok;
+				status.Message = "true";
+			} else {
+				status.ErrorCode = ReplyCode.Ok;
+				status.Message = "false";
+			}
+
+			return new OkObjectResult(status);
+		}
+
 		[HttpPost("confirm-update-email")]
 		[NormalUser]
 		[ValidateModel]
@@ -201,7 +232,7 @@ namespace SensateService.Api.Controllers.V1
 			SensateUser user;
 			EmailBody mail;
 
-			if(String.IsNullOrEmpty(changeEmailModel.NewEmail)) {
+			if(string.IsNullOrEmpty(changeEmailModel.NewEmail)) {
 				await this.Log(RequestMethod.HttpPost).AwaitSafely();
 				return BadRequest();
 			}
@@ -260,10 +291,22 @@ namespace SensateService.Api.Controllers.V1
 			return body;
 		}
 
+		private Status StringifyIdentityResult(IdentityResult results)
+		{
+			Status status;
+
+			status = new Status {
+				ErrorCode = ReplyCode.BadInput,
+				Message = results.Errors.ElementAt(0).Description
+			};
+
+			return status;
+		}
+
 		[HttpPost("register")]
 		[ValidateModel]
+		[ProducesResponseType(typeof(Status), 400)]
 		[ProducesResponseType(200)]
-		[ProducesResponseType(400)]
 		public async Task<object> Register([FromBody] Register register)
 		{
 			EmailBody mail;
@@ -280,8 +323,11 @@ namespace SensateService.Api.Controllers.V1
 				return this.InvalidInputResult("Invalid phone number!");
 
 			var result = await this._manager.CreateAsync(user, register.Password).AwaitSafely();
-			if(!result.Succeeded)
-				return this.BadRequest();
+
+			if(!result.Succeeded) {
+				var objresult = this.StringifyIdentityResult(result);
+				return this.BadRequest(objresult);
+			}
 
 			var mailTask = this.ReadMailTemplate("Confirm_Account_Registration.html",
 				"Confirm_Account_Registration.txt");
@@ -301,7 +347,6 @@ namespace SensateService.Api.Controllers.V1
 
 			await Task.WhenAll(updates);
 			return this.Ok();
-
 		}
 
 		[HttpGet("show/{uid}")]
