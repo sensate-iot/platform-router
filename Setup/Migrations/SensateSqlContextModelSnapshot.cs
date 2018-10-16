@@ -17,7 +17,8 @@ namespace SensateService.Setup.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)
-                .HasAnnotation("ProductVersion", "2.0.2-rtm-10011");
+                .HasAnnotation("ProductVersion", "2.1.3-rtm-32065")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
@@ -139,6 +140,24 @@ namespace SensateService.Setup.Migrations
                     b.HasKey("IdentityToken");
 
                     b.ToTable("ChangeEmailTokens");
+                });
+
+            modelBuilder.Entity("SensateService.Models.ChangePhoneNumberToken", b =>
+                {
+                    b.Property<string>("IdentityToken")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("PhoneNumber");
+
+                    b.Property<string>("UserToken")
+                        .IsRequired();
+
+                    b.HasKey("IdentityToken");
+
+                    b.HasAlternateKey("UserToken")
+                        .HasName("AlternateKey_UserToken");
+
+                    b.ToTable("ChangePhoneNumberTokens");
                 });
 
             modelBuilder.Entity("SensateService.Models.PasswordResetToken", b =>

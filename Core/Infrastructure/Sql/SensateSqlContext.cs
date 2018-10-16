@@ -19,6 +19,7 @@ namespace SensateService.Infrastructure.Sql
 		public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 		public DbSet<ChangeEmailToken> ChangeEmailTokens { get; set; }
 		public new DbSet<UserToken> UserTokens { get; set; }
+		public DbSet<ChangePhoneNumberToken> ChangePhoneNumberTokens { get; set; }
 
 		public SensateSqlContext(DbContextOptions<SensateSqlContext> options) :
 			base(options)
@@ -35,6 +36,9 @@ namespace SensateService.Infrastructure.Sql
 			builder.Entity<UserToken>().HasKey(k => new {
 				k.UserId, k.Value
 			});
+
+			builder.Entity<ChangePhoneNumberToken>().HasAlternateKey(e => e.UserToken)
+				.HasName("AlternateKey_UserToken");
 		}
 	}
 }

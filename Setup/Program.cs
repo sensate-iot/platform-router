@@ -1,8 +1,6 @@
 ﻿
-using Microsoft.Extensions.Configuration;
-using SensateService.Config;
 using System;
-using System.Threading;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace SensateService.Setup

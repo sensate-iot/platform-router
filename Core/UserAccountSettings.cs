@@ -14,5 +14,7 @@ namespace SensateService
 		public int JwtExpireMinutes { get; set; }
 		public int JwtRefreshExpireMinutes { get; set; }
 		public string ConfirmForward { get; set; }
+		public string ResetForward { get; set; }
+		public string PublicUrl { get; set; }
 	}
 }

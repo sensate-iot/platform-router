@@ -27,6 +27,7 @@ namespace SensateService.Init
 			services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 			services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 			services.AddScoped<IUserTokenRepository, UserTokenRepository>();
+			services.AddScoped<IChangePhoneNumberTokenRepository, ChangePhoneNumberRepository>();
 
 			return services;
 		}
