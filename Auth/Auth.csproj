@@ -19,7 +19,6 @@
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.5">
       <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="2.3.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.1.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.1.4">
       <PrivateAssets>all</PrivateAssets>

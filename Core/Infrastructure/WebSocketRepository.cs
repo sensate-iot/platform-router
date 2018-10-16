@@ -5,35 +5,37 @@
  * @email  dev@bietje.net
  */
 
+using System;
+using System.Threading;
 using System.Linq;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
 
-using Microsoft.Extensions.Logging;
-
 using SensateService.Infrastructure.Repositories;
-using System;
-using System.Threading;
 
 namespace SensateService.Infrastructure
 {
 	public class WebSocketRepository : IWebSocketRepository
 	{
-		private readonly ILogger<WebSocketRepository> _logger;
 		private readonly ConcurrentDictionary<string, WebSocket> _sockets;
 
-		public WebSocketRepository(ILogger<WebSocketRepository> logger)
+		public WebSocketRepository()
 		{
-			this._logger = logger;
 			this._sockets = new ConcurrentDictionary<string, WebSocket>();
 		}
 
 		public void Add(WebSocket socket)
 		{
 			this._sockets.TryAdd(this.CreateConnectionId(), socket);
+		}
+
+		public void Add(string id, WebSocket socket)
+		{
+			if(!this._sockets.TryAdd(id, socket)) {
+				throw new ArgumentException("ID already exists!");
+			}
 		}
 
 		private string CreateConnectionId()
@@ -56,22 +58,9 @@ namespace SensateService.Infrastructure
 			return this._sockets.FirstOrDefault(kv => kv.Value == socket).Key;
 		}
 
-		public void Remove(string id)
-		{
-			WebSocket webSocket;
-
-			this._sockets.TryRemove(id, out webSocket);
-			var result = webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure,
-											  "Closed by SensateService",
-											  cancellationToken: CancellationToken.None);
-			result.RunSynchronously();
-		}
-
 		public Task RemoveAsync(string id)
 		{
-			WebSocket socket;
-
-			this._sockets.TryRemove(id, out socket);
+			this._sockets.TryRemove(id, out var socket);
 			return socket.CloseAsync(
 				WebSocketCloseStatus.NormalClosure,
 				"Closed by SensateService",
@@ -81,11 +70,10 @@ namespace SensateService.Infrastructure
 
 		public void ForceRemove(WebSocket ws)
 		{
-			WebSocket socket;
 			string key;
 
 			key = this._sockets.FirstOrDefault(x => x.Value == ws).Key;
-			this._sockets.TryRemove(key, out socket);
+			this._sockets.TryRemove(key, out var socket);
 			socket.Dispose();
 		}
 	}
