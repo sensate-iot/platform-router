@@ -71,6 +71,8 @@ namespace SensateService.Api
 				options.ResetForward = auth.ResetForward;
 			});
 
+			services.Configure<TextServiceSettings>(options => { options.AlphaCode = text.AlpaCode; });
+
 			services.AddApiVersioning(options => {
 				options.ApiVersionReader = new QueryStringApiVersionReader();
 				options.AssumeDefaultVersionWhenUnspecified = true;
