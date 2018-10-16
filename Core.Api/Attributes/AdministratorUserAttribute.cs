@@ -7,7 +7,7 @@
 
 using Microsoft.AspNetCore.Authorization;
 
-namespace SensateService.Attributes
+namespace SensateService.Core.Api.Attributes
 {
 	public class AdministratorUserAttribute : AuthorizeAttribute
 	{

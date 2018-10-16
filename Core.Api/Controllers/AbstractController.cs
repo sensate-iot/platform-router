@@ -9,14 +9,16 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Mvc;
+
 using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Models.Json.Out;
 
-namespace SensateService.Auth.Controllers
+namespace SensateService.Core.Api.Controllers
 {
 	public abstract class AbstractController : Controller
 	{
@@ -24,7 +26,7 @@ namespace SensateService.Auth.Controllers
 
 		public SensateUser CurrentUser => this.User == null ? null : this._users.GetByClaimsPrinciple(this.User);
 
-		protected AbstractController(IUserRepository users) : base()
+		protected AbstractController(IUserRepository users)
 		{
 			this._users = users;
 		}

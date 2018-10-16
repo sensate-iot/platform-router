@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -72,12 +71,6 @@ namespace SensateService.Auth
 			});
 
 			services.Configure<TextServiceSettings>(options => { options.AlphaCode = text.AlpaCode; });
-
-			services.AddApiVersioning(options => {
-				options.ApiVersionReader = new QueryStringApiVersionReader();
-				options.AssumeDefaultVersionWhenUnspecified = true;
-				options.ApiVersionSelector = new CurrentImplementationApiVersionSelector(options);
-			});
 
 			/*
 			 * Setup user authentication

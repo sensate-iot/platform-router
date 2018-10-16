@@ -12,13 +12,16 @@ using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using SensateService.Attributes;
+
 using SensateService.Auth.Helpers;
+using SensateService.Core.Api.Attributes;
+using SensateService.Core.Api.Controllers;
 using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
@@ -27,11 +30,10 @@ using SensateService.Models.Json.In;
 using SensateService.Models.Json.Out;
 using SensateService.Services;
 
-namespace SensateService.Auth.Controllers.V1
+namespace SensateService.Auth.Controllers
 {
 	[Produces("application/json")]
 	[Route("v{version:apiVersion}/[controller]")]
-	[ApiVersion("1")]
 	public class AccountsController : AbstractController
 	{
 		private readonly UserManager<SensateUser> _manager;

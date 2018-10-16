@@ -44,10 +44,8 @@ namespace SensateService.Services
 				await this.Receive(socket, async(result, buffer) => {
 					if(result.MessageType == WebSocketMessageType.Text) {
 						await this._handler.Receive(socket, result, buffer);
-						return;
 					} else if(result.MessageType == WebSocketMessageType.Close) {
 						await this._handler.OnDisconnected(socket);
-						return;
 					}
 				});
 			} catch(WebSocketException) {

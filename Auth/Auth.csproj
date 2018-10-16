@@ -36,6 +36,7 @@
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.2" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Core.Api\Core.Api.csproj" />
     <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
 </Project>

@@ -6,7 +6,8 @@
  */
 
 using Microsoft.AspNetCore.Mvc;
-using SensateService.Auth.Controllers.V1;
+
+using SensateService.Auth.Controllers;
 
 namespace SensateService.Auth.Helpers
 {
