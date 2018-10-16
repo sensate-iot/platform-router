@@ -26,7 +26,7 @@ using SensateService.Models.Json.Out;
 namespace SensateService.Auth.Controllers
 {
 	[Produces("application/json")]
-	[Route("v{version:apiVersion}/[controller]")]
+	[Route("[controller]")]
 	public class TokensController : AbstractController
 	{
 		private readonly IUserTokenRepository _tokens;
@@ -138,9 +138,8 @@ namespace SensateService.Auth.Controllers
 
 			reply.RefreshToken = newToken.Value;
 			reply.ExpiresInMinutes = this._settings.JwtRefreshExpireMinutes;
-			reply.JwtToken = this._tokens.GenerateJwtToken(
-				user, this._users.GetRoles(user), this._settings
-			);
+			var roles = await this._users.GetRolesAsync(user);
+			reply.JwtToken = this._tokens.GenerateJwtToken( user, roles, this._settings );
 
 			await Task.WhenAll(tasks);
             await logTask.AwaitSafely();
@@ -148,7 +147,7 @@ namespace SensateService.Auth.Controllers
 			return new OkObjectResult(reply);
 		}
 
-		[HttpDelete("{token}", Name = "RevokeToken")]
+		[HttpDelete("revoke/{token}", Name = "RevokeToken")]
 		[NormalUser]
 		[ProducesResponseType(typeof(Status), 404)]
 		[ProducesResponseType(200)]
@@ -164,9 +163,7 @@ namespace SensateService.Auth.Controllers
 				return InvalidInputResult("Token not found!");
 
 			authToken = this._tokens.GetById(user, token);
-			var tasks = new Task[2];
-
-			tasks[0] = this._audit_log.CreateAsync(
+			await this._audit_log.CreateAsync(
 				this.GetCurrentRoute(),
 				RequestMethod.HttpDelete,
 				GetRemoteAddress(),
@@ -179,12 +176,11 @@ namespace SensateService.Auth.Controllers
 			if(!authToken.Valid)
 				return this.InvalidInputResult("Token already invalid!");
 
-			tasks[1] = this._tokens.InvalidateTokenAsync(authToken);
-			await Task.WhenAll(tasks).AwaitSafely();
+			await this._tokens.InvalidateTokenAsync(authToken);
 			return Ok();
 		}
 
-		[HttpDelete(Name = "RevokeAll")]
+		[HttpDelete("revoke-all", Name = "RevokeAll")]
 		[NormalUser]
 		[ProducesResponseType(200)]
 		public async Task<IActionResult> RevokeAll()
@@ -193,15 +189,12 @@ namespace SensateService.Auth.Controllers
 			var user = await this.GetCurrentUserAsync().AwaitSafely();
 
 			tokens = this._tokens.GetByUser(user);
-			var tasks = new[] {
-                this._audit_log.CreateAsync(
-                    this.GetCurrentRoute(), RequestMethod.HttpDelete,
-                    GetRemoteAddress(), user
-                ),
-                this._tokens.InvalidateManyAsync(tokens)
-			};
+			await this._audit_log.CreateAsync(
+				this.GetCurrentRoute(), RequestMethod.HttpDelete,
+				GetRemoteAddress(), user
+			);
+			await this._tokens.InvalidateManyAsync(tokens);
 
-			await Task.WhenAll(tasks).AwaitSafely();
 			return Ok();
 		}
 

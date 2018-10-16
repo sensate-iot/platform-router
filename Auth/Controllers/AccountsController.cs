@@ -33,7 +33,7 @@ using SensateService.Services;
 namespace SensateService.Auth.Controllers
 {
 	[Produces("application/json")]
-	[Route("v{version:apiVersion}/[controller]")]
+	[Route("[controller]")]
 	public class AccountsController : AbstractController
 	{
 		private readonly UserManager<SensateUser> _manager;
@@ -349,12 +349,12 @@ namespace SensateService.Auth.Controllers
 			mail.HtmlBody = mail.HtmlBody.Replace("%%URL%%", url);
 			mail.TextBody = string.Format(mail.TextBody, url);
 
-
 			var updates = new[] {
 				this._manager.AddToRoleAsync(user, "Users"),
 				this._mailer.SendEmailAsync(user.Email, "Sensate email confirmation", mail),
 			};
 
+			await Task.WhenAll(updates);
 			phonetoken = await this._manager.GenerateChangePhoneNumberTokenAsync(user, register.PhoneNumber).AwaitSafely();
 			usertoken = await this._phonetokens.CreateAsync(phonetoken, register.PhoneNumber).AwaitSafely();
 
@@ -362,7 +362,6 @@ namespace SensateService.Auth.Controllers
 			Debug.WriteLine($"Phone tokens: {phonetoken}");
 			Debug.WriteLine($"User token generated: {usertoken}");
 
-			await Task.WhenAll(updates);
 			return this.Ok();
 		}
 
