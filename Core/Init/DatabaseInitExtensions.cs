@@ -5,16 +5,14 @@
  * @email  dev@bietje.net
  */
 
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Bson.Serialization;
-
 using SensateService.Converters;
 using SensateService.Infrastructure.Document;
 using SensateService.Infrastructure.Sql;
 
-namespace SensateService
+namespace SensateService.Init
 {
 	public static class DatabaseInitExtensions
 	{
