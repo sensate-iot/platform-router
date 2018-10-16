@@ -25,7 +25,7 @@ using SensateService.Middleware;
 using SensateService.Models;
 using SensateService.Models.Json.In;
 
-namespace SensateService.Api.Middleware
+namespace SensateService.Auth.Middleware
 {
 	public class WebSocketMeasurementHandler : WebSocketHandler
 	{

@@ -20,7 +20,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
-using SensateService.Api.Middleware;
+using SensateService.Auth.Middleware;
 using SensateService.Config;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
@@ -28,7 +28,7 @@ using SensateService.Models;
 using SensateService.Services;
 using Swashbuckle.AspNetCore.Swagger;
 
-namespace SensateService.Api
+namespace SensateService.Auth
 {
 	public class Startup
 	{

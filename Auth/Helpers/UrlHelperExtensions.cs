@@ -5,12 +5,10 @@
  * @email  dev@bietje.net
  */
 
-using System;
 using Microsoft.AspNetCore.Mvc;
+using SensateService.Auth.Controllers.V1;
 
-using SensateService.Api.Controllers.V1;
-
-namespace SensateService.Api.Helpers
+namespace SensateService.Auth.Helpers
 {
     public static class UrlHelperExtensions
     {

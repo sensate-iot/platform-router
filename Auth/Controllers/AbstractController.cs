@@ -9,16 +9,14 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
-
 using Microsoft.AspNetCore.Mvc;
-
 using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Models.Json.Out;
 
-namespace SensateService.Api.Controllers
+namespace SensateService.Auth.Controllers
 {
 	public abstract class AbstractController : Controller
 	{
