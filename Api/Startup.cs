@@ -46,11 +46,13 @@ namespace SensateService.Api
 			var db = new DatabaseConfig();
 			var auth = new AuthenticationConfig();
 			var mail = new MailConfig();
+			var text = new TextConfig();
 
 			this._configuration.GetSection("Cache").Bind(cache);
 			this._configuration.GetSection("Authentication").Bind(auth);
 			this._configuration.GetSection("Database").Bind(db);
 			this._configuration.GetSection("Mail").Bind(mail);
+			this._configuration.GetSection("Text").Bind(text);
 
 			services.AddCors();
 
@@ -65,6 +67,8 @@ namespace SensateService.Api
 				options.JwtExpireMinutes = auth.JwtExpireMinutes;
 				options.JwtRefreshExpireMinutes = auth.JwtRefreshExpireMinutes;
 				options.ConfirmForward = auth.ConfirmForward;
+				options.PublicUrl = auth.PublicUrl;
+				options.ResetForward = auth.ResetForward;
 			});
 
 			services.AddApiVersioning(options => {
@@ -143,6 +147,10 @@ namespace SensateService.Api
 					opts.Port = mail.Smtp.Port;
 					opts.Host = mail.Smtp.Host;
 				});
+			}
+
+			if(text.Provider == "Twilio") {
+				services.AddTwilioTextApi(text.Twilio.AccountSid, text.Twilio.AuthToken);
 			}
 
 			services.AddSwaggerGen(c => {

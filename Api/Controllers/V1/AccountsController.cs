@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -15,6 +16,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 using SensateService.Api.Helpers;
@@ -35,12 +37,14 @@ namespace SensateService.Api.Controllers.V1
 	public class AccountsController : AbstractController
 	{
 		private readonly UserManager<SensateUser> _manager;
+		private readonly UserAccountSettings _settings;
 		private readonly IEmailSender _mailer;
 		private readonly IPasswordResetTokenRepository _passwd_tokens;
 		private readonly IChangeEmailTokenRepository _email_tokens;
 		private readonly IHostingEnvironment _env;
 		private readonly IAuditLogRepository _audit_logs;
 		private readonly IUserTokenRepository _tokens;
+		private readonly IChangePhoneNumberTokenRepository _phonetokens;
 
 		private const string PhoneNumberRegex = "[^0-9]";
 
@@ -49,8 +53,10 @@ namespace SensateService.Api.Controllers.V1
 			SignInManager<SensateUser> manager,
 			UserManager<SensateUser> userManager,
 			IEmailSender emailer,
+			IOptions<UserAccountSettings> options,
 			IPasswordResetTokenRepository tokens,
 			IChangeEmailTokenRepository emailTokens,
+			IChangePhoneNumberTokenRepository phoneTokens,
 			IAuditLogRepository auditLogs,
 			IUserTokenRepository tokenRepository,
 			IHostingEnvironment env
@@ -63,6 +69,8 @@ namespace SensateService.Api.Controllers.V1
 			this._env = env;
 			this._audit_logs = auditLogs;
 			this._tokens = tokenRepository;
+			this._phonetokens = phoneTokens;
+			this._settings = options.Value;
 		}
 
 		[HttpPost("forgot-password")]
@@ -93,7 +101,7 @@ namespace SensateService.Api.Controllers.V1
 
 			mail = await mailTask.AwaitSafely();
 			mail.HtmlBody = mail.HtmlBody.Replace("%%TOKEN%%", usertoken);
-			mail.TextBody = String.Format(mail.TextBody, usertoken);
+			mail.TextBody = string.Format(mail.TextBody, usertoken);
 			await this._mailer.SendEmailAsync(user.Email, "Reset password token", mail);
 			return Ok();
 		}
@@ -310,12 +318,13 @@ namespace SensateService.Api.Controllers.V1
 		public async Task<object> Register([FromBody] Register register)
 		{
 			EmailBody mail;
+			string phonetoken;
+			string usertoken;
 			var user = new SensateUser {
 				UserName = register.Email,
 				Email = register.Email,
 				FirstName = register.FirstName,
-				LastName = register.LastName,
-				PhoneNumber = register.PhoneNumber
+				LastName = register.LastName
 			};
 
 			await this.Log(RequestMethod.HttpPost).AwaitSafely();
@@ -334,16 +343,24 @@ namespace SensateService.Api.Controllers.V1
 			user = await this._users.GetAsync(user.Id).AwaitSafely();
 			var code = await this._manager.GenerateEmailConfirmationTokenAsync(user).AwaitSafely();
 			code = Base64UrlEncoder.Encode(code);
-			var url = this.Url.EmailConfirmationLink(user.Id, code, this.Request.Scheme);
+			var url = this.Url.EmailConfirmationLink(user.Id, code, this.Request.Scheme, this._settings.PublicUrl);
 
 			mail = await mailTask.AwaitSafely();
 			mail.HtmlBody = mail.HtmlBody.Replace("%%URL%%", url);
-			mail.TextBody = String.Format(mail.TextBody, url);
+			mail.TextBody = string.Format(mail.TextBody, url);
+
 
 			var updates = new[] {
 				this._manager.AddToRoleAsync(user, "Users"),
-				this._mailer.SendEmailAsync(user.Email, "Sensate email confirmation", mail)
+				this._mailer.SendEmailAsync(user.Email, "Sensate email confirmation", mail),
 			};
+
+			phonetoken = await this._manager.GenerateChangePhoneNumberTokenAsync(user, register.PhoneNumber).AwaitSafely();
+			usertoken = await this._phonetokens.CreateAsync(phonetoken, register.PhoneNumber).AwaitSafely();
+
+			Debug.WriteLine("Generated tokens:");
+			Debug.WriteLine($"Phone tokens: {phonetoken}");
+			Debug.WriteLine($"User token generated: {usertoken}");
 
 			await Task.WhenAll(updates);
 			return this.Ok();
@@ -463,8 +480,10 @@ namespace SensateService.Api.Controllers.V1
 			if(userUpdate.LastName != null)
 				user.LastName = userUpdate.LastName;
 
-			if(userUpdate.PhoneNumber != null && Regex.IsMatch(userUpdate.PhoneNumber, PhoneNumberRegex))
-                user.PhoneNumber = userUpdate.PhoneNumber;
+			if(userUpdate.PhoneNumber != null && Regex.IsMatch(userUpdate.PhoneNumber, PhoneNumberRegex) &&
+			   user.PhoneNumber != userUpdate.PhoneNumber) {
+				user.PhoneNumber = userUpdate.PhoneNumber;
+			}
 
 			await this._users.EndUpdateAsync().AwaitSafely();
 			return Ok();

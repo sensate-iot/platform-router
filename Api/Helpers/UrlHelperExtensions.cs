@@ -14,11 +14,11 @@ namespace SensateService.Api.Helpers
 {
     public static class UrlHelperExtensions
     {
-		public static string EmailConfirmationLink(this IUrlHelper url, string id, string code, string scheme, string target = null)
+		public static string EmailConfirmationLink(this IUrlHelper url, string id, string code, string scheme, string host, string target = null)
 		{
 			object targetValues;
 
-			if(String.IsNullOrEmpty(target)) {
+			if(string.IsNullOrEmpty(target)) {
 				targetValues = new {
 					id,
 					code,
@@ -30,24 +30,14 @@ namespace SensateService.Api.Helpers
 					target = target
 				};
 			}
+
 			var action = url.Action(
 				action: nameof(AccountsController.ConfirmEmail),
-				controller: "accounts",
+				controller: "Accounts",
 				values: targetValues,
-				protocol: scheme
-				);
-
-			return action;
-		}
-
-		public static string PasswordResetLink(this IUrlHelper url, string id, string code, string scheme)
-		{
-			var action = url.Action(
-				action: nameof(AccountsController.Resetpassword),
-				controller: "accounts",
-				values: new { id, code },
-				protocol: scheme
-				);
+				protocol: scheme,
+				host: host
+			);
 
 			return action;
 		}

@@ -24,41 +24,61 @@
     "Type": "Distributed"
   },
 
-  "Database" : {
-    "MongoDB" : {
+  "Database": {
+    "MongoDB": {
       "DatabaseName": "Sensate",
-      "ConnectionString": "mongodb://localhost:27017/Sensate"
+      "ConnectionString": "mongodb://sensate:mongopass@192.168.127.128:27017/Sensate"
     },
-    "PgSQL" : {
-      "ConnectionString": "User ID = Username;Password=SomePassword;Server=localhost;Port=5432;Database=Sensate"
+    "PgSQL": {
+      "ConnectionString": "User ID = postgres;Password=DefaultPassword;Server=192.168.127.128;Port=5432;Database=Sensate"
     },
-    "Redis" : {
-      "Host": "localhost",
+    "Redis": {
+      "Host": "192.168.127.128",
       "InstanceName": "Sensate"
     }
   },
 
+  "PublicUrl": "http://localhost:5000", 
+
   "Authentication" : {
-    "ConfirmForward": "https://example.com/login",
+    "ResetForward": "https://localhost:5000/login",
+    "ConfirmForward": "https://localhost:5000/login",
     "JwtRefreshExpireMinutes": 43200,
-    "JwtKey": "Verry secret key",
+    "JwtKey": "<key>",
     "JwtIssuer": "http://localhost:5000/",
     "JwtExpireMinutes": 43200
   },
 
-  "Mail" : {
-    "Provider": "SMTP",
-    "SendGrid" : {
-      "Username": "SomeUser",
-      "Key": "Sample Key"
-    },
-    "Smtp" : {
-      "Ssl" : true,
-      "Port" : 587,
-      "Host" : "mail.example.net",
-      "Username": "root@example.net",
-      "Password": "SomethingSecret"
-    }
-  }
-}
+  "Mqtt" : {
+    "Username": "sensate",
+    "Password": "MqttPassword",
+    "Ssl": "false",
+    "Port": 1883,
+    "Host": "breda1.nl.bietje.net",
+    "ShareTopic": "$share/sensate/sensate/measurements"
+  },
 
+  "Mail": {
+    "Provider": "SendGrid",
+    "SendGrid": {
+      "Username": "bietje",
+      "Key": "<sendgrid-key>"
+    },
+    "Smtp": {
+      "Ssl": true,
+      "Port": 587,
+      "Host": "mail.bietje.net",
+      "Username": "root@bietje.net",
+      "Password": "decyx5ux"
+    }
+  },
+
+  "Text" : {
+    "Provider": "Twilio",
+    "Twilio": {
+      "AccountSid": "<sid>",
+      "AuthToken": "<auth token>",
+      "AlphaCode": "Sensate IoT" 
+    } 
+  } 
+}
