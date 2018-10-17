@@ -5,13 +5,14 @@
  * @email  dev@bietje.net
  */
 
-using System.Security.Cryptography;
+using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Migrations;
-using Twilio;
+
+using Twilio.Exceptions;
 using Twilio.Rest.Api.V2010.Account;
-using Twilio.Rest.Messaging.V1.Service;
 using Twilio.Types;
+
 using PhoneNumberResource = Twilio.Rest.Lookups.V1.PhoneNumberResource;
 
 namespace SensateService.Services
@@ -20,25 +21,37 @@ namespace SensateService.Services
 	{
 		public async Task SendAsync(string id, string to, string body)
 		{
-			throw new System.NotImplementedException();
+			await Task.Run(() => { this.Send(id, to, body); });
 		}
 
 		public void Send(string id, string to, string body)
 		{
-			var msg = MessageResource.Create(
-				new PhoneNumber(to),
-				from: new PhoneNumber(id),
-				body: body
-			);
+			try {
+				MessageResource.Create(
+					new PhoneNumber(to),
+					from: new PhoneNumber(id),
+					body: body
+				);
+			} catch(Exception ex) {
+				Debug.WriteLine(ex.Message);
+			}
 		}
 
 		public async Task<bool> IsValidNumber(string number)
 		{
 			var verified = await Task.Run(() => {
-				var num = PhoneNumberResource.Fetch(
-					pathPhoneNumber: new PhoneNumber(number)
-				);
-				return num;
+				PhoneNumberResource res;
+
+				try {
+					res = PhoneNumberResource.Fetch(
+						pathPhoneNumber: new PhoneNumber(number)
+					);
+				} catch(ApiException ex) {
+					Debug.WriteLine(ex.Message);
+					res = null;
+				}
+
+				return res;
 			});
 
 			return verified != null;

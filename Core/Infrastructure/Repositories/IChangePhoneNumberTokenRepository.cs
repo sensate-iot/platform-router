@@ -13,7 +13,8 @@ namespace SensateService.Infrastructure.Repositories
 	public interface IChangePhoneNumberTokenRepository
 	{
 		Task CreateAsync(ChangePhoneNumberToken token);
-		Task<string> CreateAsync(string token, string phonenumber);
+		Task<string> CreateAsync(SensateUser user, string token, string phonenumber);
 		ChangePhoneNumberToken GetById(string id);
+		ChangePhoneNumberToken GetLastByUser(SensateUser user);
 	}
 }

@@ -39,6 +39,9 @@ namespace SensateService.Infrastructure.Sql
 
 			builder.Entity<ChangePhoneNumberToken>().HasAlternateKey(e => e.UserToken)
 				.HasName("AlternateKey_UserToken");
+			builder.Entity<ChangePhoneNumberToken>().HasKey(k => new {
+				k.IdentityToken, k.PhoneNumber
+			});
 		}
 	}
 }

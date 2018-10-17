@@ -26,14 +26,16 @@ namespace SensateService.Infrastructure.Sql
 			this._rng = new Random();
 		}
 
-		public async Task<string> CreateAsync(string token, string phone)
+		public async Task<string> CreateAsync(SensateUser user, string token, string phone)
 		{
 			ChangePhoneNumberToken t;
 
-			t = new ChangePhoneNumberToken() {
+			t = new ChangePhoneNumberToken {
 				PhoneNumber = phone,
 				IdentityToken = token,
-				UserToken = this._rng.NextString(UserTokenLength)
+				UserToken = this._rng.NextString(UserTokenLength),
+				User = user,
+				Timestamp = DateTime.Now
 			};
 
 			try {
@@ -49,6 +51,11 @@ namespace SensateService.Infrastructure.Sql
 		public override ChangePhoneNumberToken GetById(string id)
 		{
 			return this.Data.FirstOrDefault(x => x.UserToken == id);
+		}
+
+		public ChangePhoneNumberToken GetLastByUser(SensateUser user)
+		{
+			throw new NotImplementedException();
 		}
 
 
