@@ -335,7 +335,8 @@ namespace SensateService.Auth.Controllers
 				UserName = register.Email,
 				Email = register.Email,
 				FirstName = register.FirstName,
-				LastName = register.LastName
+				LastName = register.LastName,
+				UnconfirmedPhoneNumber = register.PhoneNumber
 			};
 
 			await this.Log(RequestMethod.HttpPost).AwaitSafely();

@@ -218,6 +218,8 @@ namespace SensateService.Setup.Migrations
 
                     b.Property<bool>("TwoFactorEnabled");
 
+                    b.Property<string>("UnconfirmedPhoneNumber");
+
                     b.Property<string>("UserName")
                         .HasMaxLength(256);
 
