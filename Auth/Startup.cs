@@ -146,6 +146,8 @@ namespace SensateService.Auth
 
 			if(text.Provider == "Twilio") {
 				services.AddTwilioTextApi(text.Twilio.AccountSid, text.Twilio.AuthToken);
+			} else {
+				Console.WriteLine("Text message provider not configured!");
 			}
 
 			services.AddSwaggerGen(c => {
