@@ -15,6 +15,6 @@ namespace SensateService.Infrastructure.Repositories
 		Task CreateAsync(ChangePhoneNumberToken token);
 		Task<string> CreateAsync(SensateUser user, string token, string phonenumber);
 		ChangePhoneNumberToken GetById(string id);
-		ChangePhoneNumberToken GetLastByUser(SensateUser user);
+		Task<ChangePhoneNumberToken> GetLatest(SensateUser user);
 	}
 }

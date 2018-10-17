@@ -56,11 +56,7 @@ namespace SensateService.Core.Api.Controllers
 
 		protected IActionResult InvalidInputResult(string msg = "Invalid input!")
 		{
-			var status = new Status();
-
-			status.Message = msg;
-			status.ErrorCode = ReplyCode.BadInput;
-
+			var status = new Status {Message = msg, ErrorCode = ReplyCode.BadInput};
 			return new BadRequestObjectResult(status);
 		}
 

@@ -9,6 +9,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using SensateService.Exceptions;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
@@ -53,11 +54,16 @@ namespace SensateService.Infrastructure.Sql
 			return this.Data.FirstOrDefault(x => x.UserToken == id);
 		}
 
-		public ChangePhoneNumberToken GetLastByUser(SensateUser user)
+		public async Task<ChangePhoneNumberToken> GetLatest(SensateUser user)
 		{
-			throw new NotImplementedException();
-		}
+			var tokens = from token in this.Data
+				where token.User.NormalizedUserName == user.NormalizedUserName &&
+				      token.PhoneNumber == user.UnconfirmedPhoneNumber 
+				select token;
+			var single = tokens.OrderByDescending(t => t.Timestamp);
 
+			return await single.FirstOrDefaultAsync().AwaitSafely();
+		}
 
 		public override async Task CreateAsync(ChangePhoneNumberToken obj)
 		{
