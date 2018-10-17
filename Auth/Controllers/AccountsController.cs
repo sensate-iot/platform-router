@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Hosting;
@@ -44,9 +43,8 @@ namespace SensateService.Auth.Controllers
 		private readonly IHostingEnvironment _env;
 		private readonly IAuditLogRepository _audit_logs;
 		private readonly IUserTokenRepository _tokens;
+		private readonly ITextSendService _text;
 		private readonly IChangePhoneNumberTokenRepository _phonetokens;
-
-		private const string PhoneNumberRegex = "[^0-9]";
 
 		public AccountsController(
 			IUserRepository repo,
@@ -59,6 +57,7 @@ namespace SensateService.Auth.Controllers
 			IChangePhoneNumberTokenRepository phoneTokens,
 			IAuditLogRepository auditLogs,
 			IUserTokenRepository tokenRepository,
+			ITextSendService text,
 			IHostingEnvironment env
 		) : base(repo)
 		{
@@ -71,6 +70,7 @@ namespace SensateService.Auth.Controllers
 			this._tokens = tokenRepository;
 			this._phonetokens = phoneTokens;
 			this._settings = options.Value;
+			this._text = text;
 		}
 
 		[HttpPost("forgot-password")]
@@ -299,7 +299,18 @@ namespace SensateService.Auth.Controllers
 			return body;
 		}
 
-		private Status StringifyIdentityResult(IdentityResult results)
+		private async Task<string> ReadTextTemplate(string template, string token)
+		{
+			string body;
+
+			using(var reader = System.IO.File.OpenText(template)) {
+				body = await reader.ReadLineAsync().AwaitSafely();
+			}
+
+			return body == null ? null : string.Format(body, token);
+		}
+
+		private static Status StringifyIdentityResult(IdentityResult results)
 		{
 			Status status;
 
@@ -328,13 +339,15 @@ namespace SensateService.Auth.Controllers
 			};
 
 			await this.Log(RequestMethod.HttpPost).AwaitSafely();
-			if(Regex.IsMatch(register.PhoneNumber, PhoneNumberRegex))
+
+			var valid = await this._text.IsValidNumber(register.PhoneNumber);
+			if(!valid)
 				return this.InvalidInputResult("Invalid phone number!");
 
 			var result = await this._manager.CreateAsync(user, register.Password).AwaitSafely();
 
 			if(!result.Succeeded) {
-				var objresult = this.StringifyIdentityResult(result);
+				var objresult = StringifyIdentityResult(result);
 				return this.BadRequest(objresult);
 			}
 
@@ -356,7 +369,7 @@ namespace SensateService.Auth.Controllers
 
 			await Task.WhenAll(updates);
 			phonetoken = await this._manager.GenerateChangePhoneNumberTokenAsync(user, register.PhoneNumber).AwaitSafely();
-			usertoken = await this._phonetokens.CreateAsync(phonetoken, register.PhoneNumber).AwaitSafely();
+			usertoken = await this._phonetokens.CreateAsync(user, phonetoken, register.PhoneNumber).AwaitSafely();
 
 			Debug.WriteLine("Generated tokens:");
 			Debug.WriteLine($"Phone tokens: {phonetoken}");
@@ -479,9 +492,14 @@ namespace SensateService.Auth.Controllers
 			if(userUpdate.LastName != null)
 				user.LastName = userUpdate.LastName;
 
-			if(userUpdate.PhoneNumber != null && Regex.IsMatch(userUpdate.PhoneNumber, PhoneNumberRegex) &&
-			   user.PhoneNumber != userUpdate.PhoneNumber) {
-				user.PhoneNumber = userUpdate.PhoneNumber;
+			/*
+			 * TODO: Validate phone number.
+			 */
+			if(userUpdate.PhoneNumber != null) {
+				var valid = await this._text.IsValidNumber(userUpdate.PhoneNumber);
+
+				if(valid && user.PhoneNumber != userUpdate.PhoneNumber)
+					user.PhoneNumber = userUpdate.PhoneNumber;
 			}
 
 			await this._users.EndUpdateAsync().AwaitSafely();
