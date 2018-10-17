@@ -54,7 +54,7 @@
     "Password": "MqttPassword",
     "Ssl": "false",
     "Port": 1883,
-    "Host": "breda1.nl.bietje.net",
+    "Host": "host.mqtt.net",
     "ShareTopic": "$share/sensate/sensate/measurements"
   },
 
@@ -68,17 +68,17 @@
       "Ssl": true,
       "Port": 587,
       "Host": "mail.bietje.net",
-      "Username": "root@bietje.net",
-      "Password": "decyx5ux"
+      "Username": "root@mail.com",
+      "Password": "SomePassword"
     }
   },
 
   "Text" : {
     "Provider": "Twilio",
+	"AlphaCode": "Sensate IoT",
     "Twilio": {
       "AccountSid": "<sid>",
-      "AuthToken": "<auth token>",
-      "AlphaCode": "Sensate IoT" 
+      "AuthToken": "<auth token>"
     } 
   } 
 }
