@@ -45,6 +45,7 @@ namespace SensateService.Auth.Controllers
 		private readonly IUserTokenRepository _tokens;
 		private readonly ITextSendService _text;
 		private readonly IChangePhoneNumberTokenRepository _phonetokens;
+		private readonly TextServiceSettings _text_settings;
 
 		public AccountsController(
 			IUserRepository repo,
@@ -58,6 +59,7 @@ namespace SensateService.Auth.Controllers
 			IAuditLogRepository auditLogs,
 			IUserTokenRepository tokenRepository,
 			ITextSendService text,
+			IOptions<TextServiceSettings> text_opts,
 			IHostingEnvironment env
 		) : base(repo)
 		{
@@ -71,6 +73,7 @@ namespace SensateService.Auth.Controllers
 			this._phonetokens = phoneTokens;
 			this._settings = options.Value;
 			this._text = text;
+			this._text_settings = text_opts.Value;
 		}
 
 		[HttpPost("forgot-password")]
@@ -302,8 +305,10 @@ namespace SensateService.Auth.Controllers
 		private async Task<string> ReadTextTemplate(string template, string token)
 		{
 			string body;
+			string path;
 
-			using(var reader = System.IO.File.OpenText(template)) {
+			path = this._env.GetTemplatePath(template);
+			using(var reader = System.IO.File.OpenText(path)) {
 				body = await reader.ReadLineAsync().AwaitSafely();
 			}
 
@@ -371,10 +376,7 @@ namespace SensateService.Auth.Controllers
 			await Task.WhenAll(updates);
 			phonetoken = await this._manager.GenerateChangePhoneNumberTokenAsync(user, register.PhoneNumber).AwaitSafely();
 			usertoken = await this._phonetokens.CreateAsync(user, phonetoken, register.PhoneNumber).AwaitSafely();
-
-			Debug.WriteLine("Generated tokens:");
-			Debug.WriteLine($"Phone tokens: {phonetoken}");
-			Debug.WriteLine($"User token generated: {usertoken}");
+			Debug.WriteLine($"Generated tokens: [identity: ${phonetoken}] [user: {usertoken}]");
 
 			return this.Ok();
 		}
@@ -431,7 +433,8 @@ namespace SensateService.Auth.Controllers
 		public async Task<IActionResult> ConfirmEmail(string id, string code, [FromQuery(Name = "target")] string target)
 		{
 			SensateUser user;
-			string url;
+			ChangePhoneNumberToken token;
+			string url, body;
 
 			url = target != null ? WebUtility.UrlDecode(target) : null;
 
@@ -442,6 +445,8 @@ namespace SensateService.Auth.Controllers
 			}
 
 			user = await this._users.GetAsync(id);
+			token = await this._phonetokens.GetLatest(user);
+
 			if(user == null)
 				return NotFound();
 
@@ -454,10 +459,15 @@ namespace SensateService.Auth.Controllers
 			if(!result.Succeeded)
 				return this.InvalidInputResult();
 
+			/* Send phone number validation token */
+			body = await this.ReadTextTemplate("Confirm_PhoneNumber.txt", token.UserToken);
+			this._text.Send(this._text_settings.AlphaCode, token.PhoneNumber, body);
+			Debug.WriteLine(token.PhoneNumber);
+
 			if(url != null)
 				return this.Redirect(url);
-			else
-				return Ok();
+
+			return Ok();
 		}
 
 		[ValidateModel]

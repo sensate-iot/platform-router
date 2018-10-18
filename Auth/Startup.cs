@@ -58,8 +58,6 @@ namespace SensateService.Auth
 			services.AddPostgres(db.PgSQL.ConnectionString);
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName);
 
-			//services.AddLogging(builder => { builder.AddConfiguration(this._configuration.GetSection("Logging"));
-
 			services.Configure<UserAccountSettings>(options => {
 				options.JwtKey = auth.JwtKey;
 				options.JwtIssuer = auth.JwtIssuer;
@@ -70,7 +68,7 @@ namespace SensateService.Auth
 				options.ResetForward = auth.ResetForward;
 			});
 
-			services.Configure<TextServiceSettings>(options => { options.AlphaCode = text.AlpaCode; });
+			services.Configure<TextServiceSettings>(options => { options.AlphaCode = text.AlphaCode; });
 
 			/*
 			 * Setup user authentication
