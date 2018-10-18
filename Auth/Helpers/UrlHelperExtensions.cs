@@ -5,6 +5,7 @@
  * @email  dev@bietje.net
  */
 
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Mvc;
 
 using SensateService.Auth.Controllers;
@@ -13,6 +14,7 @@ namespace SensateService.Auth.Helpers
 {
     public static class UrlHelperExtensions
     {
+		[SuppressMessage("ReSharper", "RedundantAnonymousTypePropertyName")]
 		public static string EmailConfirmationLink(this IUrlHelper url, string id, string code, string scheme, string host, string target = null)
 		{
 			object targetValues;

@@ -83,5 +83,14 @@ namespace SensateService.Core.Api.Controllers
 		{
 			return this.HttpContext.Connection.RemoteIpAddress;
 		}
+
+		protected bool IsValidUri(string uri)
+		{
+			bool result;
+
+			result = Uri.TryCreate(uri, UriKind.Absolute, out Uri resulturi) &&
+					 (resulturi.Scheme == Uri.UriSchemeHttp || resulturi.Scheme == Uri.UriSchemeHttps);
+			return result;
+		}
 	}
 }

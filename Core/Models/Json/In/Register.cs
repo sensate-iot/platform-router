@@ -20,5 +20,6 @@ namespace SensateService.Models.Json.In
 		[Required]
 		public string LastName {get;set;}
 		public string PhoneNumber {get;set;}
+		public string ForwardTo { get; set; }
 	}
 }
