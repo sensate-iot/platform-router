@@ -72,6 +72,26 @@ namespace SensateService.Services
 			await this.Connect();
 		}
 
+		protected async Task PublishOnAsync(string topic, string message, bool retain)
+		{
+			MqttApplicationMessageBuilder builder;
+			MqttApplicationMessage msg;
+
+			builder = new MqttApplicationMessageBuilder();
+			builder.WithAtLeastOnceQoS();
+			builder.WithPayload(message);
+			builder.WithTopic(topic);
+			builder.WithRetainFlag(retain);
+			msg = builder.Build();
+			await this._client.PublishAsync(msg);
+		}
+
+		protected  void PublishOn(string topic, string message, bool retain)
+		{
+			var worker = this.PublishOnAsync(topic, message, retain);
+			Task.Run(() => worker.RunSynchronously()).Wait();
+		}
+
 		private async Task Connect()
 		{
 			this._logger.LogInformation("Connecting to MQTT broker");
