@@ -9,7 +9,6 @@ using System;
 using System.Reflection;
 using System.Linq;
 
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -21,10 +20,7 @@ namespace SensateService.Init
 {
 	public static class MqttServiceInitExtensions
 	{
-		public static IServiceCollection AddMqttService(
-			this IServiceCollection service,
-			Action<MqttServiceOptions> setup
-		)
+		public static IServiceCollection AddMqttService(this IServiceCollection service, Action<MqttServiceOptions> setup)
 		{
 			service.AddSingleton<IHostedService, MqttService>();
 

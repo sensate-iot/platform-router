@@ -19,5 +19,6 @@ namespace SensateService.Services
 		public string Username {get;set;}
 		public string Password {get;set;}
 		public string TopicShare {get;set;}
+		public string InternalMeasurementTopic { get; set; }
 	}
 }
