@@ -8,7 +8,7 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
-
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
 using SensateService.Enums;
@@ -17,6 +17,7 @@ using SensateService.Infrastructure.Events;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Models.Json.In;
+using SensateService.Services;
 
 namespace SensateService.MqttHandler
 {
@@ -27,6 +28,8 @@ namespace SensateService.MqttHandler
 		private readonly IAuditLogRepository auditlogs;
 		private readonly IUserRepository users;
 		private readonly ISensorStatisticsRepository stats;
+		private readonly IMqttPublishService client;
+		private readonly MqttServiceOptions mqttopts;
 
 		private bool disposed;
 
@@ -34,15 +37,19 @@ namespace SensateService.MqttHandler
 									  IMeasurementRepository measurements,
 									  IAuditLogRepository auditlogs,
 									  ISensorStatisticsRepository stats,
-									  IUserRepository users)
+									  IOptions<MqttServiceOptions> options,
+									  IUserRepository users, IMqttPublishService client)
 		{
 			this.sensors = sensors;
 			this.measurements = measurements;
 			this.auditlogs = auditlogs;
 			this.users = users;
 			this.stats = stats;
+			this.client = client;
+			this.mqttopts = options.Value;
 
 			this.measurements.MeasurementReceived += this.MeasurementReceived_Handler;
+			this.measurements.MeasurementReceived += this.InternalMqttMeasurementPublish_Handler;
 #if DEBUG
 			this.measurements.MeasurementReceived += this.MeasurementReceived_DebugHandler;
 #endif
@@ -59,6 +66,14 @@ namespace SensateService.MqttHandler
 			return Task.CompletedTask;
 		}
 #endif
+
+		private async Task InternalMqttMeasurementPublish_Handler(object sender, MeasurementReceivedEventArgs e)
+		{
+			string msg;
+
+			msg = e.Measurement.ToJson();
+			await this.client.PublishOnAsync(this.mqttopts.InternalMeasurementTopic, msg, false);
+		}
 
 		private async Task MeasurementReceived_Handler(object sender, MeasurementReceivedEventArgs e)
 		{
@@ -112,8 +127,8 @@ namespace SensateService.MqttHandler
 					return;
 
 				sensor = await this.sensors.GetAsync(raw.CreatedById).AwaitSafely();
-				await this.measurements.ReceiveMeasurementAsync(sensor, raw);
 
+				await this.measurements.ReceiveMeasurementAsync(sensor, raw);
 				await this.stats.IncrementAsync(sensor);
 			} catch(Exception ex) {
 				Console.WriteLine($"Error: {ex.Message}");

@@ -44,6 +44,7 @@
     "Ssl": "false",
     "Port": 1883,
     "Host": "mqtt.example.com",
-    "ShareTopic": "$share/sensate/sensate/measurements"
+    "ShareTopic": "$share/sensate/sensate/measurements",
+    "InternalMeasurementTopic" :  "sensate/internal/measurements" 
   }
 }

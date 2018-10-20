@@ -20,6 +20,7 @@ using SensateService.Config;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
 using SensateService.Models;
+using SensateService.Services;
 
 namespace SensateService.MqttHandler
 {
@@ -100,6 +101,13 @@ namespace SensateService.MqttHandler
 				options.Password = mqtt.Password;
 				options.Id = Guid.NewGuid().ToString();
 				options.TopicShare = "$share/sensate/";
+				options.InternalMeasurementTopic = mqtt.InternalMeasurementTopic;
+			});
+
+			services.AddSingleton<IMqttPublishService>(provider => {
+				var s = provider.GetServices<IHostedService>().ToList();
+				var mqservice = s.Find(x => x.GetType() == typeof(MqttService)) as IMqttPublishService;
+				return mqservice;
 			});
 		}
 
