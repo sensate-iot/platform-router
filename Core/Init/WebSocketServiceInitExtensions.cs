@@ -31,11 +31,11 @@ namespace SensateService.Init
 
 		public static IServiceCollection AddWebSocketService(this IServiceCollection services)
 		{
-			services.AddScoped<IWebSocketRepository, WebSocketRepository>();
+			services.AddSingleton<IWebSocketRepository, WebSocketRepository>();
 
 			foreach(var etype in Assembly.GetEntryAssembly().ExportedTypes) {
 				if(etype.GetTypeInfo().BaseType == typeof(WebSocketHandler))
-					services.AddScoped(etype);
+					services.AddSingleton(etype);
 			}
 
 			return services;
