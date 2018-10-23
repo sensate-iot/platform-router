@@ -146,6 +146,7 @@ namespace SensateService.MqttHandler
 				this.measurements.MeasurementReceived -= this.MeasurementReceived_DebugHandler;
 #endif
 				this.measurements.MeasurementReceived -= this.MeasurementReceived_Handler;
+				this.measurements.MeasurementReceived -= this.InternalMqttMeasurementPublish_Handler;
 			}
 
 			this.disposed = true;
