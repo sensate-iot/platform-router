@@ -19,7 +19,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
-using SensateService.Auth.Middleware;
 using SensateService.Config;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
@@ -155,7 +154,6 @@ namespace SensateService.Auth
 				});
 			});
 
-			services.AddWebSocketService();
 			services.AddMvc();
 		}
 
@@ -188,8 +186,6 @@ namespace SensateService.Auth
 				app.UseDeveloperExceptionPage();
 			}
 
-			app.UseWebSockets();
-			app.MapWebSocketService("/measurement", sp.GetService<WebSocketMeasurementHandler>());
 			app.UseAuthentication();
 			app.UseMvc();
 		}

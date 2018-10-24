@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <AssemblyName>SensateService.Core.Api</AssemblyName>
-    <RootNamespace>SensateService.Core.Api</RootNamespace>
+    <AssemblyName>SensateService.ApiCore</AssemblyName>
+    <RootNamespace>SensateService.ApiCore</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

@@ -14,7 +14,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Setup", "Setup\Setup.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseTool", "DatabaseTool\DatabaseTool.csproj", "{5394032A-FBF9-40BD-B92A-87686B3D7B72}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Api", "Core.Api\Core.Api.csproj", "{84CAF4A2-7719-492B-B947-21051C76635E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiCore", "ApiCore\ApiCore.csproj", "{84CAF4A2-7719-492B-B947-21051C76635E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSocketHandler", "WebSocketHandler\WebSocketHandler.csproj", "{D68B15B0-B7AB-4A54-9925-3F9554DAA7A0}"
 EndProject

@@ -19,8 +19,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 using SensateService.Auth.Helpers;
-using SensateService.Core.Api.Attributes;
-using SensateService.Core.Api.Controllers;
+using SensateService.ApiCore.Attributes;
+using SensateService.ApiCore.Controllers;
 using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;

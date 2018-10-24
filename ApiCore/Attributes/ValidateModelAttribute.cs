@@ -8,10 +8,11 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+
 using SensateService.Enums;
 using SensateService.Models.Json.Out;
 
-namespace SensateService.Core.Api.Attributes
+namespace SensateService.ApiCore.Attributes
 {
 	public class ValidateModelAttribute : ActionFilterAttribute
 	{
