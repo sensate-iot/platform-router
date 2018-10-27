@@ -8,6 +8,7 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
@@ -25,8 +26,7 @@ namespace SensateService.MqttHandler.Mqtt
 	{
 		private readonly ISensorRepository sensors;
 		private readonly IMeasurementRepository measurements;
-		private readonly IAuditLogRepository auditlogs;
-		private readonly IUserRepository users;
+		private readonly IServiceProvider provider;
 		private readonly ISensorStatisticsRepository stats;
 		private readonly IMqttPublishService client;
 		private readonly MqttServiceOptions mqttopts;
@@ -35,18 +35,16 @@ namespace SensateService.MqttHandler.Mqtt
 
 		public MqttMeasurementHandler(ISensorRepository sensors,
 									  IMeasurementRepository measurements,
-									  IAuditLogRepository auditlogs,
 									  ISensorStatisticsRepository stats,
 									  IOptions<MqttServiceOptions> options,
-									  IUserRepository users, IMqttPublishService client)
+									  IServiceProvider provider, IMqttPublishService client)
 		{
 			this.sensors = sensors;
 			this.measurements = measurements;
-			this.auditlogs = auditlogs;
-			this.users = users;
 			this.stats = stats;
 			this.client = client;
 			this.mqttopts = options.Value;
+			this.provider = provider;
 
 			this.measurements.MeasurementReceived += this.MeasurementReceived_Handler;
 			this.measurements.MeasurementReceived += this.InternalMqttMeasurementPublish_Handler;
@@ -87,16 +85,21 @@ namespace SensateService.MqttHandler.Mqtt
 				return;
 
 			try {
-				user = this.users.Get(sensor.Owner);
-				log = new AuditLog {
-					Address = IPAddress.Any,
-					Method = RequestMethod.MqttTcp,
-					Route = "NA",
-					Timestamp = DateTime.Now,
-					Author = user
-				};
+				using(var scope = this.provider.CreateScope()) {
+					var users = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+					var auditlogs = scope.ServiceProvider.GetRequiredService<IAuditLogRepository>();
 
-				await this.auditlogs.CreateAsync(log, e.CancellationToken);
+					user = users.Get(sensor.Owner);
+					log = new AuditLog {
+						Address = IPAddress.Any,
+						Method = RequestMethod.MqttTcp,
+						Route = "NA",
+						Timestamp = DateTime.Now,
+						Author = user
+					};
+
+					await auditlogs.CreateAsync(log, e.CancellationToken).AwaitSafely();
+				}
 			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);
 				Console.WriteLine("");

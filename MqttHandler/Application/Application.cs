@@ -38,14 +38,7 @@ namespace SensateService.MqttHandler.Application
 
 			services.ForEach(x => x.StartAsync(CancellationToken.None));
 			Console.WriteLine("MQTT client started");
-
-			while(true) {
-				GC.Collect();
-
-				if(this._reset.WaitOne(8000)) {
-					break;
-				}
-			}
+			this._reset.WaitOne();
 		}
 	}
 }
