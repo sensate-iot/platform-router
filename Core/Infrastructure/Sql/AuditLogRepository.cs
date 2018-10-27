@@ -70,7 +70,7 @@ namespace SensateService.Infrastructure.Sql
 		public async Task CreateAsync(AuditLog obj, CancellationToken ct)
 		{
 			this.Data.Add(obj);
-			await this.CommitAsync(obj, ct).AwaitSafely();
+			await this.CommitAsync(ct).AwaitSafely();
 		}
 
 		public override async Task CreateAsync(AuditLog obj)

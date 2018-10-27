@@ -19,7 +19,7 @@ using Microsoft.Extensions.Options;
 
 using MQTTnet;
 using MQTTnet.Client;
-
+using SensateService.Helpers;
 using SensateService.Middleware;
 
 namespace SensateService.Services
@@ -119,7 +119,12 @@ namespace SensateService.Services
 					return;
 
 				msg = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
-				await handler.OnMessageAsync(e.ApplicationMessage.Topic, msg);
+
+				try {
+					await handler.OnMessageAsync(e.ApplicationMessage.Topic, msg).AwaitSafely();
+				} catch(Exception ex) {
+					this._logger.LogWarning($"Unable to store measurement: {ex.Message}");
+				}
 			}
 		}
 
