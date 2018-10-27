@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Http;
 
 using SensateService.Middleware;
 
-namespace SensateService.Services
+namespace SensateService.ApiCore.Middleware
 {
 	public class WebSocketService
 	{

@@ -5,18 +5,16 @@
  * @email  dev@bietje.net
  */
 
-using System.Reflection;
-
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
+using SensateService.ApiCore.Middleware;
 using SensateService.Infrastructure;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Middleware;
-using SensateService.Services;
 
-namespace SensateService.Init
+namespace SensateService.ApiCore.Init
 {
 	public static class WebSocketServiceInitExtensions
 	{

@@ -34,7 +34,6 @@ namespace SensateService.WebSocketHandler
 		private readonly IMqttPublishService client;
 		private readonly MqttServiceOptions mqttopts;
 		private readonly IServiceProvider provider;
-		private bool disposed;
 
 		public WebSocketMeasurementHandler(IWebSocketRepository sockets,
 										   IMqttPublishService client,
@@ -43,7 +42,6 @@ namespace SensateService.WebSocketHandler
 		{
 			this.provider = provider;
 			this.client = client;
-			this.disposed = false;
 			this.mqttopts = options.Value;
 
 		}
@@ -71,9 +69,6 @@ namespace SensateService.WebSocketHandler
 		{
 			SensateUser user;
 			AuditLog log;
-
-			if(this.disposed)
-				throw new ObjectDisposedException("MeasurementHandler");
 
 			if(!(sender is Sensor sensor))
 				return;
