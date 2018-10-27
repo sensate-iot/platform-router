@@ -32,13 +32,13 @@ namespace SensateService.Init
 		public static IServiceCollection AddWebSocketService(this IServiceCollection services)
 		{
 			services.AddSingleton<IWebSocketRepository, WebSocketRepository>();
-
-			foreach(var etype in Assembly.GetEntryAssembly().ExportedTypes) {
-				if(etype.GetTypeInfo().BaseType == typeof(WebSocketHandler))
-					services.AddSingleton(etype);
-			}
-
 			return services;
+		}
+
+		public static IServiceCollection AddWebSocketHandler<T>(this IServiceCollection sc) where T : WebSocketHandler
+		{
+			sc.AddSingleton<T>();
+			return sc;
 		}
 	}
 }

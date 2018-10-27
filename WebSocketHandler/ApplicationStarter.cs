@@ -89,17 +89,23 @@ namespace SensateService.WebSocketHandler
 			});
 
 			services.AddWebSocketService();
+			services.AddWebSocketHandler<WebSocketMeasurementHandler>();
+			services.AddWebSocketHandler<WebSocketLiveMeasurementHandler>();
 		}
 
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory logging, IServiceProvider sp)
 		{
+			var mqtt = new MqttConfig();
+
 			logging.AddConsole();
+			Configuration.GetSection("Mqtt").Bind(mqtt);
 
 			if(IsDevelopment())
 				logging.AddDebug();
 
 			app.UseWebSockets();
 			app.MapWebSocketService("/measurement", sp.GetService<WebSocketMeasurementHandler>());
+			sp.MapMqttTopic<MqttInternalMeasurementHandler>(mqtt.InternalMeasurementTopic);
 		}
 	}
 }
