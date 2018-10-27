@@ -8,6 +8,7 @@
 using System;
 
 using Microsoft.Extensions.DependencyInjection;
+using SensateService.MqttHandler.Application;
 
 namespace SensateService.MqttHandler
 {
@@ -24,7 +25,7 @@ namespace SensateService.MqttHandler
 
             var provider = services.BuildServiceProvider();
             starter.Configure(provider);
-	        starter.Run(provider);
+			starter.BuildApplication(provider).Run();
         }
     }
 }
