@@ -8,9 +8,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using SensateService.Helpers;
+
 using SensateService.Infrastructure.Events;
-using SensateService.Infrastructure.Repositories;
 using SensateService.Middleware;
 using SensateService.Models;
 

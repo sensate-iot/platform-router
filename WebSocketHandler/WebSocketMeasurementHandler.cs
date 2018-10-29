@@ -23,6 +23,7 @@ using SensateService.Exceptions;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Events;
 using SensateService.Infrastructure.Repositories;
+using SensateService.Middleware;
 using SensateService.Models;
 using SensateService.Models.Json.In;
 using SensateService.Services;
@@ -97,7 +98,7 @@ namespace SensateService.WebSocketHandler
 			}
 		}
 
-		public override async Task Receive(WebSocket socket, WebSocketReceiveResult result, byte[] buffer)
+		public override async Task Receive(AuthenticatedWebSocket socket, WebSocketReceiveResult result, byte[] buffer)
 		{
 			string msg;
 			RawMeasurement raw;
@@ -137,12 +138,12 @@ namespace SensateService.WebSocketHandler
 				Debug.WriteLine($"Unable to store measurement: {ex.Message}");
 				dynamic jobj = new JObject();
 				jobj.status = ex.ErrorCode;
-				await this.SendMessage(socket, jobj.ToString());
+				await this.SendMessage(socket.Raw, jobj.ToString());
 			} catch(Exception ex) {
 				Debug.WriteLine($"Unable to store measurement: {ex.Message}");
 				dynamic jobj = new JObject();
 				jobj.status = 500;
-				await this.SendMessage(socket, jobj.ToString());
+				await this.SendMessage(socket.Raw, jobj.ToString());
 			} finally {
 				if(measurements != null) {
 					measurements.MeasurementReceived -= MeasurementReceived_Handler;

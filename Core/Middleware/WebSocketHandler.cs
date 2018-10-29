@@ -19,7 +19,7 @@ namespace SensateService.Middleware
 	{
 		protected readonly IWebSocketRepository _sockets;
 
-		public WebSocketHandler(IWebSocketRepository socketRepository)
+		protected WebSocketHandler(IWebSocketRepository socketRepository)
 		{
 			this._sockets = socketRepository;
 		}
@@ -73,6 +73,6 @@ namespace SensateService.Middleware
 			}
 		}
 
-		public abstract Task Receive(WebSocket socket, WebSocketReceiveResult result, byte[] buffer);
+		public abstract Task Receive(AuthenticatedWebSocket socket, WebSocketReceiveResult result, byte[] buffer);
 	}
 }
