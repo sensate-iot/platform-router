@@ -8,6 +8,7 @@
 using System;
 using System.Linq;
 using System.Text;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
@@ -16,16 +17,17 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+
 using SensateService.ApiCore.Init;
 using SensateService.Config;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
 using SensateService.Models;
 using SensateService.Services;
-
+using SensateService.WebSocketHandler.Handlers;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
-namespace SensateService.WebSocketHandler
+namespace SensateService.WebSocketHandler.Application
 {
 	public class ApplicationStarter
 	{
@@ -88,7 +90,6 @@ namespace SensateService.WebSocketHandler
 				return mqservice;
 			});
 
-			services.AddWebSocketService();
 			services.AddWebSocketHandler<WebSocketMeasurementHandler>();
 			services.AddWebSocketHandler<WebSocketLiveMeasurementHandler>();
 		}

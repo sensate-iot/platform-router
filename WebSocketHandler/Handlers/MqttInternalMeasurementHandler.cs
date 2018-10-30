@@ -13,7 +13,7 @@ using SensateService.Infrastructure.Events;
 using SensateService.Middleware;
 using SensateService.Models;
 
-namespace SensateService.WebSocketHandler
+namespace SensateService.WebSocketHandler.Handlers
 {
 	public class MqttInternalMeasurementHandler : MqttHandler
 	{

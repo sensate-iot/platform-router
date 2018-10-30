@@ -7,10 +7,13 @@
 
 using System;
 using System.IO;
+
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+
+using SensateService.WebSocketHandler.Application;
 
 namespace SensateService.WebSocketHandler 
 {

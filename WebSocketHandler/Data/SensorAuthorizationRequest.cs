@@ -5,7 +5,7 @@
  * @email  dev@bietje.net
  */
 
-namespace SensateService.WebSocketHandler
+namespace SensateService.WebSocketHandler.Data
 {
 	public class SensorAuthorizationRequest
 	{

@@ -28,7 +28,7 @@ using SensateService.Models;
 using SensateService.Models.Json.In;
 using SensateService.Services;
 
-namespace SensateService.WebSocketHandler
+namespace SensateService.WebSocketHandler.Handlers
 {
 	public class WebSocketMeasurementHandler : Middleware.WebSocketHandler
 	{
@@ -36,10 +36,7 @@ namespace SensateService.WebSocketHandler
 		private readonly MqttServiceOptions mqttopts;
 		private readonly IServiceProvider provider;
 
-		public WebSocketMeasurementHandler(IWebSocketRepository sockets,
-										   IMqttPublishService client,
-										   IServiceProvider provider,
-									       IOptions<MqttServiceOptions> options) : base(sockets)
+		public WebSocketMeasurementHandler( IMqttPublishService client, IServiceProvider provider, IOptions<MqttServiceOptions> options)
 		{
 			this.provider = provider;
 			this.client = client;
