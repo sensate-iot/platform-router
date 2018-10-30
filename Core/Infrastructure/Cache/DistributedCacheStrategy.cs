@@ -38,6 +38,52 @@ namespace SensateService.Infrastructure.Cache
 			this._cache.Remove(key);
 		}
 
+		public override async Task SerializeAsync(string key, object obj, int tmo, bool slide, CancellationToken ct = default(CancellationToken))
+		{
+			byte[] data;
+			DistributedCacheEntryOptions opts;
+
+			data = obj.ToByteArray();
+			opts = new DistributedCacheEntryOptions();
+
+			if(slide)
+				opts.SetSlidingExpiration(TimeSpan.FromMinutes(tmo));
+			else
+				opts.SetAbsoluteExpiration(TimeSpan.FromMinutes(tmo));
+			await this._cache.SetAsync(key, data, opts, ct).AwaitSafely();
+		}
+
+		public override async Task<ObjType> DeserializeAsync<ObjType>(string key, CancellationToken ct = default(CancellationToken))
+		{
+			byte[] data;
+
+			data = await this._cache.GetAsync(key, ct).AwaitSafely();
+			return data.FromByteArray<ObjType>();
+		}
+
+		public override void Serialize(string key, object obj, int tmo, bool slide)
+		{
+			byte[] data;
+			DistributedCacheEntryOptions opts;
+
+			data = obj.ToByteArray();
+			opts = new DistributedCacheEntryOptions();
+
+			if(slide)
+				opts.SetSlidingExpiration(TimeSpan.FromMinutes(tmo));
+			else
+				opts.SetAbsoluteExpiration(TimeSpan.FromMinutes(tmo));
+			this._cache.SetAsync(key, data, opts);
+		}
+
+		public override ObjType Deserialize<ObjType>(string key)
+		{
+			byte[] data;
+
+			data = this._cache.Get(key);
+			return data.FromByteArray<ObjType>();
+		}
+
 		public override async Task RemoveAsync(string key)
 		{
 			await this._cache.RemoveAsync(key).AwaitSafely();

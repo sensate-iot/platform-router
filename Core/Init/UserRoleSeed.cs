@@ -53,8 +53,7 @@ namespace SensateService.Init
 			user = new SensateUser {
 				Email = "root@example.com",
 				FirstName = "System",
-				LastName = "Administrator",
-				PhoneNumber = "0612345678",
+				LastName = "Administrator"
 			};
 
 			user.UserName = user.Email;

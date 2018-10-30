@@ -23,5 +23,13 @@ namespace SensateService.Infrastructure.Cache
 
 		Task RemoveAsync(string key);
 		void Remove(string key);
+
+		Task SerializeAsync(string key, object obj, int tmo, bool slide, CancellationToken ct = default(CancellationToken));
+
+		Task<ObjType> DeserializeAsync<ObjType>(string key, CancellationToken ct = default(CancellationToken))
+			where ObjType : class;
+
+		void Serialize(string key, object obj, int tmo, bool slide);
+		ObjType Deserialize<ObjType>(string key) where ObjType : class;
 	}
 }

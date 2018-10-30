@@ -17,7 +17,8 @@ namespace SensateService.Setup.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)
-                .HasAnnotation("ProductVersion", "2.0.2-rtm-10011");
+                .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
@@ -141,6 +142,29 @@ namespace SensateService.Setup.Migrations
                     b.ToTable("ChangeEmailTokens");
                 });
 
+            modelBuilder.Entity("SensateService.Models.ChangePhoneNumberToken", b =>
+                {
+                    b.Property<string>("IdentityToken");
+
+                    b.Property<string>("PhoneNumber");
+
+                    b.Property<DateTime>("Timestamp");
+
+                    b.Property<string>("UserId");
+
+                    b.Property<string>("UserToken")
+                        .IsRequired();
+
+                    b.HasKey("IdentityToken", "PhoneNumber");
+
+                    b.HasAlternateKey("UserToken")
+                        .HasName("AlternateKey_UserToken");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ChangePhoneNumberTokens");
+                });
+
             modelBuilder.Entity("SensateService.Models.PasswordResetToken", b =>
                 {
                     b.Property<string>("UserToken")
@@ -193,6 +217,8 @@ namespace SensateService.Setup.Migrations
                     b.Property<string>("SecurityStamp");
 
                     b.Property<bool>("TwoFactorEnabled");
+
+                    b.Property<string>("UnconfirmedPhoneNumber");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256);
@@ -303,6 +329,13 @@ namespace SensateService.Setup.Migrations
                     b.HasOne("SensateService.Models.SensateUser", "Author")
                         .WithMany()
                         .HasForeignKey("AuthorId");
+                });
+
+            modelBuilder.Entity("SensateService.Models.ChangePhoneNumberToken", b =>
+                {
+                    b.HasOne("SensateService.Models.SensateUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("SensateService.Models.UserToken", b =>

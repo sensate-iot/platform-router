@@ -6,9 +6,10 @@
  */
 
 using System;
+
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SensateService.Mqtt
+namespace SensateService.MqttHandler
 {
     public class Program
     {
@@ -16,14 +17,14 @@ namespace SensateService.Mqtt
         {
             IServiceCollection services;
 
-            Console.WriteLine($"Starting Sensate MQTT client Sensate CORE {Version.VersionString}");
+            Console.WriteLine($"Starting Sensate MQTT client using {Version.VersionString}");
             services = new ServiceCollection();
-            var starter = new Startup();
+			var starter = new Startup();
             starter.ConfigureServices(services);
 
             var provider = services.BuildServiceProvider();
             starter.Configure(provider);
-            starter.Run(provider);
+	        starter.Run(provider);
         }
     }
 }

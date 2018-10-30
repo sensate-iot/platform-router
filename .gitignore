@@ -12,6 +12,7 @@ dist/
 .idea/.idea.sensate-service/.idea/workspace.xml
 **.DotSettings.user
 appsettings.json
+*.csproj.user
 
 # User specific
 **/.idea/**/workspace.xml

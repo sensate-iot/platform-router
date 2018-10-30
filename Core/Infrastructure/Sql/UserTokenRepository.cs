@@ -75,7 +75,7 @@ namespace SensateService.Infrastructure.Sql
 				   where token.UserId == user.Id
 				   select token;
 
-			return data;
+			return data.ToList();
 		}
 
 

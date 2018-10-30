@@ -74,7 +74,6 @@ namespace SensateService.Tests
 			ctx = new SensateContext(settings);
 			var repo = new MeasurementRepository(ctx, logger);
 			this._repo = repo;
-			MeasurementEvents.MeasurementReceived += OnMeasurementReceived_Handler;
 		}
 
 		[TearDown]
@@ -82,18 +81,12 @@ namespace SensateService.Tests
 		{
 		}
 
-		private Task OnMeasurementReceived_Handler(object s, MeasurementReceivedEventArgs e)
-		{
-			this._receivedMeasurement = e.Measurement;
-			return Task.CompletedTask;
-		}
-
 		[Test, Order(2)]
 		public async Task CanGetById()
 		{
 			Measurement m;
 
-			m = await this._repo.GetMeasurementAsync(null, x => x.CreatedBy == this._sensor.InternalId);
+			m = await this._repo.GetMeasurementAsync(x => x.CreatedBy == this._sensor.InternalId);
 			var list = m.Data as List<DataPoint>;
 
 			Assert.True(list[0].Name == "z");
@@ -137,7 +130,7 @@ namespace SensateService.Tests
 				Data = array
 			};
 
-			await this._repo.ReceiveMeasurement(_sensor, m);
+			await this._repo.ReceiveMeasurementAsync(_sensor, m);
 			Assert.IsTrue(this._receivedMeasurement != null);
 		}
 	}

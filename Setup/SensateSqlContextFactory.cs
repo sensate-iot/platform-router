@@ -29,7 +29,7 @@ namespace SensateService.Setup
 			this.BuildConfiguration();
 			this.Configuration.GetSection("Database").Bind(db);
 
-			builder.UseNpgsql(db.PgSQL.ConnectionString, x => x.MigrationsAssembly("Setup"));
+			builder.UseNpgsql(db.PgSQL.ConnectionString, x => x.MigrationsAssembly("SensateService.Setup"));
 			return new SensateSqlContext(builder.Options);
 		}
 

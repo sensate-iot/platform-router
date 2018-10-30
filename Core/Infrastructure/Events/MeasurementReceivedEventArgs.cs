@@ -6,17 +6,15 @@
  */
 
 using System;
-using System.Linq;
-using System.Threading.Tasks;
 
+using System.Threading;
 using SensateService.Models;
 
 namespace SensateService.Infrastructure.Events
 {
-	public delegate Task OnMeasurementReceived(object sender, MeasurementReceivedEventArgs e);
-
 	public class MeasurementReceivedEventArgs : EventArgs
 	{
-		public Measurement Measurement {get;set;}
+		public Measurement Measurement { get; set; }
+		public CancellationToken CancellationToken { get; set; }
 	}
 }

@@ -1,0 +1,1 @@
+﻿Hi! Please use the following token to confirm your phone number: {0}.

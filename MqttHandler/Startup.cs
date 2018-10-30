@@ -6,21 +6,22 @@
  */
 
 using System;
-using System.Threading;
 using System.IO;
+using System.Threading;
 using System.Linq;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+
 using SensateService.Config;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
 using SensateService.Models;
 
-namespace SensateService.Mqtt
+namespace SensateService.MqttHandler
 {
 	public class Startup
 	{
@@ -48,8 +49,13 @@ namespace SensateService.Mqtt
 
 		private static bool IsDevelopment()
 		{
+#if DEBUG
 			var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
 			return env == "Development";
+#else
+			return false;
+#endif
+
 		}
 
 		private void CancelEvent_Handler(object sender, ConsoleCancelEventArgs e)
@@ -116,7 +122,14 @@ namespace SensateService.Mqtt
 
 			services.ForEach(x => x.StartAsync(CancellationToken.None));
 			Console.WriteLine("MQTT client started");
-			this._reset.WaitOne();
+
+			while(true) {
+				GC.Collect();
+
+				if(this._reset.WaitOne(8000)) {
+					break;
+				}
+			}
 		}
 	}
 }

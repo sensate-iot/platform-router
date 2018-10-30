@@ -5,15 +5,15 @@
  * @email  dev@bietje.net
  */
 
+using System;
 using Newtonsoft.Json;
 using SensateService.Converters;
 
 using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson.Serialization.Serializers;
-using MongoDB.Bson;
 
 namespace SensateService.Models
 {
+	[Serializable]
 	public class DataPoint
 	{
 		[JsonProperty(Required = Required.Always)]

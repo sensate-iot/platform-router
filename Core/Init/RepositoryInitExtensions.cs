@@ -27,6 +27,7 @@ namespace SensateService.Init
 			services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 			services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 			services.AddScoped<IUserTokenRepository, UserTokenRepository>();
+			services.AddScoped<IChangePhoneNumberTokenRepository, ChangePhoneNumberRepository>();
 
 			return services;
 		}
@@ -35,7 +36,7 @@ namespace SensateService.Init
 			this IServiceCollection services, bool cache
 		)
 		{
-			services.AddScoped<ISensorStatisticsRepository, SensorStatisticsRepositoryRepository>();
+			services.AddScoped<ISensorStatisticsRepository, SensorStatisticsRepository>();
 
 			if(cache) {
 				Debug.WriteLine("Caching enabled!");

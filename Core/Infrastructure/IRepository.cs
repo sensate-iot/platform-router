@@ -5,7 +5,6 @@
  * @email:  dev@bietje.net
  */
 
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace SensateService.Infrastructure

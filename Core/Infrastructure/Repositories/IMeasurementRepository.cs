@@ -9,7 +9,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
+using System.Threading;
 
+using SensateService.Infrastructure.Events;
 using SensateService.Models;
 using SensateService.Models.Json.In;
 
@@ -17,16 +19,19 @@ namespace SensateService.Infrastructure.Repositories
 {
 	public interface IMeasurementRepository
 	{
+		event OnMeasurementReceived MeasurementReceived;
+
 		IEnumerable<Measurement> TryGetBetween(Sensor sensor, DateTime start, DateTime end);
-		IEnumerable<Measurement> TryGetMeasurements(string key, Expression<Func<Measurement, bool>> selector);
-		Measurement GetMeasurement(string key, Expression<Func<Measurement, bool>> selector);
+		IEnumerable<Measurement> TryGetMeasurements(Expression<Func<Measurement, bool>> selector);
+		Measurement GetMeasurement(Expression<Func<Measurement, bool>> selector);
 		IEnumerable<Measurement> GetMeasurementsBySensor(Sensor sensor);
 		IEnumerable<Measurement> GetBefore(Sensor sensor, DateTime pit);
 		IEnumerable<Measurement> GetAfter(Sensor sensor, DateTime pit);
+		Task<long> GetMeasurementCountAsync(Sensor sensor, CancellationToken token = default(CancellationToken));
 
 		Task<IEnumerable<Measurement>> TryGetBetweenAsync(Sensor sensor, DateTime start, DateTime end);
-		Task<IEnumerable<Measurement>> TryGetMeasurementsAsync(string key, Expression<Func<Measurement, bool>> selector);
-		Task<Measurement> GetMeasurementAsync(string key, Expression<Func<Measurement, bool>> selector);
+		Task<IEnumerable<Measurement>> TryGetMeasurementsAsync(Expression<Func<Measurement, bool>> selector);
+		Task<Measurement> GetMeasurementAsync(Expression<Func<Measurement, bool>> selector);
 		Task<IEnumerable<Measurement>> GetMeasurementsBySensorAsync(Sensor sensor);
 		Task<IEnumerable<Measurement>> GetBeforeAsync(Sensor sensor, DateTime pit);
 		Task<IEnumerable<Measurement>> GetAfterAsync(Sensor sensor, DateTime pit);
@@ -36,8 +41,6 @@ namespace SensateService.Infrastructure.Repositories
 		void DeleteBetween(Sensor sensor, DateTime start, DateTime end);
 		Task DeleteBetweenAsync(Sensor sensor, DateTime start, DateTime end);
 
-		Task ReceiveMeasurement(Sensor sender, RawMeasurement measurement);
-		void Commit(Measurement obj);
-		Task CommitAsync(Measurement obj);
+		Task ReceiveMeasurementAsync(Sensor sensor, RawMeasurement measurement);
 	}
 }
