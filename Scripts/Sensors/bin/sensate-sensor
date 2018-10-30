@@ -5,6 +5,7 @@
 const program = require('commander');
 const mqtt = require('../lib/mqtt');
 const websocket = require('../lib/websocket');
+const settings = require('../lib/settings-parser');
 
 main();
 
@@ -19,6 +20,7 @@ function main() {
 		.option('-P, --port <port>', 'server port number', '1883')
 		.option('-i, --id <sensor_id>', 'sensor id')
 		.option('-I, --interval <interval>', 'set the update interval', '1000')
+		.option('-c, --config <config>', 'set configuration file', undefined);
 
 	program.parse(process.argv);
 
@@ -33,7 +35,16 @@ function main() {
 		id: program.id,
 		host: program.host,
 		port: parseInt(program.port, 10),
-		interval: parseInt(program.interval, 10)
+		interval: parseInt(program.interval, 10),
+		raw_config: program.config,
+		config: settings.parse(program.config)
+	}
+
+	if(args.config != undefined) {
+		args.secret = args.config.sensorSecret;
+		args.password = args.config.mqttPassword;
+		args.username = args.config.mqttUsername;
+		args.id = args.config.sensorId;
 	}
 
 	if(program.mqtt)
