@@ -23,15 +23,13 @@ namespace SensateService.ApiCore.Middleware
 	{
 		private readonly RequestDelegate _next;
 		private readonly WebSocketHandler _handler;
-		private readonly IServiceProvider _provider;
 
 		private const int RxBufferSize = 4096;
 
-		public WebSocketService(RequestDelegate next, WebSocketHandler handler, IServiceProvider sp)
+		public WebSocketService(RequestDelegate next, WebSocketHandler handler)
 		{
 			this._next = next;
 			this._handler = handler;
-			this._provider = sp;
 		}
 
 		public async Task Invoke(HttpContext ctx)
@@ -44,11 +42,6 @@ namespace SensateService.ApiCore.Middleware
 
 			var auth = await ctx.AuthenticateAsync(JwtBearerDefaults.AuthenticationScheme);
 			socket = await ctx.WebSockets.AcceptWebSocketAsync();
-
-			if(auth == null || auth.None || !auth.Succeeded) {
-				await socket.CloseAsync(WebSocketCloseStatus.PolicyViolation, "Unable to authenticate client!", CancellationToken.None);
-				return;
-			}
 
 			this._handler.OnConnected(socket);
 			authws = new AuthenticatedWebSocket {
@@ -63,7 +56,7 @@ namespace SensateService.ApiCore.Middleware
 							await this._handler.Receive(authws, result, buffer);
 							break;
 						case WebSocketMessageType.Close:
-							await this._handler.OnDisconnected(socket);
+							this._handler.OnDisconnected(authws);
 							break;
 						case WebSocketMessageType.Binary:
 							break;
@@ -73,7 +66,7 @@ namespace SensateService.ApiCore.Middleware
 				});
 			} catch(WebSocketException) {
 				Debug.WriteLine($"Websocket error occurred! Socket state: {socket.State}");
-				this._handler.OnForceClose(socket);
+				this._handler.OnForceClose(authws);
 				return;
 			}
 

@@ -27,12 +27,6 @@ namespace SensateService.ApiCore.Init
 			return application.Map(path, (_app) => _app.UseMiddleware<WebSocketService>(handler));
 		}
 
-		public static IServiceCollection AddWebSocketService(this IServiceCollection services)
-		{
-			services.AddSingleton<IWebSocketRepository, WebSocketRepository>();
-			return services;
-		}
-
 		public static IServiceCollection AddWebSocketHandler<T>(this IServiceCollection sc) where T : WebSocketHandler
 		{
 			sc.AddSingleton<T>();
