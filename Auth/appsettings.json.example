@@ -61,13 +61,13 @@
   "Mail": {
     "Provider": "SendGrid",
     "SendGrid": {
-      "Username": "bietje",
+      "Username": "u-name",
       "Key": "<sendgrid-key>"
     },
     "Smtp": {
       "Ssl": true,
       "Port": 587,
-      "Host": "mail.bietje.net",
+      "Host": "mail.example.com",
       "Username": "root@mail.com",
       "Password": "SomePassword"
     }

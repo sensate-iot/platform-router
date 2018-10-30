@@ -6,38 +6,29 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using SensateService.Infrastructure.Repositories;
 
 namespace SensateService.Middleware
 {
 	public abstract class WebSocketHandler
 	{
-		protected readonly IWebSocketRepository _sockets;
-
-		public WebSocketHandler(IWebSocketRepository socketRepository)
+		protected WebSocketHandler()
 		{
-			this._sockets = socketRepository;
 		}
 
 		public virtual void OnConnected(WebSocket socket)
 		{
-			this._sockets.Add(socket);
 		}
 
-		public virtual async Task OnDisconnected(WebSocket socket)
+		public virtual void OnDisconnected(AuthenticatedWebSocket socket)
 		{
-			var id = this._sockets.GetId(socket);
-			await this._sockets.RemoveAsync(id);
 		}
 
-		public virtual void OnForceClose(WebSocket socket)
+		public virtual void OnForceClose(AuthenticatedWebSocket socket)
 		{
-			this._sockets.ForceRemove(socket);
 		}
 
 		public async Task SendMessage(WebSocket socket, string message)
@@ -54,25 +45,6 @@ namespace SensateService.Middleware
 			);
 		}
 
-		public async Task SendMessage(string id, string message)
-		{
-			WebSocket webSocket;
-
-			webSocket = this._sockets.GetById(id);
-			await this.SendMessage(webSocket, message);
-		}
-
-		public async Task BroadcastMessage(string message)
-		{
-			IEnumerable<WebSocket> sockets;
-
-			sockets = this._sockets.GetAll();
-			foreach(var socket in sockets) {
-				if(socket.State == WebSocketState.Open)
-					await this.SendMessage(socket, message);
-			}
-		}
-
-		public abstract Task Receive(WebSocket socket, WebSocketReceiveResult result, byte[] buffer);
+		public abstract Task Receive(AuthenticatedWebSocket socket, WebSocketReceiveResult result, byte[] buffer);
 	}
 }

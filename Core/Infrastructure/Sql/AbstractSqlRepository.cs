@@ -35,9 +35,9 @@ namespace SensateService.Infrastructure.Sql
 			await this._sqlContext.SaveChangesAsync(ct).AwaitSafely();
 		}
 
-		public async Task CommitAsync()
+		public async Task CommitAsync(CancellationToken ct = default(CancellationToken))
 		{
-			await this._sqlContext.SaveChangesAsync().AwaitSafely();
+			await this._sqlContext.SaveChangesAsync(ct).AwaitSafely();
 		}
 
 		public virtual void Commit()

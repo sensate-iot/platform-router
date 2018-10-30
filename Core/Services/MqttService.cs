@@ -19,12 +19,12 @@ using Microsoft.Extensions.Options;
 
 using MQTTnet;
 using MQTTnet.Client;
-
+using SensateService.Helpers;
 using SensateService.Middleware;
 
 namespace SensateService.Services
 {
-	public class MqttService : BackgroundService
+	public class MqttService : BackgroundService, IMqttPublishService
 	{
 		private readonly IServiceProvider _provider;
 		private readonly ConcurrentDictionary<string, Type> _handlers;
@@ -72,6 +72,29 @@ namespace SensateService.Services
 			await this.Connect();
 		}
 
+		public async Task PublishOnAsync(string topic, string message, bool retain)
+		{
+			MqttApplicationMessageBuilder builder;
+			MqttApplicationMessage msg;
+
+			if(!this._client.IsConnected)
+				return;
+
+			builder = new MqttApplicationMessageBuilder();
+			builder.WithAtLeastOnceQoS();
+			builder.WithPayload(message);
+			builder.WithTopic(topic);
+			builder.WithRetainFlag(retain);
+			msg = builder.Build();
+			await this._client.PublishAsync(msg);
+		}
+
+		public  void PublishOn(string topic, string message, bool retain)
+		{
+			var worker = this.PublishOnAsync(topic, message, retain);
+			Task.Run(() => worker.RunSynchronously()).Wait();
+		}
+
 		private async Task Connect()
 		{
 			this._logger.LogInformation("Connecting to MQTT broker");
@@ -80,20 +103,14 @@ namespace SensateService.Services
 			await this._client.ConnectAsync(this._client_options);
 		}
 
-		private async void OnMessage_Handler(
-			object sender,
-			MqttApplicationMessageReceivedEventArgs e
-		)
+		private async void OnMessage_Handler(object sender, MqttApplicationMessageReceivedEventArgs e)
 		{
 			MqttHandler handler;
 			string msg;
 
 			using(var scope = this._provider.CreateScope()) {
 				if(!this._handlers.TryGetValue(e.ApplicationMessage.Topic, out Type handlerType)) {
-					this._handlers.TryGetValue(
-						this.options.TopicShare + e.ApplicationMessage.Topic,
-						out handlerType
-					);
+					this._handlers.TryGetValue(this.options.TopicShare + e.ApplicationMessage.Topic, out handlerType);
 				}
 
 				handler = scope.ServiceProvider.GetRequiredService(handlerType) as MqttHandler;
@@ -102,14 +119,16 @@ namespace SensateService.Services
 					return;
 
 				msg = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
-				await handler.OnMessageAsync(e.ApplicationMessage.Topic, msg);
+
+				try {
+					await handler.OnMessageAsync(e.ApplicationMessage.Topic, msg).AwaitSafely();
+				} catch(Exception ex) {
+					this._logger.LogWarning($"Unable to store measurement: {ex.Message}");
+				}
 			}
 		}
 
-		private void OnConnect_Handler(
-			object sender,
-			MqttClientConnectedEventArgs e
-		)
+		private void OnConnect_Handler(object sender, MqttClientConnectedEventArgs e)
 		{
 			TopicFilterBuilder tfb;
 			List<TopicFilter> filters;
@@ -127,10 +146,7 @@ namespace SensateService.Services
 			this._logger.LogInformation("--- MQTT client connected ---");
 		}
 
-		private async void OnDisconnect_HandlerAsync(
-			object sender,
-			MqttClientDisconnectedEventArgs e
-		)
+		private async void OnDisconnect_HandlerAsync(object sender, MqttClientDisconnectedEventArgs e)
 		{
 			Debug.WriteLine("--- MQTT client disconnected ---");
 			this._logger.LogInformation("--- MQTT client disconnected ---");

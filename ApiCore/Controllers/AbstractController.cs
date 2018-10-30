@@ -18,7 +18,7 @@ using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Models.Json.Out;
 
-namespace SensateService.Core.Api.Controllers
+namespace SensateService.ApiCore.Controllers
 {
 	public abstract class AbstractController : Controller
 	{
