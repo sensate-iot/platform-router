@@ -165,20 +165,22 @@ namespace SensateService.Auth.Controllers
 		{
 			SensateUser user;
 			Status status;
-			bool confirmed;
+			bool unconfirmed;
 
 			user = await this.GetCurrentUserAsync().AwaitSafely();
-			var worker = this.Log(RequestMethod.HttpGet, user).AwaitSafely();
+			var worker = this.Log(RequestMethod.HttpGet, user);
 
 			if(user == null) {
-				await worker;
+				await worker.AwaitSafely();
 				return this.Forbid();
 			}
 
-			confirmed = await this._manager.IsPhoneNumberConfirmedAsync(user).AwaitSafely();
+			unconfirmed = ! await this._manager.IsPhoneNumberConfirmedAsync(user).AwaitSafely();
+			unconfirmed = unconfirmed || user.UnconfirmedPhoneNumber?.Length > 0;
+
 			status = new Status();
 
-			if(confirmed) {
+			if(!unconfirmed) {
 				status.ErrorCode = ReplyCode.Ok;
 				status.Message = "true";
 			} else {
@@ -186,6 +188,7 @@ namespace SensateService.Auth.Controllers
 				status.Message = "false";
 			}
 
+			await worker.AwaitSafely();
 			return new OkObjectResult(status);
 		}
 
@@ -365,7 +368,7 @@ namespace SensateService.Auth.Controllers
 			user = await this._users.GetAsync(user.Id).AwaitSafely();
 			var code = await this._manager.GenerateEmailConfirmationTokenAsync(user).AwaitSafely();
 			code = Base64UrlEncoder.Encode(code);
-			var url = this.Url.EmailConfirmationLink(user.Id, code, this.Request.Scheme, this._settings.PublicUrl, register.ForwardTo);
+			var url = this.Url.EmailConfirmationLink(user.Id, code, this._settings.Scheme, this._settings.PublicUrl, register.ForwardTo);
 
 			mail = await mailTask.AwaitSafely();
 			mail.HtmlBody = mail.HtmlBody.Replace("%%URL%%", url);
@@ -473,6 +476,76 @@ namespace SensateService.Auth.Controllers
 			return Ok();
 		}
 
+		[NormalUser]
+		[HttpGet("confirm-phone-number/{token}")]
+		[ProducesResponseType(typeof(Status), 400)]
+		[ProducesResponseType(200)]
+		public async Task<IActionResult> ConfirmPhoneNumber(string token)
+		{
+			SensateUser user;
+			ChangePhoneNumberToken phonetoken;
+
+			user = this.CurrentUser;
+			await this.Log(RequestMethod.HttpGet, user).AwaitSafely();
+
+			if(user.UnconfirmedPhoneNumber == null) {
+				return this.InvalidInputResult("No confirmable phone number found!");
+			}
+
+			phonetoken = await this._phonetokens.GetLatest(user);
+			if(phonetoken.UserToken != token)
+				return this.InvalidInputResult("Invalid confirmation token!");
+
+			var result = await this._manager.ChangePhoneNumberAsync(user, phonetoken.PhoneNumber, phonetoken.IdentityToken).AwaitSafely();
+			if(!result.Succeeded)
+				return new BadRequestObjectResult(StringifyIdentityResult(result));
+
+			this._users.StartUpdate(user);
+			user.UnconfirmedPhoneNumber = null;
+			await this._users.EndUpdateAsync().AwaitSafely();
+
+			return this.Ok();
+		}
+
+		[ValidateModel, NormalUser]
+		[HttpPatch("update-phone-number")]
+		[ProducesResponseType(typeof(Status), 400)]
+		[ProducesResponseType(typeof(Status), 200)]
+		public async Task<IActionResult> UpdatePhoneNumber([FromBody] PhoneNumberUpdate update)
+		{
+			SensateUser user;
+			Status status;
+			string body, phonetoken, usertoken;
+
+			user = this.CurrentUser;
+			if(update.PhoneNumber != null && update.PhoneNumber != user.PhoneNumber) {
+				var valid = await this._text.IsValidNumber(update.PhoneNumber);
+
+				if(!valid)
+					return this.InvalidInputResult("Invalid phone number");
+			}
+
+			if(update.PhoneNumber != null && update.PhoneNumber != user.PhoneNumber) {
+				phonetoken = await this._manager.GenerateChangePhoneNumberTokenAsync(user, update.PhoneNumber).AwaitSafely();
+				usertoken = await this._phonetokens.CreateAsync(user, phonetoken, update.PhoneNumber).AwaitSafely();
+				var worker = this.ReadTextTemplate("Confirm_PhoneNumber.txt", usertoken);
+
+				this._users.StartUpdate(user);
+				user.UnconfirmedPhoneNumber = update.PhoneNumber;
+				await this._users.EndUpdateAsync().AwaitSafely();
+
+				body = await worker.AwaitSafely();
+				this._text.Send(this._text_settings.AlphaCode, update.PhoneNumber, body);
+			}
+
+			status = new Status {
+				ErrorCode = ReplyCode.Ok,
+				Message = "Phone number updated."
+			};
+
+			return this.Ok(status);
+		}
+
 		[ValidateModel]
 		[NormalUser]
 		[HttpPatch("update")]
@@ -498,6 +571,7 @@ namespace SensateService.Auth.Controllers
 					return this.InvalidInputResult(result.Errors.First().Description);
 			}
 
+
 			this._users.StartUpdate(user);
 
 			if(userUpdate.FirstName != null)
@@ -505,16 +579,6 @@ namespace SensateService.Auth.Controllers
 
 			if(userUpdate.LastName != null)
 				user.LastName = userUpdate.LastName;
-
-			/*
-			 * TODO: Validate phone number.
-			 */
-			if(userUpdate.PhoneNumber != null) {
-				var valid = await this._text.IsValidNumber(userUpdate.PhoneNumber);
-
-				if(valid && user.PhoneNumber != userUpdate.PhoneNumber)
-					user.PhoneNumber = userUpdate.PhoneNumber;
-			}
 
 			await this._users.EndUpdateAsync().AwaitSafely();
 			return Ok();

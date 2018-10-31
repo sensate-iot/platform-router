@@ -41,12 +41,11 @@
   "PublicUrl": "http://localhost:5000", 
 
   "Authentication" : {
-    "ResetForward": "https://localhost:5000/login",
-    "ConfirmForward": "https://localhost:5000/login",
     "JwtRefreshExpireMinutes": 43200,
     "JwtKey": "<key>",
     "JwtIssuer": "http://localhost:5000/",
-    "JwtExpireMinutes": 43200
+    "JwtExpireMinutes": 43200,
+	"Scheme": "https"
   },
 
   "Mqtt" : {
@@ -78,7 +77,8 @@
 	"AlphaCode": "Sensate IoT",
     "Twilio": {
       "AccountSid": "<sid>",
-      "AuthToken": "<auth token>"
+      "AuthToken": "<auth token>",
+      "PhoneSid": "<name>" 
     } 
   } 
 }

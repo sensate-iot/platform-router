@@ -19,12 +19,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
+using Swashbuckle.AspNetCore.Swagger;
+
 using SensateService.Config;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
 using SensateService.Models;
 using SensateService.Services;
-using Swashbuckle.AspNetCore.Swagger;
+
 
 namespace SensateService.Auth
 {
@@ -62,12 +64,9 @@ namespace SensateService.Auth
 				options.JwtIssuer = auth.JwtIssuer;
 				options.JwtExpireMinutes = auth.JwtExpireMinutes;
 				options.JwtRefreshExpireMinutes = auth.JwtRefreshExpireMinutes;
-				options.ConfirmForward = auth.ConfirmForward;
 				options.PublicUrl = auth.PublicUrl;
-				options.ResetForward = auth.ResetForward;
+				options.Scheme = auth.Scheme;
 			});
-
-			services.Configure<TextServiceSettings>(options => { options.AlphaCode = text.AlphaCode; });
 
 			/*
 			 * Setup user authentication
@@ -141,8 +140,8 @@ namespace SensateService.Auth
 				});
 			}
 
-			if(text.Provider == "Twilio") {
-				services.AddTwilioTextApi(text.Twilio.AccountSid, text.Twilio.AuthToken);
+			if(text.Provider == "Twillio") {
+				services.AddTwilioTextApi(text);
 			} else {
 				Console.WriteLine("Text message provider not configured!");
 			}
@@ -162,9 +161,9 @@ namespace SensateService.Auth
 		{
 			app.UseCors(p => {
 				p.AllowAnyOrigin()
-				 .AllowAnyHeader()
-				 .AllowAnyMethod()
-				 .AllowCredentials();
+				.AllowAnyHeader()
+				.AllowAnyMethod()
+				.AllowCredentials();
 			});
 
 			using(var scope = sp.CreateScope()) {

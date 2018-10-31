@@ -38,7 +38,4 @@
     <ProjectReference Include="..\ApiCore\ApiCore.csproj" />
     <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Middleware\" />
-  </ItemGroup>
 </Project>

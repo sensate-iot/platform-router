@@ -1,1 +1,1 @@
-﻿Hi! Please use the following token to confirm your phone number: {0}.
+﻿Hi! Your Sensate IoT verification token is {0}.
