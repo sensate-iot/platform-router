@@ -123,9 +123,8 @@ namespace SensateService.WebSocketHandler.Application
 				options.JwtIssuer = auth.JwtIssuer;
 				options.JwtExpireMinutes = auth.JwtExpireMinutes;
 				options.JwtRefreshExpireMinutes = auth.JwtRefreshExpireMinutes;
-				options.ConfirmForward = auth.ConfirmForward;
 				options.PublicUrl = auth.PublicUrl;
-				options.ResetForward = auth.ResetForward;
+				options.Scheme = auth.Scheme;
 			});
 
 			services.Configure<IdentityOptions>(options => {

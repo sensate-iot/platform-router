@@ -21,7 +21,8 @@
     "JwtRefreshExpireMinutes": 43200,
     "JwtKey": "3i%bacH6yK8sm0#lYt0**aP567Fz^Ns3HKeZ3GiqlZ2&eFqjy0OqXO",
     "JwtIssuer": "http://localhost:5000/",
-    "JwtExpireMinutes": 43200
+    "JwtExpireMinutes": 43200,
+	"Scheme": "https"
   },
   
   "AllowedHosts": "*",
