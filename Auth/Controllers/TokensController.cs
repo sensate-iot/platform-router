@@ -151,6 +151,7 @@ namespace SensateService.Auth.Controllers
 		[HttpDelete("revoke/{token}", Name = "RevokeToken")]
 		[NormalUser]
 		[ProducesResponseType(typeof(Status), 404)]
+		[ProducesResponseType(typeof(Status), 400)]
 		[ProducesResponseType(200)]
 		public async Task<IActionResult> Revoke(string token)
 		{

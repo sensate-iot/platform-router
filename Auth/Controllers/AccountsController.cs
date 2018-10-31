@@ -468,7 +468,6 @@ namespace SensateService.Auth.Controllers
 			/* Send phone number validation token */
 			body = await this.ReadTextTemplate("Confirm_PhoneNumber.txt", token.UserToken);
 			this._text.Send(this._text_settings.AlphaCode, token.PhoneNumber, body);
-			Debug.WriteLine(token.PhoneNumber);
 
 			if(url != null)
 				return this.Redirect(url);
