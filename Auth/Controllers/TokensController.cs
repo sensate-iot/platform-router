@@ -125,25 +125,22 @@ namespace SensateService.Auth.Controllers
 			}
 
 			if(token.ExpiresAt < DateTime.Now) {
-				await this._tokens.InvalidateTokenAsync(token).AwaitSafely();
 				await logTask.AwaitSafely();
+				await this._tokens.InvalidateTokenAsync(token).AwaitSafely();
 				return Forbid();
 			}
 
 			reply = new TokenRequestReply();
 			var newToken = this.CreateUserTokenEntry(user);
-			var tasks = new[] {
-                this._tokens.CreateAsync(newToken),
-                this._tokens.InvalidateTokenAsync(token)
-			};
+            await logTask.AwaitSafely();
+
+			var roles = await this._users.GetRolesAsync(user).AwaitSafely();
+			await this._tokens.CreateAsync(newToken).AwaitSafely();
+			await this._tokens.InvalidateTokenAsync(token).AwaitSafely();
 
 			reply.RefreshToken = newToken.Value;
 			reply.ExpiresInMinutes = this._settings.JwtRefreshExpireMinutes;
-			var roles = await this._users.GetRolesAsync(user);
 			reply.JwtToken = this._tokens.GenerateJwtToken( user, roles, this._settings );
-
-			await Task.WhenAll(tasks);
-            await logTask.AwaitSafely();
 
 			return new OkObjectResult(reply);
 		}
