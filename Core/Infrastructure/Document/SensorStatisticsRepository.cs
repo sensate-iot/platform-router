@@ -65,7 +65,7 @@ namespace SensateService.Infrastructure.Document
 			var update = Builders<SensorStatisticsEntry>.Update;
 			UpdateDefinition<SensorStatisticsEntry> updateDefinition;
 
-			entry = await this.GetByDateAsync(sensor, DateTime.Today).AwaitSafely() ??
+			entry = await this.GetByDateAsync(sensor, DateTime.Now.ThisHour()).AwaitSafely() ??
 					await this.CreateForAsync(sensor).AwaitSafely();
 			updateDefinition = update.Inc(x => x.Measurements, 1);
 			await this._stats.FindOneAndUpdateAsync(x => x.InternalId == entry.InternalId, updateDefinition).AwaitSafely();
@@ -77,7 +77,7 @@ namespace SensateService.Infrastructure.Document
 
 			entry = new SensorStatisticsEntry {
 				InternalId = base.GenerateId(DateTime.Now),
-				Date = DateTime.Today,
+				Date = DateTime.Now.ThisHour(),
 				Measurements = 0,
 				SensorId = sensor.InternalId
 			};
@@ -110,10 +110,11 @@ namespace SensateService.Infrastructure.Document
 
 #region Entry Getters
 
-		public async Task<SensorStatisticsEntry> GetByDateAsync(Sensor sensor, DateTime date)
+		public async Task<SensorStatisticsEntry> GetByDateAsync(Sensor sensor, DateTime dt)
 		{
 			FilterDefinition<SensorStatisticsEntry> filter;
 			var filterBuilder = Builders<SensorStatisticsEntry>.Filter;
+			var date = dt.ThisHour();
 
 			filter = filterBuilder.Eq("SensorId", sensor.InternalId) & filterBuilder.Eq("Date", date);
 			var result = await this._stats.FindAsync(filter).AwaitSafely();
@@ -124,10 +125,11 @@ namespace SensateService.Infrastructure.Document
 			return await result.FirstOrDefaultAsync().AwaitSafely();
 		}
 
-		public async Task<IEnumerable<SensorStatisticsEntry>> GetBeforeAsync(Sensor sensor, DateTime date)
+		public async Task<IEnumerable<SensorStatisticsEntry>> GetBeforeAsync(Sensor sensor, DateTime dt)
 		{
 			FilterDefinition<SensorStatisticsEntry> filter;
 			var filterBuilder = Builders<SensorStatisticsEntry>.Filter;
+			var date = dt.ThisHour();
 
 			filter = filterBuilder.Eq("SensorId", sensor.InternalId) & filterBuilder.Lte("Date", date);
 			var result = await this._stats.FindAsync(filter).AwaitSafely();
@@ -138,10 +140,11 @@ namespace SensateService.Infrastructure.Document
 			return await result.ToListAsync().AwaitSafely();
 		}
 
-		public async Task<IEnumerable<SensorStatisticsEntry>> GetAfterAsync(Sensor sensor, DateTime date)
+		public async Task<IEnumerable<SensorStatisticsEntry>> GetAfterAsync(Sensor sensor, DateTime dt)
 		{
 			FilterDefinition<SensorStatisticsEntry> filter;
 			var filterBuilder = Builders<SensorStatisticsEntry>.Filter;
+			var date = dt.ThisHour();
 
 			filter = filterBuilder.Eq("SensorId", sensor.InternalId) & filterBuilder.Gte("Date", date);
 			var result = await this._stats.FindAsync(filter).AwaitSafely();
