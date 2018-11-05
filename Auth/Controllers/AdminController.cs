@@ -57,8 +57,13 @@ namespace SensateService.Auth.Controllers
 		{
 			AdminDashboard db;
 
+			var regworker = this.GetRegistrations();
+			var usercount = this._users.CountAsync();
+
 			db = new AdminDashboard {
-				Registrations = await this.GetRegistrations()
+				Registrations = await regworker.AwaitSafely(),
+				NumberOfUsers = await usercount.AwaitSafely()
+
 			};
 
 			return this.Ok(db.ToJson());

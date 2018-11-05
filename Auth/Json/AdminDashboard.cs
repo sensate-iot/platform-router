@@ -26,7 +26,7 @@ namespace SensateService.Auth.Json
 				["numberOfUsers"] = NumberOfUsers,
 				["numberOfSensors"] = NumberOfSensors,
 				["numberOfActiveUsers"] = NumberOfActiveUsers,
-				["numberOfGhosts"] = NumberOfActiveUsers,
+				["numberOfGhosts"] = NumberOfGhosts,
 				["registrations"] = JToken.FromObject(Registrations.Data) as JArray
 			};
 

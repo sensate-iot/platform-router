@@ -122,6 +122,11 @@ namespace SensateService.Infrastructure.Sql
 			return await result.ToListAsync().AwaitSafely();
 		}
 
+		public async Task<int> CountAsync()
+		{
+			return await this.Data.CountAsync().AwaitSafely();
+		}
+
 		public async Task<List<Tuple<DateTime, int>>> CountByDay(DateTime start)
 		{
 			var query = this.Data.Where(x => x.RegisteredAt >= start)
