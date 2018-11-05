@@ -67,8 +67,6 @@ namespace SensateService.Infrastructure.Sql
 
 		public override void Update(SensateUser obj)
 		{
-			var orig = this.GetByEmail(obj.Email);
-
 			this.Data.Update(obj);
 			this.Commit(obj);
 		}
