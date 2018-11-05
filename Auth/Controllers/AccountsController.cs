@@ -325,6 +325,7 @@ namespace SensateService.Auth.Controllers
 				Email = register.Email,
 				FirstName = register.FirstName,
 				LastName = register.LastName,
+				RegisteredAt = DateTime.Now,
 				UnconfirmedPhoneNumber = register.PhoneNumber
 			};
 
