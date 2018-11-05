@@ -5,6 +5,7 @@
  * @email:  dev@bietje.net
  */
 
+using System;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 
@@ -17,5 +18,7 @@ namespace SensateService.Models
 		[Required]
 		public string LastName { get; set; }
 		public string UnconfirmedPhoneNumber { get; set; }
+		[Required]
+		public DateTime RegisteredAt { get; set; }
 	}
 }

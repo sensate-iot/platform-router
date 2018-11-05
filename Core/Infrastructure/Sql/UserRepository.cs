@@ -123,5 +123,13 @@ namespace SensateService.Infrastructure.Sql
 			var result = this.Data.Where(x => x.Email.Contains(email));
 			return await result.ToListAsync().AwaitSafely();
 		}
+
+		public async Task<List<Tuple<DateTime, int>>> CountByDay(DateTime start)
+		{
+			var query = this.Data.Where(x => x.RegisteredAt >= start)
+				.GroupBy(x => x.RegisteredAt.Date)
+				.Select( x => new Tuple<DateTime, int>(x.Key, x.Count()) );
+			return await query.ToListAsync().AwaitSafely();
+		}
 	}
 }

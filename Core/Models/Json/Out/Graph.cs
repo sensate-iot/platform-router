@@ -7,14 +7,14 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+
 using Newtonsoft.Json;
 
 namespace SensateService.Models.Json.Out
 {
-	public class Graph<X, Y>
+	public class Graph<X, Y> where X : IComparable<X>
 	{
-		public IList<Node<X, Y>> Data { get; }
+		public List<Node<X, Y>> Data { get; }
 
 		public Graph()
 		{
@@ -28,18 +28,23 @@ namespace SensateService.Models.Json.Out
 				Ycoord = ycoord
 			};
 
-			this.Data.Append(tuple);
+			this.Data.Add(tuple);
 		}
 
 		public string ToJson()
 		{
-			return JsonConvert.SerializeObject(this);
+			return JsonConvert.SerializeObject(Data);
 		}
 
-		public class Node<A, B>
+		public class Node<A, B> : IComparable<Node<A, B>> where A : IComparable<A>
 		{
 			public A Xcoord { get; set; }
 			public B Ycoord { get; set; }
+
+			public int CompareTo(Node<A, B> other)
+			{
+				return this.Xcoord.CompareTo(other.Xcoord);
+			}
 		}
 	}
 }

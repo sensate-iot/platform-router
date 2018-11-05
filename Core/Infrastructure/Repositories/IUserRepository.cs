@@ -5,6 +5,7 @@
  * @email:  dev@bietje.net
  */
 
+using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -32,5 +33,6 @@ namespace SensateService.Infrastructure.Repositories
 
 		void Delete(string id);
 		Task DeleteAsync(string id);
+		Task<List<Tuple<DateTime, int>>> CountByDay(DateTime start);
 	}
 }
