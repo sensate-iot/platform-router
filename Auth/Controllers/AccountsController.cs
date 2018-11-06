@@ -41,7 +41,6 @@ namespace SensateService.Auth.Controllers
 		private readonly IPasswordResetTokenRepository _passwd_tokens;
 		private readonly IChangeEmailTokenRepository _email_tokens;
 		private readonly IHostingEnvironment _env;
-		private readonly IAuditLogRepository _audit_logs;
 		private readonly IUserTokenRepository _tokens;
 		private readonly ITextSendService _text;
 		private readonly IChangePhoneNumberTokenRepository _phonetokens;
@@ -61,14 +60,13 @@ namespace SensateService.Auth.Controllers
 			ITextSendService text,
 			IOptions<TextServiceSettings> text_opts,
 			IHostingEnvironment env
-		) : base(repo)
+		) : base(repo, auditLogs)
 		{
 			this._manager = userManager;
 			this._mailer = emailer;
 			this._passwd_tokens = tokens;
 			this._email_tokens = emailTokens;
 			this._env = env;
-			this._audit_logs = auditLogs;
 			this._tokens = tokenRepository;
 			this._phonetokens = phoneTokens;
 			this._settings = options.Value;
@@ -320,6 +318,7 @@ namespace SensateService.Auth.Controllers
 			EmailBody mail;
 			string phonetoken;
 			string usertoken;
+
 			var user = new SensateUser {
 				UserName = register.Email,
 				Email = register.Email,
@@ -563,14 +562,6 @@ namespace SensateService.Auth.Controllers
 
 			await this._users.EndUpdateAsync().AwaitSafely();
 			return Ok();
-		}
-
-		private async Task Log(RequestMethod method, SensateUser user = null)
-		{
-			await this._audit_logs.CreateAsync(
-				this.GetCurrentRoute(), method,
-				this.GetRemoteAddress(), user
-			).AwaitSafely();
 		}
 	}
 }

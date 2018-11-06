@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
 using SensateService.Auth.Json;
+using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models.Json.In;
@@ -29,7 +30,7 @@ namespace SensateService.Auth.Controllers
 	{
 		private const int DaysPerWeek = 7;
 
-		public AdminController(IUserRepository users) : base(users)
+		public AdminController(IUserRepository users, IAuditLogRepository audit) : base(users, audit)
 		{
 		}
 
@@ -40,13 +41,14 @@ namespace SensateService.Auth.Controllers
 			List<User> users;
 			var result = await this._users.FindByEmailAsync(query.Query).AwaitSafely();
 
+			await this.Log(RequestMethod.HttpPost, this.CurrentUser).AwaitSafely();
 			users = result.Select(user => new User {
-					Email = user.Email,
-					FirstName = user.FirstName,
-					LastName = user.LastName,
-					PhoneNumber = user.PhoneNumber,
-					Id = user.Id
-				}).ToList();
+				Email = user.Email,
+				FirstName = user.FirstName,
+				LastName = user.LastName,
+				PhoneNumber = user.PhoneNumber,
+				Id = user.Id
+			}).ToList();
 
 			return new OkObjectResult(users);
 		}
@@ -57,14 +59,18 @@ namespace SensateService.Auth.Controllers
 		{
 			AdminDashboard db;
 
+			await this.Log(RequestMethod.HttpPost, this.CurrentUser).AwaitSafely();
+
 			var regworker = this.GetRegistrations();
 			var usercount = this._users.CountAsync();
 
 			db = new AdminDashboard {
 				Registrations = await regworker.AwaitSafely(),
 				NumberOfUsers = await usercount.AwaitSafely()
-
 			};
+
+			var logs = await this._audit.GetByRequestType(this.CurrentUser, RequestMethod.MqttTcp).AwaitSafely();
+			db.NumberOfSensors = logs.Count();
 
 			return this.Ok(db.ToJson());
 		}
@@ -75,7 +81,7 @@ namespace SensateService.Auth.Controllers
 			Graph<DateTime, int> graph = new Graph<DateTime, int>();
 
 			/* Include today */
-			var lastweek = now.AddDays(-DaysPerWeek + 1).ToUniversalTime().Date;
+			var lastweek = now.AddDays((DaysPerWeek - 1) * -1).ToUniversalTime().Date;
 			var registrations = await this._users.CountByDay(lastweek).AwaitSafely();
 
 			for(int idx = 0; idx < DaysPerWeek; idx++) {

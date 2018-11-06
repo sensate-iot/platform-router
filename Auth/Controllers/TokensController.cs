@@ -33,7 +33,6 @@ namespace SensateService.Auth.Controllers
 		private readonly IUserTokenRepository _tokens;
 		private readonly SignInManager<SensateUser> _signin_manager;
 		private readonly UserAccountSettings _settings;
-		private readonly IAuditLogRepository _audit_log;
 
 		public TokensController(
 			IUserTokenRepository tokens,
@@ -41,12 +40,11 @@ namespace SensateService.Auth.Controllers
 			IUserRepository users,
 			SignInManager<SensateUser> signInManager,
 			IAuditLogRepository auditLog
-		) : base(users)
+		) : base(users, auditLog)
 		{
 			this._tokens = tokens;
 			this._signin_manager = signInManager;
 			this._settings = options.Value;
-			this._audit_log = auditLog;
 		}
 
 		[HttpPost("request")]
@@ -76,19 +74,12 @@ namespace SensateService.Auth.Controllers
 			signInResult = await this._signin_manager.PasswordSignInAsync(user, login.Password, false, false);
 
 			if(!signInResult.Succeeded) {
-				await this._audit_log.CreateAsync(
-					this.GetCurrentRoute(), RequestMethod.HttpPost,
-					GetRemoteAddress()
-				).AwaitSafely();
-
+				await this.Log(RequestMethod.HttpPost).AwaitSafely();
 				return new UnauthorizedResult();
 			}
 
 			token = this.CreateUserTokenEntry(user);
-			await this._audit_log.CreateAsync(
-				this.GetCurrentRoute(), RequestMethod.HttpPost,
-				GetRemoteAddress(), user
-			);
+			await this.Log(RequestMethod.HttpPost, user).AwaitSafely();
 			await this._tokens.CreateAsync(token);
 
 			var roles = this._users.GetRoles(user);
@@ -116,8 +107,7 @@ namespace SensateService.Auth.Controllers
 				return Forbid();
 
 			token = this._tokens.GetById(user, login.RefreshToken);
-			var logTask = this._audit_log.CreateAsync(this.GetCurrentRoute(),
-				RequestMethod.HttpPost, GetRemoteAddress(), user);
+			var logTask = this.Log(RequestMethod.HttpPost, user);
 
 			if(token == null || !token.Valid) {
 				await logTask.AwaitSafely();
@@ -162,12 +152,7 @@ namespace SensateService.Auth.Controllers
 				return InvalidInputResult("Token not found!");
 
 			authToken = this._tokens.GetById(user, token);
-			await this._audit_log.CreateAsync(
-				this.GetCurrentRoute(),
-				RequestMethod.HttpDelete,
-				GetRemoteAddress(),
-				user
-			);
+			await this.Log(RequestMethod.HttpDelete, user).AwaitSafely();
 
 			if(authToken == null)
 				return this.NotFoundInputResult("Token not found!");
@@ -188,10 +173,7 @@ namespace SensateService.Auth.Controllers
 			var user = await this.GetCurrentUserAsync().AwaitSafely();
 
 			tokens = this._tokens.GetByUser(user);
-			await this._audit_log.CreateAsync(
-				this.GetCurrentRoute(), RequestMethod.HttpDelete,
-				GetRemoteAddress(), user
-			);
+			await this.Log(RequestMethod.HttpDelete, user).AwaitSafely();
 			await this._tokens.InvalidateManyAsync(tokens);
 
 			return Ok();

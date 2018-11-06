@@ -23,12 +23,14 @@ namespace SensateService.ApiCore.Controllers
 	public abstract class AbstractController : Controller
 	{
 		protected readonly IUserRepository _users;
+		protected readonly IAuditLogRepository _audit;
 
 		public SensateUser CurrentUser => this.User == null ? null : this._users.GetByClaimsPrinciple(this.User);
 
-		protected AbstractController(IUserRepository users)
+		protected AbstractController(IUserRepository users, IAuditLogRepository audit)
 		{
 			this._users = users;
+			this._audit = audit;
 		}
 
 		protected StatusCodeResult ServerFault()
@@ -91,6 +93,14 @@ namespace SensateService.ApiCore.Controllers
 			result = Uri.TryCreate(uri, UriKind.Absolute, out Uri resulturi) &&
 					 (resulturi.Scheme == Uri.UriSchemeHttp || resulturi.Scheme == Uri.UriSchemeHttps);
 			return result;
+		}
+
+		protected async Task Log(RequestMethod method, SensateUser user = null)
+		{
+			await this._audit.CreateAsync(
+				this.GetCurrentRoute(), method,
+				this.GetRemoteAddress(), user
+			).AwaitSafely();
 		}
 	}
 }
