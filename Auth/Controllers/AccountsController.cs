@@ -386,7 +386,8 @@ namespace SensateService.Auth.Controllers
 				FirstName = user.FirstName,
 				LastName = user.LastName,
 				PhoneNumber = user.PhoneNumber,
-				Id = user.Id
+				Id = user.Id,
+				RegisteredAt = user.RegisteredAt.ToUniversalTime()
 			};
 
 			return new ObjectResult(viewuser);
@@ -399,7 +400,7 @@ namespace SensateService.Auth.Controllers
 		public async Task<IActionResult> Show()
 		{
 			User viewuser;
-			var user = await this.GetCurrentUserAsync();
+			var user = await this.GetCurrentUserAsync().AwaitSafely();
 
 			await this.Log(RequestMethod.HttpGet, user);
 
@@ -408,7 +409,8 @@ namespace SensateService.Auth.Controllers
 				FirstName = user.FirstName,
 				LastName = user.LastName,
 				PhoneNumber = user.PhoneNumber,
-				Id = user.Id
+				Id = user.Id,
+				RegisteredAt = user.RegisteredAt.ToUniversalTime()
 			};
 
 			return new ObjectResult(viewuser);
