@@ -34,7 +34,9 @@ namespace SensateService.Infrastructure.Repositories
 		void Delete(string id);
 		Task DeleteAsync(string id);
 
-		Task<List<Tuple<DateTime, int>>> CountByDay(DateTime start);
+		Task<int> CountGhostUsersAsync();
 		Task<int> CountAsync();
+
+		Task<List<Tuple<DateTime, int>>> CountByDay(DateTime start);
 	}
 }

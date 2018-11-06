@@ -127,6 +127,11 @@ namespace SensateService.Infrastructure.Sql
 			return await this.Data.CountAsync().AwaitSafely();
 		}
 
+		public async Task<int> CountGhostUsersAsync()
+		{
+			return await this.Data.CountAsync(x => !(x.EmailConfirmed && x.PhoneNumberConfirmed)).AwaitSafely();
+		}
+
 		public async Task<List<Tuple<DateTime, int>>> CountByDay(DateTime start)
 		{
 			var query = this.Data.Where(x => x.RegisteredAt >= start)
