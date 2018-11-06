@@ -5,6 +5,7 @@
  * @email:  dev@bietje.net
  */
 
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -37,10 +38,7 @@ namespace SensateService.Infrastructure.Document
 			this._cache.Set(obj.InternalId.ToString(), obj.ToJson());
 		}
 
-		private async Task CommitAsync(
-			Sensor obj,
-			CancellationToken ct = default(CancellationToken)
-		)
+		private async Task CommitAsync( Sensor obj, CancellationToken ct = default(CancellationToken) )
 		{
 			await this._cache.SetAsync(
 				obj.InternalId.ToString(),
@@ -83,6 +81,26 @@ namespace SensateService.Infrastructure.Document
 			this.Commit(sensor);
 			return sensor;
 
+		}
+
+		public override async Task<IEnumerable<Sensor>> GetAsync(SensateUser user)
+		{
+			string key, data;
+			IEnumerable<Sensor> sensors;
+
+			key = $"Sensors:uid:{user.Id}";
+			data = await this._cache.GetAsync(key);
+
+			if(data != null)
+				return JsonConvert.DeserializeObject<IEnumerable<Sensor>>(data);
+
+			sensors = await base.GetAsync(user).AwaitSafely();
+
+			if(sensors == null)
+				return null;
+
+			await this._cache.SetAsync( key, JsonConvert.SerializeObject(sensors), CacheTimeout.TimeoutMedium.ToInt() ).AwaitSafely();
+			return sensors;
 		}
 
 		public override async Task<Sensor> GetAsync(string id)

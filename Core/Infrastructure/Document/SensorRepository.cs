@@ -6,6 +6,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
 
@@ -68,6 +69,21 @@ namespace SensateService.Infrastructure.Document
 			return this._sensors.Find(x => x.InternalId == oid).FirstOrDefault();
 		}
 
+		public virtual async Task<IEnumerable<Sensor>> GetAsync(SensateUser user)
+		{
+			FilterDefinition<Sensor> filter;
+			var id = user.Id;
+			var builder = Builders<Sensor>.Filter;
+
+			filter = builder.Where(s => s.Owner == id);
+			var sensors = await this._sensors.FindAsync(filter).AwaitSafely();
+
+			if(sensors == null)
+				return null;
+
+			return await sensors.ToListAsync().AwaitSafely();
+		}
+
 		public virtual async Task<Sensor> GetAsync(string id)
 		{
 			ObjectId oid = new ObjectId(id);
@@ -78,6 +94,18 @@ namespace SensateService.Infrastructure.Document
 				return null;
 
 			return await result.FirstOrDefaultAsync().AwaitSafely();
+		}
+
+		public async Task<long> CountAsync(SensateUser user = null)
+		{
+			FilterDefinition<Sensor> filter;
+
+			if(user == null)
+				return await this._sensors.CountDocumentsAsync(new BsonDocument()).AwaitSafely();
+
+			var builder = Builders<Sensor>.Filter;
+			filter = builder.Where(s => s.Owner == user.Id);
+			return await this._sensors.CountDocumentsAsync(filter).AwaitSafely();
 		}
 
 		public virtual async Task RemoveAsync(string id)
