@@ -9,7 +9,11 @@ using System;
 using System.Diagnostics;
 
 using Microsoft.Extensions.DependencyInjection;
+
+using MongoDB.Bson.Serialization;
+
 using SensateService.Config;
+using SensateService.Converters;
 using SensateService.Infrastructure.Cache;
 using SensateService.Infrastructure.Document;
 using SensateService.Infrastructure.Repositories;
@@ -32,10 +36,9 @@ namespace SensateService.Init
 			return services;
 		}
 
-		public static IServiceCollection AddDocumentRepositories(
-			this IServiceCollection services, bool cache
-		)
+		public static IServiceCollection AddDocumentRepositories( this IServiceCollection services, bool cache )
 		{
+			BsonSerializer.RegisterSerializer(typeof(DateTime), new BsonUtcDateTimeSerializer());
 			services.AddScoped<ISensorStatisticsRepository, SensorStatisticsRepository>();
 
 			if(cache) {
