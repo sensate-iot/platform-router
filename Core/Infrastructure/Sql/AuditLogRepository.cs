@@ -9,8 +9,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net;
 using System.Threading;
+using Microsoft.EntityFrameworkCore;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Exceptions;
@@ -88,6 +90,14 @@ namespace SensateService.Infrastructure.Sql
 			throw new NotAllowedException("Not allowed to delete audit log entry");
 		}
 
+		public async Task<IEnumerable<AuditLog>> GetByRequestType(SensateUser user, RequestMethod method)
+		{
+			var query = from log in this.Data
+				where log.Method == method && log.Author == user
+				select log;
+			return await query.ToListAsync().AwaitSafely();
+		}
+
 		public AuditLog Get(long id)
 		{
 			AuditLog al;
@@ -103,14 +113,20 @@ namespace SensateService.Infrastructure.Sql
 			return await Task.Run(() => this.Get(id)).AwaitSafely();
 		}
 
-		public IEnumerable<AuditLog> GetBetween(DateTime start, DateTime end)
+		public IEnumerable<AuditLog> GetBetween(SensateUser user, DateTime start, DateTime end)
 		{
-			throw new NotImplementedException();
+			var query = from log in this.Data
+				where log.Author == user && log.Timestamp >= start && log.Timestamp <= end
+				select log;
+			return query.ToList();
 		}
 
-		public Task<IEnumerable<AuditLog>> GetBetweenAsync(DateTime start, DateTime end)
+		public async Task<IEnumerable<AuditLog>> GetBetweenAsync(SensateUser user, DateTime start, DateTime end)
 		{
-			throw new NotImplementedException();
+			var query = from log in this.Data
+				where user == log.Author && log.Timestamp >= start && log.Timestamp <= end
+				select log;
+			return await query.ToListAsync().AwaitSafely();
 		}
 
 		public override AuditLog GetById(long id)
@@ -118,17 +134,22 @@ namespace SensateService.Infrastructure.Sql
 			return this.Get(id);
 		}
 
-		public IEnumerable<AuditLog> GetByRoute(string route)
+		public IEnumerable<AuditLog> GetByRoute(SensateUser user, string route)
 		{
 			var al = from log in this.Data
-					 where log.Route == route
+					 where log.Route == route && user == log.Author
 					 select log;
-			return al;
+			return al.ToList();
 		}
 
-		public async Task<IEnumerable<AuditLog>> GetByRouteAsync(string route)
+		public async Task<int> CountAsync(Expression<Func<AuditLog, bool>> predicate)
 		{
-			return await Task.Run(() => this.GetByRoute(route)).AwaitSafely();
+			return await this.Data.Select(predicate).CountAsync().AwaitSafely();
+		}
+
+		public async Task<IEnumerable<AuditLog>> GetByRouteAsync(SensateUser user, string route)
+		{
+			return await Task.Run(() => this.GetByRoute(user, route)).AwaitSafely();
 		}
 
 		public IEnumerable<AuditLog> GetByUser(SensateUser user)

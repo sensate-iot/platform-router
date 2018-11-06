@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,11 +22,14 @@ namespace SensateService.Infrastructure.Repositories
 		IEnumerable<AuditLog> GetByUser(SensateUser user);
 		Task<IEnumerable<AuditLog>> GetByUserAsync(SensateUser user);
 
-		IEnumerable<AuditLog> GetBetween(DateTime start, DateTime end);
-		Task<IEnumerable<AuditLog>> GetBetweenAsync(DateTime start, DateTime end);
+		IEnumerable<AuditLog> GetBetween(SensateUser user, DateTime start, DateTime end);
+		Task<IEnumerable<AuditLog>> GetBetweenAsync(SensateUser user, DateTime start, DateTime end);
 
-		IEnumerable<AuditLog> GetByRoute(string route);
-		Task<IEnumerable<AuditLog>> GetByRouteAsync(string route);
+		IEnumerable<AuditLog> GetByRoute(SensateUser user, string route);
+		Task<IEnumerable<AuditLog>> GetByRouteAsync(SensateUser user, string route);
+
+	    Task<IEnumerable<AuditLog>> GetByRequestType(SensateUser user, RequestMethod method);
+	    Task<int> CountAsync(Expression<Func<AuditLog, bool>> predicate);
 
 		AuditLog Get(long id);
 		AuditLog GetById(long id);
