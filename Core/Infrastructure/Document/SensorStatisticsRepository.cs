@@ -155,6 +155,40 @@ namespace SensateService.Infrastructure.Document
 			return await result.ToListAsync().AwaitSafely();
 		}
 
+		public async Task<IEnumerable<SensorStatisticsEntry>> GetAfterAsync(DateTime date)
+		{
+			FilterDefinition<SensorStatisticsEntry> filter;
+			var filterBuilder = Builders<SensorStatisticsEntry>.Filter;
+			var dt = date.ThisHour();
+
+			filter = filterBuilder.Gte("Date", date);
+			var result = await this._stats.FindAsync(filter).AwaitSafely();
+
+			if(result == null)
+				return null;
+
+			return await result.ToListAsync().AwaitSafely();
+		}
+
+
+		public async Task<IEnumerable<SensorStatisticsEntry>> GetBetweenAsync(Sensor sensor, DateTime start, DateTime end)
+		{
+			FilterDefinition<SensorStatisticsEntry> filter;
+
+			var builder = Builders<SensorStatisticsEntry>.Filter;
+			var startDate = start.ThisHour();
+			var endDate = end.ThisHour();
+
+			filter = builder.Eq("SensorId", sensor.InternalId) & builder.Gte("Date", startDate) &
+			         builder.Lte("Date", endDate);
+			var result = await this._stats.FindAsync(filter).AwaitSafely();
+
+			if(result == null)
+				return null;
+
+			return await result.ToListAsync().AwaitSafely();
+		}
+
 		public override SensorStatisticsEntry GetById(string id)
 		{
 			var fb = Builders<SensorStatisticsEntry>.Filter;

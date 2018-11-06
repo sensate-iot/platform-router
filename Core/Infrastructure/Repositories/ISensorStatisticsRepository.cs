@@ -21,6 +21,9 @@ namespace SensateService.Infrastructure.Repositories
 		Task<SensorStatisticsEntry> GetByDateAsync(Sensor sensor, DateTime date);
 		Task<IEnumerable<SensorStatisticsEntry>> GetBeforeAsync(Sensor sensor, DateTime date);
 		Task<IEnumerable<SensorStatisticsEntry>> GetAfterAsync(Sensor sensor, DateTime date);
+		Task<IEnumerable<SensorStatisticsEntry>> GetAfterAsync(DateTime date);
+		Task<IEnumerable<SensorStatisticsEntry>> GetBetweenAsync(Sensor sensor, DateTime start, DateTime end);
+
 
 		void Delete(string id);
 		Task DeleteAsync(string id);
