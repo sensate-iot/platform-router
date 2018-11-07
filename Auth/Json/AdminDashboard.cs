@@ -32,7 +32,6 @@ namespace SensateService.Auth.Json
 				["measurementStats"] = JToken.FromObject(MeasurementStats.Data) as JArray
 			};
 
-
 			return json;
 		}
 	}
