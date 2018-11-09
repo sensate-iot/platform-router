@@ -41,14 +41,15 @@ namespace SensateService.Auth.Controllers
 			this._sensors = sensors;
 		}
 
-		[HttpPost("find")]
+		[HttpPost("find-users")]
 		[ProducesResponseType(typeof(List<User>), 200)]
+		[ValidateModel]
 		public async Task<IActionResult> Find([FromBody] SearchQuery query)
 		{
 			List<User> users;
 			var result = await this._users.FindByEmailAsync(query.Query).AwaitSafely();
 
-			await this.Log(RequestMethod.HttpPost, this.CurrentUser).AwaitSafely();
+			var worker = this.Log(RequestMethod.HttpPost, this.CurrentUser);
 			users = result.Select(user => new User {
 				Email = user.Email,
 				FirstName = user.FirstName,
@@ -57,6 +58,8 @@ namespace SensateService.Auth.Controllers
 				Id = user.Id,
 				RegisteredAt = user.RegisteredAt.ToUniversalTime()
 			}).ToList();
+
+			await worker.AwaitSafely();
 
 			return new OkObjectResult(users);
 		}
