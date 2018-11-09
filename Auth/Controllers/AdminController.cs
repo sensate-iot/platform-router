@@ -97,7 +97,7 @@ namespace SensateService.Auth.Controllers
 			Graph<DateTime, long> graph;
 			Dictionary<long, long> totals;
 
-			today = DateTime.Now.ToUniversalTime().Date;
+			today = DateTime.Now.AddHours(-23D).ToUniversalTime().ThisHour();
 			graph = new Graph<DateTime, long>();
 			totals = new Dictionary<long, long>();
 
