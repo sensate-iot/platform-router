@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Security.Claims;
 
@@ -138,6 +139,14 @@ namespace SensateService.Infrastructure.Sql
 				.GroupBy(x => x.RegisteredAt.Date)
 				.Select( x => new Tuple<DateTime, int>(x.Key, x.Count()) );
 			return await query.ToListAsync().AwaitSafely();
+		}
+
+		public async Task<List<SensateUser>> GetMostRecentAsync(int number)
+		{
+			var query = this.Data.OrderByDescending(x => x.RegisteredAt);
+			var ordered = query.Take(number);
+
+			return await ordered.ToListAsync().AwaitSafely();
 		}
 	}
 }

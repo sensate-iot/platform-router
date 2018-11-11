@@ -64,6 +64,29 @@ namespace SensateService.Auth.Controllers
 			return new OkObjectResult(users);
 		}
 
+		[HttpGet("users")]
+		[ProducesResponseType(typeof(List<User>), 200)]
+		public async Task<IActionResult> GetMostRecentUsers()
+		{
+			List<User> users;
+
+			var userWorker = this._users.GetMostRecentAsync(10);
+			var worker = this.Log(RequestMethod.HttpPost, this.CurrentUser);
+			var query = await userWorker.AwaitSafely();
+
+			users = query.Select(user => new User {
+				Email = user.Email,
+				FirstName = user.FirstName,
+				LastName = user.LastName,
+				PhoneNumber = user.PhoneNumber,
+				Id = user.Id,
+				RegisteredAt = user.RegisteredAt.ToUniversalTime()
+			}).ToList();
+
+			await worker.AwaitSafely();
+			return this.Ok(users);
+		}
+
 		[HttpGet]
 		[ProducesResponseType(typeof(AdminDashboard), 200)]
 		public async Task<IActionResult> Index()

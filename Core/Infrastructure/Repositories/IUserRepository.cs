@@ -8,6 +8,7 @@
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Security.Claims;
 
 using SensateService.Models;
@@ -36,7 +37,8 @@ namespace SensateService.Infrastructure.Repositories
 
 		Task<int> CountGhostUsersAsync();
 		Task<int> CountAsync();
-
 		Task<List<Tuple<DateTime, int>>> CountByDay(DateTime start);
+
+		Task<List<SensateUser>> GetMostRecentAsync(int number);
 	}
 }
