@@ -25,12 +25,16 @@ namespace SensateService.ApiCore.Controllers
 		protected readonly IUserRepository _users;
 		protected readonly IAuditLogRepository _audit;
 
-		public SensateUser CurrentUser => this.User == null ? null : this._users.GetByClaimsPrinciple(this.User);
+		protected SensateUser CurrentUser { get; }
 
 		protected AbstractController(IUserRepository users, IAuditLogRepository audit)
 		{
 			this._users = users;
 			this._audit = audit;
+			this.CurrentUser = null;
+
+			if(this.User != null)
+				this.CurrentUser = this._users.GetByClaimsPrinciple(this.User);
 		}
 
 		protected StatusCodeResult ServerFault()
