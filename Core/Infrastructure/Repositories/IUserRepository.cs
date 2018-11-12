@@ -40,5 +40,8 @@ namespace SensateService.Infrastructure.Repositories
 		Task<List<Tuple<DateTime, int>>> CountByDay(DateTime start);
 
 		Task<List<SensateUser>> GetMostRecentAsync(int number);
+
+		Task<bool> IsBanned(SensateUser user);
+		Task<bool> IsAdministrator(SensateUser user);
 	}
 }

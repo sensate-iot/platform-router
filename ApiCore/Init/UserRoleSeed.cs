@@ -7,17 +7,19 @@
 
 using System.Threading.Tasks;
 using System.Linq;
+using System.Collections.Generic;
+
+using Microsoft.AspNetCore.Identity;
 
 using SensateService.Models;
 using SensateService.Infrastructure.Sql;
-using Microsoft.AspNetCore.Identity;
-using System.Collections.Generic;
+using SensateService.Constants;
 
-namespace SensateService.Init
+namespace SensateService.ApiCore.Init
 {
 	public static class UserRoleSeed
 	{
-		public async static Task Initialize(SensateSqlContext ctx,
+		public static async Task Initialize(SensateSqlContext ctx,
 			RoleManager<UserRole> roles, UserManager<SensateUser> manager)
 		{
 			SensateUser user;
@@ -29,19 +31,19 @@ namespace SensateService.Init
 			if(ctx.Roles.Any() || ctx.Users.Any() || ctx.UserRoles.Any())
 				return;
 
-			var uroles = new UserRole[] {
+			var uroles = new [] {
 				new UserRole {
-					Name = "Administrators",
+					Name = UserRoles.Administrator,
 					Description = "System administrators",
 				},
 
 				new UserRole {
-					Name = "Users",
+					Name = UserRoles.NormalUser,
 					Description = "Normal users"
 				},
 
 				new UserRole {
-					Name = "Banned",
+					Name = UserRoles.Banned,
 					Description = "Banned users"
 				}
 			};

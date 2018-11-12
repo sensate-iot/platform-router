@@ -8,13 +8,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Security.Claims;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
+using SensateService.Constants;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
@@ -147,6 +146,24 @@ namespace SensateService.Infrastructure.Sql
 			var ordered = query.Take(number);
 
 			return await ordered.ToListAsync().AwaitSafely();
+		}
+
+		public async Task<bool> IsBanned(SensateUser user)
+		{
+			return await this.IsInRole(user, UserRoles.Banned);
+		}
+
+		public async Task<bool> IsAdministrator(SensateUser user)
+		{
+			return await this.IsInRole(user, UserRoles.Administrator);
+		}
+
+		private async Task<bool> IsInRole(SensateUser user, string role)
+		{
+			var raw = await this.GetRolesAsync(user).AwaitSafely();
+			var roles = raw.Select(r => r.ToUpper());
+
+			return roles.Contains(role.ToUpper());
 		}
 	}
 }

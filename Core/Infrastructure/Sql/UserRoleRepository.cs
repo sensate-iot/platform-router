@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+
 using SensateService.Exceptions;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
@@ -102,20 +103,13 @@ namespace SensateService.Infrastructure.Sql
 		public IEnumerable<SensateUser> GetUsers(string name)
 		{
 			IEnumerable<IdentityUserRole<string>> roles;
-			List<SensateUser> users;
 			var role = this.GetByName(name);
 
 			roles = from r in this._userRoles
 					where r.RoleId == role.Id
 					select r;
 
-			users = new List<SensateUser>();
-			foreach(var r in roles) {
-				var user = this._users.Get(r.UserId);
-				users.Add(user);
-			}
-
-			return users;
+			return roles.Select(r => this._users.Get(r.UserId)).ToList();
 		}
 
 		public void Update(string name, UserRole role)
