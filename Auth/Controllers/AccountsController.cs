@@ -528,6 +528,13 @@ namespace SensateService.Auth.Controllers
 			return this.Ok(status);
 		}
 
+		[AdministratorUser, ValidateModel]
+		[HttpPost("update-roles")]
+		public async Task<IActionResult> SetRoles(IList<SetRole> userroles)
+		{
+			return null;
+		}
+
 		[ValidateModel]
 		[NormalUser]
 		[HttpPatch("update")]

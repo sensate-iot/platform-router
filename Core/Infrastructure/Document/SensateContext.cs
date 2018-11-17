@@ -31,7 +31,6 @@ namespace SensateService.Infrastructure.Document
 
 		public SensateContext(MongoDBSettings settings)
 		{
-
 			try {
 				MongoClientSettings mongosettings = MongoClientSettings.FromUrl(new MongoUrl(
 					settings.ConnectionString

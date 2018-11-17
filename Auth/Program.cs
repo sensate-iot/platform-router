@@ -8,14 +8,16 @@
 using System;
 using System.IO;
 using System.Linq;
+
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+
+using SensateService.ApiCore.Init;
 using SensateService.Infrastructure.Sql;
-using SensateService.Init;
 using SensateService.Models;
 
 namespace SensateService.Auth

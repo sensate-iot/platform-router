@@ -71,8 +71,8 @@ namespace SensateService.Auth.Controllers
 			List<User> users;
 
 			var userWorker = this._users.GetMostRecentAsync(10);
-			var worker = this.Log(RequestMethod.HttpPost, this.CurrentUser);
 			var query = await userWorker.AwaitSafely();
+			var worker = this.Log(RequestMethod.HttpPost, this.CurrentUser);
 
 			users = query.Select(user => new User {
 				Email = user.Email,
