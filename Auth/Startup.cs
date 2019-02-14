@@ -32,12 +32,14 @@ namespace SensateService.Auth
 {
 	public class Startup
 	{
+		private readonly IHostingEnvironment _env;
+		private readonly IConfiguration _configuration;
+
 		public Startup(IConfiguration configuration, IHostingEnvironment environment)
 		{
 			this._configuration = configuration;
+			this._env = environment;
 		}
-
-		private readonly IConfiguration _configuration;
 
 		// ReSharper disable once UnusedMember.Global
 		public void ConfigureServices(IServiceCollection services)
@@ -154,13 +156,22 @@ namespace SensateService.Auth
 			});
 
 			services.AddMvc();
+
+			services.AddLogging((logging) => {
+				logging.AddConsole();
+				if(this._env.IsDevelopment())
+					logging.AddDebug();
+			});
 		}
 
 		// ReSharper disable once UnusedMember.Global
-		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider sp, ILoggingBuilder logging)
+		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider sp)
 		{
+			var auth = new AuthenticationConfig();
+			this._configuration.GetSection("Authentication").Bind(auth);
+
 			app.UseCors(p => {
-				p.AllowAnyOrigin()
+				p.WithOrigins("http://localhost:4200", auth.JwtIssuer)
 				.AllowAnyHeader()
 				.AllowAnyMethod()
 				.AllowCredentials();
@@ -171,10 +182,6 @@ namespace SensateService.Auth
 				ctx.Database.EnsureCreated();
 				ctx.Database.Migrate();
 			}
-
-			logging.AddConsole();
-			if(env.IsDevelopment())
-				logging.AddDebug();
 
 			app.UseSwagger();
 			app.UseSwaggerUI(c => {
