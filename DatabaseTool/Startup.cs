@@ -87,16 +87,17 @@ namespace SensateService.DatabaseTool
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName);
 			services.AddDocumentRepositories(cache.Enabled);
 			services.AddSqlRepositories();
+
+			services.AddLogging((builder) => {
+				builder.AddConsole();
+
+				if(IsDevelopment())
+					builder.AddDebug();
+			});
 		}
 
 		public void Configure(IServiceProvider provider)
 		{
-			var logging = provider.GetRequiredService<ILoggerFactory>();
-
-			logging.AddConsole();
-
-			if(IsDevelopment())
-                logging.AddDebug();
 		}
 
 		public async Task Run(IServiceProvider provider)

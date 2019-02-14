@@ -69,7 +69,6 @@ namespace SensateService.Auth
 
 			var wh = WebHost.CreateDefaultBuilder(args)
 				.UseConfiguration(conf)
-				.UseKestrel()
 				.UseContentRoot(Directory.GetCurrentDirectory())
 				.ConfigureAppConfiguration((hostingContext, config) => {
 					if(hostingContext.HostingEnvironment.IsProduction())
@@ -83,7 +82,11 @@ namespace SensateService.Auth
 					logging.AddConsole();
 					logging.AddDebug();
 				})
-				.UseStartup<Startup>();
+				.UseStartup<Startup>()
+				.ConfigureKestrel((ctx, opts) => {
+					opts.AllowSynchronousIO = true;
+				});
+
 			return wh.Build();
 		}
 	}

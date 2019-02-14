@@ -100,19 +100,20 @@ namespace SensateService.MqttHandler.Application
 				var mqservice = s.Find(x => x.GetType() == typeof(MqttService)) as IMqttPublishService;
 				return mqservice;
 			});
+
+			services.AddLogging((builder) => {
+				builder.AddConsole();
+				if(IsDevelopment())
+					builder.AddDebug();
+			});
 		}
 
 		public void Configure(IServiceProvider provider)
 		{
 			var mqtt = new MqttConfig();
-			var logging = provider.GetRequiredService<ILoggerFactory>();
 
 			Configuration.GetSection("Mqtt").Bind(mqtt);
 			provider.MapMqttTopic<MqttMeasurementHandler>(mqtt.ShareTopic);
-
-			logging.AddConsole();
-			if(IsDevelopment())
-                logging.AddDebug();
 		}
 
 		public Application BuildApplication(IServiceProvider sp)

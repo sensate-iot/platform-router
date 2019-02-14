@@ -92,17 +92,20 @@ namespace SensateService.WebSocketHandler.Application
 
 			services.AddWebSocketHandler<WebSocketMeasurementHandler>();
 			services.AddWebSocketHandler<WebSocketLiveMeasurementHandler>();
+
+			services.AddLogging((builder) => {
+				builder.AddConsole();
+
+				if(IsDevelopment())
+					builder.AddDebug();
+			});
 		}
 
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory logging, IServiceProvider sp)
 		{
 			var mqtt = new MqttConfig();
 
-			logging.AddConsole();
 			Configuration.GetSection("Mqtt").Bind(mqtt);
-
-			if(IsDevelopment())
-				logging.AddDebug();
 
 			app.UseWebSockets();
 			app.MapWebSocketService("/measurement", sp.GetService<WebSocketMeasurementHandler>());

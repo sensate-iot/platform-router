@@ -157,7 +157,7 @@ namespace SensateService.Auth
 		}
 
 		// ReSharper disable once UnusedMember.Global
-		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider sp, ILoggerFactory logger)
+		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider sp, ILoggingBuilder logging)
 		{
 			app.UseCors(p => {
 				p.AllowAnyOrigin()
@@ -172,9 +172,9 @@ namespace SensateService.Auth
 				ctx.Database.Migrate();
 			}
 
-			logger.AddConsole();
+			logging.AddConsole();
 			if(env.IsDevelopment())
-				logger.AddDebug();
+				logging.AddDebug();
 
 			app.UseSwagger();
 			app.UseSwaggerUI(c => {
