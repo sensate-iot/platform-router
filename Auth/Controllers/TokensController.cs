@@ -107,14 +107,16 @@ namespace SensateService.Auth.Controllers
 			var user = await this._users.GetByEmailAsync(login.Email).AwaitSafely();
 			TokenRequestReply reply;
 			UserToken token;
+			bool banned;
 
 			if(user == null)
 				return Forbid();
 
+			banned = await this._users.IsBanned(user);
 			token = this._tokens.GetById(user, login.RefreshToken);
 			var logTask = this.Log(RequestMethod.HttpPost, user);
 
-			if(token == null || !token.Valid) {
+			if(token == null || !token.Valid || banned) {
 				await logTask.AwaitSafely();
 				return Forbid();
 			}
