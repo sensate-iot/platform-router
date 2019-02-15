@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -45,6 +46,7 @@ namespace SensateService.Auth.Controllers
 		private readonly ITextSendService _text;
 		private readonly IChangePhoneNumberTokenRepository _phonetokens;
 		private readonly TextServiceSettings _text_settings;
+		private readonly ILogger<AccountsController> _logger;
 
 		public AccountsController(
 			IUserRepository repo,
@@ -59,9 +61,11 @@ namespace SensateService.Auth.Controllers
 			IUserTokenRepository tokenRepository,
 			ITextSendService text,
 			IOptions<TextServiceSettings> text_opts,
-			IHostingEnvironment env
+			IHostingEnvironment env,
+			ILogger<AccountsController> logger
 		) : base(repo, auditLogs)
 		{
+			this._logger = logger;
 			this._manager = userManager;
 			this._mailer = emailer;
 			this._passwd_tokens = tokens;
@@ -344,8 +348,7 @@ namespace SensateService.Auth.Controllers
 				return this.BadRequest(objresult);
 			}
 
-			var mailTask = this.ReadMailTemplate("Confirm_Account_Registration.html",
-				"Confirm_Account_Registration.txt");
+			var mailTask = this.ReadMailTemplate("Confirm_Account_Registration.html", "Confirm_Account_Registration.txt");
 			user = await this._users.GetAsync(user.Id).AwaitSafely();
 			var code = await this._manager.GenerateEmailConfirmationTokenAsync(user).AwaitSafely();
 			code = Base64UrlEncoder.Encode(code);
@@ -530,9 +533,29 @@ namespace SensateService.Auth.Controllers
 
 		[AdministratorUser, ValidateModel]
 		[HttpPost("update-roles")]
-		public async Task<IActionResult> SetRoles(IList<SetRole> userroles)
+		public async Task<IActionResult> SetRoles([FromBody] IList<SetRole> userroles)
 		{
-			return null;
+			foreach(var role in userroles) {
+				var user = await this._users.GetAsync(role.UserId);
+				var roles = role.Role.Split(',');
+				bool status = await this._users.ClearRolesForAsync(user);
+
+				if(!status)
+					return this.StatusCode(500);
+
+				status = await this._users.AddToRolesAsync(user, roles);
+
+				if(!status)
+					return this.StatusCode(500);
+
+				var dbgroles = await this._users.GetRolesAsync(user);
+				this._logger.LogInformation($"New roles for {role.UserId}:");
+				foreach(var r in dbgroles) {
+					this._logger.LogInformation("\t" + r);
+				}
+			}
+
+			return this.Ok();
 		}
 
 		[ValidateModel]
