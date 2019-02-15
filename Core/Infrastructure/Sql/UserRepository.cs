@@ -158,6 +158,20 @@ namespace SensateService.Infrastructure.Sql
 			return await this.IsInRole(user, UserRoles.Administrator);
 		}
 
+		public async Task<bool> ClearRolesForAsync(SensateUser user)
+		{
+			var roles = await this._manager.GetRolesAsync(user);
+			var result = await this._manager.RemoveFromRolesAsync(user, roles);
+
+			return result.Succeeded;
+		}
+
+		public async Task<bool> AddToRolesAsync(SensateUser user, IEnumerable<string> roles)
+		{
+			var result = await this._manager.AddToRolesAsync(user, roles);
+			return result.Succeeded;
+		}
+
 		private async Task<bool> IsInRole(SensateUser user, string role)
 		{
 			var raw = await this.GetRolesAsync(user).AwaitSafely();

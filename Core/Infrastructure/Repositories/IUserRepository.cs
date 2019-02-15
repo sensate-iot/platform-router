@@ -43,5 +43,7 @@ namespace SensateService.Infrastructure.Repositories
 
 		Task<bool> IsBanned(SensateUser user);
 		Task<bool> IsAdministrator(SensateUser user);
+	    Task<bool> ClearRolesForAsync(SensateUser user);
+		Task<bool> AddToRolesAsync(SensateUser user, IEnumerable<string> roles);
 	}
 }
