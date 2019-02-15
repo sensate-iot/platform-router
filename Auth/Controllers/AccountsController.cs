@@ -538,6 +538,7 @@ namespace SensateService.Auth.Controllers
 			foreach(var role in userroles) {
 				var user = await this._users.GetAsync(role.UserId);
 				var roles = role.Role.Split(',');
+
 				bool status = await this._users.ClearRolesForAsync(user);
 
 				if(!status)

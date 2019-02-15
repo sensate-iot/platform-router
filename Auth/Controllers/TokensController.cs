@@ -62,12 +62,17 @@ namespace SensateService.Auth.Controllers
 				return NotFound();
 
 			result = await this._signin_manager.CanSignInAsync(user);
+			var banned = await this._users.IsBanned(user);
 
-			if(!result) {
+			if(!result || banned) {
 				var status = new Status {
 					ErrorCode = ReplyCode.NotAllowed,
 					Message = "Not allowed to sign in!"
 				};
+
+				if(banned)
+					status.ErrorCode = ReplyCode.Banned;
+
 				return new BadRequestObjectResult(status);
 			}
 
