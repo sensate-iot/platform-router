@@ -390,7 +390,8 @@ namespace SensateService.Auth.Controllers
 				LastName = user.LastName,
 				PhoneNumber = user.PhoneNumber,
 				Id = user.Id,
-				RegisteredAt = user.RegisteredAt.ToUniversalTime()
+				RegisteredAt = user.RegisteredAt.ToUniversalTime(),
+				Roles = this._users.GetRoles(user)
 			};
 
 			return new ObjectResult(viewuser);
@@ -413,7 +414,8 @@ namespace SensateService.Auth.Controllers
 				LastName = user.LastName,
 				PhoneNumber = user.PhoneNumber,
 				Id = user.Id,
-				RegisteredAt = user.RegisteredAt.ToUniversalTime()
+				RegisteredAt = user.RegisteredAt.ToUniversalTime(),
+				Roles = await this._users.GetRolesAsync(user)
 			};
 
 			return new ObjectResult(viewuser);

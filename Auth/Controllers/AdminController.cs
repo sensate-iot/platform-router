@@ -48,18 +48,21 @@ namespace SensateService.Auth.Controllers
 		{
 			List<User> users;
 			var result = await this._users.FindByEmailAsync(query.Query).AwaitSafely();
+			await this.Log(RequestMethod.HttpPost, this.CurrentUser);
 
-			var worker = this.Log(RequestMethod.HttpPost, this.CurrentUser);
-			users = result.Select(user => new User {
-				Email = user.Email,
-				FirstName = user.FirstName,
-				LastName = user.LastName,
-				PhoneNumber = user.PhoneNumber,
-				Id = user.Id,
-				RegisteredAt = user.RegisteredAt.ToUniversalTime()
+			users =  result.Select(user => {
+				var roles = this._users.GetRoles(user);
+
+				return new User {
+					Email = user.Email,
+					FirstName = user.FirstName,
+					LastName = user.LastName,
+					PhoneNumber = user.PhoneNumber,
+					Id = user.Id,
+					RegisteredAt = user.RegisteredAt.ToUniversalTime(),
+					Roles = roles
+				};
 			}).ToList();
-
-			await worker.AwaitSafely();
 
 			return new OkObjectResult(users);
 		}
@@ -72,7 +75,7 @@ namespace SensateService.Auth.Controllers
 
 			var userWorker = this._users.GetMostRecentAsync(10);
 			var query = await userWorker.AwaitSafely();
-			var worker = this.Log(RequestMethod.HttpPost, this.CurrentUser);
+			await this.Log(RequestMethod.HttpPost, this.CurrentUser).AwaitSafely();
 
 			users = query.Select(user => new User {
 				Email = user.Email,
@@ -80,10 +83,10 @@ namespace SensateService.Auth.Controllers
 				LastName = user.LastName,
 				PhoneNumber = user.PhoneNumber,
 				Id = user.Id,
-				RegisteredAt = user.RegisteredAt.ToUniversalTime()
+				RegisteredAt = user.RegisteredAt.ToUniversalTime(),
+				Roles = this._users.GetRoles(user)
 			}).ToList();
 
-			await worker.AwaitSafely();
 			return this.Ok(users);
 		}
 

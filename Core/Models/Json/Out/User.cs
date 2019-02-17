@@ -6,6 +6,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace SensateService.Models.Json.Out
 {
@@ -17,5 +18,6 @@ namespace SensateService.Models.Json.Out
 		public string Email {get;set;}
 		public string PhoneNumber {get;set;}
 		public DateTime RegisteredAt { get; set; }
+		public IEnumerable<string> Roles { get; set; }
 	}
 }
