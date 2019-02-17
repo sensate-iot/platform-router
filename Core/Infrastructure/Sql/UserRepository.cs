@@ -106,8 +106,6 @@ namespace SensateService.Infrastructure.Sql
 		public IEnumerable<string> GetRoles(SensateUser user)
 		{
 			var result = this._manager.GetRolesAsync(user);
-
-			result.Wait();
 			return result.Result;
 		}
 
