@@ -38,7 +38,7 @@ namespace SensateService.Infrastructure.Sql
 		public override void Create(UserToken obj)
 		{
 			var asyncResult = this.CreateAsync(obj);
-			asyncResult.Wait();
+			asyncResult.RunSynchronously();
 		}
 
 		public override async Task CreateAsync(UserToken obj)

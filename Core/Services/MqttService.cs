@@ -92,7 +92,7 @@ namespace SensateService.Services
 		public  void PublishOn(string topic, string message, bool retain)
 		{
 			var worker = this.PublishOnAsync(topic, message, retain);
-			Task.Run(() => worker.RunSynchronously()).Wait();
+			worker.RunSynchronously();
 		}
 
 		private async Task Connect()
