@@ -18,6 +18,7 @@ namespace SensateService.Config
 	{
 		public string DatabaseName { get; set; }
 		public string ConnectionString { get; set; }
+		public int MaxConnections { get; set; }
 	}
 
 	public class PgSQLConfig

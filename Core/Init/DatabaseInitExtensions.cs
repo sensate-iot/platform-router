@@ -16,23 +16,24 @@ namespace SensateService.Init
 {
 	public static class DatabaseInitExtensions
 	{
-		public static void AddDocumentStore(this IServiceCollection services, string conn, string db)
+		public static void AddDocumentStore(this IServiceCollection services, string conn, string db, int max)
 		{
 			services.Configure<MongoDBSettings>(options => {
 				options.DatabaseName = db;
 				options.ConnectionString = conn;
+				options.MaxConnections = max;
 			});
 
 			BsonSerializer.RegisterSerializationProvider(new BsonDecimalSerializationProvider());
-			services.AddScoped<SensateContext>();
+			services.AddSingleton<SensateContext>();
 		}
 
 		public static void AddPostgres(this IServiceCollection services, string conn)
 		{
 			services.AddEntityFrameworkNpgsql()
-					.AddDbContext<SensateSqlContext>(options => {
+					.AddDbContextPool<SensateSqlContext>(options => {
 				options.UseNpgsql(conn);
-			}, ServiceLifetime.Scoped);
+			}, 2000);
 		}
 	}
 }

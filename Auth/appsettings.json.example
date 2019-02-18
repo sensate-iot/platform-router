@@ -27,7 +27,8 @@
   "Database": {
     "MongoDB": {
       "DatabaseName": "Sensate",
-      "ConnectionString": "mongodb://sensate:mongopass@192.168.127.128:27017/Sensate"
+      "ConnectionString": "mongodb://sensate:mongopass@192.168.127.128:27017/Sensate",
+	  "MaxConnections": 1000
     },
     "PgSQL": {
       "ConnectionString": "User ID = postgres;Password=DefaultPassword;Server=192.168.127.128;Port=5432;Database=Sensate"

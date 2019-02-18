@@ -24,10 +24,8 @@ namespace SensateService.Infrastructure.Document
 		public IMongoCollection<SensorStatisticsEntry> Statistics =>
 			this._db.GetCollection<SensorStatisticsEntry>("Statistics");
 
-		public SensateContext(IOptions<MongoDBSettings> settings) :
-			this(settings.Value)
-		{
-		}
+		public SensateContext(IOptions<MongoDBSettings> options) : this(options.Value)
+		{ }
 
 		public SensateContext(MongoDBSettings settings)
 		{
@@ -35,6 +33,8 @@ namespace SensateService.Infrastructure.Document
 				MongoClientSettings mongosettings = MongoClientSettings.FromUrl(new MongoUrl(
 					settings.ConnectionString
 				));
+
+				mongosettings.MaxConnectionPoolSize = settings.MaxConnections;
 				this._client = new MongoClient(mongosettings);
 				this._db = this._client.GetDatabase(settings.DatabaseName);
 			} catch(Exception ex) {

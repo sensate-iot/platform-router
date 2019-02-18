@@ -59,7 +59,7 @@ namespace SensateService.Auth
 			services.AddCors();
 
 			services.AddPostgres(db.PgSQL.ConnectionString);
-			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName);
+			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 
 			services.Configure<UserAccountSettings>(options => {
 				options.JwtKey = auth.JwtKey;

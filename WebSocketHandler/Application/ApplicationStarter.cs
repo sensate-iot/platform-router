@@ -67,7 +67,7 @@ namespace SensateService.WebSocketHandler.Application
 			if(cache.Enabled)
 				services.AddCacheStrategy(cache, db);
 
-			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName);
+			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.AddDocumentRepositories(cache.Enabled);
 			services.AddSqlRepositories();
 
