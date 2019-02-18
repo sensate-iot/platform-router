@@ -30,7 +30,6 @@ namespace SensateService.MqttHandler.Mqtt
 		private readonly ISensorStatisticsRepository stats;
 		private readonly IMqttPublishService client;
 		private readonly MqttServiceOptions mqttopts;
-		private readonly MeasurementStorageEventHandler _handler;
 
 		private bool disposed;
 
@@ -46,14 +45,65 @@ namespace SensateService.MqttHandler.Mqtt
 			this.client = client;
 			this.mqttopts = options.Value;
 			this.provider = provider;
-			this._handler = new MeasurementStorageEventHandler(options, provider, client);
 
-			this.measurements.MeasurementReceived += this._handler.MeasurementReceived_Handler;
-			this.measurements.MeasurementReceived += this._handler.InternalMqttMeasurementPublish_Handler;
+			this.measurements.MeasurementReceived += this.MeasurementReceived_Handler;
+			this.measurements.MeasurementReceived += this.InternalMqttMeasurementPublish_Handler;
 #if DEBUG
-			this.measurements.MeasurementReceived += this._handler.MeasurementReceived_DebugHandler;
+			this.measurements.MeasurementReceived += this.MeasurementReceived_DebugHandler;
 #endif
 			this.disposed = false;
+		}
+
+#if DEBUG
+		public Task MeasurementReceived_DebugHandler(object sender, MeasurementReceivedEventArgs e)
+		{
+			if(!(sender is Sensor sensor))
+				return Task.CompletedTask;
+
+			Console.WriteLine($"Received measurement from {{{sensor.Name}}}:{{{sensor.InternalId}}}");
+			return Task.CompletedTask;
+		}
+#endif
+
+		private async Task InternalMqttMeasurementPublish_Handler(object sender, MeasurementReceivedEventArgs e)
+		{
+			string msg;
+
+			msg = e.Measurement.ToJson();
+			await this.client.PublishOnAsync(this.mqttopts.InternalMeasurementTopic, msg, false);
+		}
+
+		private async Task MeasurementReceived_Handler(object sender, MeasurementReceivedEventArgs e)
+		{
+			SensateUser user;
+			AuditLog log;
+
+			if(this.disposed)
+				throw new ObjectDisposedException("MeasurementHandler");
+
+			if(!(sender is Sensor sensor))
+				return;
+
+			try {
+				using(var scope = this.provider.CreateScope()) {
+					var users = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+					var auditlogs = scope.ServiceProvider.GetRequiredService<IAuditLogRepository>();
+
+					user = await users.GetAsync(sensor.Owner);
+					log = new AuditLog {
+						Address = IPAddress.Any,
+						Method = RequestMethod.MqttTcp,
+						Route = "NA",
+						Timestamp = DateTime.Now,
+						Author = user
+					};
+
+					await auditlogs.CreateAsync(log, e.CancellationToken).AwaitSafely();
+				}
+			} catch (Exception ex) {
+				Console.WriteLine("Unable to log measurement!");
+				Console.WriteLine(ex.Message);
+			}
 		}
 
 		public override void OnMessage(string topic, string msg)
@@ -61,7 +111,7 @@ namespace SensateService.MqttHandler.Mqtt
 			Task t;
 
 			t = this.OnMessageAsync(topic, msg);
-			t.RunSynchronously();
+			t.Wait();
 		}
 
 		public override async Task OnMessageAsync(string topic, string message)
@@ -80,8 +130,12 @@ namespace SensateService.MqttHandler.Mqtt
 
 				sensor = await this.sensors.GetAsync(raw.CreatedById).AwaitSafely();
 
-				await this.measurements.ReceiveMeasurementAsync(sensor, raw);
-				await this.stats.IncrementAsync(sensor);
+				Task[] tasks = {
+					this.measurements.ReceiveMeasurementAsync(sensor, raw),
+					this.stats.IncrementAsync(sensor)
+				};
+
+				await Task.WhenAll(tasks).AwaitSafely();
 			} catch(Exception ex) {
 				Console.WriteLine($"Error: {ex.Message}");
 				Console.WriteLine($"Received a buggy MQTT message: {message}");
@@ -95,14 +149,13 @@ namespace SensateService.MqttHandler.Mqtt
 
 			if(disposing) {
 #if DEBUG
-				this.measurements.MeasurementReceived -= this._handler.MeasurementReceived_DebugHandler;
+				this.measurements.MeasurementReceived -= this.MeasurementReceived_DebugHandler;
 #endif
-				this.measurements.MeasurementReceived -= this._handler.MeasurementReceived_Handler;
-				this.measurements.MeasurementReceived -= this._handler.InternalMqttMeasurementPublish_Handler;
+				this.measurements.MeasurementReceived -= this.MeasurementReceived_Handler;
+				this.measurements.MeasurementReceived -= this.InternalMqttMeasurementPublish_Handler;
 			}
 
 			this.disposed = true;
-			this._handler.Cancelled = true;
 		}
 
 		public void Dispose()
