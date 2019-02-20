@@ -14,9 +14,9 @@ using SensateService.Helpers;
 
 namespace SensateService.Infrastructure.Sql
 {
-	public abstract class AbstractSqlRepository<TKey, T> : IRepository<TKey, T> where T : class
+	public abstract class AbstractSqlRepository<T> where T : class
 	{
-		private SensateSqlContext _sqlContext;
+		private readonly SensateSqlContext _sqlContext;
 		protected DbSet<T> Data;
 
 		protected AbstractSqlRepository(SensateSqlContext context)
@@ -45,13 +45,6 @@ namespace SensateService.Infrastructure.Sql
 			this._sqlContext.SaveChanges();
 		}
 
-		public abstract void Create(T obj);
-		public abstract void Update(T obj);
-		public abstract T GetById(TKey id);
-		public abstract void Delete(TKey id);
-		public abstract Task CreateAsync(T obj);
-		public abstract Task DeleteAsync(TKey id);
-
 		public virtual void StartUpdate(T obj)
 		{
 			this._sqlContext.Update(obj);
@@ -65,6 +58,18 @@ namespace SensateService.Infrastructure.Sql
 		public void EndUpdate()
 		{
 			this._sqlContext.SaveChanges();
+		}
+
+		public virtual void Create(T obj)
+		{
+			this.Data.Add(obj);
+			this.Commit();
+		}
+
+		public virtual async Task CreateAsync(T obj)
+		{
+			this.Data.Add(obj);
+			await this.CommitAsync();
 		}
 	}
 }

@@ -19,7 +19,7 @@ using SensateService.Models;
 
 namespace SensateService.Infrastructure.Sql
 {
-	public class UserRoleRepository : AbstractSqlRepository<string, UserRole>, IUserRoleRepository
+	public class UserRoleRepository : AbstractSqlRepository<UserRole>, IUserRoleRepository
 	{
 		private readonly DbSet<IdentityUserRole<string>> _userRoles;
 		private readonly IUserRepository _users;
@@ -65,29 +65,29 @@ namespace SensateService.Infrastructure.Sql
 				throw new DatabaseException("Unable to create user role!");
 		}
 
-		public override void Delete(string id)
+		public void Delete(string id)
 		{
 			var role = this.GetById(id);
 			this._roles.DeleteAsync(role);
 		}
 
-		public override async Task DeleteAsync(string id)
+		public async Task DeleteAsync(string id)
 		{
 			await Task.Run(() => this.Delete(id)).AwaitSafely();
 		}
 
-		public override UserRole GetById(string id)
+		public UserRole GetById(string id)
 		{
 			return (from role in this.Data
 					where role.Id == id
-					select role).Single<UserRole>();
+					select role).Single();
 		}
 
 		public UserRole GetByName(string name)
 		{
 			return (from role in this.Data
 					where role.Name == name
-					select role).Single<UserRole>();
+					select role).Single();
 		}
 
 		public IEnumerable<string> GetRolesFor(SensateUser user)
@@ -124,11 +124,6 @@ namespace SensateService.Infrastructure.Sql
 				obj.Description = role.Description;
 
 			this.Commit(obj);
-		}
-
-		public override void Update(UserRole obj)
-		{
-			this.Update(obj.Name, obj);
 		}
 
 		public async Task UpdateAsync(string name, UserRole obj)

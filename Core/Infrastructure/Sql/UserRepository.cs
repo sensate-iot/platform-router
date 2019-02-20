@@ -20,7 +20,7 @@ using SensateService.Models;
 
 namespace SensateService.Infrastructure.Sql
 {
-	public class UserRepository : AbstractSqlRepository<string, SensateUser>, IUserRepository
+	public class UserRepository : AbstractSqlRepository<SensateUser>, IUserRepository
 	{
 		private readonly UserManager<SensateUser> _manager;
 
@@ -31,7 +31,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public override void Create(SensateUser obj) => throw new SystemException("UserRepository.Create is forbidden!");
 
-		public override void Delete(string id)
+		public virtual void Delete(string id)
 		{
 			var obj = this.Get(id);
 
@@ -42,9 +42,7 @@ namespace SensateService.Infrastructure.Sql
 			this.Commit(obj);
 		}
 
-		public override SensateUser GetById(string id) =>
-			String.IsNullOrEmpty(id) ? null : this.Data.FirstOrDefault(x => x.Id == id);
-
+		public virtual SensateUser GetById(string id) => String.IsNullOrEmpty(id) ? null : this.Data.FirstOrDefault(x => x.Id == id);
 		public SensateUser GetByEmail(string email) => this.Data.FirstOrDefault(x => x.Email == email);
 
 		public async Task<SensateUser> GetByEmailAsync(string email)
@@ -65,18 +63,12 @@ namespace SensateService.Infrastructure.Sql
 			return user;
 		}
 
-		public override void Update(SensateUser obj)
-		{
-			this.Data.Update(obj);
-			this.Commit(obj);
-		}
-
 		public override Task CreateAsync(SensateUser obj)
 		{
 			throw new SystemException("UserRepository.CreateAsync is forbidden!");
 		}
 
-		public override async Task DeleteAsync(string id)
+		public virtual async Task DeleteAsync(string id)
 		{
 			var obj = this.Get(id);
 

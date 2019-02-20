@@ -69,12 +69,12 @@ namespace SensateService.Infrastructure.Document
 			this.Commit(m);
 		}
 
-		public override async Task CreateAsync(Measurement obj)
+		public override async Task CreateAsync(Measurement obj, CancellationToken ct = default(CancellationToken))
 		{
 			var tasks = new Task[2];
 
-			tasks[0] = base.CreateAsync(obj);
-			tasks[1] = this.CommitAsync(obj);
+			tasks[0] = base.CreateAsync(obj, ct);
+			tasks[1] = this.CommitAsync(obj, ct);
 
 			await Task.WhenAll(tasks).AwaitSafely();
 		}
@@ -149,16 +149,16 @@ namespace SensateService.Infrastructure.Document
 			await Task.WhenAll(tasks).AwaitSafely();
 		}
 
-		public override Measurement GetById(string id)
+		public override async Task<Measurement> GetByIdAsync(string id)
 		{
 			Measurement m;
 
-			m = _cache.Deserialize<Measurement>(id);
+			m = await _cache.DeserializeAsync<Measurement>(id).AwaitSafely();
 
 			if(m != null)
 				return m;
 
-			m = base.GetById(id);
+			m = await base.GetByIdAsync(id).AwaitSafely();
 
 			if(m != null)
 				this.Commit(m);
@@ -186,10 +186,12 @@ namespace SensateService.Infrastructure.Document
 			);
 		}
 
-		public override void Update(Measurement obj)
+		public override async Task UpdateAsync(Measurement obj)
 		{
-			_cache.Serialize(obj.InternalId.ToString(), obj, CacheTimeout.Timeout.ToInt(), false);
-			base.Update(obj);
+			await Task.WhenAll(
+				this._cache.SerializeAsync(obj.InternalId.ToString(), obj, CacheTimeout.Timeout.ToInt(), false),
+				base.UpdateAsync(obj)
+			).AwaitSafely();
 		}
 
 		private async Task<IEnumerable<Measurement>> TryGetMeasurementsAsync(

@@ -28,6 +28,7 @@ namespace SensateService.Infrastructure.Repositories
 		IEnumerable<Measurement> GetBefore(Sensor sensor, DateTime pit);
 		IEnumerable<Measurement> GetAfter(Sensor sensor, DateTime pit);
 		Task<long> GetMeasurementCountAsync(Sensor sensor, CancellationToken token = default(CancellationToken));
+		Task<Measurement> GetByIdAsync(string id);
 
 		Task<IEnumerable<Measurement>> TryGetBetweenAsync(Sensor sensor, DateTime start, DateTime end);
 		Task<IEnumerable<Measurement>> TryGetMeasurementsAsync(Expression<Func<Measurement, bool>> selector);
@@ -40,6 +41,7 @@ namespace SensateService.Infrastructure.Repositories
 		Task DeleteBySensorAsync(Sensor sensor);
 		void DeleteBetween(Sensor sensor, DateTime start, DateTime end);
 		Task DeleteBetweenAsync(Sensor sensor, DateTime start, DateTime end);
+		Task UpdateAsync(Measurement obj);
 
 		Task ReceiveMeasurementAsync(Sensor sensor, RawMeasurement measurement);
 	}

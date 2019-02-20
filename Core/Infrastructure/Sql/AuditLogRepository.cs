@@ -12,16 +12,17 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
 using System.Threading;
+
 using Microsoft.EntityFrameworkCore;
+
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
-using SensateService.Exceptions;
 using SensateService.Enums;
 using SensateService.Helpers;
 
 namespace SensateService.Infrastructure.Sql
 {
-	public class AuditLogRepository : AbstractSqlRepository<long, AuditLog>, IAuditLogRepository
+	public class AuditLogRepository : AbstractSqlRepository<AuditLog>, IAuditLogRepository
 	{
 		public AuditLogRepository(SensateSqlContext ctx) : base(ctx)
 		{
@@ -42,12 +43,6 @@ namespace SensateService.Infrastructure.Sql
 			};
 
 			this.Create(al);
-		}
-
-		public override void Create(AuditLog obj)
-		{
-			this.Data.Add(obj);
-			this.Commit(obj);
 		}
 
 		public async Task CreateAsync(
@@ -73,21 +68,6 @@ namespace SensateService.Infrastructure.Sql
 		{
 			this.Data.Add(obj);
 			await this.CommitAsync(ct).AwaitSafely();
-		}
-
-		public override async Task CreateAsync(AuditLog obj)
-		{
-			await this.CreateAsync(obj, default(CancellationToken));
-		}
-
-		public override void Delete(long id)
-		{
-			throw new NotAllowedException("Not allowed to delete audit log entry");
-		}
-
-		public override Task DeleteAsync(long id)
-		{
-			throw new NotAllowedException("Not allowed to delete audit log entry");
 		}
 
 		public async Task<IEnumerable<AuditLog>> GetByRequestType(SensateUser user, RequestMethod method)
@@ -129,7 +109,7 @@ namespace SensateService.Infrastructure.Sql
 			return await query.ToListAsync().AwaitSafely();
 		}
 
-		public override AuditLog GetById(long id)
+		public AuditLog GetById(long id)
 		{
 			return this.Get(id);
 		}
@@ -163,11 +143,6 @@ namespace SensateService.Infrastructure.Sql
 		public async Task<IEnumerable<AuditLog>> GetByUserAsync(SensateUser user)
 		{
 			return await Task.Run(() => this.GetByUser(user)).AwaitSafely();
-		}
-
-		public override void Update(AuditLog obj)
-		{
-			throw new NotAllowedException("Not allowed to update audit log entry!");
 		}
 	}
 }

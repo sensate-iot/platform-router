@@ -7,8 +7,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
@@ -19,7 +19,7 @@ using SensateService.Models;
 
 namespace SensateService.Infrastructure.Document
 {
-	public class SensorRepository : AbstractDocumentRepository<string, Sensor>, ISensorRepository
+	public class SensorRepository : AbstractDocumentRepository<Sensor>, ISensorRepository
 	{
 		private readonly IMongoCollection<Sensor> _sensors;
 		private readonly ILogger<SensorRepository> _logger;
@@ -29,7 +29,7 @@ namespace SensateService.Infrastructure.Document
 		public SensorRepository(SensateContext context,
 								ISensorStatisticsRepository statisticsRepository,
 								IMeasurementRepository measurements,
-								ILogger<SensorRepository> logger) : base(context)
+								ILogger<SensorRepository> logger) : base(context.Sensors)
 		{
 			this._sensors = context.Sensors;
 			this._logger = logger;
@@ -45,17 +45,17 @@ namespace SensateService.Infrastructure.Document
 			obj.CreatedAt = now;
 			obj.UpdatedAt = now;
 			obj.InternalId = base.GenerateId(now);
-			this._sensors.InsertOne(obj);
+			base.Create(obj);
 		}
 
-		public override async Task CreateAsync(Sensor sensor)
+		public override async Task CreateAsync(Sensor sensor, CancellationToken ct = default(CancellationToken))
 		{
 			var now = DateTime.Now;
 
 			sensor.CreatedAt = now;
 			sensor.UpdatedAt = now;
 			sensor.InternalId = base.GenerateId(now);
-			await this._sensors.InsertOneAsync(sensor).AwaitSafely();
+			await base.CreateAsync(sensor, ct);
 		}
 
 		public virtual void Remove(string id)
@@ -113,24 +113,20 @@ namespace SensateService.Infrastructure.Document
 			await this.DeleteAsync(id).AwaitSafely();
 		}
 
-		public override void Update(Sensor obj)
+		public virtual void Update(Sensor obj)
 		{
 			var update = Builders<Sensor>.Update
 				.Set(x => x.UpdatedAt, DateTime.Now);
 
 			if(obj.Name != null)
-				update.Set(x => x.Name, obj.Name);
+				update = update.Set(x => x.Name, obj.Name);
 			if(obj.Description != null)
-				update.Set(x => x.Description, obj.Description);
+				update = update.Set(x => x.Description, obj.Description);
 			if(obj.Secret != null)
-				update.Set(x => x.Secret, obj.Secret);
+				update = update.Set(x => x.Secret, obj.Secret);
 
 			try {
-				this._sensors.FindOneAndUpdate(
-					x => x.InternalId == obj.InternalId ||
-						x.Secret == obj.Secret,
-					update
-				);
+				this._sensors.FindOneAndUpdate( x => x.InternalId == obj.InternalId, update );
 			} catch(Exception ex) {
 				this._logger.LogInformation($"Unable to update sensor: {ex.Message}");
 			}
@@ -141,7 +137,7 @@ namespace SensateService.Infrastructure.Document
 			await Task.Run(() => this.Update(sensor)).AwaitSafely();
 		}
 
-		public override void Delete(string id)
+		public virtual void Delete(string id)
 		{
 			Sensor sensor;
 			ObjectId oid = new ObjectId(id);
@@ -152,7 +148,7 @@ namespace SensateService.Infrastructure.Document
 				this._measurements.DeleteBySensor(sensor);
 		}
 
-		public override async Task DeleteAsync(string id)
+		public virtual async Task DeleteAsync(string id)
 		{
 			Sensor sensor;
 			ObjectId oid = new ObjectId(id);
@@ -169,7 +165,7 @@ namespace SensateService.Infrastructure.Document
 			}
 		}
 
-		public override Sensor GetById(string id)
+		public virtual Sensor GetById(string id)
 		{
 			ObjectId oid = new ObjectId(id);
 			var result = this._sensors.Find(x => x.InternalId == oid);

@@ -49,12 +49,12 @@ namespace SensateService.Infrastructure.Document
 			).AwaitSafely();
 		}
 
-		public override async Task CreateAsync(Sensor sensor)
+		public override async Task CreateAsync(Sensor sensor, CancellationToken ct = default(CancellationToken))
 		{
 			var tasks = new Task[2];
 
-			tasks[0] = base.CreateAsync(sensor);
-			tasks[1] = this.CommitAsync(sensor);
+			tasks[0] = base.CreateAsync(sensor, ct);
+			tasks[1] = this.CommitAsync(sensor, ct);
 
 			await Task.WhenAll(tasks).AwaitSafely();
 		}

@@ -22,10 +22,9 @@ using SensateService.Helpers;
 
 namespace SensateService.Infrastructure.Sql
 {
-	public class UserTokenRepository :
-		AbstractSqlRepository<Tuple<SensateUser, string>, UserToken>, IUserTokenRepository
+	public class UserTokenRepository : AbstractSqlRepository<UserToken>, IUserTokenRepository
 	{
-		private Random _rng;
+		private readonly Random _rng;
 		private const int JwtRefreshTokenLength = 64;
 		public const string JwtRefreshTokenProvider = "JWTrt";
 		public const string JwtTokenProvider = "JWT";
@@ -49,16 +48,11 @@ namespace SensateService.Infrastructure.Sql
 				throw new DatabaseException("User token must have a value!");
 			}
 
-			var tasks = new[] {
-				this.Data.AddAsync(obj),
-				this.CommitAsync(obj)
-			};
-
-			await Task.WhenAll(tasks).AwaitSafely();
+			await base.CreateAsync(obj);
 		}
 
 
-		public override UserToken GetById(Tuple<SensateUser, string> id) => this.GetById(id.Item1, id.Item2);
+		public UserToken GetById(Tuple<SensateUser, string> id) => this.GetById(id.Item1, id.Item2);
 
 		public UserToken GetById(SensateUser user, string value)
 		{
@@ -76,22 +70,6 @@ namespace SensateService.Infrastructure.Sql
 				   select token;
 
 			return data.ToList();
-		}
-
-
-		public override void Update(UserToken obj)
-		{
-			throw new NotAllowedException("Unable to update user token!");
-		}
-
-		public override void Delete(Tuple<SensateUser, string> id)
-		{
-			throw new NotAllowedException("Unable to delete user token!");
-		}
-
-		public override Task DeleteAsync(Tuple<SensateUser, string> id)
-		{
-			throw new NotAllowedException("Unable to delete user token!");
 		}
 
 		public void InvalidateToken(UserToken token)

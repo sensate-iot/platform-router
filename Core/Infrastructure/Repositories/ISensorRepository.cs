@@ -6,6 +6,7 @@
  */
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using SensateService.Models;
 
@@ -14,7 +15,7 @@ namespace SensateService.Infrastructure.Repositories
 	public interface ISensorRepository
 	{
 		void Create(Sensor sensor);
-		Task CreateAsync(Sensor sensor);
+		Task CreateAsync(Sensor sensor, CancellationToken ct = default(CancellationToken));
 		Sensor Get(string id);
 		void Remove(string secret);
 		void Update(Sensor obj);
