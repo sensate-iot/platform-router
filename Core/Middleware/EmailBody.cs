@@ -8,7 +8,7 @@
 using System.Collections.Generic;
 using SendGrid.Helpers.Mail;
 
-namespace SensateService
+namespace SensateService.Middleware
 {
 	public class EmailBody
 	{

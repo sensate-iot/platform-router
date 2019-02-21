@@ -19,6 +19,7 @@ using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Models.Json.In;
 using SensateService.Services;
+using SensateService.Services.Settings;
 
 namespace SensateService.MqttHandler.Mqtt
 {

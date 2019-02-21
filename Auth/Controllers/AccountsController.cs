@@ -25,10 +25,12 @@ using SensateService.ApiCore.Controllers;
 using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
+using SensateService.Middleware;
 using SensateService.Models;
 using SensateService.Models.Json.In;
 using SensateService.Models.Json.Out;
 using SensateService.Services;
+using SensateService.Services.Settings;
 
 namespace SensateService.Auth.Controllers
 {

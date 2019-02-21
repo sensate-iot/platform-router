@@ -9,6 +9,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using SensateService.Config;
 using SensateService.Services;
+using SensateService.Services.Adapters;
+using SensateService.Services.Settings;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
 

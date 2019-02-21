@@ -5,10 +5,7 @@
  * @email:  dev@bietje.net
  */
 
-using System;
-using System.Collections.Generic;
-
-namespace SensateService.Services
+namespace SensateService.Services.Settings
 {
 	public class MqttServiceOptions
 	{

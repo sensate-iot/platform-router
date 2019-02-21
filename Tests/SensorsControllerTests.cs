@@ -7,15 +7,13 @@
 
 using System;
 using System.Threading.Tasks;
-
-using Moq;
 using MongoDB.Bson;
+using Moq;
 using NUnit.Framework;
-
-using SensateService.Models;
 using SensateService.Infrastructure.Repositories;
+using SensateService.Models;
 
-namespace SensateService.Tests.UnitTests
+namespace SensateService.Tests
 {
 	[TestFixture]
 	public class SensorsControllerTests

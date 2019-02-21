@@ -5,19 +5,17 @@
  * @email  dev@bietje.net
  */
 
-using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-
+using SensateService.Services.Settings;
 using Twilio.Exceptions;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.Types;
-
 using PhoneNumberResource = Twilio.Rest.Lookups.V1.PhoneNumberResource;
 
-namespace SensateService.Services
+namespace SensateService.Services.Adapters
 {
 	public class TwillioTextSendService : ITextSendService
 	{
@@ -42,7 +40,7 @@ namespace SensateService.Services
 			try {
 				MessageResource.Create(
 					new PhoneNumber(to),
-					from: new PhoneNumber(id),
+					@from: new PhoneNumber(id),
 					body: body
 				);
 			} catch(ApiException ex) {

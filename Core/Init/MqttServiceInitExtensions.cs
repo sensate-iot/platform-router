@@ -15,6 +15,8 @@ using Microsoft.Extensions.Hosting;
 using SensateService.Middleware;
 using SensateService.Services;
 using System.Collections.Generic;
+using SensateService.Services.Processing;
+using SensateService.Services.Settings;
 
 namespace SensateService.Init
 {

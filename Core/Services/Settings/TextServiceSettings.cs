@@ -5,7 +5,7 @@
  * @email  dev@bietje.net
  */
 
-namespace SensateService
+namespace SensateService.Services.Settings
 {
 	public class TextServiceSettings
 	{

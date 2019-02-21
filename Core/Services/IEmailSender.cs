@@ -6,6 +6,7 @@
  */
 
 using System.Threading.Tasks;
+using SensateService.Middleware;
 
 namespace SensateService.Services
 {

@@ -5,15 +5,14 @@
  * @email  dev@bietje.net
  */
 
-using System.Diagnostics;
 using System.Threading.Tasks;
-
 using Microsoft.Extensions.Options;
-
 using SendGrid;
 using SendGrid.Helpers.Mail;
+using SensateService.Middleware;
+using SensateService.Services.Settings;
 
-namespace SensateService.Services
+namespace SensateService.Services.Adapters
 {
 	public class SendGridMailer : IEmailSender
 	{

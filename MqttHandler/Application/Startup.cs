@@ -22,6 +22,7 @@ using SensateService.Models;
 using SensateService.Services;
 
 using SensateService.MqttHandler.Mqtt;
+using SensateService.Services.Processing;
 
 namespace SensateService.MqttHandler.Application
 {

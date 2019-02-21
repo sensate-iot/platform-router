@@ -27,6 +27,7 @@ using SensateService.Middleware;
 using SensateService.Models;
 using SensateService.Models.Json.In;
 using SensateService.Services;
+using SensateService.Services.Settings;
 
 namespace SensateService.WebSocketHandler.Handlers
 {

@@ -24,6 +24,7 @@ using SensateService.Infrastructure.Sql;
 using SensateService.Init;
 using SensateService.Models;
 using SensateService.Services;
+using SensateService.Services.Processing;
 using SensateService.WebSocketHandler.Handlers;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 

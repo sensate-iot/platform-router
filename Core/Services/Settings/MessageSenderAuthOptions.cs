@@ -5,7 +5,7 @@
  * @email  dev@bietje.net
  */
 
-namespace SensateService.Services
+namespace SensateService.Services.Settings
 {
 	public class MessageSenderAuthOptions
 	{

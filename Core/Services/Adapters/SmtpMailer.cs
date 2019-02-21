@@ -6,12 +6,13 @@
  */
 
 using System.Net;
-using System.Threading.Tasks;
 using System.Net.Mail;
-
+using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using SensateService.Middleware;
+using SensateService.Services.Settings;
 
-namespace SensateService.Services
+namespace SensateService.Services.Adapters
 {
 	public class SmtpMailer : IEmailSender
 	{
