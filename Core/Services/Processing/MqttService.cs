@@ -163,5 +163,13 @@ namespace SensateService.Services.Processing
 		{
 			this._handlers.TryAdd(topic, typeof(T));
 		}
+
+		public override async Task StopAsync(CancellationToken cancellationToken)
+		{
+			await base.StopAsync(cancellationToken);
+			await this._client.DisconnectAsync();
+
+			this._logger.LogInformation("MQTT client disconnected!");
+		}
 	}
 }
