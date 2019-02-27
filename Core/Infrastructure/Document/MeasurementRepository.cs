@@ -26,7 +26,7 @@ using SensateService.Infrastructure.Events;
 
 namespace SensateService.Infrastructure.Document
 {
-	public class MeasurementRepository : AbstractDocumentRepository<Measurement>, IMeasurementRepository
+	public class MeasurementRepository : AbstractDocumentRepository<Measurement>, IMeasurementRepository, IBulkWriter<Measurement>
 	{
 		protected readonly ILogger<MeasurementRepository> _logger;
 		private const int MaxDatapointLength = 25;
@@ -338,6 +338,16 @@ namespace SensateService.Infrastructure.Document
 			} finally {
 				src.Dispose();
 			}
+		}
+
+		public async Task CreateRangeAsync(IEnumerable<Measurement> objs, CancellationToken token)
+		{
+			var opts = new InsertManyOptions {
+				IsOrdered = false,
+				BypassDocumentValidation = true
+			};
+
+			await this._collection.InsertManyAsync(objs, opts, token).AwaitSafely();
 		}
 
 		private async Task InvokeReceiveMeasurement(Sensor sensor, MeasurementReceivedEventArgs eventargs)

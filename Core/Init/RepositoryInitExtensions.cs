@@ -14,10 +14,12 @@ using MongoDB.Bson.Serialization;
 
 using SensateService.Config;
 using SensateService.Converters;
+using SensateService.Infrastructure;
 using SensateService.Infrastructure.Cache;
 using SensateService.Infrastructure.Document;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Infrastructure.Sql;
+using SensateService.Models;
 
 namespace SensateService.Init
 {
@@ -32,30 +34,30 @@ namespace SensateService.Init
 			services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 			services.AddScoped<IUserTokenRepository, UserTokenRepository>();
 			services.AddScoped<IChangePhoneNumberTokenRepository, ChangePhoneNumberRepository>();
+			services.AddScoped<IBulkWriter<AuditLog>, AuditLogRepository>();
 
 			return services;
 		}
 
-		public static IServiceCollection AddDocumentRepositories( this IServiceCollection services, bool cache )
+		public static IServiceCollection AddDocumentRepositories(this IServiceCollection services, bool cache)
 		{
 			BsonSerializer.RegisterSerializer(typeof(DateTime), new BsonUtcDateTimeSerializer());
 			services.AddScoped<ISensorStatisticsRepository, SensorStatisticsRepository>();
 
 			if(cache) {
-				Debug.WriteLine("Caching enabled!");
 				services.AddScoped<IMeasurementRepository, CachedMeasurementRepository>();
 				services.AddScoped<ISensorRepository, CachedSensorRepository>();
+				services.AddScoped<IBulkWriter<Measurement>, CachedMeasurementRepository>();
 			} else {
-				Debug.WriteLine("Caching disabled!");
 				services.AddScoped<IMeasurementRepository, MeasurementRepository>();
 				services.AddScoped<ISensorRepository, SensorRepository>();
+				services.AddScoped<IBulkWriter<Measurement>, MeasurementRepository>();
 			}
 
 			return services;
 		}
 
-		public static IServiceCollection AddCacheStrategy(this IServiceCollection services,
-														  CacheConfig config, DatabaseConfig db)
+		public static IServiceCollection AddCacheStrategy(this IServiceCollection services, CacheConfig config, DatabaseConfig db)
 		{
 			if(config.Type == "Distributed") {
                 services.AddDistributedRedisCache(opts => {
