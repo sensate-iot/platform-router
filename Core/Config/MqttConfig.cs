@@ -16,5 +16,6 @@ namespace SensateService.Config
 		public short Port { get; set; }
 		public string ShareTopic { get; set; }
 		public string InternalMeasurementTopic { get; set; }
+		public string InternalBulkMeasurementTopic { get; set; }
 	}
 }
