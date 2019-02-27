@@ -114,7 +114,8 @@ namespace SensateService.Infrastructure.Sql
 			claims = new List<Claim> {
 				new Claim(JwtRegisteredClaimNames.Sub, user.Email),
 				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-				new Claim(ClaimTypes.NameIdentifier, user.Id)
+				new Claim(ClaimTypes.NameIdentifier, user.Id),
+				new Claim(JwtRegisteredClaimNames.NameId, user.Id)
 			};
 
 			roles.ToList().ForEach(x => {

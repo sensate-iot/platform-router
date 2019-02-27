@@ -10,6 +10,7 @@ using System.Net.Mail;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using SensateService.Middleware;
+using SensateService.Models.Generic;
 using SensateService.Services.Settings;
 
 namespace SensateService.Services.Adapters

@@ -25,7 +25,6 @@ using SensateService.Init;
 using SensateService.Models;
 using SensateService.Services;
 using SensateService.Services.Processing;
-using SensateService.WebSocketHandler.Handlers;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace SensateService.WebSocketHandler.Application
@@ -92,7 +91,6 @@ namespace SensateService.WebSocketHandler.Application
 			});
 
 			services.AddWebSocketHandler<WebSocketMeasurementHandler>();
-			services.AddWebSocketHandler<WebSocketLiveMeasurementHandler>();
 
 			services.AddLogging((builder) => {
 				builder.AddConsole();
@@ -104,14 +102,8 @@ namespace SensateService.WebSocketHandler.Application
 
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory logging, IServiceProvider sp)
 		{
-			var mqtt = new MqttConfig();
-
-			Configuration.GetSection("Mqtt").Bind(mqtt);
-
 			app.UseWebSockets();
 			app.MapWebSocketService("/measurement", sp.GetService<WebSocketMeasurementHandler>());
-			app.MapWebSocketService("/measurements/live", sp.GetService<WebSocketLiveMeasurementHandler>());
-			sp.MapMqttTopic<MqttInternalMeasurementHandler>(mqtt.InternalMeasurementTopic);
 		}
 
 		private void SetupAuthentication(IServiceCollection services, AuthenticationConfig auth)

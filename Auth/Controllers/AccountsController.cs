@@ -27,6 +27,7 @@ using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Middleware;
 using SensateService.Models;
+using SensateService.Models.Generic;
 using SensateService.Models.Json.In;
 using SensateService.Models.Json.Out;
 using SensateService.Services;

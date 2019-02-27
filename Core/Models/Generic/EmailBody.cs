@@ -8,7 +8,7 @@
 using System.Collections.Generic;
 using SendGrid.Helpers.Mail;
 
-namespace SensateService.Middleware
+namespace SensateService.Models.Generic
 {
 	public class EmailBody
 	{
@@ -17,7 +17,8 @@ namespace SensateService.Middleware
 		public string FromEmail { get; set; }
 		public string FromName { get; set; }
 		public string Subject { get; set; }
-		private List<EmailAddress> _recipients;
+
+		private readonly List<EmailAddress> _recipients;
 
 		public EmailBody() => this._recipients = new List<EmailAddress>();
 
@@ -25,12 +26,13 @@ namespace SensateService.Middleware
 
 		public SendGridMessage BuildSendgridMessage()
 		{
-			var msg = new SendGridMessage();
+			var msg = new SendGridMessage {
+				HtmlContent = this.HtmlBody,
+				PlainTextContent = this.TextBody,
+				From = new EmailAddress(FromEmail, FromName),
+				Subject = Subject
+			};
 
-			msg.HtmlContent = this.HtmlBody;
-			msg.PlainTextContent = this.TextBody;
-			msg.From = new EmailAddress(FromEmail, FromName);
-			msg.Subject = Subject;
 			msg.AddTos(this._recipients);
 
 			return msg;

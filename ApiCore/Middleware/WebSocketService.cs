@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 
 using SensateService.Middleware;
+using SensateService.Models.Generic;
 
 namespace SensateService.ApiCore.Middleware
 {

@@ -7,6 +7,7 @@
 
 using System.Threading.Tasks;
 using SensateService.Middleware;
+using SensateService.Models.Generic;
 
 namespace SensateService.Services
 {

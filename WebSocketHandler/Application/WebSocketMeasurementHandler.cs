@@ -23,13 +23,13 @@ using SensateService.Exceptions;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Events;
 using SensateService.Infrastructure.Repositories;
-using SensateService.Middleware;
 using SensateService.Models;
+using SensateService.Models.Generic;
 using SensateService.Models.Json.In;
 using SensateService.Services;
 using SensateService.Services.Settings;
 
-namespace SensateService.WebSocketHandler.Handlers
+namespace SensateService.WebSocketHandler.Application
 {
 	public class WebSocketMeasurementHandler : Middleware.WebSocketHandler
 	{

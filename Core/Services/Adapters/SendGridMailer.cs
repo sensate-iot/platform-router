@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using SensateService.Middleware;
+using SensateService.Models.Generic;
 using SensateService.Services.Settings;
 
 namespace SensateService.Services.Adapters

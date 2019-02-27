@@ -9,7 +9,7 @@ using System;
 using System.Net.WebSockets;
 using Microsoft.AspNetCore.Authentication;
 
-namespace SensateService.Middleware
+namespace SensateService.Models.Generic
 {
 	public class AuthenticatedWebSocket
 	{
