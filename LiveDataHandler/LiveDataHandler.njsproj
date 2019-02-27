@@ -35,7 +35,6 @@
   <ItemGroup>
     <TypeScriptCompile Include="src\app.ts" />
     <Content Include="package.json" />
-    <Content Include="README.md" />
     <Content Include="settings\appsettings.json">
       <SubType>Code</SubType>
     </Content>
