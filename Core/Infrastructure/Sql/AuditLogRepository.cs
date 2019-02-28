@@ -28,13 +28,10 @@ namespace SensateService.Infrastructure.Sql
 		{
 		}
 
-		public void Create(
-			string route, RequestMethod method,
-			IPAddress address, SensateUser user = null
-		)
+		public void Create(string route, RequestMethod method, IPAddress address, SensateUser user = null)
 		{
 			var al = new AuditLog() {
-				Author = user,
+				AuthorId = user?.Id,
 				Route = route,
 				Method = method,
 				Address = address,
@@ -45,15 +42,12 @@ namespace SensateService.Infrastructure.Sql
 			this.Create(al);
 		}
 
-		public async Task CreateAsync(
-			string route, RequestMethod method,
-			IPAddress address, SensateUser user = null
-		)
+		public async Task CreateAsync(string route, RequestMethod method, IPAddress address, SensateUser user = null)
 		{
 			AuditLog al;
 
 			al = new AuditLog() {
-				Author = user,
+				AuthorId = user?.Id,
 				Route = route,
 				Method = method,
 				Address = address,

@@ -8,8 +8,10 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+
 using Newtonsoft.Json;
 
 using SensateService.Enums;
@@ -91,12 +93,13 @@ namespace SensateService.MqttHandler.Mqtt
 					var auditlogs = scope.ServiceProvider.GetRequiredService<IAuditLogRepository>();
 
 					user = await users.GetAsync(sensor.Owner);
+
 					log = new AuditLog {
 						Address = IPAddress.Any,
 						Method = RequestMethod.MqttTcp,
 						Route = "NA",
 						Timestamp = DateTime.Now,
-						Author = user
+						AuthorId = user.Id
 					};
 
 					await auditlogs.CreateAsync(log, e.CancellationToken).AwaitSafely();

@@ -120,7 +120,7 @@ namespace SensateService.Auth
                 services.AddCacheStrategy(cache, db);
 
 			/* Add repositories */
-			services.AddSqlRepositories();
+			services.AddSqlRepositories(cache.Enabled);
 			services.AddDocumentRepositories(cache.Enabled);
 
 			if(mail.Provider == "SendGrid") {

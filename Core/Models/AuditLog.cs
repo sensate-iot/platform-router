@@ -26,6 +26,7 @@ namespace SensateService.Models
 		public RequestMethod Method { get; set; }
 		[Required]
 		public IPAddress Address { get; set; }
+		public string AuthorId { get; set; }
 		[ForeignKey("AuthorId")]
 		public SensateUser Author { get; set; }
 		public DateTime Timestamp { get; set; }

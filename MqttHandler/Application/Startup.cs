@@ -83,7 +83,7 @@ namespace SensateService.MqttHandler.Application
 
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.AddDocumentRepositories(cache.Enabled);
-			services.AddSqlRepositories();
+			services.AddSqlRepositories(cache.Enabled);
 
 			services.AddMqttService(options => {
 				options.Ssl = mqtt.Ssl;
@@ -102,7 +102,7 @@ namespace SensateService.MqttHandler.Application
 				return mqservice;
 			});
 
-			services.AddLogging((builder) => {
+			services.AddLogging(builder => {
 				if(!IsDevelopment())
 					return;
 

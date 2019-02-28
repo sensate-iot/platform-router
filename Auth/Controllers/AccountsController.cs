@@ -25,7 +25,6 @@ using SensateService.ApiCore.Controllers;
 using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
-using SensateService.Middleware;
 using SensateService.Models;
 using SensateService.Models.Generic;
 using SensateService.Models.Json.In;
@@ -381,7 +380,7 @@ namespace SensateService.Auth.Controllers
 		public async Task<IActionResult> Show(string uid)
 		{
 			User viewuser;
-			var user = this._users.Get(uid);
+			var user = await this._users.GetAsync(uid);
 
 			await this.Log(RequestMethod.HttpGet, user);
 			if(user == null)

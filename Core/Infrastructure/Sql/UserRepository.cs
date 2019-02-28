@@ -52,12 +52,12 @@ namespace SensateService.Infrastructure.Sql
 			});
 		}
 
-		public SensateUser Get(string key)
+		public virtual SensateUser Get(string key)
 		{
 			return this.GetById(key);
 		}
 
-		public async Task<SensateUser> GetAsync(string key)
+		public virtual async Task<SensateUser> GetAsync(string key)
 		{
 			var user = await Task.Run(() => this.GetById(key));
 			return user;
@@ -70,7 +70,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public virtual async Task DeleteAsync(string id)
 		{
-			var obj = this.Get(id);
+			var obj = await this.GetAsync(id);
 
 			if(obj == null)
 				return;

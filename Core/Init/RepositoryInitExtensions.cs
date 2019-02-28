@@ -6,7 +6,6 @@
  */
 
 using System;
-using System.Diagnostics;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -25,12 +24,17 @@ namespace SensateService.Init
 {
 	public static class RepositoryInitExtensions
 	{
-		public static IServiceCollection AddSqlRepositories(this IServiceCollection services)
+		public static IServiceCollection AddSqlRepositories(this IServiceCollection services, bool cache)
 		{
 			services.AddScoped<IUserRepository, UserRepository>();
 			services.AddScoped<IChangeEmailTokenRepository, ChangeEmailTokenRepository>();
 			services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
-			services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+
+			if(cache)
+				services.AddScoped<IUserRepository, CachedUserRepository>();
+			else
+				services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+
 			services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 			services.AddScoped<IUserTokenRepository, UserTokenRepository>();
 			services.AddScoped<IChangePhoneNumberTokenRepository, ChangePhoneNumberRepository>();

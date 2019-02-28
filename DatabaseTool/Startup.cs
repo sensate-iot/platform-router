@@ -86,7 +86,7 @@ namespace SensateService.DatabaseTool
 
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.AddDocumentRepositories(cache.Enabled);
-			services.AddSqlRepositories();
+			services.AddSqlRepositories(cache.Enabled);
 
 			services.AddLogging((builder) => {
 				builder.AddConsole();
