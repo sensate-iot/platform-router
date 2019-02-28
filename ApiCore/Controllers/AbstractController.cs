@@ -68,10 +68,10 @@ namespace SensateService.ApiCore.Controllers
 
 		protected IActionResult NotFoundInputResult(string msg)
 		{
-			var status = new Status();
-
-			status.Message = msg;
-			status.ErrorCode = ReplyCode.NotFound;
+			var status = new Status {
+				Message = msg,
+				ErrorCode = ReplyCode.NotFound
+			};
 
 			return new NotFoundObjectResult(status);
 		}
@@ -82,7 +82,7 @@ namespace SensateService.ApiCore.Controllers
 				return null;
 
 			return !this.RouteData.Values.TryGetValue("action", out object action) ? null :
-				String.Format("/{0}#{1}", controller.ToString(), action.ToString());
+				string.Format("/{0}#{1}", controller, action);
 		}
 
 		protected IPAddress GetRemoteAddress()
