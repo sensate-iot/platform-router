@@ -84,7 +84,7 @@ namespace SensateService.WebSocketHandler.Application
 						Method = RequestMethod.MqttTcp,
 						Route = "NA",
 						Timestamp = DateTime.Now,
-						Author = user
+						AuthorId = user?.Id
 					};
 
 					await auditlogs.CreateAsync(log, e.CancellationToken);
