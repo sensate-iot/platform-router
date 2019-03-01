@@ -53,7 +53,7 @@ namespace SensateService.Auth.Controllers
 		[ProducesResponseType(typeof(TokenRequestReply), 400)]
 		public async Task<ActionResult> RequestToken([FromBody] Login login)
 		{
-			var user = await this._users.GetByEmailAsync(login.Email).AwaitSafely();
+			var user = await this._users.GetByEmailAsync(login.Email).AwaitBackground();
 			bool result;
 			Microsoft.AspNetCore.Identity.SignInResult signInResult;
 			UserToken token;
@@ -79,12 +79,12 @@ namespace SensateService.Auth.Controllers
 			signInResult = await this._signin_manager.PasswordSignInAsync(user, login.Password, false, false);
 
 			if(!signInResult.Succeeded) {
-				await this.Log(RequestMethod.HttpPost).AwaitSafely();
+				await this.Log(RequestMethod.HttpPost).AwaitBackground();
 				return new UnauthorizedResult();
 			}
 
 			token = this.CreateUserTokenEntry(user);
-			await this.Log(RequestMethod.HttpPost, user).AwaitSafely();
+			await this.Log(RequestMethod.HttpPost, user).AwaitBackground();
 			await this._tokens.CreateAsync(token);
 
 			var roles = this._users.GetRoles(user);
@@ -104,7 +104,7 @@ namespace SensateService.Auth.Controllers
 		[ProducesResponseType(typeof(TokenRequestReply), 400)]
 		public async Task<ActionResult> RefreshToken([FromBody] RefreshLogin login)
 		{
-			var user = await this._users.GetByEmailAsync(login.Email).AwaitSafely();
+			var user = await this._users.GetByEmailAsync(login.Email).AwaitBackground();
 			TokenRequestReply reply;
 			UserToken token;
 			bool banned;
@@ -117,23 +117,23 @@ namespace SensateService.Auth.Controllers
 			var logTask = this.Log(RequestMethod.HttpPost, user);
 
 			if(token == null || !token.Valid || banned) {
-				await logTask.AwaitSafely();
+				await logTask.AwaitBackground();
 				return Forbid();
 			}
 
 			if(token.ExpiresAt < DateTime.Now) {
-				await logTask.AwaitSafely();
-				await this._tokens.InvalidateTokenAsync(token).AwaitSafely();
+				await logTask.AwaitBackground();
+				await this._tokens.InvalidateTokenAsync(token).AwaitBackground();
 				return Forbid();
 			}
 
 			reply = new TokenRequestReply();
 			var newToken = this.CreateUserTokenEntry(user);
-            await logTask.AwaitSafely();
+            await logTask.AwaitBackground();
 
-			var roles = await this._users.GetRolesAsync(user).AwaitSafely();
-			await this._tokens.CreateAsync(newToken).AwaitSafely();
-			await this._tokens.InvalidateTokenAsync(token).AwaitSafely();
+			var roles = await this._users.GetRolesAsync(user).AwaitBackground();
+			await this._tokens.CreateAsync(newToken).AwaitBackground();
+			await this._tokens.InvalidateTokenAsync(token).AwaitBackground();
 
 			reply.RefreshToken = newToken.Value;
 			reply.ExpiresInMinutes = this._settings.JwtRefreshExpireMinutes;
@@ -150,7 +150,7 @@ namespace SensateService.Auth.Controllers
 		public async Task<IActionResult> Revoke(string token)
 		{
 			UserToken authToken;
-			var user = await this.GetCurrentUserAsync().AwaitSafely();
+			var user = await this.GetCurrentUserAsync().AwaitBackground();
 
 			if(user == null)
 				return Forbid();
@@ -159,7 +159,7 @@ namespace SensateService.Auth.Controllers
 				return InvalidInputResult("Token not found!");
 
 			authToken = this._tokens.GetById(user, token);
-			await this.Log(RequestMethod.HttpDelete, user).AwaitSafely();
+			await this.Log(RequestMethod.HttpDelete, user).AwaitBackground();
 
 			if(authToken == null)
 				return this.NotFoundInputResult("Token not found!");
@@ -177,10 +177,10 @@ namespace SensateService.Auth.Controllers
 		public async Task<IActionResult> RevokeAll()
 		{
 			IEnumerable<UserToken> tokens;
-			var user = await this.GetCurrentUserAsync().AwaitSafely();
+			var user = await this.GetCurrentUserAsync().AwaitBackground();
 
 			tokens = this._tokens.GetByUser(user);
-			await this.Log(RequestMethod.HttpDelete, user).AwaitSafely();
+			await this.Log(RequestMethod.HttpDelete, user).AwaitBackground();
 			await this._tokens.InvalidateManyAsync(tokens);
 
 			return Ok();

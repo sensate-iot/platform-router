@@ -41,7 +41,7 @@ namespace SensateService.Infrastructure.Sql
 			};
 
 			try {
-				await this.CreateAsync(t).AwaitSafely();
+				await this.CreateAsync(t).AwaitBackground();
 			} catch(Exception e) {
 				Debug.WriteLine($"Unable to create token: {e.Message}");
 				return null;
@@ -63,7 +63,7 @@ namespace SensateService.Infrastructure.Sql
 				select token;
 			var single = tokens.OrderByDescending(t => t.Timestamp);
 
-			return await single.FirstOrDefaultAsync().AwaitSafely();
+			return await single.FirstOrDefaultAsync().AwaitBackground();
 		}
 	}
 }

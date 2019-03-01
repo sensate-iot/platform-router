@@ -55,13 +55,13 @@ namespace SensateService.Infrastructure.Sql
 				Id = 0L
 			};
 
-			await this.CreateAsync(al).AwaitSafely();
+			await this.CreateAsync(al).AwaitBackground();
 		}
 
 		public async Task CreateAsync(AuditLog obj, CancellationToken ct)
 		{
 			this.Data.Add(obj);
-			await this.CommitAsync(ct).AwaitSafely();
+			await this.CommitAsync(ct).AwaitBackground();
 		}
 
 		public async Task<IEnumerable<AuditLog>> GetByRequestType(SensateUser user, RequestMethod method)
@@ -69,7 +69,7 @@ namespace SensateService.Infrastructure.Sql
 			var query = from log in this.Data
 				where log.Method == method && log.Author == user
 				select log;
-			return await query.ToListAsync().AwaitSafely();
+			return await query.ToListAsync().AwaitBackground();
 		}
 
 		public AuditLog Get(long id)
@@ -84,7 +84,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public async Task<AuditLog> GetAsync(long id)
 		{
-			return await Task.Run(() => this.Get(id)).AwaitSafely();
+			return await Task.Run(() => this.Get(id)).AwaitBackground();
 		}
 
 		public IEnumerable<AuditLog> GetBetween(SensateUser user, DateTime start, DateTime end)
@@ -100,7 +100,7 @@ namespace SensateService.Infrastructure.Sql
 			var query = from log in this.Data
 				where user == log.Author && log.Timestamp >= start && log.Timestamp <= end
 				select log;
-			return await query.ToListAsync().AwaitSafely();
+			return await query.ToListAsync().AwaitBackground();
 		}
 
 		public AuditLog GetById(long id)
@@ -118,12 +118,12 @@ namespace SensateService.Infrastructure.Sql
 
 		public async Task<int> CountAsync(Expression<Func<AuditLog, bool>> predicate)
 		{
-			return await this.Data.Select(predicate).CountAsync().AwaitSafely();
+			return await this.Data.Select(predicate).CountAsync().AwaitBackground();
 		}
 
 		public async Task<IEnumerable<AuditLog>> GetByRouteAsync(SensateUser user, string route)
 		{
-			return await Task.Run(() => this.GetByRoute(user, route)).AwaitSafely();
+			return await Task.Run(() => this.GetByRoute(user, route)).AwaitBackground();
 		}
 
 		public IEnumerable<AuditLog> GetByUser(SensateUser user)
@@ -136,7 +136,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public async Task<IEnumerable<AuditLog>> GetByUserAsync(SensateUser user)
 		{
-			return await Task.Run(() => this.GetByUser(user)).AwaitSafely();
+			return await Task.Run(() => this.GetByUser(user)).AwaitBackground();
 		}
 	}
 }

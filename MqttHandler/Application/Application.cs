@@ -44,7 +44,7 @@ namespace SensateService.MqttHandler.Application
 			services = this.sp.GetServices<IHostedService>().ToList();
 			Task.Run(async () => {
 				foreach(var hosted in services) {
-					await hosted.StopAsync(CancellationToken.None).AwaitSafely();
+					await hosted.StopAsync(CancellationToken.None).AwaitBackground();
 				}
 			}).Wait();
 		}

@@ -39,7 +39,7 @@ namespace SensateService.Infrastructure.Sql
 
 		private async Task<SensateUser> LookupAsync(string id, CancellationToken ct)
 		{
-			var obj = await this._cache.GetAsync(id, ct).AwaitSafely();
+			var obj = await this._cache.GetAsync(id, ct).AwaitBackground();
 
 			if(obj == null)
 				return null;
@@ -88,7 +88,7 @@ namespace SensateService.Infrastructure.Sql
 				return obj;
 			}
 
-			obj = await base.GetAsync(key).AwaitSafely();
+			obj = await base.GetAsync(key).AwaitBackground();
 			if(obj == null)
 				return null;
 

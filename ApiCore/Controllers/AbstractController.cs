@@ -104,7 +104,7 @@ namespace SensateService.ApiCore.Controllers
 			await this._audit.CreateAsync(
 				this.GetCurrentRoute(), method,
 				this.GetRemoteAddress(), user
-			).AwaitSafely();
+			).AwaitBackground();
 		}
 	}
 }

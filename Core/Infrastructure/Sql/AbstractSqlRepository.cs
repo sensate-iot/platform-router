@@ -33,12 +33,12 @@ namespace SensateService.Infrastructure.Sql
 
 		public async Task CommitAsync(T obj, CancellationToken ct = default(CancellationToken))
 		{
-			await this._sqlContext.SaveChangesAsync(ct).AwaitSafely();
+			await this._sqlContext.SaveChangesAsync(ct).AwaitBackground();
 		}
 
 		public async Task CommitAsync(CancellationToken ct = default(CancellationToken))
 		{
-			await this._sqlContext.SaveChangesAsync(ct).AwaitSafely();
+			await this._sqlContext.SaveChangesAsync(ct).AwaitBackground();
 		}
 
 		public virtual void Commit()
@@ -53,7 +53,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public virtual async Task EndUpdateAsync()
 		{
-			await this._sqlContext.SaveChangesAsync().AwaitSafely();
+			await this._sqlContext.SaveChangesAsync().AwaitBackground();
 		}
 
 		public void EndUpdate()

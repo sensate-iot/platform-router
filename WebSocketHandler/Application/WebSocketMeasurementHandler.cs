@@ -128,7 +128,7 @@ namespace SensateService.WebSocketHandler.Application
 				if(raw.CreatedById == null)
 					return;
 
-				sensor = await sensors.GetAsync(raw.CreatedById).AwaitSafely();
+				sensor = await sensors.GetAsync(raw.CreatedById).AwaitBackground();
 
 				await measurements.ReceiveMeasurementAsync(sensor, raw);
 				await stats.IncrementAsync(sensor);

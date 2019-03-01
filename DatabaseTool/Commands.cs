@@ -35,14 +35,14 @@ namespace SensateService.DatabaseTool
 			var sensors = scope.ServiceProvider.GetRequiredService<ISensorRepository>();
 
 			try {
-				var sensor = await sensors.GetAsync(args).AwaitSafely();
+				var sensor = await sensors.GetAsync(args).AwaitBackground();
 				sw = new Stopwatch();
 
 				if(sensor == null)
 					Console.WriteLine("> Unknown sensor ID");
 
 				sw.Start();
-				var measurements = await repo.GetMeasurementsBySensorAsync(sensor).AwaitSafely();
+				var measurements = await repo.GetMeasurementsBySensorAsync(sensor).AwaitBackground();
 				sw.Stop();
 
 				var enumerable = measurements as List<Measurement> ?? measurements.ToList();
@@ -69,7 +69,7 @@ namespace SensateService.DatabaseTool
 			var sensors = scope.ServiceProvider.GetRequiredService<ISensorRepository>();
 
 			try {
-				var sensor = await sensors.GetAsync(args).AwaitSafely();
+				var sensor = await sensors.GetAsync(args).AwaitBackground();
 				sw = new Stopwatch();
 
 				if(sensor == null)
@@ -79,7 +79,7 @@ namespace SensateService.DatabaseTool
 				var yday = today.AddDays(-1D);
 
 				sw.Start();
-				var measurements = await repo.GetAfterAsync(sensor, yday).AwaitSafely();
+				var measurements = await repo.GetAfterAsync(sensor, yday).AwaitBackground();
 				sw.Stop();
 
 				var enumerable = measurements as List<Measurement> ?? measurements.ToList();
@@ -106,7 +106,7 @@ namespace SensateService.DatabaseTool
 			var sensors = scope.ServiceProvider.GetRequiredService<ISensorRepository>();
 
 			try {
-				var sensor = await sensors.GetAsync(args).AwaitSafely();
+				var sensor = await sensors.GetAsync(args).AwaitBackground();
 				sw = new Stopwatch();
 
 				if(sensor == null)
@@ -115,7 +115,7 @@ namespace SensateService.DatabaseTool
 				var today = DateTime.Today;
 
 				sw.Start();
-				var measurements = await repo.GetBeforeAsync(sensor, today).AwaitSafely();
+				var measurements = await repo.GetBeforeAsync(sensor, today).AwaitBackground();
 				sw.Stop();
 
 				var enumerable = measurements as List<Measurement> ?? measurements.ToList();

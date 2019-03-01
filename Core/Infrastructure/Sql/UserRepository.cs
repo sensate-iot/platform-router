@@ -103,23 +103,23 @@ namespace SensateService.Infrastructure.Sql
 
 		public virtual async Task<IEnumerable<string>> GetRolesAsync(SensateUser user)
 		{
-			return await this._manager.GetRolesAsync(user).AwaitSafely();
+			return await this._manager.GetRolesAsync(user).AwaitBackground();
 		}
 
 		public async Task<IEnumerable<SensateUser>> FindByEmailAsync(string email)
 		{
 			var result = this.Data.Where(x => x.Email.Contains(email));
-			return await result.ToListAsync().AwaitSafely();
+			return await result.ToListAsync().AwaitBackground();
 		}
 
 		public async Task<int> CountAsync()
 		{
-			return await this.Data.CountAsync().AwaitSafely();
+			return await this.Data.CountAsync().AwaitBackground();
 		}
 
 		public async Task<int> CountGhostUsersAsync()
 		{
-			return await this.Data.CountAsync(x => !(x.EmailConfirmed && x.PhoneNumberConfirmed)).AwaitSafely();
+			return await this.Data.CountAsync(x => !(x.EmailConfirmed && x.PhoneNumberConfirmed)).AwaitBackground();
 		}
 
 		public async Task<List<Tuple<DateTime, int>>> CountByDay(DateTime start)
@@ -127,7 +127,7 @@ namespace SensateService.Infrastructure.Sql
 			var query = this.Data.Where(x => x.RegisteredAt >= start)
 				.GroupBy(x => x.RegisteredAt.Date)
 				.Select( x => new Tuple<DateTime, int>(x.Key, x.Count()) );
-			return await query.ToListAsync().AwaitSafely();
+			return await query.ToListAsync().AwaitBackground();
 		}
 
 		public async Task<List<SensateUser>> GetMostRecentAsync(int number)
@@ -135,7 +135,7 @@ namespace SensateService.Infrastructure.Sql
 			var query = this.Data.OrderByDescending(x => x.RegisteredAt);
 			var ordered = query.Take(number);
 
-			return await ordered.ToListAsync().AwaitSafely();
+			return await ordered.ToListAsync().AwaitBackground();
 		}
 
 		public async Task<bool> IsBanned(SensateUser user)
@@ -164,7 +164,7 @@ namespace SensateService.Infrastructure.Sql
 
 		private async Task<bool> IsInRole(SensateUser user, string role)
 		{
-			var raw = await this.GetRolesAsync(user).AwaitSafely();
+			var raw = await this.GetRolesAsync(user).AwaitBackground();
 			var roles = raw.Select(r => r.ToUpper());
 
 			return roles.Contains(role.ToUpper());

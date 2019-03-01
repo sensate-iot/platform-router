@@ -39,7 +39,7 @@ namespace SensateService.Infrastructure.Document
 
 		public virtual async Task CreateAsync(T obj, CancellationToken ct = default(CancellationToken))
 		{
-			await this._collection.InsertOneAsync(obj, default(InsertOneOptions), ct).AwaitSafely();
+			await this._collection.InsertOneAsync(obj, default(InsertOneOptions), ct).AwaitBackground();
 		}
 	}
 }

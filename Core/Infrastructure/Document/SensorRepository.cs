@@ -76,24 +76,24 @@ namespace SensateService.Infrastructure.Document
 			var builder = Builders<Sensor>.Filter;
 
 			filter = builder.Where(s => s.Owner == id);
-			var sensors = await this._sensors.FindAsync(filter).AwaitSafely();
+			var sensors = await this._sensors.FindAsync(filter).AwaitBackground();
 
 			if(sensors == null)
 				return null;
 
-			return await sensors.ToListAsync().AwaitSafely();
+			return await sensors.ToListAsync().AwaitBackground();
 		}
 
 		public virtual async Task<Sensor> GetAsync(string id)
 		{
 			ObjectId oid = new ObjectId(id);
 			var filter = Builders<Sensor>.Filter.Where(x => x.InternalId == oid);
-			var result = await this._sensors.FindAsync(filter).AwaitSafely();
+			var result = await this._sensors.FindAsync(filter).AwaitBackground();
 
 			if(result == null)
 				return null;
 
-			return await result.FirstOrDefaultAsync().AwaitSafely();
+			return await result.FirstOrDefaultAsync().AwaitBackground();
 		}
 
 		public async Task<long> CountAsync(SensateUser user = null)
@@ -101,16 +101,16 @@ namespace SensateService.Infrastructure.Document
 			FilterDefinition<Sensor> filter;
 
 			if(user == null)
-				return await this._sensors.CountDocumentsAsync(new BsonDocument()).AwaitSafely();
+				return await this._sensors.CountDocumentsAsync(new BsonDocument()).AwaitBackground();
 
 			var builder = Builders<Sensor>.Filter;
 			filter = builder.Where(s => s.Owner == user.Id);
-			return await this._sensors.CountDocumentsAsync(filter).AwaitSafely();
+			return await this._sensors.CountDocumentsAsync(filter).AwaitBackground();
 		}
 
 		public virtual async Task RemoveAsync(string id)
 		{
-			await this.DeleteAsync(id).AwaitSafely();
+			await this.DeleteAsync(id).AwaitBackground();
 		}
 
 		public virtual void Update(Sensor obj)
@@ -134,7 +134,7 @@ namespace SensateService.Infrastructure.Document
 
 		public virtual async Task UpdateAsync(Sensor sensor)
 		{
-			await Task.Run(() => this.Update(sensor)).AwaitSafely();
+			await Task.Run(() => this.Update(sensor)).AwaitBackground();
 		}
 
 		public virtual void Delete(string id)
@@ -153,7 +153,7 @@ namespace SensateService.Infrastructure.Document
 			Sensor sensor;
 			ObjectId oid = new ObjectId(id);
 
-			sensor = await this._sensors.FindOneAndDeleteAsync(x => x.InternalId == oid).AwaitSafely();
+			sensor = await this._sensors.FindOneAndDeleteAsync(x => x.InternalId == oid).AwaitBackground();
 
 			if(sensor != null) {
 				var tasks = new[] {
@@ -161,7 +161,7 @@ namespace SensateService.Infrastructure.Document
                     this._stats.DeleteBySensorAsync(sensor)
 				};
 
-				await Task.WhenAll(tasks).AwaitSafely();
+				await Task.WhenAll(tasks).AwaitBackground();
 			}
 		}
 

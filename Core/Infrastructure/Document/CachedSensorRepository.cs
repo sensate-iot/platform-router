@@ -46,7 +46,7 @@ namespace SensateService.Infrastructure.Document
 				CacheTimeout.Timeout.ToInt(),
 				true,
 				ct
-			).AwaitSafely();
+			).AwaitBackground();
 		}
 
 		public override async Task CreateAsync(Sensor sensor, CancellationToken ct = default(CancellationToken))
@@ -56,7 +56,7 @@ namespace SensateService.Infrastructure.Document
 			tasks[0] = base.CreateAsync(sensor, ct);
 			tasks[1] = this.CommitAsync(sensor, ct);
 
-			await Task.WhenAll(tasks).AwaitSafely();
+			await Task.WhenAll(tasks).AwaitBackground();
 		}
 
 		public override void Create(Sensor obj)
@@ -94,12 +94,12 @@ namespace SensateService.Infrastructure.Document
 			if(data != null)
 				return JsonConvert.DeserializeObject<IEnumerable<Sensor>>(data);
 
-			sensors = await base.GetAsync(user).AwaitSafely();
+			sensors = await base.GetAsync(user).AwaitBackground();
 
 			if(sensors == null)
 				return null;
 
-			await this._cache.SetAsync( key, JsonConvert.SerializeObject(sensors), CacheTimeout.TimeoutMedium.ToInt() ).AwaitSafely();
+			await this._cache.SetAsync( key, JsonConvert.SerializeObject(sensors), CacheTimeout.TimeoutMedium.ToInt() ).AwaitBackground();
 			return sensors;
 		}
 
@@ -108,24 +108,24 @@ namespace SensateService.Infrastructure.Document
 			string data;
 			Sensor sensor;
 
-			data = await this._cache.GetAsync(id).AwaitSafely();
+			data = await this._cache.GetAsync(id).AwaitBackground();
 
 			if(data != null)
 				return JsonConvert.DeserializeObject<Sensor>(data);
 
-			sensor = await base.GetAsync(id).AwaitSafely();
+			sensor = await base.GetAsync(id).AwaitBackground();
 
 			if(sensor == null)
 				return null;
 
-			await this.CommitAsync(sensor).AwaitSafely();
+			await this.CommitAsync(sensor).AwaitBackground();
 			return sensor;
 
 		}
 
 		public override async Task RemoveAsync(string id)
 		{
-			await this.DeleteAsync(id).AwaitSafely();
+			await this.DeleteAsync(id).AwaitBackground();
 		}
 
 		public override void Remove(string id)
@@ -146,7 +146,7 @@ namespace SensateService.Infrastructure.Document
                 base.UpdateAsync(sensor)
 			};
 
-			await Task.WhenAll(tasks).AwaitSafely();
+			await Task.WhenAll(tasks).AwaitBackground();
 		}
 
 		public override void Delete(string id)
@@ -162,7 +162,7 @@ namespace SensateService.Infrastructure.Document
 				base.DeleteAsync(id)
 			};
 
-			await Task.WhenAll(tsk).AwaitSafely();
+			await Task.WhenAll(tsk).AwaitBackground();
 		}
 
 		public override Sensor GetById(string id)

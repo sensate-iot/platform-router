@@ -102,7 +102,7 @@ namespace SensateService.MqttHandler.Mqtt
 						AuthorId = user.Id
 					};
 
-					await auditlogs.CreateAsync(log, e.CancellationToken).AwaitSafely();
+					await auditlogs.CreateAsync(log, e.CancellationToken).AwaitBackground();
 				}
 			} catch (Exception ex) {
 				Console.WriteLine("Unable to log measurement!");
@@ -132,14 +132,14 @@ namespace SensateService.MqttHandler.Mqtt
 				if(raw.CreatedById == null)
 					return;
 
-				sensor = await this.sensors.GetAsync(raw.CreatedById).AwaitSafely();
+				sensor = await this.sensors.GetAsync(raw.CreatedById).AwaitBackground();
 
 				Task[] tasks = {
 					this.measurements.ReceiveMeasurementAsync(sensor, raw),
 					this.stats.IncrementAsync(sensor)
 				};
 
-				await Task.WhenAll(tasks).AwaitSafely();
+				await Task.WhenAll(tasks).AwaitBackground();
 			} catch(Exception ex) {
 				Console.WriteLine($"Error: {ex.Message}");
 				Console.WriteLine($"Received a buggy MQTT message: {message}");

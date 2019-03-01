@@ -48,7 +48,7 @@ namespace SensateService.Infrastructure.Document
 		private async Task CommitAsync(Measurement obj, CancellationToken ct = default(CancellationToken))
 		{
 			try {
-				await _cache.SerializeAsync(obj.InternalId.ToString(), obj, CacheTimeout.Timeout.ToInt(), true, ct).AwaitSafely();
+				await _cache.SerializeAsync(obj.InternalId.ToString(), obj, CacheTimeout.Timeout.ToInt(), true, ct).AwaitBackground();
 			} catch(Exception ex) {
 				throw new CachingException(
 					$"Unable to cache measurement: {ex.Message}",
@@ -76,7 +76,7 @@ namespace SensateService.Infrastructure.Document
 			tasks[0] = base.CreateAsync(obj, ct);
 			tasks[1] = this.CommitAsync(obj, ct);
 
-			await Task.WhenAll(tasks).AwaitSafely();
+			await Task.WhenAll(tasks).AwaitBackground();
 		}
 
 		public override async Task DeleteAsync(string id)
@@ -86,7 +86,7 @@ namespace SensateService.Infrastructure.Document
 				base.DeleteAsync(id)
 			};
 
-			await Task.WhenAll(tasks).AwaitSafely();
+			await Task.WhenAll(tasks).AwaitBackground();
 		}
 
 		private void CacheData(string key, object data, int tmo, bool slide = true)
@@ -102,7 +102,7 @@ namespace SensateService.Infrastructure.Document
 			if(key == null || data == null)
 				return;
 
-			await this._cache.SerializeAsync(key, data, tmo, slide).AwaitSafely();
+			await this._cache.SerializeAsync(key, data, tmo, slide).AwaitBackground();
 		}
 
 		public override void DeleteBySensor(Sensor sensor)
@@ -124,7 +124,7 @@ namespace SensateService.Infrastructure.Document
 				base.DeleteBySensorAsync(sensor)
 			};
 
-			await Task.WhenAll(tasks).AwaitSafely();
+			await Task.WhenAll(tasks).AwaitBackground();
 		}
 
 		public override void DeleteBetween(Sensor sensor, DateTime start, DateTime end)
@@ -146,19 +146,19 @@ namespace SensateService.Infrastructure.Document
                 base.DeleteBetweenAsync(sensor, start, end)
 			};
 
-			await Task.WhenAll(tasks).AwaitSafely();
+			await Task.WhenAll(tasks).AwaitBackground();
 		}
 
 		public override async Task<Measurement> GetByIdAsync(string id)
 		{
 			Measurement m;
 
-			m = await _cache.DeserializeAsync<Measurement>(id).AwaitSafely();
+			m = await _cache.DeserializeAsync<Measurement>(id).AwaitBackground();
 
 			if(m != null)
 				return m;
 
-			m = await base.GetByIdAsync(id).AwaitSafely();
+			m = await base.GetByIdAsync(id).AwaitBackground();
 
 			if(m != null)
 				this.Commit(m);
@@ -173,7 +173,7 @@ namespace SensateService.Infrastructure.Document
 			key = String.Format("Measurements::{0}", sensor.InternalId.ToString());
 			return await TryGetMeasurementsAsync(key,
 				x => x.CreatedBy == sensor.InternalId, CacheTimeout.TimeoutMedium.ToInt()
-			).AwaitSafely();
+			).AwaitBackground();
 		}
 
 		public override IEnumerable<Measurement> GetMeasurementsBySensor(Sensor sensor)
@@ -191,7 +191,7 @@ namespace SensateService.Infrastructure.Document
 			await Task.WhenAll(
 				this._cache.SerializeAsync(obj.InternalId.ToString(), obj, CacheTimeout.Timeout.ToInt(), false),
 				base.UpdateAsync(obj)
-			).AwaitSafely();
+			).AwaitBackground();
 		}
 
 		private async Task<IEnumerable<Measurement>> TryGetMeasurementsAsync(
@@ -206,8 +206,8 @@ namespace SensateService.Infrastructure.Document
 			if(measurements != null)
 				return measurements;
 
-			measurements = await base.TryGetMeasurementsAsync(expression).AwaitSafely();
-			await this.CacheDataAsync(key, measurements, tmo, false).AwaitSafely();
+			measurements = await base.TryGetMeasurementsAsync(expression).AwaitBackground();
+			await this.CacheDataAsync(key, measurements, tmo, false).AwaitBackground();
 			return measurements;
 
 		}
@@ -238,8 +238,8 @@ namespace SensateService.Infrastructure.Document
 			if(measurements != null)
 				return measurements;
 
-			measurements = await base.GetAfterAsync(sensor, pit).AwaitSafely();
-			await this.CacheDataAsync(key, measurements, CacheTimeout.TimeoutMedium.ToInt(), false).AwaitSafely();
+			measurements = await base.GetAfterAsync(sensor, pit).AwaitBackground();
+			await this.CacheDataAsync(key, measurements, CacheTimeout.TimeoutMedium.ToInt(), false).AwaitBackground();
 			return measurements;
 
 		}
@@ -290,8 +290,8 @@ namespace SensateService.Infrastructure.Document
 			if(measurements != null)
 				return measurements;
 
-			measurements = await base.TryGetBetweenAsync(sensor, start, end).AwaitSafely();
-			await CacheDataAsync(key, measurements, CacheTimeout.Timeout.ToInt()).AwaitSafely();
+			measurements = await base.TryGetBetweenAsync(sensor, start, end).AwaitBackground();
+			await CacheDataAsync(key, measurements, CacheTimeout.Timeout.ToInt()).AwaitBackground();
 			return measurements;
 
 
@@ -319,13 +319,13 @@ namespace SensateService.Infrastructure.Document
 			IEnumerable<Measurement> measurements;
 
 			key = $"{sensor.InternalId}::before::{pit.ToString(CultureInfo.InvariantCulture)}";
-			measurements = await this._cache.DeserializeAsync<IEnumerable<Measurement>>(key).AwaitSafely();
+			measurements = await this._cache.DeserializeAsync<IEnumerable<Measurement>>(key).AwaitBackground();
 
 			if(measurements != null)
 				return null;
 
-			measurements = await base.GetBeforeAsync(sensor, pit).AwaitSafely();
-			await this.CacheDataAsync(key, measurements, CacheTimeout.Timeout.ToInt()).AwaitSafely();
+			measurements = await base.GetBeforeAsync(sensor, pit).AwaitBackground();
+			await this.CacheDataAsync(key, measurements, CacheTimeout.Timeout.ToInt()).AwaitBackground();
 			return measurements;
 		}
 	}

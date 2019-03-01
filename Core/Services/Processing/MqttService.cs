@@ -120,7 +120,7 @@ namespace SensateService.Services.Processing
 				msg = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
 
 				try {
-					await handler.OnMessageAsync(e.ApplicationMessage.Topic, msg).AwaitSafely();
+					await handler.OnMessageAsync(e.ApplicationMessage.Topic, msg).AwaitBackground();
 				} catch(Exception ex) {
 					this._logger.LogWarning($"Unable to store measurement: {ex.Message}");
 				}

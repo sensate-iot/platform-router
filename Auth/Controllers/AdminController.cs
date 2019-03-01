@@ -47,7 +47,7 @@ namespace SensateService.Auth.Controllers
 		public async Task<IActionResult> Find([FromBody] SearchQuery query)
 		{
 			List<User> users;
-			var result = await this._users.FindByEmailAsync(query.Query).AwaitSafely();
+			var result = await this._users.FindByEmailAsync(query.Query).AwaitBackground();
 			await this.Log(RequestMethod.HttpPost, this.CurrentUser);
 
 			users =  result.Select(user => {
@@ -74,8 +74,8 @@ namespace SensateService.Auth.Controllers
 			List<User> users;
 
 			var userWorker = this._users.GetMostRecentAsync(10);
-			var query = await userWorker.AwaitSafely();
-			await this.Log(RequestMethod.HttpPost, this.CurrentUser).AwaitSafely();
+			var query = await userWorker.AwaitBackground();
+			await this.Log(RequestMethod.HttpPost, this.CurrentUser).AwaitBackground();
 
 			users = query.Select(user => new User {
 				Email = user.Email,
@@ -97,7 +97,7 @@ namespace SensateService.Auth.Controllers
 			AdminDashboard db;
 			long measurementCount;
 
-			await this.Log(RequestMethod.HttpPost, this.CurrentUser).AwaitSafely();
+			await this.Log(RequestMethod.HttpPost, this.CurrentUser).AwaitBackground();
 
 			var regworker = this.GetRegistrations();
 			var usercount = this._users.CountAsync();
@@ -109,12 +109,12 @@ namespace SensateService.Auth.Controllers
 			measurementCount = measurements.Aggregate(0L, (current, entry) => current + entry.Measurements);
 
 			db = new AdminDashboard {
-				Registrations = await regworker.AwaitSafely(),
-				NumberOfUsers = await usercount.AwaitSafely(),
-				NumberOfGhosts = await ghosts.AwaitSafely(),
+				Registrations = await regworker.AwaitBackground(),
+				NumberOfUsers = await usercount.AwaitBackground(),
+				NumberOfGhosts = await ghosts.AwaitBackground(),
 				MeasurementStatsLastHour = measurementCount,
-				MeasurementStats = await measurementStats.AwaitSafely(),
-				NumberOfSensors = await sensors.AwaitSafely()
+				MeasurementStats = await measurementStats.AwaitBackground(),
+				NumberOfSensors = await sensors.AwaitBackground()
 			};
 
 			return this.Ok(db.ToJson());
@@ -130,7 +130,7 @@ namespace SensateService.Auth.Controllers
 			graph = new Graph<DateTime, long>();
 			totals = new Dictionary<long, long>();
 
-			var measurements = await this._stats.GetAfterAsync(today).AwaitSafely();
+			var measurements = await this._stats.GetAfterAsync(today).AwaitBackground();
 			foreach(var entry in measurements) {
 				if(!totals.TryGetValue(entry.Date.Ticks, out var value))
 					value = 0L;
@@ -157,7 +157,7 @@ namespace SensateService.Auth.Controllers
 
 			/* Include today */
 			var lastweek = now.AddDays((DaysPerWeek - 1) * -1).ToUniversalTime().Date;
-			var registrations = await this._users.CountByDay(lastweek).AwaitSafely();
+			var registrations = await this._users.CountByDay(lastweek).AwaitBackground();
 
 			for(int idx = 0; idx < DaysPerWeek; idx++) {
 				var entry = registrations.ElementAtOrDefault(0);

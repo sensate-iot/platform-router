@@ -94,7 +94,7 @@ namespace SensateService.Auth.Controllers
 			var logTask = this.Log(RequestMethod.HttpPost, user);
 
 			if(user == null || !user.EmailConfirmed) {
-				await logTask.AwaitSafely();
+				await logTask.AwaitBackground();
 				return NotFound();
 			}
 
@@ -106,7 +106,7 @@ namespace SensateService.Auth.Controllers
 			if(usertoken == null)
 				return this.StatusCode(500);
 
-			mail = await mailTask.AwaitSafely();
+			mail = await mailTask.AwaitBackground();
 			mail.HtmlBody = mail.HtmlBody.Replace("%%TOKEN%%", usertoken);
 			mail.TextBody = string.Format(mail.TextBody, usertoken);
 			await this._mailer.SendEmailAsync(user.Email, "Reset password token", mail);
@@ -122,7 +122,7 @@ namespace SensateService.Auth.Controllers
 			SensateUser user;
 			PasswordResetToken token;
 
-			user = await this._users.GetByEmailAsync(model.Email).AwaitSafely();
+			user = await this._users.GetByEmailAsync(model.Email).AwaitBackground();
 			token = this._passwd_tokens.GetById(model.Token);
 			await this.Log(RequestMethod.HttpPost, user);
 
@@ -133,7 +133,7 @@ namespace SensateService.Auth.Controllers
 				return this.InvalidInputResult("Security token invalid!");
 
 			token.IdentityToken = Base64UrlEncoder.Decode(token.IdentityToken);
-			var result = await this._manager.ResetPasswordAsync(user, token.IdentityToken, model.Password).AwaitSafely();
+			var result = await this._manager.ResetPasswordAsync(user, token.IdentityToken, model.Password).AwaitBackground();
 
 			if(result.Succeeded)
 				return Ok();
@@ -152,15 +152,15 @@ namespace SensateService.Auth.Controllers
 			Status status;
 			bool unconfirmed;
 
-			user = await this.GetCurrentUserAsync().AwaitSafely();
+			user = await this.GetCurrentUserAsync().AwaitBackground();
 			var worker = this.Log(RequestMethod.HttpGet, user);
 
 			if(user == null) {
-				await worker.AwaitSafely();
+				await worker.AwaitBackground();
 				return this.Forbid();
 			}
 
-			unconfirmed = ! await this._manager.IsPhoneNumberConfirmedAsync(user).AwaitSafely();
+			unconfirmed = ! await this._manager.IsPhoneNumberConfirmedAsync(user).AwaitBackground();
 			unconfirmed = unconfirmed || user.UnconfirmedPhoneNumber?.Length > 0;
 
 			status = new Status();
@@ -173,7 +173,7 @@ namespace SensateService.Auth.Controllers
 				status.Message = "false";
 			}
 
-			await worker.AwaitSafely();
+			await worker.AwaitBackground();
 			return new OkObjectResult(status);
 		}
 
@@ -198,7 +198,7 @@ namespace SensateService.Auth.Controllers
 			tokens = this._tokens.GetByUser(user);
 
 			if(token == null) {
-				await logTask.AwaitSafely();
+				await logTask.AwaitBackground();
 				return this.InvalidInputResult("Token not found!");
 			}
 
@@ -206,16 +206,16 @@ namespace SensateService.Auth.Controllers
 			var setTask = this._manager.SetUserNameAsync(user, token.Email);
 
 			if(!result.Succeeded) {
-				await logTask.AwaitSafely();
+				await logTask.AwaitBackground();
 				return this.StatusCode(500);
 			}
 
 			if(tokens != null)
-				await logTask.AwaitSafely();
+				await logTask.AwaitBackground();
 				await this._tokens.InvalidateManyAsync(tokens);
 
-            await logTask.AwaitSafely();
-			await setTask.AwaitSafely();
+            await logTask.AwaitBackground();
+			await setTask.AwaitBackground();
 			return this.Ok();
 		}
 
@@ -232,23 +232,23 @@ namespace SensateService.Auth.Controllers
 			EmailBody mail;
 
 			if(string.IsNullOrEmpty(changeEmailModel.NewEmail)) {
-				await this.Log(RequestMethod.HttpPost).AwaitSafely();
+				await this.Log(RequestMethod.HttpPost).AwaitBackground();
 				return BadRequest();
 			}
 
-			user = await this.GetCurrentUserAsync().AwaitSafely();
-			await this.Log(RequestMethod.HttpPost, user).AwaitSafely();
+			user = await this.GetCurrentUserAsync().AwaitBackground();
+			await this.Log(RequestMethod.HttpPost, user).AwaitBackground();
 
-			resetToken = await this._manager.GenerateChangeEmailTokenAsync(user, changeEmailModel.NewEmail).AwaitSafely();
+			resetToken = await this._manager.GenerateChangeEmailTokenAsync(user, changeEmailModel.NewEmail).AwaitBackground();
 			token = this._email_tokens.Create(resetToken, changeEmailModel.NewEmail);
-			mail = await this.ReadMailTemplate("Confirm_Update_Email.html", "Confirm_Update_Email.txt").AwaitSafely();
+			mail = await this.ReadMailTemplate("Confirm_Update_Email.html", "Confirm_Update_Email.txt").AwaitBackground();
 
 			if(mail == null)
 				return this.StatusCode(500);
 
 			mail.HtmlBody = mail.HtmlBody.Replace("%%TOKEN%%", token);
 			mail.TextBody = String.Format(mail.TextBody, token);
-			await this._mailer.SendEmailAsync(changeEmailModel.NewEmail, "Confirm your new mail", mail).AwaitSafely();
+			await this._mailer.SendEmailAsync(changeEmailModel.NewEmail, "Confirm your new mail", mail).AwaitBackground();
 
 			return this.Ok();
 		}
@@ -261,7 +261,7 @@ namespace SensateService.Auth.Controllers
 			var user = await this.GetCurrentUserAsync();
 			IList<string> roles;
 
-			roles = await this._users.GetRolesAsync(user).AwaitSafely() as IList<string>;
+			roles = await this._users.GetRolesAsync(user).AwaitBackground() as IList<string>;
 			var reply = new UserRoles {
 				Roles = roles,
 				Email = user.Email
@@ -279,12 +279,12 @@ namespace SensateService.Auth.Controllers
 			path = this._env.GetTemplatePath(html);
 
 			using(var reader = System.IO.File.OpenText(path)) {
-				body.HtmlBody = await reader.ReadToEndAsync().AwaitSafely();
+				body.HtmlBody = await reader.ReadToEndAsync().AwaitBackground();
 			}
 
 			path = this._env.GetTemplatePath(text);
 			using(var reader = System.IO.File.OpenText(path)) {
-				body.TextBody = await reader.ReadToEndAsync().AwaitSafely();
+				body.TextBody = await reader.ReadToEndAsync().AwaitBackground();
 			}
 
 			return body;
@@ -297,7 +297,7 @@ namespace SensateService.Auth.Controllers
 
 			path = this._env.GetTemplatePath(template);
 			using(var reader = System.IO.File.OpenText(path)) {
-				body = await reader.ReadLineAsync().AwaitSafely();
+				body = await reader.ReadLineAsync().AwaitBackground();
 			}
 
 			return body == null ? null : string.Format(body, token);
@@ -334,7 +334,7 @@ namespace SensateService.Auth.Controllers
 				UnconfirmedPhoneNumber = register.PhoneNumber
 			};
 
-			await this.Log(RequestMethod.HttpPost).AwaitSafely();
+			await this.Log(RequestMethod.HttpPost).AwaitBackground();
 
 			if(!this.IsValidUri(register.ForwardTo))
 				return this.InvalidInputResult("Invalid forward URL!");
@@ -343,7 +343,7 @@ namespace SensateService.Auth.Controllers
 			if(!valid)
 				return this.InvalidInputResult("Invalid phone number!");
 
-			var result = await this._manager.CreateAsync(user, register.Password).AwaitSafely();
+			var result = await this._manager.CreateAsync(user, register.Password).AwaitBackground();
 
 			if(!result.Succeeded) {
 				var objresult = StringifyIdentityResult(result);
@@ -351,12 +351,12 @@ namespace SensateService.Auth.Controllers
 			}
 
 			var mailTask = this.ReadMailTemplate("Confirm_Account_Registration.html", "Confirm_Account_Registration.txt");
-			user = await this._users.GetAsync(user.Id).AwaitSafely();
-			var code = await this._manager.GenerateEmailConfirmationTokenAsync(user).AwaitSafely();
+			user = await this._users.GetAsync(user.Id).AwaitBackground();
+			var code = await this._manager.GenerateEmailConfirmationTokenAsync(user).AwaitBackground();
 			code = Base64UrlEncoder.Encode(code);
 			var url = this.Url.EmailConfirmationLink(user.Id, code, this._settings.Scheme, this._settings.PublicUrl, register.ForwardTo);
 
-			mail = await mailTask.AwaitSafely();
+			mail = await mailTask.AwaitBackground();
 			mail.HtmlBody = mail.HtmlBody.Replace("%%URL%%", url);
 			mail.TextBody = string.Format(mail.TextBody, url);
 
@@ -366,8 +366,8 @@ namespace SensateService.Auth.Controllers
 			};
 
 			await Task.WhenAll(updates);
-			phonetoken = await this._manager.GenerateChangePhoneNumberTokenAsync(user, register.PhoneNumber).AwaitSafely();
-			usertoken = await this._phonetokens.CreateAsync(user, phonetoken, register.PhoneNumber).AwaitSafely();
+			phonetoken = await this._manager.GenerateChangePhoneNumberTokenAsync(user, register.PhoneNumber).AwaitBackground();
+			usertoken = await this._phonetokens.CreateAsync(user, phonetoken, register.PhoneNumber).AwaitBackground();
 			Debug.WriteLine($"Generated tokens: [identity: ${phonetoken}] [user: {usertoken}]");
 
 			return this.Ok();
@@ -406,7 +406,7 @@ namespace SensateService.Auth.Controllers
 		public async Task<IActionResult> Show()
 		{
 			User viewuser;
-			var user = await this.GetCurrentUserAsync().AwaitSafely();
+			var user = await this.GetCurrentUserAsync().AwaitBackground();
 
 			await this.Log(RequestMethod.HttpGet, user);
 
@@ -475,7 +475,7 @@ namespace SensateService.Auth.Controllers
 			ChangePhoneNumberToken phonetoken;
 
 			user = this.CurrentUser;
-			await this.Log(RequestMethod.HttpGet, user).AwaitSafely();
+			await this.Log(RequestMethod.HttpGet, user).AwaitBackground();
 
 			if(user.UnconfirmedPhoneNumber == null) {
 				return this.InvalidInputResult("No confirmable phone number found!");
@@ -485,13 +485,13 @@ namespace SensateService.Auth.Controllers
 			if(phonetoken.UserToken != token)
 				return this.InvalidInputResult("Invalid confirmation token!");
 
-			var result = await this._manager.ChangePhoneNumberAsync(user, phonetoken.PhoneNumber, phonetoken.IdentityToken).AwaitSafely();
+			var result = await this._manager.ChangePhoneNumberAsync(user, phonetoken.PhoneNumber, phonetoken.IdentityToken).AwaitBackground();
 			if(!result.Succeeded)
 				return new BadRequestObjectResult(StringifyIdentityResult(result));
 
 			this._users.StartUpdate(user);
 			user.UnconfirmedPhoneNumber = null;
-			await this._users.EndUpdateAsync().AwaitSafely();
+			await this._users.EndUpdateAsync().AwaitBackground();
 
 			return this.Ok();
 		}
@@ -515,15 +515,15 @@ namespace SensateService.Auth.Controllers
 			}
 
 			if(update.PhoneNumber != null && update.PhoneNumber != user.PhoneNumber) {
-				phonetoken = await this._manager.GenerateChangePhoneNumberTokenAsync(user, update.PhoneNumber).AwaitSafely();
-				usertoken = await this._phonetokens.CreateAsync(user, phonetoken, update.PhoneNumber).AwaitSafely();
+				phonetoken = await this._manager.GenerateChangePhoneNumberTokenAsync(user, update.PhoneNumber).AwaitBackground();
+				usertoken = await this._phonetokens.CreateAsync(user, phonetoken, update.PhoneNumber).AwaitBackground();
 				var worker = this.ReadTextTemplate("Confirm_PhoneNumber.txt", usertoken);
 
 				this._users.StartUpdate(user);
 				user.UnconfirmedPhoneNumber = update.PhoneNumber;
-				await this._users.EndUpdateAsync().AwaitSafely();
+				await this._users.EndUpdateAsync().AwaitBackground();
 
-				body = await worker.AwaitSafely();
+				body = await worker.AwaitBackground();
 				this._text.Send(this._text_settings.AlphaCode, update.PhoneNumber, body);
 			}
 
@@ -597,7 +597,7 @@ namespace SensateService.Auth.Controllers
 			if(userUpdate.LastName != null)
 				user.LastName = userUpdate.LastName;
 
-			await this._users.EndUpdateAsync().AwaitSafely();
+			await this._users.EndUpdateAsync().AwaitBackground();
 			return Ok();
 		}
 	}

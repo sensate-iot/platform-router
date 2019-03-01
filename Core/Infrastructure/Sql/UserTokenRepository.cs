@@ -83,7 +83,7 @@ namespace SensateService.Infrastructure.Sql
 		{
 			this.StartUpdate(token);
 			token.Valid = false;
-			await this.EndUpdateAsync().AwaitSafely();
+			await this.EndUpdateAsync().AwaitBackground();
 		}
 
 		public void InvalidateToken(SensateUser user, string value)
@@ -103,7 +103,7 @@ namespace SensateService.Infrastructure.Sql
 			if(token == null)
 				return;
 
-			await this.InvalidateTokenAsync(token).AwaitSafely();
+			await this.InvalidateTokenAsync(token).AwaitBackground();
 		}
 
 		public string GenerateJwtToken(SensateUser user, IEnumerable<string> roles, UserAccountSettings settings)
@@ -151,7 +151,7 @@ namespace SensateService.Infrastructure.Sql
 				x.Valid = false;
 			});
 
-			await this.CommitAsync().AwaitSafely();
+			await this.CommitAsync().AwaitBackground();
 		}
 	}
 }

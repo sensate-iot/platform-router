@@ -55,12 +55,12 @@ namespace SensateService.Infrastructure.Sql
 				Description = description,
 				Name = name
 			};
-			await this.CreateAsync(role).AwaitSafely();
+			await this.CreateAsync(role).AwaitBackground();
 		}
 
 		public override async Task CreateAsync(UserRole obj)
 		{
-			var result = await this._roles.CreateAsync(obj).AwaitSafely();
+			var result = await this._roles.CreateAsync(obj).AwaitBackground();
 			if(!result.Succeeded)
 				throw new DatabaseException("Unable to create user role!");
 		}
@@ -73,7 +73,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public async Task DeleteAsync(string id)
 		{
-			await Task.Run(() => this.Delete(id)).AwaitSafely();
+			await Task.Run(() => this.Delete(id)).AwaitBackground();
 		}
 
 		public UserRole GetById(string id)
@@ -97,7 +97,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public async Task<IEnumerable<string>> GetRolesForAsync(SensateUser user)
 		{
-			return await this._users.GetRolesAsync(user).AwaitSafely();
+			return await this._users.GetRolesAsync(user).AwaitBackground();
 		}
 
 		public IEnumerable<SensateUser> GetUsers(string name)
@@ -130,7 +130,7 @@ namespace SensateService.Infrastructure.Sql
 		{
 			await Task.Run(() => {
 				this.Update(name, obj);
-			}).AwaitSafely();
+			}).AwaitBackground();
 		}
 	}
 }
