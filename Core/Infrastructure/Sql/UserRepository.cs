@@ -101,7 +101,7 @@ namespace SensateService.Infrastructure.Sql
 			return result.Result;
 		}
 
-		public async Task<IEnumerable<string>> GetRolesAsync(SensateUser user)
+		public virtual async Task<IEnumerable<string>> GetRolesAsync(SensateUser user)
 		{
 			return await this._manager.GetRolesAsync(user).AwaitSafely();
 		}

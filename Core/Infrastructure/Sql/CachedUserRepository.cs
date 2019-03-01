@@ -5,6 +5,7 @@
  * @email  dev@bietje.net
  */
 
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -81,7 +82,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public override async Task<SensateUser> GetAsync(string key)
 		{
-			var obj = await this.LookupAsync(key, CancellationToken.None).AwaitSafely();
+			var obj = await this.LookupAsync(key, default(CancellationToken)).ConfigureAwait(false);
 
 			if(obj != null) {
 				return obj;
@@ -91,7 +92,7 @@ namespace SensateService.Infrastructure.Sql
 			if(obj == null)
 				return null;
 
-			await this.SetCacheAsync(obj, CancellationToken.None);
+			await this.SetCacheAsync(obj, default(CancellationToken)).ConfigureAwait(false);
 			return obj;
 		}
 
@@ -108,6 +109,24 @@ namespace SensateService.Infrastructure.Sql
 			workers[0] = this._cache.RemoveAsync(id);
 			workers[1] = base.DeleteAsync(id);
 			await Task.WhenAll(workers);
+		}
+
+		public override async Task<IEnumerable<string>> GetRolesAsync(SensateUser user)
+		{
+			var id = $"{{roles}}:{user.Id}";
+			var obj = await this._cache.GetAsync(id, CancellationToken.None).ConfigureAwait(false);
+
+			if(obj != null)
+				return JsonConvert.DeserializeObject<IEnumerable<string>>(obj);
+
+			var roles = await base.GetRolesAsync(user).ConfigureAwait(false);
+
+			if(roles != null) {
+				obj = JsonConvert.SerializeObject(roles);
+				await this._cache.SetAsync(id, obj, CacheTimeout.TimeoutShort.ToInt(), false).ConfigureAwait(false);
+			}
+
+			return roles;
 		}
 	}
 }
