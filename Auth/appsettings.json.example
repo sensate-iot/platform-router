@@ -21,7 +21,8 @@
 
   "Cache" : {
     "Enabled": true,
-    "Type": "Distributed"
+    "Type": "Distributed",
+    "Workers": 4 
   },
 
   "Database": {
@@ -55,7 +56,11 @@
     "Ssl": "false",
     "Port": 1883,
     "Host": "host.mqtt.net",
-    "ShareTopic": "$share/sensate/sensate/measurements"
+    "ShareTopic": "$share/sensate/sensate/measurements",
+    "BulkShareTopic": "$share/sensate/sensate/measurements/bulk",
+    "RealTimeShareTopic": "$share/sensate/sensate/measurements/rt",
+    "InternalMeasurementTopic": "sensate/internal/measurements",
+    "BulkInternalMeasurementTopic": "sensate/internal/measurements/bulk"
   },
 
   "Mail": {
