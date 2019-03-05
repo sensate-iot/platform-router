@@ -20,6 +20,24 @@ if($clean) {
 	Remove-Item -ErrorAction SilentlyContinue -path Tests\dist -recurse -force
 	Remove-Item -ErrorAction SilentlyContinue -path WebSocketHandler\dist -recurse -force
 	Remove-Item -ErrorAction SilentlyContinue -path dist\ -recurse -force
+	
+	Remove-Item -ErrorAction SilentlyContinue -path ApiCore\bin\Release -recurse -force
+	Remove-Item -ErrorAction SilentlyContinue -path Auth\bin\Release -recurse -force
+	Remove-Item -ErrorAction SilentlyContinue -path Core\bin\Release -recurse -force
+	Remove-Item -ErrorAction SilentlyContinue -path DatabaseTool\bin\Release -recurse -force
+	Remove-Item -ErrorAction SilentlyContinue -path MqttHandler\bin\Release -recurse -force
+	Remove-Item -ErrorAction SilentlyContinue -path Setup\bin\Release -recurse -force
+	Remove-Item -ErrorAction SilentlyContinue -path Tests\bin\Release -recurse -force
+	Remove-Item -ErrorAction SilentlyContinue -path WebSocketHandler\bin\Release -recurse -force
+	
+	Remove-Item -ErrorAction SilentlyContinue -path ApiCore\obj\Release -recurse -force
+	Remove-Item -ErrorAction SilentlyContinue -path Auth\obj\Release -recurse -force
+	Remove-Item -ErrorAction SilentlyContinue -path Core\obj\Release -recurse -force
+	Remove-Item -ErrorAction SilentlyContinue -path DatabaseTool\obj\Release -recurse -force
+	Remove-Item -ErrorAction SilentlyContinue -path MqttHandler\obj\Release -recurse -force
+	Remove-Item -ErrorAction SilentlyContinue -path Setup\obj\Release -recurse -force
+	Remove-Item -ErrorAction SilentlyContinue -path Tests\obj\Release -recurse -force
+	Remove-Item -ErrorAction SilentlyContinue -path WebSocketHandler\obj\Release -recurse -force
 	exit
 }
 
