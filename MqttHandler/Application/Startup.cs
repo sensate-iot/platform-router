@@ -14,7 +14,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-
 using SensateService.Config;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
@@ -84,7 +83,9 @@ namespace SensateService.MqttHandler.Application
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.AddDocumentRepositories(cache.Enabled);
 			services.AddSqlRepositories(cache.Enabled);
+			services.AddMeasurementStorage();
 
+			services.AddSingleton<IHostedService, MqttPublishHandler>();
 			services.AddMqttService(options => {
 				options.Ssl = mqtt.Ssl;
 				options.Host = mqtt.Host;
@@ -94,6 +95,7 @@ namespace SensateService.MqttHandler.Application
 				options.Id = Guid.NewGuid().ToString();
 				options.TopicShare = "$share/sensate/";
 				options.InternalMeasurementTopic = mqtt.InternalMeasurementTopic;
+				options.InternalBulkMeasurementTopic = mqtt.InternalBulkMeasurementTopic;
 			});
 
 			services.AddSingleton(provider => {
@@ -103,20 +105,27 @@ namespace SensateService.MqttHandler.Application
 			});
 
 			services.AddLogging(builder => {
-				if(!IsDevelopment())
-					return;
+				if(IsDevelopment())
+					builder.AddDebug();
 
 				builder.AddConsole();
-				builder.AddDebug();
+				builder.AddConfiguration(Configuration.GetSection("Logging"));
 			});
 		}
 
 		public void Configure(IServiceProvider provider)
 		{
 			var mqtt = new MqttConfig();
+			var cache = new CacheConfig();
 
 			Configuration.GetSection("Mqtt").Bind(mqtt);
+			Configuration.GetSection("Cache").Bind(cache);
+
+			provider.MapMqttTopic<MqttRealTimeMeasurementHandler>(mqtt.RealTimeShareTopic);
 			provider.MapMqttTopic<MqttMeasurementHandler>(mqtt.ShareTopic);
+			provider.MapMqttTopic<MqttBulkMeasurementHandler>(mqtt.BulkShareTopic);
+
+			provider.UseMeasurementStorage(cache.Workers);
 		}
 
 		public Application BuildApplication(IServiceProvider sp)
