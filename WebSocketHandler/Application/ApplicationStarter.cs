@@ -70,6 +70,7 @@ namespace SensateService.WebSocketHandler.Application
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.AddDocumentRepositories(cache.Enabled);
 			services.AddSqlRepositories(cache.Enabled);
+			services.AddMeasurementStorage();
 
 			this.SetupAuthentication(services, auth);
 
@@ -81,6 +82,7 @@ namespace SensateService.WebSocketHandler.Application
 				options.Password = mqtt.Password;
 				options.Id = Guid.NewGuid().ToString();
 				options.TopicShare = "$share/sensate/";
+				options.InternalBulkMeasurementTopic = mqtt.InternalBulkMeasurementTopic;
 				options.InternalMeasurementTopic = mqtt.InternalMeasurementTopic;
 			});
 
@@ -90,7 +92,11 @@ namespace SensateService.WebSocketHandler.Application
 				return mqservice;
 			});
 
+			services.AddWebSocketHandler<RealTimeWebSocketMeasurementHandler>();
+			services.AddWebSocketHandler<WebSocketBulkMeasurementHandler>();
 			services.AddWebSocketHandler<WebSocketMeasurementHandler>();
+
+			services.AddSingleton<IHostedService, MqttPublishHandler>();
 
 			services.AddLogging((builder) => {
 				builder.AddConsole();
@@ -102,8 +108,16 @@ namespace SensateService.WebSocketHandler.Application
 
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory logging, IServiceProvider sp)
 		{
+			var cache = new CacheConfig();
+
 			app.UseWebSockets();
+			Configuration.GetSection("Cache").Bind(cache);
+
+			app.MapWebSocketService("/measurement/rt", sp.GetService<RealTimeWebSocketMeasurementHandler>());
 			app.MapWebSocketService("/measurement", sp.GetService<WebSocketMeasurementHandler>());
+			app.MapWebSocketService("/measurement/bulk", sp.GetService<WebSocketBulkMeasurementHandler>());
+
+			sp.UseMeasurementStorage(cache.Workers);
 		}
 
 		private void SetupAuthentication(IServiceCollection services, AuthenticationConfig auth)
