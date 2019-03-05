@@ -19,6 +19,8 @@ function main() {
 		.option('-H, --host <host>', 'server hostname', 'localhost')
 		.option('-P, --port <port>', 'server port number', '1883')
 		.option('-i, --id <sensor_id>', 'sensor id')
+		.option('-b --bulk <max>', 'min amount', undefined)
+		.option('-a, --allsensors', 'send measurements from multiple sensors', false)
 		.option('-I, --interval <interval>', 'set the update interval', '1000')
 		.option('-c, --config <config>', 'set configuration file', undefined);
 
@@ -35,9 +37,11 @@ function main() {
 		id: program.id,
 		host: program.host,
 		port: parseInt(program.port, 10),
+		bulk: parseInt(program.bulk, 10),
 		interval: parseInt(program.interval, 10),
 		raw_config: program.config,
-		config: settings.parse(program.config)
+		config: settings.parse(program.config),
+		allsensors: program.allsensors
 	}
 
 	if(args.config != undefined) {
@@ -45,6 +49,7 @@ function main() {
 		args.password = args.config.mqttPassword;
 		args.username = args.config.mqttUsername;
 		args.id = args.config.sensorId;
+		args.sensors = args.config.availableSensors;
 	}
 
 	if(program.mqtt)
