@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -82,6 +83,17 @@ namespace SensateService.Infrastructure.Document
 				return null;
 
 			return await sensors.ToListAsync().AwaitBackground();
+		}
+
+		public virtual async Task<IEnumerable<Sensor>> GetAsync(IEnumerable<string> ids)
+		{
+			FilterDefinition<Sensor> filter;
+			var builder = Builders<Sensor>.Filter;
+			var idlist = ids.Select(ObjectId.Parse);
+
+			filter = builder.In(x => x.InternalId, idlist);
+			var raw = await this._collection.FindAsync(filter).AwaitBackground();
+			return raw.ToList();
 		}
 
 		public virtual async Task<Sensor> GetAsync(string id)

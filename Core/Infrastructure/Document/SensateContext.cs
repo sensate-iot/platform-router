@@ -21,6 +21,7 @@ namespace SensateService.Infrastructure.Document
 
 		public IMongoCollection<Measurement> Measurements => this._db.GetCollection<Measurement>("Measurements");
 		public IMongoCollection<Sensor> Sensors => this._db.GetCollection<Sensor>("Sensors");
+		public IMongoCollection<AuditLog> Logs => this._db.GetCollection<AuditLog>("Logs");
 		public IMongoCollection<SensorStatisticsEntry> Statistics =>
 			this._db.GetCollection<SensorStatisticsEntry>("Statistics");
 

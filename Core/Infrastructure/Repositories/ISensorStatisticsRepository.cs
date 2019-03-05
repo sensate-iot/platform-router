@@ -17,6 +17,7 @@ namespace SensateService.Infrastructure.Repositories
 	{
 		Task IncrementAsync(Sensor sensor);
 		Task<SensorStatisticsEntry> CreateForAsync(Sensor sensor);
+		Task IncrementManyAsync(Sensor sensor, int num);
 
 		Task<SensorStatisticsEntry> GetByDateAsync(Sensor sensor, DateTime date);
 		Task<IEnumerable<SensorStatisticsEntry>> GetBeforeAsync(Sensor sensor, DateTime date);

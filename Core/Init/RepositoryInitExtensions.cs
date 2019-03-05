@@ -50,7 +50,7 @@ namespace SensateService.Init
 
 			if(cache) {
 				services.AddScoped<IMeasurementRepository, CachedMeasurementRepository>();
-				services.AddScoped<ISensorRepository, CachedSensorRepository>();
+				services.AddScoped<ISensorRepository, SensorRepository>();
 				services.AddScoped<IBulkWriter<Measurement>, CachedMeasurementRepository>();
 			} else {
 				services.AddScoped<IMeasurementRepository, MeasurementRepository>();

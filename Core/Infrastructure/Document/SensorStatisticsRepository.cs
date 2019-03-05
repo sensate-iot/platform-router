@@ -59,16 +59,9 @@ namespace SensateService.Infrastructure.Document
 
 #region Entry creation
 
-		public async Task IncrementAsync(Sensor sensor)
+		public Task IncrementAsync(Sensor sensor)
 		{
-			SensorStatisticsEntry entry;
-			var update = Builders<SensorStatisticsEntry>.Update;
-			UpdateDefinition<SensorStatisticsEntry> updateDefinition;
-
-			entry = await this.GetByDateAsync(sensor, DateTime.Now.ThisHour()).AwaitBackground() ??
-					await this.CreateForAsync(sensor).AwaitBackground();
-			updateDefinition = update.Inc(x => x.Measurements, 1);
-			await this._stats.FindOneAndUpdateAsync(x => x.InternalId == entry.InternalId, updateDefinition).AwaitBackground();
+			return this.IncrementManyAsync(sensor, 1);
 		}
 
 		public async Task<SensorStatisticsEntry> CreateForAsync(Sensor sensor)
@@ -86,7 +79,19 @@ namespace SensateService.Infrastructure.Document
 			return entry;
 		}
 
-#endregion
+		public async Task IncrementManyAsync(Sensor sensor, int num)
+		{
+			SensorStatisticsEntry entry;
+			var update = Builders<SensorStatisticsEntry>.Update;
+			UpdateDefinition<SensorStatisticsEntry> updateDefinition;
+
+			entry = await this.GetByDateAsync(sensor, DateTime.Now.ThisHour()).AwaitBackground() ??
+					await this.CreateForAsync(sensor).AwaitBackground();
+			updateDefinition = update.Inc(x => x.Measurements, num);
+			await this._stats.FindOneAndUpdateAsync(x => x.InternalId == entry.InternalId, updateDefinition).AwaitBackground();
+		}
+
+		#endregion
 
 #region Entry Getters
 

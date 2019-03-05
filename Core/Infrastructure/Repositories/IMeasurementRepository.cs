@@ -44,5 +44,6 @@ namespace SensateService.Infrastructure.Repositories
 		Task UpdateAsync(Measurement obj);
 
 		Task ReceiveMeasurementAsync(Sensor sensor, RawMeasurement measurement);
+		Task CreateAsync(Measurement obj, CancellationToken ct = default(CancellationToken));
 	}
 }

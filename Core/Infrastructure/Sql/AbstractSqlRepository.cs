@@ -5,6 +5,7 @@
  * @email:  dev@bietje.net
  */
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,9 +16,9 @@ using SensateService.Helpers;
 
 namespace SensateService.Infrastructure.Sql
 {
-	public abstract class AbstractSqlRepository<T> : IBulkWriter<T> where T : class
+	public abstract class AbstractSqlRepository<T> : IBulkWriter<T>, IDisposable where T : class
 	{
-		private readonly SensateSqlContext _sqlContext;
+		protected readonly SensateSqlContext _sqlContext;
 		protected DbSet<T> Data;
 
 		protected AbstractSqlRepository(SensateSqlContext context)
@@ -82,6 +83,11 @@ namespace SensateService.Infrastructure.Sql
 		{
 			this.AddRange(objs);
 			await this.CommitAsync(token);
+		}
+
+		public void Dispose()
+		{
+			_sqlContext?.Dispose();
 		}
 	}
 }

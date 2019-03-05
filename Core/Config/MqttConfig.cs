@@ -15,6 +15,8 @@ namespace SensateService.Config
 		public bool Ssl { get; set; }
 		public short Port { get; set; }
 		public string ShareTopic { get; set; }
+		public string BulkShareTopic { get; set; }
+		public string RealTimeShareTopic { get; set; }
 		public string InternalMeasurementTopic { get; set; }
 		public string InternalBulkMeasurementTopic { get; set; }
 	}

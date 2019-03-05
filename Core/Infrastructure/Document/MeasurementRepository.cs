@@ -8,6 +8,7 @@
 using System;
 using System.Linq.Expressions;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
 
@@ -248,9 +249,8 @@ namespace SensateService.Infrastructure.Document
 			if(obj.CreatedBy == ObjectId.Empty)
 				return;
 
-			obj.CreatedAt = DateTime.Now;
 			obj.InternalId = this.GenerateId(DateTime.Now);
-			await base.CreateAsync(obj, ct);
+			await base.CreateAsync(obj, ct).AwaitBackground();
 		}
 
 		private async Task<bool> CreateAsync(Sensor sensor, RawMeasurement raw, CancellationToken ct)
@@ -342,12 +342,17 @@ namespace SensateService.Infrastructure.Document
 
 		public async Task CreateRangeAsync(IEnumerable<Measurement> objs, CancellationToken token)
 		{
+			var measurements = objs.ToList();
 			var opts = new InsertManyOptions {
 				IsOrdered = false,
 				BypassDocumentValidation = true
 			};
 
-			await this._collection.InsertManyAsync(objs, opts, token).AwaitBackground();
+			foreach(var measurement in measurements) {
+				measurement.InternalId = base.GenerateId(measurement.CreatedAt);
+			}
+
+			await this._collection.InsertManyAsync(measurements, opts, token).AwaitBackground();
 		}
 
 		private async Task InvokeReceiveMeasurement(Sensor sensor, MeasurementReceivedEventArgs eventargs)

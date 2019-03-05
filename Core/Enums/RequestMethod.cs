@@ -18,6 +18,7 @@ namespace SensateService.Enums
 		WebSocket,
 
 		MqttTcp,
-		MqttWebSocket
+		MqttWebSocket,
+		Any
 	}
 }

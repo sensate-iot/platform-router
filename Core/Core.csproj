@@ -32,4 +32,9 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.2.0" />
     <PackageReference Include="Twilio" Version="5.26.0" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.AspNetCore.Razor.Language">
+      <HintPath>..\..\..\..\..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.razor.language\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Razor.Language.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

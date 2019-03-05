@@ -52,6 +52,12 @@ namespace SensateService.Infrastructure.Sql
 			});
 		}
 
+		public async Task<IEnumerable<SensateUser>> GetRangeAsync(IEnumerable<string> ids)
+		{
+			var profiles = this.Data.Where(u => ids.Contains(u.Id));
+			return await profiles.ToListAsync().AwaitBackground();
+		}
+
 		public virtual SensateUser Get(string key)
 		{
 			return this.GetById(key);

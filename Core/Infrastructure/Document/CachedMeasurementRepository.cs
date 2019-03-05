@@ -33,50 +33,10 @@ namespace SensateService.Infrastructure.Document
 			_cache = cache;
 		}
 
-		private void Commit(Measurement obj)
-		{
-			try {
-				_cache.Serialize(obj.InternalId.ToString(), obj, CacheTimeout.Timeout.ToInt(), true);
-			} catch(Exception ex) {
-				throw new CachingException(
-					$"Unable to cache measurement: {ex.Message}",
-					obj.InternalId.ToString(), ex
-				);
-			}
-		}
-
-		private async Task CommitAsync(Measurement obj, CancellationToken ct = default(CancellationToken))
-		{
-			try {
-				await _cache.SerializeAsync(obj.InternalId.ToString(), obj, CacheTimeout.Timeout.ToInt(), true, ct).AwaitBackground();
-			} catch(Exception ex) {
-				throw new CachingException(
-					$"Unable to cache measurement: {ex.Message}",
-					obj.InternalId.ToString(), ex
-				);
-			}
-		}
-
 		public override void Delete(string id)
 		{
 			_cache.Remove(id);
 			base.Delete(id);
-		}
-
-		public override void Create(Measurement m)
-		{
-			base.Create(m);
-			this.Commit(m);
-		}
-
-		public override async Task CreateAsync(Measurement obj, CancellationToken ct = default(CancellationToken))
-		{
-			var tasks = new Task[2];
-
-			tasks[0] = base.CreateAsync(obj, ct);
-			tasks[1] = this.CommitAsync(obj, ct);
-
-			await Task.WhenAll(tasks).AwaitBackground();
 		}
 
 		public override async Task DeleteAsync(string id)
@@ -147,23 +107,6 @@ namespace SensateService.Infrastructure.Document
 			};
 
 			await Task.WhenAll(tasks).AwaitBackground();
-		}
-
-		public override async Task<Measurement> GetByIdAsync(string id)
-		{
-			Measurement m;
-
-			m = await _cache.DeserializeAsync<Measurement>(id).AwaitBackground();
-
-			if(m != null)
-				return m;
-
-			m = await base.GetByIdAsync(id).AwaitBackground();
-
-			if(m != null)
-				this.Commit(m);
-
-			return m;
 		}
 
 		public override async Task<IEnumerable<Measurement>> GetMeasurementsBySensorAsync(Sensor sensor)

@@ -15,7 +15,6 @@ namespace SensateService.Infrastructure.Sql
 	public class SensateSqlContext : IdentityDbContext<SensateUser, UserRole, string>
 	{
 		public new DbSet<SensateUser> Users { get; set; }
-		public DbSet<AuditLog> AuditLogs { get; set; }
 		public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 		public DbSet<ChangeEmailToken> ChangeEmailTokens { get; set; }
 		public new DbSet<UserToken> UserTokens { get; set; }
