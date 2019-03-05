@@ -149,7 +149,7 @@ namespace SensateService.Setup.Migrations
 
                     b.HasKey("UserToken");
 
-                    b.ToTable("PasswordResetTokens");
+                    b.ToTable("AspNetPasswordResetTokens");
                 });
 
             modelBuilder.Entity("SensateService.Models.SensateUser", b =>
