@@ -53,7 +53,7 @@ namespace SensateService.MqttHandler.Mqtt
 
 		public Task StopAsync(CancellationToken cancellationToken)
 		{
-			CachedMeasurementStore.MeasurementsReceived += MeasurementsStored_Handler;
+			CachedMeasurementStore.MeasurementsReceived -= MeasurementsStored_Handler;
 			return Task.CompletedTask;
 		}
 	}
