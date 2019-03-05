@@ -76,7 +76,6 @@ namespace SensateService.MqttHandler.Application
 
 			services.AddLogging(builder => { builder.AddConfiguration(this.Configuration.GetSection("Logging")); });
 
-
 			if(cache.Enabled)
                 services.AddCacheStrategy(cache, db);
 
