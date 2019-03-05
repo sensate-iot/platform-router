@@ -18,5 +18,5 @@ export class Measurement {
     Longitude: number;
     Latitude: number;
     CreatedAt: number;
-    CreatedById: Types.ObjectId;
+    CreatedBy: Types.ObjectId;
 }

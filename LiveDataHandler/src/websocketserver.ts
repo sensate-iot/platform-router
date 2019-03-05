@@ -41,7 +41,7 @@ export class WebSocketServer {
 
     public onMeasurementReceived(measurement: Measurement) {
         this.retainedConnectionInfo.forEach((socket) => {
-            if (measurement.CreatedById.toString() === socket.sensorid) {
+            if (measurement.CreatedBy.toString() === socket.sensorid) {
                 socket.ws.send(JSON.stringify(measurement));
             }
         });
