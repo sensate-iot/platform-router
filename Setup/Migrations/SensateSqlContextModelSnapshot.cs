@@ -114,7 +114,7 @@ namespace SensateService.Setup.Migrations
 
                     b.HasKey("IdentityToken");
 
-                    b.ToTable("ChangeEmailTokens");
+                    b.ToTable("AspNetEmailTokens");
                 });
 
             modelBuilder.Entity("SensateService.Models.ChangePhoneNumberToken", b =>
@@ -137,7 +137,7 @@ namespace SensateService.Setup.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ChangePhoneNumberTokens");
+                    b.ToTable("AspNetPhoneNumberTokens");
                 });
 
             modelBuilder.Entity("SensateService.Models.PasswordResetToken", b =>
