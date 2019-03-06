@@ -13,6 +13,7 @@ using System.Net;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -64,8 +65,9 @@ namespace SensateService.Auth.Controllers
 			ITextSendService text,
 			IOptions<TextServiceSettings> text_opts,
 			IHostingEnvironment env,
+			IHttpContextAccessor ctx,
 			ILogger<AccountsController> logger
-		) : base(repo, auditLogs)
+		) : base(repo, auditLogs, ctx)
 		{
 			this._logger = logger;
 			this._manager = userManager;
@@ -507,6 +509,10 @@ namespace SensateService.Auth.Controllers
 			string body, phonetoken, usertoken;
 
 			user = this.CurrentUser;
+
+			if(user == null)
+				return this.Unauthorized();
+
 			if(update.PhoneNumber != null && update.PhoneNumber != user.PhoneNumber) {
 				var valid = await this._text.IsValidNumber(update.PhoneNumber);
 

@@ -9,7 +9,7 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
-
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 using SensateService.Enums;
@@ -27,14 +27,15 @@ namespace SensateService.ApiCore.Controllers
 
 		protected SensateUser CurrentUser { get; }
 
-		protected AbstractController(IUserRepository users, IAuditLogRepository audit)
+		protected AbstractController(IUserRepository users, IAuditLogRepository audit, IHttpContextAccessor ctx)
 		{
+			var uid = ctx.HttpContext.User;
 			this._users = users;
 			this._audit = audit;
 			this.CurrentUser = null;
 
-			if(this.User != null)
-				this.CurrentUser = this._users.GetByClaimsPrinciple(this.User);
+			if(uid != null)
+				this.CurrentUser = this._users.GetByClaimsPrinciple(uid);
 		}
 
 		protected StatusCodeResult ServerFault()

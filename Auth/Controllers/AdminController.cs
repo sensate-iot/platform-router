@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 using SensateService.ApiCore.Attributes;
@@ -34,8 +34,8 @@ namespace SensateService.Auth.Controllers
 		private readonly ISensorStatisticsRepository _stats;
 		private readonly ISensorRepository _sensors;
 
-		public AdminController(IUserRepository users, IAuditLogRepository audit,
-			ISensorStatisticsRepository stats, ISensorRepository sensors) : base(users, audit)
+		public AdminController(IUserRepository users, IAuditLogRepository audit, IHttpContextAccessor ctx,
+			ISensorStatisticsRepository stats, ISensorRepository sensors) : base(users, audit, ctx)
 		{
 			this._stats = stats;
 			this._sensors = sensors;

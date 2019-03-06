@@ -8,7 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -39,8 +39,9 @@ namespace SensateService.Auth.Controllers
 			IOptions<UserAccountSettings> options,
 			IUserRepository users,
 			SignInManager<SensateUser> signInManager,
-			IAuditLogRepository auditLog
-		) : base(users, auditLog)
+			IAuditLogRepository auditLog,
+			IHttpContextAccessor ctx
+		) : base(users, auditLog, ctx)
 		{
 			this._tokens = tokens;
 			this._signin_manager = signInManager;
