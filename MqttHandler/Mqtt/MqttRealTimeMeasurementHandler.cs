@@ -12,6 +12,8 @@ using Microsoft.Extensions.Options;
 
 using Newtonsoft.Json;
 
+using SensateService.Enums;
+using SensateService.Helpers;
 using SensateService.Infrastructure.Events;
 using SensateService.Infrastructure.Storage;
 using SensateService.Models;
@@ -83,7 +85,7 @@ namespace SensateService.MqttHandler.Mqtt
 					return;
 
 
-				await this.store.StoreAsync(raw);
+				await this.store.StoreAsync(raw, RequestMethod.MqttTcp).AwaitBackground();
 			} catch(Exception ex) {
 				Console.WriteLine($"Error: {ex.Message}");
 				Console.WriteLine($"Received a buggy MQTT message: {message}");

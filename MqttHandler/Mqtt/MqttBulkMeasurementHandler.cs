@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
+using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Storage;
 using SensateService.Models.Json.In;
@@ -41,7 +42,7 @@ namespace SensateService.MqttHandler.Mqtt
 			try {
 				raw = JsonConvert.DeserializeObject<IList<RawMeasurement>>(message);
 
-				await this.store.StoreRangeAsync(raw).AwaitBackground();
+				await this.store.StoreRangeAsync(raw, RequestMethod.MqttTcp).AwaitBackground();
 			} catch(Exception ex) {
 				this.logger.LogInformation($"Error: {ex.Message}");
 				this.logger.LogInformation($"Received a buggy MQTT message: {message}");
