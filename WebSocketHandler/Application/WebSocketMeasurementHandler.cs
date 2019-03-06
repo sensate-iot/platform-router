@@ -16,7 +16,7 @@ using Microsoft.Extensions.Options;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
+using SensateService.Enums;
 using SensateService.Exceptions;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Events;
@@ -58,7 +58,7 @@ namespace SensateService.WebSocketHandler.Application
 					if(raw.CreatedById == null)
 						return;
 
-					await store.StoreAsync(raw).AwaitBackground();
+					await store.StoreAsync(raw, RequestMethod.WebSocket).AwaitBackground();
 				}
 			} catch(InvalidRequestException ex) {
 				Debug.WriteLine($"Unable to store measurement: {ex.Message}");

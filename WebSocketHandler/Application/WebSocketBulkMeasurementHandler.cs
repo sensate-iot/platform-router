@@ -16,7 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
+using SensateService.Enums;
 using SensateService.Exceptions;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Storage;
@@ -46,7 +46,7 @@ namespace SensateService.WebSocketHandler.Application
 					var store = scope.ServiceProvider.GetRequiredService<IMeasurementCache>();
 
 					raw = JsonConvert.DeserializeObject<IEnumerable<RawMeasurement>>(msg);
-					await store.StoreRangeAsync(raw).AwaitBackground();
+					await store.StoreRangeAsync(raw, RequestMethod.WebSocket).AwaitBackground();
 				}
 			} catch(InvalidRequestException ex) {
 				Debug.WriteLine($"Unable to store measurement: {ex.Message}");
