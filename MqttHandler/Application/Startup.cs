@@ -82,7 +82,7 @@ namespace SensateService.MqttHandler.Application
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.AddDocumentRepositories(cache.Enabled);
 			services.AddSqlRepositories(cache.Enabled);
-			services.AddMeasurementStorage();
+			services.AddMeasurementStorage(cache);
 
 			services.AddSingleton<IHostedService, MqttPublishHandler>();
 			services.AddMqttService(options => {

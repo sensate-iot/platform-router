@@ -10,6 +10,7 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using SensateService.Config;
 using SensateService.Infrastructure.Storage;
 using SensateService.Services;
 using SensateService.Services.Processing;
@@ -18,9 +19,11 @@ namespace SensateService.Init
 {
 	public static class MeasurementStorageInitExtensions
 	{
-		public static IServiceCollection AddMeasurementStorage(this IServiceCollection services)
+		public static IServiceCollection AddMeasurementStorage(this IServiceCollection services, CacheConfig config)
 		{
+			services.AddSingleton(config);
 			services.AddSingleton<IHostedService, MeasurementCacheService>();
+
 			services.AddSingleton(provider => {
 				var s = provider.GetServices<IHostedService>().ToList();
 				return s.Find(x => x.GetType() == typeof(MeasurementCacheService)) as IMeasurementCacheService;

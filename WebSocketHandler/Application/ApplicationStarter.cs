@@ -70,7 +70,7 @@ namespace SensateService.WebSocketHandler.Application
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.AddDocumentRepositories(cache.Enabled);
 			services.AddSqlRepositories(cache.Enabled);
-			services.AddMeasurementStorage();
+			services.AddMeasurementStorage(cache);
 
 			this.SetupAuthentication(services, auth);
 

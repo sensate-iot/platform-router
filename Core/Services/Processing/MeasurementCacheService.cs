@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 
+using SensateService.Config;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Storage;
 using SensateService.Services.Settings;
@@ -22,18 +23,24 @@ namespace SensateService.Services.Processing
 {
 	public class MeasurementCacheService : TimedBackgroundService, IMeasurementCacheService
 	{
-		public const int IntervalInMillis = 1000;
-		private const int StartDelay = 1000;
+		public const int IntervalInMillis = 2000;
+		private const int StartDelay = 200;
 
 		private readonly ILogger<MeasurementCacheService> _logger;
+		private readonly CacheConfig _config;
+
 		private IList<ICachedMeasurementStore> _caches;
 		private int _index;
 		private int _count;
 		private long _stored;
 
-		public MeasurementCacheService(ILogger<MeasurementCacheService> logger)
+		public MeasurementCacheService(CacheConfig config, ILogger<MeasurementCacheService> logger)
 		{
 			this._logger = logger;
+			this._config = config;
+
+			if(config.Interval <= 0)
+				this._config.Interval = IntervalInMillis;
 
 			this._caches = new List<ICachedMeasurementStore>();
 			this._index = 0;
@@ -70,13 +77,13 @@ namespace SensateService.Services.Processing
 			if(processed > 0) {
 				this._logger.LogInformation($"Number of measurements processed: {processed}.{Environment.NewLine}" +
 				                            $"Processing took {sw.ElapsedMilliseconds}ms.{Environment.NewLine}" +
-				                            $"Average measurements per interval: {totalprocessed/(totaltime/1000)}.");
+				                            $"Average measurements per second: {totalprocessed/(totaltime/1000)}.");
 			}
 		}
 
 		protected override void Configure(TimedBackgroundServiceSettings settings)
 		{
-			settings.Interval = IntervalInMillis;
+			settings.Interval = this._config.Interval;
 			settings.StartDelay = StartDelay;
 		}
 
