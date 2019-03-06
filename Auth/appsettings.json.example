@@ -80,7 +80,7 @@
 
   "Text" : {
     "Provider": "Twilio",
-	"AlphaCode": "Sensate IoT",
+    "AlphaCode": "Sensate IoT",
     "Twilio": {
       "AccountSid": "<sid>",
       "AuthToken": "<auth token>",
