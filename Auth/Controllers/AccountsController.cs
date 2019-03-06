@@ -180,7 +180,6 @@ namespace SensateService.Auth.Controllers
 		}
 
 		[HttpPost("confirm-update-email")]
-		[NormalUser]
 		[ValidateModel]
 		[ProducesResponseType(200)]
 		[ProducesResponseType(400)]
@@ -195,29 +194,28 @@ namespace SensateService.Auth.Controllers
 			}
 
 			var user = await this.GetCurrentUserAsync();
-			var logTask = this.Log(RequestMethod.HttpPost, user);
+
+			if(user == null)
+				return this.NotFound();
+
+			await this.Log(RequestMethod.HttpPost, user).AwaitBackground();
 			token = this._email_tokens.GetById(changeEmail.Token);
 			tokens = this._tokens.GetByUser(user);
 
 			if(token == null) {
-				await logTask.AwaitBackground();
 				return this.InvalidInputResult("Token not found!");
 			}
 
 			var result = await this._manager.ChangeEmailAsync(user, token.Email, token.IdentityToken);
-			var setTask = this._manager.SetUserNameAsync(user, token.Email);
+			await this._manager.SetUserNameAsync(user, token.Email).AwaitBackground();
 
 			if(!result.Succeeded) {
-				await logTask.AwaitBackground();
 				return this.StatusCode(500);
 			}
 
 			if(tokens != null)
-				await logTask.AwaitBackground();
-				await this._tokens.InvalidateManyAsync(tokens);
+				await this._tokens.InvalidateManyAsync(tokens).AwaitBackground();
 
-            await logTask.AwaitBackground();
-			await setTask.AwaitBackground();
 			return this.Ok();
 		}
 

@@ -102,7 +102,7 @@ namespace SensateService.Auth.Controllers
 			var regworker = this.GetRegistrations();
 			var usercount = this._users.CountAsync();
 			var ghosts = this._users.CountGhostUsersAsync();
-			var measurements = await this._stats.GetAfterAsync(DateTime.Now);
+			var measurements = await this._stats.GetAfterAsync(DateTime.Now.ThisHour());
 			var measurementStats = this.GetMeasurementStats();
 			var sensors = this._sensors.CountAsync();
 
