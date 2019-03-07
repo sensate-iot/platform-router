@@ -146,7 +146,13 @@ namespace SensateService.Infrastructure.Sql
 
 		public async Task<bool> IsBanned(SensateUser user)
 		{
-			return await this.IsInRole(user, UserRoles.Banned);
+			var raw = await this.GetRolesAsync(user).AwaitBackground();
+			var roles = raw.ToArray();
+
+			if(roles.Length == 0)
+				return true;
+
+			return this.IsInRole(roles, UserRoles.Banned);
 		}
 
 		public async Task<bool> IsAdministrator(SensateUser user)
@@ -156,9 +162,12 @@ namespace SensateService.Infrastructure.Sql
 
 		public async Task<bool> ClearRolesForAsync(SensateUser user)
 		{
-			var roles = await this._manager.GetRolesAsync(user);
-			var result = await this._manager.RemoveFromRolesAsync(user, roles);
+			var roles = await this._manager.GetRolesAsync(user).AwaitBackground();
 
+			if(roles.Count <= 0)
+				return true;
+
+			var result = await this._manager.RemoveFromRolesAsync(user, roles).AwaitBackground();
 			return result.Succeeded;
 		}
 
@@ -174,6 +183,12 @@ namespace SensateService.Infrastructure.Sql
 			var roles = raw.Select(r => r.ToUpper());
 
 			return roles.Contains(role.ToUpper());
+		}
+
+		private bool IsInRole(string[] roles, string role)
+		{
+			var _roles = roles.Select(r => r.ToUpper());
+			return _roles.Contains(role.ToUpper());
 		}
 	}
 }
