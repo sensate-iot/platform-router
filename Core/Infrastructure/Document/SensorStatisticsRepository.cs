@@ -57,7 +57,22 @@ namespace SensateService.Infrastructure.Document
 			}
 		}
 
-#region Entry creation
+		public async Task DeleteBySensorAsync(Sensor sensor, DateTime date)
+		{
+			FilterDefinition<SensorStatisticsEntry> filter;
+			var filterBuilder = Builders<SensorStatisticsEntry>.Filter;
+			var dt = date.ThisHour();
+
+			filter = filterBuilder.Eq("SensorId", sensor.InternalId) & filterBuilder.Eq("Date", dt);
+
+			try {
+				await this._stats.DeleteManyAsync(filter).AwaitBackground();
+			} catch(Exception ex) {
+				this._logger.LogWarning(ex.Message);
+			}
+		}
+
+		#region Entry creation
 
 		public Task IncrementAsync(Sensor sensor)
 		{
@@ -101,7 +116,7 @@ namespace SensateService.Infrastructure.Document
 			var filterBuilder = Builders<SensorStatisticsEntry>.Filter;
 			var date = dt.ThisHour();
 
-			filter = filterBuilder.Eq("SensorId", sensor.InternalId) & filterBuilder.Eq("Date", date);
+			filter = filterBuilder.Eq("SensorId", sensor.InternalId) & filterBuilder.Gte("Date", date);
 			var result = await this._stats.FindAsync(filter).AwaitBackground();
 
 			if(result == null)

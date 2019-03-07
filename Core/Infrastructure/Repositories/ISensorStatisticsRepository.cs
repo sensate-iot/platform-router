@@ -29,5 +29,6 @@ namespace SensateService.Infrastructure.Repositories
 		void Delete(string id);
 		Task DeleteAsync(string id);
 		Task DeleteBySensorAsync(Sensor sensor);
+		Task DeleteBySensorAsync(Sensor sensor, DateTime date);
 	}
 }
