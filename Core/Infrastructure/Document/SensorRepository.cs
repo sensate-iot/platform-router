@@ -96,6 +96,16 @@ namespace SensateService.Infrastructure.Document
 			return raw.ToList();
 		}
 
+		public async Task<IEnumerable<Sensor>> FindByNameAsync(SensateUser user, string name)
+		{
+			FilterDefinition<Sensor> filter;
+			var builder = Builders<Sensor>.Filter;
+
+			filter = builder.Where(x => x.Name.Contains(name));
+			var raw = await this._collection.FindAsync(filter).AwaitBackground();
+			return raw.ToList();
+		}
+
 		public virtual async Task<Sensor> GetAsync(string id)
 		{
 			ObjectId oid = new ObjectId(id);

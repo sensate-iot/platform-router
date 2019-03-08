@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
@@ -28,6 +29,13 @@ namespace SensateService.Infrastructure.Document
 		{
 			this._logger = logger;
 			this._stats = context.Statistics;
+		}
+
+		public async Task<IEnumerable<SensorStatisticsEntry>> GetAsync(Expression<Func<SensorStatisticsEntry, bool>> expr)
+		{
+			var worker = this._stats.FindAsync(expr);
+			var data = await worker.AwaitBackground();
+			return data.ToList();
 		}
 
 		public void Delete(string id)
@@ -57,22 +65,17 @@ namespace SensateService.Infrastructure.Document
 			}
 		}
 
-		public async Task DeleteBySensorAsync(Sensor sensor, DateTime date)
+		public async Task DeleteBySensorAsync(Sensor sensor, DateTime from, DateTime to)
 		{
-			FilterDefinition<SensorStatisticsEntry> filter;
-			var filterBuilder = Builders<SensorStatisticsEntry>.Filter;
-			var dt = date.ThisHour();
+			var f = from.ThisHour();
+			var t = to.ThisHour();
 
-			filter = filterBuilder.Eq("SensorId", sensor.InternalId) & filterBuilder.Eq("Date", dt);
-
-			try {
-				await this._stats.DeleteManyAsync(filter).AwaitBackground();
-			} catch(Exception ex) {
-				this._logger.LogWarning(ex.Message);
-			}
+			var worker = this._collection.DeleteManyAsync(stat => stat.SensorId == sensor.InternalId &&
+			                                                      stat.Date >= f && stat.Date <= t);
+			await worker.AwaitBackground();
 		}
 
-		#region Entry creation
+#region Entry creation
 
 		public Task IncrementAsync(Sensor sensor)
 		{

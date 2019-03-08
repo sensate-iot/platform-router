@@ -12,8 +12,10 @@ using System.Linq.Expressions;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+
 using MongoDB.Bson;
 using MongoDB.Driver;
+
 using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
@@ -23,8 +25,6 @@ namespace SensateService.Infrastructure.Document
 {
 	public class AuditLogRepository : AbstractDocumentRepository<AuditLog>, IAuditLogRepository, IBulkWriter<AuditLog>
 	{
-		private static readonly Random Rng = new Random();
-
 		public AuditLogRepository(SensateContext ctx) : base(ctx.Logs)
 		{
 		}
@@ -45,11 +45,46 @@ namespace SensateService.Infrastructure.Document
 			await this.CreateAsync(al).AwaitBackground();
 		}
 
+		public async Task DeleteBetweenAsync(SensateUser user, DateTime start, DateTime end)
+		{
+			var worker = this._collection.DeleteManyAsync(log => log.AuthorId == user.Id &&
+			                                                     log.Timestamp >= start &&
+			                                                     log.Timestamp <= end);
+			await worker.AwaitBackground();
+		}
+
+		public async Task DeleteBetweenAsync(SensateUser user, string route, DateTime start, DateTime end)
+		{
+			var worker = this._collection.DeleteManyAsync(log => log.AuthorId == user.Id &&
+																 log.Route == route &&
+			                                                     log.Timestamp >= start &&
+			                                                     log.Timestamp <= end);
+			await worker.AwaitBackground();
+		}
+
+		public async Task<IEnumerable<AuditLog>> GetByRouteAsync(SensateUser user, string route, DateTime start, DateTime end)
+		{
+			var worker = this._collection.FindAsync(log => log.AuthorId == user.Id &&
+			                                               log.Route == route &&
+			                                               log.Timestamp >= start &&
+			                                               log.Timestamp <= end);
+			var result = await worker.AwaitBackground();
+			return result.ToList();
+		}
+
 		public async Task<IEnumerable<AuditLog>> GetByRequestTypeAsync(SensateUser user, RequestMethod method)
 		{
 			var worker = this._collection.FindAsync(log => log.AuthorId == user.Id && log.Method == method);
 			var results = await worker.AwaitBackground();
 			return results.ToList();
+		}
+
+		public async Task<IEnumerable<AuditLog>> GetAsync(Expression<Func<AuditLog, bool>> expr)
+		{
+			var worker = this._collection.FindAsync(expr);
+			var data = await worker.AwaitBackground();
+
+			return data.ToList();
 		}
 
 		public async Task<AuditLog> GetAsync(string id)

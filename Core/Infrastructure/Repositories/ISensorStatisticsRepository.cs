@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 using SensateService.Models;
@@ -24,11 +25,11 @@ namespace SensateService.Infrastructure.Repositories
 		Task<IEnumerable<SensorStatisticsEntry>> GetAfterAsync(Sensor sensor, DateTime date);
 		Task<IEnumerable<SensorStatisticsEntry>> GetAfterAsync(DateTime date);
 		Task<IEnumerable<SensorStatisticsEntry>> GetBetweenAsync(Sensor sensor, DateTime start, DateTime end);
-
+		Task<IEnumerable<SensorStatisticsEntry>> GetAsync(Expression<Func<SensorStatisticsEntry, bool>> expr);
 
 		void Delete(string id);
 		Task DeleteAsync(string id);
 		Task DeleteBySensorAsync(Sensor sensor);
-		Task DeleteBySensorAsync(Sensor sensor, DateTime date);
+		Task DeleteBySensorAsync(Sensor sensor, DateTime from, DateTime to);
 	}
 }

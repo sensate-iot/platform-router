@@ -149,7 +149,7 @@ namespace SensateService.Infrastructure.Document
 			if(measurements != null)
 				return measurements;
 
-			measurements = await base.TryGetMeasurementsAsync(expression).AwaitBackground();
+			measurements = await base.GetMeasurementsAsync(expression).AwaitBackground();
 			await this.CacheDataAsync(key, measurements, tmo, false).AwaitBackground();
 			return measurements;
 

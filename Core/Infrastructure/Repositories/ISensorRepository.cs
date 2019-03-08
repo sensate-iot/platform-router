@@ -23,6 +23,8 @@ namespace SensateService.Infrastructure.Repositories
 		Task<IEnumerable<Sensor>> GetAsync(SensateUser user);
 		Task<Sensor> GetAsync(string id);
 		Task<IEnumerable<Sensor>> GetAsync(IEnumerable<string> ids);
+		Task<IEnumerable<Sensor>> FindByNameAsync(SensateUser user, string name);
+
 		Task<long> CountAsync(SensateUser user = null);
 		Task RemoveAsync(string id);
 		Task UpdateAsync(Sensor sensor);

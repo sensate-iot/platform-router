@@ -195,7 +195,7 @@ namespace SensateService.Infrastructure.Document
 			return await result.FirstOrDefaultAsync().AwaitBackground();
 		}
 
-		public virtual async Task<IEnumerable<Measurement>> TryGetMeasurementsAsync(Expression<Func<Measurement, bool>> expression)
+		public virtual async Task<IEnumerable<Measurement>> GetMeasurementsAsync(Expression<Func<Measurement, bool>> expression)
 		{
 			var result = await this._collection.FindAsync(expression).AwaitBackground();
 

@@ -30,8 +30,7 @@ namespace SensateService.Infrastructure.Repositories
 		Task<long> GetMeasurementCountAsync(Sensor sensor, CancellationToken token = default(CancellationToken));
 		Task<Measurement> GetByIdAsync(string id);
 
-		Task<IEnumerable<Measurement>> TryGetBetweenAsync(Sensor sensor, DateTime start, DateTime end);
-		Task<IEnumerable<Measurement>> TryGetMeasurementsAsync(Expression<Func<Measurement, bool>> selector);
+		Task<IEnumerable<Measurement>> GetMeasurementsAsync(Expression<Func<Measurement, bool>> selector);
 		Task<Measurement> GetMeasurementAsync(Expression<Func<Measurement, bool>> selector);
 		Task<IEnumerable<Measurement>> GetMeasurementsBySensorAsync(Sensor sensor);
 		Task<IEnumerable<Measurement>> GetBeforeAsync(Sensor sensor, DateTime pit);
