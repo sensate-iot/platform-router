@@ -18,11 +18,8 @@ using MongoDB.Driver;
 using MongoDB.Bson;
 
 using SensateService.Models;
-using SensateService.Exceptions;
 using SensateService.Infrastructure.Repositories;
-using SensateService.Enums;
 using SensateService.Helpers;
-using SensateService.Models.Json.In;
 using SensateService.Infrastructure.Events;
 
 namespace SensateService.Infrastructure.Document
@@ -30,9 +27,6 @@ namespace SensateService.Infrastructure.Document
 	public class MeasurementRepository : AbstractDocumentRepository<Measurement>, IMeasurementRepository, IBulkWriter<Measurement>
 	{
 		protected readonly ILogger<MeasurementRepository> _logger;
-		private const int MaxDatapointLength = 25;
-
-		public event OnMeasurementReceived MeasurementReceived;
 
 		public MeasurementRepository(SensateContext context, ILogger<MeasurementRepository> logger) : base(context.Measurements)
 		{
@@ -92,29 +86,6 @@ namespace SensateService.Infrastructure.Document
 			}
 		}
 
-		public virtual IEnumerable<Measurement> GetMeasurementsBySensor(Sensor sensor)
-		{
-			var query = Builders<Measurement>.Filter.Eq("CreatedBy", sensor.InternalId);
-
-			try {
-				return this._collection.Find(query).ToList();
-			} catch (Exception ex) {
-				this._logger.LogWarning(ex.Message);
-				return null;
-			}
-		}
-
-		public virtual void DeleteBySensor(Sensor sensor)
-		{
-			var query = Builders<Measurement>.Filter.Eq("CreatedBy", sensor.InternalId);
-
-			try {
-				this._collection.DeleteMany(query);
-			} catch(Exception e){
-				this._logger.LogWarning(e.Message);
-			}
-		}
-
 		public virtual async Task DeleteBySensorAsync(Sensor sensor)
 		{
 			try {
@@ -122,21 +93,6 @@ namespace SensateService.Infrastructure.Document
 
 				fd = Builders<Measurement>.Filter.Eq("CreatedBy", sensor.InternalId);
 				await this._collection.DeleteManyAsync(fd).AwaitBackground();
-			} catch(Exception ex) {
-				this._logger.LogWarning(ex.Message);
-			}
-		}
-
-		public virtual void DeleteBetween(Sensor sensor, DateTime start, DateTime end)
-		{
-			var builder = Builders<Measurement>.Filter;
-
-			try {
-				FilterDefinition<Measurement> fd;
-
-				fd = builder.Gte("CreatedAt", start) & builder.Lte("CreatedAt", end) &
-					 builder.Eq("CreatedBy", sensor.InternalId);
-				this._collection.DeleteMany(fd);
 			} catch(Exception ex) {
 				this._logger.LogWarning(ex.Message);
 			}
@@ -157,16 +113,6 @@ namespace SensateService.Infrastructure.Document
 			}
 		}
 
-		public virtual void Delete(string id)
-		{
-			ObjectId oid;
-
-			oid = ToInternalId(id);
-			this._collection.DeleteOne(x =>
-				x.InternalId == oid
-			);
-		}
-
 		public virtual async Task DeleteAsync(string id)
 		{
 			ObjectId objectId;
@@ -176,24 +122,6 @@ namespace SensateService.Infrastructure.Document
 		}
 
 #region Linq getters
-
-		protected virtual Measurement TryGetMeasurement(Expression<Func<Measurement, bool>> expression)
-		{
-			var result = this._collection.FindSync(expression);
-			return result?.FirstOrDefault();
-		}
-
-		protected virtual async Task<Measurement> TryGetMeasurementAsync(Expression<Func<Measurement, bool>> expression)
-		{
-			IAsyncCursor<Measurement> result;
-
-			result = await this._collection.FindAsync(expression).AwaitBackground();
-
-			if(result == null)
-				return null;
-
-			return await result.FirstOrDefaultAsync().AwaitBackground();
-		}
 
 		public virtual async Task<IEnumerable<Measurement>> GetMeasurementsAsync(Expression<Func<Measurement, bool>> expression)
 		{
@@ -253,93 +181,6 @@ namespace SensateService.Infrastructure.Document
 			await base.CreateAsync(obj, ct).AwaitBackground();
 		}
 
-		private async Task<bool> CreateAsync(Sensor sensor, RawMeasurement raw, CancellationToken ct)
-		{
-			Measurement measurement;
-			DateTime timestamp;
-			IList<DataPoint> datapoints;
-			MeasurementReceivedEventArgs e;
-
-			if(!raw.IsCreatedBy(sensor)) {
-				this._logger.LogInformation("Unable to store measurement, invalid secret!");
-				return false;
-			}
-
-			if(raw.TryParseData(out var data)) {
-				datapoints = data as IList<DataPoint>;
-
-				if(datapoints == null)
-					throw new InvalidRequestException(ErrorCode.InvalidDataError, "Unable to parse datapoints");
-
-				if(datapoints.Count <= 0 || datapoints.Count > MeasurementRepository.MaxDatapointLength) {
-					this._logger.LogInformation($"Invalid number of datapoints in measurement: {datapoints.Count}");
-					return false;
-				}
-			} else {
-				throw new InvalidRequestException(ErrorCode.InvalidDataError, "Unable to parse datapoints");
-			}
-
-			measurement = new Measurement {
-				CreatedBy = sensor.InternalId,
-				Data = datapoints,
-				Longitude = raw.Longitude,
-				Latitude = raw.Latitude
-			};
-
-			timestamp = DateTime.Now;
-			measurement.CreatedAt = raw.CreatedAt ?? timestamp;
-			measurement.InternalId = base.GenerateId(timestamp);
-
-			e = new MeasurementReceivedEventArgs {
-				Measurement = measurement,
-				CancellationToken = ct
-			};
-
-			try {
-				var opts = new InsertOneOptions {
-					BypassDocumentValidation = true
-				};
-
-				var workers = new[] {
-					this._collection.InsertOneAsync(measurement, opts, ct),
-					this.InvokeReceiveMeasurement(sensor, e)
-				};
-
-				await Task.WhenAll(workers).AwaitBackground();
-			} catch(Exception ex) {
-				this._logger.LogWarning($"Unable to store measurement: {ex.Message}");
-				throw new DatabaseException("Unable to store measurement", "Measurements", ex);
-			}
-
-			return true;
-		}
-
-		public virtual async Task ReceiveMeasurementAsync(Sensor sensor, RawMeasurement measurement)
-		{
-			CancellationTokenSource src = new CancellationTokenSource();
-
-			try {
-				if(Math.Abs(measurement.Latitude) < double.Epsilon &&
-				   Math.Abs(measurement.Longitude) < double.Epsilon) {
-					throw new InvalidRequestException(
-						ErrorCode.InvalidDataError.ToInt(),
-						"Invalid measurement location given!"
-					);
-				}
-
-				var result = await this.CreateAsync(sensor, measurement, src.Token).AwaitBackground();
-
-				if(!result)
-					src.Cancel();
-
-			} catch(Exception ex) {
-				src.Cancel();
-				throw ex;
-			} finally {
-				src.Dispose();
-			}
-		}
-
 		public async Task CreateRangeAsync(IEnumerable<Measurement> objs, CancellationToken token)
 		{
 			var measurements = objs.ToList();
@@ -353,21 +194,6 @@ namespace SensateService.Infrastructure.Document
 			}
 
 			await this._collection.InsertManyAsync(measurements, opts, token).AwaitBackground();
-		}
-
-		private async Task InvokeReceiveMeasurement(Sensor sensor, MeasurementReceivedEventArgs eventargs)
-		{
-			Delegate[] delegates;
-
-			if(this.MeasurementReceived == null)
-				return;
-
-			delegates = this.MeasurementReceived.GetInvocationList();
-
-			if(delegates.Length <= 0)
-				return;
-
-			await this.MeasurementReceived.Invoke(sensor, eventargs);
 		}
 
 #endregion
@@ -409,16 +235,7 @@ namespace SensateService.Infrastructure.Document
 			return await result.ToListAsync().AwaitBackground();
 		}
 
-		public virtual IEnumerable<Measurement> TryGetBetween(
-			Sensor sensor, DateTime start, DateTime end
-		)
-		{
-			return this.Lookup(BuildFilter(sensor, start, end));
-		}
-
-		public virtual async Task<IEnumerable<Measurement>> TryGetBetweenAsync(
-			Sensor sensor, DateTime start, DateTime end
-		)
+		public virtual async Task<IEnumerable<Measurement>> GetBetweenAsync(Sensor sensor, DateTime start, DateTime end)
 		{
 			return await this.LookupAsync(BuildFilter(sensor, start, end)).AwaitBackground();
 		}
@@ -446,14 +263,16 @@ namespace SensateService.Infrastructure.Document
 		}
 #endregion
 
-		public virtual Measurement GetMeasurement(Expression<Func<Measurement, bool>> selector)
+		public virtual async Task<Measurement> GetMeasurementAsync(Expression<Func<Measurement, bool>> expression)
 		{
-			return this.TryGetMeasurement(selector);
-		}
+			IAsyncCursor<Measurement> result;
 
-		public virtual async Task<Measurement> GetMeasurementAsync(Expression<Func<Measurement, bool>> selector)
-		{
-			return await this.TryGetMeasurementAsync(selector).AwaitBackground();
+			result = await this._collection.FindAsync(expression).AwaitBackground();
+
+			if(result == null)
+				return null;
+
+			return await result.FirstOrDefaultAsync().AwaitBackground();
 		}
 	}
 }

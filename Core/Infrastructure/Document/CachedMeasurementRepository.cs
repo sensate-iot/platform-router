@@ -9,12 +9,10 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq.Expressions;
-using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 
-using SensateService.Exceptions;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Cache;
 using SensateService.Models;
@@ -31,12 +29,6 @@ namespace SensateService.Infrastructure.Document
 			ICacheStrategy<string> cache) : base(context, logger)
 		{
 			_cache = cache;
-		}
-
-		public override void Delete(string id)
-		{
-			_cache.Remove(id);
-			base.Delete(id);
 		}
 
 		public override async Task DeleteAsync(string id)
@@ -65,15 +57,6 @@ namespace SensateService.Infrastructure.Document
 			await this._cache.SerializeAsync(key, data, tmo, slide).AwaitBackground();
 		}
 
-		public override void DeleteBySensor(Sensor sensor)
-		{
-			string key;
-
-			key = String.Format("Measurements::{0}", sensor.InternalId.ToString());
-			_cache.Remove(key);
-			base.DeleteBySensor(sensor);
-		}
-
 		public override async Task DeleteBySensorAsync(Sensor sensor)
 		{
 			string key;
@@ -85,15 +68,6 @@ namespace SensateService.Infrastructure.Document
 			};
 
 			await Task.WhenAll(tasks).AwaitBackground();
-		}
-
-		public override void DeleteBetween(Sensor sensor, DateTime start, DateTime end)
-		{
-			string key;
-
-			key = $"{sensor.InternalId}::{start.ToString(CultureInfo.InvariantCulture)}::{end.ToString(CultureInfo.InvariantCulture)}";
-			_cache.Remove(key);
-			base.DeleteBetween(sensor, start, end);
 		}
 
 		public override async Task DeleteBetweenAsync(Sensor sensor, DateTime start, DateTime end)
@@ -117,16 +91,6 @@ namespace SensateService.Infrastructure.Document
 			return await TryGetMeasurementsAsync(key,
 				x => x.CreatedBy == sensor.InternalId, CacheTimeout.TimeoutMedium.ToInt()
 			).AwaitBackground();
-		}
-
-		public override IEnumerable<Measurement> GetMeasurementsBySensor(Sensor sensor)
-		{
-			string key;
-
-			key = String.Format("Measurements::{0}", sensor.InternalId.ToString());
-			return TryGetMeasurements(key, x =>
-				x.CreatedBy == sensor.InternalId, CacheTimeout.TimeoutMedium.ToInt()
-			);
 		}
 
 		public override async Task UpdateAsync(Measurement obj)
@@ -153,21 +117,6 @@ namespace SensateService.Infrastructure.Document
 			await this.CacheDataAsync(key, measurements, tmo, false).AwaitBackground();
 			return measurements;
 
-		}
-
-		private IEnumerable<Measurement> TryGetMeasurements(string key, Expression<Func<Measurement, bool>> selector, int tmo)
-		{
-			IEnumerable<Measurement> measurements = null;
-
-			if(key != null)
-				measurements = _cache.Deserialize<IEnumerable<Measurement>>(key);
-
-			if(measurements != null)
-				return measurements;
-
-			measurements = base.TryGetMeasurements(selector);
-			this.CacheData(key, measurements, tmo, false);
-			return measurements;
 		}
 
 		public override async Task<IEnumerable<Measurement>> GetAfterAsync(Sensor sensor, DateTime pit)
@@ -204,25 +153,7 @@ namespace SensateService.Infrastructure.Document
 
 		}
 
-		public override IEnumerable<Measurement> TryGetBetween(Sensor sensor, DateTime start, DateTime end)
-		{
-			string key;
-			IEnumerable<Measurement> measurements;
-
-			key = $"{sensor.InternalId}::{start.ToString(CultureInfo.InvariantCulture)}::{end.ToString(CultureInfo.InvariantCulture)}";
-
-			measurements = _cache.Deserialize<IEnumerable<Measurement>>(key);
-
-			if(measurements != null)
-				return measurements;
-
-			measurements = base.TryGetBetween(sensor, start, end);
-			CacheData(key, measurements, CacheTimeout.Timeout.ToInt());
-			return measurements;
-
-		}
-
-		public override async Task<IEnumerable<Measurement>> TryGetBetweenAsync(Sensor sensor, DateTime start, DateTime end)
+		public override async Task<IEnumerable<Measurement>> GetBetweenAsync(Sensor sensor, DateTime start, DateTime end)
 		{
 			string key;
 			IEnumerable<Measurement> measurements;
@@ -233,7 +164,7 @@ namespace SensateService.Infrastructure.Document
 			if(measurements != null)
 				return measurements;
 
-			measurements = await base.TryGetBetweenAsync(sensor, start, end).AwaitBackground();
+			measurements = await base.GetBetweenAsync(sensor, start, end).AwaitBackground();
 			await CacheDataAsync(key, measurements, CacheTimeout.Timeout.ToInt()).AwaitBackground();
 			return measurements;
 

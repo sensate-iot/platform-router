@@ -38,17 +38,6 @@ namespace SensateService.Infrastructure.Document
 			this._stats = statisticsRepository;
 		}
 
-		public override void Create(Sensor obj)
-		{
-			DateTime now;
-
-			now = DateTime.Now;
-			obj.CreatedAt = now;
-			obj.UpdatedAt = now;
-			obj.InternalId = base.GenerateId(now);
-			base.Create(obj);
-		}
-
 		public override async Task CreateAsync(Sensor sensor, CancellationToken ct = default(CancellationToken))
 		{
 			var now = DateTime.Now;
@@ -56,18 +45,7 @@ namespace SensateService.Infrastructure.Document
 			sensor.CreatedAt = now;
 			sensor.UpdatedAt = now;
 			sensor.InternalId = base.GenerateId(now);
-			await base.CreateAsync(sensor, ct);
-		}
-
-		public virtual void Remove(string id)
-		{
-			this.Delete(id);
-		}
-
-		public virtual Sensor Get(string id)
-		{
-			ObjectId oid = new ObjectId(id);
-			return this._sensors.Find(x => x.InternalId == oid).FirstOrDefault();
+			await base.CreateAsync(sensor, ct).AwaitBackground();
 		}
 
 		public virtual async Task<IEnumerable<Sensor>> GetAsync(SensateUser user)
@@ -132,46 +110,6 @@ namespace SensateService.Infrastructure.Document
 
 		public virtual async Task RemoveAsync(string id)
 		{
-			await this.DeleteAsync(id).AwaitBackground();
-		}
-
-		public virtual void Update(Sensor obj)
-		{
-			var update = Builders<Sensor>.Update
-				.Set(x => x.UpdatedAt, DateTime.Now);
-
-			if(obj.Name != null)
-				update = update.Set(x => x.Name, obj.Name);
-			if(obj.Description != null)
-				update = update.Set(x => x.Description, obj.Description);
-			if(obj.Secret != null)
-				update = update.Set(x => x.Secret, obj.Secret);
-
-			try {
-				this._sensors.FindOneAndUpdate( x => x.InternalId == obj.InternalId, update );
-			} catch(Exception ex) {
-				this._logger.LogInformation($"Unable to update sensor: {ex.Message}");
-			}
-		}
-
-		public virtual async Task UpdateAsync(Sensor sensor)
-		{
-			await Task.Run(() => this.Update(sensor)).AwaitBackground();
-		}
-
-		public virtual void Delete(string id)
-		{
-			Sensor sensor;
-			ObjectId oid = new ObjectId(id);
-
-			sensor = this._sensors.FindOneAndDelete(x => x.InternalId == oid);
-
-			if(sensor != null)
-				this._measurements.DeleteBySensor(sensor);
-		}
-
-		public virtual async Task DeleteAsync(string id)
-		{
 			Sensor sensor;
 			ObjectId oid = new ObjectId(id);
 
@@ -187,12 +125,22 @@ namespace SensateService.Infrastructure.Document
 			}
 		}
 
-		public virtual Sensor GetById(string id)
+		public virtual async Task UpdateAsync(Sensor obj)
 		{
-			ObjectId oid = new ObjectId(id);
-			var result = this._sensors.Find(x => x.InternalId == oid);
+			var update = Builders<Sensor>.Update.Set(x => x.UpdatedAt, DateTime.Now);
 
-			return result?.FirstOrDefault();
+			if(obj.Name != null)
+				update = update.Set(x => x.Name, obj.Name);
+			if(obj.Description != null)
+				update = update.Set(x => x.Description, obj.Description);
+			if(obj.Secret != null)
+				update = update.Set(x => x.Secret, obj.Secret);
+
+			try {
+				await this._sensors.FindOneAndUpdateAsync(x => x.InternalId == obj.InternalId, update).AwaitBackground();
+			} catch(Exception ex) {
+				this._logger.LogInformation($"Unable to update sensor: {ex.Message}");
+			}
 		}
 	}
 }
