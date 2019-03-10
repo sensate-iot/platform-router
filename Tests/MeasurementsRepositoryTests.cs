@@ -81,57 +81,5 @@ namespace SensateService.Tests
 		{
 		}
 
-		[Test, Order(2)]
-		public async Task CanGetById()
-		{
-			Measurement m;
-
-			m = await this._repo.GetMeasurementAsync(x => x.CreatedBy == this._sensor.InternalId);
-			var list = m.Data as List<DataPoint>;
-
-			Assert.True(list[0].Name == "z");
-			Assert.True(list[1].Name == "x");
-			Assert.True(list[2].Name == "y");
-			Assert.True(list[0].Value == 22.3949988317M);
-		}
-
-		[Test, Order(1)]
-		public async Task CanCreateMeasurement()
-		{
-			dynamic obj;
-			JArray array;
-			RawMeasurement m;
-
-			var x = typeof(decimal);
-			var y = typeof(decimal?);
-
-			array = new JArray();
-
-			obj = new JObject();
-			obj.Value = 22.3949988317M;
-			obj.Name = "z";
-			array.Add(obj);
-
-			obj = new JObject();
-			obj.Value = 3.143611234211M;
-			obj.Name = "x";
-			array.Add(obj);
-
-			obj = new JObject();
-			obj.Value = 9.8136986919M;
-			obj.Name = "y";
-			array.Add(obj);
-
-			m = new RawMeasurement {
-				CreatedBySecret = "TestingSecret",
-				CreatedById = _sensor.InternalId.ToString(),
-				Longitude = 1.1234,
-				Latitude = 22.123511,
-				Data = array
-			};
-
-			await this._repo.ReceiveMeasurementAsync(_sensor, m);
-			Assert.IsTrue(this._receivedMeasurement != null);
-		}
 	}
 }

@@ -122,7 +122,7 @@ namespace SensateService.WebSocketHandler.Application
 
 		private void SetupAuthentication(IServiceCollection services, AuthenticationConfig auth)
 		{
-			services.AddIdentity<SensateUser, UserRole>(config => {
+			services.AddIdentity<SensateUser, SensateRole>(config => {
 				config.SignIn.RequireConfirmedEmail = true;
 			})
 			.AddEntityFrameworkStores<SensateSqlContext>()

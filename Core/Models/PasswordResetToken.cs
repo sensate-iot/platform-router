@@ -16,9 +16,5 @@ namespace SensateService.Models
 		[Key]
 		public string UserToken { get; set; }
 		public string IdentityToken { get; set; }
-
-		public PasswordResetToken()
-		{
-		}
 	}
 }

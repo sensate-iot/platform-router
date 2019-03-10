@@ -72,7 +72,7 @@ namespace SensateService.DatabaseTool
 
 			services.AddPostgres(db.PgSQL.ConnectionString);
 
-			services.AddIdentity<SensateUser, UserRole>(config => {
+			services.AddIdentity<SensateUser, SensateRole>(config => {
 				config.SignIn.RequireConfirmedEmail = true;
 			})
 			.AddEntityFrameworkStores<SensateSqlContext>()

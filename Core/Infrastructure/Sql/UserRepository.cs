@@ -52,10 +52,15 @@ namespace SensateService.Infrastructure.Sql
 			});
 		}
 
-		public async Task<IEnumerable<SensateUser>> GetRangeAsync(IEnumerable<string> ids)
+		public Task<IEnumerable<SensateUser>> GetRangeAsync(IEnumerable<string> ids)
 		{
-			var profiles = this.Data.Where(u => ids.Contains(u.Id));
-			return await profiles.ToListAsync().AwaitBackground();
+			var worker = Task.Run(() => {
+				var profiles = this.Data.Where(u => ids.Contains(u.Id))
+					.Include(u => u.UserRoles).ThenInclude(ur => ur.Role);
+				return profiles.AsEnumerable();
+			});
+
+			return worker;
 		}
 
 		public virtual SensateUser Get(string key)
@@ -63,10 +68,14 @@ namespace SensateService.Infrastructure.Sql
 			return this.GetById(key);
 		}
 
-		public virtual async Task<SensateUser> GetAsync(string key)
+		public virtual Task<SensateUser> GetAsync(string key)
 		{
-			var user = await Task.Run(() => this.GetById(key));
-			return user;
+			var worker = Task.Run(() => {
+				return this._manager.Users.Where(u => u.Id == key)
+					.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).FirstOrDefault();
+			});
+
+			return worker;
 		}
 
 		public override Task CreateAsync(SensateUser obj)

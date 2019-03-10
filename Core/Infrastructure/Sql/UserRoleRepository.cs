@@ -19,13 +19,13 @@ using SensateService.Models;
 
 namespace SensateService.Infrastructure.Sql
 {
-	public class UserRoleRepository : AbstractSqlRepository<UserRole>, IUserRoleRepository
+	public class UserRoleRepository : AbstractSqlRepository<SensateRole>, IUserRoleRepository
 	{
-		private readonly DbSet<IdentityUserRole<string>> _userRoles;
+		private readonly DbSet<SensateUserRole> _userRoles;
 		private readonly IUserRepository _users;
-		private readonly RoleManager<UserRole> _roles;
+		private readonly RoleManager<SensateRole> _roles;
 
-		public UserRoleRepository(SensateSqlContext context, IUserRepository urepo, RoleManager<UserRole> roles) :
+		public UserRoleRepository(SensateSqlContext context, IUserRepository urepo, RoleManager<SensateRole> roles) :
 			base(context)
 		{
 			this._users = urepo;
@@ -35,14 +35,14 @@ namespace SensateService.Infrastructure.Sql
 
 		public void Create(string name, string description)
 		{
-			var role = new UserRole() {
+			var role = new SensateRole() {
 				Description = description,
 				Name = name
 			};
 			this.Create(role);
 		}
 
-		public override void Create(UserRole obj)
+		public override void Create(SensateRole obj)
 		{
 			var result = this._roles.CreateAsync(obj).Result;
 			if(!result.Succeeded)
@@ -51,14 +51,14 @@ namespace SensateService.Infrastructure.Sql
 
 		public async Task CreateAsync(string name, string description)
 		{
-			var role = new UserRole() {
+			var role = new SensateRole() {
 				Description = description,
 				Name = name
 			};
 			await this.CreateAsync(role).AwaitBackground();
 		}
 
-		public override async Task CreateAsync(UserRole obj)
+		public override async Task CreateAsync(SensateRole obj)
 		{
 			var result = await this._roles.CreateAsync(obj).AwaitBackground();
 			if(!result.Succeeded)
@@ -76,14 +76,14 @@ namespace SensateService.Infrastructure.Sql
 			await Task.Run(() => this.Delete(id)).AwaitBackground();
 		}
 
-		public UserRole GetById(string id)
+		public SensateRole GetById(string id)
 		{
 			return (from role in this.Data
 					where role.Id == id
 					select role).Single();
 		}
 
-		public UserRole GetByName(string name)
+		public SensateRole GetByName(string name)
 		{
 			return (from role in this.Data
 					where role.Name == name
@@ -112,7 +112,7 @@ namespace SensateService.Infrastructure.Sql
 			return roles.Select(r => this._users.Get(r.UserId)).ToList();
 		}
 
-		public void Update(string name, UserRole role)
+		public void Update(string name, SensateRole role)
 		{
 			var obj = this.GetById(name);
 
@@ -126,7 +126,7 @@ namespace SensateService.Infrastructure.Sql
 			this.Commit(obj);
 		}
 
-		public async Task UpdateAsync(string name, UserRole obj)
+		public async Task UpdateAsync(string name, SensateRole obj)
 		{
 			await Task.Run(() => {
 				this.Update(name, obj);

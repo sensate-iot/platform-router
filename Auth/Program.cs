@@ -36,7 +36,7 @@ namespace SensateService.Auth
 				try {
 					logger.LogInformation("Creating user roles..");
 					ctx = services.GetRequiredService<SensateSqlContext>();
-					var roles = services.GetRequiredService<RoleManager<UserRole>>();
+					var roles = services.GetRequiredService<RoleManager<SensateRole>>();
 					var manager = services.GetRequiredService<UserManager<SensateUser>>();
 
 					if(ctx.Roles.Any())
