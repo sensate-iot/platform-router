@@ -71,7 +71,7 @@ namespace SensateService.Infrastructure.Storage
 
 		protected bool CanInsert(IEnumerable<string> roles)
 		{
-			return roles.All(t => t != UserRole.Banned);
+			return roles.All(t => t != SensateRole.Banned);
 		}
 
 		public abstract Task StoreAsync(RawMeasurement obj, RequestMethod method);
