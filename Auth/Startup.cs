@@ -18,7 +18,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-
+using SensateService.ApiCore.Middleware;
 using Swashbuckle.AspNetCore.Swagger;
 
 using SensateService.Config;
@@ -195,6 +195,7 @@ namespace SensateService.Auth
 			}
 
 			app.UseAuthentication();
+			app.UseMiddleware<RequestLoggingMiddleware>();
 			app.UseMvc();
 		}
 	}
