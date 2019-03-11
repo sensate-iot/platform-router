@@ -63,7 +63,7 @@ namespace SensateService.Infrastructure.Storage
 				Data = datapoints,
 				Longitude = obj.Longitude,
 				Latitude = obj.Latitude,
-				CreatedAt = obj.CreatedAt ?? DateTime.Now
+				CreatedAt = obj.CreatedAt ?? DateTime.Now.ToUniversalTime()
 			};
 
 			return measurement;
@@ -71,7 +71,12 @@ namespace SensateService.Infrastructure.Storage
 
 		protected bool CanInsert(IEnumerable<string> roles)
 		{
-			return roles.All(t => t != SensateRole.Banned);
+			return roles.Contains(SensateRole.Banned);
+		}
+
+		protected bool CanInsert(SensateUser user)
+		{
+			return user.UserRoles.Any(role => role.Role.Name != SensateRole.Banned);
 		}
 
 		public abstract Task StoreAsync(RawMeasurement obj, RequestMethod method);

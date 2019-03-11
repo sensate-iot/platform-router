@@ -63,6 +63,8 @@ namespace SensateService.Init
 
 		public static IServiceCollection AddCacheStrategy(this IServiceCollection services, CacheConfig config, DatabaseConfig db)
 		{
+			services.AddMemoryCache();
+
 			if(config.Type == "Distributed") {
                 services.AddDistributedRedisCache(opts => {
 					opts.Configuration = db.Redis.Host;
@@ -71,7 +73,6 @@ namespace SensateService.Init
 
 				services.AddScoped<ICacheStrategy<string>, DistributedCacheStrategy>();
 			} else {
-				services.AddMemoryCache();
 				services.AddScoped<ICacheStrategy<string>, MemoryCacheStrategy>();
 			}
 

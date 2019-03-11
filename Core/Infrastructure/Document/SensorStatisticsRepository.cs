@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
@@ -79,7 +80,7 @@ namespace SensateService.Infrastructure.Document
 
 		public Task IncrementAsync(Sensor sensor)
 		{
-			return this.IncrementManyAsync(sensor, 1);
+			return this.IncrementManyAsync(sensor, 1, default(CancellationToken));
 		}
 
 		public async Task<SensorStatisticsEntry> CreateForAsync(Sensor sensor)
@@ -97,7 +98,7 @@ namespace SensateService.Infrastructure.Document
 			return entry;
 		}
 
-		public async Task IncrementManyAsync(Sensor sensor, int num)
+		public async Task IncrementManyAsync(Sensor sensor, int num, CancellationToken token)
 		{
 			SensorStatisticsEntry entry;
 			var update = Builders<SensorStatisticsEntry>.Update;
@@ -106,7 +107,7 @@ namespace SensateService.Infrastructure.Document
 			entry = await this.GetByDateAsync(sensor, DateTime.Now.ThisHour()).AwaitBackground() ??
 					await this.CreateForAsync(sensor).AwaitBackground();
 			updateDefinition = update.Inc(x => x.Measurements, num);
-			await this._stats.FindOneAndUpdateAsync(x => x.InternalId == entry.InternalId, updateDefinition).AwaitBackground();
+			await this._stats.FindOneAndUpdateAsync(x => x.InternalId == entry.InternalId, updateDefinition, cancellationToken: token).AwaitBackground();
 		}
 
 		#endregion

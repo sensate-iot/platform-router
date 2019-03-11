@@ -185,7 +185,7 @@ namespace SensateService.Infrastructure.Document
 		{
 			var measurements = objs.ToList();
 			var opts = new InsertManyOptions {
-				IsOrdered = false,
+				IsOrdered = true,
 				BypassDocumentValidation = true
 			};
 

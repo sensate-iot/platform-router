@@ -13,7 +13,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -35,6 +35,7 @@ namespace SensateService.Infrastructure.Storage
 		private List<MeasurementLog> _measurements;
 		private int _count;
 		private SpinLockWrapper _lock;
+		private readonly IMemoryCache cache;
 
 		private const string AuditLogRoute = "sensate/measurements/new";
 		private const int InitialListSize = 512;
@@ -43,6 +44,7 @@ namespace SensateService.Infrastructure.Storage
 			base(provider, logger)
 		{
 			this._lock = new SpinLockWrapper();
+			this.cache = provider.GetRequiredService<IMemoryCache>();
 
 			this._lock.Lock();
 			this._measurements = new List<MeasurementLog>(InitialListSize);
@@ -56,7 +58,7 @@ namespace SensateService.Infrastructure.Storage
 				Address = IPAddress.Any,
 				Method = method,
 				Route = AuditLogRoute,
-				Timestamp = DateTime.Now,
+				Timestamp = DateTime.Now.ToUniversalTime(),
 			};
 
 			return Task.Run(() => {
@@ -76,7 +78,7 @@ namespace SensateService.Infrastructure.Storage
 					Address = IPAddress.Any,
 					Method = method,
 					Route = AuditLogRoute,
-					Timestamp = DateTime.Now,
+					Timestamp = DateTime.Now.ToUniversalTime(),
 				};
 				return new MeasurementLog(measurement, log);
 			}).ToList();
@@ -89,17 +91,44 @@ namespace SensateService.Infrastructure.Storage
 			});
 		}
 
-		private static async Task<IList<SensateUser>> FetchDistinctUsers(IUserRepository repo, IEnumerable<Sensor> sensors)
-		{
-			var distinct_users = sensors.Select(sensor => sensor.Owner).Distinct();
-			var rawusers = await repo.GetRangeAsync(distinct_users).AwaitBackground();
-			return rawusers.ToList();
-		}
-
 		private static async Task<Sensor[]> FetchDistinctSensors(ISensorRepository repo, IEnumerable<string> ids)
 		{
 			var raw_sensors = await repo.GetAsync(ids).AwaitBackground();
 			return raw_sensors.ToArray();
+		}
+
+		private async Task<IDictionary<string, SensateUser>> GetUserInformation(IUserRepository users, IEnumerable<string> ids)
+		{
+			var unkowns = new List<string>();
+			var map = new Dictionary<string, SensateUser>();
+
+			foreach(var id in ids) {
+				if(!cache.TryGetValue(id, out var obj)) {
+					unkowns.Add(id);
+					continue;
+				}
+
+				if(!(obj is SensateUser user))
+					throw new KeyNotFoundException("Value is not of type SensateUser");
+
+				map[id] = user;
+			}
+
+			if(unkowns.Count <= 0)
+				return map;
+
+			var userdata = await users.GetRangeAsync(unkowns).AwaitBackground();
+
+			foreach(var user in userdata) {
+				map[user.Id] = user;
+				var opts = new MemoryCacheEntryOptions();
+
+				opts.SetSlidingExpiration(TimeSpan.FromHours(1));
+				opts.SetSize(1);
+				cache.Set(user.Id, user, opts);
+			}
+
+			return map;
 		}
 
 		private async Task<IList<ProcessedMeasurement>> ProcessMeasurementsAsync(ICollection<MeasurementLog> logs)
@@ -108,20 +137,18 @@ namespace SensateService.Infrastructure.Storage
 			IList<string> sensors_ids;
 			IDictionary<string, SensateUser> users;
 			IDictionary<string, Sensor> sensors;
-			IDictionary<string, string[]> roles;
 
 			sensors_ids = logs.Select(raw => raw.Item1.CreatedById).Distinct().ToList();
 			measurements = new List<ProcessedMeasurement>(logs.Count);
-			roles = new Dictionary<string, string[]>();
 
 			using(var scope = this.Provider.CreateScope()) {
 				var sensorsrepo = scope.ServiceProvider.GetRequiredService<ISensorRepository>();
 				var usersrepo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
 
 				var raw_sensors = await FetchDistinctSensors(sensorsrepo, sensors_ids).AwaitBackground();
-				var raw_users = await FetchDistinctUsers(usersrepo, raw_sensors).AwaitBackground();
+				var distinct_users = raw_sensors.Select(sensor => sensor.Owner).Distinct();
 
-				users = raw_users.ToDictionary(key => key.Id, user => user);
+				users = await GetUserInformation(usersrepo, distinct_users).AwaitBackground();
 				sensors = raw_sensors.ToDictionary(key => key.InternalId.ToString(), sensor => sensor);
 
 				foreach(var raw in logs) {
@@ -138,13 +165,7 @@ namespace SensateService.Infrastructure.Storage
 					user = users[sensor.Owner];
 					raw.Item2.AuthorId = user.Id;
 
-					if(!roles.TryGetValue(sensor.Owner, out var userroles)) {
-						var rawroles = await usersrepo.GetRolesAsync(user).AwaitBackground();
-						userroles = rawroles.ToArray();
-						roles[user.Id] = userroles;
-					}
-
-					if(!base.CanInsert(userroles) || measurement == null)
+					if(!base.CanInsert(user) || measurement == null)
 						continue;
 
 					processed = new ProcessedMeasurement(measurement, sensor);
@@ -153,6 +174,45 @@ namespace SensateService.Infrastructure.Storage
 			}
 
 			return measurements;
+		}
+
+		private static Task<IList<Measurement>> SortMeasurementsAsync(IEnumerable<ProcessedMeasurement> data)
+		{
+			return Task.Run(() => {
+				var measurements = data.Select(entry => entry.Measurement);
+				var sorted = measurements.OrderByDescending(measurement => measurement.CreatedAt);
+
+				return sorted.ToList() as IList<Measurement>;
+			});
+		}
+
+		private static Task<IList<AuditLog>> SortAuditLogsAsync(IEnumerable<MeasurementLog> data)
+		{
+			return Task.Run(() => {
+				var logs = data.Select(obj => obj.Item2);
+				var sorted = logs.OrderByDescending(log => log.Timestamp);
+
+				return sorted.ToList() as IList<AuditLog>;
+			});
+		}
+
+		private static async Task IncrementStatistics(ISensorStatisticsRepository stats,
+			IEnumerable<ProcessedMeasurement> data, CancellationToken token)
+		{
+			var sorted = from entry in data
+				group entry by entry.Creator
+				into g
+				select new {Sensor = g.Key, Length = g.ToList().Count};
+
+			var ary = sorted.ToArray();
+			var tasks = new Task[ary.Length];
+
+			for(var idx = 0; idx < ary.Length; idx++) {
+				var entry = ary[idx];
+				tasks[idx] = stats.IncrementManyAsync(entry.Sensor, entry.Length, token);
+			}
+
+			await Task.WhenAll(tasks).AwaitBackground();
 		}
 
 		public async Task<long> ProcessAsync()
@@ -182,8 +242,8 @@ namespace SensateService.Infrastructure.Storage
 
 				try {
 					var workers = new Task[4];
-					IList<Measurement> tmp;
-					IList<AuditLog> log_que;
+					Task<IList<AuditLog>> log_task;
+					Task<IList<Measurement>> measurements_task;
 
 					/*
 					 * Generate measurements using the raw measurements as input. Invalid
@@ -193,31 +253,16 @@ namespace SensateService.Infrastructure.Storage
 					 */
 
 					processed_que = await this.ProcessMeasurementsAsync(raw_que).AwaitBackground();
-					log_que = raw_que.Select(log => log.Item2).ToList();
-					tmp = processed_que.Select(m => m.Measurement).ToList();
+					log_task = SortAuditLogsAsync(raw_que);
+					measurements_task = SortMeasurementsAsync(processed_que);
+					await Task.WhenAll(measurements_task, log_task).AwaitBackground();
 
-					workers[0] = measurements.CreateRangeAsync(tmp, source.Token);
-					workers[1] = logs.CreateRangeAsync(log_que, source.Token);
-					workers[2] = InvokeEventHandlersAsync(this, tmp, source.Token);
-					workers[3] = Task.Run(async () => {
-						var sorted = from entry in processed_que 
-							group entry by entry.Creator
-							into g
-							select new {Sensor = g.Key, Length = g.ToList().Count};
-
-						var ary = sorted.ToArray();
-						var tasks = new Task[ary.Length];
-
-						for(var idx = 0; idx < ary.Length; idx++) {
-							var entry = ary[idx];
-							tasks[idx] = stats.IncrementManyAsync(entry.Sensor, entry.Length);
-						}
-
-						await Task.WhenAll(tasks).AwaitBackground();
-					}, source.Token);
+					workers[0] = measurements.CreateRangeAsync(measurements_task.Result, source.Token);
+					workers[1] = logs.CreateRangeAsync(log_task.Result, source.Token);
+					workers[2] = InvokeEventHandlersAsync(this, measurements_task.Result, source.Token);
+					workers[3] = IncrementStatistics(stats, processed_que, source.Token);
 
 					await Task.WhenAll(workers).AwaitBackground();
-					tmp.Clear();
 				} catch(Exception ex) {
 					source.Cancel(false);
 
