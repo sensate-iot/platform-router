@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq.Expressions;
 using System.Security.Claims;
 
 using Microsoft.IdentityModel.Tokens;
@@ -49,6 +50,11 @@ namespace SensateService.Infrastructure.Sql
 			}
 
 			await base.CreateAsync(obj);
+		}
+
+		public Task<long> CountAsync(Expression<Func<UserToken, bool>> expr)
+		{
+			return Task.Run(() => this._sqlContext.UserTokens.LongCount(expr));
 		}
 
 

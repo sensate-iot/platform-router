@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using SensateService.Models;
 
@@ -16,6 +17,8 @@ namespace SensateService.Infrastructure.Repositories
 	{
 		void Create(UserToken token);
 		Task CreateAsync(UserToken token);
+
+		Task<long> CountAsync(Expression<Func<UserToken, bool>> expr);
 
 		IEnumerable<UserToken> GetByUser(SensateUser user);
 		UserToken GetById(SensateUser user, string value);
