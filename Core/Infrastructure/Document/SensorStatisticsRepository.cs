@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -104,7 +105,9 @@ namespace SensateService.Infrastructure.Document
 			var update = Builders<SensorStatisticsEntry>.Update;
 			UpdateDefinition<SensorStatisticsEntry> updateDefinition;
 
-			entry = await this.GetByDateAsync(sensor, DateTime.Now.ThisHour()).AwaitBackground() ??
+			var entries = await this.GetAfterAsync(sensor, DateTime.Now.ThisHour()).AwaitBackground();
+
+			entry = entries.FirstOrDefault() ??
 					await this.CreateForAsync(sensor).AwaitBackground();
 			updateDefinition = update.Inc(x => x.Measurements, num);
 			await this._stats.FindOneAndUpdateAsync(x => x.InternalId == entry.InternalId, updateDefinition, cancellationToken: token).AwaitBackground();
@@ -120,7 +123,7 @@ namespace SensateService.Infrastructure.Document
 			var filterBuilder = Builders<SensorStatisticsEntry>.Filter;
 			var date = dt.ThisHour();
 
-			filter = filterBuilder.Eq("SensorId", sensor.InternalId) & filterBuilder.Gte("Date", date);
+			filter = filterBuilder.Eq("SensorId", sensor.InternalId) & filterBuilder.Eq("Date", date);
 			var result = await this._stats.FindAsync(filter).AwaitBackground();
 
 			if(result == null)
