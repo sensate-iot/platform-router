@@ -20,7 +20,6 @@ using MongoDB.Bson;
 using SensateService.Models;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Helpers;
-using SensateService.Infrastructure.Events;
 
 namespace SensateService.Infrastructure.Document
 {
