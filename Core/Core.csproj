@@ -9,6 +9,7 @@
     <StartupObject />
     <AssemblyName>SensateService.Core</AssemblyName>
     <Version>0.0.3</Version>
+    <Company>Sensate IoT</Company>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
