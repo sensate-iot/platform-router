@@ -1,0 +1,91 @@
+﻿{
+  "Logging": {
+    "IncludeScopes": false,
+    "Debug": {
+      "LogLevel": {
+        "Default": "Warning",
+        "Microsoft": "Warning",
+        "System": "Warning"
+      }
+    },
+    "Console": {
+      "LogLevel": {
+        "Default": "Warning",
+        "Microsoft": "Warning",
+        "System": "Warning"
+      }
+    }
+  },
+
+  "InstanceName": "kerby",
+
+  "Cache" : {
+    "Enabled": true,
+    "Type": "Distributed",
+    "Workers": 4,
+    "Interval": 1000
+  },
+
+  "Database": {
+    "MongoDB": {
+      "DatabaseName": "Sensate",
+      "ConnectionString": "mongodb://sensate:mongopass@192.168.127.128:27017/Sensate",
+      "MaxConnections": 300
+    },
+    "PgSQL": {
+      "ConnectionString": "User ID = postgres;Password=DefaultPassword;Server=192.168.127.128;Port=5432;Database=Sensate"
+    },
+    "Redis": {
+      "Host": "192.168.127.128",
+      "InstanceName": "Sensate"
+    }
+  },
+
+  "PublicUrl": "http://localhost:5000", 
+
+  "Authentication" : {
+    "JwtRefreshExpireMinutes": 43200,
+    "JwtKey": "<key>",
+    "JwtIssuer": "http://localhost:5000/",
+    "JwtExpireMinutes": 43200,
+	"Scheme": "https"
+  },
+
+  "Mqtt" : {
+    "Username": "sensate",
+    "Password": "MqttPassword",
+    "Ssl": "false",
+    "Port": 1883,
+    "Host": "host.mqtt.net",
+    "ShareTopic": "$share/sensate/sensate/measurements",
+    "BulkShareTopic": "$share/sensate/sensate/measurements/bulk",
+    "RealTimeShareTopic": "$share/sensate/sensate/measurements/rt",
+    "InternalMeasurementTopic": "sensate/internal/measurements",
+    "BulkInternalMeasurementTopic": "sensate/internal/measurements/bulk"
+  },
+
+  "Mail": {
+    "Provider": "SendGrid",
+    "SendGrid": {
+      "Username": "u-name",
+      "Key": "<sendgrid-key>"
+    },
+    "Smtp": {
+      "Ssl": true,
+      "Port": 587,
+      "Host": "mail.example.com",
+      "Username": "root@mail.com",
+      "Password": "SomePassword"
+    }
+  },
+
+  "Text" : {
+    "Provider": "Twilio",
+    "AlphaCode": "Sensate IoT",
+    "Twilio": {
+      "AccountSid": "<sid>",
+      "AuthToken": "<auth token>",
+      "PhoneSid": "<name>" 
+    } 
+  } 
+}
