@@ -72,7 +72,7 @@ namespace SensateService.ApiCore.Middleware
 
 				this._logger.LogInformation($"{ctx.Request.Method}: {ctx.Request.Path} {Environment.NewLine}" +
 				                            $"Result: HTTP {ctx.Response?.StatusCode} {Environment.NewLine}"  +
-				                            $"Client IP: {ctx.Request.HttpContext.Connection.RemoteIpAddress.ToString()}");
+				                            $"Client IP: {ctx.Request.HttpContext.Connection.RemoteIpAddress}");
 
 				if(ctx.User != null)
 					user = await users.GetByClaimsPrincipleAsync(ctx.User).AwaitBackground();
