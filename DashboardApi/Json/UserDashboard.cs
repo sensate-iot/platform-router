@@ -26,15 +26,15 @@ namespace SensateService.DashboardApi.Json
 		public JObject ToJson()
 		{
 			JObject json = new JObject {
-				["MeasurementsToday"] = JToken.FromObject(MeasurementsToday.Data) as JArray,
-				["MeasurementsCumulative"] = JToken.FromObject(MeasurementsCumulative.Data) as JArray,
-				["MeasurementsPerDayCumulative"] = JToken.FromObject(MeasurementsPerDayCumulative.Data) as JArray,
-				["ApiCallsLastWeek"] = JToken.FromObject(ApiCallsLastWeek.Data) as JArray,
+				["measurementsToday"] = JToken.FromObject(MeasurementsToday.Data) as JArray,
+				["measurementsCumulative"] = JToken.FromObject(MeasurementsCumulative.Data) as JArray,
+				["measurementsPerDayCumulative"] = JToken.FromObject(MeasurementsPerDayCumulative.Data) as JArray,
+				["apiCallsLastWeek"] = JToken.FromObject(ApiCallsLastWeek.Data) as JArray,
 
-				["SensorCount"] = SensorCount,
-				["MeasurementsTodayCount"] = MeasurementsTodayCount,
-				["ApiCallCount"] = ApiCallCount,
-				["SecurityTokenCount"] = SecurityTokenCount
+				["sensorCount"] = SensorCount,
+				["measurementsTodayCount"] = MeasurementsTodayCount,
+				["apiCallCount"] = ApiCallCount,
+				["securityTokenCount"] = SecurityTokenCount
 			};
 
 			return json;
