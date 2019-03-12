@@ -7,8 +7,8 @@
  */
 
 using System;
-using System.Net;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,15 +23,13 @@ namespace SensateService.ApiCore.Controllers
 	public abstract class AbstractController : Controller
 	{
 		protected readonly IUserRepository _users;
-		protected readonly IAuditLogRepository _audit;
 
 		protected SensateUser CurrentUser { get; }
 
-		protected AbstractController(IUserRepository users, IAuditLogRepository audit, IHttpContextAccessor ctx)
+		protected AbstractController(IUserRepository users, IHttpContextAccessor ctx)
 		{
 			var uid = ctx.HttpContext.User;
 			this._users = users;
-			this._audit = audit;
 			this.CurrentUser = null;
 
 			if(uid != null)
@@ -77,20 +75,6 @@ namespace SensateService.ApiCore.Controllers
 			return new NotFoundObjectResult(status);
 		}
 
-		protected string GetCurrentRoute()
-		{
-			if(!this.RouteData.Values.TryGetValue("controller", out object controller))
-				return null;
-
-			return !this.RouteData.Values.TryGetValue("action", out object action) ? null :
-				string.Format("/{0}#{1}", controller, action);
-		}
-
-		protected IPAddress GetRemoteAddress()
-		{
-			return this.HttpContext.Connection.RemoteIpAddress;
-		}
-
 		protected bool IsValidUri(string uri)
 		{
 			bool result;
@@ -98,14 +82,6 @@ namespace SensateService.ApiCore.Controllers
 			result = Uri.TryCreate(uri, UriKind.Absolute, out Uri resulturi) &&
 					 (resulturi.Scheme == Uri.UriSchemeHttp || resulturi.Scheme == Uri.UriSchemeHttps);
 			return result;
-		}
-
-		protected async Task Log(RequestMethod method, SensateUser user = null)
-		{
-			await this._audit.CreateAsync(
-				this.GetCurrentRoute(), method,
-				this.GetRemoteAddress(), user
-			).AwaitBackground();
 		}
 	}
 }

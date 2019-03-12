@@ -60,14 +60,13 @@ namespace SensateService.Auth.Controllers
 			IPasswordResetTokenRepository tokens,
 			IChangeEmailTokenRepository emailTokens,
 			IChangePhoneNumberTokenRepository phoneTokens,
-			IAuditLogRepository auditLogs,
 			IUserTokenRepository tokenRepository,
 			ITextSendService text,
 			IOptions<TextServiceSettings> text_opts,
 			IHostingEnvironment env,
 			IHttpContextAccessor ctx,
 			ILogger<AccountsController> logger
-		) : base(repo, auditLogs, ctx)
+		) : base(repo, ctx)
 		{
 			this._logger = logger;
 			this._manager = userManager;
@@ -93,10 +92,8 @@ namespace SensateService.Auth.Controllers
 			EmailBody mail;
 
 			user = await this._users.GetByEmailAsync(model.Email);
-			var logTask = this.Log(RequestMethod.HttpPost, user);
 
 			if(user == null || !user.EmailConfirmed) {
-				await logTask.AwaitBackground();
 				return NotFound();
 			}
 
@@ -126,7 +123,6 @@ namespace SensateService.Auth.Controllers
 
 			user = await this._users.GetByEmailAsync(model.Email).AwaitBackground();
 			token = this._passwd_tokens.GetById(model.Token);
-			await this.Log(RequestMethod.HttpPost, user);
 
 			if(user == null)
 				return this.NotFound();
@@ -155,10 +151,8 @@ namespace SensateService.Auth.Controllers
 			bool unconfirmed;
 
 			user = await this.GetCurrentUserAsync().AwaitBackground();
-			var worker = this.Log(RequestMethod.HttpGet, user);
 
 			if(user == null) {
-				await worker.AwaitBackground();
 				return this.Forbid();
 			}
 
@@ -175,7 +169,6 @@ namespace SensateService.Auth.Controllers
 				status.Message = "false";
 			}
 
-			await worker.AwaitBackground();
 			return new OkObjectResult(status);
 		}
 
@@ -189,7 +182,6 @@ namespace SensateService.Auth.Controllers
 			IEnumerable<UserToken> tokens;
 
 			if(String.IsNullOrEmpty(changeEmail.Token)) {
-				await this.Log(RequestMethod.HttpPost);
 				return BadRequest();
 			}
 
@@ -198,7 +190,6 @@ namespace SensateService.Auth.Controllers
 			if(user == null)
 				return this.NotFound();
 
-			await this.Log(RequestMethod.HttpPost, user).AwaitBackground();
 			token = this._email_tokens.GetById(changeEmail.Token);
 			tokens = this._tokens.GetByUser(user);
 
@@ -232,12 +223,10 @@ namespace SensateService.Auth.Controllers
 			EmailBody mail;
 
 			if(string.IsNullOrEmpty(changeEmailModel.NewEmail)) {
-				await this.Log(RequestMethod.HttpPost).AwaitBackground();
 				return BadRequest();
 			}
 
 			user = await this.GetCurrentUserAsync().AwaitBackground();
-			await this.Log(RequestMethod.HttpPost, user).AwaitBackground();
 
 			resetToken = await this._manager.GenerateChangeEmailTokenAsync(user, changeEmailModel.NewEmail).AwaitBackground();
 			token = this._email_tokens.Create(resetToken, changeEmailModel.NewEmail);
@@ -334,8 +323,6 @@ namespace SensateService.Auth.Controllers
 				UnconfirmedPhoneNumber = register.PhoneNumber
 			};
 
-			await this.Log(RequestMethod.HttpPost).AwaitBackground();
-
 			if(!this.IsValidUri(register.ForwardTo))
 				return this.InvalidInputResult("Invalid forward URL!");
 
@@ -382,7 +369,6 @@ namespace SensateService.Auth.Controllers
 			User viewuser;
 			var user = await this._users.GetAsync(uid);
 
-			await this.Log(RequestMethod.HttpGet, user);
 			if(user == null)
 				return Forbid();
 
@@ -408,8 +394,6 @@ namespace SensateService.Auth.Controllers
 			User viewuser;
 			var user = await this.GetCurrentUserAsync().AwaitBackground();
 
-			await this.Log(RequestMethod.HttpGet, user);
-
 			viewuser = new User {
 				Email = user.Email,
 				FirstName = user.FirstName,
@@ -433,8 +417,6 @@ namespace SensateService.Auth.Controllers
 			string url, body;
 
 			url = target != null ? WebUtility.UrlDecode(target) : null;
-
-			await this.Log(RequestMethod.HttpGet);
 
 			if(id == null || code == null) {
 				return BadRequest();
@@ -475,7 +457,6 @@ namespace SensateService.Auth.Controllers
 			ChangePhoneNumberToken phonetoken;
 
 			user = this.CurrentUser;
-			await this.Log(RequestMethod.HttpGet, user).AwaitBackground();
 
 			if(user.UnconfirmedPhoneNumber == null) {
 				return this.InvalidInputResult("No confirmable phone number found!");
@@ -579,8 +560,6 @@ namespace SensateService.Auth.Controllers
 
 			if(user == null)
 				return BadRequest();
-
-			await this.Log(RequestMethod.HttpPatch, user);
 
 			if(userUpdate.Password != null) {
 				if(userUpdate.CurrentPassword == null)

@@ -39,9 +39,8 @@ namespace SensateService.Auth.Controllers
 			IOptions<UserAccountSettings> options,
 			IUserRepository users,
 			SignInManager<SensateUser> signInManager,
-			IAuditLogRepository auditLog,
 			IHttpContextAccessor ctx
-		) : base(users, auditLog, ctx)
+		) : base(users, ctx)
 		{
 			this._tokens = tokens;
 			this._signin_manager = signInManager;
@@ -80,12 +79,10 @@ namespace SensateService.Auth.Controllers
 			signInResult = await this._signin_manager.PasswordSignInAsync(user, login.Password, false, false);
 
 			if(!signInResult.Succeeded) {
-				await this.Log(RequestMethod.HttpPost).AwaitBackground();
 				return new UnauthorizedResult();
 			}
 
 			token = this.CreateUserTokenEntry(user);
-			await this.Log(RequestMethod.HttpPost, user).AwaitBackground();
 			await this._tokens.CreateAsync(token);
 
 			var roles = this._users.GetRoles(user);
@@ -115,22 +112,18 @@ namespace SensateService.Auth.Controllers
 
 			banned = await this._users.IsBanned(user);
 			token = this._tokens.GetById(user, login.RefreshToken);
-			var logTask = this.Log(RequestMethod.HttpPost, user);
 
 			if(token == null || !token.Valid || banned) {
-				await logTask.AwaitBackground();
 				return Forbid();
 			}
 
 			if(token.ExpiresAt < DateTime.Now) {
-				await logTask.AwaitBackground();
 				await this._tokens.InvalidateTokenAsync(token).AwaitBackground();
 				return Forbid();
 			}
 
 			reply = new TokenRequestReply();
 			var newToken = this.CreateUserTokenEntry(user);
-            await logTask.AwaitBackground();
 
 			var roles = await this._users.GetRolesAsync(user).AwaitBackground();
 			await this._tokens.CreateAsync(newToken).AwaitBackground();
@@ -160,7 +153,6 @@ namespace SensateService.Auth.Controllers
 				return InvalidInputResult("Token not found!");
 
 			authToken = this._tokens.GetById(user, token);
-			await this.Log(RequestMethod.HttpDelete, user).AwaitBackground();
 
 			if(authToken == null)
 				return this.NotFoundInputResult("Token not found!");
@@ -181,7 +173,6 @@ namespace SensateService.Auth.Controllers
 			var user = await this.GetCurrentUserAsync().AwaitBackground();
 
 			tokens = this._tokens.GetByUser(user);
-			await this.Log(RequestMethod.HttpDelete, user).AwaitBackground();
 			await this._tokens.InvalidateManyAsync(tokens);
 
 			return Ok();

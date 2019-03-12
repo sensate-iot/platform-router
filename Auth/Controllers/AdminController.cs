@@ -34,8 +34,8 @@ namespace SensateService.Auth.Controllers
 		private readonly ISensorStatisticsRepository _stats;
 		private readonly ISensorRepository _sensors;
 
-		public AdminController(IUserRepository users, IAuditLogRepository audit, IHttpContextAccessor ctx,
-			ISensorStatisticsRepository stats, ISensorRepository sensors) : base(users, audit, ctx)
+		public AdminController(IUserRepository users, IHttpContextAccessor ctx,
+			ISensorStatisticsRepository stats, ISensorRepository sensors) : base(users , ctx)
 		{
 			this._stats = stats;
 			this._sensors = sensors;
@@ -48,7 +48,6 @@ namespace SensateService.Auth.Controllers
 		{
 			List<User> users;
 			var result = await this._users.FindByEmailAsync(query.Query).AwaitBackground();
-			await this.Log(RequestMethod.HttpPost, this.CurrentUser);
 
 			users =  result.Select(user => {
 				var roles = this._users.GetRoles(user);
@@ -75,7 +74,6 @@ namespace SensateService.Auth.Controllers
 
 			var userWorker = this._users.GetMostRecentAsync(10);
 			var query = await userWorker.AwaitBackground();
-			await this.Log(RequestMethod.HttpPost, this.CurrentUser).AwaitBackground();
 
 			users = query.Select(user => new User {
 				Email = user.Email,
@@ -96,8 +94,6 @@ namespace SensateService.Auth.Controllers
 		{
 			AdminDashboard db;
 			long measurementCount;
-
-			await this.Log(RequestMethod.HttpPost, this.CurrentUser).AwaitBackground();
 
 			var regworker = this.GetRegistrations();
 			var usercount = this._users.CountAsync();

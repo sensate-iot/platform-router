@@ -37,12 +37,11 @@ namespace SensateService.Auth.Controllers
 		private readonly IUserTokenRepository _tokens;
 
 		public DashboardController(IUserRepository users,
-			IAuditLogRepository audit,
 			ISensorStatisticsRepository stats,
 			ISensorRepository sensors,
 			IUserTokenRepository tokens,
 			IAuditLogRepository logs,
-			IHttpContextAccessor ctx) : base(users, audit, ctx)
+			IHttpContextAccessor ctx) : base(users, ctx)
 		{
 			this._stats = stats;
 			this._sensors = sensors;
