@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Auth", "Auth\Auth.csproj", "{C41C96C6-18AD-4801-8DFF-D3BE09522517}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthApi", "AuthApi\AuthApi.csproj", "{C41C96C6-18AD-4801-8DFF-D3BE09522517}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{C9A2C1FE-9179-45B9-ABDE-3336DD80A60B}"
 EndProject
