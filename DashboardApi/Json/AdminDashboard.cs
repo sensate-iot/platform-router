@@ -9,7 +9,7 @@ using System;
 using Newtonsoft.Json.Linq;
 using SensateService.Models.Json.Out;
 
-namespace SensateService.AuthApi.Json
+namespace SensateService.DashboardApi.Json
 {
 	public class AdminDashboard
 	{
