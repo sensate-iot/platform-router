@@ -150,7 +150,7 @@ namespace SensateService.DashboardApi
 
 			app.UseSwagger();
 			app.UseSwaggerUI(c => {
-				c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sensate API - Version 1");
+				c.SwaggerEndpoint("/swagger/swagger.json", "Sensate API - Version 1");
 			});
 
 			if (env.IsDevelopment()) {
