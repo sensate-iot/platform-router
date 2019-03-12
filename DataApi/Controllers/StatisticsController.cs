@@ -15,9 +15,11 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
+using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
+using SensateService.Models.Json.Out;
 
 namespace SensateService.DataApi.Controllers
 {
@@ -37,6 +39,7 @@ namespace SensateService.DataApi.Controllers
 		}
 
 		[HttpGet]
+		[ActionName("QueryAllStats")]
 		public async Task<IActionResult> Index()
 		{
 			Task<IEnumerable<SensorStatisticsEntry>>[] workers;
@@ -62,6 +65,176 @@ namespace SensateService.DataApi.Controllers
 			return this.Ok(jobj);
 		}
 
+		[HttpGet("{sensorid}/stats")]
+		[ActionName("QueryStatsByDate")]
+		public async Task<IActionResult> StatisticsBySensor(string sensorid, [FromQuery] DateTime start, [FromQuery] DateTime end)
+		{
+			var status = new Status {ErrorCode = ReplyCode.BadInput, Message = "Invalid request!"};
+
+			if(string.IsNullOrEmpty(sensorid))
+				return this.BadRequest(status);
+
+			var sensor = await this._sensors.GetAsync(sensorid).AwaitBackground();
+
+			if(sensor == null)
+				return this.BadRequest(status);
+
+			if(sensor.Owner != this.CurrentUser.Id)
+				return this.Forbid();
+
+			if(end == DateTime.MinValue)
+				end = DateTime.Now;
+
+			var data = await this._stats.GetBetweenAsync(sensor, start, end).AwaitBackground();
+			return this.Ok(this.Flatten(data));
+		}
+
+		private const  int DaysPerWeek = 7;
+
+		[HttpGet("cumulative/daily")]
+		public async Task<IActionResult> CumulativePerDay([FromQuery] DateTime start, [FromQuery] DateTime end)
+		{
+			var jobj = new JArray();
+			var statistics = await this.GetStatsFor(this.CurrentUser, start, end).AwaitBackground();
+			var entries = statistics.GroupBy(entry => entry.Date)
+				.Select(grp => new {DayOfWeek = (int) grp.Key.DayOfWeek, Count = AccumulateStatisticsEntries(grp.AsEnumerable())}).ToList();
+
+			for(var idx = 0; idx < DaysPerWeek; idx++) {
+				var entry = entries.Where(e => e.DayOfWeek == idx).ToList();
+				var count = entry.Aggregate(0L, (current, value) => current + value.Count);
+
+				jobj.Add(JToken.FromObject(new {
+					dayOfTheWeek = idx,
+					measurements = count
+				}));
+			}
+
+			return this.Ok(jobj);
+		}
+
+		[HttpGet("{sensorid}/cumulative/daily")]
+		public async Task<IActionResult> CumulativePerDay(string sensorid, [FromQuery] DateTime start, [FromQuery] DateTime end)
+		{
+			var status = new Status {ErrorCode = ReplyCode.BadInput, Message = "Invalid request!"};
+			var jobj = new JArray();
+
+			if(string.IsNullOrEmpty(sensorid))
+				return this.BadRequest(status);
+
+			var sensor = await this._sensors.GetAsync(sensorid).AwaitBackground();
+
+			if(sensor == null)
+				return this.BadRequest(status);
+
+			if(sensor.Owner != this.CurrentUser.Id)
+				return this.Forbid();
+
+			if(end == DateTime.MinValue)
+				end = DateTime.Now;
+
+			var statistics = await this._stats.GetBetweenAsync(sensor, start, end).AwaitBackground();
+			var entries = statistics.GroupBy(entry => entry.Date)
+				.Select(grp => new {DayOfWeek = (int) grp.Key.DayOfWeek, Count = AccumulateStatisticsEntries(grp.AsEnumerable())}).ToList();
+
+			for(var idx = 0; idx < DaysPerWeek; idx++) {
+				var entry = entries.Where(e => e.DayOfWeek == idx).ToList();
+				var count = entry.Aggregate(0L, (current, value) => current + value.Count);
+
+				jobj.Add(JToken.FromObject(new {
+					dayOfTheWeek = idx,
+					measurements = count
+				}));
+			}
+
+			return this.Ok(jobj);
+		}
+
+		[HttpGet("cumulative")]
+		public async Task<IActionResult> Cumulative([FromQuery] DateTime start, [FromQuery] DateTime end)
+		{
+			var statistics = await this.GetStatsFor(this.CurrentUser, start, end).AwaitBackground();
+			long counter = 0;
+			IDictionary<DateTime, long> totals = new Dictionary<DateTime, long>();
+
+			var grouped = statistics.GroupBy(entry => entry.Date).Select(grp => new {
+				Timestamp = grp.Key,
+				Count = grp.AsEnumerable().Aggregate(0L, (current, entry) => current + entry.Measurements)
+			}).ToList();
+
+			foreach(var entry in grouped) {
+				counter += entry.Count;
+				totals[entry.Timestamp] = counter;
+			}
+
+			return this.Ok(totals.Select(kvp => new {
+				Timestamp = kvp.Key,
+				Measurements = kvp.Value
+			}));
+		}
+
+		[HttpGet("{sensorid}/cumulative")]
+		public async Task<IActionResult> Cumulative(string sensorid, [FromQuery] DateTime start, [FromQuery] DateTime end)
+		{
+			long counter = 0;
+			IDictionary<DateTime, long> totals = new Dictionary<DateTime, long>();
+			var status = new Status {ErrorCode = ReplyCode.BadInput, Message = "Invalid request!"};
+
+			if(string.IsNullOrEmpty(sensorid))
+				return this.BadRequest(status);
+
+			var sensor = await this._sensors.GetAsync(sensorid).AwaitBackground();
+
+			if(sensor == null)
+				return this.BadRequest(status);
+
+			if(sensor.Owner != this.CurrentUser.Id)
+				return this.Forbid();
+
+			if(end == DateTime.MinValue)
+				end = DateTime.Now;
+
+			var statistics = await this._stats.GetBetweenAsync(sensor, start, end).AwaitBackground();
+
+			var grouped = statistics.GroupBy(entry => entry.Date).Select(grp => new {
+				Timestamp = grp.Key,
+				Count = grp.AsEnumerable().Aggregate(0L, (current, entry) => current + entry.Measurements)
+			}).ToList();
+
+			foreach(var entry in grouped) {
+				counter += entry.Count;
+				totals[entry.Timestamp] = counter;
+			}
+
+			return this.Ok(totals.Select(kvp => new {
+				Timestamp = kvp.Key,
+				Measurements = kvp.Value
+			}));
+		}
+
+		private async Task<IEnumerable<SensorStatisticsEntry>> GetStatsFor(SensateUser user, DateTime start, DateTime end)
+		{
+			var raw = await this._sensors.GetAsync(user).AwaitBackground();
+			var sensors = raw.ToList();
+			List<SensorStatisticsEntry> rv;
+
+			if(sensors.Count <= 0)
+				return null;
+
+			var tasks = new Task<IEnumerable<SensorStatisticsEntry>>[sensors.Count];
+			for(var i = 0; i < sensors.Count; i++) {
+				tasks[i] = this._stats.GetBetweenAsync(sensors[i], start, end);
+			}
+
+			var results = await Task.WhenAll(tasks).AwaitBackground();
+			rv = new List<SensorStatisticsEntry>();
+
+			foreach(var entry in results) {
+				rv.AddRange(entry);
+			}
+
+			return rv;
+		}
+
 		private IEnumerable<SensorStatisticsEntry> Flatten(IEnumerable<SensorStatisticsEntry> data)
 		{
 			var sorted = data.GroupBy(entry => entry.Date).Select(grp => grp.AsEnumerable());
@@ -83,6 +256,11 @@ namespace SensateService.DataApi.Controllers
 			}
 
 			return stats;
+		}
+
+		private static long AccumulateStatisticsEntries(IEnumerable<SensorStatisticsEntry> entries)
+		{
+			return entries.Aggregate(0L, (current, entry) => current + entry.Measurements);
 		}
 	}
 }
