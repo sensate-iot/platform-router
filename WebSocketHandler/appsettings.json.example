@@ -31,8 +31,8 @@
   "Cache" : {
     "Enabled": true,
     "Type": "Distributed",
-    "Interval": 1500, 
-    "Workers": 4 
+    "Interval": 1000,
+    "Workers": 4
   },
 
   "Database" : {

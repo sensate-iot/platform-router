@@ -23,7 +23,7 @@
     "Enabled": true,
     "Type": "Distributed",
     "Workers": 4,
-    "Interval": 2000 
+    "Interval": 1000
   },
 
   "Database": {
