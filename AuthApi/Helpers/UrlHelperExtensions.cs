@@ -7,10 +7,9 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Mvc;
+using SensateService.AuthApi.Controllers;
 
-using SensateService.Auth.Controllers;
-
-namespace SensateService.Auth.Helpers
+namespace SensateService.AuthApi.Helpers
 {
     public static class UrlHelperExtensions
     {

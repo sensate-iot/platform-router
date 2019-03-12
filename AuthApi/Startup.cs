@@ -8,7 +8,6 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -19,8 +18,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using SensateService.ApiCore.Middleware;
-using Swashbuckle.AspNetCore.Swagger;
-
 using SensateService.Config;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
@@ -28,9 +25,9 @@ using SensateService.Models;
 using SensateService.Services;
 using SensateService.Services.Adapters;
 using SensateService.Services.Settings;
+using Swashbuckle.AspNetCore.Swagger;
 
-
-namespace SensateService.Auth
+namespace SensateService.AuthApi
 {
 	public class Startup
 	{

@@ -12,10 +12,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
-
 using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
@@ -24,7 +22,7 @@ using SensateService.Models;
 using SensateService.Models.Json.In;
 using SensateService.Models.Json.Out;
 
-namespace SensateService.Auth.Controllers
+namespace SensateService.AuthApi.Controllers
 {
 	[Produces("application/json")]
 	[Route("[controller]")]

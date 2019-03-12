@@ -11,7 +11,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -19,10 +18,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-
-using SensateService.Auth.Helpers;
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
+using SensateService.AuthApi.Helpers;
 using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
@@ -33,7 +31,7 @@ using SensateService.Models.Json.Out;
 using SensateService.Services;
 using SensateService.Services.Settings;
 
-namespace SensateService.Auth.Controllers
+namespace SensateService.AuthApi.Controllers
 {
 	[Produces("application/json")]
 	[Route("[controller]")]

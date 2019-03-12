@@ -9,20 +9,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
-using SensateService.Auth.Json;
+using SensateService.AuthApi.Json;
 using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Models.Json.Out;
 
-namespace SensateService.Auth.Controllers
+namespace SensateService.AuthApi.Controllers
 {
 	[NormalUser]
 	[Produces("application/json")]

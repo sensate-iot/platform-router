@@ -6,11 +6,10 @@
  */
 
 using System;
-
 using Newtonsoft.Json.Linq;
 using SensateService.Models.Json.Out;
 
-namespace SensateService.Auth.Json
+namespace SensateService.AuthApi.Json
 {
 	public class UserDashboard
 	{

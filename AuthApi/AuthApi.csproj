@@ -6,8 +6,8 @@
     <Copyright>Michel Megens &lt;dev@bietje.net&gt;</Copyright>
     <Version>0.0.3</Version>
     <ServerGarbageCollection>true</ServerGarbageCollection>
-    <RootNamespace>SensateService.Auth</RootNamespace>
-    <AssemblyName>SensateService.Auth</AssemblyName>
+    <RootNamespace>SensateService.AuthApi</RootNamespace>
+    <AssemblyName>SensateService.AuthApi</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
