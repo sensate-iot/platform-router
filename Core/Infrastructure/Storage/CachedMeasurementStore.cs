@@ -123,7 +123,7 @@ namespace SensateService.Infrastructure.Storage
 				map[user.Id] = user;
 				var opts = new MemoryCacheEntryOptions();
 
-				opts.SetSlidingExpiration(TimeSpan.FromHours(1));
+				opts.SetAbsoluteExpiration(TimeSpan.FromHours(1));
 				opts.SetSize(1);
 				cache.Set(user.Id, user, opts);
 			}
