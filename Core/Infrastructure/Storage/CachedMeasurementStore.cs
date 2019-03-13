@@ -165,7 +165,7 @@ namespace SensateService.Infrastructure.Storage
 					user = users[sensor.Owner];
 					raw.Item2.AuthorId = user.Id;
 
-					if(!base.CanInsert(user) || measurement == null)
+					if(!base.CanInsert(user) || !base.InsertAllowed(user, raw.Item1.CreatedBySecret) || measurement == null)
 						continue;
 
 					processed = new ProcessedMeasurement(measurement, sensor);

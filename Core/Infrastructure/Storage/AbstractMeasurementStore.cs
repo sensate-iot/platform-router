@@ -79,6 +79,16 @@ namespace SensateService.Infrastructure.Storage
 			return user.UserRoles.Any(role => role.Role.Name != SensateRole.Banned);
 		}
 
+		protected bool InsertAllowed(SensateUser user, string key)
+		{
+			var apikey = user.ApiKeys.FirstOrDefault(k => k.ApiKey == key);
+
+			if(apikey == null)
+				return false;
+
+			return !apikey.Revoked && apikey.Type == ApiKeyType.SensorKey;
+		}
+
 		public abstract Task StoreAsync(RawMeasurement obj, RequestMethod method);
 	}
 }
