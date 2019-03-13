@@ -241,7 +241,7 @@ namespace SensateService.Infrastructure.Storage
 				var source = new CancellationTokenSource();
 
 				try {
-					var workers = new Task[4];
+					var tasks = new Task[4];
 					Task<IList<AuditLog>> log_task;
 					Task<IList<Measurement>> measurements_task;
 
@@ -257,12 +257,16 @@ namespace SensateService.Infrastructure.Storage
 					measurements_task = SortMeasurementsAsync(processed_que);
 					await Task.WhenAll(measurements_task, log_task).AwaitBackground();
 
-					workers[0] = measurements.CreateRangeAsync(measurements_task.Result, source.Token);
-					workers[1] = logs.CreateRangeAsync(log_task.Result, source.Token);
-					workers[2] = InvokeEventHandlersAsync(this, measurements_task.Result, source.Token);
-					workers[3] = IncrementStatistics(stats, processed_que, source.Token);
+					tasks.Populate(Task.CompletedTask);
+					tasks[0] = logs.CreateRangeAsync(log_task.Result, source.Token);
 
-					await Task.WhenAll(workers).AwaitBackground();
+					if(measurements_task.Result.Count > 0) {
+						tasks[1] = measurements.CreateRangeAsync(measurements_task.Result, source.Token);
+						tasks[2] = InvokeEventHandlersAsync(this, measurements_task.Result, source.Token);
+						tasks[3] = IncrementStatistics(stats, processed_que, source.Token);
+					}
+
+					await Task.WhenAll(tasks).AwaitBackground();
 				} catch(Exception ex) {
 					source.Cancel(false);
 
