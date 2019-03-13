@@ -21,6 +21,7 @@ namespace SensateService.Infrastructure.Sql
 		public DbSet<ChangeEmailToken> ChangeEmailTokens { get; set; }
 		public new DbSet<UserToken> UserTokens { get; set; }
 		public DbSet<ChangePhoneNumberToken> ChangePhoneNumberTokens { get; set; }
+		public DbSet<SensateApiKey> ApiKeys { get; set; }
 
 		public SensateSqlContext(DbContextOptions<SensateSqlContext> options) :
 			base(options)
@@ -42,6 +43,13 @@ namespace SensateService.Infrastructure.Sql
 				.HasName("AlternateKey_UserToken");
 			builder.Entity<ChangePhoneNumberToken>().HasKey(k => new {
 				k.IdentityToken, k.PhoneNumber
+			});
+
+			builder.Entity<SensateApiKey>(key => {
+				key.HasIndex(u => u.ApiKey).IsUnique();
+				key.HasOne(k => k.User).WithMany(user => user.ApiKeys)
+					.HasForeignKey(k => k.UserId)
+					.IsRequired();
 			});
 
 			builder.Entity<SensateUserRole>(userrole => {

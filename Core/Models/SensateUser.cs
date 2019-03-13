@@ -23,5 +23,6 @@ namespace SensateService.Models
 		[Required]
 		public DateTime RegisteredAt { get; set; }
 		public virtual ICollection<SensateUserRole> UserRoles { get; set; }
+		public virtual ICollection<SensateApiKey> ApiKeys { get; set; }
 	}
 }

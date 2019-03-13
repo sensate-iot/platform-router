@@ -26,16 +26,16 @@ namespace SensateService.Init
 	{
 		public static IServiceCollection AddSqlRepositories(this IServiceCollection services, bool cache)
 		{
-			services.AddScoped<IUserRepository, UserRepository>();
 			services.AddScoped<IChangeEmailTokenRepository, ChangeEmailTokenRepository>();
 			services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
 
 			if(cache)
 				services.AddScoped<IUserRepository, CachedUserRepository>();
 			else
-				services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+				services.AddScoped<IUserRepository, UserRepository>();
 
-			services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+			services.AddScoped<IApiKeyRepository, ApiKeyRepository>();
+			services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 			services.AddScoped<IUserTokenRepository, UserTokenRepository>();
 			services.AddScoped<IChangePhoneNumberTokenRepository, ChangePhoneNumberRepository>();
 			services.AddScoped<IBulkWriter<AuditLog>, AuditLogRepository>();
@@ -46,7 +46,9 @@ namespace SensateService.Init
 		public static IServiceCollection AddDocumentRepositories(this IServiceCollection services, bool cache)
 		{
 			BsonSerializer.RegisterSerializer(typeof(DateTime), new BsonUtcDateTimeSerializer());
+
 			services.AddScoped<ISensorStatisticsRepository, SensorStatisticsRepository>();
+			services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 
 			if(cache) {
 				services.AddScoped<IMeasurementRepository, CachedMeasurementRepository>();

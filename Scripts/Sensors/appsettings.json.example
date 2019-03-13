@@ -1,6 +1,11 @@
 {
 	"sensorId": "",
-	"sensorSecret": "",
 	"mqttUsername": "",
-	"mqttPassword": ""
+	"mqttPassword": "",
+	"availableSensors": [
+		{
+			"sensor": "",
+			"secret": ""
+		}
+	]
 }

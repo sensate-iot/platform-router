@@ -56,8 +56,9 @@ namespace SensateService.Infrastructure.Sql
 		{
 			var worker = Task.Run(() => {
 				var profiles = this.Data.Where(u => ids.Contains(u.Id))
+					.Include(u => u.ApiKeys).ThenInclude(key => key.User)
 					.Include(u => u.UserRoles).ThenInclude(ur => ur.Role);
-				return profiles.AsEnumerable();
+				return profiles.ToList().AsEnumerable();
 			});
 
 			return worker;
@@ -71,7 +72,8 @@ namespace SensateService.Infrastructure.Sql
 		public virtual Task<SensateUser> GetAsync(string key)
 		{
 			var worker = Task.Run(() => {
-				return this._manager.Users.Where(u => u.Id == key)
+				return this.Data.Where(u => u.Id == key)
+					.Include(u => u.ApiKeys).ThenInclude(k => k.User)
 					.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).FirstOrDefault();
 			});
 

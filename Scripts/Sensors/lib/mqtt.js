@@ -24,8 +24,8 @@ function generateMeasurement(args) {
 	const measurement = {
 		Longitude: 2.13613511,
 		Latitude: 31.215135211,
-		CreatedById: args.sensors[idx],
-		CreatedBySecret: args.secret,
+		CreatedById: args.sensors[idx].sensor,
+		CreatedBySecret: args.sensors[idx].secret,
 		Data: [
 			{ Name: 'x', Value: Math.random() * 10 },
 			{ Name: 'y', Value: Math.random() * 100 },
