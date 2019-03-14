@@ -149,6 +149,11 @@ namespace SensateService.Setup.Migrations
 
                     b.Property<DateTime>("CreatedOn");
 
+                    b.Property<string>("Name")
+                        .IsRequired();
+
+                    b.Property<bool>("ReadOnly");
+
                     b.Property<bool>("Revoked");
 
                     b.Property<int>("Type");

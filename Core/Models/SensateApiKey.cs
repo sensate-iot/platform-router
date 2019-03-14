@@ -8,6 +8,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
 using Newtonsoft.Json;
 using SensateService.Enums;
 
@@ -30,5 +31,9 @@ namespace SensateService.Models
 		public DateTime CreatedOn { get; set; }
 		[Required]
 		public ApiKeyType Type { get; set; }
+		[Required]
+		public string Name { get; set; }
+		[Required]
+		public bool ReadOnly { get; set; }
 	}
 }

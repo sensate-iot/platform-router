@@ -47,12 +47,12 @@ namespace SensateService.DataApi
 		{
 			var cache = new CacheConfig();
 			var db = new DatabaseConfig();
-			var auth = new AuthenticationConfig();
 			var mail = new MailConfig();
 			var text = new TextConfig();
+			var auth = new AuthenticationConfig();
 
-			this._configuration.GetSection("Cache").Bind(cache);
 			this._configuration.GetSection("Authentication").Bind(auth);
+			this._configuration.GetSection("Cache").Bind(cache);
 			this._configuration.GetSection("Database").Bind(db);
 			this._configuration.GetSection("Mail").Bind(mail);
 			this._configuration.GetSection("Text").Bind(text);
@@ -197,8 +197,10 @@ namespace SensateService.DataApi
 				app.UseDeveloperExceptionPage();
 			}
 
-			app.UseAuthentication();
 			app.UseMiddleware<RequestLoggingMiddleware>();
+			app.UseMiddleware<ApiKeyValidationMiddleware>();
+
+			app.UseAuthentication();
 			app.UseMvc();
 
 			sp.UseMeasurementStorage(cache.Workers);

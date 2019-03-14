@@ -10,5 +10,6 @@ namespace SensateService.AuthApi.Json
 	public class CreateApiKey
 	{
 		public string Name { get; set; }
+		public bool ReadOnly { get; set; }
 	}
 }

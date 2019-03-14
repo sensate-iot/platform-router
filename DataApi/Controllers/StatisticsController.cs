@@ -23,9 +23,9 @@ using SensateService.Models.Json.Out;
 
 namespace SensateService.DataApi.Controllers
 {
-	[NormalUser]
 	[Produces("application/json")]
 	[Route("[controller]")]
+	[NormalUser]
 	public class StatisticsController : AbstractController
 	{
 		private readonly ISensorStatisticsRepository _stats;
