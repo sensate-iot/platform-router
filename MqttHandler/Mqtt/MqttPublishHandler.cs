@@ -6,6 +6,9 @@
  */
 
 using System;
+using System.IO;
+using System.IO.Compression;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,13 +26,30 @@ using SensateService.Services.Settings;
 
 namespace SensateService.MqttHandler.Mqtt
 {
-	public class MqttPublishHandler : IHostedService
+	public class MqttPublishHandler : IHostedService 
 	{
 		private readonly IServiceProvider _provider;
+		private readonly InternalMqttServiceOptions _options;
 
-		public MqttPublishHandler(IServiceProvider provider)
+		public MqttPublishHandler(IServiceProvider provider, IOptions<InternalMqttServiceOptions> opts)
 		{
 			this._provider = provider;
+			this._options = opts.Value;
+		}
+
+		private static Task<string> Compress(string str)
+		{
+			return Task.Run(() => {
+				var bytes = Encoding.UTF8.GetBytes(str);
+				using(var msi = new MemoryStream(bytes))
+					using(var mso = new MemoryStream()) {
+						using(var gs = new GZipStream(mso, CompressionMode.Compress)) {
+							msi.CopyTo(gs);
+						}
+
+						return Convert.ToBase64String(mso.ToArray());
+					}
+			});
 		}
 
 		private async Task MeasurementsStored_Handler(object sender, MeasurementsReceivedEventArgs e)
@@ -37,21 +57,21 @@ namespace SensateService.MqttHandler.Mqtt
 			string data;
 
 			using(var scope = this._provider.CreateScope()) {
-				var opts = scope.ServiceProvider.GetRequiredService<IOptions<MqttServiceOptions>>();
 				var client = scope.ServiceProvider.GetRequiredService<IMqttPublishService>();
 
 				data = JsonConvert.SerializeObject(e.Measurements);
-				await client.PublishOnAsync(opts.Value.InternalBulkMeasurementTopic, data, false).AwaitBackground();
+				data = await Compress(data).AwaitBackground();
+				await client.PublishOnAsync(this._options.InternalBulkMeasurementTopic, data, false).AwaitBackground();
 			}
 		}
 
-		public Task StartAsync(CancellationToken cancellationToken)
+		public  Task StartAsync(CancellationToken cancellationToken)
 		{
 			CachedMeasurementStore.MeasurementsReceived += MeasurementsStored_Handler;
 			return Task.CompletedTask;
 		}
 
-		public Task StopAsync(CancellationToken cancellationToken)
+		public  Task StopAsync(CancellationToken cancellationToken)
 		{
 			CachedMeasurementStore.MeasurementsReceived -= MeasurementsStored_Handler;
 			return Task.CompletedTask;

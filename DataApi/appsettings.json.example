@@ -51,17 +51,26 @@
 	"Scheme": "https"
   },
 
-  "Mqtt" : {
-    "Username": "sensate",
-    "Password": "MqttPassword",
-    "Ssl": "false",
-    "Port": 1883,
-    "Host": "host.mqtt.net",
-    "ShareTopic": "$share/sensate/sensate/measurements",
-    "BulkShareTopic": "$share/sensate/sensate/measurements/bulk",
-    "RealTimeShareTopic": "$share/sensate/sensate/measurements/rt",
-    "InternalMeasurementTopic": "sensate/internal/measurements",
-    "BulkInternalMeasurementTopic": "sensate/internal/measurements/bulk"
+  "Mqtt": {
+    "PublicBroker": {
+      "Username": "",
+      "Password": "",
+      "Ssl": "false",
+      "Port": 1883,
+      "Host": "",
+      "RealTimeShareTopic": "$share/sensate/sensate/measurements/rt",
+      "ShareTopic": "$share/sensate/sensate/measurements",
+      "BulkShareTopic": "$share/sensate/sensate/measurements/bulk"
+    },
+    "InternalBroker": {
+      "Username": "",
+      "Password": "",
+      "Ssl": "false",
+      "Port": 1883,
+      "Host": "",
+      "InternalMeasurementTopic": "sensate/internal/measurements",
+      "InternalBulkMeasurementTopic": "sensate/internal/measurements/bulk"
+    } 
   },
 
   "Mail": {

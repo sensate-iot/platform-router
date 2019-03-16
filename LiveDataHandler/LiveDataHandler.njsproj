@@ -56,7 +56,6 @@
     <Folder Include="src\" />
     <Folder Include="src\mqtt\" />
     <Folder Include="src\models\" />
-    <Folder Include="src\websockets\" />
     <Folder Include="settings\" />
   </ItemGroup>
   <!-- Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them. -->

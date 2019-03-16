@@ -8,126 +8,54 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+
 using MQTTnet;
-using MQTTnet.Client;
+
 using SensateService.Helpers;
 using SensateService.Middleware;
 using SensateService.Services.Settings;
 
 namespace SensateService.Services.Processing
 {
-	public class MqttService : BackgroundService, IMqttPublishService
+	public class MqttService : AbstractMqttService 
 	{
 		private readonly IServiceProvider _provider;
 		private readonly ConcurrentDictionary<string, Type> _handlers;
-		private readonly MqttServiceOptions options;
-		private readonly ILogger<MqttService> _logger;
+		private readonly MqttServiceOptions _options;
 
-		private IMqttClient _client;
-		private IMqttClientOptions _client_options;
-
-		public MqttService(IServiceProvider provider,
-						   IOptions<MqttServiceOptions> options,
-						   ILogger<MqttService> logger)
+		public MqttService(IServiceProvider provider, IOptions<MqttServiceOptions> options, ILogger<MqttService> logger) :
+			base(options.Value.Host, options.Value.Port, options.Value.Ssl, logger)
 		{
 			this._provider = provider;
 			this._handlers = new ConcurrentDictionary<string, Type>();
-			this.options = options.Value;
-			this._logger = logger;
+			this._options = options.Value;
 		}
 
 		public override async Task ExecuteAsync(CancellationToken token)
 		{
-			var factory = new MqttFactory();
-			MqttClientOptionsBuilder builder;
-
-			this._client = factory.CreateMqttClient();
-			builder = new MqttClientOptionsBuilder()
-				.WithClientId(this.options.Id)
-				.WithTcpServer(this.options.Host, this.options.Port)
-				.WithCleanSession();
-
-			if(this.options.Ssl)
-				builder.WithTls(new MqttClientOptionsBuilderTlsParameters {
-					AllowUntrustedCertificates = true,
-					UseTls = true
-				});
-
-			if(this.options.Username != null)
-				builder.WithCredentials(this.options.Username, this.options.Password);
-
-			this._client.Connected += OnConnect_Handler;
-			this._client.Disconnected += OnDisconnect_HandlerAsync;
-			this._client.ApplicationMessageReceived += OnMessage_Handler;
-
-			this._client_options = builder.Build();
-			await this.Connect();
+			await this.Connect(this._options.Username, this._options.Password).AwaitBackground();
 		}
 
-		public async Task PublishOnAsync(string topic, string message, bool retain)
+		public void MapTopicHandler<T>(string topic) where T : MqttHandler
 		{
-			MqttApplicationMessageBuilder builder;
-			MqttApplicationMessage msg;
-
-			if(!this._client.IsConnected)
-				return;
-
-			builder = new MqttApplicationMessageBuilder();
-			builder.WithAtLeastOnceQoS();
-			builder.WithPayload(message);
-			builder.WithTopic(topic);
-			builder.WithRetainFlag(retain);
-			msg = builder.Build();
-			await this._client.PublishAsync(msg);
+			this._handlers.TryAdd(topic, typeof(T));
 		}
 
-		public  void PublishOn(string topic, string message, bool retain)
+		public override async Task StopAsync(CancellationToken cancellationToken)
 		{
-			var worker = this.PublishOnAsync(topic, message, retain);
-			worker.RunSynchronously();
+			await base.StopAsync(cancellationToken);
+			await this.Disconnect().AwaitBackground();
+
+			this._logger.LogInformation("MQTT client disconnected!");
 		}
 
-		private async Task Connect()
-		{
-			this._logger.LogInformation("Connecting to MQTT broker");
-			Debug.WriteLine("Connecting to MQTT broker");
-
-			await this._client.ConnectAsync(this._client_options);
-		}
-
-		private async void OnMessage_Handler(object sender, MqttApplicationMessageReceivedEventArgs e)
-		{
-			MqttHandler handler;
-			string msg;
-
-			using(var scope = this._provider.CreateScope()) {
-				if(!this._handlers.TryGetValue(e.ApplicationMessage.Topic, out Type handlerType)) {
-					this._handlers.TryGetValue(this.options.TopicShare + e.ApplicationMessage.Topic, out handlerType);
-				}
-
-				handler = scope.ServiceProvider.GetRequiredService(handlerType) as MqttHandler;
-
-				if(handler == null)
-					return;
-
-				msg = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
-
-				try {
-					await handler.OnMessageAsync(e.ApplicationMessage.Topic, msg).AwaitBackground();
-				} catch(Exception ex) {
-					this._logger.LogWarning($"Unable to store measurement: {ex.Message}");
-				}
-			}
-		}
-
-		private void OnConnect_Handler(object sender, MqttClientConnectedEventArgs e)
+		protected override async Task OnConnectAsync()
 		{
 			TopicFilterBuilder tfb;
 			List<TopicFilter> filters;
@@ -140,36 +68,30 @@ namespace SensateService.Services.Processing
 				filters.Add(tfb.Build());
 			}
 
-			this._client.SubscribeAsync(filters);
-			Debug.WriteLine("--- MQTT client connected ---");
-			this._logger.LogInformation("--- MQTT client connected ---");
+			this._logger.LogInformation("MQTT client connected!");
+			await this.Client.SubscribeAsync(filters).AwaitBackground();
 		}
 
-		private async void OnDisconnect_HandlerAsync(object sender, MqttClientDisconnectedEventArgs e)
+		protected override async Task OnMessageAsync(string topic, string msg)
 		{
-			Debug.WriteLine("--- MQTT client disconnected ---");
-			this._logger.LogInformation("--- MQTT client disconnected ---");
+			MqttHandler handler;
 
-			await Task.Delay(TimeSpan.FromSeconds(5D));
-			try {
-				await this._client.ConnectAsync(this._client_options);
-			} catch {
-				Debug.WriteLine("--- MQTT client unable to reconnect ---");
-				this._logger.LogInformation("Unable to reconnect");
+			using(var scope = this._provider.CreateScope()) {
+				if(!this._handlers.TryGetValue(topic, out Type handlerType)) {
+					this._handlers.TryGetValue(this._options.TopicShare + topic, out handlerType);
+				}
+
+				handler = scope.ServiceProvider.GetRequiredService(handlerType) as MqttHandler;
+
+				if(handler == null)
+					return;
+
+				try {
+					await handler.OnMessageAsync(topic, msg).AwaitBackground();
+				} catch(Exception ex) {
+					this._logger.LogWarning($"Unable to store measurement: {ex.Message}");
+				}
 			}
-		}
-
-		public void MapTopicHandler<T>(string topic) where T : MqttHandler
-		{
-			this._handlers.TryAdd(topic, typeof(T));
-		}
-
-		public override async Task StopAsync(CancellationToken cancellationToken)
-		{
-			await base.StopAsync(cancellationToken);
-			await this._client.DisconnectAsync();
-
-			this._logger.LogInformation("MQTT client disconnected!");
 		}
 	}
 }

@@ -37,7 +37,7 @@ namespace SensateService.WebSocketHandler.Application
 			string data;
 
 			using(var scope = this._provider.CreateScope()) {
-				var opts = scope.ServiceProvider.GetRequiredService<IOptions<MqttServiceOptions>>();
+				var opts = scope.ServiceProvider.GetRequiredService<IOptions<InternalMqttServiceOptions>>();
 				var client = scope.ServiceProvider.GetRequiredService<IMqttPublishService>();
 
 				data = JsonConvert.SerializeObject(e.Measurement);
@@ -50,7 +50,7 @@ namespace SensateService.WebSocketHandler.Application
 			string data;
 
 			using(var scope = this._provider.CreateScope()) {
-				var opts = scope.ServiceProvider.GetRequiredService<IOptions<MqttServiceOptions>>();
+				var opts = scope.ServiceProvider.GetRequiredService<IOptions<InternalMqttServiceOptions>>();
 				var client = scope.ServiceProvider.GetRequiredService<IMqttPublishService>();
 
 				data = JsonConvert.SerializeObject(e.Measurements);

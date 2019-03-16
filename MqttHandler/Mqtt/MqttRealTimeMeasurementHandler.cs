@@ -26,12 +26,12 @@ namespace SensateService.MqttHandler.Mqtt
 	public class MqttRealTimeMeasurementHandler : Middleware.MqttHandler, IDisposable
 	{
 		private readonly IMqttPublishService client;
-		private readonly MqttServiceOptions mqttopts;
+		private readonly InternalMqttServiceOptions mqttopts;
 		private readonly IMeasurementStore store;
 
 		private bool disposed;
 
-		public MqttRealTimeMeasurementHandler( IMeasurementStore store, IOptions<MqttServiceOptions> options, IMqttPublishService client)
+		public MqttRealTimeMeasurementHandler( IMeasurementStore store, IOptions<InternalMqttServiceOptions> options, IMqttPublishService client)
 		{
 			this.client = client;
 			this.mqttopts = options.Value;

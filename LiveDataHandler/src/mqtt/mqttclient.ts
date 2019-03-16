@@ -7,13 +7,28 @@
 
 import { IClientOptions, Client, connect } from "mqtt";
 import { Guid } from "../guid";
+import * as gzip from "zlib";
 
 declare type MessageHandler = (topic: string, message: string) => void;
 
 export class MqttClient {
     private client: Client;
     private handler: MessageHandler;
-    constructor(private host: string, private port: number) { }
+    constructor(private readonly host: string, private readonly port: number) { }
+
+    private decode(data: string) {
+        const buf = Buffer.from(data, "base64");
+
+        return new Promise((resolve, reject) => {
+            gzip.unzip(buf, (err, buffer) => {
+                if (err)
+                    reject(err);
+
+                const content = buffer.toString('utf-8');
+                resolve(content);
+            });
+        });
+    }
 
     public connect(user: string, password: string) {
         console.debug(`Connecting to MQTT broker: ${this.host} on port ${this.port}`);
@@ -32,7 +47,11 @@ export class MqttClient {
         });
 
         this.client.on("message", (topic, msg) => {
-            this.handler(topic, msg.toString());
+            this.decode(msg.toString()).then((data: string) => {
+                this.handler(topic, data);
+            }).catch(err => {
+                console.warn(`Unable to decode MQTT message: ${err.toString()}`);
+            });
         });
 
         return rv;

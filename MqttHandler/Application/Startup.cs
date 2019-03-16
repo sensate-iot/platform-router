@@ -66,6 +66,9 @@ namespace SensateService.MqttHandler.Application
 			Configuration.GetSection("Database").Bind(db);
 			Configuration.GetSection("Cache").Bind(cache);
 
+			var publicmqtt = mqtt.PublicBroker;
+			var privatemqtt = mqtt.InternalBroker;
+
 			services.AddPostgres(db.PgSQL.ConnectionString);
 
 			services.AddIdentity<SensateUser, SensateRole>(config => {
@@ -84,24 +87,28 @@ namespace SensateService.MqttHandler.Application
 			services.AddSqlRepositories(cache.Enabled);
 			services.AddMeasurementStorage(cache);
 
-			services.AddSingleton<IHostedService, MqttPublishHandler>();
 			services.AddMqttService(options => {
-				options.Ssl = mqtt.Ssl;
-				options.Host = mqtt.Host;
-				options.Port = mqtt.Port;
-				options.Username = mqtt.Username;
-				options.Password = mqtt.Password;
+				options.Ssl = publicmqtt.Ssl;
+				options.Host = publicmqtt.Host;
+				options.Port = publicmqtt.Port;
+				options.Username = publicmqtt.Username;
+				options.Password = publicmqtt.Password;
 				options.Id = Guid.NewGuid().ToString();
 				options.TopicShare = "$share/sensate/";
-				options.InternalMeasurementTopic = mqtt.InternalMeasurementTopic;
-				options.InternalBulkMeasurementTopic = mqtt.InternalBulkMeasurementTopic;
 			});
 
-			services.AddSingleton(provider => {
-				var s = provider.GetServices<IHostedService>().ToList();
-				var mqservice = s.Find(x => x.GetType() == typeof(MqttService)) as IMqttPublishService;
-				return mqservice;
+			services.AddInternalMqttService(options => {
+				options.Ssl = privatemqtt.Ssl;
+				options.Host = privatemqtt.Host;
+				options.Port = privatemqtt.Port;
+				options.Username = privatemqtt.Username;
+				options.Password = privatemqtt.Password;
+				options.Id = Guid.NewGuid().ToString();
+				options.InternalBulkMeasurementTopic = privatemqtt.InternalBulkMeasurementTopic;
+				options.InternalMeasurementTopic = privatemqtt.InternalMeasurementTopic;
 			});
+
+			services.AddSingleton<IHostedService, MqttPublishHandler>();
 
 			services.AddLogging(builder => {
 				if(IsDevelopment())
@@ -119,10 +126,11 @@ namespace SensateService.MqttHandler.Application
 
 			Configuration.GetSection("Mqtt").Bind(mqtt);
 			Configuration.GetSection("Cache").Bind(cache);
+			var @public = mqtt.PublicBroker;
 
-			provider.MapMqttTopic<MqttRealTimeMeasurementHandler>(mqtt.RealTimeShareTopic);
-			provider.MapMqttTopic<MqttMeasurementHandler>(mqtt.ShareTopic);
-			provider.MapMqttTopic<MqttBulkMeasurementHandler>(mqtt.BulkShareTopic);
+			provider.MapMqttTopic<MqttRealTimeMeasurementHandler>(@public.RealTimeShareTopic);
+			provider.MapMqttTopic<MqttMeasurementHandler>(@public.ShareTopic);
+			provider.MapMqttTopic<MqttBulkMeasurementHandler>(@public.BulkShareTopic);
 
 			provider.UseMeasurementStorage(cache.Workers);
 		}

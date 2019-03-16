@@ -31,10 +31,10 @@ namespace SensateService.WebSocketHandler.Application
 	public class WebSocketMeasurementHandler : Middleware.WebSocketHandler
 	{
 		private readonly IMqttPublishService client;
-		private readonly MqttServiceOptions mqttopts;
+		private readonly InternalMqttServiceOptions mqttopts;
 		private readonly IServiceProvider provider;
 
-		public WebSocketMeasurementHandler(IMqttPublishService client, IServiceProvider provider, IOptions<MqttServiceOptions> options)
+		public WebSocketMeasurementHandler(IMqttPublishService client, IServiceProvider provider, IOptions<InternalMqttServiceOptions> options)
 		{
 			this.provider = provider;
 			this.client = client;

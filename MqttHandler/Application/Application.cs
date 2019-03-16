@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SensateService.Helpers;
+using SensateService.MqttHandler.Mqtt;
 
 namespace SensateService.MqttHandler.Application
 {
@@ -38,10 +39,10 @@ namespace SensateService.MqttHandler.Application
 			var services = this.sp.GetServices<IHostedService>().ToList();
 
 			services.ForEach(x => x.StartAsync(CancellationToken.None));
-			Console.WriteLine("MQTT client started");
 			this._reset.WaitOne();
 
 			services = this.sp.GetServices<IHostedService>().ToList();
+
 			Task.Run(async () => {
 				foreach(var hosted in services) {
 					await hosted.StopAsync(CancellationToken.None).AwaitBackground();

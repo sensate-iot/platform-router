@@ -41,12 +41,25 @@
     }
   },
 
-  "Mqtt" : {
-    "Username": "sensate",
-    "Password": "SamplePassword",
-    "Ssl": "false",
-    "Port": 1883,
-    "Host": "mqtt.example.com",
-    "ShareTopic": "$share/sensate/sensate/measurements"
+  "Mqtt": {
+    "PublicBroker": {
+      "Username": "",
+      "Password": "",
+      "Ssl": "false",
+      "Port": 1883,
+      "Host": "",
+      "RealTimeShareTopic": "$share/sensate/sensate/measurements/rt",
+      "ShareTopic": "$share/sensate/sensate/measurements",
+      "BulkShareTopic": "$share/sensate/sensate/measurements/bulk"
+    },
+    "InternalBroker": {
+      "Username": "",
+      "Password": "",
+      "Ssl": "false",
+      "Port": 1883,
+      "Host": "",
+      "InternalMeasurementTopic": "sensate/internal/measurements",
+      "InternalBulkMeasurementTopic": "sensate/internal/measurements/bulk"
+    } 
   }
 }

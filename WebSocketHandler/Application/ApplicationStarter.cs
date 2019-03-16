@@ -74,29 +74,22 @@ namespace SensateService.WebSocketHandler.Application
 
 			this.SetupAuthentication(services, auth);
 
-			services.AddMqttService(options => {
-				options.Ssl = mqtt.Ssl;
-				options.Host = mqtt.Host;
-				options.Port = mqtt.Port;
-				options.Username = mqtt.Username;
-				options.Password = mqtt.Password;
+			services.AddInternalMqttService(options => {
+				options.Ssl = mqtt.InternalBroker.Ssl;
+				options.Host = mqtt.InternalBroker.Host;
+				options.Port = mqtt.InternalBroker.Port;
+				options.Username = mqtt.InternalBroker.Username;
+				options.Password = mqtt.InternalBroker.Password;
 				options.Id = Guid.NewGuid().ToString();
-				options.TopicShare = "$share/sensate/";
-				options.InternalBulkMeasurementTopic = mqtt.InternalBulkMeasurementTopic;
-				options.InternalMeasurementTopic = mqtt.InternalMeasurementTopic;
+				options.InternalBulkMeasurementTopic = mqtt.InternalBroker.InternalBulkMeasurementTopic;
+				options.InternalMeasurementTopic = mqtt.InternalBroker.InternalMeasurementTopic;
 			});
 
-			services.AddSingleton(provider => {
-				var s = provider.GetServices<IHostedService>().ToList();
-				var mqservice = s.Find(x => x.GetType() == typeof(MqttService)) as IMqttPublishService;
-				return mqservice;
-			});
+			services.AddSingleton<IHostedService, MqttPublishHandler>();
 
 			services.AddWebSocketHandler<RealTimeWebSocketMeasurementHandler>();
 			services.AddWebSocketHandler<WebSocketBulkMeasurementHandler>();
 			services.AddWebSocketHandler<WebSocketMeasurementHandler>();
-
-			services.AddSingleton<IHostedService, MqttPublishHandler>();
 
 			services.AddLogging((builder) => {
 				builder.AddConsole();
