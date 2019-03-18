@@ -53,7 +53,7 @@ namespace SensateService.WebSocketHandler.Application
 				var opts = scope.ServiceProvider.GetRequiredService<IOptions<InternalMqttServiceOptions>>();
 				var client = scope.ServiceProvider.GetRequiredService<IMqttPublishService>();
 
-				data = JsonConvert.SerializeObject(e.Measurements);
+				data = e.Compressed;
 				await client.PublishOnAsync(opts.Value.InternalBulkMeasurementTopic, data, false).AwaitBackground();
 			}
 		}

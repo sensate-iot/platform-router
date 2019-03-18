@@ -6,17 +6,12 @@
  */
 
 using System;
-using System.IO;
-using System.IO.Compression;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-
-using Newtonsoft.Json;
 
 using SensateService.Helpers;
 using SensateService.Infrastructure.Events;
@@ -37,21 +32,6 @@ namespace SensateService.MqttHandler.Mqtt
 			this._options = opts.Value;
 		}
 
-		private static Task<string> Compress(string str)
-		{
-			return Task.Run(() => {
-				var bytes = Encoding.UTF8.GetBytes(str);
-				using(var msi = new MemoryStream(bytes))
-					using(var mso = new MemoryStream()) {
-						using(var gs = new GZipStream(mso, CompressionMode.Compress)) {
-							msi.CopyTo(gs);
-						}
-
-						return Convert.ToBase64String(mso.ToArray());
-					}
-			});
-		}
-
 		private async Task MeasurementsStored_Handler(object sender, MeasurementsReceivedEventArgs e)
 		{
 			string data;
@@ -59,8 +39,7 @@ namespace SensateService.MqttHandler.Mqtt
 			using(var scope = this._provider.CreateScope()) {
 				var client = scope.ServiceProvider.GetRequiredService<IMqttPublishService>();
 
-				data = JsonConvert.SerializeObject(e.Measurements);
-				data = await Compress(data).AwaitBackground();
+				data = e.Compressed;
 				await client.PublishOnAsync(this._options.InternalBulkMeasurementTopic, data, false).AwaitBackground();
 			}
 		}
