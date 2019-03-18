@@ -25,6 +25,7 @@ namespace SensateService.Infrastructure.Repositories
 		Task UpdateAsync(string name, SensateRole role);
 		void Update(string name, SensateRole role);
 
+	    Task<SensateRole> GetByNameAsync(string name);
 		SensateRole GetById(string id);
 		SensateRole GetByName(string name);
 		IEnumerable<SensateUser> GetUsers(string id);

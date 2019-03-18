@@ -65,6 +65,11 @@ namespace SensateService.Infrastructure.Sql
 				throw new DatabaseException("Unable to create user role!");
 		}
 
+		public async Task<SensateRole> GetByNameAsync(string name)
+		{
+			return await this.Data.FirstOrDefaultAsync(role => role.Name == name).AwaitBackground();
+		}
+
 		public void Delete(string id)
 		{
 			var role = this.GetById(id);
