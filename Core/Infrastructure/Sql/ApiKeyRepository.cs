@@ -42,6 +42,10 @@ namespace SensateService.Infrastructure.Sql
 			var query = this.Data.Where(apikey => apikey.ApiKey == key).Include(apikey => apikey.User)
 				.ThenInclude(user => user.ApiKeys);
 			var _apikey = await query.FirstOrDefaultAsync(token).AwaitBackground();
+
+			if(_apikey == null)
+				return null;
+
 			_apikey.CreatedOn = DateTime.SpecifyKind(_apikey.CreatedOn, DateTimeKind.Utc);
 
 			return _apikey;
@@ -52,6 +56,10 @@ namespace SensateService.Infrastructure.Sql
 			var query = this.Data.Where(apikey => apikey.Id == id).Include(apikey => apikey.User)
 				.ThenInclude(user => user.ApiKeys);
 			var _apikey = await query.FirstOrDefaultAsync(token).AwaitBackground();
+
+			if(_apikey == null)
+				return null;
+
 			_apikey.CreatedOn = DateTime.SpecifyKind(_apikey.CreatedOn, DateTimeKind.Utc);
 
 			return _apikey;
@@ -105,6 +113,9 @@ namespace SensateService.Infrastructure.Sql
 				.ThenInclude(u => u.ApiKeys);
 			var keys = await query.ToListAsync(token).AwaitBackground();
 
+			if(keys == null)
+				return null;
+
 			foreach(var key in keys) {
 				key.CreatedOn = DateTime.SpecifyKind(key.CreatedOn, DateTimeKind.Utc);
 			}
@@ -117,6 +128,9 @@ namespace SensateService.Infrastructure.Sql
 			var query = this.Data.Where(apikey => apikey.UserId == user.Id && apikey.Type == type).Include(apikey => apikey.User)
 				.ThenInclude(u => u.ApiKeys);
 			var keys = await query.ToListAsync(token).AwaitBackground();
+
+			if(keys == null)
+				return null;
 
 			foreach(var key in keys) {
 				key.CreatedOn = DateTime.SpecifyKind(key.CreatedOn, DateTimeKind.Utc);
