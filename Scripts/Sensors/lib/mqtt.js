@@ -75,5 +75,5 @@ module.exports.run = function (args) {
 	if(isNaN(args.bulk))
 		timer.setInterval(publish, [client, args], args.interval.toString() + 'u');
 	else
-		setInterval(publishBulk, args.interval, client, args);
+		timer.setInterval(publishBulk, [client, args], args.interval.toString() + 'u')
 }
