@@ -14,7 +14,9 @@ clever use of caches and document stores.
 Sensors can communicate in one of two ways with the sensate servers:
 
 * MQTT (with or without TLS)
-* Websockets
+* HTTP
+	* REST call or
+	* Websockets
 
 In both cases, a pseudo model in JSON format is expected by the Sensate backend:
 
@@ -38,11 +40,10 @@ In both cases, a pseudo model in JSON format is expected by the Sensate backend:
         ]
     }
 
-All but the `CreatedAt` attribute are required. The format of the `CreatedAt` attribute is:
+All but the `CreatedAt` and the `Unit` attributes are required.
 
-    %d.%M.%Y %H:%m:%s
-
-Please note that the array length of ```Data``` isn't limited to two.
+Please note that the array length of ```Data``` isn't limited to two. A measurement can contain anywhere
+between 1 and 25 data points.
 
 ## Contributing
 
