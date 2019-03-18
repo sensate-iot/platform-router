@@ -61,7 +61,7 @@ namespace SensateService.ApiCore.Middleware
 		public async Task Invoke(HttpContext ctx)
 		{
 			AuditLog log;
-			SensateUser user = null;
+			SensateUser user;
 
 			var sw = Stopwatch.StartNew();
 			await this._next(ctx).AwaitBackground();
@@ -75,8 +75,12 @@ namespace SensateService.ApiCore.Middleware
 				                            $"Result: HTTP {ctx.Response?.StatusCode} {Environment.NewLine}"  +
 				                            $"Client IP: {ctx.Request.HttpContext.Connection.RemoteIpAddress}");
 
-				if(ctx.User != null)
+				if(ctx.User != null) {
 					user = await users.GetByClaimsPrincipleAsync(ctx.User).AwaitBackground();
+				} else {
+					var token = ctx.Items["ApiKey"] as SensateApiKey;
+					user = token?.User;
+				}
 
 				log = new AuditLog {
 					Timestamp = DateTime.Now,
