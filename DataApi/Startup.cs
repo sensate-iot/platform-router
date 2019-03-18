@@ -197,8 +197,8 @@ namespace SensateService.DataApi
 				app.UseDeveloperExceptionPage();
 			}
 
-			app.UseMiddleware<RequestLoggingMiddleware>();
 			app.UseMiddleware<ApiKeyValidationMiddleware>();
+			app.UseMiddleware<RequestLoggingMiddleware>();
 
 			app.UseAuthentication();
 			app.UseMvc();

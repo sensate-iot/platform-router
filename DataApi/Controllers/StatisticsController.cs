@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,14 +26,13 @@ namespace SensateService.DataApi.Controllers
 {
 	[Produces("application/json")]
 	[Route("[controller]")]
-	[NormalUser]
-	public class StatisticsController : AbstractController
+	public class StatisticsController : AbstractApiController 
 	{
 		private readonly ISensorStatisticsRepository _stats;
 		private readonly ISensorRepository _sensors;
 
-		public StatisticsController(IUserRepository users, ISensorStatisticsRepository stats,
-			ISensorRepository sensors, IHttpContextAccessor ctx) : base(users, ctx)
+		public StatisticsController(ISensorStatisticsRepository stats, ISensorRepository sensors,
+			IHttpContextAccessor ctx) : base(ctx)
 		{
 			this._stats = stats;
 			this._sensors = sensors;
