@@ -6,9 +6,7 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,7 +19,7 @@ using SensateService.Services.Settings;
 
 namespace SensateService.Services.Processing
 {
-	public class MeasurementCacheService : TimedBackgroundService, IMeasurementCacheService
+	public class MeasurementCacheService : TimedBackgroundService 
 	{
 		public const int IntervalInMillis = 2000;
 		private const int StartDelay = 200;
@@ -29,12 +27,10 @@ namespace SensateService.Services.Processing
 		private readonly ILogger<MeasurementCacheService> _logger;
 		private readonly CacheConfig _config;
 
-		private IList<ICachedMeasurementStore> _caches;
-		private int _index;
-		private int _count;
-		private long _stored;
+		private readonly ICachedMeasurementStore _store;
+		private long _totalCount;
 
-		public MeasurementCacheService(CacheConfig config, ILogger<MeasurementCacheService> logger)
+		public MeasurementCacheService(CacheConfig config, ILogger<MeasurementCacheService> logger, ICachedMeasurementStore store)
 		{
 			this._logger = logger;
 			this._config = config;
@@ -42,42 +38,28 @@ namespace SensateService.Services.Processing
 			if(config.Interval <= 0)
 				this._config.Interval = IntervalInMillis;
 
-			this._caches = new List<ICachedMeasurementStore>();
-			this._index = 0;
-			this._stored = 0;
+			this._store = store;
+			this._totalCount = 0L;
 		}
 
 		protected override async Task ProcessAsync()
 		{
 			Stopwatch sw;
-			Task<long>[] workers;
-			int count;
-			long processed;
+			long count;
 			long totaltime;
-			long totalprocessed;
 
 			sw = Stopwatch.StartNew();
 			this._logger.LogTrace("Cache service triggered!");
-			count = Interlocked.Add(ref this._count, 0);
-
-			workers = new Task<long>[count];
-
-			for(var idx = 0; idx < count; idx++) {
-				var cache = this._caches[idx];
-				workers[idx] = cache.ProcessAsync();
-			}
-
-			var result = await Task.WhenAll(workers).AwaitBackground();
-			processed = result.Sum();
+			count = await this._store.ProcessAsync().AwaitBackground();
 			sw.Stop();
 
-			totalprocessed = Interlocked.Add(ref this._stored, processed);
 			totaltime = base.MillisecondsElapsed();
+			this._totalCount += count;
 
-			if(processed > 0) {
-				this._logger.LogInformation($"Number of measurements processed: {processed}.{Environment.NewLine}" +
+			if(count > 0) {
+				this._logger.LogInformation($"Number of measurements processed: {count}.{Environment.NewLine}" +
 				                            $"Processing took {sw.ElapsedMilliseconds}ms.{Environment.NewLine}" +
-				                            $"Average measurements per second: {totalprocessed/(totaltime/1000)}.");
+				                            $"Average measurements per second: {this._totalCount/(totaltime/1000)}.");
 			}
 		}
 
@@ -87,38 +69,12 @@ namespace SensateService.Services.Processing
 			settings.StartDelay = StartDelay;
 		}
 
-		public IMeasurementCache Next()
-		{
-			IMeasurementCache cache;
-			int index, count;
-
-			count = Interlocked.Add(ref this._count, 0);
-			if(count <= 0)
-				throw new IndexOutOfRangeException();
-
-			index = Interlocked.Increment(ref this._index) - 1;
-			cache = this._caches[index];
-			Interlocked.CompareExchange(ref this._index, 0, count);
-
-			return cache;
-		}
-
 		public override async Task StopAsync(CancellationToken cancellationToken)
 		{
 			await base.StopAsync(cancellationToken).AwaitBackground();
 
-			foreach(var cache in this._caches) {
-				cache.Destroy();
-			}
-
+			this._store.Destroy();
 			this._logger.LogInformation("Stopping measurement cache service!");
-		}
-
-		public void RegisterCache(ICachedMeasurementStore store)
-		{
-			var caches = new List<ICachedMeasurementStore>(this._caches) {store};
-			Interlocked.Exchange(ref this._caches, caches);
-			Interlocked.Increment(ref this._count);
 		}
 	}
 }

@@ -9,13 +9,19 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+
+using Newtonsoft.Json;
 
 using SensateService.Enums;
 using SensateService.Helpers;
@@ -176,26 +182,6 @@ namespace SensateService.Infrastructure.Storage
 			return measurements;
 		}
 
-		private static Task<IList<Measurement>> SortMeasurementsAsync(IEnumerable<ProcessedMeasurement> data)
-		{
-			return Task.Run(() => {
-				var measurements = data.Select(entry => entry.Measurement);
-				var sorted = measurements.OrderByDescending(measurement => measurement.CreatedAt);
-
-				return sorted.ToList() as IList<Measurement>;
-			});
-		}
-
-		private static Task<IList<AuditLog>> SortAuditLogsAsync(IEnumerable<MeasurementLog> data)
-		{
-			return Task.Run(() => {
-				var logs = data.Select(obj => obj.Item2);
-				var sorted = logs.OrderByDescending(log => log.Timestamp);
-
-				return sorted.ToList() as IList<AuditLog>;
-			});
-		}
-
 		private static async Task IncrementStatistics(ISensorStatisticsRepository stats,
 			IEnumerable<ProcessedMeasurement> data, CancellationToken token)
 		{
@@ -213,6 +199,35 @@ namespace SensateService.Infrastructure.Storage
 			}
 
 			await Task.WhenAll(tasks).AwaitBackground();
+		}
+
+		private static string Compress(IEnumerable<Measurement> measurements)
+		{
+			string rv;
+			MemoryStream msi, mso;
+			GZipStream gzip;
+
+			msi = null;
+			mso = null;
+
+			try {
+				var data = JsonConvert.SerializeObject(measurements);
+				var bytes = Encoding.UTF8.GetBytes(data);
+
+				msi = new MemoryStream(bytes);
+				mso = new MemoryStream();
+				gzip = new GZipStream(mso, CompressionMode.Compress);
+
+				msi.CopyTo(gzip);
+				gzip.Dispose();
+
+				rv = Convert.ToBase64String(mso.ToArray());
+			} finally {
+				mso?.Dispose();
+				msi?.Dispose();
+			}
+
+			return rv;
 		}
 
 		public async Task<long> ProcessAsync()
@@ -237,36 +252,34 @@ namespace SensateService.Infrastructure.Storage
 			using(var scope = this.Provider.CreateScope()) {
 				var measurements = scope.ServiceProvider.GetRequiredService<IBulkWriter<Measurement>>();
 				var logs = scope.ServiceProvider.GetRequiredService<IBulkWriter<AuditLog>>();
-				var stats = scope.ServiceProvider.GetRequiredService<ISensorStatisticsRepository>();
+				var statistics = scope.ServiceProvider.GetRequiredService<ISensorStatisticsRepository>();
 				var source = new CancellationTokenSource();
 
 				try {
-					var tasks = new Task[4];
-					Task<IList<AuditLog>> log_task;
-					Task<IList<Measurement>> measurements_task;
+					var iotasks = new Task[4];
+					IEnumerable<AuditLog> auditlogs;
+					IList<Measurement> telemetry;
 
-					/*
-					 * Generate measurements using the raw measurements as input. Invalid
-					 * raw measurements are silently discarded. Both measurements and audit logs
-					 * are then stored asynchronously in bulk. An audit log entry is created even
-					 * if the raw measurement was discarded.
-					 */
+					iotasks.Populate(Task.CompletedTask);
+					auditlogs = raw_que.Select(x => x.Item2);
+					iotasks[0] = logs.CreateRangeAsync(auditlogs, source.Token);
 
 					processed_que = await this.ProcessMeasurementsAsync(raw_que).AwaitBackground();
-					log_task = SortAuditLogsAsync(raw_que);
-					measurements_task = SortMeasurementsAsync(processed_que);
-					await Task.WhenAll(measurements_task, log_task).AwaitBackground();
+					telemetry = processed_que.Select(x => x.Measurement).ToList();
 
-					tasks.Populate(Task.CompletedTask);
-					tasks[0] = logs.CreateRangeAsync(log_task.Result, source.Token);
+					/*
+					 * Do not update when no valid measurements are received. The audit log
+					 * entries are always created.
+					 */
 
-					if(measurements_task.Result.Count > 0) {
-						tasks[1] = measurements.CreateRangeAsync(measurements_task.Result, source.Token);
-						tasks[2] = InvokeEventHandlersAsync(this, measurements_task.Result, source.Token);
-						tasks[3] = IncrementStatistics(stats, processed_que, source.Token);
+					if(telemetry.Count > 0) {
+						iotasks[1] = measurements.CreateRangeAsync(telemetry, source.Token);
+						iotasks[2] = InvokeEventHandlersAsync(this, telemetry, source.Token);
+						iotasks[3] = IncrementStatistics(statistics, processed_que, source.Token);
 					}
 
-					await Task.WhenAll(tasks).AwaitBackground();
+					count = telemetry.Count;
+					await Task.WhenAll(iotasks).AwaitBackground();
 				} catch(Exception ex) {
 					source.Cancel(false);
 
@@ -283,21 +296,26 @@ namespace SensateService.Infrastructure.Storage
 			return count;
 		}
 
-		private static Task InvokeEventHandlersAsync(object sender, IList<Measurement> measurements, CancellationToken token)
+		private static async Task InvokeEventHandlersAsync(object sender, IList<Measurement> measurements, CancellationToken token)
 		{
 			Delegate[] delegates;
 			MeasurementsReceivedEventArgs args;
 
 			if(MeasurementsReceived == null)
-				return Task.CompletedTask;
+				return;
 
 			delegates = MeasurementsReceived.GetInvocationList();
 
 			if(delegates.Length <= 0)
-				return Task.CompletedTask;
+				return;
 
-			args = new MeasurementsReceivedEventArgs(measurements, token);
-			return MeasurementsReceived.Invoke(sender, args);
+			var task = Task.Run(() => Compress(measurements), token);
+
+			args = new MeasurementsReceivedEventArgs(measurements, token) {
+				Compressed = await task.AwaitBackground()
+			};
+
+			await MeasurementsReceived.Invoke(sender, args).AwaitBackground();
 		}
 
 		private void SwapQueues(ref List<MeasurementLog> data)

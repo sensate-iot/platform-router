@@ -7,21 +7,18 @@
 
 using System;
 using System.IO;
-using System.Linq;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+
 using SensateService.Config;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
 using SensateService.Models;
-using SensateService.Services;
-
 using SensateService.MqttHandler.Mqtt;
-using SensateService.Services.Processing;
 
 namespace SensateService.MqttHandler.Application
 {
@@ -131,8 +128,6 @@ namespace SensateService.MqttHandler.Application
 			provider.MapMqttTopic<MqttRealTimeMeasurementHandler>(@public.RealTimeShareTopic);
 			provider.MapMqttTopic<MqttMeasurementHandler>(@public.ShareTopic);
 			provider.MapMqttTopic<MqttBulkMeasurementHandler>(@public.BulkShareTopic);
-
-			provider.UseMeasurementStorage(cache.Workers);
 		}
 
 		public Application BuildApplication(IServiceProvider sp)

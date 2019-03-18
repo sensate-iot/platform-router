@@ -6,7 +6,6 @@
  */
 
 using System;
-using System.Linq;
 using System.Text;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -23,8 +22,6 @@ using SensateService.Config;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
 using SensateService.Models;
-using SensateService.Services;
-using SensateService.Services.Processing;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace SensateService.WebSocketHandler.Application
@@ -109,8 +106,6 @@ namespace SensateService.WebSocketHandler.Application
 			app.MapWebSocketService("/measurement/rt", sp.GetService<RealTimeWebSocketMeasurementHandler>());
 			app.MapWebSocketService("/measurement", sp.GetService<WebSocketMeasurementHandler>());
 			app.MapWebSocketService("/measurement/bulk", sp.GetService<WebSocketBulkMeasurementHandler>());
-
-			sp.UseMeasurementStorage(cache.Workers);
 		}
 
 		private void SetupAuthentication(IServiceCollection services, AuthenticationConfig auth)

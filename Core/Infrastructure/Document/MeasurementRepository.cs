@@ -132,13 +132,6 @@ namespace SensateService.Infrastructure.Document
 			return await result.ToListAsync().AwaitBackground();
 		}
 
-		public virtual IEnumerable<Measurement> TryGetMeasurements(Expression<Func<Measurement, bool>> expression)
-		{
-			var result = this._collection.Find(expression);
-
-			return result?.ToList();
-		}
-
 		public async Task<long> GetMeasurementCountAsync(Sensor sensor, CancellationToken token = default(CancellationToken))
 		{
 			FilterDefinition<Measurement> fd;
@@ -183,16 +176,19 @@ namespace SensateService.Infrastructure.Document
 		public async Task CreateRangeAsync(IEnumerable<Measurement> objs, CancellationToken token)
 		{
 			var measurements = objs.ToList();
+			var concern = WriteConcern.Unacknowledged;
+			var db = this._collection.WithWriteConcern(concern);
+
 			var opts = new InsertManyOptions {
-				IsOrdered = true,
+				IsOrdered = false,
 				BypassDocumentValidation = true
 			};
 
-			foreach(var measurement in measurements) {
-				measurement.InternalId = base.GenerateId(measurement.CreatedAt);
-			}
+			measurements.ForEach(m => {
+				m.InternalId = base.GenerateId(m.CreatedAt);
+			});
 
-			await this._collection.InsertManyAsync(measurements, opts, token).AwaitBackground();
+			await db.InsertManyAsync(measurements, opts, token).AwaitBackground();
 		}
 
 #endregion

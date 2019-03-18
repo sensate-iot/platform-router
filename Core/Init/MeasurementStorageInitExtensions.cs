@@ -24,32 +24,14 @@ namespace SensateService.Init
 			services.AddSingleton(config);
 			services.AddSingleton<IHostedService, MeasurementCacheService>();
 
-			services.AddSingleton(provider => {
-				var s = provider.GetServices<IHostedService>().ToList();
-				return s.Find(x => x.GetType() == typeof(MeasurementCacheService)) as IMeasurementCacheService;
-			});
-
 			services.AddScoped<IMeasurementStore, MeasurementStore>();
-			services.AddScoped(provider => {
-				var service = provider.GetRequiredService<IMeasurementCacheService>();
-				return service.Next();
+			services.AddSingleton<ICachedMeasurementStore, CachedMeasurementStore>();
+			services.AddSingleton<IMeasurementCache>(x => {
+				var obj = x.GetRequiredService<ICachedMeasurementStore>();
+				return obj;
 			});
 
 			return services;
-		}
-
-		public static IServiceProvider UseMeasurementStorage(this IServiceProvider provider, int workers)
-		{
-			var service = provider.GetRequiredService<IMeasurementCacheService>();
-
-			for(var num = 0; num < workers; num++) {
-				var logger = provider.GetRequiredService<ILogger<CachedMeasurementStore>>();
-				var cache = new CachedMeasurementStore(provider.CreateScope().ServiceProvider, logger);
-
-				service.RegisterCache(cache);
-			}
-
-			return provider;
 		}
 	}
 }

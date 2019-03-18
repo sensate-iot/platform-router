@@ -202,8 +202,6 @@ namespace SensateService.DataApi
 
 			app.UseAuthentication();
 			app.UseMvc();
-
-			sp.UseMeasurementStorage(cache.Workers);
 		}
 	}
 }

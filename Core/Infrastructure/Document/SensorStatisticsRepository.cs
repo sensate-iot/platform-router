@@ -104,13 +104,14 @@ namespace SensateService.Infrastructure.Document
 			SensorStatisticsEntry entry;
 			var update = Builders<SensorStatisticsEntry>.Update;
 			UpdateDefinition<SensorStatisticsEntry> updateDefinition;
+			var stats = this._collection.WithWriteConcern(WriteConcern.Unacknowledged);
 
 			var entries = await this.GetAfterAsync(sensor, DateTime.Now.ThisHour()).AwaitBackground();
 
 			entry = entries.FirstOrDefault() ??
 					await this.CreateForAsync(sensor).AwaitBackground();
 			updateDefinition = update.Inc(x => x.Measurements, num);
-			await this._stats.FindOneAndUpdateAsync(x => x.InternalId == entry.InternalId, updateDefinition, cancellationToken: token).AwaitBackground();
+			await stats.FindOneAndUpdateAsync(x => x.InternalId == entry.InternalId, updateDefinition, cancellationToken: token).AwaitBackground();
 		}
 
 		#endregion

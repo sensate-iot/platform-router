@@ -83,7 +83,6 @@ namespace SensateService.Infrastructure.Document
 		{
 			var worker = this._collection.FindAsync(expr);
 			var data = await worker.AwaitBackground();
-
 			return data.ToList();
 		}
 
@@ -128,10 +127,18 @@ namespace SensateService.Infrastructure.Document
 			var objects = objs.ToList();
 
 			foreach(var log in objects) {
-				log.InternalId = ObjectId.GenerateNewId(DateTime.Now);
+				log.InternalId = ObjectId.GenerateNewId(log.Timestamp);
 			}
 
-			return this._collection.InsertManyAsync(objects, null, token);
+			var concern = WriteConcern.Unacknowledged;
+			var logs = this._collection.WithWriteConcern(concern);
+
+			var opts = new InsertManyOptions {
+				IsOrdered = false,
+				BypassDocumentValidation = true
+			};
+
+			return logs.InsertManyAsync(objects, opts, token);
 		}
 	}
 }
