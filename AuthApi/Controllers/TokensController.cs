@@ -7,11 +7,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
 using SensateService.Enums;
@@ -31,18 +34,21 @@ namespace SensateService.AuthApi.Controllers
 		private readonly IUserTokenRepository _tokens;
 		private readonly SignInManager<SensateUser> _signin_manager;
 		private readonly UserAccountSettings _settings;
+		private readonly IApiKeyRepository _keys;
 
 		public TokensController(
 			IUserTokenRepository tokens,
 			IOptions<UserAccountSettings> options,
 			IUserRepository users,
 			SignInManager<SensateUser> signInManager,
+			IApiKeyRepository keys,
 			IHttpContextAccessor ctx
 		) : base(users, ctx)
 		{
 			this._tokens = tokens;
 			this._signin_manager = signInManager;
 			this._settings = options.Value;
+			this._keys = keys;
 		}
 
 		[HttpPost("request")]
@@ -84,14 +90,36 @@ namespace SensateService.AuthApi.Controllers
 			await this._tokens.CreateAsync(token);
 
 			var roles = this._users.GetRoles(user);
+			var key = await this.CreateSystemApiKeyAsync().AwaitBackground();
+
 			var reply = new TokenRequestReply {
 				RefreshToken = token.Value,
 				ExpiresInMinutes = this._settings.JwtRefreshExpireMinutes,
 				JwtToken = this._tokens.GenerateJwtToken(user, roles, _settings),
-				JwtExpiresInMinutes = this._settings.JwtExpireMinutes
+				JwtExpiresInMinutes = this._settings.JwtExpireMinutes,
+				SystemApiKey = key.ApiKey
 			};
 
 			return new OkObjectResult(reply);
+		}
+
+		private async Task<SensateApiKey> CreateSystemApiKeyAsync()
+		{
+			SensateApiKey key;
+
+			key = new SensateApiKey {
+				Id = Guid.NewGuid().ToString(),
+				User = this.CurrentUser,
+				UserId = this.CurrentUser.Id,
+				Type = ApiKeyType.SystemKey,
+				Revoked = false,
+				CreatedOn = DateTime.Now.ToUniversalTime(),
+				ReadOnly = false,
+				Name = Guid.NewGuid().ToString()
+			};
+
+			await this._keys.CreateAsync(key, CancellationToken.None).AwaitBackground();
+			return key;
 		}
 
 		[HttpPost("refresh")]
