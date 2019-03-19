@@ -67,12 +67,17 @@ namespace SensateService.AuthApi.Controllers
 		}
 
 		[HttpDelete("revoke")]
-		public async Task<IActionResult> Revoke([FromQuery] string id, [FromQuery] bool system = true)
+		public async Task<IActionResult> Revoke([FromQuery] string id, [FromQuery] string key, [FromQuery] bool system = true)
 		{
-			if(string.IsNullOrEmpty(id))
+			SensateApiKey apikey;
+
+			if(string.IsNullOrEmpty(id) && string.IsNullOrEmpty(key))
 				return await this.RevokeAll(system).AwaitBackground();
 
-			var apikey = await this._keys.GetByIdAsync(id).AwaitBackground();
+			if(id != null)
+				apikey = await this._keys.GetByIdAsync(id).AwaitBackground();
+			else
+				apikey = await this._keys.GetByKeyAsync(key).AwaitBackground();
 
 			if(apikey.Revoked)
 				return this.BadRequest();
