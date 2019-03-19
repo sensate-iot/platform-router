@@ -74,11 +74,11 @@ namespace SensateService.AuthApi.Controllers
 
 			var apikey = await this._keys.GetByIdAsync(id).AwaitBackground();
 
-			if(!apikey.Revoked)
+			if(apikey.Revoked)
 				return this.BadRequest();
 
 			if(apikey.UserId != this.CurrentUser.Id || !(apikey.Type == ApiKeyType.ApiKey || apikey.Type == ApiKeyType.SystemKey))
-				return this.Forbid();
+				return this.BadRequest();
 
 			await this._keys.MarkRevokedAsync(apikey).AwaitBackground();
 			return this.Ok();

@@ -90,7 +90,7 @@ namespace SensateService.AuthApi.Controllers
 			await this._tokens.CreateAsync(token);
 
 			var roles = this._users.GetRoles(user);
-			var key = await this.CreateSystemApiKeyAsync().AwaitBackground();
+			var key = await this.CreateSystemApiKeyAsync(user).AwaitBackground();
 
 			var reply = new TokenRequestReply {
 				RefreshToken = token.Value,
@@ -103,14 +103,14 @@ namespace SensateService.AuthApi.Controllers
 			return new OkObjectResult(reply);
 		}
 
-		private async Task<SensateApiKey> CreateSystemApiKeyAsync()
+		private async Task<SensateApiKey> CreateSystemApiKeyAsync(SensateUser user)
 		{
 			SensateApiKey key;
 
 			key = new SensateApiKey {
 				Id = Guid.NewGuid().ToString(),
-				User = this.CurrentUser,
-				UserId = this.CurrentUser.Id,
+				User = user,
+				UserId = user.Id,
 				Type = ApiKeyType.SystemKey,
 				Revoked = false,
 				CreatedOn = DateTime.Now.ToUniversalTime(),
