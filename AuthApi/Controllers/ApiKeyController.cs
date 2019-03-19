@@ -66,7 +66,7 @@ namespace SensateService.AuthApi.Controllers
 			return this.Ok();
 		}
 
-		[HttpGet("revoke")]
+		[HttpDelete("revoke")]
 		public async Task<IActionResult> Revoke([FromQuery] string id, [FromQuery] bool system = true)
 		{
 			if(string.IsNullOrEmpty(id))
