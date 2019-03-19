@@ -11,8 +11,8 @@ namespace SensateService.Services
 {
 	public interface ITextSendService
 	{
-		Task SendAsync(string id, string to, string body);
-		void Send(string id, string to, string body);
+		Task SendAsync(string id, string to, string body, bool retry = true);
+		void Send(string id, string to, string body, bool retry = true);
 		Task<bool> IsValidNumber(string number);
 	}
 }

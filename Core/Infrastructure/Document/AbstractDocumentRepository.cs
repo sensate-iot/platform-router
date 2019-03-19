@@ -6,23 +6,23 @@
  */
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 using MongoDB.Bson;
+using MongoDB.Driver;
+using SensateService.Helpers;
 
 namespace SensateService.Infrastructure.Document
 {
-	public abstract class AbstractDocumentRepository<TKey, T> : IRepository<TKey, T> where T : class
+	public abstract class AbstractDocumentRepository<T>
 	{
-		private readonly SensateContext context;
+		protected readonly IMongoCollection<T> _collection;
 
-		protected AbstractDocumentRepository(SensateContext context)
+		protected AbstractDocumentRepository(IMongoCollection<T> collection)
 		{
-			this.context = context;
+			this._collection = collection;
 		}
-
-		public abstract void Create(T obj);
-		public abstract T GetById(TKey id);
 
 		protected ObjectId GenerateId(DateTime? ts)
 		{
@@ -32,9 +32,14 @@ namespace SensateService.Infrastructure.Document
 			return ObjectId.GenerateNewId(timestamp);
 		}
 
-		public abstract Task CreateAsync(T obj);
-		public abstract Task DeleteAsync(TKey id);
-		public abstract void Update(T obj);
-		public abstract void Delete(TKey id);
+		public virtual void Create(T obj)
+		{
+			this._collection.InsertOne(obj);
+		}
+
+		public virtual async Task CreateAsync(T obj, CancellationToken ct = default(CancellationToken))
+		{
+			await this._collection.InsertOneAsync(obj, default(InsertOneOptions), ct).AwaitBackground();
+		}
 	}
 }

@@ -33,7 +33,7 @@ namespace SensateService.Infrastructure.Cache
 			if(string.IsNullOrEmpty(key))
 				return null;
 
-			return await Task.Run(() => this._cache.Get<string>(key), ct).AwaitSafely();
+			return await Task.Run(() => this._cache.Get<string>(key), ct).AwaitBackground();
 		}
 
 		public override void Remove(string key)
@@ -85,7 +85,7 @@ namespace SensateService.Infrastructure.Cache
 
 		public override async Task RemoveAsync(string key)
 		{
-			await Task.Run(() => this._cache.Remove(key)).AwaitSafely();
+			await Task.Run(() => this._cache.Remove(key)).AwaitBackground();
 		}
 
 		public override void Set(string key, string obj)
@@ -101,7 +101,7 @@ namespace SensateService.Infrastructure.Cache
 
 		public override async Task SetAsync(string key, string obj)
 		{
-			await this.SetAsync(key, obj, CacheTimeout.Timeout.ToInt()).AwaitSafely();
+			await this.SetAsync(key, obj, CacheTimeout.Timeout.ToInt()).AwaitBackground();
 		}
 
 		public override async Task SetAsync(
@@ -116,7 +116,7 @@ namespace SensateService.Infrastructure.Cache
 				key, obj,
 				new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(tmo))),
 				ct
-			).AwaitSafely();
+			).AwaitBackground();
 		}
 	}
 }

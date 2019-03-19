@@ -7,18 +7,28 @@
  */
 
 using Microsoft.Extensions.DependencyInjection;
+using SensateService.Config;
 using SensateService.Services;
+using SensateService.Services.Adapters;
+using SensateService.Services.Settings;
 using Twilio;
+using Twilio.Rest.Api.V2010.Account;
 
 namespace SensateService.Init
 {
 	public static class TwilioInitExtensions
 	{
-		public static IServiceCollection AddTwilioTextApi(this IServiceCollection services, string sid, string token)
+		public static IServiceCollection AddTwilioTextApi(this IServiceCollection services, TextConfig config)
 		{
-			TwilioClient.Init(sid, token);
-			services.AddScoped<ITextSendService, TwilioTextSendService>();
+			TwilioClient.Init(config.Twilio.AccountSid, config.Twilio.AuthToken);
 
+			var incoming = IncomingPhoneNumberResource.Fetch(pathSid: config.Twilio.PhoneSid);
+			services.Configure<TextServiceSettings>(options => {
+				options.AlphaCode = config.AlphaCode;
+				options.PhoneNumber = incoming.PhoneNumber.ToString();
+			});
+
+			services.AddScoped<ITextSendService, TwillioTextSendService>();
 			return services;
 		}
 	}

@@ -5,6 +5,7 @@
  * @email:  dev@bietje.net
  */
 
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -37,10 +38,7 @@ namespace SensateService.Infrastructure.Document
 			this._cache.Set(obj.InternalId.ToString(), obj.ToJson());
 		}
 
-		private async Task CommitAsync(
-			Sensor obj,
-			CancellationToken ct = default(CancellationToken)
-		)
+		private async Task CommitAsync( Sensor obj, CancellationToken ct = default(CancellationToken) )
 		{
 			await this._cache.SetAsync(
 				obj.InternalId.ToString(),
@@ -48,17 +46,17 @@ namespace SensateService.Infrastructure.Document
 				CacheTimeout.Timeout.ToInt(),
 				true,
 				ct
-			).AwaitSafely();
+			).AwaitBackground();
 		}
 
-		public override async Task CreateAsync(Sensor sensor)
+		public override async Task CreateAsync(Sensor sensor, CancellationToken ct = default(CancellationToken))
 		{
 			var tasks = new Task[2];
 
-			tasks[0] = base.CreateAsync(sensor);
-			tasks[1] = this.CommitAsync(sensor);
+			tasks[0] = base.CreateAsync(sensor, ct);
+			tasks[1] = this.CommitAsync(sensor, ct);
 
-			await Task.WhenAll(tasks).AwaitSafely();
+			await Task.WhenAll(tasks).AwaitBackground();
 		}
 
 		public override void Create(Sensor obj)
@@ -67,22 +65,24 @@ namespace SensateService.Infrastructure.Document
 			this.Commit(obj);
 		}
 
-		public override Sensor Get(string id)
+		public override async Task<IEnumerable<Sensor>> GetAsync(SensateUser user)
 		{
-			string data;
-			Sensor sensor;
+			string key, data;
+			IEnumerable<Sensor> sensors;
 
-			data = this._cache.Get(id);
+			key = $"Sensors:uid:{user.Id}";
+			data = await this._cache.GetAsync(key);
+
 			if(data != null)
-				return JsonConvert.DeserializeObject<Sensor>(data);
+				return JsonConvert.DeserializeObject<IEnumerable<Sensor>>(data);
 
-			sensor = base.Get(id);
-			if(sensor == null)
+			sensors = await base.GetAsync(user).AwaitBackground();
+
+			if(sensors == null)
 				return null;
 
-			this.Commit(sensor);
-			return sensor;
-
+			await this._cache.SetAsync( key, JsonConvert.SerializeObject(sensors), CacheTimeout.TimeoutMedium.ToInt() ).AwaitBackground();
+			return sensors;
 		}
 
 		public override async Task<Sensor> GetAsync(string id)
@@ -90,35 +90,19 @@ namespace SensateService.Infrastructure.Document
 			string data;
 			Sensor sensor;
 
-			data = await this._cache.GetAsync(id).AwaitSafely();
+			data = await this._cache.GetAsync(id).AwaitBackground();
 
 			if(data != null)
 				return JsonConvert.DeserializeObject<Sensor>(data);
 
-			sensor = await base.GetAsync(id).AwaitSafely();
+			sensor = await base.GetAsync(id).AwaitBackground();
 
 			if(sensor == null)
 				return null;
 
-			await this.CommitAsync(sensor).AwaitSafely();
+			await this.CommitAsync(sensor).AwaitBackground();
 			return sensor;
 
-		}
-
-		public override async Task RemoveAsync(string id)
-		{
-			await this.DeleteAsync(id).AwaitSafely();
-		}
-
-		public override void Remove(string id)
-		{
-			this.Delete(id);
-		}
-
-		public override void Update(Sensor obj)
-		{
-			this._cache.Set(obj.InternalId.ToString(), obj.ToJson());
-			base.Update(obj);
 		}
 
 		public override async Task UpdateAsync(Sensor sensor)
@@ -128,28 +112,17 @@ namespace SensateService.Infrastructure.Document
                 base.UpdateAsync(sensor)
 			};
 
-			await Task.WhenAll(tasks).AwaitSafely();
+			await Task.WhenAll(tasks).AwaitBackground();
 		}
 
-		public override void Delete(string id)
-		{
-			this._cache.Remove(id);
-			base.Delete(id);
-		}
-
-		public override async Task DeleteAsync(string id)
+		public override async Task RemoveAsync(string id)
 		{
 			var tsk = new[] {
 				this._cache.RemoveAsync(id),
-				base.DeleteAsync(id)
+				base.RemoveAsync(id)
 			};
 
-			await Task.WhenAll(tsk).AwaitSafely();
-		}
-
-		public override Sensor GetById(string id)
-		{
-			return this.Get(id);
+			await Task.WhenAll(tsk).AwaitBackground();
 		}
 	}
 }

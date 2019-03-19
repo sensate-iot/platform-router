@@ -13,14 +13,14 @@ using System.Security.Claims;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
+using SensateService.Constants;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 
 namespace SensateService.Infrastructure.Sql
 {
-	public class UserRepository : AbstractSqlRepository<string, SensateUser>, IUserRepository
+	public class UserRepository : AbstractSqlRepository<SensateUser>, IUserRepository
 	{
 		private readonly UserManager<SensateUser> _manager;
 
@@ -31,7 +31,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public override void Create(SensateUser obj) => throw new SystemException("UserRepository.Create is forbidden!");
 
-		public override void Delete(string id)
+		public virtual void Delete(string id)
 		{
 			var obj = this.Get(id);
 
@@ -42,9 +42,7 @@ namespace SensateService.Infrastructure.Sql
 			this.Commit(obj);
 		}
 
-		public override SensateUser GetById(string id) =>
-			String.IsNullOrEmpty(id) ? null : this.Data.FirstOrDefault(x => x.Id == id);
-
+		public virtual SensateUser GetById(string id) => String.IsNullOrEmpty(id) ? null : this.Data.FirstOrDefault(x => x.Id == id);
 		public SensateUser GetByEmail(string email) => this.Data.FirstOrDefault(x => x.Email == email);
 
 		public async Task<SensateUser> GetByEmailAsync(string email)
@@ -54,23 +52,32 @@ namespace SensateService.Infrastructure.Sql
 			});
 		}
 
-		public SensateUser Get(string key)
+		public Task<IEnumerable<SensateUser>> GetRangeAsync(IEnumerable<string> ids)
+		{
+			var worker = Task.Run(() => {
+				var profiles = this.Data.Where(u => ids.Contains(u.Id))
+					.Include(u => u.ApiKeys).ThenInclude(key => key.User)
+					.Include(u => u.UserRoles).ThenInclude(ur => ur.Role);
+				return profiles.ToList().AsEnumerable();
+			});
+
+			return worker;
+		}
+
+		public virtual SensateUser Get(string key)
 		{
 			return this.GetById(key);
 		}
 
-		public async Task<SensateUser> GetAsync(string key)
+		public virtual Task<SensateUser> GetAsync(string key)
 		{
-			var user = await Task.Run(() => this.GetById(key));
-			return user;
-		}
+			var worker = Task.Run(() => {
+				return this.Data.Where(u => u.Id == key)
+					.Include(u => u.ApiKeys).ThenInclude(k => k.User)
+					.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).FirstOrDefault();
+			});
 
-		public override void Update(SensateUser obj)
-		{
-			var orig = this.GetByEmail(obj.Email);
-
-			this.Data.Update(obj);
-			this.Commit(obj);
+			return worker;
 		}
 
 		public override Task CreateAsync(SensateUser obj)
@@ -78,9 +85,9 @@ namespace SensateService.Infrastructure.Sql
 			throw new SystemException("UserRepository.CreateAsync is forbidden!");
 		}
 
-		public override async Task DeleteAsync(string id)
+		public virtual async Task DeleteAsync(string id)
 		{
-			var obj = this.Get(id);
+			var obj = await this.GetAsync(id);
 
 			if(obj == null)
 				return;
@@ -108,20 +115,91 @@ namespace SensateService.Infrastructure.Sql
 		public IEnumerable<string> GetRoles(SensateUser user)
 		{
 			var result = this._manager.GetRolesAsync(user);
-
-			result.Wait();
 			return result.Result;
 		}
 
-		public async Task<IEnumerable<string>> GetRolesAsync(SensateUser user)
+		public virtual async Task<IEnumerable<string>> GetRolesAsync(SensateUser user)
 		{
-			return await this._manager.GetRolesAsync(user).AwaitSafely();
+			return await this._manager.GetRolesAsync(user).AwaitBackground();
 		}
 
 		public async Task<IEnumerable<SensateUser>> FindByEmailAsync(string email)
 		{
 			var result = this.Data.Where(x => x.Email.Contains(email));
-			return await result.ToListAsync().AwaitSafely();
+			return await result.ToListAsync().AwaitBackground();
+		}
+
+		public async Task<int> CountAsync()
+		{
+			return await this.Data.CountAsync().AwaitBackground();
+		}
+
+		public async Task<int> CountGhostUsersAsync()
+		{
+			return await this.Data.CountAsync(x => !(x.EmailConfirmed && x.PhoneNumberConfirmed)).AwaitBackground();
+		}
+
+		public async Task<List<Tuple<DateTime, int>>> CountByDay(DateTime start)
+		{
+			var query = this.Data.Where(x => x.RegisteredAt >= start)
+				.GroupBy(x => x.RegisteredAt.Date)
+				.Select( x => new Tuple<DateTime, int>(x.Key, x.Count()) );
+			return await query.ToListAsync().AwaitBackground();
+		}
+
+		public async Task<List<SensateUser>> GetMostRecentAsync(int number)
+		{
+			var query = this.Data.OrderByDescending(x => x.RegisteredAt);
+			var ordered = query.Take(number);
+
+			return await ordered.ToListAsync().AwaitBackground();
+		}
+
+		public async Task<bool> IsBanned(SensateUser user)
+		{
+			var raw = await this.GetRolesAsync(user).AwaitBackground();
+			var roles = raw.ToArray();
+
+			if(roles.Length == 0)
+				return true;
+
+			return this.IsInRole(roles, UserRoles.Banned);
+		}
+
+		public async Task<bool> IsAdministrator(SensateUser user)
+		{
+			return await this.IsInRole(user, UserRoles.Administrator);
+		}
+
+		public async Task<bool> ClearRolesForAsync(SensateUser user)
+		{
+			var roles = await this._manager.GetRolesAsync(user).AwaitBackground();
+
+			if(roles.Count <= 0)
+				return true;
+
+			var result = await this._manager.RemoveFromRolesAsync(user, roles).AwaitBackground();
+			return result.Succeeded;
+		}
+
+		public async Task<bool> AddToRolesAsync(SensateUser user, IEnumerable<string> roles)
+		{
+			var result = await this._manager.AddToRolesAsync(user, roles);
+			return result.Succeeded;
+		}
+
+		private async Task<bool> IsInRole(SensateUser user, string role)
+		{
+			var raw = await this.GetRolesAsync(user).AwaitBackground();
+			var roles = raw.Select(r => r.ToUpper());
+
+			return roles.Contains(role.ToUpper());
+		}
+
+		private bool IsInRole(string[] roles, string role)
+		{
+			var _roles = roles.Select(r => r.ToUpper());
+			return _roles.Contains(role.ToUpper());
 		}
 	}
 }

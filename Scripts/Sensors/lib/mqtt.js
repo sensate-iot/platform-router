@@ -8,13 +8,24 @@
 'use strict';
 
 var mqtt = require('mqtt');
+var NanoTimer = require('nanotimer');
 
-function publish(client, args) {
+function getRandNumber(min, max) {
+	return Math.floor(Math.random() * ( max - min)) + min;
+}
+
+function generateMeasurement(args) {
+	let idx = 0;
+
+	if(args.allsensors) {
+		idx = getRandNumber(0, args.sensors.length);
+	}
+
 	const measurement = {
 		Longitude: 2.13613511,
 		Latitude: 31.215135211,
-		CreatedById: args.id,
-		CreatedBySecret: args.secret,
+		CreatedById: args.sensors[idx].sensor,
+		CreatedBySecret: args.sensors[idx].secret,
 		Data: [
 			{ Name: 'x', Value: Math.random() * 10 },
 			{ Name: 'y', Value: Math.random() * 100 },
@@ -22,11 +33,30 @@ function publish(client, args) {
 		]
 	}
 
+	return measurement;
+}
+
+function publish(client, args) {
+	const measurement = generateMeasurement(args, args);
 	client.publish('sensate/measurements', JSON.stringify(measurement));
 }
 
+function publishBulk(client, args) {
+	let ary = [];
+	const max = getRandNumber(args.bulk, args.bulk + 20);
+
+	for(let idx = 0; idx < max; idx++) {
+		ary.push(generateMeasurement(args, args));
+	}
+
+	client.publish('sensate/measurements/bulk', JSON.stringify(ary));
+}
+
+let timer = undefined;
+
 module.exports.run = function (args) {
 	var opts = {};
+	timer = new NanoTimer();
 
 	if(args.username != undefined) {
 		opts.username = args.username;
@@ -42,5 +72,8 @@ module.exports.run = function (args) {
 		console.log('Connected to MQTT broker!');
 	});
 
-	setInterval(publish, args.interval, client, args);
+	if(isNaN(args.bulk))
+		timer.setInterval(publish, [client, args], args.interval.toString() + 'u');
+	else
+		timer.setInterval(publishBulk, [client, args], args.interval.toString() + 'u')
 }

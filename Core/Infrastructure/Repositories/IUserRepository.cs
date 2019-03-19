@@ -5,6 +5,7 @@
  * @email:  dev@bietje.net
  */
 
+using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -19,6 +20,7 @@ namespace SensateService.Infrastructure.Repositories
 		Task<SensateUser> GetAsync(string key);
 		SensateUser GetByEmail(string key);
 		Task<SensateUser> GetByEmailAsync(string key);
+		Task<IEnumerable<SensateUser>> GetRangeAsync(IEnumerable<string> ids);
 
 		Task<IEnumerable<SensateUser>> FindByEmailAsync(string email);
 
@@ -32,5 +34,16 @@ namespace SensateService.Infrastructure.Repositories
 
 		void Delete(string id);
 		Task DeleteAsync(string id);
+
+		Task<int> CountGhostUsersAsync();
+		Task<int> CountAsync();
+		Task<List<Tuple<DateTime, int>>> CountByDay(DateTime start);
+
+		Task<List<SensateUser>> GetMostRecentAsync(int number);
+
+		Task<bool> IsBanned(SensateUser user);
+		Task<bool> IsAdministrator(SensateUser user);
+	    Task<bool> ClearRolesForAsync(SensateUser user);
+		Task<bool> AddToRolesAsync(SensateUser user, IEnumerable<string> roles);
 	}
 }

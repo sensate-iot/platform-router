@@ -11,5 +11,7 @@ namespace SensateService.Config
 	{
 		public bool Enabled { get; set; }
 		public string Type { get; set; }
+		public int Workers { get; set; }
+		public int Interval { get; set; }
 	}
 }

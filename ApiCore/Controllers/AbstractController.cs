@@ -7,9 +7,9 @@
  */
 
 using System;
-using System.Net;
 using System.Threading.Tasks;
 
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 using SensateService.Enums;
@@ -24,11 +24,16 @@ namespace SensateService.ApiCore.Controllers
 	{
 		protected readonly IUserRepository _users;
 
-		public SensateUser CurrentUser => this.User == null ? null : this._users.GetByClaimsPrinciple(this.User);
+		protected SensateUser CurrentUser { get; }
 
-		protected AbstractController(IUserRepository users)
+		protected AbstractController(IUserRepository users, IHttpContextAccessor ctx)
 		{
+			var uid = ctx.HttpContext.User;
 			this._users = users;
+			this.CurrentUser = null;
+
+			if(uid != null)
+				this.CurrentUser = this._users.GetByClaimsPrinciple(uid);
 		}
 
 		protected StatusCodeResult ServerFault()
@@ -62,26 +67,12 @@ namespace SensateService.ApiCore.Controllers
 
 		protected IActionResult NotFoundInputResult(string msg)
 		{
-			var status = new Status();
-
-			status.Message = msg;
-			status.ErrorCode = ReplyCode.NotFound;
+			var status = new Status {
+				Message = msg,
+				ErrorCode = ReplyCode.NotFound
+			};
 
 			return new NotFoundObjectResult(status);
-		}
-
-		protected string GetCurrentRoute()
-		{
-			if(!this.RouteData.Values.TryGetValue("controller", out object controller))
-				return null;
-
-			return !this.RouteData.Values.TryGetValue("action", out object action) ? null :
-				String.Format("/{0}#{1}", controller.ToString(), action.ToString());
-		}
-
-		protected IPAddress GetRemoteAddress()
-		{
-			return this.HttpContext.Connection.RemoteIpAddress;
 		}
 
 		protected bool IsValidUri(string uri)

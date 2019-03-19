@@ -11,5 +11,6 @@ namespace SensateService.Infrastructure.Document
 	{
 		public string ConnectionString { get; set; }
 		public string DatabaseName { get; set; }
+		public int MaxConnections { get; set; }
 	}
 }

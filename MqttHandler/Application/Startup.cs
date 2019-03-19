@@ -7,7 +7,6 @@
 
 using System;
 using System.IO;
-using System.Linq;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -19,8 +18,6 @@ using SensateService.Config;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
 using SensateService.Models;
-using SensateService.Services;
-
 using SensateService.MqttHandler.Mqtt;
 
 namespace SensateService.MqttHandler.Application
@@ -66,9 +63,12 @@ namespace SensateService.MqttHandler.Application
 			Configuration.GetSection("Database").Bind(db);
 			Configuration.GetSection("Cache").Bind(cache);
 
+			var publicmqtt = mqtt.PublicBroker;
+			var privatemqtt = mqtt.InternalBroker;
+
 			services.AddPostgres(db.PgSQL.ConnectionString);
 
-			services.AddIdentity<SensateUser, UserRole>(config => {
+			services.AddIdentity<SensateUser, SensateRole>(config => {
 				config.SignIn.RequireConfirmedEmail = true;
 			})
 			.AddEntityFrameworkStores<SensateSqlContext>()
@@ -76,43 +76,58 @@ namespace SensateService.MqttHandler.Application
 
 			services.AddLogging(builder => { builder.AddConfiguration(this.Configuration.GetSection("Logging")); });
 
-
 			if(cache.Enabled)
                 services.AddCacheStrategy(cache, db);
 
-			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName);
+			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.AddDocumentRepositories(cache.Enabled);
-			services.AddSqlRepositories();
+			services.AddSqlRepositories(cache.Enabled);
+			services.AddMeasurementStorage(cache);
 
 			services.AddMqttService(options => {
-				options.Ssl = mqtt.Ssl;
-				options.Host = mqtt.Host;
-				options.Port = mqtt.Port;
-				options.Username = mqtt.Username;
-				options.Password = mqtt.Password;
+				options.Ssl = publicmqtt.Ssl;
+				options.Host = publicmqtt.Host;
+				options.Port = publicmqtt.Port;
+				options.Username = publicmqtt.Username;
+				options.Password = publicmqtt.Password;
 				options.Id = Guid.NewGuid().ToString();
 				options.TopicShare = "$share/sensate/";
-				options.InternalMeasurementTopic = mqtt.InternalMeasurementTopic;
 			});
 
-			services.AddSingleton(provider => {
-				var s = provider.GetServices<IHostedService>().ToList();
-				var mqservice = s.Find(x => x.GetType() == typeof(MqttService)) as IMqttPublishService;
-				return mqservice;
+			services.AddInternalMqttService(options => {
+				options.Ssl = privatemqtt.Ssl;
+				options.Host = privatemqtt.Host;
+				options.Port = privatemqtt.Port;
+				options.Username = privatemqtt.Username;
+				options.Password = privatemqtt.Password;
+				options.Id = Guid.NewGuid().ToString();
+				options.InternalBulkMeasurementTopic = privatemqtt.InternalBulkMeasurementTopic;
+				options.InternalMeasurementTopic = privatemqtt.InternalMeasurementTopic;
+			});
+
+			services.AddSingleton<IHostedService, MqttPublishHandler>();
+
+			services.AddLogging(builder => {
+				if(IsDevelopment())
+					builder.AddDebug();
+
+				builder.AddConsole();
+				builder.AddConfiguration(Configuration.GetSection("Logging"));
 			});
 		}
 
 		public void Configure(IServiceProvider provider)
 		{
 			var mqtt = new MqttConfig();
-			var logging = provider.GetRequiredService<ILoggerFactory>();
+			var cache = new CacheConfig();
 
 			Configuration.GetSection("Mqtt").Bind(mqtt);
-			provider.MapMqttTopic<MqttMeasurementHandler>(mqtt.ShareTopic);
+			Configuration.GetSection("Cache").Bind(cache);
+			var @public = mqtt.PublicBroker;
 
-			logging.AddConsole();
-			if(IsDevelopment())
-                logging.AddDebug();
+			provider.MapMqttTopic<MqttRealTimeMeasurementHandler>(@public.RealTimeShareTopic);
+			provider.MapMqttTopic<MqttMeasurementHandler>(@public.ShareTopic);
+			provider.MapMqttTopic<MqttBulkMeasurementHandler>(@public.BulkShareTopic);
 		}
 
 		public Application BuildApplication(IServiceProvider sp)

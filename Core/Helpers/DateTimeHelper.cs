@@ -23,5 +23,13 @@ namespace SensateService.Helpers
 
 			return time.Value.CompareTo(DateTime.MinValue) <= 0;
 		}
+
+		public static DateTime ThisHour(this DateTime dt)
+		{
+			DateTime rounded;
+
+			rounded = new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, 0, 0, dt.Kind);
+			return rounded;
+		}
 	}
 }

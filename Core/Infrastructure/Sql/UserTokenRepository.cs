@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq.Expressions;
 using System.Security.Claims;
 
 using Microsoft.IdentityModel.Tokens;
@@ -22,10 +23,9 @@ using SensateService.Helpers;
 
 namespace SensateService.Infrastructure.Sql
 {
-	public class UserTokenRepository :
-		AbstractSqlRepository<Tuple<SensateUser, string>, UserToken>, IUserTokenRepository
+	public class UserTokenRepository : AbstractSqlRepository<UserToken>, IUserTokenRepository
 	{
-		private Random _rng;
+		private readonly Random _rng;
 		private const int JwtRefreshTokenLength = 64;
 		public const string JwtRefreshTokenProvider = "JWTrt";
 		public const string JwtTokenProvider = "JWT";
@@ -38,7 +38,7 @@ namespace SensateService.Infrastructure.Sql
 		public override void Create(UserToken obj)
 		{
 			var asyncResult = this.CreateAsync(obj);
-			asyncResult.Wait();
+			asyncResult.RunSynchronously();
 		}
 
 		public override async Task CreateAsync(UserToken obj)
@@ -49,16 +49,16 @@ namespace SensateService.Infrastructure.Sql
 				throw new DatabaseException("User token must have a value!");
 			}
 
-			var tasks = new[] {
-				this.Data.AddAsync(obj),
-				this.CommitAsync(obj)
-			};
+			await base.CreateAsync(obj);
+		}
 
-			await Task.WhenAll(tasks).AwaitSafely();
+		public Task<long> CountAsync(Expression<Func<UserToken, bool>> expr)
+		{
+			return Task.Run(() => this._sqlContext.UserTokens.LongCount(expr));
 		}
 
 
-		public override UserToken GetById(Tuple<SensateUser, string> id) => this.GetById(id.Item1, id.Item2);
+		public UserToken GetById(Tuple<SensateUser, string> id) => this.GetById(id.Item1, id.Item2);
 
 		public UserToken GetById(SensateUser user, string value)
 		{
@@ -78,22 +78,6 @@ namespace SensateService.Infrastructure.Sql
 			return data.ToList();
 		}
 
-
-		public override void Update(UserToken obj)
-		{
-			throw new NotAllowedException("Unable to update user token!");
-		}
-
-		public override void Delete(Tuple<SensateUser, string> id)
-		{
-			throw new NotAllowedException("Unable to delete user token!");
-		}
-
-		public override Task DeleteAsync(Tuple<SensateUser, string> id)
-		{
-			throw new NotAllowedException("Unable to delete user token!");
-		}
-
 		public void InvalidateToken(UserToken token)
 		{
 			this.StartUpdate(token);
@@ -105,7 +89,7 @@ namespace SensateService.Infrastructure.Sql
 		{
 			this.StartUpdate(token);
 			token.Valid = false;
-			await this.EndUpdateAsync().AwaitSafely();
+			await this.EndUpdateAsync().AwaitBackground();
 		}
 
 		public void InvalidateToken(SensateUser user, string value)
@@ -125,7 +109,7 @@ namespace SensateService.Infrastructure.Sql
 			if(token == null)
 				return;
 
-			await this.InvalidateTokenAsync(token).AwaitSafely();
+			await this.InvalidateTokenAsync(token).AwaitBackground();
 		}
 
 		public string GenerateJwtToken(SensateUser user, IEnumerable<string> roles, UserAccountSettings settings)
@@ -136,7 +120,8 @@ namespace SensateService.Infrastructure.Sql
 			claims = new List<Claim> {
 				new Claim(JwtRegisteredClaimNames.Sub, user.Email),
 				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-				new Claim(ClaimTypes.NameIdentifier, user.Id)
+				new Claim(ClaimTypes.NameIdentifier, user.Id),
+				new Claim(JwtRegisteredClaimNames.NameId, user.Id)
 			};
 
 			roles.ToList().ForEach(x => {
@@ -172,7 +157,7 @@ namespace SensateService.Infrastructure.Sql
 				x.Valid = false;
 			});
 
-			await this.CommitAsync().AwaitSafely();
+			await this.CommitAsync().AwaitBackground();
 		}
 	}
 }

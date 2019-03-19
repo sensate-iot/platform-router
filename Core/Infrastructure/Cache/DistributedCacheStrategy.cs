@@ -30,7 +30,7 @@ namespace SensateService.Infrastructure.Cache
 
 		public override async Task<string> GetAsync(string key, CancellationToken ct = default(CancellationToken))
 		{
-			return await this._cache.GetStringAsync(key, ct).AwaitSafely();
+			return await this._cache.GetStringAsync(key, ct).AwaitBackground();
 		}
 
 		public override void Remove(string key)
@@ -50,14 +50,14 @@ namespace SensateService.Infrastructure.Cache
 				opts.SetSlidingExpiration(TimeSpan.FromMinutes(tmo));
 			else
 				opts.SetAbsoluteExpiration(TimeSpan.FromMinutes(tmo));
-			await this._cache.SetAsync(key, data, opts, ct).AwaitSafely();
+			await this._cache.SetAsync(key, data, opts, ct).AwaitBackground();
 		}
 
 		public override async Task<ObjType> DeserializeAsync<ObjType>(string key, CancellationToken ct = default(CancellationToken))
 		{
 			byte[] data;
 
-			data = await this._cache.GetAsync(key, ct).AwaitSafely();
+			data = await this._cache.GetAsync(key, ct).AwaitBackground();
 			return data.FromByteArray<ObjType>();
 		}
 
@@ -86,7 +86,7 @@ namespace SensateService.Infrastructure.Cache
 
 		public override async Task RemoveAsync(string key)
 		{
-			await this._cache.RemoveAsync(key).AwaitSafely();
+			await this._cache.RemoveAsync(key).AwaitBackground();
 		}
 
 		public override void Set(string key, string obj)
@@ -110,7 +110,7 @@ namespace SensateService.Infrastructure.Cache
 
 		public override async Task SetAsync(string key, string obj)
 		{
-			await this.SetAsync(key, obj, CacheTimeout.Timeout.ToInt()).AwaitSafely();
+			await this.SetAsync(key, obj, CacheTimeout.Timeout.ToInt()).AwaitBackground();
 		}
 
 		public override async Task SetAsync(
@@ -128,7 +128,7 @@ namespace SensateService.Infrastructure.Cache
 			else
 				options.SetAbsoluteExpiration(TimeSpan.FromMinutes(tmo));
 
-			await this._cache.SetStringAsync(key, obj, options, ct).AwaitSafely();
+			await this._cache.SetStringAsync(key, obj, options, ct).AwaitBackground();
 		}
 	}
 }

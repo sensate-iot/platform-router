@@ -12,6 +12,7 @@ namespace SensateService.Enums
 		BadInput = 400,
 		NotAllowed = 401,
 		NotFound = 402,
+		Banned = 403,
 		Ok = 200
 	}
 }

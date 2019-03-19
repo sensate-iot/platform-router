@@ -7,6 +7,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
@@ -19,18 +22,25 @@ using SensateService.Models;
 
 namespace SensateService.Infrastructure.Document
 {
-	public class SensorStatisticsRepository : AbstractDocumentRepository<string, SensorStatisticsEntry>, ISensorStatisticsRepository
+	public class SensorStatisticsRepository : AbstractDocumentRepository<SensorStatisticsEntry>, ISensorStatisticsRepository
 	{
 		private readonly ILogger<SensorStatisticsRepository> _logger;
 		private readonly IMongoCollection<SensorStatisticsEntry> _stats;
 
-		public SensorStatisticsRepository(SensateContext context, ILogger<SensorStatisticsRepository> logger) : base(context)
+		public SensorStatisticsRepository(SensateContext context, ILogger<SensorStatisticsRepository> logger) : base(context.Statistics)
 		{
 			this._logger = logger;
 			this._stats = context.Statistics;
 		}
 
-		public override void Delete(string id)
+		public async Task<IEnumerable<SensorStatisticsEntry>> GetAsync(Expression<Func<SensorStatisticsEntry, bool>> expr)
+		{
+			var worker = this._stats.FindAsync(expr);
+			var data = await worker.AwaitBackground();
+			return data.ToList();
+		}
+
+		public void Delete(string id)
 		{
 			ObjectId objectId;
 
@@ -38,12 +48,12 @@ namespace SensateService.Infrastructure.Document
 			this._stats.DeleteOne(x => x.InternalId == objectId);
 		}
 
-		public override async Task DeleteAsync(string id)
+		public async Task DeleteAsync(string id)
 		{
 			ObjectId objectId;
 
 			objectId = ObjectId.Parse(id);
-			await this._stats.DeleteOneAsync(x => x.InternalId == objectId).AwaitSafely();
+			await this._stats.DeleteOneAsync(x => x.InternalId == objectId).AwaitBackground();
 		}
 
 		public async Task DeleteBySensorAsync(Sensor sensor)
@@ -51,24 +61,27 @@ namespace SensateService.Infrastructure.Document
 			var query = Builders<SensorStatisticsEntry>.Filter.Eq("SensorId", sensor.InternalId);
 
 			try {
-				await this._stats.DeleteManyAsync(query).AwaitSafely();
+				await this._stats.DeleteManyAsync(query).AwaitBackground();
 			} catch(Exception ex) {
 				this._logger.LogWarning(ex.Message);
 			}
 		}
 
+		public async Task DeleteBySensorAsync(Sensor sensor, DateTime from, DateTime to)
+		{
+			var f = from.ThisHour();
+			var t = to.ThisHour();
+
+			var worker = this._collection.DeleteManyAsync(stat => stat.SensorId == sensor.InternalId &&
+			                                                      stat.Date >= f && stat.Date <= t);
+			await worker.AwaitBackground();
+		}
+
 #region Entry creation
 
-		public async Task IncrementAsync(Sensor sensor)
+		public Task IncrementAsync(Sensor sensor)
 		{
-			SensorStatisticsEntry entry;
-			var update = Builders<SensorStatisticsEntry>.Update;
-			UpdateDefinition<SensorStatisticsEntry> updateDefinition;
-
-			entry = await this.GetByDateAsync(sensor, DateTime.Today).AwaitSafely() ??
-					await this.CreateForAsync(sensor).AwaitSafely();
-			updateDefinition = update.Inc(x => x.Measurements, 1);
-			await this._stats.FindOneAndUpdateAsync(x => x.InternalId == entry.InternalId, updateDefinition).AwaitSafely();
+			return this.IncrementManyAsync(sensor, 1, default(CancellationToken));
 		}
 
 		public async Task<SensorStatisticsEntry> CreateForAsync(Sensor sensor)
@@ -77,82 +90,113 @@ namespace SensateService.Infrastructure.Document
 
 			entry = new SensorStatisticsEntry {
 				InternalId = base.GenerateId(DateTime.Now),
-				Date = DateTime.Today,
+				Date = DateTime.Now.ThisHour(),
 				Measurements = 0,
 				SensorId = sensor.InternalId
 			};
 
-			await this.CreateAsync(entry).AwaitSafely();
+			await this.CreateAsync(entry).AwaitBackground();
 			return entry;
 		}
 
-		public override void Create(SensorStatisticsEntry obj)
+		public async Task IncrementManyAsync(Sensor sensor, int num, CancellationToken token)
 		{
-			try {
-				this._stats.InsertOne(obj);
-			} catch(Exception ex) {
-				this._logger.LogWarning(ex.Message);
-				throw ex;
-			}
+			SensorStatisticsEntry entry;
+			var update = Builders<SensorStatisticsEntry>.Update;
+			UpdateDefinition<SensorStatisticsEntry> updateDefinition;
+			var stats = this._collection.WithWriteConcern(WriteConcern.Unacknowledged);
+
+			var entries = await this.GetAfterAsync(sensor, DateTime.Now.ThisHour()).AwaitBackground();
+
+			entry = entries.FirstOrDefault() ??
+					await this.CreateForAsync(sensor).AwaitBackground();
+			updateDefinition = update.Inc(x => x.Measurements, num);
+			await stats.FindOneAndUpdateAsync(x => x.InternalId == entry.InternalId, updateDefinition, cancellationToken: token).AwaitBackground();
 		}
 
-		public override async Task CreateAsync(SensorStatisticsEntry obj)
-		{
-			try {
-				await this._stats.InsertOneAsync(obj).AwaitSafely();
-			} catch(Exception ex) {
-				this._logger.LogWarning(ex.Message);
-				throw ex;
-			}
-		}
-
-#endregion
+		#endregion
 
 #region Entry Getters
 
-		public async Task<SensorStatisticsEntry> GetByDateAsync(Sensor sensor, DateTime date)
+		public async Task<SensorStatisticsEntry> GetByDateAsync(Sensor sensor, DateTime dt)
 		{
 			FilterDefinition<SensorStatisticsEntry> filter;
 			var filterBuilder = Builders<SensorStatisticsEntry>.Filter;
+			var date = dt.ThisHour();
 
 			filter = filterBuilder.Eq("SensorId", sensor.InternalId) & filterBuilder.Eq("Date", date);
-			var result = await this._stats.FindAsync(filter).AwaitSafely();
+			var result = await this._stats.FindAsync(filter).AwaitBackground();
 
 			if(result == null)
 				return null;
 
-			return await result.FirstOrDefaultAsync().AwaitSafely();
+			return await result.FirstOrDefaultAsync().AwaitBackground();
 		}
 
-		public async Task<IEnumerable<SensorStatisticsEntry>> GetBeforeAsync(Sensor sensor, DateTime date)
+		public async Task<IEnumerable<SensorStatisticsEntry>> GetBeforeAsync(Sensor sensor, DateTime dt)
 		{
 			FilterDefinition<SensorStatisticsEntry> filter;
 			var filterBuilder = Builders<SensorStatisticsEntry>.Filter;
+			var date = dt.ThisHour();
 
 			filter = filterBuilder.Eq("SensorId", sensor.InternalId) & filterBuilder.Lte("Date", date);
-			var result = await this._stats.FindAsync(filter).AwaitSafely();
+			var result = await this._stats.FindAsync(filter).AwaitBackground();
 
 			if(result == null)
 				return null;
 
-			return await result.ToListAsync().AwaitSafely();
+			return await result.ToListAsync().AwaitBackground();
 		}
 
-		public async Task<IEnumerable<SensorStatisticsEntry>> GetAfterAsync(Sensor sensor, DateTime date)
+		public async Task<IEnumerable<SensorStatisticsEntry>> GetAfterAsync(Sensor sensor, DateTime dt)
+		{
+			FilterDefinition<SensorStatisticsEntry> filter;
+			var filterBuilder = Builders<SensorStatisticsEntry>.Filter;
+			var date = dt.ThisHour();
+
+			filter = filterBuilder.Eq("SensorId", sensor.InternalId) & filterBuilder.Gte("Date", date);
+			var result = await this._stats.FindAsync(filter).AwaitBackground();
+
+			if(result == null)
+				return null;
+
+			return await result.ToListAsync().AwaitBackground();
+		}
+
+		public async Task<IEnumerable<SensorStatisticsEntry>> GetAfterAsync(DateTime date)
 		{
 			FilterDefinition<SensorStatisticsEntry> filter;
 			var filterBuilder = Builders<SensorStatisticsEntry>.Filter;
 
-			filter = filterBuilder.Eq("SensorId", sensor.InternalId) & filterBuilder.Gte("Date", date);
-			var result = await this._stats.FindAsync(filter).AwaitSafely();
+			filter = filterBuilder.Gte("Date", date);
+			var result = await this._stats.FindAsync(filter).AwaitBackground();
 
 			if(result == null)
 				return null;
 
-			return await result.ToListAsync().AwaitSafely();
+			return await result.ToListAsync().AwaitBackground();
 		}
 
-		public override SensorStatisticsEntry GetById(string id)
+
+		public async Task<IEnumerable<SensorStatisticsEntry>> GetBetweenAsync(Sensor sensor, DateTime start, DateTime end)
+		{
+			FilterDefinition<SensorStatisticsEntry> filter;
+
+			var builder = Builders<SensorStatisticsEntry>.Filter;
+			var startDate = start.ThisHour();
+			var endDate = end.ThisHour();
+
+			filter = builder.Eq("SensorId", sensor.InternalId) & builder.Gte("Date", startDate) &
+			         builder.Lte("Date", endDate);
+			var result = await this._stats.FindAsync(filter).AwaitBackground();
+
+			if(result == null)
+				return null;
+
+			return await result.ToListAsync().AwaitBackground();
+		}
+
+		public SensorStatisticsEntry GetById(string id)
 		{
 			var fb = Builders<SensorStatisticsEntry>.Filter;
 
@@ -163,15 +207,6 @@ namespace SensateService.Infrastructure.Document
 			var result = this._stats.FindSync(filter);
 
 			return result.FirstOrDefault();
-		}
-
-#endregion
-
-#region Not implemented
-
-		public override void Update(SensorStatisticsEntry obj)
-		{
-			throw new InvalidOperationException("SensorStatisticsRepository.Update is an invalid operation!");
 		}
 
 #endregion

@@ -1,6 +1,0 @@
-/*
- * Some sample text.
- *
- * @author Michel Megens <dev@bietje.net>
- * @author Another Dev <another@example.com>
- */

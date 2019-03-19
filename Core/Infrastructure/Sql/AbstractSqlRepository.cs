@@ -5,6 +5,8 @@
  * @email:  dev@bietje.net
  */
 
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,9 +16,9 @@ using SensateService.Helpers;
 
 namespace SensateService.Infrastructure.Sql
 {
-	public abstract class AbstractSqlRepository<TKey, T> : IRepository<TKey, T> where T : class
+	public abstract class AbstractSqlRepository<T> : IBulkWriter<T>, IDisposable where T : class
 	{
-		private SensateSqlContext _sqlContext;
+		protected readonly SensateSqlContext _sqlContext;
 		protected DbSet<T> Data;
 
 		protected AbstractSqlRepository(SensateSqlContext context)
@@ -32,25 +34,18 @@ namespace SensateService.Infrastructure.Sql
 
 		public async Task CommitAsync(T obj, CancellationToken ct = default(CancellationToken))
 		{
-			await this._sqlContext.SaveChangesAsync(ct).AwaitSafely();
+			await this._sqlContext.SaveChangesAsync(ct).AwaitBackground();
 		}
 
 		public async Task CommitAsync(CancellationToken ct = default(CancellationToken))
 		{
-			await this._sqlContext.SaveChangesAsync(ct).AwaitSafely();
+			await this._sqlContext.SaveChangesAsync(ct).AwaitBackground();
 		}
 
 		public virtual void Commit()
 		{
 			this._sqlContext.SaveChanges();
 		}
-
-		public abstract void Create(T obj);
-		public abstract void Update(T obj);
-		public abstract T GetById(TKey id);
-		public abstract void Delete(TKey id);
-		public abstract Task CreateAsync(T obj);
-		public abstract Task DeleteAsync(TKey id);
 
 		public virtual void StartUpdate(T obj)
 		{
@@ -59,12 +54,40 @@ namespace SensateService.Infrastructure.Sql
 
 		public virtual async Task EndUpdateAsync()
 		{
-			await this._sqlContext.SaveChangesAsync().AwaitSafely();
+			await this._sqlContext.SaveChangesAsync().AwaitBackground();
 		}
 
 		public void EndUpdate()
 		{
 			this._sqlContext.SaveChanges();
+		}
+
+		public virtual void Create(T obj)
+		{
+			this.Data.Add(obj);
+			this.Commit();
+		}
+
+		public virtual async Task CreateAsync(T obj)
+		{
+			this.Data.Add(obj);
+			await this.CommitAsync();
+		}
+
+		public void AddRange(IEnumerable<T> objs)
+		{
+			this.Data.AddRange(objs);
+		}
+
+		public virtual async Task CreateRangeAsync(IEnumerable<T> objs, CancellationToken token)
+		{
+			this.AddRange(objs);
+			await this.CommitAsync(token);
+		}
+
+		public void Dispose()
+		{
+			_sqlContext?.Dispose();
 		}
 	}
 }

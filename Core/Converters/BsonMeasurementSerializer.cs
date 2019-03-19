@@ -38,7 +38,11 @@ namespace SensateService.Converters
 			writer.WriteDouble("Longitude", value.Longitude);
 			writer.WriteDouble("Latitude", value.Latitude);
 
-			offset = new DateTimeOffset(value.CreatedAt);
+			if(value.CreatedAt.Kind != DateTimeKind.Utc)
+				offset = new DateTimeOffset(value.CreatedAt.ToUniversalTime());
+			else
+				offset = new DateTimeOffset(value.CreatedAt);
+
 			writer.WriteDateTime("CreatedAt", offset.ToUnixTimeMilliseconds());
 			writer.WriteObjectId("CreatedBy", value.CreatedBy);
 
@@ -75,7 +79,7 @@ namespace SensateService.Converters
 
 			case "CreatedAt":
 				ticks = reader.ReadDateTime();
-				m.CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(ticks).DateTime;
+				m.CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(ticks).UtcDateTime;
 				break;
 
 			case "Longitude":

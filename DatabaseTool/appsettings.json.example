@@ -1,0 +1,43 @@
+﻿{
+  "Logging": {
+    "IncludeScopes": false,
+    "Debug": {
+      "LogLevel": {
+        "Default": "Warning",
+        "Microsoft": "Warning",
+        "System": "Warning"
+      }
+    },
+    "Console": {
+      "LogLevel": {
+        "Default": "Information",
+        "Microsoft": "Warning",
+        "System": "Warning"
+      }
+    }
+  },
+
+  "InstanceName": "kerby",
+
+  "Cache" : {
+    "Enabled": true,
+    "Type": "Distributed",
+    "Workers": 4,
+    "Interval": 1000
+  },
+
+  "Database": {
+    "MongoDB": {
+      "DatabaseName": "Sensate",
+      "ConnectionString": "mongodb://sensate:sensateiot@192.168.127.128:27017/Sensate",
+      "MaxConnections": 1000
+    },
+    "PgSQL": {
+      "ConnectionString": "User ID = postgres;Password=DefaultPassword;Server=192.168.127.128;Port=5432;Database=Sensate"
+    },
+    "Redis": {
+      "Host": "192.168.127.128",
+      "InstanceName": "Sensate"
+    }
+  } 
+}

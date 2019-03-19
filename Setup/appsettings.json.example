@@ -21,13 +21,16 @@
 
   "Cache" : {
     "Enabled": true,
+    "Workers": 4,
+    "Interval": 1000, 
     "Type": "Distributed"
   },
 
   "Database" : {
     "MongoDB" : {
       "DatabaseName": "Sensate",
-      "ConnectionString": "mongodb://localhost:27017/Sensate"
+      "ConnectionString": "mongodb://localhost:27017/Sensate",
+	  "MaxConnections": 1000
     },
     "PgSQL" : {
       "ConnectionString": "User ID = Username;Password=SomePassword;Server=localhost;Port=5432;Database=Sensate"
@@ -38,12 +41,25 @@
     }
   },
 
-  "Mqtt" : {
-    "Username": "sensate",
-    "Password": "SamplePassword",
-    "Ssl": "false",
-    "Port": 1883,
-    "Host": "mqtt.example.com",
-    "ShareTopic": "$share/sensate/sensate/measurements"
+  "Mqtt": {
+    "PublicBroker": {
+      "Username": "",
+      "Password": "",
+      "Ssl": "false",
+      "Port": 1883,
+      "Host": "",
+      "RealTimeShareTopic": "sensate/measurements/rt",
+      "ShareTopic": "sensate/measurements",
+      "BulkShareTopic": "sensate/measurements/bulk"
+    },
+    "InternalBroker": {
+      "Username": "",
+      "Password": "",
+      "Ssl": "false",
+      "Port": 1883,
+      "Host": "",
+      "InternalMeasurementTopic": "sensate/internal/measurements",
+      "InternalBulkMeasurementTopic": "sensate/internal/measurements/bulk"
+    } 
   }
 }

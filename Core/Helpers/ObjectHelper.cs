@@ -39,5 +39,11 @@ namespace SensateService.Helpers
 				return data as T;
 			}
 		}
+
+		public static void Populate<T>(this T[] ary, T value)
+		{
+			for(var idx = 0; idx < ary.Length; ++idx)
+				ary[idx] = value;
+		}
 	}
 }

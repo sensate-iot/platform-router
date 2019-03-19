@@ -7,6 +7,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 using SensateService.Models;
@@ -17,13 +19,18 @@ namespace SensateService.Infrastructure.Repositories
 	{
 		Task IncrementAsync(Sensor sensor);
 		Task<SensorStatisticsEntry> CreateForAsync(Sensor sensor);
+		Task IncrementManyAsync(Sensor sensor, int num, CancellationToken token = default(CancellationToken));
 
 		Task<SensorStatisticsEntry> GetByDateAsync(Sensor sensor, DateTime date);
 		Task<IEnumerable<SensorStatisticsEntry>> GetBeforeAsync(Sensor sensor, DateTime date);
 		Task<IEnumerable<SensorStatisticsEntry>> GetAfterAsync(Sensor sensor, DateTime date);
+		Task<IEnumerable<SensorStatisticsEntry>> GetAfterAsync(DateTime date);
+		Task<IEnumerable<SensorStatisticsEntry>> GetBetweenAsync(Sensor sensor, DateTime start, DateTime end);
+		Task<IEnumerable<SensorStatisticsEntry>> GetAsync(Expression<Func<SensorStatisticsEntry, bool>> expr);
 
 		void Delete(string id);
 		Task DeleteAsync(string id);
 		Task DeleteBySensorAsync(Sensor sensor);
+		Task DeleteBySensorAsync(Sensor sensor, DateTime from, DateTime to);
 	}
 }

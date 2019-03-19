@@ -10,8 +10,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
 using SensateService.ApiCore.Middleware;
-using SensateService.Infrastructure;
-using SensateService.Infrastructure.Repositories;
 using SensateService.Middleware;
 
 namespace SensateService.ApiCore.Init

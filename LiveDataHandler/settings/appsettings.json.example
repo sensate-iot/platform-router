@@ -1,0 +1,19 @@
+﻿{
+  "web": {
+    "port": 4750,
+    "secret": "3i%bacH6yK8sm0#lYt0**aP567Fz^Ns3HKeZ3GiqlZ2&eFqjy0OqXO"
+  },
+  "mongoDB": {
+    "connectionString": "mongodb://sensate:sensateiot@192.168.127.128:27017/Sensate",
+    "maxConnections":300
+  },
+  "mqtt": {
+    "username": "",
+    "password": "",
+    "ssl": "false",
+    "port": 1883,
+    "host": "192.168.127.128",
+    "internalMeasurementTopic": "sensate/internal/measurements",
+    "internalBulkMeasurementTopic": "sensate/internal/measurements/bulk"
+  }
+}

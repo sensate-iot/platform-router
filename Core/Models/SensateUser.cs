@@ -5,7 +5,10 @@
  * @email:  dev@bietje.net
  */
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+
 using Microsoft.AspNetCore.Identity;
 
 namespace SensateService.Models
@@ -17,5 +20,9 @@ namespace SensateService.Models
 		[Required]
 		public string LastName { get; set; }
 		public string UnconfirmedPhoneNumber { get; set; }
+		[Required]
+		public DateTime RegisteredAt { get; set; }
+		public virtual ICollection<SensateUserRole> UserRoles { get; set; }
+		public virtual ICollection<SensateApiKey> ApiKeys { get; set; }
 	}
 }

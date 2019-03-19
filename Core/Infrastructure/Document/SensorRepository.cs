@@ -6,8 +6,10 @@
  */
 
 using System;
-using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
@@ -18,7 +20,7 @@ using SensateService.Models;
 
 namespace SensateService.Infrastructure.Document
 {
-	public class SensorRepository : AbstractDocumentRepository<string, Sensor>, ISensorRepository
+	public class SensorRepository : AbstractDocumentRepository<Sensor>, ISensorRepository
 	{
 		private readonly IMongoCollection<Sensor> _sensors;
 		private readonly ILogger<SensorRepository> _logger;
@@ -28,7 +30,7 @@ namespace SensateService.Infrastructure.Document
 		public SensorRepository(SensateContext context,
 								ISensorStatisticsRepository statisticsRepository,
 								IMeasurementRepository measurements,
-								ILogger<SensorRepository> logger) : base(context)
+								ILogger<SensorRepository> logger) : base(context.Sensors)
 		{
 			this._sensors = context.Sensors;
 			this._logger = logger;
@@ -36,100 +38,82 @@ namespace SensateService.Infrastructure.Document
 			this._stats = statisticsRepository;
 		}
 
-		public override void Create(Sensor obj)
-		{
-			DateTime now;
-
-			now = DateTime.Now;
-			obj.CreatedAt = now;
-			obj.UpdatedAt = now;
-			obj.InternalId = base.GenerateId(now);
-			this._sensors.InsertOne(obj);
-		}
-
-		public override async Task CreateAsync(Sensor sensor)
+		public override async Task CreateAsync(Sensor sensor, CancellationToken ct = default(CancellationToken))
 		{
 			var now = DateTime.Now;
 
 			sensor.CreatedAt = now;
 			sensor.UpdatedAt = now;
 			sensor.InternalId = base.GenerateId(now);
-			await this._sensors.InsertOneAsync(sensor).AwaitSafely();
+			await base.CreateAsync(sensor, ct).AwaitBackground();
 		}
 
-		public virtual void Remove(string id)
+		public virtual async Task<IEnumerable<Sensor>> GetAsync(SensateUser user)
 		{
-			this.Delete(id);
+			FilterDefinition<Sensor> filter;
+			var id = user.Id;
+			var builder = Builders<Sensor>.Filter;
+
+			filter = builder.Where(s => s.Owner == id);
+			var sensors = await this._sensors.FindAsync(filter).AwaitBackground();
+
+			if(sensors == null)
+				return null;
+
+			return await sensors.ToListAsync().AwaitBackground();
 		}
 
-		public virtual Sensor Get(string id)
+		public virtual async Task<IEnumerable<Sensor>> GetAsync(IEnumerable<string> ids)
 		{
-			ObjectId oid = new ObjectId(id);
-			return this._sensors.Find(x => x.InternalId == oid).FirstOrDefault();
+			FilterDefinition<Sensor> filter;
+			var builder = Builders<Sensor>.Filter;
+			var idlist = ids.Select(ObjectId.Parse);
+
+			filter = builder.In(x => x.InternalId, idlist);
+			var raw = await this._collection.FindAsync(filter).AwaitBackground();
+			return raw.ToList();
+		}
+
+		public async Task<IEnumerable<Sensor>> FindByNameAsync(SensateUser user, string name)
+		{
+			FilterDefinition<Sensor> filter;
+			var builder = Builders<Sensor>.Filter;
+
+			filter = builder.Where(x => x.Name.Contains(name));
+			var raw = await this._collection.FindAsync(filter).AwaitBackground();
+			return raw.ToList();
 		}
 
 		public virtual async Task<Sensor> GetAsync(string id)
 		{
 			ObjectId oid = new ObjectId(id);
 			var filter = Builders<Sensor>.Filter.Where(x => x.InternalId == oid);
-			var result = await this._sensors.FindAsync(filter).AwaitSafely();
+			var result = await this._sensors.FindAsync(filter).AwaitBackground();
 
 			if(result == null)
 				return null;
 
-			return await result.FirstOrDefaultAsync().AwaitSafely();
+			return await result.FirstOrDefaultAsync().AwaitBackground();
+		}
+
+		public async Task<long> CountAsync(SensateUser user = null)
+		{
+			FilterDefinition<Sensor> filter;
+
+			if(user == null)
+				return await this._sensors.CountDocumentsAsync(new BsonDocument()).AwaitBackground();
+
+			var builder = Builders<Sensor>.Filter;
+			filter = builder.Where(s => s.Owner == user.Id);
+			return await this._sensors.CountDocumentsAsync(filter).AwaitBackground();
 		}
 
 		public virtual async Task RemoveAsync(string id)
 		{
-			await this.DeleteAsync(id).AwaitSafely();
-		}
-
-		public override void Update(Sensor obj)
-		{
-			var update = Builders<Sensor>.Update
-				.Set(x => x.UpdatedAt, DateTime.Now);
-
-			if(obj.Name != null)
-				update.Set(x => x.Name, obj.Name);
-			if(obj.Description != null)
-				update.Set(x => x.Description, obj.Description);
-			if(obj.Secret != null)
-				update.Set(x => x.Secret, obj.Secret);
-
-			try {
-				this._sensors.FindOneAndUpdate(
-					x => x.InternalId == obj.InternalId ||
-						x.Secret == obj.Secret,
-					update
-				);
-			} catch(Exception ex) {
-				this._logger.LogInformation($"Unable to update sensor: {ex.Message}");
-			}
-		}
-
-		public virtual async Task UpdateAsync(Sensor sensor)
-		{
-			await Task.Run(() => this.Update(sensor)).AwaitSafely();
-		}
-
-		public override void Delete(string id)
-		{
 			Sensor sensor;
 			ObjectId oid = new ObjectId(id);
 
-			sensor = this._sensors.FindOneAndDelete(x => x.InternalId == oid);
-
-			if(sensor != null)
-				this._measurements.DeleteBySensor(sensor);
-		}
-
-		public override async Task DeleteAsync(string id)
-		{
-			Sensor sensor;
-			ObjectId oid = new ObjectId(id);
-
-			sensor = await this._sensors.FindOneAndDeleteAsync(x => x.InternalId == oid).AwaitSafely();
+			sensor = await this._sensors.FindOneAndDeleteAsync(x => x.InternalId == oid).AwaitBackground();
 
 			if(sensor != null) {
 				var tasks = new[] {
@@ -137,16 +121,26 @@ namespace SensateService.Infrastructure.Document
                     this._stats.DeleteBySensorAsync(sensor)
 				};
 
-				await Task.WhenAll(tasks).AwaitSafely();
+				await Task.WhenAll(tasks).AwaitBackground();
 			}
 		}
 
-		public override Sensor GetById(string id)
+		public virtual async Task UpdateAsync(Sensor obj)
 		{
-			ObjectId oid = new ObjectId(id);
-			var result = this._sensors.Find(x => x.InternalId == oid);
+			var update = Builders<Sensor>.Update.Set(x => x.UpdatedAt, DateTime.Now);
 
-			return result?.FirstOrDefault();
+			if(obj.Name != null)
+				update = update.Set(x => x.Name, obj.Name);
+			if(obj.Description != null)
+				update = update.Set(x => x.Description, obj.Description);
+			if(obj.Secret != null)
+				update = update.Set(x => x.Secret, obj.Secret);
+
+			try {
+				await this._sensors.FindOneAndUpdateAsync(x => x.InternalId == obj.InternalId, update).AwaitBackground();
+			} catch(Exception ex) {
+				this._logger.LogInformation($"Unable to update sensor: {ex.Message}");
+			}
 		}
 	}
 }

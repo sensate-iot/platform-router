@@ -1,4 +1,11 @@
-﻿namespace SensateService.Config
+﻿/*
+ * Text messaging configuration.
+ *
+ * @author Michel Megens
+ * @email  dev@bietje.net
+ */
+
+namespace SensateService.Config
 {
 	public class TextConfig
 	{
@@ -11,5 +18,6 @@
 	{
 		public string AccountSid { get; set; }
 		public string AuthToken { get; set; }
+		public string PhoneSid { get; set; }
 	}
 }

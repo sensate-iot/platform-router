@@ -18,9 +18,10 @@
     "url": "https://github.com/sensate-iot/SensateService.git"
   },
   "dependencies": {
-    "commander": "^2.15.1",
-    "mqtt": "^2.17.0",
-    "npm": "^6.4.1",
-    "ws": "^5.1.1"
+    "commander": "^2.19.0",
+    "mqtt": "^2.18.8",
+    "nanotimer": "^0.3.15",
+    "npm": "^6.8.0",
+    "ws": "^5.2.2"
   }
 }

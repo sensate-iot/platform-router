@@ -6,7 +6,6 @@
  */
 
 using System;
-using System.Linq;
 using System.Text;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -23,8 +22,6 @@ using SensateService.Config;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
 using SensateService.Models;
-using SensateService.Services;
-using SensateService.WebSocketHandler.Handlers;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace SensateService.WebSocketHandler.Application
@@ -67,52 +64,53 @@ namespace SensateService.WebSocketHandler.Application
 			if(cache.Enabled)
 				services.AddCacheStrategy(cache, db);
 
-			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName);
+			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.AddDocumentRepositories(cache.Enabled);
-			services.AddSqlRepositories();
+			services.AddSqlRepositories(cache.Enabled);
+			services.AddMeasurementStorage(cache);
 
 			this.SetupAuthentication(services, auth);
 
-			services.AddMqttService(options => {
-				options.Ssl = mqtt.Ssl;
-				options.Host = mqtt.Host;
-				options.Port = mqtt.Port;
-				options.Username = mqtt.Username;
-				options.Password = mqtt.Password;
+			services.AddInternalMqttService(options => {
+				options.Ssl = mqtt.InternalBroker.Ssl;
+				options.Host = mqtt.InternalBroker.Host;
+				options.Port = mqtt.InternalBroker.Port;
+				options.Username = mqtt.InternalBroker.Username;
+				options.Password = mqtt.InternalBroker.Password;
 				options.Id = Guid.NewGuid().ToString();
-				options.TopicShare = "$share/sensate/";
-				options.InternalMeasurementTopic = mqtt.InternalMeasurementTopic;
+				options.InternalBulkMeasurementTopic = mqtt.InternalBroker.InternalBulkMeasurementTopic;
+				options.InternalMeasurementTopic = mqtt.InternalBroker.InternalMeasurementTopic;
 			});
 
-			services.AddSingleton(provider => {
-				var s = provider.GetServices<IHostedService>().ToList();
-				var mqservice = s.Find(x => x.GetType() == typeof(MqttService)) as IMqttPublishService;
-				return mqservice;
-			});
+			services.AddSingleton<IHostedService, MqttPublishHandler>();
 
+			services.AddWebSocketHandler<RealTimeWebSocketMeasurementHandler>();
+			services.AddWebSocketHandler<WebSocketBulkMeasurementHandler>();
 			services.AddWebSocketHandler<WebSocketMeasurementHandler>();
-			services.AddWebSocketHandler<WebSocketLiveMeasurementHandler>();
+
+			services.AddLogging((builder) => {
+				builder.AddConsole();
+
+				if(IsDevelopment())
+					builder.AddDebug();
+			});
 		}
 
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory logging, IServiceProvider sp)
 		{
-			var mqtt = new MqttConfig();
-
-			logging.AddConsole();
-			Configuration.GetSection("Mqtt").Bind(mqtt);
-
-			if(IsDevelopment())
-				logging.AddDebug();
+			var cache = new CacheConfig();
 
 			app.UseWebSockets();
+			Configuration.GetSection("Cache").Bind(cache);
+
+			app.MapWebSocketService("/measurement/rt", sp.GetService<RealTimeWebSocketMeasurementHandler>());
 			app.MapWebSocketService("/measurement", sp.GetService<WebSocketMeasurementHandler>());
-			app.MapWebSocketService("/measurements/live", sp.GetService<WebSocketLiveMeasurementHandler>());
-			sp.MapMqttTopic<MqttInternalMeasurementHandler>(mqtt.InternalMeasurementTopic);
+			app.MapWebSocketService("/measurement/bulk", sp.GetService<WebSocketBulkMeasurementHandler>());
 		}
 
 		private void SetupAuthentication(IServiceCollection services, AuthenticationConfig auth)
 		{
-			services.AddIdentity<SensateUser, UserRole>(config => {
+			services.AddIdentity<SensateUser, SensateRole>(config => {
 				config.SignIn.RequireConfirmedEmail = true;
 			})
 			.AddEntityFrameworkStores<SensateSqlContext>()
@@ -123,9 +121,8 @@ namespace SensateService.WebSocketHandler.Application
 				options.JwtIssuer = auth.JwtIssuer;
 				options.JwtExpireMinutes = auth.JwtExpireMinutes;
 				options.JwtRefreshExpireMinutes = auth.JwtRefreshExpireMinutes;
-				options.ConfirmForward = auth.ConfirmForward;
 				options.PublicUrl = auth.PublicUrl;
-				options.ResetForward = auth.ResetForward;
+				options.Scheme = auth.Scheme;
 			});
 
 			services.Configure<IdentityOptions>(options => {

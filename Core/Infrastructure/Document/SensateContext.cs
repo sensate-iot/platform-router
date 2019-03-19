@@ -21,21 +21,21 @@ namespace SensateService.Infrastructure.Document
 
 		public IMongoCollection<Measurement> Measurements => this._db.GetCollection<Measurement>("Measurements");
 		public IMongoCollection<Sensor> Sensors => this._db.GetCollection<Sensor>("Sensors");
+		public IMongoCollection<AuditLog> Logs => this._db.GetCollection<AuditLog>("Logs");
 		public IMongoCollection<SensorStatisticsEntry> Statistics =>
 			this._db.GetCollection<SensorStatisticsEntry>("Statistics");
 
-		public SensateContext(IOptions<MongoDBSettings> settings) :
-			this(settings.Value)
-		{
-		}
+		public SensateContext(IOptions<MongoDBSettings> options) : this(options.Value)
+		{ }
 
 		public SensateContext(MongoDBSettings settings)
 		{
-
 			try {
 				MongoClientSettings mongosettings = MongoClientSettings.FromUrl(new MongoUrl(
 					settings.ConnectionString
 				));
+
+				mongosettings.MaxConnectionPoolSize = settings.MaxConnections;
 				this._client = new MongoClient(mongosettings);
 				this._db = this._client.GetDatabase(settings.DatabaseName);
 			} catch(Exception ex) {

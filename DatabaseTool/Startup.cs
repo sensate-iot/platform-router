@@ -72,7 +72,7 @@ namespace SensateService.DatabaseTool
 
 			services.AddPostgres(db.PgSQL.ConnectionString);
 
-			services.AddIdentity<SensateUser, UserRole>(config => {
+			services.AddIdentity<SensateUser, SensateRole>(config => {
 				config.SignIn.RequireConfirmedEmail = true;
 			})
 			.AddEntityFrameworkStores<SensateSqlContext>()
@@ -84,19 +84,20 @@ namespace SensateService.DatabaseTool
 			if(cache.Enabled)
                 services.AddCacheStrategy(cache, db);
 
-			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName);
+			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.AddDocumentRepositories(cache.Enabled);
-			services.AddSqlRepositories();
+			services.AddSqlRepositories(cache.Enabled);
+
+			services.AddLogging((builder) => {
+				builder.AddConsole();
+
+				if(IsDevelopment())
+					builder.AddDebug();
+			});
 		}
 
 		public void Configure(IServiceProvider provider)
 		{
-			var logging = provider.GetRequiredService<ILoggerFactory>();
-
-			logging.AddConsole();
-
-			if(IsDevelopment())
-                logging.AddDebug();
 		}
 
 		public async Task Run(IServiceProvider provider)

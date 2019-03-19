@@ -15,6 +15,8 @@ using Microsoft.Extensions.Hosting;
 using SensateService.Middleware;
 using SensateService.Services;
 using System.Collections.Generic;
+using SensateService.Services.Processing;
+using SensateService.Services.Settings;
 
 namespace SensateService.Init
 {
@@ -35,10 +37,23 @@ namespace SensateService.Init
 			return service;
 		}
 
-		public static void MapMqttTopic<T>(
-			this IServiceProvider sp,
-			string topic
-		) where T : MqttHandler
+		public static IServiceCollection AddInternalMqttService(this IServiceCollection services, Action<InternalMqttServiceOptions> setup)
+		{
+			if(setup != null)
+				services.Configure(setup);
+
+			services.AddSingleton<IHostedService, InternalMqttService>();
+
+			services.AddSingleton(provider => {
+				var s = provider.GetServices<IHostedService>().ToList();
+				var mqservice = s.Find(x => x.GetType() == typeof(InternalMqttService)) as IMqttPublishService;
+				return mqservice;
+			});
+
+			return services;
+		}
+
+		public static void MapMqttTopic<T>(this IServiceProvider sp, string topic) where T : MqttHandler
 		{
 			MqttService mqtt;
 			List<IHostedService> services;
@@ -53,7 +68,7 @@ namespace SensateService.Init
 			 */
 			services = sp.GetServices<IHostedService>().ToList();
 			mqtt = services.Find(x => x.GetType() == typeof(MqttService)) as MqttService;
-			mqtt.MapTopicHandler<T>(topic);
+			mqtt?.MapTopicHandler<T>(topic);
 		}
 	}
 }
