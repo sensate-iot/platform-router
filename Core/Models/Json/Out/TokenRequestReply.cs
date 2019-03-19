@@ -13,5 +13,6 @@ namespace SensateService.Models.Json.Out
 		public string JwtToken { get; set; }
 		public int ExpiresInMinutes { get; set; }
 		public int JwtExpiresInMinutes { get; set; }
+		public string SystemApiKey { get; set; }
 	}
 }
