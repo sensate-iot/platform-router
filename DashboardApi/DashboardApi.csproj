@@ -5,7 +5,7 @@
     <UserSecretsId>SensateService</UserSecretsId>
     <Authors>Michel Megens</Authors>
     <Copyright>Michel Megens &lt;dev@bietje.net&gt;</Copyright>
-    <Version>0.0.1</Version>
+    <Version>0.0.4</Version>
     <ServerGarbageCollection>true</ServerGarbageCollection>
     <RootNamespace>SensateService.DashboardApi</RootNamespace>
     <AssemblyName>SensateService.DashboardApi</AssemblyName>

@@ -6,6 +6,7 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <RootNamespace>SensateService.Setup</RootNamespace>
     <AssemblyName>SensateService.Setup</AssemblyName>
+    <Version>0.0.4</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
