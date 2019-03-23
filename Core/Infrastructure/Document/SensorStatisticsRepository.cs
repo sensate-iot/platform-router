@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -101,17 +100,15 @@ namespace SensateService.Infrastructure.Document
 
 		public async Task IncrementManyAsync(Sensor sensor, int num, CancellationToken token)
 		{
-			SensorStatisticsEntry entry;
 			var update = Builders<SensorStatisticsEntry>.Update;
 			UpdateDefinition<SensorStatisticsEntry> updateDefinition;
 			var stats = this._collection.WithWriteConcern(WriteConcern.Unacknowledged);
 
-			var entries = await this.GetAfterAsync(sensor, DateTime.Now.ThisHour()).AwaitBackground();
-
-			entry = entries.FirstOrDefault() ??
-					await this.CreateForAsync(sensor).AwaitBackground();
 			updateDefinition = update.Inc(x => x.Measurements, num);
-			await stats.FindOneAndUpdateAsync(x => x.InternalId == entry.InternalId, updateDefinition, cancellationToken: token).AwaitBackground();
+
+			var opts = new UpdateOptions {IsUpsert = true};
+			await stats.UpdateOneAsync(x => x.SensorId == sensor.InternalId &&
+				x.Date == DateTime.Now.ThisHour(), updateDefinition, opts, token).AwaitBackground();
 		}
 
 		#endregion
