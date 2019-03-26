@@ -28,7 +28,6 @@ namespace SensateService.Converters
 			var writer = context.Writer;
 
 			writer.WriteStartDocument();
-			writer.WriteObjectId("_id", value.InternalId);
 
 			writer.WriteName("Data");
 			writer.WriteStartArray();
@@ -44,7 +43,6 @@ namespace SensateService.Converters
 				offset = new DateTimeOffset(value.CreatedAt);
 
 			writer.WriteDateTime("CreatedAt", offset.ToUnixTimeMilliseconds());
-			writer.WriteObjectId("CreatedBy", value.CreatedBy);
 
 			writer.WriteEndDocument();
 		}
@@ -69,14 +67,6 @@ namespace SensateService.Converters
 			long ticks;
 
 			switch(attr) {
-			case "_id":
-				m.InternalId = reader.ReadObjectId();
-				break;
-
-			case "CreatedBy":
-				m.CreatedBy = reader.ReadObjectId();
-				break;
-
 			case "CreatedAt":
 				ticks = reader.ReadDateTime();
 				m.CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(ticks).UtcDateTime;

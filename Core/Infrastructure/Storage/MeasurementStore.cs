@@ -8,12 +8,10 @@
  */
 
 using System;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
-
 using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Events;
@@ -29,7 +27,6 @@ namespace SensateService.Infrastructure.Storage
 
 		private readonly ISensorRepository _sensors;
 		private readonly IMeasurementRepository _measurements;
-		private readonly IAuditLogRepository _logs;
 		private readonly IUserRepository _users;
 		private readonly ISensorStatisticsRepository _stats;
 
@@ -37,7 +34,6 @@ namespace SensateService.Infrastructure.Storage
 			IUserRepository users,
 			ISensorRepository sensors,
 			IMeasurementRepository measurements,
-			IAuditLogRepository logs,
 			ISensorStatisticsRepository stats,
 			IServiceProvider provider,
 			ILogger<MeasurementStore> logger
@@ -45,7 +41,6 @@ namespace SensateService.Infrastructure.Storage
 		{
 			this._sensors = sensors;
 			this._measurements = measurements;
-			this._logs = logs;
 			this._users = users;
 			this._stats = stats;
 		}
@@ -53,7 +48,6 @@ namespace SensateService.Infrastructure.Storage
 		public override async Task StoreAsync(RawMeasurement obj, RequestMethod method)
 		{
 			Measurement m;
-			AuditLog log;
 			Sensor sensor;
 			SensateUser user;
 
@@ -67,31 +61,19 @@ namespace SensateService.Infrastructure.Storage
 			if(user == null)
 				return;
 
-			var worker = this._users.GetRolesAsync(user);
-
-			log = new AuditLog {
-				Address = IPAddress.Any,
-				Method = method,
-				Route = "sensate/measurements/rt/new",
-				Timestamp = DateTime.Now,
-				AuthorId = user.Id
-			};
-
-			var roles = await worker.AwaitBackground();
-			var auditworker = this._logs.CreateAsync(log);
+			var roles = await this._users.GetRolesAsync(user).AwaitBackground();
 
 			if(!base.CanInsert(roles)) {
-				await auditworker.AwaitBackground();
 				return;
 			}
 
 			m = base.ProcessRawMeasurement(sensor, obj);
 
-			var measurement_worker = this._measurements.CreateAsync(m);
-			var stats_worker = this._stats.IncrementAsync(sensor);
+			var measurement_worker = this._measurements.StoreAsync(sensor, m);
+			var stats_worker = this._stats.IncrementAsync(sensor, method);
 			var events_worker = InvokeMeasurementReceivedAsync(sensor, m);
 
-			await Task.WhenAll(auditworker, measurement_worker, stats_worker, events_worker).AwaitBackground();
+			await Task.WhenAll(measurement_worker, stats_worker, events_worker).AwaitBackground();
 		}
 
 		private static async Task InvokeMeasurementReceivedAsync(object sender, Measurement m)

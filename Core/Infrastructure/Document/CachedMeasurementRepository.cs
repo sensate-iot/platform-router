@@ -41,14 +41,6 @@ namespace SensateService.Infrastructure.Document
 			await Task.WhenAll(tasks).AwaitBackground();
 		}
 
-		private void CacheData(string key, object data, int tmo, bool slide = true)
-		{
-			if(key == null || data == null)
-				return;
-
-			this._cache.Serialize(key, data, tmo, slide);
-		}
-
 		private async Task CacheDataAsync(string key, object data, int tmo, bool slide = true)
 		{
 			if(key == null || data == null)
@@ -61,7 +53,7 @@ namespace SensateService.Infrastructure.Document
 		{
 			string key;
 
-			key = String.Format("Measurements::{0}", sensor.InternalId.ToString());
+			key = $"Measurements::{sensor.InternalId.ToString()}";
 			var tasks = new[] {
 				this._cache.RemoveAsync(key),
 				base.DeleteBySensorAsync(sensor)
@@ -87,23 +79,11 @@ namespace SensateService.Infrastructure.Document
 		{
 			string key;
 
-			key = String.Format("Measurements::{0}", sensor.InternalId.ToString());
-			return await TryGetMeasurementsAsync(key,
-				x => x.CreatedBy == sensor.InternalId, CacheTimeout.TimeoutMedium.ToInt()
-			).AwaitBackground();
+			key = $"Measurements::{sensor.InternalId.ToString()}";
+			return await TryGetMeasurementsAsync(key, x => x.SensorId == sensor.InternalId, CacheTimeout.TimeoutMedium.ToInt() ).AwaitBackground();
 		}
 
-		public override async Task UpdateAsync(Measurement obj)
-		{
-			await Task.WhenAll(
-				this._cache.SerializeAsync(obj.InternalId.ToString(), obj, CacheTimeout.Timeout.ToInt(), false),
-				base.UpdateAsync(obj)
-			).AwaitBackground();
-		}
-
-		private async Task<IEnumerable<Measurement>> TryGetMeasurementsAsync(
-			string key, Expression<Func<Measurement, bool>> expression, int tmo
-		)
+		private async Task<IEnumerable<Measurement>> TryGetMeasurementsAsync(string key, Expression<Func<MeasurementBucket, bool>> expression, int tmo)
 		{
 			IEnumerable<Measurement> measurements = null;
 
@@ -136,23 +116,6 @@ namespace SensateService.Infrastructure.Document
 
 		}
 
-		public override IEnumerable<Measurement> GetAfter(Sensor sensor, DateTime pit)
-		{
-			string key;
-			IEnumerable<Measurement> measurements;
-
-			key = $"{sensor.InternalId}::after::{pit.ToString(CultureInfo.InvariantCulture)}";
-			measurements = _cache.Deserialize<IEnumerable<Measurement>>(key);
-
-			if(measurements != null)
-				return measurements;
-
-			measurements = base.GetAfter(sensor, pit);
-			CacheData(key, measurements, CacheTimeout.TimeoutMedium.ToInt(), false);
-			return measurements;
-
-		}
-
 		public override async Task<IEnumerable<Measurement>> GetBetweenAsync(Sensor sensor, DateTime start, DateTime end)
 		{
 			string key;
@@ -169,22 +132,6 @@ namespace SensateService.Infrastructure.Document
 			return measurements;
 
 
-		}
-
-		public override IEnumerable<Measurement> GetBefore(Sensor sensor, DateTime pit)
-		{
-			string key;
-			IEnumerable<Measurement> measurements;
-
-			key = $"{sensor.InternalId}::before::{pit.ToString(CultureInfo.InvariantCulture)}";
-			measurements = this._cache.Deserialize<IEnumerable<Measurement>>(key);
-
-			if(measurements != null)
-				return null;
-
-			measurements = base.GetBefore(sensor, pit);
-			this.CacheData(key, measurements, CacheTimeout.Timeout.ToInt());
-			return measurements;
 		}
 
 		public override async Task<IEnumerable<Measurement>> GetBeforeAsync(Sensor sensor, DateTime pit)

@@ -12,6 +12,7 @@ using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 
 using SensateService.Converters;
+using SensateService.Enums;
 
 namespace SensateService.Models
 {
@@ -25,5 +26,6 @@ namespace SensateService.Models
 		public DateTime Date { get; set; }
 		[BsonRequired]
 		public int Measurements { get; set; }
+		public RequestMethod Method { get; set; }
 	}
 }

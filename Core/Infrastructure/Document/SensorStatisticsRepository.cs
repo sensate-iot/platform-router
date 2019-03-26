@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 
 using MongoDB.Bson;
 using MongoDB.Driver;
+using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
@@ -78,9 +79,9 @@ namespace SensateService.Infrastructure.Document
 
 #region Entry creation
 
-		public Task IncrementAsync(Sensor sensor)
+		public Task IncrementAsync(Sensor sensor, RequestMethod method)
 		{
-			return this.IncrementManyAsync(sensor, 1, default(CancellationToken));
+			return this.IncrementManyAsync(sensor, method, 1, default(CancellationToken));
 		}
 
 		public async Task<SensorStatisticsEntry> CreateForAsync(Sensor sensor)
@@ -98,17 +99,18 @@ namespace SensateService.Infrastructure.Document
 			return entry;
 		}
 
-		public async Task IncrementManyAsync(Sensor sensor, int num, CancellationToken token)
+		public async Task IncrementManyAsync(Sensor sensor, RequestMethod method, int num, CancellationToken token)
 		{
 			var update = Builders<SensorStatisticsEntry>.Update;
 			UpdateDefinition<SensorStatisticsEntry> updateDefinition;
 			var stats = this._collection.WithWriteConcern(WriteConcern.Unacknowledged);
 
-			updateDefinition = update.Inc(x => x.Measurements, num);
+			updateDefinition = update.Inc(x => x.Measurements, num)
+				.SetOnInsert(x => x.Method, method);
 
 			var opts = new UpdateOptions {IsUpsert = true};
 			await stats.UpdateOneAsync(x => x.SensorId == sensor.InternalId &&
-				x.Date == DateTime.Now.ThisHour(), updateDefinition, opts, token).AwaitBackground();
+				x.Date == DateTime.Now.ThisHour() && x.Method == method, updateDefinition, opts, token).AwaitBackground();
 		}
 
 		#endregion
@@ -174,7 +176,6 @@ namespace SensateService.Infrastructure.Document
 			return await result.ToListAsync().AwaitBackground();
 		}
 
-
 		public async Task<IEnumerable<SensorStatisticsEntry>> GetBetweenAsync(Sensor sensor, DateTime start, DateTime end)
 		{
 			FilterDefinition<SensorStatisticsEntry> filter;
@@ -192,20 +193,6 @@ namespace SensateService.Infrastructure.Document
 
 			return await result.ToListAsync().AwaitBackground();
 		}
-
-		public SensorStatisticsEntry GetById(string id)
-		{
-			var fb = Builders<SensorStatisticsEntry>.Filter;
-
-			if(!ObjectId.TryParse(id, out var objId))
-				return null;
-
-			var filter = fb.Eq("InternalId", objId);
-			var result = this._stats.FindSync(filter);
-
-			return result.FirstOrDefault();
-		}
-
 #endregion
 	}
 }

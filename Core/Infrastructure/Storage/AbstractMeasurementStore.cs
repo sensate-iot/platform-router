@@ -59,7 +59,6 @@ namespace SensateService.Infrastructure.Storage
 			}
 
 			measurement = new Measurement {
-				CreatedBy = sensor.InternalId,
 				Data = datapoints,
 				Longitude = obj.Longitude,
 				Latitude = obj.Latitude,

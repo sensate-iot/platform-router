@@ -15,13 +15,14 @@ using SensateService.Models;
 
 namespace SensateService.Infrastructure.Repositories
 {
+	using MeasurementMap = IDictionary<Sensor, List<Measurement>>;
+
 	public interface IMeasurementRepository
 	{
 		Task<long> GetMeasurementCountAsync(Sensor sensor, CancellationToken token = default(CancellationToken));
 
-		Task<Measurement> GetByIdAsync(string id);
-		Task<IEnumerable<Measurement>> GetMeasurementsAsync(Expression<Func<Measurement, bool>> selector);
-		Task<Measurement> GetMeasurementAsync(Expression<Func<Measurement, bool>> selector);
+		Task<IEnumerable<Measurement>> GetMeasurementsAsync(Expression<Func<MeasurementBucket, bool>> selector);
+		Task<IEnumerable<Measurement>> GetMeasurementsAsync(Expression<Func<MeasurementBucket, bool>> expr, Func<Measurement, bool> mexpr);
 		Task<IEnumerable<Measurement>> GetMeasurementsBySensorAsync(Sensor sensor);
 		Task<IEnumerable<Measurement>> GetBeforeAsync(Sensor sensor, DateTime pit);
 		Task<IEnumerable<Measurement>> GetAfterAsync(Sensor sensor, DateTime pit);
@@ -31,7 +32,7 @@ namespace SensateService.Infrastructure.Repositories
 		Task DeleteBetweenAsync(Sensor sensor, DateTime start, DateTime end);
 		Task DeleteAsync(string id);
 
-		Task UpdateAsync(Measurement obj);
-		Task CreateAsync(Measurement obj, CancellationToken ct = default(CancellationToken));
+		Task StoreAsync(MeasurementMap measurements, CancellationToken ct = default(CancellationToken));
+		Task StoreAsync(Sensor sensor, Measurement measurement, CancellationToken ct = default(CancellationToken));
 	}
 }

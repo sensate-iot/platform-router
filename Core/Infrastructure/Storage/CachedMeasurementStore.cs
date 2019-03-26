@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,7 +21,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
-
 using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Events;
@@ -32,18 +30,17 @@ using SensateService.Models.Json.In;
 
 namespace SensateService.Infrastructure.Storage
 {
-	using MeasurementLog = Tuple<RawMeasurement, AuditLog>;
+	using RawMeasurementEntry = Tuple<RequestMethod, RawMeasurement>;
 
 	public class CachedMeasurementStore : AbstractMeasurementStore, ICachedMeasurementStore
 	{
 		public static event OnMeasurementsReceived MeasurementsReceived;
 
-		private List<MeasurementLog> _measurements;
+		private List<RawMeasurementEntry> _measurements;
 		private int _count;
 		private SpinLockWrapper _lock;
 		private readonly IMemoryCache cache;
 
-		private const string AuditLogRoute = "sensate/measurements/new";
 		private const int InitialListSize = 512;
 
 		public CachedMeasurementStore(IServiceProvider provider, ILogger<CachedMeasurementStore> logger) :
@@ -53,48 +50,34 @@ namespace SensateService.Infrastructure.Storage
 			this.cache = provider.GetRequiredService<IMemoryCache>();
 
 			this._lock.Lock();
-			this._measurements = new List<MeasurementLog>(InitialListSize);
+			this._measurements = new List<RawMeasurementEntry>(InitialListSize);
 			this._count = 0;
 			this._lock.Unlock();
 		}
 
 		public override Task StoreAsync(RawMeasurement obj, RequestMethod method)
 		{
-			var log = new AuditLog {
-				Address = IPAddress.Any,
-				Method = method,
-				Route = AuditLogRoute,
-				Timestamp = DateTime.Now.ToUniversalTime(),
-			};
+			if(obj.CreatedById == null || obj.CreatedBySecret == null)
+				return Task.CompletedTask;
 
-			return Task.Run(() => {
-					this._lock.Lock();
+			this._lock.Lock();
+			this._measurements.Add(new RawMeasurementEntry(method, obj));
+			this._count += 1;
+			this._lock.Unlock();
 
-					this._measurements.Add(new MeasurementLog(obj, log));
-					this._count += 1;
-
-					this._lock.Unlock();
-			});
+			return Task.CompletedTask;
 		}
 
-		public Task StoreRangeAsync(IEnumerable<RawMeasurement> measurements, RequestMethod method)
+		public async Task StoreRangeAsync(IEnumerable<RawMeasurement> measurements, RequestMethod method)
 		{
-			var logs = measurements.Select(measurement => {
-				var log = new AuditLog {
-					Address = IPAddress.Any,
-					Method = method,
-					Route = AuditLogRoute,
-					Timestamp = DateTime.Now.ToUniversalTime(),
-				};
-				return new MeasurementLog(measurement, log);
-			}).ToList();
+			await Task.Run(() => {
+				var data = measurements.Select(m => new RawMeasurementEntry(method, m)).ToList();
 
-			return Task.Run(() => {
 				this._lock.Lock();
-				this._measurements.AddRange(logs);
-				this._count += logs.Count;
+				this._measurements.AddRange(data);
+				this._count += data.Count;
 				this._lock.Unlock();
-			});
+			}).AwaitBackground();
 		}
 
 		private static async Task<Sensor[]> FetchDistinctSensors(ISensorRepository repo, IEnumerable<string> ids)
@@ -129,7 +112,7 @@ namespace SensateService.Infrastructure.Storage
 				map[user.Id] = user;
 				var opts = new MemoryCacheEntryOptions();
 
-				opts.SetAbsoluteExpiration(TimeSpan.FromHours(1));
+				opts.SetAbsoluteExpiration(TimeSpan.FromMinutes(1));
 				opts.SetSize(1);
 				cache.Set(user.Id, user, opts);
 			}
@@ -137,14 +120,14 @@ namespace SensateService.Infrastructure.Storage
 			return map;
 		}
 
-		private async Task<IList<ProcessedMeasurement>> ProcessMeasurementsAsync(ICollection<MeasurementLog> logs)
+		private async Task<IList<ProcessedMeasurement>> ProcessMeasurementsAsync(ICollection<RawMeasurementEntry> logs)
 		{
 			IList<ProcessedMeasurement> measurements;
 			IList<string> sensors_ids;
 			IDictionary<string, SensateUser> users;
 			IDictionary<string, Sensor> sensors;
 
-			sensors_ids = logs.Select(raw => raw.Item1.CreatedById).Distinct().ToList();
+			sensors_ids = logs.Select(raw => raw.Item2.CreatedById).Distinct().ToList();
 			measurements = new List<ProcessedMeasurement>(logs.Count);
 
 			using(var scope = this.Provider.CreateScope()) {
@@ -162,19 +145,21 @@ namespace SensateService.Infrastructure.Storage
 					Measurement measurement;
 					SensateUser user;
 
-					var sensor = sensors[raw.Item1.CreatedById];
-					measurement = base.ProcessRawMeasurement(sensor, raw.Item1);
+					var sensor = sensors[raw.Item2.CreatedById];
+					measurement = base.ProcessRawMeasurement(sensor, raw.Item2);
 
-					if(sensor == null)
+					if(sensor == null || measurement == null)
 						continue;
 
 					user = users[sensor.Owner];
-					raw.Item2.AuthorId = user.Id;
 
-					if(!base.CanInsert(user) || !base.InsertAllowed(user, raw.Item1.CreatedBySecret) || measurement == null)
+					if(!base.CanInsert(user) || !base.InsertAllowed(user, raw.Item2.CreatedBySecret))
 						continue;
 
-					processed = new ProcessedMeasurement(measurement, sensor);
+					processed = new ProcessedMeasurement(measurement, sensor) {
+						Method = raw.Item1
+					};
+
 					measurements.Add(processed);
 				}
 			}
@@ -186,16 +171,20 @@ namespace SensateService.Infrastructure.Storage
 			IEnumerable<ProcessedMeasurement> data, CancellationToken token)
 		{
 			var sorted = from entry in data
-				group entry by entry.Creator
+				group entry by new { entry.Creator, entry.Method }
 				into g
-				select new {Sensor = g.Key, Length = g.ToList().Count};
+				select new {
+					Sensor = g.Key.Creator,
+					Length = g.ToList().Count,
+					RequestMethod = g.Key.Method
+				};
 
 			var ary = sorted.ToArray();
 			var tasks = new Task[ary.Length];
 
 			for(var idx = 0; idx < ary.Length; idx++) {
 				var entry = ary[idx];
-				tasks[idx] = stats.IncrementManyAsync(entry.Sensor, entry.Length, token);
+				tasks[idx] = stats.IncrementManyAsync(entry.Sensor, entry.RequestMethod, entry.Length, token);
 			}
 
 			await Task.WhenAll(tasks).AwaitBackground();
@@ -233,7 +222,8 @@ namespace SensateService.Infrastructure.Storage
 		public async Task<long> ProcessAsync()
 		{
 			IList<ProcessedMeasurement> processed_que;
-			List<MeasurementLog> raw_que;
+			IDictionary<Sensor, List<Measurement>> data;
+			List<RawMeasurementEntry> raw_que;
 			int count;
 
 			this._lock.Lock();
@@ -244,42 +234,35 @@ namespace SensateService.Infrastructure.Storage
 				return 0;
 			}
 
-			raw_que = new List<MeasurementLog>(count);
+			raw_que = new List<RawMeasurementEntry>(count);
 
 			this.SwapQueues(ref raw_que);
 			this._lock.Unlock();
 
 			using(var scope = this.Provider.CreateScope()) {
-				var measurements = scope.ServiceProvider.GetRequiredService<IBulkWriter<Measurement>>();
-				var logs = scope.ServiceProvider.GetRequiredService<IBulkWriter<AuditLog>>();
+				var measurements = scope.ServiceProvider.GetRequiredService<IMeasurementRepository>();
 				var statistics = scope.ServiceProvider.GetRequiredService<ISensorStatisticsRepository>();
-				var source = new CancellationTokenSource();
+				var source = new CancellationTokenSource(TimeSpan.FromMinutes(1));
 
 				try {
-					var iotasks = new Task[4];
-					IEnumerable<AuditLog> auditlogs;
+					var asyncio = new Task[3];
 					IList<Measurement> telemetry;
-
-					iotasks.Populate(Task.CompletedTask);
-					auditlogs = raw_que.Select(x => x.Item2);
-					iotasks[0] = logs.CreateRangeAsync(auditlogs, source.Token);
 
 					processed_que = await this.ProcessMeasurementsAsync(raw_que).AwaitBackground();
 					telemetry = processed_que.Select(x => x.Measurement).ToList();
+					data = processed_que.GroupBy(x => x.Creator)
+						.ToDictionary(x => x.Key,
+									  v => v.Select(x => x.Measurement).OrderBy(x => x.CreatedAt).ToList());
 
-					/*
-					 * Do not update when no valid measurements are received. The audit log
-					 * entries are always created.
-					 */
+					if(processed_que.Count <= 0)
+						return 0;
 
-					if(telemetry.Count > 0) {
-						iotasks[1] = measurements.CreateRangeAsync(telemetry, source.Token);
-						iotasks[2] = InvokeEventHandlersAsync(this, telemetry, source.Token);
-						iotasks[3] = IncrementStatistics(statistics, processed_que, source.Token);
-					}
+					asyncio[0] = measurements.StoreAsync(data, source.Token);
+					asyncio[1] = IncrementStatistics(statistics, processed_que, source.Token);
+					asyncio[2] = InvokeEventHandlersAsync(this, telemetry, source.Token);
+					await Task.WhenAll(asyncio).AwaitBackground();
 
-					count = telemetry.Count;
-					await Task.WhenAll(iotasks).AwaitBackground();
+					count = processed_que.Count;
 				} catch(Exception ex) {
 					source.Cancel(false);
 
@@ -318,7 +301,7 @@ namespace SensateService.Infrastructure.Storage
 			await MeasurementsReceived.Invoke(sender, args).AwaitBackground();
 		}
 
-		private void SwapQueues(ref List<MeasurementLog> data)
+		private void SwapQueues(ref List<RawMeasurementEntry> data)
 		{
 			var tmp_m = this._measurements;
 
@@ -342,11 +325,13 @@ namespace SensateService.Infrastructure.Storage
 	{
 		public Measurement Measurement { get; }
 		public Sensor Creator { get; }
+		public RequestMethod Method { get; set; }
 
 		public ProcessedMeasurement(Measurement measurement, Sensor creator)
 		{
 			this.Measurement = measurement;
 			this.Creator = creator;
+			this.Method = RequestMethod.Any;
 		}
 	}
 }

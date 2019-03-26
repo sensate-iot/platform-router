@@ -6,6 +6,7 @@
  */
 
 using System.Threading.Tasks;
+
 using SensateService.Enums;
 using SensateService.Models.Json.In;
 
@@ -13,6 +14,6 @@ namespace SensateService.Infrastructure.Storage
 {
 	public interface IMeasurementStore
 	{
-		Task StoreAsync(RawMeasurement obj, RequestMethod method = RequestMethod.Any);
+		Task StoreAsync(RawMeasurement obj, RequestMethod method);
 	}
 }

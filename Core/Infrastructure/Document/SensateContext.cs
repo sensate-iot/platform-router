@@ -19,11 +19,10 @@ namespace SensateService.Infrastructure.Document
 		private readonly IMongoDatabase _db;
 		private readonly IMongoClient _client;
 
-		public IMongoCollection<Measurement> Measurements => this._db.GetCollection<Measurement>("Measurements");
+		public IMongoCollection<MeasurementBucket> Measurements => this._db.GetCollection<MeasurementBucket>("Measurements");
 		public IMongoCollection<Sensor> Sensors => this._db.GetCollection<Sensor>("Sensors");
 		public IMongoCollection<AuditLog> Logs => this._db.GetCollection<AuditLog>("Logs");
-		public IMongoCollection<SensorStatisticsEntry> Statistics =>
-			this._db.GetCollection<SensorStatisticsEntry>("Statistics");
+		public IMongoCollection<SensorStatisticsEntry> Statistics => this._db.GetCollection<SensorStatisticsEntry>("Statistics");
 
 		public SensateContext(IOptions<MongoDBSettings> options) : this(options.Value)
 		{ }

@@ -11,15 +11,16 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
+using SensateService.Enums;
 using SensateService.Models;
 
 namespace SensateService.Infrastructure.Repositories
 {
 	public interface ISensorStatisticsRepository
 	{
-		Task IncrementAsync(Sensor sensor);
+		Task IncrementAsync(Sensor sensor, RequestMethod method);
 		Task<SensorStatisticsEntry> CreateForAsync(Sensor sensor);
-		Task IncrementManyAsync(Sensor sensor, int num, CancellationToken token = default(CancellationToken));
+		Task IncrementManyAsync(Sensor sensor, RequestMethod method, int num, CancellationToken token = default(CancellationToken));
 
 		Task<SensorStatisticsEntry> GetByDateAsync(Sensor sensor, DateTime date);
 		Task<IEnumerable<SensorStatisticsEntry>> GetBeforeAsync(Sensor sensor, DateTime date);

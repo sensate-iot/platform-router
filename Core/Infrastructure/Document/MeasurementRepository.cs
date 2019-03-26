@@ -16,15 +16,16 @@ using Microsoft.Extensions.Logging;
 
 using MongoDB.Driver;
 using MongoDB.Bson;
-
+using MongoDB.Driver.Linq;
 using SensateService.Models;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Helpers;
 
 namespace SensateService.Infrastructure.Document
 {
-	public class MeasurementRepository : AbstractDocumentRepository<Measurement>, IMeasurementRepository, IBulkWriter<Measurement>
+	public class MeasurementRepository : AbstractDocumentRepository<MeasurementBucket>, IMeasurementRepository
 	{
+		private const int MeasurementBucketSize = 500; 
 		protected readonly ILogger<MeasurementRepository> _logger;
 
 		public MeasurementRepository(SensateContext context, ILogger<MeasurementRepository> logger) : base(context.Measurements)
@@ -40,45 +41,39 @@ namespace SensateService.Infrastructure.Document
 			return internalId;
 		}
 
-		public virtual async Task UpdateAsync(Measurement obj)
+		public IEnumerable<Measurement> ConcatMeasurementBuckets(IList<MeasurementBucket> buckets)
 		{
-			bool updating;
-			var update = Builders<Measurement>.Update;
-			UpdateDefinition<Measurement> updateDefinition = null;
+			var count = buckets.Aggregate(0, (current, bucket) => current + bucket.Count);
+			var data = new List<Measurement>(count);
 
-			updating = false;
-			if(Math.Abs(obj.Longitude) > double.Epsilon && Math.Abs(obj.Latitude) > double.Epsilon) {
-				updateDefinition = update.Set(x => x.Latitude, obj.Latitude)
-				                         .Set(x => x.Longitude, obj.Longitude);
-				updating = true;
+			foreach(var bucket in buckets) {
+				data.AddRange(bucket.Measurements);
 			}
 
-			if(obj.Data != null)
-			{
-				updateDefinition = updateDefinition == null ?
-					update.Set(x => x.Data, obj.Data) : updateDefinition.Set(x => x.Data, obj.Data);
-				updating = true;
+			return data.OrderBy(x => x.CreatedAt).ToList();
+		}
+
+		public IList<Measurement> ConcatMeasurementBuckets(IList<MeasurementBucket> buckets, Func<Measurement, bool> expr)
+		{
+			var count = buckets.Aggregate(0, (current, bucket) => current + bucket.Count);
+			var data = new List<Measurement>(count);
+
+			foreach(var bucket in buckets) {
+				data.AddRange(bucket.Measurements.Where(expr));
 			}
 
-
-			if(!updating)
-				return;
-
-			try {
-				await this._collection.FindOneAndUpdateAsync( x => x.InternalId == obj.InternalId, updateDefinition );
-
-			} catch(Exception ex) {
-				this._logger.LogWarning($"Failed to update measurement: {ex.Message}");
-			}
+			return data.OrderBy(x => x.CreatedAt).ToList();
 		}
 
 		public virtual async Task<IEnumerable<Measurement>> GetMeasurementsBySensorAsync(Sensor sensor)
 		{
-			var query = Builders<Measurement>.Filter.Eq("CreatedBy", sensor.InternalId);
+			var query = Builders<MeasurementBucket>.Filter.Eq(x => x.SensorId, sensor.InternalId);
 
 			try {
 				var result = await this._collection.FindAsync(query).AwaitBackground();
-				return await result.ToListAsync().AwaitBackground();
+				var aslist = await result.ToListAsync().AwaitBackground();
+
+				return this.ConcatMeasurementBuckets(aslist);
 			} catch (Exception ex) {
 				this._logger.LogWarning(ex.Message);
 				return null;
@@ -88,9 +83,9 @@ namespace SensateService.Infrastructure.Document
 		public virtual async Task DeleteBySensorAsync(Sensor sensor)
 		{
 			try {
-				FilterDefinition<Measurement> fd;
+				FilterDefinition<MeasurementBucket> fd;
 
-				fd = Builders<Measurement>.Filter.Eq("CreatedBy", sensor.InternalId);
+				fd = Builders<MeasurementBucket>.Filter.Eq(x => x.SensorId, sensor.InternalId);
 				await this._collection.DeleteManyAsync(fd).AwaitBackground();
 			} catch(Exception ex) {
 				this._logger.LogWarning(ex.Message);
@@ -99,13 +94,14 @@ namespace SensateService.Infrastructure.Document
 
 		public virtual async Task DeleteBetweenAsync(Sensor sensor, DateTime start, DateTime end)
 		{
-			var builder = Builders<Measurement>.Filter;
+			var builder = Builders<MeasurementBucket>.Filter;
 
 			try {
-				FilterDefinition<Measurement> fd;
+				FilterDefinition<MeasurementBucket> fd;
 
-				fd = builder.Gte("CreatedAt", start) & builder.Lte("CreatedAt", end) &
-				     builder.Eq("CreatedBy", sensor.InternalId);
+				fd = builder.Gte(x => x.Timestamp, start.ThisHour()) &
+				     builder.Lte(x => x.Timestamp, end.ThisHour()) &
+				     builder.Eq(x => x.SensorId, sensor.InternalId);
 				await this._collection.DeleteManyAsync(fd).AwaitBackground();
 			} catch(Exception ex) {
 				this._logger.LogWarning(ex.Message);
@@ -120,111 +116,103 @@ namespace SensateService.Infrastructure.Document
 			await this._collection.DeleteOneAsync(x => x.InternalId == objectId).AwaitBackground();
 		}
 
-#region Linq getters
+		#region Linq getters
 
-		public virtual async Task<IEnumerable<Measurement>> GetMeasurementsAsync(Expression<Func<Measurement, bool>> expression)
+		public virtual async Task<IEnumerable<Measurement>> GetMeasurementsAsync(Expression<Func<MeasurementBucket, bool>> expression)
 		{
 			var result = await this._collection.FindAsync(expression).AwaitBackground();
 
 			if(result == null)
 				return null;
 
-			return await result.ToListAsync().AwaitBackground();
+			var data = await result.ToListAsync().AwaitBackground();
+			return ConcatMeasurementBuckets(data);
 		}
 
 		public async Task<long> GetMeasurementCountAsync(Sensor sensor, CancellationToken token = default(CancellationToken))
 		{
-			FilterDefinition<Measurement> fd;
-			var builder = Builders<Measurement>.Filter;
-
-			fd = builder.Eq("CreatedBy", sensor.InternalId);
-			return await this._collection.CountDocumentsAsync(fd, null, token);
+			var total = this._collection.AsQueryable().Where(x => x.SensorId == sensor.InternalId).SumAsync(x => x.Count, token);
+			return await total.AwaitBackground();
 		}
 
 #endregion
-
-		public virtual async Task<Measurement> GetByIdAsync(string id)
-		{
-			ObjectId oid = ToInternalId(id);
-			var find = Builders<Measurement>.Filter.Eq("InternalId", oid);
-			var result = await this._collection.FindAsync(find).AwaitBackground();
-
-			return result?.FirstOrDefault();
-		}
 
 #region Measurement creation
 
-		public override void Create(Measurement m)
+		public async Task StoreAsync(IDictionary<Sensor, List<Measurement>> measurements, CancellationToken ct)
 		{
-			if(m.CreatedBy == ObjectId.Empty)
-				return;
-
-			m.CreatedAt = DateTime.Now;
-			m.InternalId = this.GenerateId(DateTime.Now);
-			base.Create(m);
-		}
-
-		public override async Task CreateAsync(Measurement obj, CancellationToken ct = default(CancellationToken))
-		{
-			if(obj.CreatedBy == ObjectId.Empty)
-				return;
-
-			obj.InternalId = this.GenerateId(DateTime.Now);
-			await base.CreateAsync(obj, ct).AwaitBackground();
-		}
-
-		public async Task CreateRangeAsync(IEnumerable<Measurement> objs, CancellationToken token)
-		{
-			var measurements = objs.ToList();
-			var concern = WriteConcern.Unacknowledged;
+			var concern = new WriteConcern(0, new Optional<TimeSpan?>(), false, false);
 			var db = this._collection.WithWriteConcern(concern);
+			var data = new List<UpdateOneModel<MeasurementBucket>>();
 
-			var opts = new InsertManyOptions {
-				IsOrdered = false,
-				BypassDocumentValidation = true
+			foreach(var kvpair in measurements) {
+				var fbuilder = Builders<MeasurementBucket>.Filter;
+				var ubuilder = Builders<MeasurementBucket>.Update;
+
+				var filter = fbuilder.Eq(x => x.Timestamp, DateTime.Now.ThisHour()) &
+				             fbuilder.Eq(x => x.SensorId, kvpair.Key.InternalId) &
+				             fbuilder.Lt(x => x.Count, MeasurementBucketSize);
+				var update = ubuilder.PushEach(x => x.Measurements, kvpair.Value)
+					.SetOnInsert(x => x.Timestamp, DateTime.Now.ThisHour())
+					.SetOnInsert(x => x.SensorId, kvpair.Key.InternalId)
+					.Inc(x => x.Count, kvpair.Value.Count)
+					.Min(x => x.First, kvpair.Value[0].CreatedAt)
+					.Max(x => x.Last, kvpair.Value[kvpair.Value.Count - 1].CreatedAt);
+
+				var upsert = new UpdateOneModel<MeasurementBucket>(filter, update) {
+					IsUpsert = true
+				};
+
+				data.Add(upsert);
+			}
+
+			var opts = new BulkWriteOptions {
+				IsOrdered = false
 			};
 
-			measurements.ForEach(m => {
-				m.InternalId = base.GenerateId(m.CreatedAt);
-			});
-
-			await db.InsertManyAsync(measurements, opts, token).AwaitBackground();
+			await db.BulkWriteAsync(data, opts, ct).AwaitBackground();
 		}
 
-#endregion
+		public async Task StoreAsync(Sensor sensor, Measurement measurement, CancellationToken ct = default(CancellationToken))
+		{
+			var dict = new Dictionary<Sensor, List<Measurement>>();
+			var measurements = new List<Measurement> {measurement};
+
+			dict[sensor] = measurements;
+			await this.StoreAsync(dict, ct).AwaitBackground();
+		}
+
+		#endregion
 
 #region Time based getters
-		private static FilterDefinition<Measurement> BuildFilter(Sensor sensor, DateTime? start, DateTime? end)
+		private static FilterDefinition<MeasurementBucket> BuildQuery(Sensor sensor, DateTime? start, DateTime? end)
 		{
-			FilterDefinition<Measurement> fd;
-			var builder = Builders<Measurement>.Filter;
+			FilterDefinition<MeasurementBucket> fd;
+			var builder = Builders<MeasurementBucket>.Filter;
 
 			if(start == null && end == null)
 				return null;
 
+			fd = builder.Eq(doc => doc.SensorId, sensor.InternalId);
+
 			if(start != null && end != null) {
-				fd = builder.Eq("CreatedBy", sensor.InternalId) &
-					builder.Gte("CreatedAt", start) & builder.Lte("CreatedAt", end);
+				fd &= builder.Gte(x => x.First, start) &
+					 builder.Lte(x => x.First, end);
 			} else if(end == null) {
 				/* Interpret end == null as infinity and
 				   build an 'after' _start_ filter. */
 
-				fd = builder.Eq("CreatedBy", sensor.InternalId) &
-					builder.Gte("CreatedAt", start);
+				fd = builder.Eq(x => x.SensorId, sensor.InternalId) &
+					builder.Gte(x => x.First, start);
 			} else {
-				fd = builder.Eq("CreatedBy", sensor.InternalId) &
-				     builder.Lte("CreatedAt", end);
+				fd = builder.Eq(x => x.SensorId, sensor.InternalId) &
+				     builder.Lte(x => x.First, end);
 			}
 
 			return fd;
 		}
 
-		private IEnumerable<Measurement> Lookup(FilterDefinition<Measurement> fd)
-		{
-			return this._collection.FindSync(fd).ToList();
-		}
-
-		private async Task<IEnumerable<Measurement>> LookupAsync(FilterDefinition<Measurement> fd)
+		private async Task<IList<MeasurementBucket>> LookupAsync(FilterDefinition<MeasurementBucket> fd)
 		{
 			var result = await this._collection.FindAsync(fd).AwaitBackground();
 			return await result.ToListAsync().AwaitBackground();
@@ -232,42 +220,36 @@ namespace SensateService.Infrastructure.Document
 
 		public virtual async Task<IEnumerable<Measurement>> GetBetweenAsync(Sensor sensor, DateTime start, DateTime end)
 		{
-			return await this.LookupAsync(BuildFilter(sensor, start, end)).AwaitBackground();
-		}
-
-		public virtual IEnumerable<Measurement> GetBefore(Sensor sensor, DateTime pit)
-		{
-			return this.Lookup(BuildFilter(sensor, null, pit));
-		}
-
-		public virtual IEnumerable<Measurement> GetAfter(Sensor sensor, DateTime pit)
-		{
-			return this.Lookup(BuildFilter(sensor, pit, null));
+			var data = await this.LookupAsync(BuildQuery(sensor, start, end)).AwaitBackground();
+			return this.ConcatMeasurementBuckets(data, x => x.CreatedAt >= start && x.CreatedAt <= end);
 		}
 
 		public virtual async Task<IEnumerable<Measurement>> GetBeforeAsync(Sensor sensor, DateTime pit)
 		{
-			return await this.LookupAsync(BuildFilter(sensor, null, pit)).AwaitBackground();
+			var data = await this.LookupAsync(BuildQuery(sensor, null, pit)).AwaitBackground();
+			return this.ConcatMeasurementBuckets(data, x => x.CreatedAt <= pit);
 		}
 
-		public virtual async Task<IEnumerable<Measurement>> GetAfterAsync(
-			Sensor sensor, DateTime pit
-		)
+		public virtual async Task<IEnumerable<Measurement>> GetAfterAsync(Sensor sensor, DateTime pit)
 		{
-			return await this.LookupAsync(BuildFilter(sensor, pit, null)).AwaitBackground();
+			var data = await this.LookupAsync(BuildQuery(sensor, pit, null)).AwaitBackground();
+			return this.ConcatMeasurementBuckets(data, x => x.CreatedAt >= pit);
 		}
 #endregion
 
-		public virtual async Task<Measurement> GetMeasurementAsync(Expression<Func<Measurement, bool>> expression)
+		public virtual async Task<IEnumerable<Measurement>> GetMeasurementsAsync(Expression<Func<MeasurementBucket, bool>> expression, Func<Measurement, bool> mexpr)
 		{
-			IAsyncCursor<Measurement> result;
+			IAsyncCursor<MeasurementBucket> result;
+			var measurements = new List<Measurement>();
 
 			result = await this._collection.FindAsync(expression).AwaitBackground();
+			var list = await result.ToListAsync().AwaitBackground();
 
-			if(result == null)
-				return null;
+			foreach(var bucket in list) {
+				measurements.AddRange(bucket.Measurements.Where(mexpr).ToList());
+			}
 
-			return await result.FirstOrDefaultAsync().AwaitBackground();
+			return measurements;
 		}
 	}
 }
