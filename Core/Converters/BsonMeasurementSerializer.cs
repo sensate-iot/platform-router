@@ -6,7 +6,6 @@
  */
 
 using System;
-using System.Linq;
 
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
@@ -29,13 +28,9 @@ namespace SensateService.Converters
 
 			writer.WriteStartDocument();
 
-			writer.WriteName("Data");
-			writer.WriteStartArray();
-			value.Data.ToList().ForEach(x => this.SerializeDataPoint(writer, x));
-			writer.WriteEndArray();
-
-			writer.WriteDouble("Longitude", value.Longitude);
-			writer.WriteDouble("Latitude", value.Latitude);
+			writer.WriteStartDocument("Data");
+			this.SerializeDataPoint(writer, value.Data);
+			writer.WriteEndDocument();
 
 			if(value.CreatedAt.Kind != DateTimeKind.Utc)
 				offset = new DateTimeOffset(value.CreatedAt.ToUniversalTime());
@@ -47,19 +42,17 @@ namespace SensateService.Converters
 			writer.WriteEndDocument();
 		}
 
-		private void SerializeDataPoint(IBsonWriter writer, DataPoint dp)
+		private void SerializeDataPoint(IBsonWriter writer, IDictionary<string, DataPoint> points)
 		{
-			writer.WriteStartDocument();
+			foreach(var dp in points) {
+				writer.WriteStartDocument(dp.Key);
 
-			writer.WriteString("Name", dp.Name);
-			writer.WriteDecimal128("Value", dp.Value.ToDecimal128());
+				if(!string.IsNullOrEmpty(dp.Value.Unit))
+					writer.WriteString("Unit", dp.Value.Unit);
 
-			if(dp.Unit == null)
-				writer.WriteNull("Unit");
-			else
-				writer.WriteString("Unit", dp.Unit);
-
-			writer.WriteEndDocument();
+				writer.WriteDecimal128("Value", dp.Value.Value.ToDecimal128());
+				writer.WriteEndDocument();
+			}
 		}
 
 		public void DeserializeAttribute(string attr, IBsonReader reader, ref Measurement m)
@@ -70,14 +63,6 @@ namespace SensateService.Converters
 			case "CreatedAt":
 				ticks = reader.ReadDateTime();
 				m.CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(ticks).UtcDateTime;
-				break;
-
-			case "Longitude":
-				m.Longitude = reader.ReadDouble();
-				break;
-
-			case "Latitude":
-				m.Latitude = reader.ReadDouble();
 				break;
 
 			case "Data":
@@ -92,10 +77,6 @@ namespace SensateService.Converters
 		private void DeserializeDataPointAttribute(string attr, IBsonReader reader, ref DataPoint dataPoint)
 		{
 			switch(attr) {
-			case "Name":
-				dataPoint.Name = reader.ReadString();
-				break;
-
 			case "Value":
 				dataPoint.Value = reader.ReadDecimal128().ToDecimal();
 				break;
@@ -116,14 +97,16 @@ namespace SensateService.Converters
 
 		private void DeserializeDataPoints(IBsonReader reader, ref Measurement m)
 		{
+			IDictionary<string, DataPoint> datapoints;
 			DataPoint dp;
-			List<DataPoint> datapoints;
+			string key;
 
-			datapoints = new List<DataPoint>();
-			reader.ReadStartArray();
+			datapoints = new Dictionary<string, DataPoint>();
+			reader.ReadStartDocument();
 
-			while(reader.State != BsonReaderState.EndOfArray) {
+			while(reader.State != BsonReaderState.EndOfDocument) {
 				dp = new DataPoint();
+				key = reader.ReadName();
 				reader.ReadStartDocument();
 
 				while(reader.CurrentBsonType != BsonType.EndOfDocument) {
@@ -131,12 +114,13 @@ namespace SensateService.Converters
 					reader.ReadBsonType();
 				}
 
-				datapoints.Add(dp);
 				reader.ReadEndDocument();
 				reader.ReadBsonType();
-			}
-			reader.ReadEndArray();
 
+				datapoints[key] = dp;
+			}
+
+			reader.ReadEndDocument();
 			m.Data = datapoints;
 		}
 
@@ -162,7 +146,6 @@ namespace SensateService.Converters
 			switch(memberName) {
 			case "_id":
 			case "InternalId":
-			case "CreatedBy":
 				serializationInfo = new BsonSerializationInfo(
 					memberName, new ObjectIdSerializer(), typeof(ObjectId)
 				);
@@ -171,13 +154,6 @@ namespace SensateService.Converters
 			case "CreatedAt":
 				serializationInfo = new BsonSerializationInfo(
 					memberName, new DateTimeSerializer(), typeof(DateTime)
-				);
-				break;
-
-			case "Longitude":
-			case "Latitude":
-				serializationInfo = new BsonSerializationInfo(
-					memberName, new DoubleSerializer(), typeof(double)
 				);
 				break;
 

@@ -15,8 +15,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 using SensateService.Enums;
-using SensateService.Exceptions;
-using SensateService.Helpers;
 using SensateService.Models;
 using SensateService.Models.Json.In;
 
@@ -38,16 +36,13 @@ namespace SensateService.Infrastructure.Storage
 		protected Measurement ProcessRawMeasurement(Sensor sensor, RawMeasurement obj)
 		{
 			Measurement measurement;
-			IList<DataPoint> datapoints;
-
-			if(Math.Abs(obj.Latitude) < double.Epsilon && Math.Abs(obj.Longitude) < double.Epsilon)
-				throw new InvalidRequestException(ErrorCode.InvalidDataError.ToInt(), "Invalid measurement location!");
+			IDictionary<string, DataPoint> datapoints;
 
 			if(!obj.IsCreatedBy(sensor))
 				return null;
 
 			if(obj.TryParseData(out var data)) {
-				datapoints = data as IList<DataPoint>;
+				datapoints = data;
 
 				if(datapoints == null)
 					return null;
@@ -58,10 +53,24 @@ namespace SensateService.Infrastructure.Storage
 				return null;
 			}
 
+			if(obj.Longitude != null && obj.Latitude != null) {
+				var lon = obj.Longitude.Value;
+				var lat = obj.Latitude.Value;
+
+				if(Math.Abs(lat) > double.Epsilon || Math.Abs(lon) > double.Epsilon) {
+					datapoints["Longitude"] = new DataPoint {
+						Unit = null,
+						Value = Convert.ToDecimal(lon)
+					};
+					datapoints["Latitude"] = new DataPoint {
+						Unit = null,
+						Value = Convert.ToDecimal(lat)
+					};
+				}
+			}
+
 			measurement = new Measurement {
 				Data = datapoints,
-				Longitude = obj.Longitude,
-				Latitude = obj.Latitude,
 				CreatedAt = obj.CreatedAt ?? DateTime.Now.ToUniversalTime()
 			};
 

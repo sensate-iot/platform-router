@@ -17,16 +17,14 @@ using SensateService.Converters;
 
 namespace SensateService.Models
 {
+	using DataPointMap = IDictionary<string, DataPoint>;
+
 	[Serializable]
 	[BsonSerializer(typeof(BsonMeasurementSerializer))]
 	public class Measurement : ISerializable
 	{
 		[BsonRequired]
-		public IEnumerable<DataPoint> Data { get;set; }
-		[BsonRequired]
-		public double Longitude {get;set;}
-		[BsonRequired]
-		public double Latitude {get;set;}
+		public IDictionary<string, DataPoint> Data { get;set; }
 		[BsonRequired]
 		public DateTime CreatedAt {get;set;}
 
@@ -36,9 +34,7 @@ namespace SensateService.Models
 
 		protected Measurement(SerializationInfo info, StreamingContext context)
 		{
-			this.Data = info.GetValue("Data", typeof(IEnumerable<DataPoint>)) as IEnumerable<DataPoint>;
-			this.Longitude = info.GetDouble("Longitude");
-			this.Latitude = info.GetDouble("Latitude");
+			this.Data = info.GetValue("Data", typeof(DataPointMap)) as DataPointMap;
 			this.CreatedAt = info.GetDateTime("CreatedAt");
 		}
 
@@ -47,9 +43,9 @@ namespace SensateService.Models
 			return JsonConvert.SerializeObject(this);
 		}
 
-		public static bool TryParseData(JToken data, out IEnumerable<DataPoint> output)
+		public static bool TryParseData(JToken data, out DataPointMap output)
 		{
-			IEnumerable<DataPoint> datapoints;
+			DataPointMap datapoints;
 
 			if(data == null) {
 				output = null;
@@ -57,7 +53,7 @@ namespace SensateService.Models
 			}
 
 			try {
-				datapoints = data.ToObject<IEnumerable<DataPoint>>();
+				datapoints = data.ToObject<DataPointMap>();
 			} catch(JsonSerializationException) {
 				output = null;
 				return false;
@@ -69,9 +65,7 @@ namespace SensateService.Models
 
 		public void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
-			info.AddValue("Data", this.Data, typeof(IEnumerable<DataPoint>));
-			info.AddValue("Longitude", this.Longitude);
-			info.AddValue("Latitude", this.Latitude);
+			info.AddValue("Data", this.Data, typeof(DataPointMap));
 			info.AddValue("CreatedAt", this.CreatedAt);
 		}
 	}

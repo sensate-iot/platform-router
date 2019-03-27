@@ -16,14 +16,20 @@ namespace SensateService.Models
 	[Serializable]
 	public class DataPoint
 	{
-		[JsonProperty(Required = Required.Always)]
-		[BsonRequired]
-		public string Name { get; set; }
 		public string Unit { get; set; }
 		[JsonConverter(typeof(DecimalJsonConverter))]
 		[JsonProperty(Required = Required.Always)]
 		[BsonRequired]
 		public decimal Value { get; set; }
+
+		public DataPoint()
+		{ }
+
+		public DataPoint(decimal value, string unit = null)
+		{
+			this.Value = value;
+			this.Unit = unit;
+		}
 
 		public string ToJson()
 		{
