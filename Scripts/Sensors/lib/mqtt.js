@@ -26,11 +26,20 @@ function generateMeasurement(args) {
 		Latitude: 31.215135211,
 		CreatedById: args.sensors[idx].sensor,
 		CreatedBySecret: args.sensors[idx].secret,
-		Data: [
-			{ Name: 'x', Value: Math.random() * 10 },
-			{ Name: 'y', Value: Math.random() * 100 },
-			{ Name: 'z', Value: Math.random() * 20 }
-		]
+		Data: {
+			x: {
+				Value: Math.random() * 10,
+				Unit: "m/s2"
+			},
+			y: {
+				Value: Math.random() * 100,
+				Unit: "m/s2"
+			},
+			z: {
+				Value: Math.random() * 20,
+				Unit: "m/s2"
+			}
+		}
 	}
 
 	return measurement;

@@ -9,15 +9,24 @@ const socket = require('ws');
 
 function publish(ws, args) {
 	const measurement = {
-		Longitude: 2.13613511,
-		Latitude: 31.215135211,
+		Longitude: 5.13613511,
+		Latitude: 55.215135211,
 		CreatedById: args.id,
 		CreatedBySecret: args.secret,
-		Data: [
-			{ Name: 'x', Value: Math.random() * 10 },
-			{ Name: 'y', Value: Math.random() * 100 },
-			{ Name: 'z', Value: Math.random() * 20 }
-		]
+		Data: {
+			x: {
+				Value: Math.random() * 10,
+				Unit: "m/s2"
+			},
+			y: {
+				Value: Math.random() * 100,
+				Unit: "m/s2"
+			},
+			z: {
+				Value: Math.random() * 20,
+				Unit: "m/s2"
+			}
+		}
 	}
 
 	ws.send(JSON.stringify(measurement));
