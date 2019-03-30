@@ -85,12 +85,9 @@ namespace SensateService.DashboardApi.Controllers
 		{
 			var start = DateTime.Now.Date;
 
-			var logs = await this._logs.CountAsync(entry => entry.AuthorId == this.CurrentUser.Id &&
-			                                                entry.Timestamp >= start &&
-			                                                entry.Timestamp <= DateTime.Now &&
-			                                                (entry.Route == "sensate/measurements/new" ||
-			                                                 entry.Route == "sensate/measurements/rt/new")).AwaitBackground();
-			return logs;
+			var sensors = await this._sensors.GetAsync(this.CurrentUser).AwaitBackground();
+			var stats = await this._stats.GetBetweenAsync(sensors, start, DateTime.Now).AwaitBackground();
+			return stats.Aggregate(0L, (value, current) => value + current.Measurements);
 		}
 
 		private async Task<long> GetApiCallCountAsync()
