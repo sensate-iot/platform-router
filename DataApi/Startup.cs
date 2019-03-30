@@ -153,7 +153,7 @@ namespace SensateService.DataApi
 			services.AddSwaggerGen(c => {
 				c.SwaggerDoc("v1", new Info {
 					Title = "Sensate API - Version 1",
-					Version = "v1"
+					Version = "v1" 
 				});
 			});
 
@@ -188,17 +188,17 @@ namespace SensateService.DataApi
 				ctx.Database.Migrate();
 			}
 
-			app.UseSwagger();
-			app.UseSwaggerUI(c => {
-				c.SwaggerEndpoint("/swagger/swagger.json", "Sensate API - Version 1");
-			});
-
 			if (env.IsDevelopment()) {
 				app.UseDeveloperExceptionPage();
 			}
 
 			app.UseMiddleware<ApiKeyValidationMiddleware>();
 			app.UseMiddleware<RequestLoggingMiddleware>();
+
+			app.UseSwagger();
+			app.UseSwaggerUI(c => {
+				c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sensate API - Version 1");
+			});
 
 			app.UseAuthentication();
 			app.UseMvc();

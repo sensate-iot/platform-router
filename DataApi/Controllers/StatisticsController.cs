@@ -14,8 +14,8 @@ using Microsoft.AspNetCore.Mvc;
 
 using Newtonsoft.Json.Linq;
 
-using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
+using SensateService.DataApi.Json;
 using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
@@ -57,7 +57,7 @@ namespace SensateService.DataApi.Controllers
 			}
 
 			var data = await Task.WhenAll(workers).AwaitBackground();
-			var jobj = data.Select(this.Flatten).Select((flat, idx) => new {
+			var jobj = data.Select(Flatten).Select((flat, idx) => new {
 				SensorId = sensors[idx].InternalId.ToString(),
 				Statistics = flat
 			}).ToList();
@@ -67,6 +67,9 @@ namespace SensateService.DataApi.Controllers
 
 		[HttpGet("{sensorid}/stats")]
 		[ActionName("QueryStatsByDate")]
+		[ProducesResponseType(typeof(IEnumerable<SensorStatisticsEntry>), 200)]
+		[ProducesResponseType(403)]
+		[ProducesResponseType(typeof(Status), 400)]
 		public async Task<IActionResult> StatisticsBySensor(string sensorid, [FromQuery] DateTime start, [FromQuery] DateTime end)
 		{
 			var status = new Status {ErrorCode = ReplyCode.BadInput, Message = "Invalid request!"};
@@ -86,7 +89,7 @@ namespace SensateService.DataApi.Controllers
 				end = DateTime.Now;
 
 			var data = await this._stats.GetBetweenAsync(sensor, start, end).AwaitBackground();
-			return this.Ok(this.Flatten(data));
+			return this.Ok(Flatten(data));
 		}
 
 		private const  int DaysPerWeek = 7;
@@ -113,10 +116,13 @@ namespace SensateService.DataApi.Controllers
 		}
 
 		[HttpGet("{sensorid}/cumulative/daily")]
+		[ProducesResponseType(typeof(IEnumerable<DailyStatisticsEntry>), 200)]
+		[ProducesResponseType(403)]
+		[ProducesResponseType(typeof(Status), 400)]
 		public async Task<IActionResult> CumulativePerDay(string sensorid, [FromQuery] DateTime start, [FromQuery] DateTime end)
 		{
 			var status = new Status {ErrorCode = ReplyCode.BadInput, Message = "Invalid request!"};
-			var jobj = new JArray();
+			var jobj = new List<DailyStatisticsEntry>();
 
 			if(string.IsNullOrEmpty(sensorid))
 				return this.BadRequest(status);
@@ -140,10 +146,10 @@ namespace SensateService.DataApi.Controllers
 				var entry = entries.Where(e => e.DayOfWeek == idx).ToList();
 				var count = entry.Aggregate(0L, (current, value) => current + value.Count);
 
-				jobj.Add(JToken.FromObject(new {
-					dayOfTheWeek = idx,
-					measurements = count
-				}));
+				jobj.Add(new DailyStatisticsEntry {
+					DayOfTheWeek = idx,
+					Measurements = count
+				});
 			}
 
 			return this.Ok(jobj);
@@ -235,7 +241,7 @@ namespace SensateService.DataApi.Controllers
 			return rv;
 		}
 
-		private IEnumerable<SensorStatisticsEntry> Flatten(IEnumerable<SensorStatisticsEntry> data)
+		private static IEnumerable<SensorStatisticsEntry> Flatten(IEnumerable<SensorStatisticsEntry> data)
 		{
 			var sorted = data.GroupBy(entry => entry.Date).Select(grp => grp.AsEnumerable());
 			IList<SensorStatisticsEntry> stats = new List<SensorStatisticsEntry>();
