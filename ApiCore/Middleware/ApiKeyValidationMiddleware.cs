@@ -6,14 +6,16 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+
 using Newtonsoft.Json;
+
 using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
@@ -40,6 +42,11 @@ namespace SensateService.ApiCore.Middleware
 			return user.UserRoles == null || user.UserRoles.Any(r => r.RoleId == role.Id);
 		}
 
+		public static bool IsSwagger(string url)
+		{
+			return url.Contains("swagger");
+		}
+
 		public static async Task RespondErrorAsync(HttpContext ctx, ReplyCode code, string err, int http)
 		{
 			Status output = new Status {
@@ -56,6 +63,11 @@ namespace SensateService.ApiCore.Middleware
 		public async Task Invoke(HttpContext ctx)
 		{
 			var query = ctx.Request.Query;
+
+			if(IsSwagger(ctx.Request.Path)) {
+				await this._next(ctx).AwaitBackground();
+				return;
+			}
 
 			if(!query.TryGetValue("key", out var key)) {
 				await RespondErrorAsync(ctx, ReplyCode.NotAllowed, "API key missing!", 400).AwaitBackground();

@@ -8,6 +8,7 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -17,6 +18,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+
 using SensateService.ApiCore.Middleware;
 using SensateService.Config;
 using SensateService.Infrastructure.Sql;
@@ -25,6 +27,7 @@ using SensateService.Models;
 using SensateService.Services;
 using SensateService.Services.Adapters;
 using SensateService.Services.Settings;
+
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace SensateService.AuthApi
@@ -184,7 +187,7 @@ namespace SensateService.AuthApi
 
 			app.UseSwagger();
 			app.UseSwaggerUI(c => {
-				c.SwaggerEndpoint("/swagger/swagger.json", "Sensate API - Version 1");
+				c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sensate API - Version 1");
 			});
 
 			if (env.IsDevelopment()) {

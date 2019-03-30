@@ -54,7 +54,7 @@ namespace SensateService.AuthApi.Controllers
 		[HttpPost("request")]
 		[ValidateModel]
 		[ProducesResponseType(typeof(Status), 400)]
-		[ProducesResponseType(typeof(TokenRequestReply), 400)]
+		[ProducesResponseType(typeof(TokenRequestReply), 200)]
 		public async Task<ActionResult> RequestToken([FromBody] Login login)
 		{
 			var user = await this._users.GetByEmailAsync(login.Email).AwaitBackground();
