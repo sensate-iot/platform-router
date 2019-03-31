@@ -25,7 +25,7 @@ namespace SensateService.Infrastructure.Document
 {
 	public class MeasurementRepository : AbstractDocumentRepository<MeasurementBucket>, IMeasurementRepository
 	{
-		private const int MeasurementBucketSize = 500; 
+		private const int MeasurementBucketSize = 100; 
 		protected readonly ILogger<MeasurementRepository> _logger;
 
 		public MeasurementRepository(SensateContext context, ILogger<MeasurementRepository> logger) : base(context.Measurements)
