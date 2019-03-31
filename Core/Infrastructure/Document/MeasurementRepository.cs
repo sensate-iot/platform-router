@@ -139,6 +139,20 @@ namespace SensateService.Infrastructure.Document
 
 #region Measurement creation
 
+		private static UpdateDefinition<MeasurementBucket> CreateBucketUpdate(ObjectId sensor,
+			IList<Measurement> measurements)
+		{
+				var ubuilder = Builders<MeasurementBucket>.Update;
+				var update = ubuilder.PushEach(x => x.Measurements, measurements)
+					.SetOnInsert(x => x.Timestamp, DateTime.Now.ThisHour())
+					.SetOnInsert(x => x.SensorId, sensor)
+					.Inc(x => x.Count, measurements.Count)
+					.Min(x => x.First, measurements[0].CreatedAt)
+					.Max(x => x.Last, measurements[measurements.Count - 1].CreatedAt);
+
+			return update;
+		}
+
 		public async Task StoreAsync(IDictionary<Sensor, List<Measurement>> measurements, CancellationToken ct)
 		{
 			var concern = new WriteConcern(0, new Optional<TimeSpan?>(), false, false);
@@ -147,23 +161,22 @@ namespace SensateService.Infrastructure.Document
 
 			foreach(var kvpair in measurements) {
 				var fbuilder = Builders<MeasurementBucket>.Filter;
-				var ubuilder = Builders<MeasurementBucket>.Update;
 
 				var filter = fbuilder.Eq(x => x.Timestamp, DateTime.Now.ThisHour()) &
 				             fbuilder.Eq(x => x.SensorId, kvpair.Key.InternalId) &
 				             fbuilder.Lt(x => x.Count, MeasurementBucketSize);
-				var update = ubuilder.PushEach(x => x.Measurements, kvpair.Value)
-					.SetOnInsert(x => x.Timestamp, DateTime.Now.ThisHour())
-					.SetOnInsert(x => x.SensorId, kvpair.Key.InternalId)
-					.Inc(x => x.Count, kvpair.Value.Count)
-					.Min(x => x.First, kvpair.Value[0].CreatedAt)
-					.Max(x => x.Last, kvpair.Value[kvpair.Value.Count - 1].CreatedAt);
 
-				var upsert = new UpdateOneModel<MeasurementBucket>(filter, update) {
-					IsUpsert = true
-				};
+				for(var idx = 0; idx < kvpair.Value.Count; idx += MeasurementBucketSize) {
+					var sublist = kvpair.Value.GetRange(idx,
+						Math.Min(MeasurementBucketSize, kvpair.Value.Count - idx));
+					var update = CreateBucketUpdate(kvpair.Key.InternalId, sublist);
 
-				data.Add(upsert);
+					var upsert = new UpdateOneModel<MeasurementBucket>(filter, update) {
+						IsUpsert = true
+					};
+
+					data.Add(upsert);
+				}
 			}
 
 			var opts = new BulkWriteOptions {
