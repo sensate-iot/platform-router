@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
 using SensateService.Enums;
 using SensateService.Helpers;
-using SensateService.Infrastructure.Repositories;
 using SensateService.Infrastructure.Storage;
 using SensateService.Models;
 using SensateService.Models.Json.In;
@@ -23,11 +23,11 @@ namespace SensateService.DataApi.Controllers
 {
 	[Produces("application/json")]
 	[Route("[controller]")]
-	public class MeasurementsController : AbstractController
+	public class MeasurementsController : AbstractApiController 
 	{
 		private readonly IMeasurementCache _store;
 
-		public MeasurementsController(IUserRepository users, IMeasurementCache cache, IHttpContextAccessor ctx) : base(users, ctx)
+		public MeasurementsController(IMeasurementCache cache, IHttpContextAccessor ctx) : base(ctx)
 		{
 			this._store = cache;
 		}
