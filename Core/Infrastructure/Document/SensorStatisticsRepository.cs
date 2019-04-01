@@ -72,7 +72,7 @@ namespace SensateService.Infrastructure.Document
 
 		public async Task DeleteBySensorAsync(Sensor sensor)
 		{
-			var query = Builders<SensorStatisticsEntry>.Filter.Eq("SensorId", sensor.InternalId);
+			var query = Builders<SensorStatisticsEntry>.Filter.Eq(x => x.SensorId, sensor.InternalId);
 
 			try {
 				await this._stats.DeleteManyAsync(query).AwaitBackground();
@@ -137,7 +137,7 @@ namespace SensateService.Infrastructure.Document
 			var filterBuilder = Builders<SensorStatisticsEntry>.Filter;
 			var date = dt.ThisHour();
 
-			filter = filterBuilder.Eq("SensorId", sensor.InternalId) & filterBuilder.Eq("Date", date);
+			filter = filterBuilder.Eq(x => x.SensorId, sensor.InternalId) & filterBuilder.Eq(x => x.Date, date);
 			var result = await this._stats.FindAsync(filter).AwaitBackground();
 
 			if(result == null)
@@ -152,7 +152,7 @@ namespace SensateService.Infrastructure.Document
 			var filterBuilder = Builders<SensorStatisticsEntry>.Filter;
 			var date = dt.ThisHour();
 
-			filter = filterBuilder.Eq("SensorId", sensor.InternalId) & filterBuilder.Lte("Date", date);
+			filter = filterBuilder.Eq(x => x.SensorId, sensor.InternalId) & filterBuilder.Lte(x => x.Date, date);
 			var result = await this._stats.FindAsync(filter).AwaitBackground();
 
 			if(result == null)
@@ -167,7 +167,7 @@ namespace SensateService.Infrastructure.Document
 			var filterBuilder = Builders<SensorStatisticsEntry>.Filter;
 			var date = dt.ThisHour();
 
-			filter = filterBuilder.Eq("SensorId", sensor.InternalId) & filterBuilder.Gte("Date", date);
+			filter = filterBuilder.Eq(x => x.SensorId, sensor.InternalId) & filterBuilder.Gte(x => x.Date, date);
 			var result = await this._stats.FindAsync(filter).AwaitBackground();
 
 			if(result == null)
@@ -181,7 +181,7 @@ namespace SensateService.Infrastructure.Document
 			FilterDefinition<SensorStatisticsEntry> filter;
 			var filterBuilder = Builders<SensorStatisticsEntry>.Filter;
 
-			filter = filterBuilder.Gte("Date", date);
+			filter = filterBuilder.Gte(x => x.Date, date);
 			var result = await this._stats.FindAsync(filter).AwaitBackground();
 
 			if(result == null)
@@ -198,8 +198,8 @@ namespace SensateService.Infrastructure.Document
 			var startDate = start.ThisHour();
 			var endDate = end.ThisHour();
 
-			filter = builder.Eq("SensorId", sensor.InternalId) & builder.Gte("Date", startDate) &
-			         builder.Lte("Date", endDate);
+			filter = builder.Eq(x => x.SensorId, sensor.InternalId) & builder.Gte(x => x.Date, startDate) &
+			         builder.Lte(x => x.Date, endDate);
 			var result = await this._stats.FindAsync(filter).AwaitBackground();
 
 			if(result == null)
