@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -40,6 +41,9 @@ namespace SensateService.DataApi.Controllers
 
 		[HttpGet]
 		[ActionName("QueryAllStats")]
+		[ProducesResponseType(typeof(IEnumerable<SensorStatisticsEntry>), 200)]
+		[ProducesResponseType(403)]
+		[ProducesResponseType(typeof(Status), 400)]
 		public async Task<IActionResult> Index()
 		{
 			Task<IEnumerable<SensorStatisticsEntry>>[] workers;
@@ -65,12 +69,25 @@ namespace SensateService.DataApi.Controllers
 			return this.Ok(jobj);
 		}
 
-		[HttpGet("{sensorid}/stats")]
+		public async Task<IActionResult> GetByMethod(Sensor sensor, RequestMethod method, DateTime start, DateTime end)
+		{
+			var data = await this._stats.GetAsync(e => e.SensorId == sensor.InternalId && e.Method == method &&
+			                                           e.Date >= start && e.Date <= end).AwaitBackground();
+			var flat = Flatten(data);
+
+			foreach(var entry in flat) {
+				entry.Method = method;
+			}
+
+			return this.Ok(flat);
+		}
+
+		[HttpGet("{sensorid}")]
 		[ActionName("QueryStatsByDate")]
 		[ProducesResponseType(typeof(IEnumerable<SensorStatisticsEntry>), 200)]
 		[ProducesResponseType(403)]
 		[ProducesResponseType(typeof(Status), 400)]
-		public async Task<IActionResult> StatisticsBySensor(string sensorid, [FromQuery] DateTime start, [FromQuery] DateTime end)
+		public async Task<IActionResult> StatisticsBySensor(string sensorid, [FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] RequestMethod method = RequestMethod.Any)
 		{
 			var status = new Status {ErrorCode = ReplyCode.BadInput, Message = "Invalid request!"};
 
@@ -87,6 +104,9 @@ namespace SensateService.DataApi.Controllers
 
 			if(end == DateTime.MinValue)
 				end = DateTime.Now;
+
+			if(method != RequestMethod.Any)
+				return await this.GetByMethod(sensor, method, start, end).AwaitBackground();
 
 			var data = await this._stats.GetBetweenAsync(sensor, start, end).AwaitBackground();
 			return this.Ok(Flatten(data));
