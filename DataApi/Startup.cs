@@ -16,11 +16,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 using SensateService.ApiCore.Middleware;
 using SensateService.Config;
+using SensateService.DataApi.Services;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
 using SensateService.Models;
@@ -28,6 +30,7 @@ using SensateService.Services;
 using SensateService.Services.Adapters;
 using SensateService.Services.Settings;
 using Swashbuckle.AspNetCore.Swagger;
+using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace SensateService.DataApi
 {
@@ -50,12 +53,16 @@ namespace SensateService.DataApi
 			var mail = new MailConfig();
 			var text = new TextConfig();
 			var auth = new AuthenticationConfig();
+			var mqtt = new MqttConfig();
 
+			this._configuration.GetSection("Mqtt").Bind(mqtt);
 			this._configuration.GetSection("Authentication").Bind(auth);
 			this._configuration.GetSection("Cache").Bind(cache);
 			this._configuration.GetSection("Database").Bind(db);
 			this._configuration.GetSection("Mail").Bind(mail);
 			this._configuration.GetSection("Text").Bind(text);
+
+			var privatemqtt = mqtt.InternalBroker;
 
 			services.AddCors();
 
@@ -143,6 +150,19 @@ namespace SensateService.DataApi
 					opts.Host = mail.Smtp.Host;
 				});
 			}
+
+			services.AddInternalMqttService(options => {
+				options.Ssl = privatemqtt.Ssl;
+				options.Host = privatemqtt.Host;
+				options.Port = privatemqtt.Port;
+				options.Username = privatemqtt.Username;
+				options.Password = privatemqtt.Password;
+				options.Id = Guid.NewGuid().ToString();
+				options.InternalBulkMeasurementTopic = privatemqtt.InternalBulkMeasurementTopic;
+				options.InternalMeasurementTopic = privatemqtt.InternalMeasurementTopic;
+			});
+
+			services.AddHostedService<MqttPublishHandler>();
 
 			if(text.Provider == "Twillio") {
 				services.AddTwilioTextApi(text);
