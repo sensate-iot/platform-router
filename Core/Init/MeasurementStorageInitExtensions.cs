@@ -5,14 +5,11 @@
  * @email  dev@bietje.net
  */
 
-using System;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+
 using SensateService.Config;
 using SensateService.Infrastructure.Storage;
-using SensateService.Services;
 using SensateService.Services.Processing;
 
 namespace SensateService.Init
