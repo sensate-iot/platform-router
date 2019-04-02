@@ -8,7 +8,7 @@
 using System;
 using System.Runtime.Serialization;
 using System.Collections.Generic;
-
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 using Newtonsoft.Json;
@@ -20,13 +20,16 @@ namespace SensateService.Models
 	using DataPointMap = IDictionary<string, DataPoint>;
 
 	[Serializable]
-	[BsonSerializer(typeof(BsonMeasurementSerializer))]
 	public class Measurement : ISerializable
 	{
+		[BsonId]
+		public string InternalId { get; set; }
 		[BsonRequired]
 		public IDictionary<string, DataPoint> Data { get;set; }
 		[BsonRequired]
 		public DateTime CreatedAt {get;set;}
+		[BsonRequired]
+		public ObjectId CreatedBy { get; set; }
 
 		public Measurement()
 		{

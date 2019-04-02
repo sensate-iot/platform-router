@@ -27,10 +27,12 @@ namespace SensateService.Infrastructure.Document
 	{
 		private const int MeasurementBucketSize = 500; 
 		protected readonly ILogger<MeasurementRepository> _logger;
+		private readonly IMongoCollection<Measurement> _measurements;
 
 		public MeasurementRepository(SensateContext context, ILogger<MeasurementRepository> logger) : base(context.Measurements)
 		{
 			this._logger = logger;
+			this._measurements = context.MeasurementData;
 		}
 
 		private static ObjectId ToInternalId(string id)
@@ -156,10 +158,10 @@ namespace SensateService.Infrastructure.Document
 		public async Task StoreAsync(IDictionary<Sensor, List<Measurement>> measurements, CancellationToken ct)
 		{
 			var concern = new WriteConcern(0, new Optional<TimeSpan?>(), false, false);
-			var db = this._collection.WithWriteConcern(concern);
-			var data = new List<UpdateOneModel<MeasurementBucket>>();
+			var db = this._measurements.WithWriteConcern(concern);
+			var writes = new List<InsertOneModel<Measurement>>();
 
-			foreach(var kvpair in measurements) {
+			/*foreach(var kvpair in measurements) {
 				var fbuilder = Builders<MeasurementBucket>.Filter;
 
 				var filter = fbuilder.Eq(x => x.Timestamp, DateTime.Now.ThisHour()) &
@@ -181,9 +183,24 @@ namespace SensateService.Infrastructure.Document
 
 			var opts = new BulkWriteOptions {
 				IsOrdered = false
+			};*/
+
+			foreach(var kvpair in measurements) {
+				foreach(var measurements_data in kvpair.Value) {
+					measurements_data.CreatedBy = kvpair.Key.InternalId;
+					measurements_data.InternalId = $"{Guid.NewGuid().ToString()}:{DateTime.Now.Ticks}";
+
+					var model = new InsertOneModel<Measurement>(measurements_data);
+					writes.Add(model);
+				}
+			}
+
+			var opts = new BulkWriteOptions {
+				IsOrdered = true,
+				BypassDocumentValidation = true
 			};
 
-			await db.BulkWriteAsync(data, opts, ct).AwaitBackground();
+			await db.BulkWriteAsync(writes, opts, ct).AwaitBackground();
 		}
 
 		public async Task StoreAsync(Sensor sensor, Measurement measurement, CancellationToken ct = default(CancellationToken))
