@@ -14,6 +14,9 @@ using Microsoft.Extensions.Logging;
 
 using MQTTnet;
 using MQTTnet.Client;
+using MQTTnet.Client.Connecting;
+using MQTTnet.Client.Disconnecting;
+using MQTTnet.Client.Options;
 
 using SensateService.Helpers;
 
@@ -65,9 +68,12 @@ namespace SensateService.Services.Processing
 			if(user != null)
 				builder.WithCredentials(user, passwd);
 
-			this.Client.Connected += OnConnect_Handler;
-			this.Client.Disconnected += OnDisconnect_HandlerAsync;
-			this.Client.ApplicationMessageReceived += OnMessage_Handler;
+			this.Client.UseDisconnectedHandler(e => { this.OnDisconnect_HandlerAsync(this, e); });
+			this.Client.UseConnectedHandler(e => { this.OnConnect_Handler(this.Client, e); });
+			this.Client.UseApplicationMessageReceivedHandler(e => this.OnMessage_Handler(this.Client, e));
+			//this.Client.Connected += OnConnect_Handler;
+			//this.Client.Disconnected += OnDisconnect_HandlerAsync;
+			//this.Client.ApplicationMessageReceived += OnMessage_Handler;
 
 			this._client_options = builder.Build();
 			await this.Client.ConnectAsync(this._client_options).AwaitBackground();

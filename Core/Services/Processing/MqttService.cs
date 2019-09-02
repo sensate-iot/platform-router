@@ -16,7 +16,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using MQTTnet;
-
+using MQTTnet.Client.Subscribing;
+using MQTTnet.Protocol;
 using SensateService.Helpers;
 using SensateService.Middleware;
 using SensateService.Services.Settings;
@@ -57,19 +58,19 @@ namespace SensateService.Services.Processing
 
 		protected override async Task OnConnectAsync()
 		{
-			TopicFilterBuilder tfb;
-			List<TopicFilter> filters;
-
-			filters = new List<TopicFilter>();
-
 			foreach(var tuple in this._handlers) {
-				tfb = new TopicFilterBuilder().WithAtMostOnceQoS();
-				tfb.WithTopic(tuple.Key);
-				filters.Add(tfb.Build());
+				var tfb = new TopicFilterBuilder()
+					.WithTopic(tuple.Key)
+					.WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtMostOnce);
+				var build = tfb.Build();
+				var opts = new MqttClientSubscribeOptionsBuilder()
+					.WithTopicFilter(build);
+
+				await this.Client.SubscribeAsync(opts.Build(), CancellationToken.None);
+				this._logger.LogInformation($"Subscribed to: {tuple.Key}");
 			}
 
 			this._logger.LogInformation("MQTT client connected!");
-			await this.Client.SubscribeAsync(filters).AwaitBackground();
 		}
 
 		protected override async Task OnMessageAsync(string topic, string msg)

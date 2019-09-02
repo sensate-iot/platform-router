@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using MQTTnet;
+using MQTTnet.Client;
 
 using SensateService.Helpers;
 using SensateService.Services.Settings;
@@ -55,6 +56,7 @@ namespace SensateService.Services.Processing
 			builder.WithTopic(topic);
 			builder.WithRetainFlag(retain);
 			msg = builder.Build();
+
 			await this.Client.PublishAsync(msg);
 		}
 
