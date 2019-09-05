@@ -2,7 +2,7 @@
  * Application entry point.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel.megens@sonatolabs.com
  */
 
 import { MqttClient } from "./mqtt/mqttclient";

@@ -2,7 +2,7 @@
  * Sensor MongoDB model.
  * 
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel.megens@sonatolabs.com
  */
 
 import { Document, Schema, Model, model } from "mongoose";
