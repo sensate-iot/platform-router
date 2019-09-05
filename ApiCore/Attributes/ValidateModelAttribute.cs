@@ -3,7 +3,7 @@
  * a controller method.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel.megens@sonatolabs.com
  */
 
 using Microsoft.AspNetCore.Mvc;

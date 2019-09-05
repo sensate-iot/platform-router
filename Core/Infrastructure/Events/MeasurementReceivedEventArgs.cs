@@ -2,7 +2,7 @@
  * Measurement event argument wrapper.
  *
  * @author: Michel Megens
- * @email:  dev@bietje.net
+ * @email:  michel.megens@sonatolabs.com
  */
 
 using System;

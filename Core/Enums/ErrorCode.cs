@@ -2,7 +2,7 @@
  * Error code definitions.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel.megens@sonatolabs.com
  */
 
 namespace SensateService.Enums

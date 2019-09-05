@@ -2,7 +2,7 @@
  * Attribute to restrict access to the Administrators group.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel.megens@sonatolabs.com
  */
 
 using Microsoft.AspNetCore.Authorization;

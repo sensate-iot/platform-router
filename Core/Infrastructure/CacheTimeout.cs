@@ -2,7 +2,7 @@
  * Enumeration of cache timeouts.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel.megens@sonatolabs.com
  */
 
 namespace SensateService.Infrastructure

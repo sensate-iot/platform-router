@@ -2,7 +2,7 @@
  * ASP.NET middleware to log requests and responses.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel.megens@sonatolabs.com
  */
 
 using System;

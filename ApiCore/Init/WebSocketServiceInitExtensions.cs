@@ -2,7 +2,7 @@
  * Extension methods to initialise a new websocket service.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel.megens@sonatolabs.com
  */
 
 using Microsoft.AspNetCore.Builder;

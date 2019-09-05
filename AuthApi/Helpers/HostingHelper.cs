@@ -2,7 +2,7 @@
  * Extension methods for the IHostingEnvironment interface.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel.megens@sonatolabs.com
  */
 
 using System.IO;

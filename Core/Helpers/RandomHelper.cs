@@ -2,7 +2,7 @@
  * Helper methods to generate random strings.
  *
  * @author Michel Megens
- * @author dev@bietje.net
+ * @author michel.megens@sonatolabs.com
  */
 
 using System;

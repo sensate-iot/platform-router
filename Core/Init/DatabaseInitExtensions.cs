@@ -2,7 +2,7 @@
  * Helper methods to create new database connections.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel.megens@sonatolabs.com
  */
 
 using Microsoft.EntityFrameworkCore;

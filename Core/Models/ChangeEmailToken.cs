@@ -2,7 +2,7 @@
  * Change email token bridge.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel.megens@sonatolabs.com
  */
 
 using System.ComponentModel.DataAnnotations;

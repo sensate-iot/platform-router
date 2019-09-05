@@ -2,7 +2,7 @@
  * MQTT measurement handler.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel.megens@sonatolabs.com
  */
 
 using System;

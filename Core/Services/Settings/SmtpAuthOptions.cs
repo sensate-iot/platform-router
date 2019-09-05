@@ -2,7 +2,7 @@
  * SMTP authentication configuration options.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel.megens@sonatolabs.com
  */
 
 namespace SensateService.Services.Settings

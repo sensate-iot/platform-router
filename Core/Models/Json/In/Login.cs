@@ -2,7 +2,7 @@
  * Json model to login.
  *
  * @author Michel Megens
- * @email   dev@bietje.net
+ * @email   michel.megens@sonatolabs.com
  */
 
 using System.ComponentModel.DataAnnotations;

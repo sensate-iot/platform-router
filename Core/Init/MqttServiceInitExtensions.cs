@@ -2,7 +2,7 @@
  * MQTT service init.
  *
  * @author: Michel Megens
- * @email:  dev@bietje.net
+ * @email:  michel.megens@sonatolabs.com
  */
 
 using System;

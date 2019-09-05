@@ -2,7 +2,7 @@
  * Forgot password JSON model.
  *
  * @author Michel Megens
- * @email   dev@bietje.net
+ * @email   michel.megens@sonatolabs.com
  */
 
 using System.ComponentModel.DataAnnotations;

@@ -2,7 +2,7 @@
  * Information model for the administrative dashboard page.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel.megens@sonatolabs.com
  */
 
 using System;

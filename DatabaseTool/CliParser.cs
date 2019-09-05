@@ -2,7 +2,7 @@
  * Command line interface parser.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel.megens@sonatolabs.com
  */
 
 using System;

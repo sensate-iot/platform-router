@@ -2,7 +2,7 @@
  * Extension method to initialise database repositories.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel.megens@sonatolabs.com
  */
 
 using System;

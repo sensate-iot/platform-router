@@ -2,7 +2,7 @@
  * JSON model to update a users phone number.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel.megens@sonatolabs.com
  */
 
 using System.ComponentModel.DataAnnotations;

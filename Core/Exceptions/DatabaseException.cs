@@ -2,7 +2,7 @@
  * Exeption which is thrown when database reads / writes fail.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel.megens@sonatolabs.com
  */
 
 using System;

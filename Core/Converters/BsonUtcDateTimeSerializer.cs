@@ -2,7 +2,7 @@
  * BSON serializer to force UTC date time objects in MongoDB.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel.megens@sonatolabs.com
  */
 
 using System;

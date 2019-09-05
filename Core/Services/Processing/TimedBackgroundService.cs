@@ -2,7 +2,7 @@
  * Background service based on System.Threading.Timer.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel.megens@sonatolabs.com
  */
 
 using System.Threading;

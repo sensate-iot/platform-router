@@ -2,7 +2,7 @@
  * Settings for TimedBackgroundService.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel.megens@sonatolabs.com
  */
 
 namespace SensateService.Services.Settings
