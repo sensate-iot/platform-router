@@ -12,8 +12,10 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
+
 using MongoDB.Driver;
 using MongoDB.Bson;
+
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
@@ -26,6 +28,9 @@ namespace SensateService.Infrastructure.Document
 		private readonly ILogger<SensorRepository> _logger;
 		private readonly IMeasurementRepository _measurements;
 		private readonly ISensorStatisticsRepository _stats;
+		private readonly Random _rng;
+
+		private const int SensorSecretLength = 32;
 
 		public SensorRepository(SensateContext context,
 								ISensorStatisticsRepository statisticsRepository,
@@ -36,6 +41,7 @@ namespace SensateService.Infrastructure.Document
 			this._logger = logger;
 			this._measurements = measurements;
 			this._stats = statisticsRepository;
+			this._rng = new Random(DateTime.Now.Millisecond);
 		}
 
 		public override async Task CreateAsync(Sensor sensor, CancellationToken ct = default(CancellationToken))
@@ -45,6 +51,10 @@ namespace SensateService.Infrastructure.Document
 			sensor.CreatedAt = now;
 			sensor.UpdatedAt = now;
 			sensor.InternalId = base.GenerateId(now);
+
+			if(string.IsNullOrEmpty(sensor.Secret))
+				sensor.Secret = this._rng.NextStringWithSymbols(SensorSecretLength);
+
 			await base.CreateAsync(sensor, ct).AwaitBackground();
 		}
 
