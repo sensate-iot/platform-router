@@ -9,7 +9,7 @@ using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Security.Claims;
-
+using System.Threading;
 using SensateService.Models;
 
 namespace SensateService.Infrastructure.Repositories
@@ -28,7 +28,7 @@ namespace SensateService.Infrastructure.Repositories
 		Task<SensateUser> GetByClaimsPrincipleAsync(ClaimsPrincipal cp);
 
 		void StartUpdate(SensateUser user);
-		Task EndUpdateAsync();
+		Task EndUpdateAsync(CancellationToken token = default(CancellationToken));
 		IEnumerable<string> GetRoles(SensateUser user);
 		Task<IEnumerable<string>> GetRolesAsync(SensateUser user);
 
