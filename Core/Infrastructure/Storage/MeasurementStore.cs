@@ -76,7 +76,7 @@ namespace SensateService.Infrastructure.Storage
 			await Task.WhenAll(measurement_worker, stats_worker, events_worker).AwaitBackground();
 		}
 
-		private static async Task InvokeMeasurementReceivedAsync(object sender, Measurement m)
+		private static async Task InvokeMeasurementReceivedAsync(Sensor sender, Measurement m)
 		{
 			Delegate[] delegates;
 			MeasurementReceivedEventArgs args;

@@ -52,9 +52,9 @@ namespace SensateService.Infrastructure.Sql
 			this._sqlContext.Update(obj);
 		}
 
-		public virtual async Task EndUpdateAsync()
+		public virtual async Task EndUpdateAsync(CancellationToken token = default(CancellationToken))
 		{
-			await this._sqlContext.SaveChangesAsync().AwaitBackground();
+			await this._sqlContext.SaveChangesAsync(token).AwaitBackground();
 		}
 
 		public void EndUpdate()
