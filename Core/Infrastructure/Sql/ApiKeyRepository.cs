@@ -22,7 +22,7 @@ namespace SensateService.Infrastructure.Sql
 {
 	public class ApiKeyRepository : AbstractSqlRepository<SensateApiKey>, IApiKeyRepository
 	{
-		private Random _rng;
+		private readonly Random _rng;
 		private const int UserTokenLength = 32;
 
 		public ApiKeyRepository(SensateSqlContext context) : base(context)
@@ -69,7 +69,7 @@ namespace SensateService.Infrastructure.Sql
 		{
 			this.StartUpdate(key);
 			key.Revoked = true;
-			return this.EndUpdateAsync();
+			return this.EndUpdateAsync(token);
 		}
 
 		public Task MarkRevokedRangeAsync(IEnumerable<SensateApiKey> keys, CancellationToken token = default(CancellationToken))
@@ -92,7 +92,7 @@ namespace SensateService.Infrastructure.Sql
 		{
 			this.StartUpdate(apikey);
 			apikey.ApiKey = this._rng.NextStringWithSymbols(UserTokenLength);
-			await this.EndUpdateAsync().AwaitBackground();
+			await this.EndUpdateAsync(token).AwaitBackground();
 
 			return apikey;
 		}
