@@ -53,20 +53,18 @@ namespace SensateService.Infrastructure.Storage
 				return null;
 			}
 
-			if(obj.Longitude != null && obj.Latitude != null) {
-				var lon = obj.Longitude.Value;
-				var lat = obj.Latitude.Value;
+			if(obj.Longitude.HasValue) {
+				datapoints["Longitude"] = new DataPoint {
+					Unit = null,
+					Value = Convert.ToDecimal(obj.Longitude.Value)
+				};
+			}
 
-				if(Math.Abs(lat) > double.Epsilon || Math.Abs(lon) > double.Epsilon) {
-					datapoints["Longitude"] = new DataPoint {
-						Unit = null,
-						Value = Convert.ToDecimal(lon)
-					};
-					datapoints["Latitude"] = new DataPoint {
-						Unit = null,
-						Value = Convert.ToDecimal(lat)
-					};
-				}
+			if(obj.Latitude.HasValue) {
+				datapoints["Latitude"] = new DataPoint {
+					Unit = null,
+					Value = Convert.ToDecimal(obj.Latitude.Value)
+				};
 			}
 
 			measurement = new Measurement {
