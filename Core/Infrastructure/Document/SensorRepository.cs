@@ -15,7 +15,8 @@ using Microsoft.Extensions.Logging;
 
 using MongoDB.Driver;
 using MongoDB.Bson;
-
+using SensateService.Enums;
+using SensateService.Exceptions;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
@@ -132,6 +133,22 @@ namespace SensateService.Infrastructure.Document
 				};
 
 				await Task.WhenAll(tasks).AwaitBackground();
+			}
+		}
+
+		public async Task UpdateSecret(Sensor sensor, SensateApiKey key)
+		{
+			var update = Builders<Sensor>.Update.Set(x => x.UpdatedAt, DateTime.Now)
+				.Set(x => x.Secret, key.ApiKey);
+
+			if(key.Revoked || key.Type != ApiKeyType.SensorKey)
+				return;
+
+			try {
+				await this._sensors.FindOneAndUpdateAsync(x => x.InternalId == sensor.InternalId, update)
+					.AwaitBackground();
+			} catch(Exception ex) {
+				throw new DatabaseException(ex.Message, "Sensors", ex);
 			}
 		}
 
