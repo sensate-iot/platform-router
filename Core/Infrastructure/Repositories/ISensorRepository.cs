@@ -24,5 +24,6 @@ namespace SensateService.Infrastructure.Repositories
 		Task<long> CountAsync(SensateUser user = null);
 		Task RemoveAsync(string id);
 		Task UpdateAsync(Sensor sensor);
+		Task UpdateSecret(Sensor sensor, SensateApiKey key);
 	}
 }
