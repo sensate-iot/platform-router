@@ -20,7 +20,7 @@ export class Measurement {
     public CreatedAt: number;
 }
 
-export class MeasurementCollection {
+export class BulkMeasurementInfo {
     public Measurements: [Measurement];
     public CreatedBy: Types.ObjectId;
 }

@@ -9,7 +9,7 @@ import { MqttClient } from "./mqtt/mqttclient";
 import { Settings } from "./models/settings";
 import settings from "../settings/appsettings.json";
 import * as mongodb from "./mongodb";
-import { MeasurementCollection, MeasurementInfo } from "./models/measurement";
+import { BulkMeasurementInfo, MeasurementInfo } from "./models/measurement";
 import { WebSocketServer } from "./websocketserver";
 import "./jsonmodule";
 
@@ -32,12 +32,17 @@ class Application {
 
     public onMessage(topic: string, msg: string) {
         if (topic === this.config.mqtt.internalBulkMeasurementTopic) {
-            const measurements: MeasurementCollection = JSON.parse(msg);
+            const measurements: [BulkMeasurementInfo] = JSON.parse(msg);
 
             if (measurements == null)
                 return;
 
-            measurements.Measurements.forEach(m => { this.wss.onMeasurementReceived(measurements.CreatedBy, m); });
+            measurements.forEach(m => {
+                if (!this.wss.hasOpenSocketFor(m.CreatedBy))
+                    return;
+
+                m.Measurements.forEach(measurement => this.wss.onMeasurementReceived(m.CreatedBy, measurement));
+            });
         } else if (topic === this.config.mqtt.internalMeasurementTopic) {
             const measurement: MeasurementInfo = JSON.parse(msg);
 

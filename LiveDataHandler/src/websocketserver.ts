@@ -48,6 +48,17 @@ export class WebSocketServer {
         });
     }
 
+    public hasOpenSocketFor(id: Types.ObjectId) {
+        const strId = id.toString();
+
+        for (const socket of this.retainedConnectionInfo) {
+            if (socket.sensorid === strId)
+                return true;
+        }
+
+        return false;
+    }
+
     private onMessage(ws: any, data : WebSocket.Data) {
         const info = this.findConnectionInfoBySocket(ws);
 
@@ -59,6 +70,7 @@ export class WebSocketServer {
             if (err) {
                 this.destroyConnection(ws);
                 ws.close();
+                console.log("JWT authentication failed!");
                 return;
             }
 
@@ -79,8 +91,8 @@ export class WebSocketServer {
         if(obj.auth)
             return true;
 
-        return new Promise(async(resolve, reject) => {
-            const sensor = await Sensor.findById(obj.sensorid);
+        return new Promise(async (resolve, reject) => {
+            const sensor = await Sensor.findById(new Types.ObjectId(obj.sensorid));
 
             if (sensor.Secret !== secret) {
                 reject();
