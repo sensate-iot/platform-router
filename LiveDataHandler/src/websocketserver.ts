@@ -10,6 +10,7 @@ import * as WebSocket from "ws";
 import * as express from "express";
 import * as jwt from "jsonwebtoken";
 import * as url from "url";
+import { Types } from "mongoose";
 import { ISensorAuthRequest } from "./models/sensorauthrequest";
 import { Sensor } from "./models/sensor";
 import { Measurement } from "./models/measurement";
@@ -39,9 +40,9 @@ export class WebSocketServer {
         this.wss = new WebSocket.Server({ noServer: true });
     }
 
-    public onMeasurementReceived(measurement: Measurement) {
+    public onMeasurementReceived(id: Types.ObjectId, measurement: Measurement) {
         this.retainedConnectionInfo.forEach((socket) => {
-            if (measurement.CreatedBy.toString() === socket.sensorid) {
+            if (id.toString() === socket.sensorid) {
                 socket.ws.send(JSON.stringify(measurement));
             }
         });

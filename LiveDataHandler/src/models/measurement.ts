@@ -14,9 +14,18 @@ export interface IDataPoint {
 };
 
 export class Measurement {
-    Data: [IDataPoint];
-    Longitude: number;
-    Latitude: number;
-    CreatedAt: number;
-    CreatedBy: Types.ObjectId;
+    public Data: [IDataPoint];
+    public Longitude: number;
+    public Latitude: number;
+    public CreatedAt: number;
+}
+
+export class MeasurementCollection {
+    public Measurements: [Measurement];
+    public CreatedBy: Types.ObjectId;
+}
+
+export class MeasurementInfo {
+    public Measurement: Measurement;
+    public CreatedBy: Types.ObjectId;
 }
