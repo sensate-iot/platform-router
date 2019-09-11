@@ -19,8 +19,8 @@ namespace SensateService.Models
 {
 	public class AuditLog
 	{
-		[BsonId, BsonRequired, JsonConverter(typeof(ObjectIdJsonConverter))]
-		public ObjectId InternalId {get;set;}
+		[Required, Key]
+		public long Id { get; set; }
 		[Required]
 		public string Route { get; set; }
 		[Required]

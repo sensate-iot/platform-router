@@ -22,6 +22,7 @@ namespace SensateService.Infrastructure.Sql
 		public new DbSet<UserToken> UserTokens { get; set; }
 		public DbSet<ChangePhoneNumberToken> ChangePhoneNumberTokens { get; set; }
 		public DbSet<SensateApiKey> ApiKeys { get; set; }
+		public DbSet<AuditLog> AuditLogs { get; set; }
 
 		public SensateSqlContext(DbContextOptions<SensateSqlContext> options) :
 			base(options)
@@ -52,6 +53,7 @@ namespace SensateService.Infrastructure.Sql
 					.IsRequired();
 			});
 
+			/* Define User => UserRole relationships */
 			builder.Entity<SensateUserRole>(userrole => {
 				userrole.HasKey(role => new {role.UserId, role.RoleId});
 				userrole.HasOne(role => role.Role)
@@ -64,6 +66,13 @@ namespace SensateService.Infrastructure.Sql
 					.HasForeignKey(user => user.UserId)
 					.IsRequired();
 			});
+
+			builder.HasSequence<long>("Id_sequence")
+				.StartsAt(1)
+				.IncrementsBy(1);
+			builder.Entity<AuditLog>()
+				.Property(o => o.Id)
+				.HasDefaultValueSql("nextval('\"Id_sequence\"')");
 		}
 	}
 }

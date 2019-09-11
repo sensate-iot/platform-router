@@ -25,13 +25,12 @@ namespace SensateService.Infrastructure.Repositories
 		Task<IEnumerable<AuditLog>> GetByRouteAsync(SensateUser user, string route, DateTime start, DateTime end);
 	    Task<IEnumerable<AuditLog>> GetByRequestTypeAsync(SensateUser user, RequestMethod method);
 	    Task<IEnumerable<AuditLog>> GetAsync(Expression<Func<AuditLog, bool>> expr);
-		Task<AuditLog> GetAsync(string id);
+		Task<AuditLog> GetAsync(long id);
 
-	    Task<long> CountAsync(Expression<Func<AuditLog, bool>> predicate);
-
+	    Task<int> CountAsync(Expression<Func<AuditLog, bool>> predicate);
 
 		Task CreateAsync(string route, RequestMethod method, IPAddress address, SensateUser user = null);
-		Task CreateAsync(AuditLog log, CancellationToken ct = default(CancellationToken));
+	    Task CreateAsync(AuditLog log, CancellationToken ct = default(CancellationToken));
 
 	    Task DeleteBetweenAsync(SensateUser user, DateTime start, DateTime end);
 	    Task DeleteBetweenAsync(SensateUser user, string route, DateTime start, DateTime end);
