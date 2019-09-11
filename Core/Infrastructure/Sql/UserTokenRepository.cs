@@ -13,7 +13,7 @@ using System.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq.Expressions;
 using System.Security.Claims;
-
+using System.Threading;
 using Microsoft.IdentityModel.Tokens;
 
 using SensateService.Exceptions;
@@ -41,11 +41,11 @@ namespace SensateService.Infrastructure.Sql
 			asyncResult.RunSynchronously();
 		}
 
-		public override async Task CreateAsync(UserToken obj)
+		public override async Task CreateAsync(UserToken obj, CancellationToken ct = default(CancellationToken))
 		{
-			if(obj.Value == null && obj.LoginProvider == JwtRefreshTokenProvider)
+			if(obj.Value == null && obj.LoginProvider == JwtRefreshTokenProvider) {
 				obj.Value = this.GenerateRefreshToken();
-			else if(obj.Value == null) {
+			} else if(obj.Value == null) {
 				throw new DatabaseException("User token must have a value!");
 			}
 

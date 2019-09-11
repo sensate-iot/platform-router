@@ -8,7 +8,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
+
 using SensateService.Models;
 
 namespace SensateService.Infrastructure.Repositories
@@ -16,7 +18,7 @@ namespace SensateService.Infrastructure.Repositories
 	public interface IUserTokenRepository
 	{
 		void Create(UserToken token);
-		Task CreateAsync(UserToken token);
+		Task CreateAsync(UserToken token, CancellationToken ct = default(CancellationToken));
 
 		Task<long> CountAsync(Expression<Func<UserToken, bool>> expr);
 

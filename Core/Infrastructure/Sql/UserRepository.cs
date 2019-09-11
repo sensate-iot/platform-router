@@ -80,11 +80,6 @@ namespace SensateService.Infrastructure.Sql
 			return worker;
 		}
 
-		public override Task CreateAsync(SensateUser obj)
-		{
-			throw new SystemException("UserRepository.CreateAsync is forbidden!");
-		}
-
 		public virtual async Task DeleteAsync(string id)
 		{
 			var obj = await this.GetAsync(id);

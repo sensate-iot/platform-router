@@ -30,7 +30,7 @@ namespace SensateService.Infrastructure.Sql
 			this._rng = new Random(DateTime.Now.Millisecond);
 		}
 
-		public Task CreateAsync(SensateApiKey key, CancellationToken token = default(CancellationToken))
+		public override Task CreateAsync(SensateApiKey key, CancellationToken token = default(CancellationToken))
 		{
 			key.ApiKey = this._rng.NextStringWithSymbols(UserTokenLength);
 			this.Data.Add(key);

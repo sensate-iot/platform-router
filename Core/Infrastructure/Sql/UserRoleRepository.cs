@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Identity;
@@ -58,7 +59,7 @@ namespace SensateService.Infrastructure.Sql
 			await this.CreateAsync(role).AwaitBackground();
 		}
 
-		public override async Task CreateAsync(SensateRole obj)
+		public override async Task CreateAsync(SensateRole obj, CancellationToken ct = default(CancellationToken))
 		{
 			var result = await this._roles.CreateAsync(obj).AwaitBackground();
 			if(!result.Succeeded)

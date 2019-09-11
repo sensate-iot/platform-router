@@ -68,10 +68,10 @@ namespace SensateService.Infrastructure.Sql
 			this.Commit();
 		}
 
-		public virtual async Task CreateAsync(T obj)
+		public virtual async Task CreateAsync(T obj, CancellationToken ct = default(CancellationToken))
 		{
 			this.Data.Add(obj);
-			await this.CommitAsync();
+			await this.CommitAsync(ct);
 		}
 
 		public void AddRange(IEnumerable<T> objs)
