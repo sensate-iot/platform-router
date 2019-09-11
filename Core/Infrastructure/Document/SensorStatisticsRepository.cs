@@ -117,7 +117,11 @@ namespace SensateService.Infrastructure.Document
 		{
 			var update = Builders<SensorStatisticsEntry>.Update;
 			UpdateDefinition<SensorStatisticsEntry> updateDefinition;
+#if DEBUG
+			var stats = this._collection;
+#else
 			var stats = this._collection.WithWriteConcern(WriteConcern.Unacknowledged);
+#endif
 
 			updateDefinition = update.Inc(x => x.Measurements, num)
 				.SetOnInsert(x => x.Method, method);
@@ -127,7 +131,7 @@ namespace SensateService.Infrastructure.Document
 				x.Date == DateTime.Now.ThisHour() && x.Method == method, updateDefinition, opts, token).AwaitBackground();
 		}
 
-		#endregion
+#endregion
 
 #region Entry Getters
 

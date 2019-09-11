@@ -2,7 +2,7 @@
  * Measurement bucket model class.
  *
  * @author Michel Megens
- * @email  michel.megens@sonatolabs.com
+ * @email  michel@michelmegens.net
  */
 
 using System;
@@ -23,10 +23,6 @@ namespace SensateService.Models
 		public ObjectId InternalId {get;set;}
 		[BsonRequired]
 		public DateTime Timestamp { get; set; }
-		[BsonRequired]
-		public DateTime First { get; set; }
-		[BsonRequired]
-		public DateTime Last { get; set; }
 		[BsonRequired]
 		public ICollection<Measurement> Measurements { get; set; }
 		[BsonRequired]

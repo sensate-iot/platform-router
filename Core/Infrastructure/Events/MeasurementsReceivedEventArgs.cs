@@ -13,13 +13,11 @@ namespace SensateService.Infrastructure.Events
 {
 	public class MeasurementsReceivedEventArgs
 	{
-		public IList<Measurement> Measurements { get; }
 		public string Compressed { get; set; }
 		public CancellationToken Token { get; }
 
-		public MeasurementsReceivedEventArgs(IList<Measurement> measurements, CancellationToken token)
+		public MeasurementsReceivedEventArgs(CancellationToken token)
 		{
-			this.Measurements = measurements;
 			this.Token = token;
 		}
 	}

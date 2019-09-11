@@ -4,7 +4,7 @@
  * thread-safe.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel@michelmegens.net
  */
 
 using System;
@@ -20,8 +20,11 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
+using MongoDB.Bson;
 using Newtonsoft.Json;
+
 using SensateService.Enums;
+using SensateService.Exceptions;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Events;
 using SensateService.Infrastructure.Repositories;
@@ -39,15 +42,16 @@ namespace SensateService.Infrastructure.Storage
 		private List<RawMeasurementEntry> _measurements;
 		private int _count;
 		private SpinLockWrapper _lock;
-		private readonly IMemoryCache cache;
+		private readonly IMemoryCache _cache;
 
 		private const int InitialListSize = 512;
+		private const int DatabaseTimeout = 20;
 
 		public CachedMeasurementStore(IServiceProvider provider, ILogger<CachedMeasurementStore> logger) :
 			base(provider, logger)
 		{
 			this._lock = new SpinLockWrapper();
-			this.cache = provider.GetRequiredService<IMemoryCache>();
+			this._cache = provider.GetRequiredService<IMemoryCache>();
 
 			this._lock.Lock();
 			this._measurements = new List<RawMeasurementEntry>(InitialListSize);
@@ -92,7 +96,7 @@ namespace SensateService.Infrastructure.Storage
 			var map = new Dictionary<string, SensateUser>();
 
 			foreach(var id in ids) {
-				if(!cache.TryGetValue(id, out var obj)) {
+				if(!this._cache.TryGetValue(id, out var obj)) {
 					unkowns.Add(id);
 					continue;
 				}
@@ -114,7 +118,7 @@ namespace SensateService.Infrastructure.Storage
 
 				opts.SetAbsoluteExpiration(TimeSpan.FromMinutes(1));
 				opts.SetSize(1);
-				cache.Set(user.Id, user, opts);
+				this._cache.Set(user.Id, user, opts);
 			}
 
 			return map;
@@ -143,17 +147,22 @@ namespace SensateService.Infrastructure.Storage
 				foreach(var raw in logs) {
 					ProcessedMeasurement processed;
 					Measurement measurement;
+					Sensor sensor;
 					SensateUser user;
 
-					var sensor = sensors[raw.Item2.CreatedById];
-					measurement = base.ProcessRawMeasurement(sensor, raw.Item2);
+					sensor = sensors[raw.Item2.CreatedById];
 
-					if(sensor == null || measurement == null)
+					if(sensor == null)
 						continue;
 
 					user = users[sensor.Owner];
 
 					if(!base.CanInsert(user) || !base.InsertAllowed(user, raw.Item2.CreatedBySecret))
+						continue;
+
+					measurement = base.ProcessRawMeasurement(sensor, raw.Item2);
+
+					if(measurement == null)
 						continue;
 
 					processed = new ProcessedMeasurement(measurement, sensor) {
@@ -167,8 +176,7 @@ namespace SensateService.Infrastructure.Storage
 			return measurements;
 		}
 
-		private static async Task IncrementStatistics(ISensorStatisticsRepository stats,
-			IEnumerable<ProcessedMeasurement> data, CancellationToken token)
+		private static async Task IncrementStatistics(ISensorStatisticsRepository stats, IEnumerable<ProcessedMeasurement> data, CancellationToken token)
 		{
 			var sorted = from entry in data
 				group entry by new { entry.Creator, entry.Method }
@@ -190,7 +198,7 @@ namespace SensateService.Infrastructure.Storage
 			await Task.WhenAll(tasks).AwaitBackground();
 		}
 
-		private static string Compress(IEnumerable<Measurement> measurements)
+		private static string Compress(IList<LiveDataMeasurementWrapper> measurements)
 		{
 			string rv;
 			MemoryStream msi, mso;
@@ -221,20 +229,18 @@ namespace SensateService.Infrastructure.Storage
 
 		public async Task<long> ProcessAsync()
 		{
-			IList<ProcessedMeasurement> processed_que;
-			IDictionary<Sensor, List<Measurement>> data;
 			List<RawMeasurementEntry> raw_que;
+			IList<ProcessedMeasurement> processed_que;
 			int count;
 
 			this._lock.Lock();
-			count = this._count;
 
-			if(count <= 0L) {
+			if(this._count <= 0L) {
 				this._lock.Unlock();
 				return 0;
 			}
 
-			raw_que = new List<RawMeasurementEntry>(count);
+			raw_que = new List<RawMeasurementEntry>(this._count);
 
 			this.SwapQueues(ref raw_que);
 			this._lock.Unlock();
@@ -242,34 +248,44 @@ namespace SensateService.Infrastructure.Storage
 			using(var scope = this.Provider.CreateScope()) {
 				var measurements = scope.ServiceProvider.GetRequiredService<IMeasurementRepository>();
 				var statistics = scope.ServiceProvider.GetRequiredService<ISensorStatisticsRepository>();
-				var source = new CancellationTokenSource(TimeSpan.FromMinutes(1));
+				var source = new CancellationTokenSource(TimeSpan.FromSeconds(DatabaseTimeout));
 
 				try {
-					var asyncio = new Task[3];
-					IList<Measurement> telemetry;
+					IDictionary<Sensor, List<Measurement>> telemetry;
+					IList<LiveDataMeasurementWrapper> livedata;
+					var io = new Task[3];
 
 					processed_que = await this.ProcessMeasurementsAsync(raw_que).AwaitBackground();
-					telemetry = processed_que.Select(x => x.Measurement).ToList();
-					data = processed_que.GroupBy(x => x.Creator)
-						.ToDictionary(x => x.Key,
-									  v => v.Select(x => x.Measurement).OrderBy(x => x.CreatedAt).ToList());
+					io[0] = IncrementStatistics(statistics, processed_que, source.Token);
 
 					if(processed_que.Count <= 0)
 						return 0;
 
-					asyncio[0] = measurements.StoreAsync(data, source.Token);
-					asyncio[1] = IncrementStatistics(statistics, processed_que, source.Token);
-					asyncio[2] = InvokeEventHandlersAsync(this, telemetry, source.Token);
-					await Task.WhenAll(asyncio).AwaitBackground();
+					telemetry = processed_que.GroupBy(x => x.Creator)
+						.ToDictionary(x => x.Key, v => v.Select(x => x.Measurement)
+							.OrderBy(x => x.CreatedAt).ToList());
+					livedata = telemetry.Select(kv => new LiveDataMeasurementWrapper(kv.Key.InternalId, kv.Value))
+						.ToList();
+
+					io[1] = measurements.StoreAsync(telemetry, source.Token);
+					io[2] = this.InvokeEventHandlersAsync(livedata, source.Token);
+					await Task.WhenAll(io).AwaitBackground();
 
 					count = processed_que.Count;
+				} catch(DatabaseException ex) {
+					source.Cancel(false);
+
+					this.Logger.LogInformation($"Measurement database error: {ex.Message}");
+					this.Logger.LogDebug(ex.StackTrace);
+
+					throw new DatabaseException("CachedMeasurementStore failed to store measurements", ex.Database, ex.InnerException);
 				} catch(Exception ex) {
 					source.Cancel(false);
 
 					this.Logger.LogInformation($"Bulk measurement I/O error: {ex.Message}");
-					this.Logger.LogInformation(ex.StackTrace);
+					this.Logger.LogDebug(ex.StackTrace);
 
-					return 0;
+					throw new CachingException("Unable to store measurements or statistics!", "MeasurementCache", ex);
 				}
 			}
 
@@ -279,7 +295,7 @@ namespace SensateService.Infrastructure.Storage
 			return count;
 		}
 
-		private static async Task InvokeEventHandlersAsync(object sender, IList<Measurement> measurements, CancellationToken token)
+		private async Task InvokeEventHandlersAsync(IList<LiveDataMeasurementWrapper> measurements, CancellationToken token)
 		{
 			Delegate[] delegates;
 			MeasurementsReceivedEventArgs args;
@@ -294,11 +310,11 @@ namespace SensateService.Infrastructure.Storage
 
 			var task = Task.Run(() => Compress(measurements), token);
 
-			args = new MeasurementsReceivedEventArgs(measurements, token) {
+			args = new MeasurementsReceivedEventArgs(token) {
 				Compressed = await task.AwaitBackground()
 			};
 
-			await MeasurementsReceived.Invoke(sender, args).AwaitBackground();
+			await MeasurementsReceived.Invoke(this, args).AwaitBackground();
 		}
 
 		private void SwapQueues(ref List<RawMeasurementEntry> data)
@@ -332,6 +348,18 @@ namespace SensateService.Infrastructure.Storage
 			this.Measurement = measurement;
 			this.Creator = creator;
 			this.Method = RequestMethod.Any;
+		}
+	}
+
+	internal class LiveDataMeasurementWrapper
+	{
+		public List<Measurement> Measurements { get; }
+		public ObjectId CreatedBy { get; }
+
+		public LiveDataMeasurementWrapper(ObjectId id, List<Measurement> data)
+		{
+			this.CreatedBy = id;
+			this.Measurements = data;
 		}
 	}
 }

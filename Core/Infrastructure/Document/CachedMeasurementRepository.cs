@@ -1,8 +1,8 @@
 /*
  * Cached measurement repository
  *
- * @author: Michel Megens
- * @email:  dev@bietje.net
+ * @author Michel Megens
+ * @email  michel@michelmegens.net
  */
 
 using System;

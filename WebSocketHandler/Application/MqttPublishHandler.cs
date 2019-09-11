@@ -2,7 +2,7 @@
  * MQTT publish handler for bulk storage.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel@michelmegens.net
  */
 
 using System;
@@ -39,8 +39,12 @@ namespace SensateService.WebSocketHandler.Application
 			using(var scope = this._provider.CreateScope()) {
 				var opts = scope.ServiceProvider.GetRequiredService<IOptions<InternalMqttServiceOptions>>();
 				var client = scope.ServiceProvider.GetRequiredService<IMqttPublishService>();
+				var obj = new {
+					CreatedBy = e.Sensor.InternalId,
+					e.Measurement
+				};
 
-				data = JsonConvert.SerializeObject(e.Measurement);
+				data = JsonConvert.SerializeObject(obj);
 				await client.PublishOnAsync(opts.Value.InternalBulkMeasurementTopic, data, false).AwaitBackground();
 			}
 		}

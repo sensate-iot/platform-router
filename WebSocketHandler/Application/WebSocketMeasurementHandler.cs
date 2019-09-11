@@ -2,7 +2,7 @@
  * Websocket handler used to receive messages.
  *
  * @author Michel Megens
- * @email  michel.megens@sonatolabs.com
+ * @email  michel@michelmegens.net
  */
 
 using System;
@@ -75,10 +75,7 @@ namespace SensateService.WebSocketHandler.Application
 
 		private async Task MeasurementsStored_Handler(object sender, MeasurementsReceivedEventArgs e)
 		{
-			string data;
-
-			data = JsonConvert.SerializeObject(e.Measurements);
-			await client.PublishOnAsync(this.mqttopts.InternalBulkMeasurementTopic, data, false).AwaitBackground();
+			await client.PublishOnAsync(this.mqttopts.InternalBulkMeasurementTopic, e.Compressed, false).AwaitBackground();
 		}
 	}
 }

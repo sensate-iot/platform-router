@@ -2,7 +2,7 @@
  * MQTT measurement handler.
  *
  * @author Michel Megens
- * @email  michel.megens@sonatolabs.com
+ * @email  michel@michelmegens.net
  */
 
 using System;
@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
 using SensateService.Enums;
+using SensateService.Exceptions;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Storage;
 using SensateService.Models.Json.In;
@@ -45,6 +46,8 @@ namespace SensateService.MqttHandler.Mqtt
 					return;
 
 				await this.store.StoreAsync(raw, RequestMethod.MqttTcp).AwaitBackground();
+			} catch(CachingException ex) {
+				this.logger.LogInformation($"{ex.Key}: {ex.Message}");
 			} catch(Exception ex) {
 				this.logger.LogInformation($"Error: {ex.Message}");
 				this.logger.LogInformation($"Received a buggy MQTT message: {message}");

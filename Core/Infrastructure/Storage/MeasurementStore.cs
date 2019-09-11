@@ -4,7 +4,7 @@
  * isn't cached locally.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel@michelmegens.net
  */
 
 using System;
@@ -90,7 +90,8 @@ namespace SensateService.Infrastructure.Storage
 
 			args = new MeasurementReceivedEventArgs {
 				CancellationToken = CancellationToken.None,
-				Measurement = m
+				Measurement = m,
+				Sensor = sender
 			};
 
 			await MeasurementReceived.Invoke(sender, args).AwaitBackground();

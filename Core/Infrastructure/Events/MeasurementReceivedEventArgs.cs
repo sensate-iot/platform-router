@@ -16,5 +16,6 @@ namespace SensateService.Infrastructure.Events
 	{
 		public Measurement Measurement { get; set; }
 		public CancellationToken CancellationToken { get; set; }
+		public Sensor Sensor { get; set; }
 	}
 }

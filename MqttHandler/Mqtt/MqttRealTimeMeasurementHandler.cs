@@ -2,7 +2,7 @@
  * MQTT message handler.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel@michelmegens.net
  */
 
 using System;
@@ -59,7 +59,12 @@ namespace SensateService.MqttHandler.Mqtt
 		{
 			string msg;
 
-			msg = e.Measurement.ToJson();
+			var obj = new {
+				e.Measurement,
+				CreatedBy = e.Sensor.InternalId
+			};
+
+			msg = JsonConvert.SerializeObject(obj);
 			await this.client.PublishOnAsync(this.mqttopts.InternalMeasurementTopic, msg, false);
 		}
 

@@ -4,7 +4,7 @@
  * measurements.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel@michelmegens.net
  */
 
 using System;
@@ -77,7 +77,7 @@ namespace SensateService.Infrastructure.Storage
 
 		protected bool CanInsert(IEnumerable<string> roles)
 		{
-			return roles.Contains(SensateRole.Banned);
+			return !roles.Contains(SensateRole.Banned);
 		}
 
 		protected bool CanInsert(SensateUser user)

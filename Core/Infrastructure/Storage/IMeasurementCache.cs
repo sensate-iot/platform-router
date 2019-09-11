@@ -2,7 +2,7 @@
  * Measurement cache interface definition.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel@michelmegens.net
  */
 
 using System.Collections.Generic;

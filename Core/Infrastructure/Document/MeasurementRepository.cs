@@ -2,7 +2,7 @@
  * MongoDB measurement repository implementation.
  *
  * @author Michel Megens
- * @email  dev@bietje.net
+ * @email  michel@michelmegens.net
  */
 
 using System;
@@ -17,6 +17,7 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using MongoDB.Driver.Linq;
+using SensateService.Exceptions;
 using SensateService.Models;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Helpers;
@@ -139,25 +140,26 @@ namespace SensateService.Infrastructure.Document
 
 #region Measurement creation
 
-		private static UpdateDefinition<MeasurementBucket> CreateBucketUpdate(ObjectId sensor,
-			IList<Measurement> measurements)
+		private static UpdateDefinition<MeasurementBucket> CreateBucketUpdate(ObjectId sensor, ICollection<Measurement> measurements)
 		{
-				var ubuilder = Builders<MeasurementBucket>.Update;
-				var update = ubuilder.PushEach(x => x.Measurements, measurements)
-					.SetOnInsert(x => x.Timestamp, DateTime.Now.ThisHour())
-					.SetOnInsert(x => x.SensorId, sensor)
-					.Inc(x => x.Count, measurements.Count)
-					.Min(x => x.First, measurements[0].CreatedAt)
-					.Max(x => x.Last, measurements[measurements.Count - 1].CreatedAt);
+			var ubuilder = Builders<MeasurementBucket>.Update;
+			var update = ubuilder.PushEach(x => x.Measurements, measurements)
+				.SetOnInsert(x => x.Timestamp, DateTime.Now.ThisHour())
+				.SetOnInsert(x => x.SensorId, sensor)
+				.Inc(x => x.Count, measurements.Count);
 
 			return update;
 		}
 
 		public async Task StoreAsync(IDictionary<Sensor, List<Measurement>> measurements, CancellationToken ct)
 		{
+			var updates = new List<UpdateOneModel<MeasurementBucket>>();
+#if DEBUG
+			var db = this._collection;
+#else
 			var concern = new WriteConcern(0, new Optional<TimeSpan?>(), false, false);
 			var db = this._collection.WithWriteConcern(concern);
-			var updates = new List<UpdateOneModel<MeasurementBucket>>();
+#endif
 
 			foreach(var kvpair in measurements) {
 				var fbuilder = Builders<MeasurementBucket>.Filter;
@@ -184,7 +186,11 @@ namespace SensateService.Infrastructure.Document
 				BypassDocumentValidation = true
 			};
 
-			await db.BulkWriteAsync(updates, opts, ct).AwaitBackground();
+			try {
+				await db.BulkWriteAsync(updates, opts, ct).AwaitBackground();
+			} catch(Exception ex) {
+				throw new DatabaseException(ex.Message, "Measurements", ex);
+			}
 		}
 
 		public async Task StoreAsync(Sensor sensor, Measurement measurement, CancellationToken ct = default(CancellationToken))
@@ -210,17 +216,17 @@ namespace SensateService.Infrastructure.Document
 			fd = builder.Eq(doc => doc.SensorId, sensor.InternalId);
 
 			if(start != null && end != null) {
-				fd &= builder.Gte(x => x.First, start) &
-					 builder.Lte(x => x.First, end);
+				fd &= builder.Gte(x => x.Timestamp, start.Value.ThisHour()) &
+					 builder.Lte(x => x.Timestamp, end.Value.AddHours(1D).ThisHour());
 			} else if(end == null) {
 				/* Interpret end == null as infinity and
 				   build an 'after' _start_ filter. */
 
 				fd = builder.Eq(x => x.SensorId, sensor.InternalId) &
-					builder.Gte(x => x.First, start);
+					builder.Gte(x => x.Timestamp, start.Value.ThisHour());
 			} else {
 				fd = builder.Eq(x => x.SensorId, sensor.InternalId) &
-				     builder.Lte(x => x.First, end);
+				     builder.Lte(x => x.Timestamp, end.Value.AddHours(1D).ThisHour());
 			}
 
 			return fd;
