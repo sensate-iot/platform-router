@@ -154,12 +154,6 @@ namespace SensateService.Infrastructure.Document
 		public async Task StoreAsync(IDictionary<Sensor, List<Measurement>> measurements, CancellationToken ct)
 		{
 			var updates = new List<UpdateOneModel<MeasurementBucket>>();
-#if DEBUG
-			var db = this._collection;
-#else
-			var concern = new WriteConcern(0, new Optional<TimeSpan?>(), false, false);
-			var db = this._collection.WithWriteConcern(concern);
-#endif
 
 			foreach(var kvpair in measurements) {
 				var fbuilder = Builders<MeasurementBucket>.Filter;
@@ -187,7 +181,7 @@ namespace SensateService.Infrastructure.Document
 			};
 
 			try {
-				await db.BulkWriteAsync(updates, opts, ct).AwaitBackground();
+				await this._collection.BulkWriteAsync(updates, opts, ct).AwaitBackground();
 			} catch(Exception ex) {
 				throw new DatabaseException(ex.Message, "Measurements", ex);
 			}

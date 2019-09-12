@@ -17,6 +17,7 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SensateService.Enums;
+using SensateService.Exceptions;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
@@ -117,18 +118,18 @@ namespace SensateService.Infrastructure.Document
 		{
 			var update = Builders<SensorStatisticsEntry>.Update;
 			UpdateDefinition<SensorStatisticsEntry> updateDefinition;
-#if DEBUG
-			var stats = this._collection;
-#else
-			var stats = this._collection.WithWriteConcern(WriteConcern.Unacknowledged);
-#endif
 
 			updateDefinition = update.Inc(x => x.Measurements, num)
 				.SetOnInsert(x => x.Method, method);
 
 			var opts = new UpdateOptions {IsUpsert = true};
-			await stats.UpdateOneAsync(x => x.SensorId == sensor.InternalId &&
-				x.Date == DateTime.Now.ThisHour() && x.Method == method, updateDefinition, opts, token).AwaitBackground();
+			try {
+				await this._collection.UpdateOneAsync(x => x.SensorId == sensor.InternalId &&
+				                                           x.Date == DateTime.Now.ThisHour() && x.Method == method,
+					updateDefinition, opts, token).AwaitBackground();
+			} catch(Exception ex) {
+				throw new DatabaseException("Unable to update measurement statistics!", "Statistics", ex);
+			}
 		}
 
 #endregion
