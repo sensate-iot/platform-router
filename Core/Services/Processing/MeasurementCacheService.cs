@@ -2,7 +2,7 @@
  * Measurement cache service implementation details.
  *
  * @author Michel Megens
- * @email  michel.megens@sonatolabs.com
+ * @email  michel@michelmegens.net
  */
 
 using System;
@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 using SensateService.Config;
+using SensateService.Exceptions;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Storage;
 using SensateService.Services.Settings;
@@ -50,7 +51,18 @@ namespace SensateService.Services.Processing
 
 			sw = Stopwatch.StartNew();
 			this._logger.LogTrace("Cache service triggered!");
-			count = await this._store.ProcessAsync().AwaitBackground();
+			count = 0L;
+
+			try {
+				count = await this._store.ProcessAsync().AwaitBackground();
+			} catch(DatabaseException ex) {
+				this._logger.LogInformation($"Database {ex.Database} failed!");
+			} catch(CachingException ex) {
+				this._logger.LogInformation($"Measurement cache failed: {ex.InnerException?.Message}");
+			} catch(Exception ex) {
+				this._logger.LogInformation($"Measurement cache failed: {ex.Message}");
+			}
+
 			sw.Stop();
 
 			totaltime = base.MillisecondsElapsed();
