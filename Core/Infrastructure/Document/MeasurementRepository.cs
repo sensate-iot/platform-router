@@ -215,10 +215,10 @@ namespace SensateService.Infrastructure.Document
 
 			fd = builder.Eq(doc => doc.SensorId, sensor.InternalId);
 
-			if(start != null && end != null) {
+			if(start.HasValue && end.HasValue) {
 				fd &= builder.Gte(x => x.Timestamp, start.Value.ThisHour()) &
-					 builder.Lte(x => x.Timestamp, end.Value.AddHours(1D).ThisHour());
-			} else if(end == null) {
+					 builder.Lte(x => x.Timestamp, end.Value.ThisHour());
+			} else if(!end.HasValue) {
 				/* Interpret end == null as infinity and
 				   build an 'after' _start_ filter. */
 
