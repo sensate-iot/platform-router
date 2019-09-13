@@ -66,13 +66,21 @@ namespace SensateService.Infrastructure.Document
 			return data.OrderBy(x => x.CreatedAt).ToList();
 		}
 
-		public virtual async Task<IEnumerable<Measurement>> GetMeasurementsBySensorAsync(Sensor sensor)
+		public virtual async Task<IEnumerable<Measurement>> GetMeasurementsBySensorAsync(Sensor sensor, int skip = -1, int limit = -1)
 		{
-			var query = Builders<MeasurementBucket>.Filter.Eq(x => x.SensorId, sensor.InternalId);
+			var fd = Builders<MeasurementBucket>.Filter.Eq(x => x.SensorId, sensor.InternalId);
 
 			try {
-				var result = await this._collection.FindAsync(query).AwaitBackground();
-				var aslist = await result.ToListAsync().AwaitBackground();
+				var query = this._collection.Find(fd);
+
+				if(skip >= 0)
+					query = query.Skip(skip);
+
+				if(limit >= 0)
+					query = query.Limit(limit);
+
+
+				var aslist = await query.ToListAsync().AwaitBackground();
 
 				return this.ConcatMeasurementBuckets(aslist);
 			} catch (Exception ex) {
@@ -119,14 +127,17 @@ namespace SensateService.Infrastructure.Document
 
 		#region Linq getters
 
-		public virtual async Task<IEnumerable<Measurement>> GetMeasurementsAsync(Expression<Func<MeasurementBucket, bool>> expression)
+		public virtual async Task<IEnumerable<Measurement>> GetMeasurementsAsync(Expression<Func<MeasurementBucket, bool>> expression, int skip = -1, int limit = -1)
 		{
-			var result = await this._collection.FindAsync(expression).AwaitBackground();
+			var query = this._collection.Find(expression);
 
-			if(result == null)
-				return null;
+			if(skip >= 0)
+				query = query.Skip(skip);
 
-			var data = await result.ToListAsync().AwaitBackground();
+			if(limit >= 0)
+				query = query.Limit(limit);
+
+			var data = await query.ToListAsync().AwaitBackground();
 			return ConcatMeasurementBuckets(data);
 		}
 
@@ -134,6 +145,21 @@ namespace SensateService.Infrastructure.Document
 		{
 			var total = this._collection.AsQueryable().Where(x => x.SensorId == sensor.InternalId).SumAsync(x => x.Count, token);
 			return await total.AwaitBackground();
+		}
+
+		public virtual async Task<IEnumerable<Measurement>> GetMeasurementsAsync(Expression<Func<MeasurementBucket, bool>> expression, Func<Measurement, bool> mexpr, int skip = -1, int limit = -1)
+		{
+			IAsyncCursor<MeasurementBucket> result;
+			var measurements = new List<Measurement>();
+
+			result = await this._collection.FindAsync(expression).AwaitBackground();
+			var list = await result.ToListAsync().AwaitBackground();
+
+			foreach(var bucket in list) {
+				measurements.AddRange(bucket.Measurements.Where(mexpr).ToList());
+			}
+
+			return measurements;
 		}
 
 #endregion
@@ -226,44 +252,41 @@ namespace SensateService.Infrastructure.Document
 			return fd;
 		}
 
-		private async Task<IList<MeasurementBucket>> LookupAsync(FilterDefinition<MeasurementBucket> fd)
+		private async Task<IList<MeasurementBucket>> LookupAsync(FilterDefinition<MeasurementBucket> fd, int skip, int limit)
 		{
-			var result = await this._collection.FindAsync(fd).AwaitBackground();
-			return await result.ToListAsync().AwaitBackground();
+			if(skip == -1 && limit == -1) {
+				var result = await this._collection.FindAsync(fd).AwaitBackground();
+				return await result.ToListAsync().AwaitBackground();
+			}
+
+			var query = this._collection.Find(fd);
+
+			if(skip != -1)
+				query = query.Skip(skip);
+
+			if(limit != -1)
+				query = query.Limit(limit);
+
+			return await query.ToListAsync();
 		}
 
-		public virtual async Task<IEnumerable<Measurement>> GetBetweenAsync(Sensor sensor, DateTime start, DateTime end)
+		public virtual async Task<IEnumerable<Measurement>> GetBetweenAsync(Sensor sensor, DateTime start, DateTime end, int skip = -1, int limit = -1)
 		{
-			var data = await this.LookupAsync(BuildQuery(sensor, start, end)).AwaitBackground();
+			var data = await this.LookupAsync(BuildQuery(sensor, start, end), skip, limit).AwaitBackground();
 			return this.ConcatMeasurementBuckets(data, x => x.CreatedAt >= start && x.CreatedAt <= end);
 		}
 
-		public virtual async Task<IEnumerable<Measurement>> GetBeforeAsync(Sensor sensor, DateTime pit)
+		public virtual async Task<IEnumerable<Measurement>> GetBeforeAsync(Sensor sensor, DateTime pit, int skip = -1, int limit = -1)
 		{
-			var data = await this.LookupAsync(BuildQuery(sensor, null, pit)).AwaitBackground();
+			var data = await this.LookupAsync(BuildQuery(sensor, null, pit), skip, limit).AwaitBackground();
 			return this.ConcatMeasurementBuckets(data, x => x.CreatedAt <= pit);
 		}
 
-		public virtual async Task<IEnumerable<Measurement>> GetAfterAsync(Sensor sensor, DateTime pit)
+		public virtual async Task<IEnumerable<Measurement>> GetAfterAsync(Sensor sensor, DateTime pit, int skip = -1, int limit = -1)
 		{
-			var data = await this.LookupAsync(BuildQuery(sensor, pit, null)).AwaitBackground();
+			var data = await this.LookupAsync(BuildQuery(sensor, pit, null), skip, limit).AwaitBackground();
 			return this.ConcatMeasurementBuckets(data, x => x.CreatedAt >= pit);
 		}
 #endregion
-
-		public virtual async Task<IEnumerable<Measurement>> GetMeasurementsAsync(Expression<Func<MeasurementBucket, bool>> expression, Func<Measurement, bool> mexpr)
-		{
-			IAsyncCursor<MeasurementBucket> result;
-			var measurements = new List<Measurement>();
-
-			result = await this._collection.FindAsync(expression).AwaitBackground();
-			var list = await result.ToListAsync().AwaitBackground();
-
-			foreach(var bucket in list) {
-				measurements.AddRange(bucket.Measurements.Where(mexpr).ToList());
-			}
-
-			return measurements;
-		}
 	}
 }

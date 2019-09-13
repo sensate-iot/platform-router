@@ -75,7 +75,7 @@ namespace SensateService.Infrastructure.Document
 			await Task.WhenAll(tasks).AwaitBackground();
 		}
 
-		public override async Task<IEnumerable<Measurement>> GetMeasurementsBySensorAsync(Sensor sensor)
+		public override async Task<IEnumerable<Measurement>> GetMeasurementsBySensorAsync(Sensor sensor, int skip = -1, int limit = -1)
 		{
 			string key;
 
@@ -99,7 +99,7 @@ namespace SensateService.Infrastructure.Document
 
 		}
 
-		public override async Task<IEnumerable<Measurement>> GetAfterAsync(Sensor sensor, DateTime pit)
+		public override async Task<IEnumerable<Measurement>> GetAfterAsync(Sensor sensor, DateTime pit, int skip = -1, int limit = -1)
 		{
 			string key;
 			IEnumerable<Measurement> measurements;
@@ -110,13 +110,13 @@ namespace SensateService.Infrastructure.Document
 			if(measurements != null)
 				return measurements;
 
-			measurements = await base.GetAfterAsync(sensor, pit).AwaitBackground();
+			measurements = await base.GetAfterAsync(sensor, pit, skip, limit).AwaitBackground();
 			await this.CacheDataAsync(key, measurements, CacheTimeout.TimeoutMedium.ToInt(), false).AwaitBackground();
 			return measurements;
 
 		}
 
-		public override async Task<IEnumerable<Measurement>> GetBetweenAsync(Sensor sensor, DateTime start, DateTime end)
+		public override async Task<IEnumerable<Measurement>> GetBetweenAsync(Sensor sensor, DateTime start, DateTime end, int skip = -1, int limit = -1)
 		{
 			string key;
 			IEnumerable<Measurement> measurements;
@@ -127,14 +127,14 @@ namespace SensateService.Infrastructure.Document
 			if(measurements != null)
 				return measurements;
 
-			measurements = await base.GetBetweenAsync(sensor, start, end).AwaitBackground();
+			measurements = await base.GetBetweenAsync(sensor, start, end, skip, limit).AwaitBackground();
 			await CacheDataAsync(key, measurements, CacheTimeout.Timeout.ToInt()).AwaitBackground();
 			return measurements;
 
 
 		}
 
-		public override async Task<IEnumerable<Measurement>> GetBeforeAsync(Sensor sensor, DateTime pit)
+		public override async Task<IEnumerable<Measurement>> GetBeforeAsync(Sensor sensor, DateTime pit, int skip = -1, int limit = -1)
 		{
 			string key;
 			IEnumerable<Measurement> measurements;
@@ -145,7 +145,7 @@ namespace SensateService.Infrastructure.Document
 			if(measurements != null)
 				return null;
 
-			measurements = await base.GetBeforeAsync(sensor, pit).AwaitBackground();
+			measurements = await base.GetBeforeAsync(sensor, pit, skip, limit).AwaitBackground();
 			await this.CacheDataAsync(key, measurements, CacheTimeout.Timeout.ToInt()).AwaitBackground();
 			return measurements;
 		}
