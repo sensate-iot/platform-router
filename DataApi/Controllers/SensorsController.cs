@@ -29,6 +29,7 @@ namespace SensateService.DataApi.Controllers
 		}
 
 		[HttpGet]
+		[ActionName("FindSensorsByName")]
 		[ProducesResponseType(typeof(IEnumerable<Sensor>), 200)]
 		public async Task<IActionResult> Index([FromQuery] string name)
 		{
@@ -40,6 +41,18 @@ namespace SensateService.DataApi.Controllers
 				sensors = await this._sensors.FindByNameAsync(this.CurrentUser, name).AwaitBackground();
 				
 			return this.Ok(sensors);
+		}
+
+		[HttpGet("{id}")]
+		[ProducesResponseType(typeof(Sensor), 200)]
+		public async Task<IActionResult> Get(string id)
+		{
+			var sensor = await this._sensors.GetAsync(id).AwaitBackground();
+
+			if(sensor == null)
+				return this.NotFound();
+
+			return this.Ok(sensor);
 		}
 	}
 }
