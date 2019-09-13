@@ -14,8 +14,6 @@ using Microsoft.Extensions.Logging;
 
 using MQTTnet;
 using MQTTnet.Client;
-using MQTTnet.Client.Connecting;
-using MQTTnet.Client.Disconnecting;
 using MQTTnet.Client.Options;
 
 using SensateService.Helpers;
@@ -68,12 +66,9 @@ namespace SensateService.Services.Processing
 			if(user != null)
 				builder.WithCredentials(user, passwd);
 
-			this.Client.UseDisconnectedHandler(e => { this.OnDisconnect_HandlerAsync(this, e); });
-			this.Client.UseConnectedHandler(e => { this.OnConnect_Handler(this.Client, e); });
-			this.Client.UseApplicationMessageReceivedHandler(e => this.OnMessage_Handler(this.Client, e));
-			//this.Client.Connected += OnConnect_Handler;
-			//this.Client.Disconnected += OnDisconnect_HandlerAsync;
-			//this.Client.ApplicationMessageReceived += OnMessage_Handler;
+			this.Client.UseDisconnectedHandler(e => { this.OnDisconnect_HandlerAsync(); });
+			this.Client.UseConnectedHandler(e => { this.OnConnect_Handler(); });
+			this.Client.UseApplicationMessageReceivedHandler(e => this.OnMessage_Handler(e));
 
 			this._client_options = builder.Build();
 			await this.Client.ConnectAsync(this._client_options).AwaitBackground();
@@ -82,7 +77,7 @@ namespace SensateService.Services.Processing
 		protected abstract Task OnConnectAsync();
 		protected abstract Task OnMessageAsync(string topic, string msg);
 
-		private async void OnMessage_Handler(object sender, MqttApplicationMessageReceivedEventArgs e)
+		private async void OnMessage_Handler(MqttApplicationMessageReceivedEventArgs e)
 		{
 			var msg = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
 			var topic = e.ApplicationMessage.Topic;
@@ -90,12 +85,12 @@ namespace SensateService.Services.Processing
 			await this.OnMessageAsync(topic, msg).AwaitBackground();
 		}
 
-		private async void OnConnect_Handler(object sender, MqttClientConnectedEventArgs e)
+		private async void OnConnect_Handler()
 		{
 			await this.OnConnectAsync().AwaitBackground();
 		}
 
-		private async void OnDisconnect_HandlerAsync(object sender, MqttClientDisconnectedEventArgs e)
+		private async void OnDisconnect_HandlerAsync()
 		{
 			if(this._disconnected)
 				return;
