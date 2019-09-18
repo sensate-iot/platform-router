@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Threading;
 
 using Microsoft.Extensions.Caching.Distributed;
+
 using SensateService.Helpers;
 
 namespace SensateService.Infrastructure.Cache
@@ -40,25 +41,23 @@ namespace SensateService.Infrastructure.Cache
 
 		public override async Task SerializeAsync(string key, object obj, int tmo, bool slide, CancellationToken ct = default(CancellationToken))
 		{
-			byte[] data;
+			string data;
 			DistributedCacheEntryOptions opts;
 
-			data = obj.ToByteArray();
+			data = Newtonsoft.Json.JsonConvert.SerializeObject(obj);
 			opts = new DistributedCacheEntryOptions();
 
 			if(slide)
 				opts.SetSlidingExpiration(TimeSpan.FromMinutes(tmo));
 			else
 				opts.SetAbsoluteExpiration(TimeSpan.FromMinutes(tmo));
-			await this._cache.SetAsync(key, data, opts, ct).AwaitBackground();
+			await this._cache.SetStringAsync(key, data, opts, ct).AwaitBackground();
 		}
 
 		public override async Task<ObjType> DeserializeAsync<ObjType>(string key, CancellationToken ct = default(CancellationToken))
 		{
-			byte[] data;
-
-			data = await this._cache.GetAsync(key, ct).AwaitBackground();
-			return data.FromByteArray<ObjType>();
+			var data = await this._cache.GetStringAsync(key, ct).AwaitBackground();
+			return data == null ? null : Newtonsoft.Json.JsonConvert.DeserializeObject<ObjType>(data);
 		}
 
 		public override void Serialize(string key, object obj, int tmo, bool slide)
