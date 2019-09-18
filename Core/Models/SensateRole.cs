@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json;
 
 namespace SensateService.Models
 {
@@ -17,6 +18,7 @@ namespace SensateService.Models
 		public const string Administrator = "Administrators";
 
 		public string Description { get; set; }
+		[JsonIgnore]
 		public ICollection<SensateUserRole> UserRoles { get; set; }
 	}
 }

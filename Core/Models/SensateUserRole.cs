@@ -14,7 +14,6 @@ namespace SensateService.Models
 	{
 		[JsonIgnore]
 		public virtual SensateUser User { get; set; }
-		[JsonIgnore]
 		public virtual SensateRole Role { get; set; }
 	}
 }
