@@ -11,7 +11,7 @@ namespace SensateService.Infrastructure.Storage
 {
 	public interface ICachedMeasurementStore : IMeasurementCache
 	{
-		Task<long> ProcessAsync();
+		Task<long> ProcessMeasurementsAsync();
 		void Destroy();
 	}
 }

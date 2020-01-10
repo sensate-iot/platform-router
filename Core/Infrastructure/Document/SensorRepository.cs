@@ -78,7 +78,15 @@ namespace SensateService.Infrastructure.Document
 		{
 			FilterDefinition<Sensor> filter;
 			var builder = Builders<Sensor>.Filter;
-			var idlist = ids.Select(ObjectId.Parse);
+			var idlist = new List<ObjectId>();
+
+			foreach(var id in ids) {
+				if(!ObjectId.TryParse(id, out var parsedId)) {
+					continue;
+				}
+
+				idlist.Add(parsedId);
+			}
 
 			filter = builder.In(x => x.InternalId, idlist);
 			var raw = await this._collection.FindAsync(filter).AwaitBackground();

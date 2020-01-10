@@ -54,13 +54,9 @@ namespace SensateService.Services.Processing
 			count = 0L;
 
 			try {
-				count = await this._store.ProcessAsync().AwaitBackground();
-			} catch(DatabaseException ex) {
-				this._logger.LogInformation($"Database {ex.Database} failed!");
+				count = await this._store.ProcessMeasurementsAsync().AwaitBackground();
 			} catch(CachingException ex) {
 				this._logger.LogInformation($"Measurement cache failed: {ex.InnerException?.Message}");
-			} catch(Exception ex) {
-				this._logger.LogInformation($"Measurement cache failed: {ex.Message}");
 			}
 
 			sw.Stop();

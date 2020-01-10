@@ -13,8 +13,9 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
-
+using MongoDB.Driver.GeoJsonObjectModel;
 using SensateService.Enums;
+
 using SensateService.Models;
 using SensateService.Models.Json.In;
 
@@ -37,6 +38,7 @@ namespace SensateService.Infrastructure.Storage
 		{
 			Measurement measurement;
 			IDictionary<string, DataPoint> datapoints;
+			GeoJsonPoint<GeoJson2DGeographicCoordinates> point;
 
 			if(!obj.IsCreatedBy(sensor))
 				return null;
@@ -53,23 +55,17 @@ namespace SensateService.Infrastructure.Storage
 				return null;
 			}
 
-			if(obj.Longitude.HasValue) {
-				datapoints["Longitude"] = new DataPoint {
-					Unit = null,
-					Value = Convert.ToDecimal(obj.Longitude.Value)
-				};
-			}
-
-			if(obj.Latitude.HasValue) {
-				datapoints["Latitude"] = new DataPoint {
-					Unit = null,
-					Value = Convert.ToDecimal(obj.Latitude.Value)
-				};
+			if(obj.Latitude.HasValue && obj.Longitude.HasValue) {
+				var coords = new GeoJson2DGeographicCoordinates(obj.Longitude.Value, obj.Latitude.Value);
+				point = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(coords);
+			} else {
+				point = null;
 			}
 
 			measurement = new Measurement {
 				Data = datapoints,
-				CreatedAt = obj.CreatedAt ?? DateTime.Now.ToUniversalTime()
+				Timestamp = obj.CreatedAt ?? DateTime.Now.ToUniversalTime(),
+				Location = point
 			};
 
 			return measurement;
