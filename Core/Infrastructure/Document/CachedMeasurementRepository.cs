@@ -80,10 +80,11 @@ namespace SensateService.Infrastructure.Document
 			string key;
 
 			key = $"Measurements::{sensor.InternalId.ToString()}";
-			return await TryGetMeasurementsAsync(key, x => x.SensorId == sensor.InternalId, CacheTimeout.TimeoutMedium.ToInt() ).AwaitBackground();
+			return await TryGetMeasurementsAsync(key, x => x.SensorId == sensor.InternalId, CacheTimeout.TimeoutMedium.ToInt(),
+				skip, limit ).AwaitBackground();
 		}
 
-		private async Task<IEnumerable<Measurement>> TryGetMeasurementsAsync(string key, Expression<Func<MeasurementBucket, bool>> expression, int tmo)
+		private async Task<IEnumerable<Measurement>> TryGetMeasurementsAsync(string key, Expression<Func<MeasurementBucket, bool>> expression, int tmo, int skip, int limit)
 		{
 			IEnumerable<Measurement> measurements = null;
 
@@ -93,7 +94,7 @@ namespace SensateService.Infrastructure.Document
 			if(measurements != null)
 				return measurements;
 
-			measurements = await base.GetMeasurementsAsync(expression).AwaitBackground();
+			measurements = await base.GetMeasurementsAsync(expression, skip, limit).AwaitBackground();
 			await this.CacheDataAsync(key, measurements, tmo, false).AwaitBackground();
 			return measurements;
 
@@ -121,6 +122,7 @@ namespace SensateService.Infrastructure.Document
 			string key;
 			IEnumerable<Measurement> measurements;
 
+			// TODO cache skip & limit
 			key = $"{sensor.InternalId}::{start.ToString(CultureInfo.InvariantCulture)}::{end.ToString(CultureInfo.InvariantCulture)}";
 			measurements = await _cache.DeserializeAsync<IEnumerable<Measurement>>(key);
 

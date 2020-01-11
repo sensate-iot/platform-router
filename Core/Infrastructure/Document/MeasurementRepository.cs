@@ -8,6 +8,7 @@
 using System;
 using System.Linq.Expressions;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
@@ -17,6 +18,7 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using MongoDB.Driver.Linq;
+
 using SensateService.Exceptions;
 using SensateService.Models;
 using SensateService.Infrastructure.Repositories;
@@ -51,19 +53,7 @@ namespace SensateService.Infrastructure.Document
 				data.AddRange(bucket.Measurements);
 			}
 
-			return data.OrderBy(x => x.CreatedAt).ToList();
-		}
-
-		public IList<Measurement> ConcatMeasurementBuckets(IList<MeasurementBucket> buckets, Func<Measurement, bool> expr)
-		{
-			var count = buckets.Aggregate(0, (current, bucket) => current + bucket.Count);
-			var data = new List<Measurement>(count);
-
-			foreach(var bucket in buckets) {
-				data.AddRange(bucket.Measurements.Where(expr));
-			}
-
-			return data.OrderBy(x => x.CreatedAt).ToList();
+			return data.OrderBy(x => x.Timestamp).ToList();
 		}
 
 		public virtual async Task<IEnumerable<Measurement>> GetMeasurementsBySensorAsync(Sensor sensor, int skip = -1, int limit = -1)
@@ -168,10 +158,15 @@ namespace SensateService.Infrastructure.Document
 
 		private static UpdateDefinition<MeasurementBucket> CreateBucketUpdate(ObjectId sensor, ICollection<Measurement> measurements)
 		{
+			var first = measurements.ElementAt(0);
+			var last = measurements.ElementAt(measurements.Count - 1);
+
 			var ubuilder = Builders<MeasurementBucket>.Update;
 			var update = ubuilder.PushEach(x => x.Measurements, measurements)
 				.SetOnInsert(x => x.Timestamp, DateTime.Now.ThisHour())
 				.SetOnInsert(x => x.SensorId, sensor)
+				.SetOnInsert(x => x.First, first.Timestamp)
+				.Set(x => x.Last, last.Timestamp)
 				.Inc(x => x.Count, measurements.Count);
 
 			return update;
@@ -180,6 +175,7 @@ namespace SensateService.Infrastructure.Document
 		public async Task StoreAsync(IDictionary<Sensor, List<Measurement>> measurements, CancellationToken ct)
 		{
 			var updates = new List<UpdateOneModel<MeasurementBucket>>();
+			var total = 0L;
 
 			foreach(var kvpair in measurements) {
 				var fbuilder = Builders<MeasurementBucket>.Filter;
@@ -188,7 +184,7 @@ namespace SensateService.Infrastructure.Document
 				             fbuilder.Eq(x => x.SensorId, kvpair.Key.InternalId) &
 				             fbuilder.Lt(x => x.Count, MeasurementBucketSize);
 
-				for(var idx = 0; idx < kvpair.Value.Count; idx += MeasurementBucketSize) {
+				for(var idx = 0; idx < kvpair.Value.Count;) {
 					var sublist = kvpair.Value.GetRange(idx,
 						Math.Min(MeasurementBucketSize, kvpair.Value.Count - idx));
 					var update = CreateBucketUpdate(kvpair.Key.InternalId, sublist);
@@ -198,8 +194,12 @@ namespace SensateService.Infrastructure.Document
 					};
 
 					updates.Add(upsert);
+					idx += sublist.Count;
+					total += idx;
 				}
 			}
+
+			this._logger.LogDebug("Measurements stored: "+ total);
 
 			var opts = new BulkWriteOptions {
 				IsOrdered = false,
@@ -225,6 +225,7 @@ namespace SensateService.Infrastructure.Document
 		#endregion
 
 #region Time based getters
+
 		private static FilterDefinition<MeasurementBucket> BuildQuery(Sensor sensor, DateTime? start, DateTime? end)
 		{
 			FilterDefinition<MeasurementBucket> fd;
@@ -237,13 +238,13 @@ namespace SensateService.Infrastructure.Document
 
 			if(start.HasValue && end.HasValue) {
 				fd &= builder.Gte(x => x.Timestamp, start.Value.ThisHour()) &
-					 builder.Lte(x => x.Timestamp, end.Value.ThisHour());
+				      builder.Lte(x => x.Timestamp, end.Value.ThisHour());
 			} else if(!end.HasValue) {
 				/* Interpret end == null as infinity and
 				   build an 'after' _start_ filter. */
 
 				fd = builder.Eq(x => x.SensorId, sensor.InternalId) &
-					builder.Gte(x => x.Timestamp, start.Value.ThisHour());
+				     builder.Gte(x => x.Timestamp, start.Value.ThisHour());
 			} else {
 				fd = builder.Eq(x => x.SensorId, sensor.InternalId) &
 				     builder.Lte(x => x.Timestamp, end.Value.AddHours(1D).ThisHour());
@@ -252,40 +253,103 @@ namespace SensateService.Infrastructure.Document
 			return fd;
 		}
 
-		private async Task<IList<MeasurementBucket>> LookupAsync(FilterDefinition<MeasurementBucket> fd, int skip, int limit)
+		private IEnumerable<Measurement> ConcatMeasurementBuckets(IEnumerable<MeasurementBucket> buckets, int skip,
+			int limit)
 		{
-			if(skip == -1 && limit == -1) {
-				var result = await this._collection.FindAsync(fd).AwaitBackground();
-				return await result.ToListAsync().AwaitBackground();
+			List<Measurement> measurements;
+
+			if(skip > 0)
+				buckets = buckets.Skip(skip);
+
+			if(limit > 0)
+				buckets = buckets.ToList().GetRange(0, limit);
+
+			measurements = new List<Measurement>();
+
+			foreach(var bucket in buckets) {
+				measurements.AddRange(bucket.Measurements);
 			}
 
-			var query = this._collection.Find(fd);
+			return measurements;
+		}
 
-			if(skip != -1)
-				query = query.Skip(skip);
+		private async Task<IEnumerable<Measurement>> LookupAsync(FilterDefinition<MeasurementBucket> fd, DateTime start, DateTime end, int skip, int limit)
+		{
+			Stopwatch sw = Stopwatch.StartNew();
+			IAggregateFluent<MeasurementBucket> query;
 
-			if(limit != -1)
-				query = query.Limit(limit);
+			if(start != DateTime.MinValue && end != DateTime.MinValue) {
+				query = this._collection.Aggregate().Match(fd)
+					.Project(x => new MeasurementBucket {
+						Measurements = x.Measurements.Where((measurement) =>
+							measurement.Timestamp >= start && measurement.Timestamp <= end),
+						SensorId = x.SensorId,
+						Timestamp = x.Timestamp,
+						Count = x.Count,
+						_id = x.InternalId
+					});
 
-			return await query.ToListAsync();
+
+			} else if(end == DateTime.MinValue) {
+				query = this._collection.Aggregate().Match(fd)
+					.Project(x => new MeasurementBucket {
+						Measurements = x.Measurements.Where((measurement) => measurement.Timestamp >= start),
+						SensorId = x.SensorId,
+						Timestamp = x.Timestamp,
+						Count = x.Count,
+						_id = x.InternalId
+					});
+
+			} else if(start == DateTime.MinValue) {
+				query = this._collection.Aggregate().Match(fd)
+					.Project(x => new MeasurementBucket {
+						Measurements = x.Measurements.Where(( measurement) => measurement.Timestamp <= end),
+						SensorId = x.SensorId,
+						Timestamp = x.Timestamp,
+						Count = x.Count,
+						_id = x.InternalId
+					});
+			} else {
+				query = this._collection.Aggregate().Match(fd)
+					.Project(x => new MeasurementBucket {
+						Measurements = x.Measurements,
+						SensorId = x.SensorId,
+						Timestamp = x.Timestamp,
+						Count = x.Count,
+						_id = x.InternalId
+					});
+			}
+
+			var buckets = new List<MeasurementBucket>();
+			var cursor = await query.ToCursorAsync().AwaitBackground();
+
+			while(await cursor.MoveNextAsync().AwaitBackground()) {
+				buckets.AddRange(cursor.Current);
+			}
+
+			sw.Stop();
+			
+			this._logger.LogInformation($"Query took {sw.ElapsedMilliseconds}ms!");
+			return this.ConcatMeasurementBuckets(buckets, skip, limit);
+
 		}
 
 		public virtual async Task<IEnumerable<Measurement>> GetBetweenAsync(Sensor sensor, DateTime start, DateTime end, int skip = -1, int limit = -1)
 		{
-			var data = await this.LookupAsync(BuildQuery(sensor, start, end), skip, limit).AwaitBackground();
-			return this.ConcatMeasurementBuckets(data, x => x.CreatedAt >= start && x.CreatedAt <= end);
+			var data = await this.LookupAsync(BuildQuery(sensor, start, end), start, end, skip, limit).AwaitBackground();
+			return data;
 		}
 
 		public virtual async Task<IEnumerable<Measurement>> GetBeforeAsync(Sensor sensor, DateTime pit, int skip = -1, int limit = -1)
 		{
-			var data = await this.LookupAsync(BuildQuery(sensor, null, pit), skip, limit).AwaitBackground();
-			return this.ConcatMeasurementBuckets(data, x => x.CreatedAt <= pit);
+			var data = await this.LookupAsync(BuildQuery(sensor, null, pit), DateTime.MinValue, pit, skip, limit).AwaitBackground();
+			return data;
 		}
 
 		public virtual async Task<IEnumerable<Measurement>> GetAfterAsync(Sensor sensor, DateTime pit, int skip = -1, int limit = -1)
 		{
-			var data = await this.LookupAsync(BuildQuery(sensor, pit, null), skip, limit).AwaitBackground();
-			return this.ConcatMeasurementBuckets(data, x => x.CreatedAt >= pit);
+			var data = await this.LookupAsync(BuildQuery(sensor, pit, null), pit, DateTime.MinValue, skip, limit).AwaitBackground();
+			return data;
 		}
 #endregion
 	}

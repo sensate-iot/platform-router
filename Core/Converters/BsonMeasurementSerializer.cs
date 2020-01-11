@@ -32,10 +32,10 @@ namespace SensateService.Converters
 			this.SerializeDataPoint(writer, value.Data);
 			writer.WriteEndDocument();
 
-			if(value.CreatedAt.Kind != DateTimeKind.Utc)
-				offset = new DateTimeOffset(value.CreatedAt.ToUniversalTime());
+			if(value.Timestamp.Kind != DateTimeKind.Utc)
+				offset = new DateTimeOffset(value.Timestamp.ToUniversalTime());
 			else
-				offset = new DateTimeOffset(value.CreatedAt);
+				offset = new DateTimeOffset(value.Timestamp);
 
 			writer.WriteDateTime("CreatedAt", offset.ToUnixTimeMilliseconds());
 
@@ -62,7 +62,7 @@ namespace SensateService.Converters
 			switch(attr) {
 			case "CreatedAt":
 				ticks = reader.ReadDateTime();
-				m.CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(ticks).UtcDateTime;
+				m.Timestamp = DateTimeOffset.FromUnixTimeMilliseconds(ticks).UtcDateTime;
 				break;
 
 			case "Data":

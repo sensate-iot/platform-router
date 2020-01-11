@@ -21,11 +21,14 @@ namespace SensateService.Models
 	{
 		[BsonId, BsonRequired, JsonConverter(typeof(ObjectIdJsonConverter))]
 		public ObjectId InternalId {get;set;}
+		[BsonIgnore]
+		public ObjectId _id { get; set; }
 		[BsonRequired]
 		public DateTime Timestamp { get; set; }
+		public DateTime First { get; set; }
+		public DateTime Last { get; set; }
 		[BsonRequired]
-		public ICollection<Measurement> Measurements { get; set; }
-		[BsonRequired]
+		public IEnumerable<Measurement> Measurements { get; set; }
 		public int Count { get; set; }
 		[BsonRequired, JsonConverter(typeof(ObjectIdJsonConverter))]
 		public ObjectId SensorId { get; set; }

@@ -10,7 +10,8 @@ using System.Threading.Tasks;
 using System.Threading;
 
 using Microsoft.Extensions.Caching.Distributed;
-
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using SensateService.Helpers;
 
 namespace SensateService.Infrastructure.Cache
@@ -44,7 +45,7 @@ namespace SensateService.Infrastructure.Cache
 			string data;
 			DistributedCacheEntryOptions opts;
 
-			data = Newtonsoft.Json.JsonConvert.SerializeObject(obj);
+			data = JsonConvert.SerializeObject(obj);
 			opts = new DistributedCacheEntryOptions();
 
 			if(slide)
