@@ -5,6 +5,7 @@
  * @email  michel.megens@sonatolabs.com
  */
 
+using System;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
@@ -14,6 +15,7 @@ using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
 using SensateService.Enums;
 using SensateService.Helpers;
+using SensateService.Infrastructure.Repositories;
 using SensateService.Infrastructure.Storage;
 using SensateService.Models;
 using SensateService.Models.Json.In;
@@ -26,10 +28,14 @@ namespace SensateService.DataApi.Controllers
 	public class MeasurementsController : AbstractApiController 
 	{
 		private readonly IMeasurementCache _store;
+		private readonly IMeasurementRepository _repo;
+		private readonly ISensorRepository _sensors;
 
-		public MeasurementsController(IMeasurementCache cache, IHttpContextAccessor ctx) : base(ctx)
+		public MeasurementsController(IMeasurementCache cache, IMeasurementRepository repo, ISensorRepository sensors, IHttpContextAccessor ctx) : base(ctx)
 		{
 			this._store = cache;
+			this._repo = repo;
+			this._sensors = sensors;
 		}
 
 		[HttpPost("create")]
@@ -55,6 +61,21 @@ namespace SensateService.DataApi.Controllers
 
 			await this._store.StoreAsync(raw, RequestMethod.HttpPost).AwaitBackground();
 			return this.Ok(status);
+		}
+
+		[HttpGet("{sensorId}")]
+		[ProducesResponseType(200)]
+		public async Task<IActionResult> Get(string sensorId, [FromQuery] DateTime start, [FromQuery] DateTime end,
+			[FromQuery] int skip = -1, [FromQuery] int limit = -1)
+		{
+			var sensor = await this._sensors.GetAsync(sensorId).AwaitBackground();
+
+			// TODO: check for admin
+			if(sensor.Owner != this.CurrentUser.Id)
+				return this.Unauthorized();
+
+			var data = await this._repo.GetBetweenAsync(sensor, start, end, skip, limit).AwaitBackground();
+			return this.Ok(data);
 		}
 	}
 }
