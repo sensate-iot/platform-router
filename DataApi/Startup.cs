@@ -19,6 +19,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 using SensateService.ApiCore.Middleware;
 using SensateService.Config;
@@ -29,17 +30,15 @@ using SensateService.Models;
 using SensateService.Services;
 using SensateService.Services.Adapters;
 using SensateService.Services.Settings;
-using Swashbuckle.AspNetCore.Swagger;
-using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace SensateService.DataApi
 {
 	public class Startup
 	{
-		private readonly IHostingEnvironment _env;
+		private readonly IWebHostEnvironment _env;
 		private readonly IConfiguration _configuration;
 
-		public Startup(IConfiguration configuration, IHostingEnvironment environment)
+		public Startup(IConfiguration configuration, IWebHostEnvironment environment)
 		{
 			this._configuration = configuration;
 			this._env = environment;
@@ -171,13 +170,14 @@ namespace SensateService.DataApi
 			}
 
 			services.AddSwaggerGen(c => {
-				c.SwaggerDoc("v1", new Info {
-					Title = "Sensate API - Version 1",
+				c.SwaggerDoc("v1", new OpenApiInfo {
+					Title = "Sensate Data API - Version 1",
 					Version = "v1" 
 				});
 			});
 
-			services.AddMvc();
+			services.AddRouting();
+			services.AddControllers().AddNewtonsoftJson();
 
 			services.AddLogging((logging) => {
 				logging.AddConsole();
@@ -187,7 +187,7 @@ namespace SensateService.DataApi
 		}
 
 		// ReSharper disable once UnusedMember.Global
-		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider sp)
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider sp)
 		{
 			var auth = new AuthenticationConfig();
 			var cache = new CacheConfig();
@@ -195,11 +195,13 @@ namespace SensateService.DataApi
 			this._configuration.GetSection("Authentication").Bind(auth);
 			this._configuration.GetSection("Cache").Bind(cache);
 
+			app.UseRouting();
+
 			app.UseCors(p => {
 				p.WithOrigins("http://localhost:4200", auth.JwtIssuer)
-				.AllowAnyHeader()
-				.AllowAnyMethod()
-				.AllowCredentials();
+					.AllowAnyHeader()
+					.AllowAnyMethod()
+					.AllowCredentials();
 			});
 
 			using(var scope = sp.CreateScope()) {
@@ -208,20 +210,19 @@ namespace SensateService.DataApi
 				ctx.Database.Migrate();
 			}
 
-			if (env.IsDevelopment()) {
+			if(env.IsDevelopment()) {
 				app.UseDeveloperExceptionPage();
 			}
+
+			app.UseSwagger();
+			app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sensate Data API v1"); });
 
 			app.UseMiddleware<ApiKeyValidationMiddleware>();
 			app.UseMiddleware<RequestLoggingMiddleware>();
 
-			app.UseSwagger();
-			app.UseSwaggerUI(c => {
-				c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sensate API - Version 1");
-			});
-
 			app.UseAuthentication();
-			app.UseMvc();
+			app.UseAuthorization();
+			app.UseEndpoints(ep => { ep.MapControllers(); });
 		}
 	}
 }

@@ -12,7 +12,7 @@ namespace SensateService.AuthApi.Helpers
 {
 	public static class HostingHelper
 	{
-		public static string GetTemplatePath(this IHostingEnvironment environment, string template)
+		public static string GetTemplatePath(this IWebHostEnvironment environment, string template)
 		{
 			var root = environment.ContentRootPath;
 

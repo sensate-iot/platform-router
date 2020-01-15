@@ -13,13 +13,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-
-using SensateService.ApiCore.Middleware;
+using Microsoft.OpenApi.Models;
 using SensateService.Config;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
@@ -28,16 +27,14 @@ using SensateService.Services;
 using SensateService.Services.Adapters;
 using SensateService.Services.Settings;
 
-using Swashbuckle.AspNetCore.Swagger;
-
 namespace SensateService.AuthApi
 {
 	public class Startup
 	{
-		private readonly IHostingEnvironment _env;
+		private readonly IWebHostEnvironment _env;
 		private readonly IConfiguration _configuration;
 
-		public Startup(IConfiguration configuration, IHostingEnvironment environment)
+		public Startup(IConfiguration configuration, IWebHostEnvironment environment)
 		{
 			this._configuration = configuration;
 			this._env = environment;
@@ -151,13 +148,15 @@ namespace SensateService.AuthApi
 			}
 
 			services.AddSwaggerGen(c => {
-				c.SwaggerDoc("v1", new Info {
-					Title = "Sensate API - Version 1",
-					Version = "v1"
+				c.SwaggerDoc("v1", new OpenApiInfo {
+					Title = "Sensate Authentication API - Version 1",
+					Version = "v1" 
 				});
 			});
 
-			services.AddMvc();
+			//services.AddMvc();
+			services.AddRouting();
+			services.AddControllers().AddNewtonsoftJson();
 
 			services.AddLogging((logging) => {
 				logging.AddConsole();
@@ -167,10 +166,21 @@ namespace SensateService.AuthApi
 		}
 
 		// ReSharper disable once UnusedMember.Global
-		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider sp)
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider sp)
 		{
 			var auth = new AuthenticationConfig();
 			this._configuration.GetSection("Authentication").Bind(auth);
+
+			app.UseSwagger();
+
+			if (env.IsDevelopment()) {
+				app.UseDeveloperExceptionPage();
+			}
+
+			app.UseRouting();
+
+			app.UseSwagger();
+			app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sensate Data API v1"); });
 
 			app.UseCors(p => {
 				p.WithOrigins("http://localhost:4200", auth.JwtIssuer)
@@ -179,24 +189,9 @@ namespace SensateService.AuthApi
 				.AllowCredentials();
 			});
 
-			using(var scope = sp.CreateScope()) {
-				var ctx = scope.ServiceProvider.GetRequiredService<SensateSqlContext>();
-				ctx.Database.EnsureCreated();
-				ctx.Database.Migrate();
-			}
-
-			app.UseSwagger();
-			app.UseSwaggerUI(c => {
-				c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sensate API - Version 1");
-			});
-
-			if (env.IsDevelopment()) {
-				app.UseDeveloperExceptionPage();
-			}
-
 			app.UseAuthentication();
-			app.UseMiddleware<RequestLoggingMiddleware>();
-			app.UseMvc();
+			app.UseAuthorization();
+			app.UseEndpoints(ep => { ep.MapControllers(); });
 		}
 	}
 }

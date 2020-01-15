@@ -39,7 +39,7 @@ namespace SensateService.DataApi.Controllers
 			this._sensors = sensors;
 		}
 
-		[HttpGet]
+		[HttpGet(Name = "StatsIndex")]
 		[ActionName("QueryAllStats")]
 		[ProducesResponseType(typeof(IEnumerable<SensorStatisticsEntry>), 200)]
 		[ProducesResponseType(403)]
@@ -69,7 +69,7 @@ namespace SensateService.DataApi.Controllers
 			return this.Ok(jobj);
 		}
 
-		public async Task<IActionResult> GetByMethod(Sensor sensor, RequestMethod method, DateTime start, DateTime end)
+		private async Task<IActionResult> GetByMethod(Sensor sensor, RequestMethod method, DateTime start, DateTime end)
 		{
 			var data = await this._stats.GetAsync(e => e.SensorId == sensor.InternalId && e.Method == method &&
 			                                           e.Date >= start && e.Date <= end).AwaitBackground();

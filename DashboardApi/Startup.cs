@@ -18,6 +18,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 
 using SensateService.ApiCore.Middleware;
 using SensateService.Config;
@@ -25,16 +27,14 @@ using SensateService.Infrastructure.Sql;
 using SensateService.Init;
 using SensateService.Models;
 
-using Swashbuckle.AspNetCore.Swagger;
-
 namespace SensateService.DashboardApi
 {
 	public class Startup
 	{
-		private readonly IHostingEnvironment _env;
+		private readonly IWebHostEnvironment _env;
 		private readonly IConfiguration _configuration;
 
-		public Startup(IConfiguration configuration, IHostingEnvironment environment)
+		public Startup(IConfiguration configuration, IWebHostEnvironment environment)
 		{
 			this._configuration = configuration;
 			this._env = environment;
@@ -117,13 +117,14 @@ namespace SensateService.DashboardApi
 			services.AddDocumentRepositories(cache.Enabled);
 
 			services.AddSwaggerGen(c => {
-				c.SwaggerDoc("v1", new Info {
-					Title = "Sensate API - Version 1",
-					Version = "v1"
+				c.SwaggerDoc("v1", new OpenApiInfo {
+					Title = "Sensate Dashboard API - Version 1",
+					Version = "v1" 
 				});
 			});
 
-			services.AddMvc();
+			services.AddRouting();
+			services.AddControllers().AddNewtonsoftJson();
 
 			services.AddLogging((logging) => {
 				logging.AddConsole();
@@ -133,10 +134,12 @@ namespace SensateService.DashboardApi
 		}
 
 		// ReSharper disable once UnusedMember.Global
-		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider sp)
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider sp)
 		{
 			var auth = new AuthenticationConfig();
 			this._configuration.GetSection("Authentication").Bind(auth);
+
+			app.UseRouting();
 
 			app.UseCors(p => {
 				p.WithOrigins("http://localhost:4200", auth.JwtIssuer)
@@ -152,17 +155,16 @@ namespace SensateService.DashboardApi
 			}
 
 			app.UseSwagger();
-			app.UseSwaggerUI(c => {
-				c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sensate API - Version 1");
-			});
+			app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sensate Dashboard API v1"); });
 
 			if (env.IsDevelopment()) {
 				app.UseDeveloperExceptionPage();
 			}
 
 			app.UseAuthentication();
+			app.UseAuthorization();
 			app.UseMiddleware<RequestLoggingMiddleware>();
-			app.UseMvc();
+			app.UseEndpoints(ep => { ep.MapControllers(); });
 		}
 	}
 }

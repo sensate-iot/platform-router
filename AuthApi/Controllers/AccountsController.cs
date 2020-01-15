@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -18,6 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
 using SensateService.AuthApi.Helpers;
@@ -42,7 +44,7 @@ namespace SensateService.AuthApi.Controllers
 		private readonly IEmailSender _mailer;
 		private readonly IPasswordResetTokenRepository _passwd_tokens;
 		private readonly IChangeEmailTokenRepository _email_tokens;
-		private readonly IHostingEnvironment _env;
+		private readonly IWebHostEnvironment _env;
 		private readonly IUserTokenRepository _tokens;
 		private readonly ITextSendService _text;
 		private readonly IChangePhoneNumberTokenRepository _phonetokens;
@@ -51,7 +53,6 @@ namespace SensateService.AuthApi.Controllers
 
 		public AccountsController(
 			IUserRepository repo,
-			SignInManager<SensateUser> manager,
 			UserManager<SensateUser> userManager,
 			IEmailSender emailer,
 			IOptions<UserAccountSettings> options,
@@ -61,7 +62,7 @@ namespace SensateService.AuthApi.Controllers
 			IUserTokenRepository tokenRepository,
 			ITextSendService text,
 			IOptions<TextServiceSettings> text_opts,
-			IHostingEnvironment env,
+			IWebHostEnvironment env,
 			IHttpContextAccessor ctx,
 			ILogger<AccountsController> logger
 		) : base(repo, ctx)
@@ -79,10 +80,10 @@ namespace SensateService.AuthApi.Controllers
 			this._text_settings = text_opts.Value;
 		}
 
-		[HttpPost("forgot-password")]
 		[ValidateModel]
 		[ProducesResponseType(200)]
 		[ProducesResponseType(204)]
+		[HttpPost("forgot-password")]
 		public async Task<IActionResult> ForgotPassword([FromBody] ForgotPassword model)
 		{
 			SensateUser user;

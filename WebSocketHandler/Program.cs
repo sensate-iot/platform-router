@@ -11,6 +11,7 @@ using System.IO;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 using SensateService.WebSocketHandler.Application;
@@ -23,7 +24,7 @@ namespace SensateService.WebSocketHandler
 		{
 			IWebHost wh;
 
-			Console.WriteLine($"Starting {SensateService.Version.VersionString}");
+			Console.WriteLine($"Starting {Version.VersionString}");
 			wh = BuildWebHost(args);
 			wh.Run();
 		}
@@ -37,7 +38,6 @@ namespace SensateService.WebSocketHandler
 
 			var wh = WebHost.CreateDefaultBuilder(args)
 				.UseConfiguration(conf)
-				.UseKestrel()
 				.UseContentRoot(Directory.GetCurrentDirectory())
 				.ConfigureAppConfiguration((hostingContext, config) => {
 					if(hostingContext.HostingEnvironment.IsProduction())
@@ -51,7 +51,10 @@ namespace SensateService.WebSocketHandler
 					logging.AddConsole();
 					logging.AddDebug();
 				})
-				.UseStartup<ApplicationStarter>();
+				.UseStartup<ApplicationStarter>()
+				.ConfigureKestrel((ctx, opts) => {
+					opts.AllowSynchronousIO = true;
+				});
 			return wh.Build();
 		}
 	}

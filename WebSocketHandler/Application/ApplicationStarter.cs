@@ -10,6 +10,7 @@ using System.Text;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,7 +23,6 @@ using SensateService.Config;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
 using SensateService.Models;
-using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace SensateService.WebSocketHandler.Application
 {
@@ -87,6 +87,7 @@ namespace SensateService.WebSocketHandler.Application
 			services.AddWebSocketHandler<RealTimeWebSocketMeasurementHandler>();
 			services.AddWebSocketHandler<WebSocketBulkMeasurementHandler>();
 			services.AddWebSocketHandler<WebSocketMeasurementHandler>();
+			services.AddControllers().AddNewtonsoftJson();
 
 			services.AddLogging((builder) => {
 				builder.AddConsole();
@@ -96,16 +97,20 @@ namespace SensateService.WebSocketHandler.Application
 			});
 		}
 
-		public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory logging, IServiceProvider sp)
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory logging, IServiceProvider sp)
 		{
 			var cache = new CacheConfig();
 
+			app.UseRouting();
 			app.UseWebSockets();
 			Configuration.GetSection("Cache").Bind(cache);
 
 			app.MapWebSocketService("/measurement/rt", sp.GetService<RealTimeWebSocketMeasurementHandler>());
 			app.MapWebSocketService("/measurement", sp.GetService<WebSocketMeasurementHandler>());
 			app.MapWebSocketService("/measurement/bulk", sp.GetService<WebSocketBulkMeasurementHandler>());
+			app.UseAuthorization();
+			app.UseAuthorization();
+			app.UseEndpoints(ep => { ep.MapControllers(); });
 		}
 
 		private void SetupAuthentication(IServiceCollection services, AuthenticationConfig auth)
