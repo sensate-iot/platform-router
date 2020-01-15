@@ -47,9 +47,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public async Task<SensateUser> GetByEmailAsync(string email)
 		{
-			return await Task.Run(() => {
-				return this.Data.FirstOrDefault(x => x.Email == email);
-			});
+			return await this._manager.FindByEmailAsync(email).AwaitBackground();
 		}
 
 		public Task<IEnumerable<SensateUser>> GetRangeAsync(IEnumerable<string> ids)

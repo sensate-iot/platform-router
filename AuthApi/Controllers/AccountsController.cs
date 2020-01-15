@@ -421,7 +421,7 @@ namespace SensateService.AuthApi.Controllers
 				return BadRequest();
 			}
 
-			user = await this._users.GetAsync(id);
+			user = await this._manager.FindByIdAsync(id).AwaitBackground();
 			token = await this._phonetokens.GetLatest(user);
 
 			if(user == null)
@@ -432,13 +432,14 @@ namespace SensateService.AuthApi.Controllers
 			 * Base64. The + sign gets mangled to a space if we don't.
 			 */
 			code = Base64UrlEncoder.Decode(code);
-			var result = await this._manager.ConfirmEmailAsync(user, code);
+			var result = await this._manager.ConfirmEmailAsync(user, code).AwaitBackground();
+
 			if(!result.Succeeded)
 				return this.InvalidInputResult();
 
 			/* Send phone number validation token */
 			body = await this.ReadTextTemplate("Confirm_PhoneNumber.txt", token.UserToken);
-			this._text.Send(this._text_settings.AlphaCode, token.PhoneNumber, body);
+			//this._text.Send(this._text_settings.AlphaCode, token.PhoneNumber, body);
 
 			if(url != null)
 				return this.Redirect(url);
@@ -462,6 +463,7 @@ namespace SensateService.AuthApi.Controllers
 			}
 
 			phonetoken = await this._phonetokens.GetLatest(user);
+
 			if(phonetoken.UserToken != token)
 				return this.InvalidInputResult("Invalid confirmation token!");
 
@@ -524,7 +526,7 @@ namespace SensateService.AuthApi.Controllers
 		public async Task<IActionResult> SetRoles([FromBody] IList<SetRole> userroles)
 		{
 			foreach(var role in userroles) {
-				var user = await this._users.GetAsync(role.UserId);
+				var user = await this._manager.FindByIdAsync(role.UserId);
 				var roles = role.Role.Split(',');
 
 				bool status = await this._users.ClearRolesForAsync(user);

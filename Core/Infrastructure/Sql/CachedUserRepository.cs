@@ -85,6 +85,7 @@ namespace SensateService.Infrastructure.Sql
 			var obj = await this.LookupAsync(key, default(CancellationToken)).ConfigureAwait(false);
 
 			if(obj != null) {
+				this._sqlContext.Attach(obj);
 				return obj;
 			}
 

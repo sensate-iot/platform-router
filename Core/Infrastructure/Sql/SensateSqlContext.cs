@@ -67,12 +67,14 @@ namespace SensateService.Infrastructure.Sql
 					.IsRequired();
 			});
 
-			builder.HasSequence<long>("Id_sequence")
+			builder.Entity<AuditLog>().Property(log => log.Id).UseIdentityByDefaultColumn();
+
+			/*builder.HasSequence<long>("Id_sequence")
 				.StartsAt(1)
 				.IncrementsBy(1);
 			builder.Entity<AuditLog>()
 				.Property(o => o.Id)
-				.HasDefaultValueSql("nextval('\"Id_sequence\"')");
+				.HasDefaultValueSql("nextval('\"Id_sequence\"')");*/
 		}
 	}
 }
