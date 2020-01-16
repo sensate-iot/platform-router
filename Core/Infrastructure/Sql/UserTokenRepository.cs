@@ -1,5 +1,5 @@
 /*
- * Repository for the SensateUserToken table.
+ * Repository for the SensateAuthUserToken table.
  *
  * @author Michel Megens
  * @email  michel.megens@sonatolabs.com
@@ -23,7 +23,7 @@ using SensateService.Helpers;
 
 namespace SensateService.Infrastructure.Sql
 {
-	public class UserTokenRepository : AbstractSqlRepository<UserToken>, IUserTokenRepository
+	public class UserTokenRepository : AbstractSqlRepository<AuthUserToken>, IUserTokenRepository
 	{
 		private readonly Random _rng;
 		private const int JwtRefreshTokenLength = 64;
@@ -35,13 +35,13 @@ namespace SensateService.Infrastructure.Sql
 			this._rng = new Random();
 		}
 
-		public override void Create(UserToken obj)
+		public override void Create(AuthUserToken obj)
 		{
 			var asyncResult = this.CreateAsync(obj);
 			asyncResult.RunSynchronously();
 		}
 
-		public override async Task CreateAsync(UserToken obj, CancellationToken ct = default(CancellationToken))
+		public override async Task CreateAsync(AuthUserToken obj, CancellationToken ct = default(CancellationToken))
 		{
 			if(obj.Value == null && obj.LoginProvider == JwtRefreshTokenProvider) {
 				obj.Value = this.GenerateRefreshToken();
@@ -49,27 +49,27 @@ namespace SensateService.Infrastructure.Sql
 				throw new DatabaseException("User token must have a value!");
 			}
 
-			await base.CreateAsync(obj);
+			await base.CreateAsync(obj, ct).AwaitBackground();
 		}
 
-		public Task<long> CountAsync(Expression<Func<UserToken, bool>> expr)
+		public Task<long> CountAsync(Expression<Func<AuthUserToken, bool>> expr)
 		{
 			return Task.Run(() => this._sqlContext.UserTokens.LongCount(expr));
 		}
 
 
-		public UserToken GetById(Tuple<SensateUser, string> id) => this.GetById(id.Item1, id.Item2);
+		public AuthUserToken GetById(Tuple<SensateUser, string> id) => this.GetById(id.Item1, id.Item2);
 
-		public UserToken GetById(SensateUser user, string value)
+		public AuthUserToken GetById(SensateUser user, string value)
 		{
 			return this.Data.FirstOrDefault(
 				x => x.UserId == user.Id && x.Value == value
 			);
 		}
 
-		public IEnumerable<UserToken> GetByUser(SensateUser user)
+		public IEnumerable<AuthUserToken> GetByUser(SensateUser user)
 		{
-			IEnumerable<UserToken> data;
+			IEnumerable<AuthUserToken> data;
 
 			data = from token in this.Data
 				   where token.UserId == user.Id
@@ -78,14 +78,14 @@ namespace SensateService.Infrastructure.Sql
 			return data.ToList();
 		}
 
-		public void InvalidateToken(UserToken token)
+		public void InvalidateToken(AuthUserToken token)
 		{
 			this.StartUpdate(token);
 			token.Valid = false;
 			this.EndUpdate();
 		}
 
-		public async Task InvalidateTokenAsync(UserToken token)
+		public async Task InvalidateTokenAsync(AuthUserToken token)
 		{
 			this.StartUpdate(token);
 			token.Valid = false;
@@ -147,9 +147,9 @@ namespace SensateService.Infrastructure.Sql
 			return this._rng.NextString(JwtRefreshTokenLength);
 		}
 
-		public async Task InvalidateManyAsync(IEnumerable<UserToken> tokens)
+		public async Task InvalidateManyAsync(IEnumerable<AuthUserToken> tokens)
 		{
-			List<UserToken> _tokens;
+			List<AuthUserToken> _tokens;
 
 			_tokens = tokens.ToList();
 			_tokens.ForEach(x => {

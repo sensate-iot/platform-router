@@ -60,7 +60,7 @@ namespace SensateService.AuthApi.Controllers
 			var user = await this._users.GetByEmailAsync(login.Email).AwaitBackground();
 			bool result;
 			Microsoft.AspNetCore.Identity.SignInResult signInResult;
-			UserToken token;
+			AuthUserToken token;
 
 			if(user == null)
 				return NotFound();
@@ -86,7 +86,7 @@ namespace SensateService.AuthApi.Controllers
 				return new UnauthorizedResult();
 			}
 
-			token = this.CreateUserTokenEntry(user);
+			token = this.CreateAuthUserTokenEntry(user);
 			await this._tokens.CreateAsync(token);
 
 			var roles = this._users.GetRoles(user);
@@ -130,7 +130,7 @@ namespace SensateService.AuthApi.Controllers
 		{
 			var user = await this._users.GetByEmailAsync(login.Email).AwaitBackground();
 			TokenRequestReply reply;
-			UserToken token;
+			AuthUserToken token;
 			bool banned;
 
 			if(user == null)
@@ -149,7 +149,7 @@ namespace SensateService.AuthApi.Controllers
 			}
 
 			reply = new TokenRequestReply();
-			var newToken = this.CreateUserTokenEntry(user);
+			var newToken = this.CreateAuthUserTokenEntry(user);
 
 			var roles = await this._users.GetRolesAsync(user).AwaitBackground();
 			await this._tokens.CreateAsync(newToken).AwaitBackground();
@@ -169,7 +169,7 @@ namespace SensateService.AuthApi.Controllers
 		[ProducesResponseType(200)]
 		public async Task<IActionResult> Revoke(string token)
 		{
-			UserToken authToken;
+			AuthUserToken authToken;
 			var user = await this.GetCurrentUserAsync().AwaitBackground();
 
 			if(user == null)
@@ -195,7 +195,7 @@ namespace SensateService.AuthApi.Controllers
 		[ProducesResponseType(200)]
 		public async Task<IActionResult> RevokeAll()
 		{
-			IEnumerable<UserToken> tokens;
+			IEnumerable<AuthUserToken> tokens;
 			var user = await this.GetCurrentUserAsync().AwaitBackground();
 
 			tokens = this._tokens.GetByUser(user);
@@ -204,9 +204,9 @@ namespace SensateService.AuthApi.Controllers
 			return Ok();
 		}
 
-		private UserToken CreateUserTokenEntry(SensateUser user)
+		private AuthUserToken CreateAuthUserTokenEntry(SensateUser user)
 		{
-			var token = new UserToken {
+			var token = new AuthUserToken {
 				UserId = user.Id,
 				User = user,
 				ExpiresAt = DateTime.Now.AddMinutes(this._settings.JwtRefreshExpireMinutes),

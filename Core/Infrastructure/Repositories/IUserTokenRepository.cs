@@ -17,23 +17,23 @@ namespace SensateService.Infrastructure.Repositories
 {
 	public interface IUserTokenRepository
 	{
-		void Create(UserToken token);
-		Task CreateAsync(UserToken token, CancellationToken ct = default(CancellationToken));
+		void Create(AuthUserToken token);
+		Task CreateAsync(AuthUserToken token, CancellationToken ct = default(CancellationToken));
 
-		Task<long> CountAsync(Expression<Func<UserToken, bool>> expr);
+		Task<long> CountAsync(Expression<Func<AuthUserToken, bool>> expr);
 
-		IEnumerable<UserToken> GetByUser(SensateUser user);
-		UserToken GetById(SensateUser user, string value);
-		UserToken GetById(Tuple<SensateUser, string> id);
+		IEnumerable<AuthUserToken> GetByUser(SensateUser user);
+		AuthUserToken GetById(SensateUser user, string value);
+		AuthUserToken GetById(Tuple<SensateUser, string> id);
 
 		string GenerateJwtToken(SensateUser user, IEnumerable<string> roles, UserAccountSettings settings);
 		string GenerateRefreshToken();
 
-		void InvalidateToken(UserToken token);
+		void InvalidateToken(AuthUserToken token);
 		void InvalidateToken(SensateUser user, string value);
 
-		Task InvalidateTokenAsync(UserToken token);
-		Task InvalidateManyAsync(IEnumerable<UserToken> tokens);
+		Task InvalidateTokenAsync(AuthUserToken token);
+		Task InvalidateManyAsync(IEnumerable<AuthUserToken> tokens);
 		Task InvalidateTokenAsync(SensateUser user, string value);
 	}
 }

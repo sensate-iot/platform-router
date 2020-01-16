@@ -19,7 +19,7 @@ namespace SensateService.Infrastructure.Sql
 	{
 		public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 		public DbSet<ChangeEmailToken> ChangeEmailTokens { get; set; }
-		public new DbSet<UserToken> UserTokens { get; set; }
+		public new DbSet<AuthUserToken> UserTokens { get; set; }
 		public DbSet<ChangePhoneNumberToken> ChangePhoneNumberTokens { get; set; }
 		public DbSet<SensateApiKey> ApiKeys { get; set; }
 		public DbSet<AuditLog> AuditLogs { get; set; }
@@ -43,7 +43,7 @@ namespace SensateService.Infrastructure.Sql
 				k => k.UserToken
 			);
 
-			builder.Entity<UserToken>().HasKey(k => new {
+			builder.Entity<AuthUserToken>().HasKey(k => new {
 				k.UserId, k.Value
 			});
 

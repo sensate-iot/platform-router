@@ -178,7 +178,7 @@ namespace SensateService.AuthApi.Controllers
 		public async Task<IActionResult> ConfirmChangeEmail([FromBody] ConfirmUpdateEmail changeEmail)
 		{
 			ChangeEmailToken token;
-			IEnumerable<UserToken> tokens;
+			IEnumerable<AuthUserToken> tokens;
 
 			if(String.IsNullOrEmpty(changeEmail.Token)) {
 				return BadRequest();

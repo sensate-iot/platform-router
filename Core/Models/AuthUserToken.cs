@@ -12,7 +12,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace SensateService.Models
 {
 	[Table("AuthTokens")]
-	public class UserToken
+	public class AuthUserToken
 	{
 		public bool Valid { get; set; }
 		public DateTime CreatedAt { get; set; }
@@ -24,13 +24,13 @@ namespace SensateService.Models
 		public string UserId { get; set; }
 		public SensateUser User { get; set; }
 
-		public UserToken()
+		public AuthUserToken()
 		{
 			this.Valid = true;
 			this.CreatedAt = DateTime.Now;
 		}
 
-		public UserToken(TimeSpan expiresIn) : this()
+		public AuthUserToken(TimeSpan expiresIn) : this()
 		{
 			this.ExpiresAt = DateTime.Now.Add(expiresIn);
 		}
