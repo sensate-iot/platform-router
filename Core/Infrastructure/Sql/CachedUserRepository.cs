@@ -6,6 +6,7 @@
  */
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -85,6 +86,16 @@ namespace SensateService.Infrastructure.Sql
 			var obj = await this.LookupAsync(key, default(CancellationToken)).ConfigureAwait(false);
 
 			if(obj != null) {
+				var entries = this._sqlContext.ChangeTracker.Entries<SensateUser>().ToList();
+
+				foreach(var entry in entries) {
+					if(entry.Entity.Id != key) {
+						continue;
+					}
+
+					return obj;
+				}
+
 				this._sqlContext.Attach(obj);
 				return obj;
 			}

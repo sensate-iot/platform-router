@@ -102,6 +102,10 @@ namespace SensateService.Infrastructure.Sql
 			string email;
 
 			email = this._manager.GetUserId(cp);
+
+			if(email == null)
+				return null;
+
 			return await this.GetByEmailAsync(email);
 		}
 
