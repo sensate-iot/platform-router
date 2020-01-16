@@ -26,7 +26,7 @@ namespace SensateService.MqttHandler.Application
 	{
 		private readonly IConfiguration Configuration;
 
-		public Startup()
+		/*public Startup()
 		{
 			var builder = new ConfigurationBuilder();
 
@@ -40,6 +40,11 @@ namespace SensateService.MqttHandler.Application
 
 
 			Configuration = builder.Build();
+		}*/
+
+		public Startup(IConfiguration configuration)
+		{
+			this.Configuration = configuration;
 		}
 
 		private static bool IsDevelopment()
@@ -108,11 +113,11 @@ namespace SensateService.MqttHandler.Application
 			services.AddSingleton<IHostedService, MqttPublishHandler>();
 
 			services.AddLogging(builder => {
+				builder.AddConfiguration(Configuration.GetSection("Logging"));
 				if(IsDevelopment())
 					builder.AddDebug();
 
 				builder.AddConsole();
-				builder.AddConfiguration(Configuration.GetSection("Logging"));
 			});
 		}
 
@@ -129,10 +134,6 @@ namespace SensateService.MqttHandler.Application
 			provider.MapMqttTopic<MqttMeasurementHandler>(@public.ShareTopic);
 			provider.MapMqttTopic<MqttBulkMeasurementHandler>(@public.BulkShareTopic);
 		}
-
-		public Application BuildApplication(IServiceProvider sp)
-		{
-			return new Application(sp);
-		}
 	}
 }
+
