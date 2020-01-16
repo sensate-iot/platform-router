@@ -11,7 +11,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SensateService.Models
 {
-	[Table("AspNetAuthTokens")]
+	[Table("AuthTokens")]
 	public class UserToken
 	{
 		public bool Valid { get; set; }

@@ -41,7 +41,7 @@ namespace SensateService.Setup.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetRoleClaims");
+                    b.ToTable("RoleClaims");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -65,7 +65,7 @@ namespace SensateService.Setup.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserClaims");
+                    b.ToTable("UserClaims");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
@@ -87,7 +87,7 @@ namespace SensateService.Setup.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserLogins");
+                    b.ToTable("UserLogins");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -106,7 +106,7 @@ namespace SensateService.Setup.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("AspNetUserTokens");
+                    b.ToTable("UserTokens");
                 });
 
             modelBuilder.Entity("SensateService.Models.AuditLog", b =>
@@ -151,7 +151,7 @@ namespace SensateService.Setup.Migrations
 
                     b.HasKey("IdentityToken");
 
-                    b.ToTable("AspNetEmailTokens");
+                    b.ToTable("EmailTokens");
                 });
 
             modelBuilder.Entity("SensateService.Models.ChangePhoneNumberToken", b =>
@@ -179,7 +179,7 @@ namespace SensateService.Setup.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetPhoneNumberTokens");
+                    b.ToTable("PhoneNumberTokens");
                 });
 
             modelBuilder.Entity("SensateService.Models.PasswordResetToken", b =>
@@ -192,7 +192,7 @@ namespace SensateService.Setup.Migrations
 
                     b.HasKey("UserToken");
 
-                    b.ToTable("AspNetPasswordResetTokens");
+                    b.ToTable("PasswordResetTokens");
                 });
 
             modelBuilder.Entity("SensateService.Models.SensateApiKey", b =>
@@ -231,7 +231,7 @@ namespace SensateService.Setup.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetApiKeys");
+                    b.ToTable("ApiKeys");
                 });
 
             modelBuilder.Entity("SensateService.Models.SensateRole", b =>
@@ -260,7 +260,7 @@ namespace SensateService.Setup.Migrations
                         .IsUnique()
                         .HasName("RoleNameIndex");
 
-                    b.ToTable("AspNetRoles");
+                    b.ToTable("Roles");
                 });
 
             modelBuilder.Entity("SensateService.Models.SensateUser", b =>
@@ -338,7 +338,7 @@ namespace SensateService.Setup.Migrations
                         .IsUnique()
                         .HasName("UserNameIndex");
 
-                    b.ToTable("AspNetUsers");
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("SensateService.Models.SensateUserRole", b =>
@@ -353,7 +353,7 @@ namespace SensateService.Setup.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetUserRoles");
+                    b.ToTable("UserRoles");
                 });
 
             modelBuilder.Entity("SensateService.Models.UserToken", b =>
@@ -378,7 +378,7 @@ namespace SensateService.Setup.Migrations
 
                     b.HasKey("UserId", "Value");
 
-                    b.ToTable("AspNetAuthTokens");
+                    b.ToTable("AuthTokens");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

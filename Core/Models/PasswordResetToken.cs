@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SensateService.Models
 {
-	[Table("AspNetPasswordResetTokens")]
+	[Table("PasswordResetTokens")]
 	public class PasswordResetToken
 	{
 		[Key]

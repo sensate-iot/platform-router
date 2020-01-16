@@ -24,13 +24,20 @@ namespace SensateService.Infrastructure.Sql
 		public DbSet<SensateApiKey> ApiKeys { get; set; }
 		public DbSet<AuditLog> AuditLogs { get; set; }
 
-		public SensateSqlContext(DbContextOptions<SensateSqlContext> options) :
-			base(options)
+		public SensateSqlContext(DbContextOptions<SensateSqlContext> options) : base(options)
 		{}
 
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
 			base.OnModelCreating(builder);
+
+			builder.Entity<IdentityUserClaim<string>>().ToTable("UserClaims");
+			builder.Entity<IdentityRoleClaim<string>>().ToTable("RoleClaims");
+			builder.Entity<IdentityUserLogin<string>>().ToTable("UserLogins");
+			builder.Entity<IdentityUserToken<string>>().ToTable("UserTokens");
+			builder.Entity<SensateUser>().ToTable("Users");
+			builder.Entity<SensateRole>().ToTable("Roles");
+			builder.Entity<SensateUserRole>().ToTable("UserRoles");
 
 			builder.Entity<PasswordResetToken>().HasKey(
 				k => k.UserToken

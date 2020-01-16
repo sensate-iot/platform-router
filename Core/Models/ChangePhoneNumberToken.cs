@@ -11,7 +11,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SensateService.Models
 {
-	[Table("AspNetPhoneNumberTokens")]
+	[Table("PhoneNumberTokens")]
 	public class ChangePhoneNumberToken
 	{
 		[Key]

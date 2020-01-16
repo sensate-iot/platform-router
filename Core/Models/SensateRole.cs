@@ -6,11 +6,13 @@
  */
 
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
 
 namespace SensateService.Models
 {
+	[Table("Roles")]
 	public class SensateRole : IdentityRole
 	{
 		public const string Banned = "Banned";

@@ -5,11 +5,13 @@
  * @email  michel.megens@sonatolabs.com
  */
 
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
 
 namespace SensateService.Models
 {
+	[Table("UserRoles")]
 	public class SensateUserRole : IdentityUserRole<string>
 	{
 		[JsonIgnore]

@@ -14,7 +14,7 @@ using SensateService.Enums;
 
 namespace SensateService.Models
 {
-	[Table("AspNetApiKeys")]
+	[Table("ApiKeys")]
 	public class SensateApiKey
 	{
 		[Key]

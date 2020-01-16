@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SensateService.Models
 {
-	[Table("AspNetEmailTokens")]
+	[Table("EmailTokens")]
 	public class ChangeEmailToken
 	{
 		[Key]
