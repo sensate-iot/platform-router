@@ -439,7 +439,7 @@ namespace SensateService.AuthApi.Controllers
 
 			/* Send phone number validation token */
 			body = await this.ReadTextTemplate("Confirm_PhoneNumber.txt", token.UserToken);
-			//this._text.Send(this._text_settings.AlphaCode, token.PhoneNumber, body);
+			this._text.Send(this._text_settings.AlphaCode, token.PhoneNumber, body);
 
 			if(url != null)
 				return this.Redirect(url);
