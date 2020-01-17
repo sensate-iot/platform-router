@@ -50,11 +50,11 @@ namespace SensateService.Converters
 				if(!string.IsNullOrEmpty(dp.Value.Unit))
 					writer.WriteString("Unit", dp.Value.Unit);
 
-				if(dp.Value.Precision.HasValue) {
+				if(dp.Value.Precision != null) {
 					writer.WriteDecimal128("Precision", dp.Value.Precision.Value.ToDecimal128());
 				}
 
-				if(dp.Value.Accuracy.HasValue) {
+				if(dp.Value.Accuracy != null) {
 					writer.WriteDouble("Accuracy", dp.Value.Accuracy.Value);
 				}
 
