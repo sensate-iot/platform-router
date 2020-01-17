@@ -50,6 +50,14 @@ namespace SensateService.Converters
 				if(!string.IsNullOrEmpty(dp.Value.Unit))
 					writer.WriteString("Unit", dp.Value.Unit);
 
+				if(dp.Value.Precision.HasValue) {
+					writer.WriteDecimal128("Precision", dp.Value.Precision.Value.ToDecimal128());
+				}
+
+				if(dp.Value.Accuracy.HasValue) {
+					writer.WriteDouble("Accuracy", dp.Value.Accuracy.Value);
+				}
+
 				writer.WriteDecimal128("Value", dp.Value.Value.ToDecimal128());
 				writer.WriteEndDocument();
 			}
@@ -88,6 +96,24 @@ namespace SensateService.Converters
 				} else {
 					dataPoint.Unit = reader.ReadString();
 				}
+				break;
+
+			case "Precision":
+				if(reader.GetCurrentBsonType() == BsonType.Null) {
+					reader.ReadNull();
+					dataPoint.Precision = null;
+				}
+
+				dataPoint.Precision = reader.ReadDecimal128().ToDecimal();
+				break;
+
+			case "Accuracy":
+				if(reader.GetCurrentBsonType() == BsonType.Null) {
+					reader.ReadNull();
+					dataPoint.Accuracy = null;
+				}
+
+				dataPoint.Accuracy = reader.ReadDouble();
 				break;
 
 			default:
