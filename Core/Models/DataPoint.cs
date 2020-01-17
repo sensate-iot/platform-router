@@ -21,7 +21,9 @@ namespace SensateService.Models
 		[JsonProperty(Required = Required.Always)]
 		[BsonRequired]
 		public decimal Value { get; set; }
+		[BsonIgnoreIfNull]
 		public decimal? Precision { get; set; }
+		[BsonIgnoreIfNull]
 		public double? Accuracy { get; set; }
 
 		public DataPoint()
