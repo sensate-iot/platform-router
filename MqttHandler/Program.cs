@@ -34,7 +34,9 @@ namespace SensateService.MqttHandler
 				.ConfigureLogging((hostingContext, logging) => {
 					logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
 					logging.AddConsole();
-					logging.AddDebug();
+
+					if(hostingContext.HostingEnvironment.IsDevelopment())
+						logging.AddDebug();
 				})
 				.ConfigureServices((ctx, services) => {
 					starter = new Startup(ctx.Configuration);

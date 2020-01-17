@@ -50,7 +50,7 @@ namespace SensateService.MqttHandler.Application
 		private static bool IsDevelopment()
 		{
 #if DEBUG
-			var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+			var env = Environment.GetEnvironmentVariable("NETCORE_ENVIRONMENT") ?? "Development";
 			return env == "Development";
 #else
 			return false;
