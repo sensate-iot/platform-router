@@ -71,15 +71,14 @@ namespace SensateService.ApiCore.Middleware
 				var logs = scope.ServiceProvider.GetRequiredService<IAuditLogRepository>();
 				var users = scope.ServiceProvider.GetRequiredService<IUserRepository>();
 
-				this._logger.LogInformation($"{ctx.Request.Method}: {ctx.Request.Path} {Environment.NewLine}" +
-				                            $"Result: HTTP {ctx.Response?.StatusCode} {Environment.NewLine}"  +
-				                            $"Client IP: {ctx.Request.HttpContext.Connection.RemoteIpAddress}");
+				this._logger.LogInformation($"{ctx.Request.Method}: {ctx.Request.Path} {Environment.NewLine}");
+				this._logger.LogInformation($"Result: HTTP {ctx.Response?.StatusCode}");
+				this._logger.LogInformation($"Client IP: {ctx.Request.HttpContext.Connection.RemoteIpAddress}");
 
-				if(ctx.User != null) {
-					user = await users.GetByClaimsPrincipleAsync(ctx.User).AwaitBackground();
+				if(ctx.Items["ApiKey"] is SensateApiKey token) {
+					user = token.User;
 				} else {
-					var token = ctx.Items["ApiKey"] as SensateApiKey;
-					user = token?.User;
+					user = await users.GetByClaimsPrincipleAsync(ctx.User).AwaitBackground();
 				}
 
 				log = new AuditLog {
@@ -87,7 +86,7 @@ namespace SensateService.ApiCore.Middleware
 					Method = ToRequestMethod(ctx.Request.Method),
 					Address = ctx.Request.HttpContext.Connection.RemoteIpAddress,
 					AuthorId = user?.Id,
-					Route = ctx.Request.Path
+					Route = ctx.Request.Path + ctx.Request.QueryString.ToString()
 				};
 
 				await logs.CreateAsync(log, CancellationToken.None).AwaitBackground();

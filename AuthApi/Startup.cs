@@ -19,6 +19,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using SensateService.ApiCore.Middleware;
 using SensateService.Config;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
@@ -188,6 +189,8 @@ namespace SensateService.AuthApi
 				.AllowAnyMethod()
 				.AllowCredentials();
 			});
+
+			app.UseMiddleware<RequestLoggingMiddleware>();
 
 			app.UseAuthentication();
 			app.UseAuthorization();
