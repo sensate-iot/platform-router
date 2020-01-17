@@ -322,10 +322,8 @@ namespace SensateService.AuthApi.Controllers
 				UnconfirmedPhoneNumber = register.PhoneNumber
 			};
 
-			if(!this.IsValidUri(register.ForwardTo))
-				return this.InvalidInputResult("Invalid forward URL!");
-
 			var valid = await this._text.IsValidNumber(register.PhoneNumber);
+
 			if(!valid)
 				return this.InvalidInputResult("Invalid phone number!");
 
@@ -340,7 +338,8 @@ namespace SensateService.AuthApi.Controllers
 			user = await this._users.GetAsync(user.Id).AwaitBackground();
 			var code = await this._manager.GenerateEmailConfirmationTokenAsync(user).AwaitBackground();
 			code = Base64UrlEncoder.Encode(code);
-			var url = this.Url.EmailConfirmationLink(user.Id, code, this._settings.Scheme, this._settings.PublicUrl, register.ForwardTo);
+
+			var url = this.Url.EmailConfirmationLink(user.Id, code, this._settings.Scheme, this._settings.PublicUrl);
 
 			mail = await mailTask.AwaitBackground();
 			mail.HtmlBody = mail.HtmlBody.Replace("%%URL%%", url);

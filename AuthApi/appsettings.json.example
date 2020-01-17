@@ -41,14 +41,13 @@
     }
   },
 
-  "PublicUrl": "http://localhost:5000", 
-
   "Authentication" : {
+    "PublicUrl": "localhost:4200/confirm",
     "JwtRefreshExpireMinutes": 43200,
     "JwtKey": "<key>",
     "JwtIssuer": "http://localhost:5000/",
     "JwtExpireMinutes": 43200,
-	"Scheme": "https"
+    "Scheme": "https"
   },
 
   "Mqtt": {

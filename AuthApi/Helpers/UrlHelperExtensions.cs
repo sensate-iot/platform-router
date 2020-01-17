@@ -5,6 +5,7 @@
  * @email  michel.megens@sonatolabs.com
  */
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Mvc;
 using SensateService.AuthApi.Controllers;
@@ -13,33 +14,12 @@ namespace SensateService.AuthApi.Helpers
 {
     public static class UrlHelperExtensions
     {
+		private static string TokenIdentifier = "{token}";
+
 		[SuppressMessage("ReSharper", "RedundantAnonymousTypePropertyName")]
-		public static string EmailConfirmationLink(this IUrlHelper url, string id, string code, string scheme, string host, string target = null)
+		public static string EmailConfirmationLink(this IUrlHelper url, string id, string code, string scheme, string host)
 		{
-			object targetValues;
-
-			if(string.IsNullOrEmpty(target)) {
-				targetValues = new {
-					id,
-					code,
-				};
-			} else {
-				targetValues = new {
-					id,
-					code,
-					target = target
-				};
-			}
-
-			var action = url.Action(
-				action: nameof(AccountsController.ConfirmEmail),
-				controller: "Accounts",
-				values: targetValues,
-				protocol: scheme,
-				host: host
-			);
-
-			return action;
+			return $"{scheme}://{host}/{id}/{code}";
 		}
     }
 }
