@@ -63,10 +63,9 @@ namespace SensateService.DataApi.Controllers
 			return this.Ok(status);
 		}
 
-		[HttpGet("{sensorId}")]
+		[HttpGet]
 		[ProducesResponseType(200)]
-		public async Task<IActionResult> Get(string sensorId, [FromQuery] DateTime start, [FromQuery] DateTime end,
-			[FromQuery] int skip = -1, [FromQuery] int limit = -1)
+		public async Task<IActionResult> Get([FromQuery] string sensorId, [FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] int skip = -1, [FromQuery] int limit = -1)
 		{
 			var sensor = await this._sensors.GetAsync(sensorId).AwaitBackground();
 
