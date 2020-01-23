@@ -385,6 +385,53 @@ namespace SensateService.Setup.Migrations
                     b.ToTable("UserRoles");
                 });
 
+            modelBuilder.Entity("SensateService.Models.Trigger", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("KeyValue")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("LastTriggered")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<decimal?>("LowerEdge")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("SensorId")
+                        .IsRequired()
+                        .HasColumnType("character varying(24)")
+                        .HasMaxLength(24);
+
+                    b.Property<decimal?>("UpperEdge")
+                        .HasColumnType("numeric");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LastTriggered");
+
+                    b.HasIndex("SensorId");
+
+                    b.ToTable("Triggers");
+                });
+
+            modelBuilder.Entity("SensateService.Models.TriggerAction", b =>
+                {
+                    b.Property<long>("TriggerId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Channel")
+                        .HasColumnType("integer");
+
+                    b.HasKey("TriggerId", "Channel");
+
+                    b.ToTable("TriggerActions");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("SensateService.Models.SensateRole", null)
@@ -464,6 +511,15 @@ namespace SensateService.Setup.Migrations
                     b.HasOne("SensateService.Models.SensateUser", "User")
                         .WithMany("UserRoles")
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SensateService.Models.TriggerAction", b =>
+                {
+                    b.HasOne("SensateService.Models.Trigger", null)
+                        .WithMany("Actions")
+                        .HasForeignKey("TriggerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

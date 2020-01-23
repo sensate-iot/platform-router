@@ -23,9 +23,11 @@ namespace SensateService.Infrastructure.Sql
 		public DbSet<ChangePhoneNumberToken> ChangePhoneNumberTokens { get; set; }
 		public DbSet<SensateApiKey> ApiKeys { get; set; }
 		public DbSet<AuditLog> AuditLogs { get; set; }
+		public DbSet<Trigger> Triggers { get; set; }
+		public DbSet<TriggerAction> TriggerActions { get; set; }
 
 		public SensateSqlContext(DbContextOptions<SensateSqlContext> options) : base(options)
-		{}
+		{ }
 
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
@@ -38,6 +40,8 @@ namespace SensateService.Infrastructure.Sql
 			builder.Entity<SensateUser>().ToTable("Users");
 			builder.Entity<SensateRole>().ToTable("Roles");
 			builder.Entity<SensateUserRole>().ToTable("UserRoles");
+			builder.Entity<Trigger>().ToTable("Triggers");
+			builder.Entity<TriggerAction>().ToTable("TriggerActions");
 
 			builder.Entity<PasswordResetToken>().HasKey( k => k.UserToken );
 			builder.Entity<AuthUserToken>().HasKey(k => new { k.UserId, k.Value });
@@ -73,12 +77,13 @@ namespace SensateService.Infrastructure.Sql
 			builder.Entity<AuditLog>().HasOne<SensateUser>().WithMany().HasForeignKey(log => log.AuthorId);
 			builder.Entity<AuditLog>().HasIndex(log => log.Method);
 
-			/*builder.HasSequence<long>("Id_sequence")
-				.StartsAt(1)
-				.IncrementsBy(1);
-			builder.Entity<AuditLog>()
-				.Property(o => o.Id)
-				.HasDefaultValueSql("nextval('\"Id_sequence\"')");*/
+			builder.Entity<Trigger>().Property(trigger => trigger.Id).UseIdentityByDefaultColumn();
+			builder.Entity<Trigger>().HasIndex(trigger => trigger.SensorId);
+			builder.Entity<Trigger>().HasIndex(trigger => trigger.LastTriggered);
+			builder.Entity<TriggerAction>(action => {
+				action.HasKey(t => new {t.TriggerId, t.Channel});
+				action.HasOne<Trigger>().WithMany(t => t.Actions).HasForeignKey(a => a.TriggerId).IsRequired();
+			});
 		}
 	}
 }

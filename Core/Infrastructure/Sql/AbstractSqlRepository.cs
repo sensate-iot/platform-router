@@ -71,7 +71,7 @@ namespace SensateService.Infrastructure.Sql
 		public virtual async Task CreateAsync(T obj, CancellationToken ct = default(CancellationToken))
 		{
 			this.Data.Add(obj);
-			await this.CommitAsync(ct);
+			await this.CommitAsync(ct).AwaitBackground();
 		}
 
 		public void AddRange(IEnumerable<T> objs)
@@ -82,7 +82,7 @@ namespace SensateService.Infrastructure.Sql
 		public virtual async Task CreateRangeAsync(IEnumerable<T> objs, CancellationToken token)
 		{
 			this.AddRange(objs);
-			await this.CommitAsync(token);
+			await this.CommitAsync(token).AwaitBackground();
 		}
 
 		public void Dispose()

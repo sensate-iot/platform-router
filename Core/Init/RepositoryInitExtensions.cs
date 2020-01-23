@@ -40,6 +40,7 @@ namespace SensateService.Init
 			services.AddScoped<IChangePhoneNumberTokenRepository, ChangePhoneNumberRepository>();
 			services.AddScoped<IBulkWriter<AuditLog>, AuditLogRepository>();
 			services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+			services.AddScoped<ITriggerRepository, TriggerRepository>();
 
 			return services;
 		}
