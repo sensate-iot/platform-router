@@ -6,7 +6,6 @@
  */
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
@@ -16,7 +15,6 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 
 using SensateService.ApiCore.Attributes;
-using SensateService.ApiCore.Controllers;
 using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
@@ -28,31 +26,15 @@ namespace SensateService.DataApi.Controllers
 {
 	[Produces("application/json")]
 	[Route("[controller]")]
-	public class MessagesController : AbstractApiController
+	public class MessagesController : AbstractDataController 
 	{
 		private readonly IMessageRepository m_messages;
 		private readonly ILogger<MessagesController> m_logger;
-		private readonly ISensorRepository m_sensors;
 
-		public MessagesController(IHttpContextAccessor ctx, IMessageRepository messages, ILogger<MessagesController> logger, ISensorRepository sensors) : base(ctx)
+		public MessagesController(IHttpContextAccessor ctx, IMessageRepository messages, ILogger<MessagesController> logger, ISensorRepository sensors) : base(ctx, sensors)
 		{
 			this.m_messages = messages;
 			this.m_logger = logger;
-			this.m_sensors = sensors;
-		}
-
-		private async Task<bool> AuthenticateUserForSensor(string sensorId)
-		{
-			var sensor = await this.m_sensors.GetAsync(sensorId).AwaitBackground();
-			var auth = sensor.Owner == this.CurrentUser.Id;
-			var key = this.CurrentUser.ApiKeys.FirstOrDefault(k => k.ApiKey == this.ApiKey.ApiKey);
-
-			if(key == null)
-				return false;
-
-			auth = auth && !key.Revoked && key.Type == ApiKeyType.SensorKey;
-			auth = auth && this.CurrentUser.UserRoles.All(role => role.Role.Name != SensateRole.Banned);
-			return auth;
 		}
 
 		[HttpPost]
@@ -77,7 +59,7 @@ namespace SensateService.DataApi.Controllers
 
 			msg.SensorId = tmp;
 			msg.InternalId = ObjectId.GenerateNewId(msg.CreatedAt);
-			var auth = await this.AuthenticateUserForSensor(raw.SensorId).AwaitBackground();
+			var auth = await this.AuthenticateUserForSensor(raw.SensorId, true).AwaitBackground();
 
 			if(!auth) {
 				return this.Unauthorized(new Status {

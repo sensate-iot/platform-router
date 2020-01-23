@@ -1,4 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿/*
+ * Abstract API controller.
+ *
+ * @author Michel Megens
+ * @email  michel@michelmegens.net
+ */
+
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SensateService.Models;
 
@@ -18,3 +25,4 @@ namespace SensateService.ApiCore.Controllers
 		}
 	}
 }
+
