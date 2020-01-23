@@ -39,13 +39,8 @@ namespace SensateService.Infrastructure.Sql
 			builder.Entity<SensateRole>().ToTable("Roles");
 			builder.Entity<SensateUserRole>().ToTable("UserRoles");
 
-			builder.Entity<PasswordResetToken>().HasKey(
-				k => k.UserToken
-			);
-
-			builder.Entity<AuthUserToken>().HasKey(k => new {
-				k.UserId, k.Value
-			});
+			builder.Entity<PasswordResetToken>().HasKey( k => k.UserToken );
+			builder.Entity<AuthUserToken>().HasKey(k => new { k.UserId, k.Value });
 
 			builder.Entity<ChangePhoneNumberToken>().HasAlternateKey(e => e.UserToken)
 				.HasName("AlternateKey_UserToken");
@@ -75,6 +70,8 @@ namespace SensateService.Infrastructure.Sql
 			});
 
 			builder.Entity<AuditLog>().Property(log => log.Id).UseIdentityByDefaultColumn();
+			builder.Entity<AuditLog>().HasOne<SensateUser>().WithMany().HasForeignKey(log => log.AuthorId);
+			builder.Entity<AuditLog>().HasIndex(log => log.Method);
 
 			/*builder.HasSequence<long>("Id_sequence")
 				.StartsAt(1)

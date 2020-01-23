@@ -135,7 +135,36 @@ namespace SensateService.Setup.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("Method");
+
                     b.ToTable("AuditLogs");
+                });
+
+            modelBuilder.Entity("SensateService.Models.AuthUserToken", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("Valid")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("UserId", "Value");
+
+                    b.ToTable("AuthTokens");
                 });
 
             modelBuilder.Entity("SensateService.Models.ChangeEmailToken", b =>
@@ -356,31 +385,6 @@ namespace SensateService.Setup.Migrations
                     b.ToTable("UserRoles");
                 });
 
-            modelBuilder.Entity("SensateService.Models.UserToken", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("LoginProvider")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("Valid")
-                        .HasColumnType("boolean");
-
-                    b.HasKey("UserId", "Value");
-
-                    b.ToTable("AuthTokens");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("SensateService.Models.SensateRole", null)
@@ -417,6 +421,22 @@ namespace SensateService.Setup.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("SensateService.Models.AuditLog", b =>
+                {
+                    b.HasOne("SensateService.Models.SensateUser", null)
+                        .WithMany()
+                        .HasForeignKey("AuthorId");
+                });
+
+            modelBuilder.Entity("SensateService.Models.AuthUserToken", b =>
+                {
+                    b.HasOne("SensateService.Models.SensateUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("SensateService.Models.ChangePhoneNumberToken", b =>
                 {
                     b.HasOne("SensateService.Models.SensateUser", "User")
@@ -443,15 +463,6 @@ namespace SensateService.Setup.Migrations
 
                     b.HasOne("SensateService.Models.SensateUser", "User")
                         .WithMany("UserRoles")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("SensateService.Models.UserToken", b =>
-                {
-                    b.HasOne("SensateService.Models.SensateUser", "User")
-                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
