@@ -39,6 +39,7 @@ namespace SensateService.Init
 			services.AddScoped<IUserTokenRepository, UserTokenRepository>();
 			services.AddScoped<IChangePhoneNumberTokenRepository, ChangePhoneNumberRepository>();
 			services.AddScoped<IBulkWriter<AuditLog>, AuditLogRepository>();
+			services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 
 			return services;
 		}
@@ -48,11 +49,11 @@ namespace SensateService.Init
 			BsonSerializer.RegisterSerializer(typeof(DateTime), new BsonUtcDateTimeSerializer());
 
 			services.AddScoped<ISensorStatisticsRepository, SensorStatisticsRepository>();
-			services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+			services.AddScoped<IMessageRepository, MessageRepository>();
 
 			if(cache) {
 				services.AddScoped<IMeasurementRepository, CachedMeasurementRepository>();
-				services.AddScoped<ISensorRepository, SensorRepository>();
+				services.AddScoped<ISensorRepository, CachedSensorRepository>();
 			} else {
 				services.AddScoped<IMeasurementRepository, MeasurementRepository>();
 				services.AddScoped<ISensorRepository, SensorRepository>();
