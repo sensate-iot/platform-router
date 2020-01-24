@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26124.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthApi", "AuthApi\AuthApi.csproj", "{C41C96C6-18AD-4801-8DFF-D3BE09522517}"
 EndProject
@@ -8,7 +8,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MqttHandler", "MqttHandler\MqttHandler.csproj", "{8D55A3E7-8E0E-4ABB-ADEA-FFD157E9D095}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Setup", "Setup\Setup.csproj", "{AE713298-9C5F-483D-B4BE-D335BA63B0A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlSetup", "SqlSetup\SqlSetup.csproj", "{AE713298-9C5F-483D-B4BE-D335BA63B0A2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseTool", "DatabaseTool\DatabaseTool.csproj", "{5394032A-FBF9-40BD-B92A-87686B3D7B72}"
 EndProject
@@ -18,9 +18,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSocketHandler", "WebSock
 EndProject
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "LiveDataHandler", "LiveDataHandler\LiveDataHandler.njsproj", "{74A74F73-F76A-40F1-9D73-6B8D4A143F91}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DashboardApi", "DashboardApi\DashboardApi.csproj", "{F598D3EB-A33F-42A5-BEBC-E460046C4682}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DashboardApi", "DashboardApi\DashboardApi.csproj", "{F598D3EB-A33F-42A5-BEBC-E460046C4682}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataApi", "DataApi\DataApi.csproj", "{4982C307-2FFB-4561-8A4A-E7E856A51DA6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataApi", "DataApi\DataApi.csproj", "{4982C307-2FFB-4561-8A4A-E7E856A51DA6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TriggerHandler", "TriggerHandler\TriggerHandler.csproj", "{D8AE4969-D915-4CCF-B406-392836A921F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -194,6 +196,22 @@ Global
 		{4982C307-2FFB-4561-8A4A-E7E856A51DA6}.Release|x64.Build.0 = Release|Any CPU
 		{4982C307-2FFB-4561-8A4A-E7E856A51DA6}.Release|x86.ActiveCfg = Release|Any CPU
 		{4982C307-2FFB-4561-8A4A-E7E856A51DA6}.Release|x86.Build.0 = Release|Any CPU
+		{D8AE4969-D915-4CCF-B406-392836A921F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8AE4969-D915-4CCF-B406-392836A921F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8AE4969-D915-4CCF-B406-392836A921F6}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{D8AE4969-D915-4CCF-B406-392836A921F6}.Debug|ARM.Build.0 = Debug|Any CPU
+		{D8AE4969-D915-4CCF-B406-392836A921F6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D8AE4969-D915-4CCF-B406-392836A921F6}.Debug|x64.Build.0 = Debug|Any CPU
+		{D8AE4969-D915-4CCF-B406-392836A921F6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D8AE4969-D915-4CCF-B406-392836A921F6}.Debug|x86.Build.0 = Debug|Any CPU
+		{D8AE4969-D915-4CCF-B406-392836A921F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8AE4969-D915-4CCF-B406-392836A921F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8AE4969-D915-4CCF-B406-392836A921F6}.Release|ARM.ActiveCfg = Release|Any CPU
+		{D8AE4969-D915-4CCF-B406-392836A921F6}.Release|ARM.Build.0 = Release|Any CPU
+		{D8AE4969-D915-4CCF-B406-392836A921F6}.Release|x64.ActiveCfg = Release|Any CPU
+		{D8AE4969-D915-4CCF-B406-392836A921F6}.Release|x64.Build.0 = Release|Any CPU
+		{D8AE4969-D915-4CCF-B406-392836A921F6}.Release|x86.ActiveCfg = Release|Any CPU
+		{D8AE4969-D915-4CCF-B406-392836A921F6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
