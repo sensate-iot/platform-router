@@ -12,17 +12,18 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
-
 using Microsoft.Extensions.Logging;
 
 using MongoDB.Driver;
 using MongoDB.Bson;
+using MongoDB.Driver.GeoJsonObjectModel;
 using MongoDB.Driver.Linq;
 
 using SensateService.Exceptions;
 using SensateService.Models;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Helpers;
+using SensateService.Models.Generic;
 
 namespace SensateService.Infrastructure.Document
 {
@@ -115,7 +116,106 @@ namespace SensateService.Infrastructure.Document
 			await this._collection.DeleteOneAsync(x => x.InternalId == objectId).AwaitBackground();
 		}
 
-		#region Linq getters
+#region Linq getters
+public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index, CancellationToken ct = default)
+		{
+			var builder = Builders<MeasurementBucket>.Filter;
+			var filter = builder.Eq(x => x.InternalId, index.MeasurementBucketId);
+
+			var query = this._collection.Aggregate().Match(filter).Project(projection => new SingleMeasurement {
+				Id = this.GenerateId(DateTime.Now),
+				SensorId = projection.SensorId,
+				Measurement = projection.Measurements.ElementAt(index.Index)
+			});
+
+			var rv = await query.FirstOrDefaultAsync(ct).AwaitBackground();
+			return rv;
+		}
+
+		public async Task<MeasurementIndex> GetMeasurementIndexAsync(ObjectId sensorId, DateTime timestamp, CancellationToken ct = default)
+		{
+			if(timestamp.Kind != DateTimeKind.Utc) {
+				timestamp = timestamp.ToUniversalTime();
+			}
+
+			var builder = Builders<MeasurementBucket>.Filter;
+			var filter = builder.Eq(bucket => bucket.SensorId, sensorId) &
+						 builder.Eq(bucket => bucket.Timestamp, timestamp.ThisHour()) &
+			             builder.Lte(bucket => bucket.First, timestamp) &
+			             builder.Gte(bucket => bucket.Last, timestamp);
+			/*var query = this._collection.Aggregate().Match(filter).Project(bucket => new MeasurementIndex {
+				MeasurementBucketId = bucket.InternalId,
+				Index = bucket.Measurements.ToList().FindIndex(m => m.Timestamp == timestamp)
+			});*/
+
+			var query = this._collection.Aggregate().Match(filter).Project(new BsonDocument {
+				{ "_id", 1 },
+				{ "Index", new BsonDocument { {"$indexOfArray", new BsonArray { "$Measurements.Timestamp", timestamp } } } }
+			});
+
+			var data = await query.FirstOrDefaultAsync(ct).AwaitBackground();
+			var idx = new MeasurementIndex {
+				MeasurementBucketId = data.GetValue("_id").AsObjectId,
+				Index = data.GetValue("Index").AsInt32
+			};
+
+			return idx;
+		}
+
+		public async Task<IEnumerable<MeasurementsGeoQueryResult>> GetMeasurementsNearAsync(Sensor sensor, DateTime start, DateTime end, GeoJson2DGeographicCoordinates coords, int skip = -1, int limit = -1, CancellationToken ct = default)
+		{
+			var near = new BsonDocument {
+				{ "near", new BsonDocument {
+					{ "type", "Point" },
+					{ "coordinates", new BsonArray { coords.Longitude, coords.Latitude } }
+				} },
+				{ "spherical", true },
+				{ "query", new BsonDocument {
+					{ "SensorId", sensor.InternalId },
+					{ "First", new BsonDocument { { "$lte", start } } },
+					{ "Last", new BsonDocument { { "$gte", start } } }
+				} },
+				{ "distanceField", "Distance" },
+				{ "key", "Measurements.Location" }
+			};
+
+			var cond = new BsonDocument {
+				{ "$and", new BsonArray {
+					new BsonDocument {{ "$gte", new BsonArray { "$$measurement.Timestamp", start } }},
+					new BsonDocument {{ "$lte", new BsonArray { "$$measurement.Timestamp", end } }}
+				} }
+			};
+
+			var filter = new BsonDocument {
+				{"input", "$Measurements"},
+				{"as", "measurement"},
+				{"cond", cond}
+			};
+
+			var project = new BsonDocument {
+				{"Distance", 1},
+				{"_id", 1},
+				{ "Measurements", new BsonDocument { {"$filter", filter} } }
+			};
+
+			var pipeline = new List<BsonDocument> {
+				new BsonDocument {{"$geoNear", near}},
+				new BsonDocument {{"$project", project}}
+			};
+
+			if(skip > 0) {
+				pipeline.Add(new BsonDocument { { "$skip", skip }});
+			}
+
+			if(limit > 0) {
+				pipeline.Add(new BsonDocument { { "$limit", limit }});
+			}
+
+			var query = this._collection.Aggregate<MeasurementsGeoQueryResult>(pipeline, cancellationToken: ct);
+			var results = query.ToList(ct);
+
+			return results;
+		}
 
 		public virtual async Task<IEnumerable<Measurement>> GetMeasurementsAsync(Expression<Func<MeasurementBucket, bool>> expression, int skip = -1, int limit = -1)
 		{
