@@ -162,7 +162,8 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 			return idx;
 		}
 
-		public async Task<IEnumerable<MeasurementsGeoQueryResult>> GetMeasurementsNearAsync(Sensor sensor, DateTime start, DateTime end, GeoJson2DGeographicCoordinates coords, int skip = -1, int limit = -1, CancellationToken ct = default)
+		public async Task<IEnumerable<MeasurementsGeoQueryResult>> GetMeasurementsNearAsync(Sensor sensor, DateTime start, DateTime end, GeoJson2DGeographicCoordinates coords,
+			int max = -1, int min = -1, int skip = -1, int limit = -1, CancellationToken ct = default)
 		{
 			var near = new BsonDocument {
 				{ "near", new BsonDocument {
@@ -178,6 +179,14 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 				{ "distanceField", "Distance" },
 				{ "key", "Measurements.Location" }
 			};
+
+			if(max >= 0) {
+				near.Add(new BsonElement ("maxDistance", max));
+			}
+
+			if(min >= 0) {
+				near.Add(new BsonElement ("minDistance", min));
+			}
 
 			var cond = new BsonDocument {
 				{ "$and", new BsonArray {
