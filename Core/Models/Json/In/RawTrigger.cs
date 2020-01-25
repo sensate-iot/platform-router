@@ -5,8 +5,6 @@
  * @email  michel@michelmegens.net
  */
 
-using System.ComponentModel.DataAnnotations;
-
 namespace SensateService.Models.Json.In
 {
 	public class RawTrigger
@@ -15,5 +13,6 @@ namespace SensateService.Models.Json.In
 		public decimal? LowerEdge { get; set; }
 		public decimal? UpperEdge { get; set; }
 		public string SensorId { get; set; }
+		public string Message { get; set; }
 	}
 }

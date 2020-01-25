@@ -23,7 +23,8 @@ namespace SensateService.Infrastructure.Repositories
 		public Task DeleteAsync(long id, CancellationToken ct = default);
 		public Task AddActionAsync(Trigger trigger, TriggerAction action, CancellationToken ct = default);
 		public Task AddActionsAsync(Trigger trigger, IEnumerable<TriggerAction> action, CancellationToken ct = default);
-		public Task UpdateTriggerTimestampAsync(Trigger trigger, CancellationToken ct = default);
+		public Task AddInvocationAsync(Trigger trigger, TriggerInvocation invocation, CancellationToken ct = default);
+		public Task AddInvocationsAsync(IEnumerable<TriggerInvocation> invocations, CancellationToken ct = default);
 	}
 }
 

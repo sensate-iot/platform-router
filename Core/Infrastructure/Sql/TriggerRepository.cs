@@ -38,22 +38,19 @@ namespace SensateService.Infrastructure.Sql
 		public async Task<Trigger> GetAsync(long id, CancellationToken ct = default)
 		{
 			var query = this.Data.Where(t => t.Id == id)
-				.Include(a => a.Actions);
+				.Include(t => t.Actions)
+				.Include(t => t.Invocations);
 			var trigger = await query.FirstOrDefaultAsync(ct).AwaitBackground();
 
-			trigger.LastTriggered = new DateTime(trigger.LastTriggered.Ticks, DateTimeKind.Utc);
 			return trigger;
 		}
 
 		public async Task<IEnumerable<Trigger>> GetAsync(string id, CancellationToken ct = default)
 		{
 			var query = this.Data.Where(trigger => trigger.SensorId == id)
-				.Include(a => a.Actions);
+				.Include(t => t.Actions)
+				.Include(t => t.Invocations);
 			var triggers = await query.ToListAsync(ct).AwaitBackground();
-
-			foreach(var trigger in triggers) {
-				trigger.LastTriggered = new DateTime(trigger.LastTriggered.Ticks, DateTimeKind.Utc);
-			}
 
 			return triggers;
 		}
@@ -61,12 +58,10 @@ namespace SensateService.Infrastructure.Sql
 		public async Task<IEnumerable<Trigger>> GetAsync(IEnumerable<string> ids, CancellationToken ct = default)
 		{
 			var query = this.Data.Where(t => ids.Contains(t.SensorId))
-				.Include(a => a.Actions);
-			var triggers = await query.ToListAsync(ct).AwaitBackground();
+				.Include(t => t.Invocations)
+				.Include(t => t.Actions);
 
-			foreach(var trigger in triggers) {
-				trigger.LastTriggered = new DateTime(trigger.LastTriggered.Ticks, DateTimeKind.Utc);
-			}
+			var triggers = await query.ToListAsync(ct).AwaitBackground();
 
 			return triggers;
 		}
@@ -102,11 +97,18 @@ namespace SensateService.Infrastructure.Sql
 			}
 		}
 
-		public async Task UpdateTriggerTimestampAsync(Trigger trigger, CancellationToken ct = default)
+		public async Task AddInvocationAsync(Trigger trigger, TriggerInvocation invocation, CancellationToken ct = default)
 		{
-			this.StartUpdate(trigger);
-			trigger.LastTriggered = DateTime.Now.ToUniversalTime();
+			invocation.Timestamp = DateTimeOffset.UtcNow;
+
+			this._sqlContext.TriggerInvocations.Add(invocation);
 			await this.CommitAsync(ct).AwaitBackground();
+		}
+
+		public Task AddInvocationsAsync(IEnumerable<TriggerInvocation> invocations, CancellationToken ct = default)
+		{
+			this._sqlContext.TriggerInvocations.AddRange(invocations);
+			return this.CommitAsync(ct);
 		}
 	}
 }

@@ -25,6 +25,7 @@ namespace SensateService.Infrastructure.Sql
 		public DbSet<AuditLog> AuditLogs { get; set; }
 		public DbSet<Trigger> Triggers { get; set; }
 		public DbSet<TriggerAction> TriggerActions { get; set; }
+		public DbSet<TriggerInvocation> TriggerInvocations { get; set; }
 
 		public SensateSqlContext(DbContextOptions<SensateSqlContext> options) : base(options)
 		{ }
@@ -42,6 +43,7 @@ namespace SensateService.Infrastructure.Sql
 			builder.Entity<SensateUserRole>().ToTable("UserRoles");
 			builder.Entity<Trigger>().ToTable("Triggers");
 			builder.Entity<TriggerAction>().ToTable("TriggerActions");
+			builder.Entity<TriggerInvocation>().ToTable("TriggerInvocations");
 
 			builder.Entity<PasswordResetToken>().HasKey( k => k.UserToken );
 			builder.Entity<AuthUserToken>().HasKey(k => new { k.UserId, k.Value });
@@ -79,10 +81,18 @@ namespace SensateService.Infrastructure.Sql
 
 			builder.Entity<Trigger>().Property(trigger => trigger.Id).UseIdentityByDefaultColumn();
 			builder.Entity<Trigger>().HasIndex(trigger => trigger.SensorId);
-			builder.Entity<Trigger>().HasIndex(trigger => trigger.LastTriggered);
+			builder.Entity<Trigger>().HasMany(trigger => trigger.Invocations).WithOne()
+				.HasForeignKey(invoc => invoc.TriggerId);
+			builder.Entity<Trigger>().HasMany(trigger => trigger.Actions).WithOne()
+				.HasForeignKey(action => action.TriggerId);
+
+			builder.Entity<TriggerInvocation>().Property(invocation => invocation.Id).UseIdentityByDefaultColumn();
+			builder.Entity<TriggerInvocation>().HasIndex(invocation => invocation.TriggerId);
+			builder.Entity<TriggerInvocation>().HasAlternateKey(invocation =>
+				new {invocation.MeasurementBucketId, invocation.MeasurementId, invocation.TriggerId});
 			builder.Entity<TriggerAction>(action => {
 				action.HasKey(t => new {t.TriggerId, t.Channel});
-				action.HasOne<Trigger>().WithMany(t => t.Actions).HasForeignKey(a => a.TriggerId).IsRequired();
+				//action.HasOne<Trigger>().WithMany(t => t.Actions).HasForeignKey(a => a.TriggerId).IsRequired();
 			});
 		}
 	}
