@@ -37,6 +37,23 @@ namespace SensateService.Init
 			return service;
 		}
 
+		public static IServiceCollection AddMqttPublishService<T>(this IServiceCollection services, Action<MqttPublishServiceOptions> setup = null)
+			where T : AbstractMqttService, IMqttPublishService
+		{
+			services.AddSingleton<IHostedService, T>();
+
+			if(setup != null)
+				services.Configure<MqttPublishServiceOptions>(setup);
+
+			services.AddSingleton(provider => {
+				var s = provider.GetServices<IHostedService>().ToList();
+				var mqservice = s.Find(x => x.GetType() == typeof(T)) as IMqttPublishService;
+				return mqservice;
+			});
+
+			return services;
+		}
+
 		public static IServiceCollection AddInternalMqttService(this IServiceCollection services, Action<InternalMqttServiceOptions> setup)
 		{
 			if(setup != null)
@@ -66,6 +83,16 @@ namespace SensateService.Init
 			 * we need. I'm truly sorry you are a witness to this savage
 			 * piece of SWE.
 			 */
+			services = sp.GetServices<IHostedService>().ToList();
+			mqtt = services.Find(x => x.GetType() == typeof(MqttService)) as MqttService;
+			mqtt?.MapTopicHandler<T>(topic);
+		}
+
+		public static void MapInternalMqttTopic<T>(this IServiceProvider sp, string topic) where T : MqttHandler
+		{
+			MqttService mqtt;
+			List<IHostedService> services;
+
 			services = sp.GetServices<IHostedService>().ToList();
 			mqtt = services.Find(x => x.GetType() == typeof(MqttService)) as MqttService;
 			mqtt?.MapTopicHandler<T>(topic);
