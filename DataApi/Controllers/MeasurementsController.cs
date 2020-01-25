@@ -10,9 +10,10 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+
 using MongoDB.Bson;
+
 using SensateService.ApiCore.Attributes;
-using SensateService.ApiCore.Controllers;
 using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
@@ -85,6 +86,12 @@ namespace SensateService.DataApi.Controllers
 			idx.MeasurementBucketId = id;
 
 			var measurement = await this.m_measurements.GetMeasurementAsync(idx).AwaitBackground();
+			var auth = await this.AuthenticateUserForSensor(measurement.SensorId.ToString()).AwaitBackground();
+
+			if(!auth) {
+				return this.Unauthorized();
+			}
+
 			return this.Ok(measurement);
 		}
 
