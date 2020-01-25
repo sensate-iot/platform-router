@@ -11,7 +11,7 @@ using SensateService.Infrastructure.Sql;
 namespace SensateService.SqlSetup.Migrations
 {
     [DbContext(typeof(SensateSqlContext))]
-    [Migration("20200123192759_AddTriggerInvocationsTable")]
+    [Migration("20200125001637_AddTriggerInvocationsTable")]
     partial class AddTriggerInvocationsTable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -401,6 +401,11 @@ namespace SensateService.SqlSetup.Migrations
                     b.Property<decimal?>("LowerEdge")
                         .HasColumnType("numeric");
 
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("character varying(300)")
+                        .HasMaxLength(300);
+
                     b.Property<string>("SensorId")
                         .IsRequired()
                         .HasColumnType("character varying(24)")
@@ -436,8 +441,12 @@ namespace SensateService.SqlSetup.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<string>("Reason")
-                        .HasColumnType("text");
+                    b.Property<string>("MeasurementBucketId")
+                        .HasColumnType("character varying(24)")
+                        .HasMaxLength(24);
+
+                    b.Property<int>("MeasurementId")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset>("Timestamp")
                         .HasColumnType("timestamp with time zone");
