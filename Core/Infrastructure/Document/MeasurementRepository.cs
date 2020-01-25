@@ -143,14 +143,10 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 						 builder.Eq(bucket => bucket.Timestamp, timestamp.ThisHour()) &
 			             builder.Lte(bucket => bucket.First, timestamp) &
 			             builder.Gte(bucket => bucket.Last, timestamp);
-			/*var query = this._collection.Aggregate().Match(filter).Project(bucket => new MeasurementIndex {
-				MeasurementBucketId = bucket.InternalId,
-				Index = bucket.Measurements.ToList().FindIndex(m => m.Timestamp == timestamp)
-			});*/
 
 			var query = this._collection.Aggregate().Match(filter).Project(new BsonDocument {
-				{ "_id", 1 },
-				{ "Index", new BsonDocument { {"$indexOfArray", new BsonArray { "$Measurements.Timestamp", timestamp } } } }
+				{"_id", 1},
+				{"Index", new BsonDocument {{"$indexOfArray", new BsonArray {"$Measurements.Timestamp", timestamp}}}}
 			});
 
 			var data = await query.FirstOrDefaultAsync(ct).AwaitBackground();
@@ -221,7 +217,7 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 			}
 
 			var query = this._collection.Aggregate<MeasurementsGeoQueryResult>(pipeline, cancellationToken: ct);
-			var results = query.ToList(ct);
+			var results = await query.ToListAsync(ct).AwaitBackground();
 
 			return results;
 		}
