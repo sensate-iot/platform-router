@@ -1,0 +1,95 @@
+﻿{
+  "Logging": {
+    "IncludeScopes": false,
+    "Debug": {
+      "LogLevel": {
+        "Default": "Warning",
+        "Microsoft": "Warning",
+        "System": "Warning"
+      }
+    },
+    "Console": {
+      "LogLevel": {
+        "Default": "Warning",
+        "Microsoft": "Warning",
+        "System": "Warning"
+      }
+    }
+  },
+
+  "InstanceName": "kerby-mqtt",
+
+  "Cache" : {
+    "Enabled": true,
+    "Interval": 1000,
+    "Type": "Distributed"
+  },
+
+  "Database": {
+    "MongoDB": {
+      "DatabaseName": "Sensate",
+      "ConnectionString": "mongodb://localhost:27017/Sensate",
+      "MaxConnections": 300
+    },
+    "PgSQL": {
+      "ConnectionString": "User ID = Username;Password=SomePassword;Server=localhost;Port=5432;Database=Sensate"
+    },
+    "Redis": {
+      "Host": "localhost",
+      "InstanceName": "Sensate"
+    }
+  },
+
+  "Timeouts": {
+    "MessageTimeout": 5,
+    "MailTimeout": 2,
+    "MqttTimeout": 0
+  } ,
+
+  "Mqtt": {
+    "PublicBroker": {
+      "Username": "",
+      "Password": "",
+      "Ssl": "false",
+      "Port": 1883,
+      "Host": "",
+      "RealTimeShareTopic": "sensate/measurements/rt",
+      "ShareTopic": "sensate/measurements",
+      "BulkShareTopic": "sensate/measurements/bulk"
+    },
+    "InternalBroker": {
+      "Username": "",
+      "Password": "",
+      "Ssl": "false",
+      "Port": 1883,
+      "Host": "",
+      "InternalMeasurementTopic": "sensate/internal/measurements",
+      "InternalBulkMeasurementTopic": "sensate/internal/measurements/bulk"
+    }
+  },
+
+  "Mail": {
+    "Provider": "SendGrid",
+    "SendGrid": {
+      "Username": "u-name",
+      "Key": "<sendgrid-key>"
+    },
+    "Smtp": {
+      "Ssl": true,
+      "Port": 587,
+      "Host": "mail.example.com",
+      "Username": "root@mail.com",
+      "Password": "SomePassword"
+    }
+  },
+
+  "Text" : {
+    "Provider": "Twilio",
+    "AlphaCode": "Sensate IoT",
+    "Twilio": {
+      "AccountSid": "<sid>",
+      "AuthToken": "<auth token>",
+      "PhoneSid": "<name>" 
+    } 
+  } 
+}
