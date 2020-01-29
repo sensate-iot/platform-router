@@ -80,10 +80,12 @@ namespace SensateService.WebSocketHandler.Application
 				options.Id = Guid.NewGuid().ToString();
 				options.InternalBulkMeasurementTopic = mqtt.InternalBroker.InternalBulkMeasurementTopic;
 				options.InternalMeasurementTopic = mqtt.InternalBroker.InternalMeasurementTopic;
+				options.InternalMessageTopic = mqtt.InternalBroker.InternalMessageTopic;
 			});
 
 			services.AddSingleton<IHostedService, MqttPublishHandler>();
 
+			services.AddWebSocketHandler<WebSocketMessageHandler>();
 			services.AddWebSocketHandler<RealTimeWebSocketMeasurementHandler>();
 			services.AddWebSocketHandler<WebSocketBulkMeasurementHandler>();
 			services.AddWebSocketHandler<WebSocketMeasurementHandler>();
@@ -108,7 +110,9 @@ namespace SensateService.WebSocketHandler.Application
 			app.MapWebSocketService("/measurement/rt", sp.GetService<RealTimeWebSocketMeasurementHandler>());
 			app.MapWebSocketService("/measurement", sp.GetService<WebSocketMeasurementHandler>());
 			app.MapWebSocketService("/measurement/bulk", sp.GetService<WebSocketBulkMeasurementHandler>());
-			app.UseAuthorization();
+			app.MapWebSocketService("/messages", sp.GetService<WebSocketMessageHandler>());
+
+			app.UseAuthentication();
 			app.UseAuthorization();
 			app.UseEndpoints(ep => { ep.MapControllers(); });
 		}

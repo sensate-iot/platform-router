@@ -52,14 +52,14 @@ namespace SensateService.WebSocketHandler.Application
 			try {
 				raw = JsonConvert.DeserializeObject<RawMeasurement>(msg);
 
-				using(var scope = this.provider.CreateScope()) {
-					var store = scope.ServiceProvider.GetRequiredService<IMeasurementCache>();
+				using var scope = this.provider.CreateScope();
+				var store = scope.ServiceProvider.GetRequiredService<IMeasurementCache>();
 
-					if(raw.CreatedById == null)
-						return;
-
-					await store.StoreAsync(raw, RequestMethod.WebSocket).AwaitBackground();
+				if(raw.CreatedById == null) {
+					return;
 				}
+
+				await store.StoreAsync(raw, RequestMethod.WebSocket).AwaitBackground();
 			} catch(InvalidRequestException ex) {
 				Debug.WriteLine($"Unable to store measurement: {ex.Message}");
 				dynamic jobj = new JObject();

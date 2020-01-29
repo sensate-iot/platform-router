@@ -6,7 +6,6 @@
  */
 
 using System;
-using System.IO;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -108,6 +107,7 @@ namespace SensateService.MqttHandler.Application
 				options.Id = Guid.NewGuid().ToString();
 				options.InternalBulkMeasurementTopic = privatemqtt.InternalBulkMeasurementTopic;
 				options.InternalMeasurementTopic = privatemqtt.InternalMeasurementTopic;
+				options.InternalMessageTopic = privatemqtt.InternalMessageTopic;
 			});
 
 			services.AddSingleton<IHostedService, MqttPublishHandler>();
@@ -133,6 +133,7 @@ namespace SensateService.MqttHandler.Application
 			provider.MapMqttTopic<MqttRealTimeMeasurementHandler>(@public.RealTimeShareTopic);
 			provider.MapMqttTopic<MqttMeasurementHandler>(@public.ShareTopic);
 			provider.MapMqttTopic<MqttBulkMeasurementHandler>(@public.BulkShareTopic);
+			provider.MapMqttTopic<MqttMessageHandler>(@public.MessageTopic);
 		}
 	}
 }

@@ -49,7 +49,8 @@
       "Host": "",
       "RealTimeShareTopic": "sensate/measurements/rt",
       "ShareTopic": "sensate/measurements",
-      "BulkShareTopic": "sensate/measurements/bulk"
+      "BulkShareTopic": "sensate/measurements/bulk",
+      "MessageTopic":  "sensate/messages"
     },
     "InternalBroker": {
       "Username": "",
@@ -58,7 +59,8 @@
       "Port": 1883,
       "Host": "",
       "InternalMeasurementTopic": "sensate/internal/measurements",
-      "InternalBulkMeasurementTopic": "sensate/internal/measurements/bulk"
+      "InternalBulkMeasurementTopic": "sensate/internal/measurements/bulk",
+      "InternalMessageTopic": "sensate/internal/messages"
     } 
   }
 }

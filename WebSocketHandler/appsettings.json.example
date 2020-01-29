@@ -67,7 +67,8 @@
       "Port": 1883,
       "Host": "",
       "InternalMeasurementTopic": "sensate/internal/measurements",
-      "InternalBulkMeasurementTopic": "sensate/internal/measurements/bulk"
+      "InternalBulkMeasurementTopic": "sensate/internal/measurements/bulk",
+      "InternalMessageTopic": "sensate/internal/messages"
     } 
   }
 }

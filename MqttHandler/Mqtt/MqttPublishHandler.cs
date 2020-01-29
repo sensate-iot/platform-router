@@ -36,12 +36,11 @@ namespace SensateService.MqttHandler.Mqtt
 		{
 			string data;
 
-			using(var scope = this._provider.CreateScope()) {
-				var client = scope.ServiceProvider.GetRequiredService<IMqttPublishService>();
+			using var scope = this._provider.CreateScope();
+			var client = scope.ServiceProvider.GetRequiredService<IMqttPublishService>();
 
-				data = e.Compressed;
-				await client.PublishOnAsync(this._options.InternalBulkMeasurementTopic, data, false).AwaitBackground();
-			}
+			data = e.Compressed;
+			await client.PublishOnAsync(this._options.InternalBulkMeasurementTopic, data, false).AwaitBackground();
 		}
 
 		public  Task StartAsync(CancellationToken cancellationToken)

@@ -23,6 +23,7 @@ namespace SensateService.Config
 		public string ShareTopic { get; set; }
 		public string BulkShareTopic { get; set; }
 		public string RealTimeShareTopic { get; set; }
+		public string MessageTopic { get; set; }
 	}
 
 	public class PrivateMqttConfig
@@ -34,5 +35,6 @@ namespace SensateService.Config
 		public short Port { get; set; }
 		public string InternalMeasurementTopic { get; set; }
 		public string InternalBulkMeasurementTopic { get; set; }
+		public string InternalMessageTopic { get; set; }
 	}
 }

@@ -17,5 +17,6 @@ namespace SensateService.Services.Settings
 		public string Password {get;set;}
 		public string InternalMeasurementTopic { get; set; }
 		public string InternalBulkMeasurementTopic { get; set; }
+		public string InternalMessageTopic { get; set; }
 	}
 }
