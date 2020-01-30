@@ -12,6 +12,7 @@ main();
 function main() {
 	program.version('0.1.0', '-v, --version')
 		.option('-m, --mqtt', 'run the MQTT client')
+		.option('-M, --messages', 'generate message\'s')
 		.option('-w, --websocket', 'run the websocket client')
 		.option('-s, --secret <secret>', 'sensor secret key')
 		.option('-u, --user <username>', 'specifiy the MQTT broker username', undefined)
@@ -41,7 +42,8 @@ function main() {
 		interval: parseInt(program.interval, 10),
 		raw_config: program.config,
 		config: settings.parse(program.config),
-		allsensors: program.allsensors
+		allsensors: program.allsensors,
+		messages: program.messages
 	}
 
 	if(args.config != undefined) {
@@ -50,6 +52,7 @@ function main() {
 		args.username = args.config.mqttUsername;
 		args.id = args.config.sensorId;
 		args.sensors = args.config.availableSensors;
+		args.websocket = args.config.webSocket;
 	}
 
 	if(program.mqtt)

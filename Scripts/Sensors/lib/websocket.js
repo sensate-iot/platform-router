@@ -32,12 +32,33 @@ function publish(ws, args) {
 	ws.send(JSON.stringify(measurement));
 }
 
-module.exports.run = function (args) {
-	const host = args.host + ':' + args.port + '/measurement';
-	const ws = new socket('ws://' + host);
+function publishMessage(ws, args) {
+	const message = {
+		SensorId: args.id,
+		Secret: args.secret,
+		Data: "Hello, World!"
+	}
 
-	ws.on('open', () => {
-		console.log('Websocket connected!');
-		setInterval(publish, args.interval, ws, args);
-	});
+	ws.send(JSON.stringify(message));
+}
+
+module.exports.run = function (args) {
+	if(args.messages) {
+		const host = args.host + ':' + args.port + '/messages';
+		const ws = new socket('ws://' + host);
+
+		ws.on('open', () => {
+			console.log('Websocket connected!');
+			setInterval(publishMessage, args.interval, ws, args);
+		});
+	} else {
+		const host = args.host + ':' + args.port + '/measurement';
+		const ws = new socket('ws://' + host);
+
+		ws.on('open', () => {
+			console.log('Websocket connected!');
+			setInterval(publish, args.interval, ws, args);
+		});
+	}
+
 }
