@@ -166,7 +166,7 @@ namespace SensateService.TriggerHandler.Mqtt
 
 						case TriggerActionChannel.MQTT:
 							if(last != null && CanExecute(last.Timestamp, this.m_timeoutSettings.MqttTimeout)) {
-								var topic = $"sensate/sensor/{trigger.SensorId}";
+								var topic = $"sensate/trigger/{trigger.SensorId}";
 								tasks.Add(publishService.PublishOnAsync(topic, body, false));
 							}
 							break;
