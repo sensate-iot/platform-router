@@ -158,8 +158,10 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 			return idx;
 		}
 
+		private const double DiameterOfEarth = 6378137d;
+
 		public async Task<IEnumerable<MeasurementsGeoQueryResult>> GetMeasurementsNearAsync(Sensor sensor, DateTime start, DateTime end, GeoJson2DGeographicCoordinates coords,
-			int max = -1, int min = -1, int skip = -1, int limit = -1, CancellationToken ct = default)
+			int max = 100, int skip = -1, int limit = -1, CancellationToken ct = default)
 		{
 			var near = new BsonDocument {
 				{ "near", new BsonDocument {
@@ -178,10 +180,6 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 
 			if(max >= 0) {
 				near.Add(new BsonElement ("maxDistance", max));
-			}
-
-			if(min >= 0) {
-				near.Add(new BsonElement ("minDistance", min));
 			}
 
 			var cond = new BsonDocument {
@@ -203,9 +201,38 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 				{ "Measurements", new BsonDocument { {"$filter", filter} } }
 			};
 
+			var projectRewrite = new BsonDocument {
+				{ "_id", 1 },
+				{ "Timestamp", "$Measurements.Timestamp" },
+				{ "Location", "$Measurements.Location" },
+				{ "Data", "$Measurements.Data" },
+			};
+
+			double radians = max;
+			radians /= DiameterOfEarth;
+
+			var centerSphere = new BsonArray {
+				new BsonArray { coords.Longitude, coords.Latitude }, radians
+			};
+
+			var match = new BsonDocument {
+				{
+					"Location", new BsonDocument {
+						{
+							"$geoWithin", new BsonDocument {
+								{ "$centerSphere", centerSphere}
+							}
+						}
+					}
+				}
+			};
+
 			var pipeline = new List<BsonDocument> {
 				new BsonDocument {{"$geoNear", near}},
-				new BsonDocument {{"$project", project}}
+				new BsonDocument {{"$project", project}},
+				new BsonDocument {{"$unwind", "$Measurements"}},
+				new BsonDocument {{"$project", projectRewrite}},
+				new BsonDocument {{"$match", match}}
 			};
 
 			if(skip > 0) {

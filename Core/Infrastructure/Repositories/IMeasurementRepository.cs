@@ -31,7 +31,7 @@ namespace SensateService.Infrastructure.Repositories
 		Task<IEnumerable<Measurement>> GetBetweenAsync(Sensor sensor, DateTime start, DateTime end, int skip = -1, int limit = -1);
 
 		Task<IEnumerable<MeasurementsGeoQueryResult>> GetMeasurementsNearAsync(Sensor sensor, DateTime start, DateTime end, GeoJson2DGeographicCoordinates coords,
-			int max = -1, int min = -1, int skip = -1, int limit = -1, CancellationToken ct = default);
+			int max = 100, int skip = -1, int limit = -1, CancellationToken ct = default);
 
 		Task DeleteBySensorAsync(Sensor sensor);
 		Task DeleteBetweenAsync(Sensor sensor, DateTime start, DateTime end);

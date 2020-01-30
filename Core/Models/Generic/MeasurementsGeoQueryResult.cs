@@ -5,16 +5,24 @@
  * @email  michel@michelmegens.net
  */
 
+using System;
 using System.Collections.Generic;
+
 using MongoDB.Bson;
+using MongoDB.Driver.GeoJsonObjectModel;
+using Newtonsoft.Json;
+
+using SensateService.Converters;
 
 namespace SensateService.Models.Generic
 {
 	public class MeasurementsGeoQueryResult
 	{
-        public ObjectId Id { get; set; }
-		public double Distance { get; set; }
-        public IEnumerable<Measurement> Measurements { get; set; }
-
+		[JsonIgnore]
+		public ObjectId _id { get; set; }
+		public DateTime Timestamp { get; set; }
+		[JsonConverter(typeof(GeoJsonPointJsonConverter))]
+		public GeoJsonPoint<GeoJson2DGeographicCoordinates> Location { get; set; }
+		public IDictionary<string, DataPoint> Data { get;set; }
 	}
 }
