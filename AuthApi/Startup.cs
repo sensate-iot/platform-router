@@ -184,10 +184,9 @@ namespace SensateService.AuthApi
 			app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sensate Data API v1"); });
 
 			app.UseCors(p => {
-				p.WithOrigins("http://localhost:4200", auth.JwtIssuer)
-				.AllowAnyHeader()
-				.AllowAnyMethod()
-				.AllowCredentials();
+				p.AllowAnyOrigin()
+					.AllowAnyHeader()
+					.AllowAnyMethod();
 			});
 
 			app.UseMiddleware<RequestLoggingMiddleware>();
