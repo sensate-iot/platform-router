@@ -41,6 +41,7 @@ namespace SensateService.Init
 			services.AddScoped<IBulkWriter<AuditLog>, AuditLogRepository>();
 			services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 			services.AddScoped<ITriggerRepository, TriggerRepository>();
+			services.AddScoped<IBlobRepository, BlobRepository>();
 
 			return services;
 		}

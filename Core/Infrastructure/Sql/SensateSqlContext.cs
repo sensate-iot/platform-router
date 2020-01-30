@@ -26,6 +26,7 @@ namespace SensateService.Infrastructure.Sql
 		public DbSet<Trigger> Triggers { get; set; }
 		public DbSet<TriggerAction> TriggerActions { get; set; }
 		public DbSet<TriggerInvocation> TriggerInvocations { get; set; }
+		public DbSet<Blob> Blobs { get; set; }
 
 		public SensateSqlContext(DbContextOptions<SensateSqlContext> options) : base(options)
 		{ }
@@ -44,6 +45,7 @@ namespace SensateService.Infrastructure.Sql
 			builder.Entity<Trigger>().ToTable("Triggers");
 			builder.Entity<TriggerAction>().ToTable("TriggerActions");
 			builder.Entity<TriggerInvocation>().ToTable("TriggerInvocations");
+			builder.Entity<Blob>().ToTable("Blobs");
 
 			builder.Entity<PasswordResetToken>().HasKey( k => k.UserToken );
 			builder.Entity<AuthUserToken>().HasKey(k => new { k.UserId, k.Value });
@@ -92,8 +94,11 @@ namespace SensateService.Infrastructure.Sql
 				new {invocation.MeasurementBucketId, invocation.MeasurementId, invocation.TriggerId});
 			builder.Entity<TriggerAction>(action => {
 				action.HasKey(t => new {t.TriggerId, t.Channel});
-				//action.HasOne<Trigger>().WithMany(t => t.Actions).HasForeignKey(a => a.TriggerId).IsRequired();
 			});
+
+			builder.Entity<Blob>().Property(blob => blob.Id).UseIdentityByDefaultColumn();
+			builder.Entity<Blob>().HasIndex(blob => blob.SensorId);
+			builder.Entity<Blob>().HasIndex(blob => new { blob.SensorId, blob.FileName }).IsUnique();
 		}
 	}
 }
