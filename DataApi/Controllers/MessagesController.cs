@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 
 using SensateService.ApiCore.Attributes;
+using SensateService.ApiCore.Controllers;
 using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;

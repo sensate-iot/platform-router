@@ -7,13 +7,14 @@
 
 using System;
 using System.Threading.Tasks;
-
+using DnsClient.Protocol;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 using MongoDB.Bson;
-
+using MongoDB.Driver.GeoJsonObjectModel;
 using SensateService.ApiCore.Attributes;
+using SensateService.ApiCore.Controllers;
 using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
@@ -97,16 +98,29 @@ namespace SensateService.DataApi.Controllers
 
 		[HttpGet]
 		[ProducesResponseType(200)]
-		public async Task<IActionResult> Get([FromQuery] string sensorId, [FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] int skip = -1, [FromQuery] int limit = -1)
+		public async Task<IActionResult> Get([FromQuery] string sensorId, [FromQuery] DateTime start, [FromQuery] DateTime end,
+			[FromQuery] double? longitude, [FromQuery] double? latitude, [FromQuery] int? max,
+			[FromQuery] int skip = -1, [FromQuery] int limit = -1)
 		{
 			var sensor = await this.m_sensors.GetAsync(sensorId).AwaitBackground();
 
-			// TODO: check for admin
-			if(sensor.Owner != this.CurrentUser.Id)
+			if(!this.AuthenticateUserForSensor(sensor, false)) {
 				return this.Unauthorized();
+			}
 
-			var data = await this.m_measurements.GetBetweenAsync(sensor, start, end, skip, limit).AwaitBackground();
-			return this.Ok(data);
+			if(longitude != null && latitude != null) {
+				var maxDist = max ?? 100;
+				var coords = new GeoJson2DGeographicCoordinates(longitude.Value, latitude.Value);
+
+				var data = await this.m_measurements
+					.GetMeasurementsNearAsync(sensor, start, end, coords, maxDist, skip, limit).AwaitBackground();
+
+				return this.Ok(data);
+			} else {
+				var data = await this.m_measurements.GetBetweenAsync(sensor, start, end, skip, limit).AwaitBackground();
+				return this.Ok(data);
+			}
+
 		}
 	}
 }
