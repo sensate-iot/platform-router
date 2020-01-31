@@ -1,0 +1,10 @@
+version: "3.1"
+services:
+  sensate_mqtthandler:
+    build: .
+    image: sensateiot/mqtthandler-dev
+    environment:
+      DOTNET_ENVIRONMENT: "Production"
+      ASPNETCORE_ENVIRONMENT: "Production"
+      PATH: "/usr/bin:/usr/sbin:/sbin:/bin:/app:$PATH"
+    network_mode: host
