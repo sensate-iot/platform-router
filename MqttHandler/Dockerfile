@@ -7,9 +7,6 @@
 
 FROM debian:stretch
 
-ARG source
-
-
 RUN apt-get update && \
 	apt-get -y install bash openssl curl
 
