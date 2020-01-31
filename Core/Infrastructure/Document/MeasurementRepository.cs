@@ -171,7 +171,7 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 				{ "spherical", true },
 				{ "query", new BsonDocument {
 					{ "SensorId", sensor.InternalId },
-					{ "First", new BsonDocument { { "$lte", start } } },
+					{ "First", new BsonDocument { { "$lte", end } } },
 					{ "Last", new BsonDocument { { "$gte", start } } }
 				} },
 				{ "distanceField", "Distance" },
@@ -182,23 +182,11 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 				near.Add(new BsonElement ("maxDistance", max));
 			}
 
-			var cond = new BsonDocument {
-				{ "$and", new BsonArray {
-					new BsonDocument {{ "$gte", new BsonArray { "$$measurement.Timestamp", start } }},
-					new BsonDocument {{ "$lte", new BsonArray { "$$measurement.Timestamp", end } }}
-				} }
-			};
-
-			var filter = new BsonDocument {
-				{"input", "$Measurements"},
-				{"as", "measurement"},
-				{"cond", cond}
-			};
-
-			var project = new BsonDocument {
-				{"Distance", 1},
-				{"_id", 1},
-				{ "Measurements", new BsonDocument { {"$filter", filter} } }
+			var matchTimestamp = new BsonDocument {
+				{ "Measurements.Timestamp", new BsonDocument {
+					{"$gte", start},
+					{"$lte", end}
+				}}
 			};
 
 			var projectRewrite = new BsonDocument {
@@ -229,7 +217,7 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 
 			var pipeline = new List<BsonDocument> {
 				new BsonDocument {{"$geoNear", near}},
-				new BsonDocument {{"$project", project}},
+				new BsonDocument {{"$match", matchTimestamp}},
 				new BsonDocument {{"$unwind", "$Measurements"}},
 				new BsonDocument {{"$project", projectRewrite}},
 				new BsonDocument {{"$match", match}}
