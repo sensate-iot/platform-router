@@ -52,6 +52,7 @@ namespace SensateService.Init
 
 			services.AddScoped<ISensorStatisticsRepository, SensorStatisticsRepository>();
 			services.AddScoped<IMessageRepository, MessageRepository>();
+			services.AddScoped<IControlMessageRepository, ControlMessageRepository>();
 
 			if(cache) {
 				services.AddScoped<IMeasurementRepository, CachedMeasurementRepository>();

@@ -16,10 +16,9 @@ namespace SensateService.Infrastructure.Repositories
 	public interface IControlMessageRepository 
 	{
 		Task CreateAsync(ControlMessage msg, CancellationToken ct = default);
-		Task UpdateAsync(ControlMessage msg, string newmsg,  CancellationToken ct = default);
-		Task DeleteAsync(ControlMessage msg, CancellationToken ct = default);
-		Task<IEnumerable<ControlMessage>> GetAsync(Sensor sensor, int skip = 0, int take = -1, CancellationToken ct = default);
-		Task<IEnumerable<ControlMessage>> GetAsync(Sensor sensor, DateTime start, DateTime end, int skip = 0, int take = -1, CancellationToken ct = default);
-		Task<Message> GetAsync(string messageId, CancellationToken ct = default);
+		Task DeleteBeforeAsync(Sensor sensor, DateTime dt, CancellationToken ct = default);
+		Task<IEnumerable<ControlMessage>> GetAsync(Sensor sensor, int skip = -1, int take = -1, CancellationToken ct = default);
+		Task<IEnumerable<ControlMessage>> GetAsync(Sensor sensor, DateTime start, DateTime end, int skip = -1, int take = -1, CancellationToken ct = default);
+		Task<ControlMessage> GetAsync(string messageId, CancellationToken ct = default);
 	}
 }
