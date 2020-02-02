@@ -8,6 +8,7 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -19,6 +20,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+
 using SensateService.ApiCore.Middleware;
 using SensateService.Config;
 using SensateService.Infrastructure.Sql;
@@ -29,7 +31,7 @@ using SensateService.Services;
 using SensateService.Services.Adapters;
 using SensateService.Services.Settings;
 
-namespace SensateService.NetworkApi
+namespace SensateService.NetworkApi.Application
 {
 	public class Startup
 	{
@@ -155,6 +157,7 @@ namespace SensateService.NetworkApi
 				options.Username = publicmqtt.Username;
 				options.Password = publicmqtt.Password;
 				options.Id = Guid.NewGuid().ToString();
+				options.ActuatorTopic = publicmqtt.ActuatorTopic;
 			});
 
 			if(text.Provider == "Twillio") {
