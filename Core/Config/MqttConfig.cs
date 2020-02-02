@@ -24,6 +24,7 @@ namespace SensateService.Config
 		public string BulkShareTopic { get; set; }
 		public string RealTimeShareTopic { get; set; }
 		public string MessageTopic { get; set; }
+		public string ActuatorTopic { get; set; }
 	}
 
 	public class PrivateMqttConfig
