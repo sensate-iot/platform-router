@@ -5,12 +5,21 @@
 # @email  michel@michelmegens.net
 #
 
-FROM debian:stretch
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build-env
 
-RUN apt-get update && \
-	apt-get -y install bash openssl curl
+WORKDIR /build
+COPY Core/*.csproj Core/
+COPY MqttHandler/*.csproj MqttHandler/
+COPY COPYING .
+RUN dotnet restore -r linux-x64 MqttHandler/MqttHandler.csproj
 
-COPY . /app
+COPY Core/ Core/
+COPY MqttHandler/ MqttHandler/
+RUN dotnet publish -c Release -o /app/bin -r linux-x64 --self-contained true --no-restore MqttHandler/MqttHandler.csproj
+
+FROM debian:buster-slim
+
 WORKDIR /app
+COPY --from=build-env /app /app
 
-ENTRYPOINT ["MqttHandler"]
+ENTRYPOINT ["/app/bin/MqttHandler"]

@@ -16,6 +16,11 @@ namespace SensateService.MqttHandler.Application
 {
     public class Program
     {
+	    public static string GetAppSettings()
+	    {
+			return Environment.GetEnvironmentVariable("SENSATE_MQTTHANDLER_APPSETTINGS") ?? "appsettings.json";
+	    }
+
 	    public static IHost CreateHost(string[] args)
 	    {
 		    Startup starter = null;
@@ -23,10 +28,12 @@ namespace SensateService.MqttHandler.Application
 			var wh = Host.CreateDefaultBuilder(args)
 				.UseContentRoot(Directory.GetCurrentDirectory())
 				.ConfigureAppConfiguration((hostingContext, config) => {
-					if(hostingContext.HostingEnvironment.IsProduction())
-						config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-					else
+					if(hostingContext.HostingEnvironment.IsProduction()) {
+						config.AddJsonFile(GetAppSettings(), optional: false, reloadOnChange: true);
+					} else {
 						config.AddUserSecrets<Startup>();
+					}
+
 					config.AddEnvironmentVariables();
 				})
 				.ConfigureLogging((hostingContext, logging) => {
@@ -53,7 +60,7 @@ namespace SensateService.MqttHandler.Application
 
         public static void Main(string[] args)
         {
-            Console.WriteLine($"Starting Sensate MQTT client using {Version.VersionString}");
+            Console.WriteLine($"Starting Sensate IoT MQTT client using {Version.VersionString}");
 
 			var program = new Application(CreateHost(args));
 			program.Run();
