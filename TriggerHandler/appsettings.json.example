@@ -55,7 +55,8 @@
       "Host": "",
       "RealTimeShareTopic": "sensate/measurements/rt",
       "ShareTopic": "sensate/measurements",
-      "BulkShareTopic": "sensate/measurements/bulk"
+      "BulkShareTopic": "sensate/measurements/bulk",
+      "ActuatorTopic": "sensate/actuator/$sensorId"
     },
     "InternalBroker": {
       "Username": "",

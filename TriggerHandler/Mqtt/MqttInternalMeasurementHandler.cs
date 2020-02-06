@@ -38,9 +38,11 @@ namespace SensateService.TriggerHandler.Mqtt
 		private readonly ILogger<MqttInternalMeasurementHandler> logger;
 		private readonly TextServiceSettings m_textSettings;
 		private readonly TimeoutSettings m_timeoutSettings;
+		private readonly MqttPublishServiceOptions m_options;
 
 		public MqttInternalMeasurementHandler(IServiceProvider provider,
 			IOptions<TextServiceSettings> text_opts,
+			IOptions<MqttPublishServiceOptions> options,
 			IOptions<TimeoutSettings> timeout,
 			ILogger<MqttInternalMeasurementHandler> logger)
 		{
@@ -48,6 +50,7 @@ namespace SensateService.TriggerHandler.Mqtt
 			this.logger = logger;
 			this.m_textSettings = text_opts.Value;
 			this.m_timeoutSettings = timeout.Value;
+			this.m_options = options.Value;
 		}
 
 		public override void OnMessage(string topic, string msg)
@@ -107,7 +110,8 @@ namespace SensateService.TriggerHandler.Mqtt
 		}
 
 		private async Task HandleTriggers(IUserRepository usersdb, ISensorRepository sensorsdb,
-			IList<Tuple<Trigger, TriggerInvocation, DataPoint>> invocations, IServiceProvider provider)
+			IControlMessageRepository controldb, IList<Tuple<Trigger, TriggerInvocation, DataPoint>> invocations,
+			IServiceProvider provider)
 		{
 			var distinctSensors = invocations.Select(x => x.Item1.SensorId).Distinct();
 			var enum_sensors = await sensorsdb.GetAsync(distinctSensors).AwaitBackground();
@@ -140,7 +144,7 @@ namespace SensateService.TriggerHandler.Mqtt
 
 				foreach(var action in trigger.Actions) {
 					switch(action.Channel) {
-						case TriggerActionChannel.Emain:
+						case TriggerActionChannel.Email:
 							if(!user.EmailConfirmed)
 								continue;
 
@@ -171,6 +175,27 @@ namespace SensateService.TriggerHandler.Mqtt
 							}
 							break;
 
+						case TriggerActionChannel.ControlMessage:
+							if(!ObjectId.TryParse(action.Target, out var id)) {
+								break;
+							}
+
+							var msg = new ControlMessage {
+								Data = body,
+								SensorId = id,
+								Timestamp = DateTime.UtcNow
+							};
+
+							var actuator = this.m_options.ActuatorTopic.Replace("$sensorId", action.Target);
+
+							var io = new [] {
+								publishService.PublishOnAsync(actuator, body, false),
+								controldb.CreateAsync(msg)
+							};
+
+							await Task.WhenAll(io).AwaitBackground();
+							break;
+
 						default:
 							throw new ArgumentOutOfRangeException();
 					}
@@ -192,6 +217,7 @@ namespace SensateService.TriggerHandler.Mqtt
 			var usersdb = scope.ServiceProvider.GetRequiredService<IUserRepository>();
 			var sensorsdb = scope.ServiceProvider.GetRequiredService<ISensorRepository>();
 			var measurementsdb = scope.ServiceProvider.GetRequiredService<IMeasurementRepository>();
+			var controldb = scope.ServiceProvider.GetRequiredService<IControlMessageRepository>();
 
 			var ids = measurements.Select(m => m.CreatedBy).Distinct().ToList();
 			var raw_triggers = await triggersdb.GetAsync(ids).AwaitBackground();
@@ -233,7 +259,7 @@ namespace SensateService.TriggerHandler.Mqtt
 					{t.Item2.MeasurementBucketId, t.Item2.MeasurementId, t.Item2.TriggerId}).Select(g => g.First())
 				.ToList();
 
-			await HandleTriggers(usersdb, sensorsdb, distinct, scope.ServiceProvider).AwaitBackground();
+			await HandleTriggers(usersdb, sensorsdb, controldb, distinct, scope.ServiceProvider).AwaitBackground();
 			await triggersdb.AddInvocationsAsync(distinct.Select(t => t.Item2)).AwaitBackground();
 
 			this.logger.LogDebug($"{triggered.Count} triggers triggered!");

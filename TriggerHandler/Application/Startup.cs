@@ -131,6 +131,7 @@ namespace SensateService.TriggerHandler.Application
 				options.Port = publicmqtt.Port;
 				options.Username = publicmqtt.Username;
 				options.Password = publicmqtt.Password;
+				options.ActuatorTopic = publicmqtt.ActuatorTopic;
 				options.Id = Guid.NewGuid().ToString();
 			});
 
