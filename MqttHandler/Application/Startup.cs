@@ -25,22 +25,6 @@ namespace SensateService.MqttHandler.Application
 	{
 		private readonly IConfiguration Configuration;
 
-		/*public Startup()
-		{
-			var builder = new ConfigurationBuilder();
-
-			builder.SetBasePath(Path.Combine(AppContext.BaseDirectory));
-			builder.AddEnvironmentVariables();
-
-			if(IsDevelopment())
-				builder.AddUserSecrets<Startup>();
-			else
-                builder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-
-
-			Configuration = builder.Build();
-		}*/
-
 		public Startup(IConfiguration configuration)
 		{
 			this.Configuration = configuration;
@@ -114,9 +98,9 @@ namespace SensateService.MqttHandler.Application
 
 			services.AddLogging(builder => {
 				builder.AddConfiguration(Configuration.GetSection("Logging"));
-				if(IsDevelopment())
+				if(IsDevelopment()) {
 					builder.AddDebug();
-
+				}
 				builder.AddConsole();
 			});
 		}
