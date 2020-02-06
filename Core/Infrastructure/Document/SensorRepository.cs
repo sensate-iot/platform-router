@@ -97,7 +97,8 @@ namespace SensateService.Infrastructure.Document
 			FilterDefinition<Sensor> filter;
 			var builder = Builders<Sensor>.Filter;
 
-			filter = builder.Where(x => x.Name.Contains(name));
+			filter = builder.Where(x => x.Name.Contains(name)) &
+			         builder.Eq(x => x.Owner, user.Id);
 			var raw = await this._collection.FindAsync(filter).AwaitBackground();
 			return raw.ToList();
 		}
