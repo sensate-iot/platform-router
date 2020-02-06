@@ -150,6 +150,10 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 			});
 
 			var data = await query.FirstOrDefaultAsync(ct).AwaitBackground();
+
+			if(data == null)
+				return null;
+
 			var idx = new MeasurementIndex {
 				MeasurementBucketId = data.GetValue("_id").AsObjectId,
 				Index = data.GetValue("Index").AsInt32
