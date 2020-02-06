@@ -11,9 +11,12 @@ namespace SensateService.Models
 {
 	public enum TriggerActionChannel
 	{
-		Emain,
+		Email,
 		SMS,
-		MQTT
+		MQTT,
+		HttpPost,
+		HttpGet,
+		ControlMessage
 	}
 
 	public class TriggerAction
@@ -22,5 +25,6 @@ namespace SensateService.Models
 		public long TriggerId { get; set; }
 		[Required]
 		public TriggerActionChannel Channel { get; set; }
+		public string Target { get; set; }
 	}
 }
