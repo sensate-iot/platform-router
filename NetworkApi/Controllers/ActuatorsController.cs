@@ -6,14 +6,13 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
+
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
 using SensateService.Enums;
@@ -49,24 +48,14 @@ namespace SensateService.NetworkApi.Controllers
 	        this.m_options = options.Value;
         }
 
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new [] { "value1", "value2" };
-        }
-
-        [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
         [HttpPost]
         [ValidateModel]
         [ReadWriteApiKey]
+		[ProducesResponseType(typeof(Status), StatusCodes.Status403Forbidden)]
+		[ProducesResponseType(typeof(Status), StatusCodes.Status204NoContent)]
         public async Task<IActionResult> Post([FromBody] ControlMessage msg)
         {
-	        var auth = await this.AuthenticateUserForSensor(msg.SensorId.ToString()).AwaitBackground();
+	        var auth = await this.AuthenticateUserForSensor(msg.SensorId.ToString(), true).AwaitBackground();
 
 	        if(!auth) {
 		        return this.Forbid();
@@ -79,7 +68,7 @@ namespace SensateService.NetworkApi.Controllers
 		        var topic = this.m_options.ActuatorTopic.Replace("$sensorId", msg.SensorId.ToString());
 
 		        asyncio[0] = this.m_controlMessages.CreateAsync(msg);
-		        asyncio[1] = this.m_publisher.PublishOnAsync(topic, JsonConvert.SerializeObject(msg), false);
+		        asyncio[1] = this.m_publisher.PublishOnAsync(topic, msg.Data, false);
 		        await Task.WhenAll(asyncio).AwaitBackground();
 	        } catch(Exception ex) {
                 this.m_logger.LogInformation($"Unable to send control message: {ex.Message}");
@@ -92,18 +81,6 @@ namespace SensateService.NetworkApi.Controllers
 	        }
 
 	        return this.NoContent();
-        }
-
-        // PUT: api/Actuators/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
         }
     }
 }

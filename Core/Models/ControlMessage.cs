@@ -20,7 +20,6 @@ namespace SensateService.Models
 	{
         [BsonId, BsonRequired]
 		public ObjectId InternalId { get; set; }
-        public int NodeId { get; set; }
         [BsonRequired, Required, JsonConverter(typeof(ObjectIdJsonConverter))]
         public ObjectId SensorId { get; set; }
         [BsonRequired, Required]

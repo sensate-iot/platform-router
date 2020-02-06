@@ -50,6 +50,7 @@ namespace SensateService.NetworkApi.Controllers
 
 		[HttpPost]
 		[ReadWriteApiKey]
+		[ValidateModel]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status422UnprocessableEntity)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status401Unauthorized)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status201Created)]
@@ -66,7 +67,8 @@ namespace SensateService.NetworkApi.Controllers
 				KeyValue = raw.KeyValue,
 				UpperEdge = raw.UpperEdge,
 				LowerEdge = raw.LowerEdge,
-				SensorId = raw.SensorId
+				SensorId = raw.SensorId,
+				Message = raw.Message
 			};
 
 			if(string.IsNullOrEmpty(raw.KeyValue)) {
@@ -94,8 +96,29 @@ namespace SensateService.NetworkApi.Controllers
 			return this.CreatedAtAction(nameof(GetById), new {triggerId = trigger.Id}, trigger);
 		}
 
+		private async Task<bool> CreatedTargetedActionAsync(TriggerAction action)
+		{
+			bool auth;
+
+			if(action.Channel == TriggerActionChannel.ControlMessage) {
+				var actuator = await this.m_sensors.GetAsync(action.Target).AwaitBackground(); 
+
+				if(actuator == null) {
+					return false;
+				}
+
+				auth = this.AuthenticateUserForSensor(actuator, false);
+			} else {
+				auth = Uri.TryCreate(action.Target, UriKind.Absolute, out var result) &&
+				       result.Scheme == Uri.UriSchemeHttp || result.Scheme == Uri.UriSchemeHttps;
+			}
+
+			return auth;
+		}
+
 		[HttpPost("{triggerId}/add-action")]
 		[ReadWriteApiKey]
+		[ValidateModel]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status422UnprocessableEntity)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status401Unauthorized)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status201Created)]
@@ -108,6 +131,13 @@ namespace SensateService.NetworkApi.Controllers
 				});
 			}
 
+			if(action.Channel > TriggerActionChannel.MQTT && string.IsNullOrEmpty( action.Target)) {
+				return this.UnprocessableEntity(new Status {
+					Message = "Missing target field.",
+					ErrorCode = ReplyCode.BadInput
+				});
+			}
+
 			var trigger = await this.m_triggers.GetAsync(triggerId).AwaitBackground();
 
 			action.TriggerId = triggerId;
@@ -116,9 +146,13 @@ namespace SensateService.NetworkApi.Controllers
 				return this.NotFound();
 			}
 
-			var auth = await this.AuthenticateUserForSensor(trigger.SensorId).AwaitBackground();
+			var authForTrigger = await this.AuthenticateUserForSensor(trigger.SensorId).AwaitBackground();
 
-			if(!auth) {
+			if(action.Channel > TriggerActionChannel.MQTT) {
+				authForTrigger = await this.CreatedTargetedActionAsync(action).AwaitBackground();
+			}
+
+			if(!authForTrigger) {
 				return this.CreateNotAuthorizedResult();
 			}
 
@@ -139,8 +173,9 @@ namespace SensateService.NetworkApi.Controllers
 
 		[HttpPost("{triggerId}/add-actions")]
 		[ReadWriteApiKey]
+		[ValidateModel]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status422UnprocessableEntity)]
-		[ProducesResponseType(typeof(Status), StatusCodes.Status401Unauthorized)]
+		[ProducesResponseType(typeof(Status), StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status201Created)]
 		public async Task<IActionResult> AddActions(long triggerId, [FromBody] List<TriggerAction> actions)
 		{
@@ -161,7 +196,7 @@ namespace SensateService.NetworkApi.Controllers
 			var auth = await this.AuthenticateUserForSensor(trigger.SensorId).AwaitBackground();
 
 			if(!auth) {
-				return this.CreateNotAuthorizedResult();
+				return this.Forbid();
 			}
 
 			try {
