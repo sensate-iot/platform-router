@@ -1,0 +1,41 @@
+version: "3.1"
+services:
+  redis_db:
+    image: redis
+    ports:
+      - 6379:6379
+  postgres_db:
+    image: postgres:12
+    user: root
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: DefaultPassword
+    volumes:
+      - postgres-data:/var/lib/postgresql/data:rw
+  mongo_db:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb-data:/var/lib/mongodb
+  vmq:
+    image: vernemq/vernemq
+    environment:
+      DOCKER_VERNEMQ_ACCEPT_EULA: "yes"
+      DOCKER_VERNEMQ_ALLOW_ANONYMOUS: "on"
+      DOCKER_VERNEMQ_SHARED_SUBSCRIPTION_POLICY: "random"
+      DOCKER_VERNEMQ_USER_sensate: "sensateiot"
+    ports:
+      - 1883:1883
+      
+volumes:
+  postgres-data:
+    external: true
+  mongodb-data:
+    external: true

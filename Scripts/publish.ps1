@@ -55,7 +55,6 @@ $target = Read-Host -Prompt 'Input the target architecture'
 dotnet publish -c Release -r $target -o dist\MqttHandler MqttHandler\MqttHandler.csproj
 dotnet publish -c Release -r $target -o dist\WebSocketHandler WebSocketHandler\WebSocketHandler.csproj
 dotnet publish -c Release -r $target -o dist\Auth Auth\Auth.csproj
-dotnet publish -c Release -r $target -o dist\Setup Setup\Setup.csproj
-dotnet publish -c Release -r $target -o dist\DatabaseTool DatabaseTool\DatabaseTool.csproj
+dotnet publish -c Release -r $target -o dist\SqlSetup SqlSetup\SqlSetup.csproj
 
 # Copy files to central location
