@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-
+using Newtonsoft.Json;
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
 using SensateService.DashboardApi.Json;
@@ -55,7 +55,9 @@ namespace SensateService.DashboardApi.Controllers
 		{
 			UserDashboard board;
 			var raw = await this.GetStatsFor(this.CurrentUser, DateTime.MinValue).AwaitBackground();
-			var stats = raw.ToList();
+			List<SensorStatisticsEntry> stats;
+
+			stats = raw?.ToList();
 
 			board = new UserDashboard {
 				SensorCount = await this._sensors.CountAsync(this.CurrentUser).AwaitBackground(),
@@ -65,10 +67,16 @@ namespace SensateService.DashboardApi.Controllers
 
 
 				MeasurementsToday =  await this.GetMeasurementStatsToday().AwaitBackground(),
-				MeasurementsCumulative =  GetMeasurementStatsCumulative(stats),
-				MeasurementsPerDayCumulative = GetMeasurementStatsCumulativePerDay(stats),
 				ApiCallsLastWeek = await this.GetApiCallsPerDayAsync().AwaitBackground()
 			};
+
+			if(stats != null) {
+				board.MeasurementsCumulative = GetMeasurementStatsCumulative(stats);
+				board.MeasurementsPerDayCumulative = GetMeasurementStatsCumulativePerDay(stats);
+			} else {
+				board.MeasurementsCumulative = new Graph<DateTime, long>();
+				board.MeasurementsPerDayCumulative = new Graph<int, long>();
+			}
 
 			return this.Ok(board.ToJson());
 		}
@@ -233,6 +241,9 @@ namespace SensateService.DashboardApi.Controllers
 			graph = new Graph<DateTime, long>();
 			totals = new Dictionary<long, long>();
 			var measurements = await this.GetStatsFor(this.CurrentUser, today).AwaitBackground();
+
+			if(measurements == null)
+				return graph;
 
 			foreach(var entry in measurements) {
 				if(!totals.TryGetValue(entry.Date.Ticks, out var value))
