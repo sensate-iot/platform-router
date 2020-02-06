@@ -36,7 +36,7 @@
 	
     <SignAssembly>false</SignAssembly>
     <RootNamespace>SensateService.MqttHandler</RootNamespace>
-    <Version>0.0.4</Version>
+    <Version>0.1.0</Version>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>TRACE;DEBUG</DefineConstants>
