@@ -15,7 +15,7 @@ RUN dotnet restore -r linux-x64 MqttHandler/MqttHandler.csproj
 
 COPY Core/ Core/
 COPY MqttHandler/ MqttHandler/
-RUN dotnet publish -c Release -o /app/bin -r linux-x64 --self-contained true --no-restore MqttHandler/MqttHandler.csproj
+RUN dotnet publish -c Release -o /app/bin -r linux-x64 --no-restore --self-contained true --no-restore MqttHandler/MqttHandler.csproj
 
 FROM debian:buster-slim
 
