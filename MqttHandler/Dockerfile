@@ -11,15 +11,16 @@ WORKDIR /build
 COPY Core/*.csproj Core/
 COPY MqttHandler/*.csproj MqttHandler/
 COPY COPYING .
-RUN dotnet restore -r linux-x64 MqttHandler/MqttHandler.csproj
+RUN dotnet restore -r linux-musl-x64 MqttHandler/MqttHandler.csproj
 
 COPY Core/ Core/
 COPY MqttHandler/ MqttHandler/
-RUN dotnet publish -c Release -o /app/bin -r linux-x64 --no-restore --self-contained true --no-restore MqttHandler/MqttHandler.csproj
+RUN dotnet publish -c Release -o /app/bin -r linux-musl-x64 --no-restore --self-contained true --no-restore MqttHandler/MqttHandler.csproj
 
-FROM debian:buster-slim
+FROM alpine:3.11
 
-WORKDIR /app
 COPY --from=build-env /app /app
+WORKDIR /app
+RUN apk add --no-cache libstdc++ libintl icu
 
-ENTRYPOINT ["/app/bin/MqttHandler"]
+ENTRYPOINT ["bin/MqttHandler"]
