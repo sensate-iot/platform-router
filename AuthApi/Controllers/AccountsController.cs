@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -310,8 +309,6 @@ namespace SensateService.AuthApi.Controllers
 		public async Task<object> Register([FromBody] Register register)
 		{
 			EmailBody mail;
-			string phonetoken;
-			string usertoken;
 
 			var user = new SensateUser {
 				UserName = register.Email,
@@ -351,10 +348,6 @@ namespace SensateService.AuthApi.Controllers
 			};
 
 			await Task.WhenAll(updates);
-			phonetoken = await this._manager.GenerateChangePhoneNumberTokenAsync(user, register.PhoneNumber).AwaitBackground();
-			usertoken = await this._phonetokens.CreateAsync(user, phonetoken, register.PhoneNumber).AwaitBackground();
-			Debug.WriteLine($"Generated tokens: [identity: ${phonetoken}] [user: {usertoken}]");
-
 			return this.Ok();
 		}
 
@@ -405,14 +398,23 @@ namespace SensateService.AuthApi.Controllers
 			return new ObjectResult(viewuser);
 		}
 
+		private async Task SendConfirmPhoneAsync(SensateUser user, string number)
+		{
+			var phonetoken = await this._manager.GenerateChangePhoneNumberTokenAsync(user, number).AwaitBackground();
+			var usertoken = await this._phonetokens.CreateAsync(user, phonetoken, number).AwaitBackground();
+			var worker = this.ReadTextTemplate("Confirm_PhoneNumber.txt", usertoken);
+
+			var body = await worker.AwaitBackground();
+			this._text.Send(this._text_settings.AlphaCode, number, body);
+		}
+
 		[HttpGet("confirm/{id}/{code}")]
 		[ProducesResponseType(404)]
 		[ProducesResponseType(200)]
 		public async Task<IActionResult> ConfirmEmail(string id, string code, [FromQuery(Name = "target")] string target)
 		{
 			SensateUser user;
-			ChangePhoneNumberToken token;
-			string url, body;
+			string url;
 
 			url = target != null ? WebUtility.UrlDecode(target) : null;
 
@@ -421,7 +423,6 @@ namespace SensateService.AuthApi.Controllers
 			}
 
 			user = await this._manager.FindByIdAsync(id).AwaitBackground();
-			token = await this._phonetokens.GetLatest(user);
 
 			if(user == null)
 				return NotFound();
@@ -437,8 +438,7 @@ namespace SensateService.AuthApi.Controllers
 				return this.InvalidInputResult();
 
 			/* Send phone number validation token */
-			body = await this.ReadTextTemplate("Confirm_PhoneNumber.txt", token.UserToken);
-			this._text.Send(this._text_settings.AlphaCode, token.PhoneNumber, body);
+			await this.SendConfirmPhoneAsync(user, user.UnconfirmedPhoneNumber).AwaitBackground();
 
 			if(url != null)
 				return this.Redirect(url);
@@ -467,8 +467,14 @@ namespace SensateService.AuthApi.Controllers
 				return this.InvalidInputResult("Invalid confirmation token!");
 
 			var result = await this._manager.ChangePhoneNumberAsync(user, phonetoken.PhoneNumber, phonetoken.IdentityToken).AwaitBackground();
-			if(!result.Succeeded)
-				return new BadRequestObjectResult(StringifyIdentityResult(result));
+
+			if(!result.Succeeded) {
+				await this.SendConfirmPhoneAsync(user, phonetoken.PhoneNumber).AwaitBackground();
+				return this.BadRequest(new Status {
+					Message = "Phone number expired!",
+					ErrorCode = ReplyCode.NotAllowed
+				});
+			}
 
 			this._users.StartUpdate(user);
 			user.UnconfirmedPhoneNumber = null;
