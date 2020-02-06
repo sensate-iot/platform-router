@@ -148,6 +148,7 @@ namespace SensateService.TriggerHandler.Application
 				options.MailTimeout = timeouts.MailTimeout;
 				options.MessageTimeout = timeouts.MessageTimeout;
 				options.MqttTimeout = timeouts.MqttTimeout;
+				options.HttpTimeout = timeouts.HttpTimeout;
 			});
 		}
 

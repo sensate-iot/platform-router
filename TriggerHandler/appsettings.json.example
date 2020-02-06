@@ -43,7 +43,8 @@
   "Timeouts": {
     "MessageTimeout": 5,
     "MailTimeout": 2,
-    "MqttTimeout": 0
+    "MqttTimeout": 0,
+    "HttpTimeout": 0 
   } ,
 
   "Mqtt": {

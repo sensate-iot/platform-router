@@ -12,5 +12,6 @@ namespace SensateService.TriggerHandler.Models
 		public int MessageTimeout { get; set; }
 		public int MailTimeout { get; set; }
 		public int MqttTimeout { get; set; }
+		public int HttpTimeout { get; set; }
 	}
 }

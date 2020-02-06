@@ -19,7 +19,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using MongoDB.Bson;
-using Newtonsoft.Json;
 
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
@@ -27,8 +26,11 @@ using SensateService.Models;
 using SensateService.Models.Generic;
 using SensateService.Services;
 using SensateService.Services.Settings;
+using SensateService.TriggerHandler.Application;
 using SensateService.TriggerHandler.Models;
+
 using Convert = System.Convert;
+using JsonConvert = Newtonsoft.Json.JsonConvert;
 
 namespace SensateService.TriggerHandler.Mqtt
 {
@@ -125,6 +127,7 @@ namespace SensateService.TriggerHandler.Mqtt
 			var usersMap = users.ToDictionary(x => x.Id, x => x);
 			var sensorsMap = sensors.ToDictionary(x => x.InternalId.ToString(), x => x);
 			var tasks = new List<Task>();
+			var client = new RestClient();
 
 			foreach(var (trigger, _, dp) in invocations) {
 				var sensor = sensorsMap[trigger.SensorId];
@@ -173,6 +176,24 @@ namespace SensateService.TriggerHandler.Mqtt
 								var topic = $"sensate/trigger/{trigger.SensorId}";
 								tasks.Add(publishService.PublishOnAsync(topic, body, false));
 							}
+							break;
+
+						case TriggerActionChannel.HttpPost:
+						case TriggerActionChannel.HttpGet:
+							var result = Uri.TryCreate(action.Target, UriKind.Absolute, out var output) &&
+							              output.Scheme == Uri.UriSchemeHttp || output.Scheme == Uri.UriSchemeHttps;
+
+							if(!result) {
+								break;
+							}
+
+							if(last != null && !CanExecute(last.Timestamp, this.m_timeoutSettings.HttpTimeout)) {
+								break;
+							}
+
+							tasks.Add(action.Channel == TriggerActionChannel.HttpGet
+								? client.GetAsync(action.Target)
+								: client.PostAsync(action.Target, body));
 							break;
 
 						case TriggerActionChannel.ControlMessage:
