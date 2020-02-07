@@ -5,24 +5,33 @@
  * @email  michel.megens@sonatolabs.com
  */
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
+using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
+using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
+using SensateService.Models.Json.Out;
 
 namespace SensateService.NetworkApi.Controllers
 {
 	[Produces("application/json")]
 	[Route("[controller]")]
-	public class SensorsController : AbstractDataController 
+	public class SensorsController : AbstractDataController
 	{
-		public SensorsController(IHttpContextAccessor ctx, ISensorRepository sensors) : base(ctx, sensors)
+		private readonly ILogger<SensorsController> m_logger;
+
+		public SensorsController(IHttpContextAccessor ctx, ISensorRepository sensors, ILogger<SensorsController> logger) : base(ctx, sensors)
 		{
+			this.m_logger = logger;
 		}
 
 		[HttpGet]
@@ -39,6 +48,30 @@ namespace SensateService.NetworkApi.Controllers
 			}
 				
 			return this.Ok(sensors);
+		}
+
+		[HttpPost]
+		[ReadWriteApiKey, ValidateModel]
+		[ProducesResponseType(typeof(Sensor), StatusCodes.Status201Created)]
+		[ProducesResponseType(typeof(Sensor), StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(typeof(Sensor), StatusCodes.Status403Forbidden)]
+		[ProducesResponseType(typeof(Sensor), StatusCodes.Status422UnprocessableEntity)]
+		public async Task<IActionResult> Post([FromBody] Sensor sensor)
+		{
+			sensor.Owner = this.CurrentUser.Id;
+
+			try {
+				await this.m_sensors.CreateAsync(sensor).AwaitBackground();
+			} catch(Exception ex) {
+				this.m_logger.LogInformation($"Unable to create sensor: {ex.Message}");
+
+				return this.BadRequest(new Status {
+					Message = "Unable to save sensor.",
+					ErrorCode = ReplyCode.BadInput
+				});
+			}
+
+			return this.CreatedAtAction(nameof(Get), new {Id = sensor.InternalId}, sensor);
 		}
 
 		[HttpGet("{id}")]

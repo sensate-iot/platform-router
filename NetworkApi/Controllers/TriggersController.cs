@@ -100,6 +100,9 @@ namespace SensateService.NetworkApi.Controllers
 		{
 			bool auth;
 
+			if(action.Target == null)
+				return false;
+
 			if(action.Channel == TriggerActionChannel.ControlMessage) {
 				var actuator = await this.m_sensors.GetAsync(action.Target).AwaitBackground(); 
 
@@ -212,6 +215,61 @@ namespace SensateService.NetworkApi.Controllers
 			}
 
 			return this.CreatedAtAction(nameof(GetById), new {triggerId = trigger.Id}, trigger);
+		}
+
+		[HttpDelete("{triggerId}")]
+		[ReadWriteApiKey]
+		[ProducesResponseType(typeof(Status), StatusCodes.Status422UnprocessableEntity)]
+		[ProducesResponseType(typeof(Status), StatusCodes.Status403Forbidden)]
+		[ProducesResponseType(typeof(Status), StatusCodes.Status404NotFound)]
+		[ProducesResponseType(typeof(Status), StatusCodes.Status204NoContent)]
+		public async Task<IActionResult> Delete(long triggerId)
+		{
+			var trigger = await this.m_triggers.GetAsync(triggerId).AwaitBackground();
+
+			if(trigger == null) {
+				return this.NotFound();
+			}
+
+			var sensor = await this.m_sensors.GetAsync(trigger.SensorId).AwaitBackground();
+
+			if(sensor == null || sensor.Owner != this.CurrentUser.Id) {
+				return this.Forbid();
+			}
+
+			await this.m_triggers.DeleteAsync(trigger.Id).AwaitBackground();
+			return this.NoContent();
+		}
+
+		[HttpDelete("{triggerId}/remove-action")]
+		[ReadWriteApiKey]
+		[ProducesResponseType(typeof(Status), StatusCodes.Status422UnprocessableEntity)]
+		[ProducesResponseType(typeof(Status), StatusCodes.Status404NotFound)]
+		[ProducesResponseType(typeof(Status), StatusCodes.Status403Forbidden)]
+		[ProducesResponseType(typeof(Status), StatusCodes.Status204NoContent)]
+		public async Task<IActionResult> RemoveAction(long triggerId, [FromQuery] TriggerActionChannel? channel)
+		{
+			if(channel == null) {
+				return this.UnprocessableEntity(new Status {
+					Message = "Action ID required.",
+					ErrorCode = ReplyCode.BadInput
+				});
+			}
+
+			var trigger = await this.m_triggers.GetAsync(triggerId).AwaitBackground();
+
+			if(trigger == null) {
+				return this.NotFound();
+			}
+
+			var sensor = await this.m_sensors.GetAsync(trigger.SensorId).AwaitBackground();
+
+			if(sensor == null || sensor.Owner != this.CurrentUser.Id) {
+				return this.Forbid();
+			}
+
+			await this.m_triggers.RemoveActionAsync(trigger, channel.Value).AwaitBackground();
+			return this.NoContent();
 		}
 
 		[HttpGet("{triggerId}")]
