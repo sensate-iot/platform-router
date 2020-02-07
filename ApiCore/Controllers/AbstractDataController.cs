@@ -52,7 +52,9 @@ namespace SensateService.ApiCore.Controllers
 				auth = auth && this.ApiKey.ApiKey == sensor.Secret;
 			}
 
-			return auth && this.CurrentUser.UserRoles.All(role => role.Role.Name != SensateRole.Banned);
+			var isHealthyUser = this.CurrentUser.UserRoles.Any(role => role.Role.Name != SensateRole.Banned);
+
+			return auth && isHealthyUser;
 		}
 	}
 }
