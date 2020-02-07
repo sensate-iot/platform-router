@@ -26,5 +26,6 @@ namespace SensateService.Infrastructure.Repositories
 		Task<IEnumerable<SensateApiKey>> GetByUserAsync(SensateUser user, CancellationToken token = default(CancellationToken));
 		Task<IEnumerable<SensateApiKey>> GetByUserAsync(SensateUser user, ApiKeyType type,
 			CancellationToken token = default(CancellationToken));
+		Task DeleteAsync(SensateUser user, string key, CancellationToken ct = default);
 	}
 }
