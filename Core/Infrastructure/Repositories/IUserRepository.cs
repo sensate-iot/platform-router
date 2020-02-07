@@ -32,10 +32,7 @@ namespace SensateService.Infrastructure.Repositories
 		IEnumerable<string> GetRoles(SensateUser user);
 		Task<IEnumerable<string>> GetRolesAsync(SensateUser user);
 
-		Task RemoveAsync(string id, CancellationToken ct = default);
-
-		void Delete(string id);
-		Task DeleteAsync(string id);
+		Task DeleteAsync(string id, CancellationToken ct = default);
 
 		Task<int> CountGhostUsersAsync();
 		Task<int> CountAsync();

@@ -108,18 +108,12 @@ namespace SensateService.Infrastructure.Sql
 			return obj;
 		}
 
-		public override void Delete(string id)
-		{
-			this._cache.Remove(id);
-			base.Delete(id);
-		}
-
-		public override async Task DeleteAsync(string id)
+		public override async Task DeleteAsync(string id, CancellationToken ct = default)
 		{
 			Task[] workers = new Task[2];
 
 			workers[0] = this._cache.RemoveAsync(id);
-			workers[1] = base.DeleteAsync(id);
+			workers[1] = base.DeleteAsync(id, ct);
 			await Task.WhenAll(workers);
 		}
 

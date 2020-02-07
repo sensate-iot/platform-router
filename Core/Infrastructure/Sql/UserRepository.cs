@@ -31,7 +31,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public override void Create(SensateUser obj) => throw new SystemException("UserRepository.Create is forbidden!");
 
-		public async Task RemoveAsync(string id, CancellationToken ct = default)
+		public virtual async Task DeleteAsync(string id, CancellationToken ct = default)
 		{
 			var user = await this._manager.FindByIdAsync(id).AwaitBackground();
 
@@ -39,17 +39,6 @@ namespace SensateService.Infrastructure.Sql
 				throw new OperationCanceledException();
 
 			await this._manager.DeleteAsync(user).AwaitBackground();
-		}
-
-		public virtual void Delete(string id)
-		{
-			var obj = this.Get(id);
-
-			if(obj == null)
-				return;
-
-			this.Data.Remove(obj);
-			this.Commit(obj);
 		}
 
 		public virtual SensateUser GetById(string id) => String.IsNullOrEmpty(id) ? null : this.Data.FirstOrDefault(x => x.Id == id);
@@ -86,17 +75,6 @@ namespace SensateService.Infrastructure.Sql
 			});
 
 			return worker;
-		}
-
-		public virtual async Task DeleteAsync(string id)
-		{
-			var obj = await this.GetAsync(id);
-
-			if(obj == null)
-				return;
-
-			this.Data.Remove(obj);
-			await this.CommitAsync();
 		}
 
 		public SensateUser GetByClaimsPrinciple(ClaimsPrincipal cp)
