@@ -361,7 +361,7 @@ namespace SensateService.AuthApi.Controllers
 			var user = await this._users.GetAsync(uid);
 
 			if(user == null)
-				return Forbid();
+				return NotFound();
 
 			viewuser = new User {
 				Email = user.Email,
@@ -384,6 +384,10 @@ namespace SensateService.AuthApi.Controllers
 		{
 			User viewuser;
 			var user = await this.GetCurrentUserAsync().AwaitBackground();
+
+			if(user == null) {
+				return this.NotFound();
+			}
 
 			viewuser = new User {
 				Email = user.Email,
