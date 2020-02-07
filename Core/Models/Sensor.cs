@@ -6,14 +6,13 @@
  */
 
 using System;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
 
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using SensateService.Converters;
-using Newtonsoft.Json.Converters;
 using Newtonsoft.Json;
+
+using SensateService.Converters;
 
 namespace SensateService.Models
 {
@@ -23,10 +22,11 @@ namespace SensateService.Models
 
 		[BsonId, BsonRequired, JsonConverter(typeof(ObjectIdJsonConverter))]
 		public ObjectId InternalId {get;set;}
-		[BsonRequired, StringLength(256, MinimumLength = 4)]
+		[BsonRequired, Required, StringLength(SecretLength, MinimumLength = 4)]
 		public string Secret {get;set;}
-		[BsonRequired]
+		[BsonRequired, Required]
 		public string Name {get;set;}
+		[Required]
 		public string Description {get;set;}
 		[BsonRequired]
 		public DateTime CreatedAt {get;set;}
