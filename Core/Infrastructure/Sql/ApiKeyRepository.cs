@@ -65,6 +65,18 @@ namespace SensateService.Infrastructure.Sql
 			return _apikey;
 		}
 
+		public async Task DeleteAsync(SensateUser owner, string key, CancellationToken ct = default)
+		{
+			var apiKey = await this.Data.Where(apikey => apikey.UserId == owner.Id && apikey.ApiKey == key)
+				.FirstOrDefaultAsync(ct).AwaitBackground();
+
+			if(apiKey == null)
+				return;
+
+			this.Data.Remove(apiKey);
+			await this.CommitAsync(ct).AwaitBackground();
+		}
+
 		public Task MarkRevokedAsync(SensateApiKey key, CancellationToken token = default(CancellationToken))
 		{
 			this.StartUpdate(key);
