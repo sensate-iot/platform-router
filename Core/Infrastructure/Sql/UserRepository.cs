@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Security.Claims;
-
+using System.Threading;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SensateService.Constants;
@@ -30,6 +30,16 @@ namespace SensateService.Infrastructure.Sql
 		}
 
 		public override void Create(SensateUser obj) => throw new SystemException("UserRepository.Create is forbidden!");
+
+		public async Task RemoveAsync(string id, CancellationToken ct = default)
+		{
+			var user = await this._manager.FindByIdAsync(id).AwaitBackground();
+
+			if(ct.IsCancellationRequested)
+				throw new OperationCanceledException();
+
+			await this._manager.DeleteAsync(user).AwaitBackground();
+		}
 
 		public virtual void Delete(string id)
 		{
