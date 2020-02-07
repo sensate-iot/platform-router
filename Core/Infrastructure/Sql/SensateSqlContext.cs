@@ -84,9 +84,9 @@ namespace SensateService.Infrastructure.Sql
 			builder.Entity<Trigger>().Property(trigger => trigger.Id).UseIdentityByDefaultColumn();
 			builder.Entity<Trigger>().HasIndex(trigger => trigger.SensorId);
 			builder.Entity<Trigger>().HasMany(trigger => trigger.Invocations).WithOne()
-				.HasForeignKey(invoc => invoc.TriggerId);
+				.HasForeignKey(invoc => invoc.TriggerId).OnDelete(DeleteBehavior.Cascade);
 			builder.Entity<Trigger>().HasMany(trigger => trigger.Actions).WithOne()
-				.HasForeignKey(action => action.TriggerId);
+				.HasForeignKey(action => action.TriggerId).OnDelete(DeleteBehavior.Cascade);
 
 			builder.Entity<TriggerInvocation>().Property(invocation => invocation.Id).UseIdentityByDefaultColumn();
 			builder.Entity<TriggerInvocation>().HasIndex(invocation => invocation.TriggerId);
