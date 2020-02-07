@@ -97,6 +97,19 @@ namespace SensateService.Infrastructure.Sql
 			}
 		}
 
+		public async Task RemoveActionAsync(Trigger trigger, TriggerActionChannel id, CancellationToken ct = default)
+		{
+			var action = trigger.Actions.FirstOrDefault(x => x.TriggerId == trigger.Id && x.Channel == id);
+
+			if(action == null)
+				return;
+
+			this._sqlContext.TriggerActions.Remove(action);
+			await this.CommitAsync(ct).AwaitBackground();
+
+			trigger.Actions.Remove(action);
+		}
+
 		public async Task AddInvocationAsync(Trigger trigger, TriggerInvocation invocation, CancellationToken ct = default)
 		{
 			invocation.Timestamp = DateTimeOffset.UtcNow;
