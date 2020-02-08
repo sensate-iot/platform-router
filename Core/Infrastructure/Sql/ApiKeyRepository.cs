@@ -48,6 +48,8 @@ namespace SensateService.Infrastructure.Sql
 				key.ApiKey = sensor.Secret;
 			}
 
+			key.UserId = sensor.Owner;
+			key.Id = Guid.NewGuid().ToString();
 			key.Revoked = false;
 			key.Type = ApiKeyType.SensorKey;
 			key.Name = sensor.Name;
