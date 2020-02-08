@@ -22,7 +22,7 @@ namespace SensateService.Models
 
 		[BsonId, BsonRequired, JsonConverter(typeof(ObjectIdJsonConverter))]
 		public ObjectId InternalId {get;set;}
-		[BsonRequired, Required, StringLength(SecretLength, MinimumLength = 4)]
+		[BsonRequired, StringLength(SecretLength, MinimumLength = 4)]
 		public string Secret {get;set;}
 		[BsonRequired, Required]
 		public string Name {get;set;}
