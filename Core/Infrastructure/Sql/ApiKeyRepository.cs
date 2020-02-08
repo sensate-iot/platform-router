@@ -33,8 +33,29 @@ namespace SensateService.Infrastructure.Sql
 		public override Task CreateAsync(SensateApiKey key, CancellationToken token = default(CancellationToken))
 		{
 			key.ApiKey = this._rng.NextStringWithSymbols(UserTokenLength);
+			key.CreatedOn = DateTime.UtcNow;
+
 			this.Data.Add(key);
 			return this._sqlContext.SaveChangesAsync(token);
+		}
+
+		public async Task CreateSensorKey(SensateApiKey key, Sensor sensor, CancellationToken token = default)
+		{
+			if(string.IsNullOrEmpty(sensor.Secret)) {
+				key.ApiKey = this._rng.NextStringWithSymbols(UserTokenLength);
+				sensor.Secret = key.ApiKey;
+			} else {
+				key.ApiKey = sensor.Secret;
+			}
+
+			key.Revoked = false;
+			key.Type = ApiKeyType.SensorKey;
+			key.Name = sensor.Name;
+			key.Revoked = key.ReadOnly = false;
+			key.CreatedOn = DateTime.UtcNow;
+
+			this.Data.Add(key);
+			await this.CommitAsync(token).AwaitBackground();
 		}
 
 		public async Task<SensateApiKey> GetByKeyAsync(string key, CancellationToken token = default(CancellationToken))

@@ -17,6 +17,7 @@ namespace SensateService.Infrastructure.Repositories
 	public interface IApiKeyRepository
 	{
 		Task CreateAsync(SensateApiKey key, CancellationToken token = default(CancellationToken));
+		Task CreateSensorKey(SensateApiKey key, CancellationToken token = default);
 		Task<SensateApiKey> GetByKeyAsync(string key, CancellationToken token = default(CancellationToken));
 		Task<SensateApiKey> GetByIdAsync(string id, CancellationToken token = default(CancellationToken));
 		Task MarkRevokedAsync(SensateApiKey key, CancellationToken token = default(CancellationToken));
