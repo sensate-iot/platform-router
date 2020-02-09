@@ -39,7 +39,7 @@ namespace SensateService.Infrastructure.Sql
 			return this._sqlContext.SaveChangesAsync(token);
 		}
 
-		public async Task CreateSensorKey(SensateApiKey key, Sensor sensor, CancellationToken token = default)
+		public virtual async Task CreateSensorKey(SensateApiKey key, Sensor sensor, CancellationToken token = default)
 		{
 			if(string.IsNullOrEmpty(sensor.Secret)) {
 				key.ApiKey = this._rng.NextStringWithSymbols(UserTokenLength);

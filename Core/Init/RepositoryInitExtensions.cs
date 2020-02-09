@@ -29,12 +29,14 @@ namespace SensateService.Init
 			services.AddScoped<IChangeEmailTokenRepository, ChangeEmailTokenRepository>();
 			services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
 
-			if(cache)
+			if(cache) {
 				services.AddScoped<IUserRepository, CachedUserRepository>();
-			else
+				services.AddScoped<IApiKeyRepository, CachedApiKeyRepository>();
+			} else {
+				services.AddScoped<IApiKeyRepository, ApiKeyRepository>();
 				services.AddScoped<IUserRepository, UserRepository>();
+			}
 
-			services.AddScoped<IApiKeyRepository, ApiKeyRepository>();
 			services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 			services.AddScoped<IUserTokenRepository, UserTokenRepository>();
 			services.AddScoped<IChangePhoneNumberTokenRepository, ChangePhoneNumberRepository>();
