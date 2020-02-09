@@ -63,6 +63,7 @@ namespace SensateService.NetworkApi.Controllers
 			sensor.Owner = this.CurrentUser.Id;
 
 			try {
+				await this.m_apiKeys.CreateSensorKey(new SensateApiKey(), sensor).AwaitBackground();
 				await this.m_sensors.CreateAsync(sensor).AwaitBackground();
 			} catch(Exception ex) {
 				this.m_logger.LogInformation($"Unable to create sensor: {ex.Message}");
@@ -77,6 +78,7 @@ namespace SensateService.NetworkApi.Controllers
 		}
 
 		[HttpDelete("{id}")]
+		[ReadWriteApiKey]
 		[ProducesResponseType(typeof(Sensor), StatusCodes.Status204NoContent)]
 		[ProducesResponseType(typeof(Sensor), StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(typeof(Sensor), StatusCodes.Status403Forbidden)]
