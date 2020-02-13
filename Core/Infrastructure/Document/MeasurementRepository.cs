@@ -164,7 +164,7 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 
 		private const double DiameterOfEarth = 6378137d;
 
-		public async Task<IEnumerable<MeasurementsGeoQueryResult>> GetMeasurementsNearAsync(Sensor sensor, DateTime start, DateTime end, GeoJson2DGeographicCoordinates coords,
+		public async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsNearAsync(Sensor sensor, DateTime start, DateTime end, GeoJson2DGeographicCoordinates coords,
 			int max = 100, int skip = -1, int limit = -1, CancellationToken ct = default)
 		{
 			var near = new BsonDocument {
@@ -235,7 +235,60 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 				pipeline.Add(new BsonDocument { { "$limit", limit }});
 			}
 
-			var query = this._collection.Aggregate<MeasurementsGeoQueryResult>(pipeline, cancellationToken: ct);
+			var query = this._collection.Aggregate<MeasurementsQueryResult>(pipeline, cancellationToken: ct);
+			var results = await query.ToListAsync(ct).AwaitBackground();
+
+			return results;
+		}
+
+		public async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsBetweenAsync(Sensor sensor, DateTime start, DateTime end,
+			int skip = -1, int limit = -1, CancellationToken ct = default)
+		{
+			var matchTimestamp = new BsonDocument {
+				{
+					"SensorId", sensor.InternalId
+				},
+				{
+					"First", new BsonDocument {
+						{"$lte", end}
+					}
+				},
+				{
+					"Last", new BsonDocument {
+						{"$gte", start}
+					}
+				},
+				{
+					"Measurements.Timestamp", new BsonDocument {
+						{"$gte", start},
+						{"$lte", end}
+					}
+				},
+			};
+
+			var projectRewrite = new BsonDocument {
+				{ "_id", 1 },
+				{ "Timestamp", "$Measurements.Timestamp" },
+				{ "Location", "$Measurements.Location" },
+				{ "Data", "$Measurements.Data" },
+			};
+
+
+			var pipeline = new List<BsonDocument> {
+				new BsonDocument {{"$match", matchTimestamp}},
+				new BsonDocument {{"$unwind", "$Measurements"}},
+				new BsonDocument {{"$project", projectRewrite}},
+			};
+
+			if(skip > 0) {
+				pipeline.Add(new BsonDocument { { "$skip", skip }});
+			}
+
+			if(limit > 0) {
+				pipeline.Add(new BsonDocument { { "$limit", limit }});
+			}
+
+			var query = this._collection.Aggregate<MeasurementsQueryResult>(pipeline, cancellationToken: ct);
 			var results = await query.ToListAsync(ct).AwaitBackground();
 
 			return results;
@@ -394,6 +447,14 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 				measurements.AddRange(bucket.Measurements);
 			}
 
+			if(skip > 0) {
+				measurements = measurements.Skip(skip).ToList();
+			}
+
+			if(limit > 0) {
+				measurements = measurements.Take(limit).ToList();
+			}
+
 			return measurements;
 		}
 
@@ -458,9 +519,9 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 
 		}
 
-		public virtual async Task<IEnumerable<Measurement>> GetBetweenAsync(Sensor sensor, DateTime start, DateTime end, int skip = -1, int limit = -1)
+		public virtual async Task<IEnumerable<MeasurementsQueryResult>> GetBetweenAsync(Sensor sensor, DateTime start, DateTime end, int skip = -1, int limit = -1)
 		{
-			var data = await this.LookupAsync(BuildQuery(sensor, start, end), start, end, skip, limit).AwaitBackground();
+			var data = await this.GetMeasurementsBetweenAsync(sensor, start, end, skip, limit).AwaitBackground();
 			return data;
 		}
 

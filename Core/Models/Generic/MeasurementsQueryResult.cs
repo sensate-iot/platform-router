@@ -16,7 +16,7 @@ using SensateService.Converters;
 
 namespace SensateService.Models.Generic
 {
-	public class MeasurementsGeoQueryResult
+	public class MeasurementsQueryResult
 	{
 		[JsonIgnore]
 		public ObjectId _id { get; set; }

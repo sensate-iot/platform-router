@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Cache;
 using SensateService.Models;
+using SensateService.Models.Generic;
 
 namespace SensateService.Infrastructure.Document
 {
@@ -105,7 +106,7 @@ namespace SensateService.Infrastructure.Document
 			string key;
 			IEnumerable<Measurement> measurements;
 
-			key = $"{sensor.InternalId}::after::{pit.ToString(CultureInfo.InvariantCulture)}";
+			key = $"{sensor.InternalId}::after::{pit.ToString(CultureInfo.InvariantCulture)}::{skip}::{limit}";
 			measurements = await _cache.DeserializeAsync<IEnumerable<Measurement>>(key);
 
 			if(measurements != null)
@@ -117,14 +118,13 @@ namespace SensateService.Infrastructure.Document
 
 		}
 
-		public override async Task<IEnumerable<Measurement>> GetBetweenAsync(Sensor sensor, DateTime start, DateTime end, int skip = -1, int limit = -1)
+		public override async Task<IEnumerable<MeasurementsQueryResult>> GetBetweenAsync(Sensor sensor, DateTime start, DateTime end, int skip = -1, int limit = -1)
 		{
 			string key;
-			IEnumerable<Measurement> measurements;
+			IEnumerable<MeasurementsQueryResult> measurements;
 
-			// TODO cache skip & limit
-			key = $"{sensor.InternalId}::{start.ToString(CultureInfo.InvariantCulture)}::{end.ToString(CultureInfo.InvariantCulture)}";
-			measurements = await _cache.DeserializeAsync<IEnumerable<Measurement>>(key);
+			key = $"{sensor.InternalId}::{start.ToString(CultureInfo.InvariantCulture)}::{end.ToString(CultureInfo.InvariantCulture)}::{skip}::{limit}";
+			measurements = await _cache.DeserializeAsync<IEnumerable<MeasurementsQueryResult>>(key);
 
 			if(measurements != null)
 				return measurements;
@@ -141,7 +141,7 @@ namespace SensateService.Infrastructure.Document
 			string key;
 			IEnumerable<Measurement> measurements;
 
-			key = $"{sensor.InternalId}::before::{pit.ToString(CultureInfo.InvariantCulture)}";
+			key = $"{sensor.InternalId}::before::{pit.ToString(CultureInfo.InvariantCulture)}::{skip}::{limit}";
 			measurements = await this._cache.DeserializeAsync<IEnumerable<Measurement>>(key).AwaitBackground();
 
 			if(measurements != null)
