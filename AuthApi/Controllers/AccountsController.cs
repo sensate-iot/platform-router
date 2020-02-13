@@ -38,6 +38,8 @@ namespace SensateService.AuthApi.Controllers
 	[Route("[controller]")]
 	public class AccountsController : AbstractController
 	{
+		private const int PhoneTokenTimeout = 5; // Timeout in minutes.
+
 		private readonly UserManager<SensateUser> _manager;
 		private readonly UserAccountSettings _settings;
 		private readonly IEmailSender _mailer;
@@ -156,6 +158,10 @@ namespace SensateService.AuthApi.Controllers
 
 			unconfirmed = ! await this._manager.IsPhoneNumberConfirmedAsync(user).AwaitBackground();
 			unconfirmed = unconfirmed || user.UnconfirmedPhoneNumber?.Length > 0;
+
+			if(string.IsNullOrEmpty(user.PhoneNumber) && string.IsNullOrEmpty(user.UnconfirmedPhoneNumber)) {
+				unconfirmed = false;
+			}
 
 			status = new Status();
 
@@ -461,11 +467,20 @@ namespace SensateService.AuthApi.Controllers
 
 			user = this.CurrentUser;
 
-			if(user.UnconfirmedPhoneNumber == null) {
+			if(string.IsNullOrEmpty(user.UnconfirmedPhoneNumber)) {
 				return this.InvalidInputResult("No confirmable phone number found!");
 			}
 
 			phonetoken = await this._phonetokens.GetLatest(user);
+			var tmo = phonetoken.Timestamp.AddMinutes(PhoneTokenTimeout);
+
+			if(DateTime.Now > tmo) {
+				await this.SendConfirmPhoneAsync(user, phonetoken.PhoneNumber).AwaitBackground();
+				return this.BadRequest(new Status {
+					Message = "Phone number expired!",
+					ErrorCode = ReplyCode.NotAllowed
+				});
+			}
 
 			if(phonetoken.UserToken != token)
 				return this.InvalidInputResult("Invalid confirmation token!");

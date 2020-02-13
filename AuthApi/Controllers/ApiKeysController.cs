@@ -74,16 +74,24 @@ namespace SensateService.AuthApi.Controllers
 			if(string.IsNullOrEmpty(id) && string.IsNullOrEmpty(key))
 				return await this.RevokeAll(system).AwaitBackground();
 
-			if(id != null)
+			if(id != null) {
 				apikey = await this._keys.GetByIdAsync(id).AwaitBackground();
-			else
+			} else {
 				apikey = await this._keys.GetByKeyAsync(key).AwaitBackground();
+			}
 
-			if(apikey.Revoked)
+			if(apikey == null) {
 				return this.BadRequest();
+			}
 
-			if(apikey.UserId != this.CurrentUser.Id || !(apikey.Type == ApiKeyType.ApiKey || apikey.Type == ApiKeyType.SystemKey))
+			if(apikey.Revoked) {
 				return this.BadRequest();
+			}
+
+			if(apikey.UserId != this.CurrentUser.Id ||
+			   !(apikey.Type == ApiKeyType.ApiKey || apikey.Type == ApiKeyType.SystemKey)) {
+				return this.BadRequest();
+			}
 
 			await this._keys.MarkRevokedAsync(apikey).AwaitBackground();
 			return this.Ok();
