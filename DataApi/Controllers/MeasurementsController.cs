@@ -7,7 +7,6 @@
 
 using System;
 using System.Threading.Tasks;
-using DnsClient.Protocol;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
