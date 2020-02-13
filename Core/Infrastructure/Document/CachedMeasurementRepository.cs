@@ -101,13 +101,13 @@ namespace SensateService.Infrastructure.Document
 
 		}
 
-		public override async Task<IEnumerable<Measurement>> GetAfterAsync(Sensor sensor, DateTime pit, int skip = -1, int limit = -1)
+		public override async Task<IEnumerable<MeasurementsQueryResult>> GetAfterAsync(Sensor sensor, DateTime pit, int skip = -1, int limit = -1)
 		{
 			string key;
-			IEnumerable<Measurement> measurements;
+			IEnumerable<MeasurementsQueryResult> measurements;
 
 			key = $"{sensor.InternalId}::after::{pit.ToString(CultureInfo.InvariantCulture)}::{skip}::{limit}";
-			measurements = await _cache.DeserializeAsync<IEnumerable<Measurement>>(key);
+			measurements = await _cache.DeserializeAsync<IEnumerable<MeasurementsQueryResult>>(key);
 
 			if(measurements != null)
 				return measurements;
@@ -136,13 +136,13 @@ namespace SensateService.Infrastructure.Document
 
 		}
 
-		public override async Task<IEnumerable<Measurement>> GetBeforeAsync(Sensor sensor, DateTime pit, int skip = -1, int limit = -1)
+		public override async Task<IEnumerable<MeasurementsQueryResult>> GetBeforeAsync(Sensor sensor, DateTime pit, int skip = -1, int limit = -1)
 		{
 			string key;
-			IEnumerable<Measurement> measurements;
+			IEnumerable<MeasurementsQueryResult> measurements;
 
 			key = $"{sensor.InternalId}::before::{pit.ToString(CultureInfo.InvariantCulture)}::{skip}::{limit}";
-			measurements = await this._cache.DeserializeAsync<IEnumerable<Measurement>>(key).AwaitBackground();
+			measurements = await this._cache.DeserializeAsync<IEnumerable<MeasurementsQueryResult>>(key).AwaitBackground();
 
 			if(measurements != null)
 				return null;
