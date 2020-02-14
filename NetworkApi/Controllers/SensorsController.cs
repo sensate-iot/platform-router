@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
+using MongoDB.Bson;
+
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
 using SensateService.Enums;
@@ -20,6 +22,7 @@ using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Models.Json.Out;
+using SensateService.NetworkApi.Models;
 
 namespace SensateService.NetworkApi.Controllers
 {
@@ -88,6 +91,113 @@ namespace SensateService.NetworkApi.Controllers
 			}
 
 			return this.CreatedAtAction(nameof(Get), new {Id = sensor.InternalId}, sensor);
+		}
+
+		[HttpPatch("{id}")]
+		[ReadWriteApiKey, ValidateModel]
+		[ProducesResponseType(typeof(Sensor), StatusCodes.Status201Created)]
+		[ProducesResponseType(typeof(Sensor), StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(typeof(Sensor), StatusCodes.Status403Forbidden)]
+		[ProducesResponseType(typeof(Sensor), StatusCodes.Status422UnprocessableEntity)]
+		public async Task<IActionResult> Patch(string id, [FromBody] SensorUpdate update)
+		{
+			Sensor sensor;
+			if(!ObjectId.TryParse(id, out _)) {
+				return this.UnprocessableEntity(new Status {
+					Message = "Unable to parse ID",
+					ErrorCode = ReplyCode.BadInput
+				});
+			}
+
+
+			try {
+				sensor = await this.m_sensors.GetAsync(id).AwaitBackground();
+
+				if(!this.AuthenticateUserForSensor(sensor, false)) {
+					return this.Forbid();
+				}
+
+				if(sensor == null) {
+					return this.NotFound();
+				}
+
+				if(!string.IsNullOrEmpty(update.Name)) {
+					sensor.Name = update.Name;
+				}
+
+				if(!string.IsNullOrEmpty(update.Description)) {
+					sensor.Description = update.Description;
+				}
+
+				await this.m_sensors.UpdateAsync(sensor).AwaitBackground();
+			} catch(Exception ex) {
+				this.m_logger.LogInformation($"Unable to update sensor: {ex.Message}");
+
+				return this.BadRequest(new Status {
+					Message = "Unable to update sensor.",
+					ErrorCode = ReplyCode.BadInput
+				});
+			}
+
+			return this.Ok(sensor);
+		}
+
+		[HttpPatch("{id}/secret")]
+		[ReadWriteApiKey]
+		[ProducesResponseType(typeof(Sensor), StatusCodes.Status201Created)]
+		[ProducesResponseType(typeof(Sensor), StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(typeof(Sensor), StatusCodes.Status403Forbidden)]
+		[ProducesResponseType(typeof(Sensor), StatusCodes.Status422UnprocessableEntity)]
+		public async Task<IActionResult> PatchSecret(string id, [FromBody] SensorUpdate update)
+		{
+			Sensor sensor;
+
+			if(update == null) {
+				update = new SensorUpdate();
+			}
+
+			if(!ObjectId.TryParse(id, out _)) {
+				return this.UnprocessableEntity(new Status {
+					Message = "Unable to parse ID",
+					ErrorCode = ReplyCode.BadInput
+				});
+			}
+
+			try {
+				sensor = await this.m_sensors.GetAsync(id).AwaitBackground();
+
+				if(!this.AuthenticateUserForSensor(sensor, false)) {
+					return this.Forbid();
+				}
+
+				if(sensor == null) {
+					return this.NotFound();
+				}
+
+				var key = await this.m_apiKeys.GetByKeyAsync(update.Secret).AwaitBackground();
+				var old = await this.m_apiKeys.GetByKeyAsync(sensor.Secret).AwaitBackground();
+
+				if(key != null) {
+					return this.BadRequest(new Status {
+						Message = "Unable to update sensor.",
+						ErrorCode = ReplyCode.BadInput
+					});
+				}
+
+				sensor.Secret = string.IsNullOrEmpty(update.Secret) ? this.m_apiKeys.GenerateApiKey() : update.Secret;
+
+				await this.m_apiKeys.RefreshAsync(old, sensor.Secret).AwaitBackground();
+				await this.m_sensors.UpdateSecretAsync(sensor, old).AwaitBackground();
+			} catch(Exception ex) {
+				this.m_logger.LogInformation($"Unable to update sensor: {ex.Message}");
+
+				return this.BadRequest(new Status {
+					Message = "Unable to update sensor.",
+					ErrorCode = ReplyCode.BadInput
+				});
+			}
+
+			return this.Ok(sensor);
 		}
 
 		[HttpDelete("{id}")]
