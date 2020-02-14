@@ -29,11 +29,24 @@ namespace SensateService.NetworkApi.Controllers
 	{
 		private readonly ILogger<SensorsController> m_logger;
 		private readonly IApiKeyRepository m_apiKeys;
+		private readonly IMeasurementRepository m_measurements;
+		private readonly IMessageRepository m_messages;
+		private readonly ITriggerRepository m_triggers;
+		private readonly ISensorStatisticsRepository m_stats;
 
-		public SensorsController(IHttpContextAccessor ctx, ISensorRepository sensors, ILogger<SensorsController> logger, IApiKeyRepository keys) : base(ctx, sensors)
+		public SensorsController(IHttpContextAccessor ctx, ISensorRepository sensors, ILogger<SensorsController> logger,
+			IMeasurementRepository measurements,
+			ITriggerRepository triggers,
+			IMessageRepository messages,
+			ISensorStatisticsRepository stats,
+			IApiKeyRepository keys) : base(ctx, sensors)
 		{
 			this.m_logger = logger;
 			this.m_apiKeys = keys;
+			this.m_measurements = measurements;
+			this.m_triggers = triggers;
+			this.m_messages = messages;
+			this.m_stats = stats;
 		}
 
 		[HttpGet]
@@ -97,7 +110,11 @@ namespace SensateService.NetworkApi.Controllers
 
 				var tasks = new[] {
 					this.m_sensors.RemoveAsync(id),
-					this.m_apiKeys.DeleteAsync(this.CurrentUser, sensor.Secret)
+					this.m_apiKeys.DeleteAsync(this.CurrentUser, sensor.Secret),
+					this.m_triggers.DeleteBySensorAsync(id),
+					this.m_messages.DeleteBySensorAsync(sensor),
+					this.m_stats.DeleteBySensorAsync(sensor),
+					this.m_measurements.DeleteBySensorAsync(sensor)
 				};
 
 				await Task.WhenAll(tasks).AwaitBackground();
