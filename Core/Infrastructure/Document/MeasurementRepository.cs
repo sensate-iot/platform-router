@@ -219,12 +219,17 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 				}
 			};
 
+			var sort = new BsonDocument {
+				{ "Timestamp", 1 }
+			};
+
 			var pipeline = new List<BsonDocument> {
 				new BsonDocument {{"$geoNear", near}},
-				new BsonDocument {{"$match", matchTimestamp}},
 				new BsonDocument {{"$unwind", "$Measurements"}},
+				new BsonDocument {{"$match", matchTimestamp}},
 				new BsonDocument {{"$project", projectRewrite}},
-				new BsonDocument {{"$match", match}}
+				new BsonDocument {{"$match", match}},
+				new BsonDocument {{"$sort", sort}}
 			};
 
 			if(skip > 0) {

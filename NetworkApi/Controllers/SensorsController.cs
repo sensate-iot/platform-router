@@ -109,15 +109,15 @@ namespace SensateService.NetworkApi.Controllers
 				}
 
 				var tasks = new[] {
-					this.m_sensors.RemoveAsync(id),
+					this.m_sensors.RemoveAsync(sensor),
 					this.m_apiKeys.DeleteAsync(this.CurrentUser, sensor.Secret),
-					this.m_triggers.DeleteBySensorAsync(id),
 					this.m_messages.DeleteBySensorAsync(sensor),
 					this.m_stats.DeleteBySensorAsync(sensor),
 					this.m_measurements.DeleteBySensorAsync(sensor)
 				};
 
 				await Task.WhenAll(tasks).AwaitBackground();
+				await this.m_triggers.DeleteBySensorAsync(id).AwaitBackground();
 			} catch(Exception ex) {
 				this.m_logger.LogInformation($"Unable to remove sensor: {ex.Message}");
 				this.m_logger.LogDebug(ex.StackTrace);

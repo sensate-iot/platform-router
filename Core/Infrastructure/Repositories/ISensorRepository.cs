@@ -22,7 +22,7 @@ namespace SensateService.Infrastructure.Repositories
 		Task<IEnumerable<Sensor>> FindByNameAsync(SensateUser user, string name);
 
 		Task<long> CountAsync(SensateUser user = null);
-		Task RemoveAsync(string id);
+		Task RemoveAsync(Sensor sensor);
 		Task UpdateAsync(Sensor sensor);
 		Task UpdateSecret(Sensor sensor, SensateApiKey key);
 	}
