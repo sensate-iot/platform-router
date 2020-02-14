@@ -17,7 +17,5 @@ namespace SensateService.Models.Json.In
 		public decimal? UpperEdge { get; set; }
 		[Required]
 		public string SensorId { get; set; }
-		[Required]
-		public string Message { get; set; }
 	}
 }

@@ -68,7 +68,6 @@ namespace SensateService.NetworkApi.Controllers
 				UpperEdge = raw.UpperEdge,
 				LowerEdge = raw.LowerEdge,
 				SensorId = raw.SensorId,
-				Message = raw.Message
 			};
 
 			if(string.IsNullOrEmpty(raw.KeyValue)) {

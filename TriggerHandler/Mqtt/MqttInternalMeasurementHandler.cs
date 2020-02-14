@@ -103,12 +103,33 @@ namespace SensateService.TriggerHandler.Mqtt
 			return rv;
 		}
 
-		private static bool CanExecute(DateTimeOffset last, int timeout)
+		private static bool CanExecute(TriggerInvocation last, int timeout)
 		{
-			var nextAvailable = last.AddMinutes(timeout);
-			//var rv = nextAvailable.CompareTo(DateTimeOffset.Now);
+			if(last == null) {
+				return true;
+			}
+
+			var nextAvailable = last.Timestamp.AddMinutes(timeout);
 			var rv = nextAvailable.DateTime.ToUniversalTime() < DateTime.UtcNow;
+
 			return rv ;
+		}
+
+		private static string Replace(TriggerAction action, DataPoint dp)
+		{
+			var body = action.Message.Replace("$value", dp.Value.ToString(CultureInfo.InvariantCulture));
+
+			body = body.Replace("$unit", dp.Unit);
+
+			if(dp.Precision != null) {
+				body = body.Replace("$precision", dp.Precision.Value.ToString(CultureInfo.InvariantCulture));
+			}
+
+			if(dp.Accuracy != null) {
+				body = body.Replace("$accuracy", dp.Accuracy.Value.ToString(CultureInfo.InvariantCulture));
+			}
+
+			return body;
 		}
 
 		private async Task HandleTriggers(IUserRepository usersdb, ISensorRepository sensorsdb,
@@ -133,25 +154,17 @@ namespace SensateService.TriggerHandler.Mqtt
 				var sensor = sensorsMap[trigger.SensorId];
 				var user = usersMap[sensor.Owner];
 				var last = trigger.Invocations.OrderByDescending(x => x.Timestamp).FirstOrDefault();
-				var body = trigger.Message.Replace("%V%", dp.Value.ToString(CultureInfo.InvariantCulture));
-
-				body = body.Replace("%U%", dp.Unit);
-
-				if(dp.Precision != null) {
-					body = body.Replace("%P%", dp.Precision.Value.ToString(CultureInfo.InvariantCulture));
-				}
-
-				if(dp.Accuracy != null) {
-					body = body.Replace("%A%", dp.Accuracy.Value.ToString(CultureInfo.InvariantCulture));
-				}
 
 				foreach(var action in trigger.Actions) {
+					var body = Replace(action, dp);
+
 					switch(action.Channel) {
 						case TriggerActionChannel.Email:
-							if(!user.EmailConfirmed)
+							if(!user.EmailConfirmed) {
 								continue;
+							}
 
-							if(last != null && CanExecute(last.Timestamp, this.m_timeoutSettings.MailTimeout)) {
+							if(CanExecute(last, this.m_timeoutSettings.MailTimeout)) {
 								var mail = new EmailBody {
 									HtmlBody = body,
 									TextBody = body
@@ -162,7 +175,7 @@ namespace SensateService.TriggerHandler.Mqtt
 
 							break;
 						case TriggerActionChannel.SMS:
-							if(last != null && CanExecute(last.Timestamp, this.m_timeoutSettings.MessageTimeout)) {
+							if(CanExecute(last, this.m_timeoutSettings.MessageTimeout)) {
 								if(!user.PhoneNumberConfirmed)
 									continue;
 
@@ -172,7 +185,7 @@ namespace SensateService.TriggerHandler.Mqtt
 							break;
 
 						case TriggerActionChannel.MQTT:
-							if(last != null && CanExecute(last.Timestamp, this.m_timeoutSettings.MqttTimeout)) {
+							if(CanExecute(last, this.m_timeoutSettings.MqttTimeout)) {
 								var topic = $"sensate/trigger/{trigger.SensorId}";
 								tasks.Add(publishService.PublishOnAsync(topic, body, false));
 							}
@@ -187,7 +200,7 @@ namespace SensateService.TriggerHandler.Mqtt
 								break;
 							}
 
-							if(last != null && !CanExecute(last.Timestamp, this.m_timeoutSettings.HttpTimeout)) {
+							if(!CanExecute(last, this.m_timeoutSettings.HttpTimeout)) {
 								break;
 							}
 

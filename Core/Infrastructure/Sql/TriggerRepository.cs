@@ -80,6 +80,10 @@ namespace SensateService.Infrastructure.Sql
 		public Task DeleteBySensorAsync(string sensorId, CancellationToken ct = default)
 		{
 			var where = this.Data.Where(t => t.SensorId == sensorId);
+
+			if(!@where.Any()) {
+				return Task.CompletedTask;
+			}
 			this.Data.RemoveRange(where);
 
 			return this.CommitAsync(ct);

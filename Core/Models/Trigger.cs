@@ -20,8 +20,6 @@ namespace SensateService.Models
 		public decimal? UpperEdge { get; set; }
 		[Required, StringLength(24, MinimumLength = 24)]
 		public string SensorId { get; set; }
-        [Required, StringLength(300)]
-        public string Message { get; set; }
 		public ICollection<TriggerAction> Actions { get; set; }
 		public ICollection<TriggerInvocation> Invocations { get; set; }
 	}
