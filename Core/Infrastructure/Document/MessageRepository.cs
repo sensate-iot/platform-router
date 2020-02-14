@@ -89,5 +89,11 @@ namespace SensateService.Infrastructure.Document
 
 			return await result.FirstOrDefaultAsync(cancellationToken: ct).AwaitBackground();
 		}
+
+		public Task DeleteBySensorAsync(Sensor sensor, CancellationToken ct = default)
+		{
+			var filter = Builders<Message>.Filter.Eq(x => x.SensorId, sensor.InternalId);
+			return this._collection.DeleteManyAsync(filter, ct);
+		}
 	}
 }

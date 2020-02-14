@@ -77,6 +77,14 @@ namespace SensateService.Infrastructure.Sql
 			await this.CommitAsync(ct).AwaitBackground();
 		}
 
+		public Task DeleteBySensorAsync(string sensorId, CancellationToken ct = default)
+		{
+			var where = this.Data.Where(t => t.SensorId == sensorId);
+			this.Data.RemoveRange(where);
+
+			return this.CommitAsync(ct);
+		}
+
 		public async Task AddActionAsync(Trigger trigger, TriggerAction action, CancellationToken ct = default)
 		{
 			this._sqlContext.TriggerActions.Add(action);

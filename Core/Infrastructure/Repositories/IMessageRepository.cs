@@ -21,6 +21,7 @@ namespace SensateService.Infrastructure.Repositories
 		Task<IEnumerable<Message>> GetAsync(Sensor sensor, int skip = 0, int take = -1, CancellationToken ct = default);
 		Task<IEnumerable<Message>> GetAsync(Sensor sensor, DateTime start, DateTime end, int skip = 0, int take = -1, CancellationToken ct = default);
 		Task<Message> GetAsync(string messageId, CancellationToken ct = default);
+		Task DeleteBySensorAsync(Sensor sensor, CancellationToken ct = default);
 	}
 }
 

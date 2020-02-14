@@ -21,6 +21,7 @@ namespace SensateService.Infrastructure.Repositories
 		public Task<IEnumerable<Trigger>> GetAsync(string id, CancellationToken ct = default);
 		public Task<IEnumerable<Trigger>> GetAsync(IEnumerable<string> ids, CancellationToken ct = default);
 		public Task DeleteAsync(long id, CancellationToken ct = default);
+		public Task DeleteBySensorAsync(string sensorId, CancellationToken ct = default);
 		public Task AddActionAsync(Trigger trigger, TriggerAction action, CancellationToken ct = default);
 		public Task AddActionsAsync(Trigger trigger, IEnumerable<TriggerAction> action, CancellationToken ct = default);
 		public Task RemoveActionAsync(Trigger trigger, TriggerActionChannel id, CancellationToken ct = default);
