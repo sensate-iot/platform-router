@@ -14,10 +14,6 @@ namespace SensateService.Models
 	{
         [Required]
         public long Id { get; set; }
-		[StringLength(24, MinimumLength = 24)]
-		public string MeasurementBucketId { get; set; }
-        [Required]
-        public int MeasurementId { get; set; }
         [Required]
         public long TriggerId { get; set; }
         [Required]

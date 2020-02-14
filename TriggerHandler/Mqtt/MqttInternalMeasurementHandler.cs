@@ -250,10 +250,10 @@ namespace SensateService.TriggerHandler.Mqtt
 			var triggersdb = scope.ServiceProvider.GetRequiredService<ITriggerRepository>();
 			var usersdb = scope.ServiceProvider.GetRequiredService<IUserRepository>();
 			var sensorsdb = scope.ServiceProvider.GetRequiredService<ISensorRepository>();
-			var measurementsdb = scope.ServiceProvider.GetRequiredService<IMeasurementRepository>();
 			var controldb = scope.ServiceProvider.GetRequiredService<IControlMessageRepository>();
 
 			var ids = measurements.Select(m => m.CreatedBy).Distinct().ToList();
+
 			var raw_triggers = await triggersdb.GetAsync(ids).AwaitBackground();
 			var triggers = raw_triggers.ToList();
 			var triggered = new List<Tuple<Trigger, TriggerInvocation, DataPoint>>();
@@ -274,24 +274,19 @@ namespace SensateService.TriggerHandler.Mqtt
 							continue;
 						}
 
-						var inv = new TriggerInvocation();
-						var index = await measurementsdb
-							.GetMeasurementIndexAsync(ObjectId.Parse(mCollection.CreatedBy), measurement.Timestamp)
-							.AwaitBackground();
+						var inv = new TriggerInvocation {
+							TriggerId = t.Id,
+							Timestamp = new DateTimeOffset(measurement.Timestamp.ToUniversalTime(), TimeSpan.Zero),
+						};
 
-						inv.MeasurementBucketId = index.MeasurementBucketId.ToString();
-						inv.TriggerId = t.Id;
-						inv.Timestamp = new DateTimeOffset(measurement.Timestamp.ToUniversalTime(), TimeSpan.Zero);
-						inv.MeasurementId = index.Index;
 
 						triggered.Add(new Tuple<Trigger, TriggerInvocation, DataPoint>(t, inv, datapoint));
 					}
 				}
 			}
 
-			var distinct = triggered.GroupBy(t => new
-					{t.Item2.MeasurementBucketId, t.Item2.MeasurementId, t.Item2.TriggerId}).Select(g => g.First())
-				.ToList();
+			var distinct = triggered.GroupBy(t => t.Item2.TriggerId)
+				.Select(g => g.First()).ToList();
 
 			await HandleTriggers(usersdb, sensorsdb, controldb, distinct, scope.ServiceProvider).AwaitBackground();
 			await triggersdb.AddInvocationsAsync(distinct.Select(t => t.Item2)).AwaitBackground();

@@ -90,8 +90,6 @@ namespace SensateService.Infrastructure.Sql
 
 			builder.Entity<TriggerInvocation>().Property(invocation => invocation.Id).UseIdentityByDefaultColumn();
 			builder.Entity<TriggerInvocation>().HasIndex(invocation => invocation.TriggerId);
-			builder.Entity<TriggerInvocation>().HasAlternateKey(invocation =>
-				new {invocation.MeasurementBucketId, invocation.MeasurementId, invocation.TriggerId});
 			builder.Entity<TriggerAction>(action => {
 				action.HasKey(t => new {t.TriggerId, t.Channel});
 			});
