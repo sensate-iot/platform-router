@@ -123,6 +123,15 @@ namespace SensateService.Infrastructure.Sql
 			return this._sqlContext.SaveChangesAsync(token);
 		}
 
+		public async Task<SensateApiKey> RefreshAsync(SensateApiKey apikey, string key, CancellationToken token = default)
+		{
+			this.StartUpdate(apikey);
+			apikey.ApiKey = key;
+			await this.EndUpdateAsync(token).AwaitBackground();
+
+			return apikey;
+		}
+
 		public async Task<SensateApiKey> RefreshAsync(SensateApiKey apikey, CancellationToken token = default(CancellationToken))
 		{
 			this.StartUpdate(apikey);
@@ -140,6 +149,11 @@ namespace SensateService.Infrastructure.Sql
 				return null;
 
 			return await this.RefreshAsync(apikey, token).AwaitBackground();
+		}
+
+		public string GenerateApiKey()
+		{
+			return this._rng.NextStringWithSymbols(UserTokenLength);
 		}
 
 		public async Task<IEnumerable<SensateApiKey>> GetByUserAsync(SensateUser user, CancellationToken token = default(CancellationToken))

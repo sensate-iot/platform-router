@@ -26,21 +26,14 @@ namespace SensateService.Infrastructure.Document
 	{
 		private readonly IMongoCollection<Sensor> _sensors;
 		private readonly ILogger<SensorRepository> _logger;
-		private readonly IMeasurementRepository _measurements;
-		private readonly ISensorStatisticsRepository _stats;
 		private readonly Random _rng;
 
 		private const int SensorSecretLength = 32;
 
-		public SensorRepository(SensateContext context,
-								ISensorStatisticsRepository statisticsRepository,
-								IMeasurementRepository measurements,
-								ILogger<SensorRepository> logger) : base(context.Sensors)
+		public SensorRepository(SensateContext context, ILogger<SensorRepository> logger) : base(context.Sensors)
 		{
 			this._sensors = context.Sensors;
 			this._logger = logger;
-			this._measurements = measurements;
-			this._stats = statisticsRepository;
 			this._rng = new Random(DateTime.Now.Millisecond);
 		}
 
@@ -135,7 +128,7 @@ namespace SensateService.Infrastructure.Document
 			await this._sensors.DeleteOneAsync(x => x.InternalId == sensor.InternalId).AwaitBackground();
 		}
 
-		public async Task UpdateSecret(Sensor sensor, SensateApiKey key)
+		public virtual async Task UpdateSecretAsync(Sensor sensor, SensateApiKey key)
 		{
 			var update = Builders<Sensor>.Update.Set(x => x.UpdatedAt, DateTime.Now)
 				.Set(x => x.Secret, key.ApiKey);
@@ -159,8 +152,6 @@ namespace SensateService.Infrastructure.Document
 				update = update.Set(x => x.Name, obj.Name);
 			if(obj.Description != null)
 				update = update.Set(x => x.Description, obj.Description);
-			if(obj.Secret != null)
-				update = update.Set(x => x.Secret, obj.Secret);
 
 			try {
 				await this._sensors.FindOneAndUpdateAsync(x => x.InternalId == obj.InternalId, update).AwaitBackground();
