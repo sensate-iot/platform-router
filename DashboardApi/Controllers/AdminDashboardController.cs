@@ -45,23 +45,23 @@ namespace SensateService.DashboardApi.Controllers
 			AdminDashboard db;
 			long measurementCount;
 
-			var regworker = this.GetRegistrations();
-			var usercount = this._users.CountAsync();
-			var ghosts = this._users.CountGhostUsersAsync();
-			var measurements = await this._stats.GetAfterAsync(DateTime.Now.ThisHour());
 			var measurementStats = this.GetMeasurementStats();
 			var sensors = this._sensors.CountAsync();
 
+			db = new AdminDashboard
+			{
+				Registrations = await this.GetRegistrations().AwaitBackground(),
+				NumberOfUsers = await this._users.CountAsync().AwaitBackground(),
+				NumberOfGhosts = await this._users.CountGhostUsersAsync().AwaitBackground()
+			};
+
+			var measurements = await this._stats.GetAfterAsync(DateTime.Now.ThisHour()).AwaitBackground();
+
 			measurementCount = measurements.Aggregate(0L, (current, entry) => current + entry.Measurements);
 
-			db = new AdminDashboard {
-				Registrations = await regworker.AwaitBackground(),
-				NumberOfUsers = await usercount.AwaitBackground(),
-				NumberOfGhosts = await ghosts.AwaitBackground(),
-				MeasurementStatsLastHour = measurementCount,
-				MeasurementStats = await measurementStats.AwaitBackground(),
-				NumberOfSensors = await sensors.AwaitBackground()
-			};
+			db.MeasurementStatsLastHour = measurementCount;
+			db.MeasurementStats = await measurementStats.AwaitBackground();
+			db.NumberOfSensors = await sensors.AwaitBackground();
 
 			return this.Ok(db.ToJson());
 		}
