@@ -99,7 +99,7 @@ namespace SensateService.DataApi.Controllers
 		[HttpGet]
 		[ProducesResponseType(200)]
 		public async Task<IActionResult> Get([FromQuery] string sensorId, [FromQuery] DateTime start, [FromQuery] DateTime end,
-			[FromQuery] double? longitude, [FromQuery] double? latitude, [FromQuery] int? max,
+			[FromQuery] double? longitude, [FromQuery] double? latitude, [FromQuery] int? radius,
 			[FromQuery] int skip = -1, [FromQuery] int limit = -1)
 		{
 			var sensor = await this.m_sensors.GetAsync(sensorId).AwaitBackground();
@@ -109,7 +109,7 @@ namespace SensateService.DataApi.Controllers
 			}
 
 			if(longitude != null && latitude != null) {
-				var maxDist = max ?? 100;
+				var maxDist = radius ?? 100;
 				var coords = new GeoJson2DGeographicCoordinates(longitude.Value, latitude.Value);
 
 				var data = await this.m_measurements
