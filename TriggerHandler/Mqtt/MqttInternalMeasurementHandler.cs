@@ -117,17 +117,17 @@ namespace SensateService.TriggerHandler.Mqtt
 
 		private static string Replace(TriggerAction action, DataPoint dp)
 		{
+			string precision;
+			string accuracy;
 			var body = action.Message.Replace("$value", dp.Value.ToString(CultureInfo.InvariantCulture));
 
 			body = body.Replace("$unit", dp.Unit);
 
-			if(dp.Precision != null) {
-				body = body.Replace("$precision", dp.Precision.Value.ToString(CultureInfo.InvariantCulture));
-			}
+			precision = dp.Precision != null ? dp.Precision.Value.ToString(CultureInfo.InvariantCulture) : "";
+			accuracy = dp.Accuracy != null ? dp.Accuracy.Value.ToString(CultureInfo.InvariantCulture) : "";
 
-			if(dp.Accuracy != null) {
-				body = body.Replace("$accuracy", dp.Accuracy.Value.ToString(CultureInfo.InvariantCulture));
-			}
+			body = body.Replace("$precision", precision);
+			body = body.Replace("$accuracy", accuracy);
 
 			return body;
 		}
