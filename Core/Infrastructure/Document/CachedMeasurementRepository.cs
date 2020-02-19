@@ -9,10 +9,11 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
-
+using MongoDB.Driver.GeoJsonObjectModel;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Cache;
 using SensateService.Models;
@@ -106,14 +107,17 @@ namespace SensateService.Infrastructure.Document
 			string key;
 			IEnumerable<MeasurementsQueryResult> measurements;
 
-			key = $"{sensor.InternalId}::after::{pit.ToString(CultureInfo.InvariantCulture)}::{skip}::{limit}";
+			var cache_pit = pit.ThisMinute();
+			key = $"{sensor.InternalId}::after::{cache_pit.ToString("u", CultureInfo.InvariantCulture)}::{skip}::{limit}";
 			measurements = await _cache.DeserializeAsync<IEnumerable<MeasurementsQueryResult>>(key);
 
-			if(measurements != null)
+			if(measurements != null) {
 				return measurements;
+			}
 
 			measurements = await base.GetAfterAsync(sensor, pit, skip, limit).AwaitBackground();
 			await this.CacheDataAsync(key, measurements, CacheTimeout.TimeoutMedium.ToInt(), false).AwaitBackground();
+
 			return measurements;
 
 		}
@@ -123,14 +127,17 @@ namespace SensateService.Infrastructure.Document
 			string key;
 			IEnumerable<MeasurementsQueryResult> measurements;
 
-			key = $"{sensor.InternalId}::{start.ToString(CultureInfo.InvariantCulture)}::{end.ToString(CultureInfo.InvariantCulture)}::{skip}::{limit}";
+			var cache_end = end.ThisMinute();
+			var cache_start = start.ThisMinute();
+
+			key = $"{sensor.InternalId}::{cache_start.ToString("u", CultureInfo.InvariantCulture)}::{cache_end.ToString("u", CultureInfo.InvariantCulture)}::{skip}::{limit}";
 			measurements = await _cache.DeserializeAsync<IEnumerable<MeasurementsQueryResult>>(key);
 
 			if(measurements != null)
 				return measurements;
 
 			measurements = await base.GetBetweenAsync(sensor, start, end, skip, limit).AwaitBackground();
-			await CacheDataAsync(key, measurements, CacheTimeout.Timeout.ToInt()).AwaitBackground();
+			await this.CacheDataAsync(key, measurements, CacheTimeout.TimeoutShort.ToInt(), false).AwaitBackground();
 			return measurements;
 
 
@@ -141,14 +148,42 @@ namespace SensateService.Infrastructure.Document
 			string key;
 			IEnumerable<MeasurementsQueryResult> measurements;
 
-			key = $"{sensor.InternalId}::before::{pit.ToString(CultureInfo.InvariantCulture)}::{skip}::{limit}";
+			var cache_pit = pit.ThisMinute();
+
+			key = $"{sensor.InternalId}::before::{cache_pit.ToString("u", CultureInfo.InvariantCulture)}::{skip}::{limit}";
 			measurements = await this._cache.DeserializeAsync<IEnumerable<MeasurementsQueryResult>>(key).AwaitBackground();
 
 			if(measurements != null)
 				return null;
 
 			measurements = await base.GetBeforeAsync(sensor, pit, skip, limit).AwaitBackground();
-			await this.CacheDataAsync(key, measurements, CacheTimeout.Timeout.ToInt()).AwaitBackground();
+			await this.CacheDataAsync(key, measurements, CacheTimeout.TimeoutShort.ToInt(), false).AwaitBackground();
+			return measurements;
+		}
+
+		public override async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsNearAsync(Sensor sensor,
+			DateTime start,
+			DateTime end, GeoJson2DGeographicCoordinates coords,
+			int max = 100, int skip = -1, int limit = -1, CancellationToken ct = default)
+		{
+			IEnumerable<MeasurementsQueryResult> measurements;
+			var cache_end = end.ThisMinute();
+			var cache_start = start.ThisMinute();
+
+			var key =
+				$"{sensor.InternalId}::{cache_start.ToString("u", CultureInfo.InvariantCulture)}::" +
+				$"{cache_end.ToString("u", CultureInfo.InvariantCulture)}::" +
+				$"{skip}::{limit}::" +
+				$"{max}::{coords.Longitude}::{coords.Latitude}";
+			measurements = await _cache.DeserializeAsync<IEnumerable<MeasurementsQueryResult>>(key, ct);
+
+			if(measurements != null) {
+				return measurements;
+			}
+
+			measurements = await base.GetMeasurementsNearAsync(sensor, start, end, coords, max, skip, limit, ct).AwaitBackground();
+			await this.CacheDataAsync(key, measurements, CacheTimeout.TimeoutShort.ToInt(), false).AwaitBackground();
+
 			return measurements;
 		}
 	}

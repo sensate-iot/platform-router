@@ -31,5 +31,13 @@ namespace SensateService.Helpers
 			rounded = new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, 0, 0, dt.Kind);
 			return rounded;
 		}
+
+		public static DateTime ThisMinute(this DateTime dt)
+		{
+			DateTime rounded;
+
+			rounded = new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, 0, dt.Kind);
+			return rounded;
+		}
 	}
 }

@@ -164,7 +164,8 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 
 		private const double DiameterOfEarth = 6378137d;
 
-		public async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsNearAsync(Sensor sensor, DateTime start, DateTime end, GeoJson2DGeographicCoordinates coords,
+		public virtual async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsNearAsync(Sensor sensor, DateTime start,
+			DateTime end, GeoJson2DGeographicCoordinates coords,
 			int max = 100, int skip = -1, int limit = -1, CancellationToken ct = default)
 		{
 			var near = new BsonDocument {
