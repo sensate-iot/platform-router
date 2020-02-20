@@ -14,6 +14,27 @@ function getRandNumber(min, max) {
 	return Math.floor(Math.random() * ( max - min)) + min;
 }
 
+function generateLocationAround(lat, lng, radius) {
+	const x0 = lng;
+	const y0 = lat;
+	const deg = radius / 111300;
+
+	const m = Math.random();
+	const n = Math.random();
+
+	const w = deg * Math.sqrt(m);
+	const t = 2 * Math.PI * n;
+	const x = w * Math.cos(t);
+	const y = w * Math.sin(t);
+
+	const xp = x / Math.cos(y0);
+
+	return [
+		y + y0,
+		xp + x0
+	]
+}
+
 function generateMeasurement(args) {
 	let idx = 0;
 
@@ -21,9 +42,11 @@ function generateMeasurement(args) {
 		idx = getRandNumber(0, args.sensors.length);
 	}
 
+	const location = generateLocationAround(51.59137, 4.7786, 800);
+
 	const measurement = {
-		Longitude: 2.13613511,
-		Latitude: 31.215135211,
+		Longitude: location[1],
+		Latitude: location[0],
 		CreatedById: args.sensors[idx].sensor,
 		CreatedBySecret: args.sensors[idx].secret,
 		Data: {
