@@ -9,6 +9,7 @@
 
 var mqtt = require('mqtt');
 var NanoTimer = require('nanotimer');
+var crypto = require('crypto');
 
 function getRandNumber(min, max) {
 	return Math.floor(Math.random() * ( max - min)) + min;
@@ -64,6 +65,9 @@ function generateMeasurement(args) {
 			}
 		}
 	}
+
+	const hash = crypto.createHash('sha256').update(JSON.stringify(measurement));
+	measurement.CreatedBySecret = hash.digest('hex');
 
 	return measurement;
 }
