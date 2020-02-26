@@ -12,6 +12,9 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
+
+using Newtonsoft.Json.Linq;
+
 using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Events;
@@ -21,6 +24,8 @@ using SensateService.Models.Json.In;
 
 namespace SensateService.Infrastructure.Storage
 {
+	using ParsedMeasurementEntry = Tuple<RequestMethod, RawMeasurement, JObject>;
+
 	public class MeasurementStore : AbstractMeasurementStore
 	{
 		public static event OnMeasurementReceived MeasurementReceived;
@@ -45,11 +50,12 @@ namespace SensateService.Infrastructure.Storage
 			this._stats = stats;
 		}
 
-		public override async Task StoreAsync(RawMeasurement obj, RequestMethod method)
+		public override async Task StoreAsync(JObject raw, RequestMethod method)
 		{
 			Measurement m;
 			Sensor sensor;
 			SensateUser user;
+			var obj = raw.ToObject<RawMeasurement>();
 
 			sensor = await this._sensors.GetAsync(obj.CreatedById).AwaitBackground();
 
@@ -58,16 +64,11 @@ namespace SensateService.Infrastructure.Storage
 
 			user = await this._users.GetAsync(sensor.Owner).AwaitBackground();
 
-			if(user == null)
+			if(user == null) {
 				return;
+			}
 
-			var roles = await this._users.GetRolesAsync(user).AwaitBackground();
-
-			if(!base.CanInsert(roles) || !base.InsertAllowed(user, obj.CreatedBySecret))
-				return;
-
-			m = base.ProcessRawMeasurement(sensor, obj);
-
+			m = base.AuthorizeMeasurement(sensor, user, new ParsedMeasurementEntry(method, obj, raw));
 			var measurement_worker = this._measurements.StoreAsync(sensor, m);
 			var stats_worker = this._stats.IncrementAsync(sensor, method);
 			var events_worker = InvokeMeasurementReceivedAsync(sensor, m);

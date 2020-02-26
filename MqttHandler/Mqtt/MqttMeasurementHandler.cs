@@ -6,16 +6,17 @@
  */
 
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
-
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 using SensateService.Enums;
 using SensateService.Exceptions;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Storage;
-using SensateService.Models.Json.In;
 
 namespace SensateService.MqttHandler.Mqtt
 {
@@ -37,14 +38,12 @@ namespace SensateService.MqttHandler.Mqtt
 
 		public override async Task OnMessageAsync(string topic, string message)
 		{
-			RawMeasurement raw;
+			JObject raw;
 
 			try {
-				raw = JsonConvert.DeserializeObject<RawMeasurement>(message);
+				var reader = new JsonTextReader(new StringReader(message)) {FloatParseHandling = FloatParseHandling.Decimal};
 
-				if(raw.CreatedById == null)
-					return;
-
+				raw = JObject.Load(reader);
 				await this.store.StoreAsync(raw, RequestMethod.MqttTcp).AwaitBackground();
 			} catch(CachingException ex) {
 				this.logger.LogInformation($"{ex.Key}: {ex.Message}");

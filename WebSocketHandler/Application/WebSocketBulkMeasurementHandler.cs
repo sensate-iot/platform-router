@@ -2,7 +2,7 @@
  * Websocket handler used to receive messages.
  *
  * @author Michel Megens
- * @email  michel.megens@sonatolabs.com
+ * @email  michel@michelmegens.net
  */
 
 using System;
@@ -21,7 +21,6 @@ using SensateService.Exceptions;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Storage;
 using SensateService.Models.Generic;
-using SensateService.Models.Json.In;
 
 namespace SensateService.WebSocketHandler.Application
 {
@@ -37,17 +36,16 @@ namespace SensateService.WebSocketHandler.Application
 		public override async Task Receive(AuthenticatedWebSocket socket, WebSocketReceiveResult result, byte[] buffer)
 		{
 			string msg;
-			IEnumerable<RawMeasurement> raw;
+			IList<JObject> raw;
 
 			msg = Encoding.UTF8.GetString(buffer, 0, result.Count);
 
 			try {
-				using(var scope = this.provider.CreateScope()) {
-					var store = scope.ServiceProvider.GetRequiredService<IMeasurementCache>();
+				using var scope = this.provider.CreateScope();
+				var store = scope.ServiceProvider.GetRequiredService<IMeasurementCache>();
 
-					raw = JsonConvert.DeserializeObject<IEnumerable<RawMeasurement>>(msg);
-					await store.StoreRangeAsync(raw, RequestMethod.WebSocket).AwaitBackground();
-				}
+				raw = JsonConvert.DeserializeObject<IList<JObject>>(msg);
+				await store.StoreRangeAsync(raw, RequestMethod.WebSocket).AwaitBackground();
 			} catch(InvalidRequestException ex) {
 				Debug.WriteLine($"Unable to store measurement: {ex.Message}");
 

@@ -21,6 +21,7 @@ using Microsoft.Extensions.Logging;
 
 using MongoDB.Bson;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 using SensateService.Enums;
 using SensateService.Exceptions;
@@ -32,7 +33,9 @@ using SensateService.Models.Json.In;
 
 namespace SensateService.Infrastructure.Storage
 {
-	using RawMeasurementEntry = Tuple<RequestMethod, RawMeasurement>;
+	using RawMeasurementEntry = Tuple<RequestMethod, JObject>;
+	using ValidationData = Tuple<IDictionary<string, Sensor>, IDictionary<string, SensateUser>>;
+	using ParsedMeasurementEntry = Tuple<RequestMethod, RawMeasurement, JObject>;
 
 	public class CachedMeasurementStore : AbstractMeasurementStore, ICachedMeasurementStore
 	{
@@ -56,10 +59,11 @@ namespace SensateService.Infrastructure.Storage
 			this.m_lock.Unlock();
 		}
 
-		public override Task StoreAsync(RawMeasurement obj, RequestMethod method)
+		public override Task StoreAsync(JObject obj, RequestMethod method)
 		{
-			if(obj.CreatedById == null || obj.CreatedBySecret == null)
+			if(!obj.TryGetValue("CreatedById", out _) || !obj.TryGetValue("CreatedBySecret", out _)) {
 				return Task.CompletedTask;
+			}
 
 			this.m_lock.Lock();
 			this.m_measurements.Add(new RawMeasurementEntry(method, obj));
@@ -69,7 +73,7 @@ namespace SensateService.Infrastructure.Storage
 			return Task.CompletedTask;
 		}
 
-		public async Task StoreRangeAsync(IEnumerable<RawMeasurement> measurements, RequestMethod method)
+		public async Task StoreRangeAsync(IEnumerable<JObject> measurements, RequestMethod method)
 		{
 			await Task.Run(() => {
 				var data = measurements.Select(m => new RawMeasurementEntry(method, m)).ToList();
@@ -93,44 +97,12 @@ namespace SensateService.Infrastructure.Storage
 			return userdata.ToDictionary(user => user.Id);
 		}
 
-		private ProcessedMeasurement ValidateMeasurement(IDictionary<string, SensateUser> users,
-			IDictionary<string, Sensor> sensors, RawMeasurementEntry raw)
+		private async Task<IList<ProcessedMeasurement>> ProcessMeasurementsAsync(ICollection<ParsedMeasurementEntry> logs)
 		{
-			ProcessedMeasurement processed;
-			Measurement measurement;
-
-			if (!sensors.TryGetValue(raw.Item2.CreatedById, out Sensor sensor)) {
-				return null;
-			}
-
-			if (!users.TryGetValue(sensor.Owner, out SensateUser user)) {
-				return null;
-			}
-
-			if(!base.CanInsert(user) || !base.InsertAllowed(user, raw.Item2.CreatedBySecret)) {
-				return null;
-			}
-
-			measurement = base.ProcessRawMeasurement(sensor, raw.Item2);
-
-			if(measurement == null) {
-				return null;
-			}
-
-			processed = new ProcessedMeasurement(measurement, sensor) {
-				Method = raw.Item1
-			};
-
-			return processed;
-		}
-
-		private async Task<IList<ProcessedMeasurement>> ProcessMeasurementsAsync(ICollection<RawMeasurementEntry> logs)
-		{
-			List<ProcessedMeasurement> measurements;
+			IList<ProcessedMeasurement> measurements;
 			IList<string> sensors_ids;
 			IDictionary<string, SensateUser> users;
 			IDictionary<string, Sensor> sensors;
-			IList<Task<ProcessedMeasurement>> tasks;
 
 			sensors_ids = logs.Select(raw => raw.Item2.CreatedById).Distinct().ToList();
 
@@ -141,13 +113,9 @@ namespace SensateService.Infrastructure.Storage
 				var raw_sensors = await FetchDistinctSensors(sensorsrepo, sensors_ids).AwaitBackground();
 				var distinct_users = raw_sensors.Select(sensor => sensor.Owner).Distinct();
 
-				users = await GetUserInformation(usersrepo, distinct_users).AwaitBackground();
 				sensors = raw_sensors.ToDictionary(key => key.InternalId.ToString(), sensor => sensor);
-				tasks = logs.Select(raw => Task.Run(() => this.ValidateMeasurement(users, sensors, raw))).ToList();
-
-				var data = await Task.WhenAll(tasks).AwaitBackground();
-				measurements = data.ToList();
-				measurements.RemoveAll(m => m == null);
+				users = await GetUserInformation(usersrepo, distinct_users).AwaitBackground();
+				measurements = base.AuthorizeMeasurements(new ValidationData(sensors, users), logs.ToList());
 			}
 
 			return measurements;
@@ -188,9 +156,23 @@ namespace SensateService.Infrastructure.Storage
 			await MeasurementsReceived.Invoke(this, args).AwaitBackground();
 		}
 
+		private static IList<ParsedMeasurementEntry> ParseMeasurements(IList<RawMeasurementEntry> raw_q)
+		{
+			var parsed_q = new List<ParsedMeasurementEntry>();
+
+			Parallel.ForEach(raw_q, raw => {
+				try {
+					parsed_q.Add(new ParsedMeasurementEntry(raw.Item1, raw.Item2.ToObject<RawMeasurement>(), raw.Item2));
+				} catch(JsonSerializationException) { }
+			});
+
+			return parsed_q;
+		}
+
 		public async Task<long> ProcessMeasurementsAsync()
 		{
 			IList<ProcessedMeasurement> processed_q;
+			IList<ParsedMeasurementEntry> parsed_q;
 			long count;
 
 			this.m_lock.Lock();
@@ -216,7 +198,8 @@ namespace SensateService.Infrastructure.Storage
 					IList<StatisticsUpdate> statsdata;
 					var asyncio = new Task[3];
 
-					processed_q = await this.ProcessMeasurementsAsync(raw_q).AwaitBackground();
+					parsed_q = ParseMeasurements(raw_q);
+					processed_q = await this.ProcessMeasurementsAsync(parsed_q).AwaitBackground();
 
 					if(processed_q.Count <= 0L)
 						return 0L;
@@ -309,20 +292,6 @@ namespace SensateService.Infrastructure.Storage
 			this.m_count = 0;
 
 			this.m_lock.Unlock();
-		}
-	}
-
-	internal class ProcessedMeasurement
-	{
-		public Measurement Measurement { get; }
-		public Sensor Creator { get; }
-		public RequestMethod Method { get; set; }
-
-		public ProcessedMeasurement(Measurement measurement, Sensor creator)
-		{
-			this.Measurement = measurement;
-			this.Creator = creator;
-			this.Method = RequestMethod.Any;
 		}
 	}
 

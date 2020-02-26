@@ -12,10 +12,10 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Storage;
-using SensateService.Models.Json.In;
 
 namespace SensateService.MqttHandler.Mqtt
 {
@@ -37,10 +37,10 @@ namespace SensateService.MqttHandler.Mqtt
 
 		public override async Task OnMessageAsync(string topic, string message)
 		{
-			IList<RawMeasurement> raw;
+			IList<JObject> raw;
 
 			try {
-				raw = JsonConvert.DeserializeObject<IList<RawMeasurement>>(message);
+				raw = JsonConvert.DeserializeObject<IList<JObject>>(message);
 
 				await this.store.StoreRangeAsync(raw, RequestMethod.MqttTcp).AwaitBackground();
 			} catch(Exception ex) {
