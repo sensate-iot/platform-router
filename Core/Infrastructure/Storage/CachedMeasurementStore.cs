@@ -156,15 +156,29 @@ namespace SensateService.Infrastructure.Storage
 			await MeasurementsReceived.Invoke(this, args).AwaitBackground();
 		}
 
-		private static IList<ParsedMeasurementEntry> ParseMeasurements(IList<RawMeasurementEntry> raw_q)
+		private IList<ParsedMeasurementEntry> ParseMeasurements(IList<RawMeasurementEntry> raw_q)
 		{
-			var parsed_q = new List<ParsedMeasurementEntry>();
+			var parsed_q = new List<ParsedMeasurementEntry>(raw_q.Count);
+			bool hasNull = false;
 
-			Parallel.ForEach(raw_q, raw => {
+			for(var idx = 0; idx < raw_q.Count; idx++) {
+				parsed_q.Add(null);
+			}
+
+			Parallel.For(0, raw_q.Count, index => {
+				var raw = raw_q[index];
+
 				try {
-					parsed_q.Add(new ParsedMeasurementEntry(raw.Item1, raw.Item2.ToObject<RawMeasurement>(), raw.Item2));
-				} catch(JsonSerializationException) { }
+					parsed_q[index] = new ParsedMeasurementEntry(raw.Item1, raw.Item2.ToObject<RawMeasurement>(), raw.Item2);
+				} catch(Exception ex) {
+					this.Logger.LogInformation($"Unable to parse measurement object: {ex.Message}");
+					hasNull = true;
+				}
 			});
+
+			if(hasNull) {
+				parsed_q.RemoveAll(x => x == null);
+			}
 
 			return parsed_q;
 		}
