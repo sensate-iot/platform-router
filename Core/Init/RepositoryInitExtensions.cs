@@ -19,6 +19,8 @@ using SensateService.Infrastructure.Document;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Infrastructure.Sql;
 using SensateService.Models;
+using SensateService.Services;
+using SensateService.Services.Processing;
 
 namespace SensateService.Init
 {
@@ -55,6 +57,7 @@ namespace SensateService.Init
 			services.AddScoped<ISensorStatisticsRepository, SensorStatisticsRepository>();
 			services.AddScoped<IMessageRepository, MessageRepository>();
 			services.AddScoped<IControlMessageRepository, ControlMessageRepository>();
+			services.AddScoped<IGeoQueryService, GeoQueryService>();
 
 			if(cache) {
 				services.AddScoped<IMeasurementRepository, CachedMeasurementRepository>();

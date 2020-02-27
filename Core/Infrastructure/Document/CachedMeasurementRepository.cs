@@ -13,11 +13,14 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
+
 using MongoDB.Driver.GeoJsonObjectModel;
+
 using SensateService.Helpers;
 using SensateService.Infrastructure.Cache;
 using SensateService.Models;
 using SensateService.Models.Generic;
+using SensateService.Services;
 
 namespace SensateService.Infrastructure.Document
 {
@@ -27,8 +30,9 @@ namespace SensateService.Infrastructure.Document
 
 		public CachedMeasurementRepository(
 			SensateContext context,
+			IGeoQueryService geo,
 			ILogger<MeasurementRepository> logger,
-			ICacheStrategy<string> cache) : base(context, logger)
+			ICacheStrategy<string> cache) : base(context, geo, logger)
 		{
 			_cache = cache;
 		}

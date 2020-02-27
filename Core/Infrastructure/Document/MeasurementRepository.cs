@@ -24,17 +24,21 @@ using SensateService.Models;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Helpers;
 using SensateService.Models.Generic;
+using SensateService.Services;
 
 namespace SensateService.Infrastructure.Document
 {
 	public class MeasurementRepository : AbstractDocumentRepository<MeasurementBucket>, IMeasurementRepository
 	{
-		private const int MeasurementBucketSize = 500; 
+		private const int MeasurementBucketSize = 500;
+
+		private readonly IGeoQueryService m_geoService;
 		protected readonly ILogger<MeasurementRepository> _logger;
 
-		public MeasurementRepository(SensateContext context, ILogger<MeasurementRepository> logger) : base(context.Measurements)
+		public MeasurementRepository(SensateContext context, IGeoQueryService geo, ILogger<MeasurementRepository> logger) : base(context.Measurements)
 		{
 			this._logger = logger;
+			this.m_geoService = geo;
 		}
 
 		private static ObjectId ToInternalId(string id)
@@ -162,89 +166,12 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 			return idx;
 		}
 
-		private const double DiameterOfEarth = 6378137d;
-
 		public virtual async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsNearAsync(Sensor sensor, DateTime start,
 			DateTime end, GeoJson2DGeographicCoordinates coords,
 			int max = 100, int skip = -1, int limit = -1, CancellationToken ct = default)
 		{
-			var near = new BsonDocument {
-				{ "near", new BsonDocument {
-					{ "type", "Point" },
-					{ "coordinates", new BsonArray { coords.Longitude, coords.Latitude } }
-				} },
-				{ "spherical", true },
-				{ "query", new BsonDocument {
-					{ "SensorId", sensor.InternalId },
-					{ "First", new BsonDocument { { "$lte", end } } },
-					{ "Last", new BsonDocument { { "$gte", start } } }
-				} },
-				{ "distanceField", "Distance" },
-				{ "key", "Measurements.Location" }
-			};
-
-			if(max >= 0) {
-				near.Add(new BsonElement ("maxDistance", max));
-			}
-
-			var matchTimestamp = new BsonDocument {
-				{ "Measurements.Timestamp", new BsonDocument {
-					{"$gte", start},
-					{"$lte", end}
-				}}
-			};
-
-			var projectRewrite = new BsonDocument {
-				{ "_id", 1 },
-				{ "Timestamp", "$Measurements.Timestamp" },
-				{ "Location", "$Measurements.Location" },
-				{ "Data", "$Measurements.Data" },
-			};
-
-			double radians = max;
-			radians /= DiameterOfEarth;
-
-			var centerSphere = new BsonArray {
-				new BsonArray { coords.Longitude, coords.Latitude }, radians
-			};
-
-			var match = new BsonDocument {
-				{
-					"Location", new BsonDocument {
-						{
-							"$geoWithin", new BsonDocument {
-								{ "$centerSphere", centerSphere}
-							}
-						}
-					}
-				}
-			};
-
-			var sort = new BsonDocument {
-				{ "Timestamp", 1 }
-			};
-
-			var pipeline = new List<BsonDocument> {
-				new BsonDocument {{"$geoNear", near}},
-				new BsonDocument {{"$unwind", "$Measurements"}},
-				new BsonDocument {{"$match", matchTimestamp}},
-				new BsonDocument {{"$project", projectRewrite}},
-				new BsonDocument {{"$match", match}},
-				new BsonDocument {{"$sort", sort}}
-			};
-
-			if(skip > 0) {
-				pipeline.Add(new BsonDocument { { "$skip", skip }});
-			}
-
-			if(limit > 0) {
-				pipeline.Add(new BsonDocument { { "$limit", limit }});
-			}
-
-			var query = this._collection.Aggregate<MeasurementsQueryResult>(pipeline, cancellationToken: ct);
-			var results = await query.ToListAsync(ct).AwaitBackground();
-
-			return results;
+			var measurements = await this.GetMeasurementsBetweenAsync(sensor, start, end, ct: ct).AwaitBackground();
+			return this.m_geoService.GetMeasurementsNear(measurements.ToList(), coords, max, skip, limit, ct);
 		}
 
 		public async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsBetweenAsync(Sensor sensor, DateTime start, DateTime end,
@@ -314,7 +241,7 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 			return ConcatMeasurementBuckets(data);
 		}
 
-		public async Task<long> GetMeasurementCountAsync(Sensor sensor, CancellationToken token = default(CancellationToken))
+		public async Task<long> GetMeasurementCountAsync(Sensor sensor, CancellationToken token = default)
 		{
 			var total = this._collection.AsQueryable().Where(x => x.SensorId == sensor.InternalId).SumAsync(x => x.Count, token);
 			return await total.AwaitBackground();
