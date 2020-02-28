@@ -43,7 +43,7 @@ function generateMeasurement(args) {
 		idx = getRandNumber(0, args.sensors.length);
 	}
 
-	const location = generateLocationAround(51.59137, 4.7786, 800);
+	const location = generateLocationAround(51.59137, 4.7786, 1200);
 
 	const measurement = {
 		Longitude: location[1],

@@ -1,14 +1,18 @@
 {
   "name": "sensate-sensors",
   "version": "0.1.0",
-  "description": "Fake sensors to unit test the sensate backend services.",
-  "main": "bin/sensate-sensor",
-  "scripts": {},
+  "description": "Fake sensors to e2e test the sensate backend services.",
+  "main": "bin/sensate-sensor.js",
+  "scripts": { },
+  "bin": {
+	  "sensate-sensor": "./bin/sensate-sensor.js"
+  },
   "keywords": [
     "iot",
     "sensors",
-    "measurements",
-    "dotnet",
+	"measurements",
+	"sensate-iot",
+	"sensate",
     "testing"
   ],
   "author": "Michel Megens",
