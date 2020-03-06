@@ -12,6 +12,7 @@ import * as WebSocket from "ws";
 import { ISensorAuthRequest } from "../models/sensorauthrequest";
 import { BulkMeasurementInfo } from "../models/measurement";
 import { IWebSocketRequest } from "../models/request";
+import * as jwt from "jsonwebtoken";
 
 // ReSharper disable once UnusedLocalImport
 import moment from "moment";
@@ -19,30 +20,60 @@ import moment from "moment";
 export class WebSocketClient {
     private readonly sensors: Map<string, SensorModel>;
     private readonly socket: WebSocket;
+    private authorized: boolean;
 
     private static timeout = 250;
 
-    public constructor(socket: WebSocket) {
+    public constructor(socket: WebSocket, private readonly secret: string) {
         this.socket = socket;
         this.sensors = new Map<string, SensorModel>();
         this.socket.onmessage = this.onMessage.bind(this);
+        this.authorized = false;
     }
 
     private async onMessage(data: WebSocket.MessageEvent) {
-        const auth = JSON.parse(data.data.toString()) as IWebSocketRequest<any>;
+        const req = JSON.parse(data.data.toString()) as IWebSocketRequest<any>;
 
-        switch (auth.request) {
+        if (req === null || req === undefined) {
+            return;
+        }
+
+        if (req.request !== "auth" && !this.authorized) {
+            console.log(`Received unauthorized request: ${req.request}`);
+            return;
+        }
+
+        switch (req.request) {
             case "subscribe":
-                await this.subscribe(auth);
+                await this.subscribe(req);
                 break;
 
             case "unsubscribe":
+                this.unsubscribe(req);
+                break;
+
+            case "auth":
+                this.authorized = await this.auth(req);
                 break;
 
             default:
-                console.log(`Invalid request: ${auth.request}`);
+                console.log(`Invalid request: ${req.request}`);
                 break;
         }
+    }
+
+    private async auth(req: IWebSocketRequest<string>) {
+        return await this.verifyRequest(req.data);
+    }
+
+    private unsubscribe(req: IWebSocketRequest<ISensorAuthRequest>) {
+        if (!this.sensors.has(req.data.sensorId)) {
+            return;
+        }
+
+        console.log(`Removing sensor: ${req.data.sensorId}`);
+
+        this.sensors.delete(req.data.sensorId);
     }
 
     private async subscribe(req: IWebSocketRequest<ISensorAuthRequest>) {
@@ -84,7 +115,11 @@ export class WebSocketClient {
     }
 
     public process(measurements: BulkMeasurementInfo) {
-        const sensor = this.sensors.get(measurements.CreatedBy.toString());
+        if (!this.authorized) {
+            return;
+        }
+
+        const sensor = this.sensors.get(measurements.createdBy.toString());
 
         if (sensor === null) {
             return;
@@ -92,5 +127,30 @@ export class WebSocketClient {
 
         const data = JSON.stringify(measurements);
         this.socket.send(data);
+    }
+
+    public async authorize(token: string) {
+        this.authorized = await this.verifyRequest(token);
+    }
+
+    public isAuthorized() {
+        return this.authorized;
+    }
+
+    private verifyRequest(token: string) {
+        if (token === null || token === undefined) {
+            return false;
+        }
+
+        return new Promise<boolean>((resolve) => {
+            jwt.verify(token, this.secret, (err) => {
+                if (err) {
+                    resolve(false);
+                    return;
+                }
+
+                resolve(true);
+            });
+        });
     }
 }

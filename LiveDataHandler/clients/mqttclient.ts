@@ -7,13 +7,15 @@
 
 import { IClientOptions, Client, connect } from "mqtt";
 import { Guid } from "../app/guid";
-
-declare type MessageHandler = (topic: string, message: string) => void;
+import { IMessageHandler } from "../app/imessagehandler";
 
 export class MqttClient {
     private client: Client;
-    private handler: MessageHandler;
-    constructor(private readonly host: string, private readonly port: number) { }
+    private readonly handlers: IMessageHandler[];
+
+    public constructor(private readonly host: string, private readonly port: number) {
+        this.handlers = [];
+    }
 
     public connect(user: string, password: string) {
         console.debug(`Connecting to MQTT broker: ${this.host} on port ${this.port}`);
@@ -32,7 +34,13 @@ export class MqttClient {
         });
 
         this.client.on("message", (topic, msg) => {
-            this.handler(topic, msg.toString());
+            this.handlers.forEach(handler => {
+                if (handler.getTopic() !== topic) {
+                    return;
+                }
+
+                handler.handle(topic, msg.toString());
+            });
         });
 
         return rv;
@@ -42,8 +50,8 @@ export class MqttClient {
         this.client.publish(topic, message);
     }
 
-    public setHandleMessage(msg: MessageHandler) {
-        this.handler = msg;
+    public addHandler(handler: IMessageHandler) {
+        this.handlers.push(handler);
     }
 
     public subscribe(topic: string) {

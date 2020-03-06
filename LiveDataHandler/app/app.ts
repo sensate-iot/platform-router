@@ -9,76 +9,38 @@ import { MqttClient } from "../clients/mqttclient";
 import { Settings } from "../models/settings";
 import settings from "../settings/appsettings.json";
 import * as mongodb from "./mongodb";
-import { BulkMeasurementInfo, MeasurementInfo } from "../models/measurement";
 import { WebSocketServer } from "./websocketserver";
-import "./jsonmodule";
-import * as gzip from "zlib";
+import { Express } from "express";
 
 // ReSharper disable once UnusedLocalImport
 import express from "express";
+import cors from "cors";
+import "./jsonmodule";
+import { MessageHandler } from "./messagehandler";
+import { BulkMessageHandler } from "./bulkmessagehandler";
 
 class Application {
     private readonly client: MqttClient;
     private readonly config: Settings;
     private readonly wss: WebSocketServer;
 
-    constructor() {
+    public constructor() {
         const tmp = JSON.stringify(settings);
         this.config = JSON.parse(tmp);
 
         this.client = new MqttClient(this.config.mqtt.host, this.config.mqtt.port);
         // ReSharper disable once TsResolvedFromInaccessibleModule
-        this.wss = new WebSocketServer(express(), this.config.web.secret);
-    }
+        const app: Express = express();
 
-    public async onMessage(topic: string, data: string) {
-        if (topic === this.config.mqtt.internalBulkMeasurementTopic) {
-            const msg = await this.decode(data);
-
-            const measurements: [BulkMeasurementInfo] = JSON.parse(msg);
-
-            if (measurements == null)
-                return;
-
-            measurements.forEach(m => {
-                if (!this.wss.hasOpenSocketFor(m.CreatedBy.toString()))
-                    return;
-
-                this.wss.process(m);
-            });
-        } else if (topic === this.config.mqtt.internalMeasurementTopic) {
-            const measurement: MeasurementInfo = JSON.parse(data);
-            const bulk = new BulkMeasurementInfo();
-
-
-            if (measurement == null) {
-                return;
-            }
-
-            bulk.CreatedBy = measurement.CreatedBy;
-            bulk.Measurements = [measurement.Measurement];
-
-            this.wss.process(bulk);
-        }
-    }
-
-    private decode(data: string) {
-        const buf = Buffer.from(data, "base64");
-
-        return new Promise<string>((resolve, reject) => {
-            gzip.unzip(buf, (err, buffer) => {
-                if (err) {
-                    reject(err);
-                }
-
-                const content = buffer.toString("utf-8");
-                resolve(content);
-            });
-        });
+        app.use(cors());
+        this.wss = new WebSocketServer(app, this.config.web.secret);
     }
 
     public run() {
         mongodb.connect(this.config.mongoDB.connectionString);
+
+        this.client.addHandler(new MessageHandler(this.wss, this.config.mqtt.internalMeasurementTopic));
+        this.client.addHandler(new BulkMessageHandler(this.wss, this.config.mqtt.internalBulkMeasurementTopic));
 
         this.client.connect(this.config.mqtt.username, this.config.mqtt.password).then(() => {
             console.log("Connected to MQTT!");
@@ -90,10 +52,6 @@ class Application {
             console.log(`Subscribed to: ${this.config.mqtt.internalMeasurementTopic}`);
         }).catch(err => {
             console.warn(`Unable to connect to MQTT: ${err.toString()}`);
-        });
-
-        this.client.setHandleMessage((topic, msg) => {
-            this.onMessage(topic, msg);
         });
 
         this.wss.listen(this.config.web.port);

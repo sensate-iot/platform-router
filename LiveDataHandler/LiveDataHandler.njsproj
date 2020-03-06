@@ -40,7 +40,19 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="tsconfig.json" />
+    <TypeScriptCompile Include="app\bulkmessagehandler.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="app\imessagehandler.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="app\live-data-handler.ts" />
+    <TypeScriptCompile Include="app\messagehandler.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="app\util.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="clients\websocketclient.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
@@ -62,8 +74,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="app\" />
-    <Folder Include="src\" />
-    <Folder Include="src\mqtt\" />
     <Folder Include="models\" />
     <Folder Include="settings\" />
     <Folder Include="clients\" />
