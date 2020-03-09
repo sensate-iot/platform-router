@@ -141,6 +141,22 @@ namespace SensateService.AuthApi.Controllers
 				new NotFoundObjectResult(new {Message = result.Errors});
 		}
 
+		[HttpGet("list")]
+		[NormalUser]
+		[ProducesResponseType(typeof(string[]), 200)]
+		public async Task<IActionResult> GetAllEmail()
+		{
+			var user = await this.GetCurrentUserAsync().AwaitBackground();
+
+			if(user == null) {
+				return this.Forbid();
+			}
+
+			var users = await this._users.GetAllAsync().AwaitBackground();
+			var mail = users.Select(x => x.Email);
+			return this.Ok(mail);
+		}
+
 		[HttpGet("phone-confirmed")]
 		[NormalUser]
 		[ProducesResponseType(typeof(Status), 200)]
