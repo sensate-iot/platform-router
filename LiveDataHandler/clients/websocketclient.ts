@@ -13,6 +13,8 @@ import { ISensorAuthRequest } from "../models/sensorauthrequest";
 import { BulkMeasurementInfo } from "../models/measurement";
 import { IWebSocketRequest } from "../models/request";
 import * as jwt from "jsonwebtoken";
+import { SensorLinksClient } from "./sensorlinksclient";
+import { Pool } from "pg";
 
 // ReSharper disable once UnusedLocalImport
 import moment from "moment";
@@ -21,14 +23,18 @@ export class WebSocketClient {
     private readonly sensors: Map<string, SensorModel>;
     private readonly socket: WebSocket;
     private authorized: boolean;
+    private readonly client: SensorLinksClient;
+    private userId: string;
 
     private static timeout = 250;
 
-    public constructor(socket: WebSocket, private readonly secret: string) {
+    public constructor(socket: WebSocket, pool: Pool, private readonly secret: string) {
         this.socket = socket;
         this.sensors = new Map<string, SensorModel>();
         this.socket.onmessage = this.onMessage.bind(this);
         this.authorized = false;
+        this.client = new SensorLinksClient(pool);
+        this.userId = null;
     }
 
     private async onMessage(data: WebSocket.MessageEvent) {
@@ -98,8 +104,15 @@ export class WebSocketClient {
         const computed = createHash("sha256").update(JSON.stringify(auth)).digest("hex");
 
         if (computed !== hash) {
-            this.socket.close();
-            return;
+            const links = await this.client.getSensorLinks(auth.sensorId);
+            const match = links.find((value) => {
+                return value.UserId === this.userId;
+            });
+
+            if (match === null || match === undefined) {
+                this.socket.close();
+                return;
+            }
         }
 
         this.sensors.set(auth.sensorId, sensor);
@@ -143,12 +156,13 @@ export class WebSocketClient {
         }
 
         return new Promise<boolean>((resolve) => {
-            jwt.verify(token, this.secret, (err) => {
+            jwt.verify(token, this.secret, (err, obj: any) => {
                 if (err) {
                     resolve(false);
                     return;
                 }
 
+                this.userId = obj.sub;
                 resolve(true);
             });
         });

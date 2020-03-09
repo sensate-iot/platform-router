@@ -11,6 +11,7 @@ import settings from "../settings/appsettings.json";
 import * as mongodb from "./mongodb";
 import { WebSocketServer } from "./websocketserver";
 import { Express } from "express";
+import { connect } from "./postgresql";
 
 // ReSharper disable once UnusedLocalImport
 import express from "express";
@@ -31,9 +32,10 @@ class Application {
         this.client = new MqttClient(this.config.mqtt.host, this.config.mqtt.port);
         // ReSharper disable once TsResolvedFromInaccessibleModule
         const app: Express = express();
+        const pool = connect(this.config);
 
         app.use(cors());
-        this.wss = new WebSocketServer(app, this.config.web.secret);
+        this.wss = new WebSocketServer(app, pool, this.config.web.secret);
     }
 
     public run() {

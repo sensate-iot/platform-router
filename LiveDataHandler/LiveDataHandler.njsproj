@@ -50,7 +50,13 @@
     <TypeScriptCompile Include="app\messagehandler.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="app\postgresql.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="app\util.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="clients\sensorlinksclient.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="clients\websocketclient.ts">
@@ -64,6 +70,9 @@
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="models\sensorauthrequest.ts" />
+    <TypeScriptCompile Include="models\sensorlink.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="models\settings.ts" />
     <TypeScriptCompile Include="app\mongodb.ts">
       <SubType>Code</SubType>

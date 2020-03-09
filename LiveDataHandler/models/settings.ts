@@ -22,8 +22,17 @@ interface WebServerSettings {
     secret: string;
 }
 
+interface PostgresQL {
+    user: string;
+    host: string;
+    database: string;
+    password: string;
+    port: number;
+}
+
 export interface Settings {
     mqtt: MqttSettings;
     mongoDB: MongoDB;
+    postgresql: PostgresQL;
     web: WebServerSettings;
 }

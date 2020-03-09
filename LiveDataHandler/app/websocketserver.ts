@@ -12,6 +12,7 @@ import * as url from "url";
 
 import { BulkMeasurementInfo } from "../models/measurement";
 import { WebSocketClient } from "../clients/websocketclient";
+import { Pool } from "pg";
 
 export function createServer(expr: express.Express) {
     const server = http.createServer(expr);
@@ -24,7 +25,7 @@ export class WebSocketServer {
 
     private readonly clients: WebSocketClient[];
 
-    public constructor(expr: express.Express, private readonly secret: string) {
+    public constructor(expr: express.Express, private readonly pool: Pool, private readonly secret: string) {
         const server = http.createServer(expr);
         this.server = server;
         this.wss = new WebSocket.Server({ noServer: true });
@@ -63,7 +64,7 @@ export class WebSocketServer {
     }
 
     private async handleSocketUpgrade(socket: WebSocket, request: any) {
-        const client = new WebSocketClient(socket, this.secret);
+        const client = new WebSocketClient(socket, this.pool, this.secret);
         const hdr = request.headers["authorization"];
 
         if (hdr !== null && hdr !== undefined) {

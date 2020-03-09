@@ -20,6 +20,7 @@
     "@types/mongodb": "^3.3.14",
     "@types/mongoose": "^5.5.43",
     "@types/node": "^8.10.59",
+    "@types/pg": "^7.14.1",
     "@types/ws": "^6.0.4",
     "nodemon": "^1.19.4",
     "ts-node": "^8.6.2",
@@ -34,6 +35,9 @@
     "moment": "^2.24.0",
     "mongoose": "^5.8.9",
     "mqtt": "^3.0.0",
+    "pg": "^7.18.2",
+    "pg-hstore": "^2.3.3",
+    "pg-pool": "^2.0.10",
     "ws": "^6.2.1",
     "zlib": "^1.0.5"
   }
