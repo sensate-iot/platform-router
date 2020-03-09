@@ -46,7 +46,14 @@ namespace SensateService.Init
 			services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 			services.AddScoped<ITriggerRepository, TriggerRepository>();
 			services.AddScoped<IBlobRepository, BlobRepository>();
+			services.AddScoped<ISensorLinkRepository, SensorLinkRepository>();
 
+			return services;
+		}
+
+		public static IServiceCollection AddSensorServices(this IServiceCollection services)
+		{
+			services.AddScoped<ISensorService, SensorService>();
 			return services;
 		}
 
