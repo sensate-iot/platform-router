@@ -27,6 +27,7 @@ namespace SensateService.Infrastructure.Sql
 		public DbSet<TriggerAction> TriggerActions { get; set; }
 		public DbSet<TriggerInvocation> TriggerInvocations { get; set; }
 		public DbSet<Blob> Blobs { get; set; }
+		public DbSet<SensorLink> SensorLinks { get; set; }
 
 		public SensateSqlContext(DbContextOptions<SensateSqlContext> options) : base(options)
 		{ }
@@ -46,6 +47,7 @@ namespace SensateService.Infrastructure.Sql
 			builder.Entity<TriggerAction>().ToTable("TriggerActions");
 			builder.Entity<TriggerInvocation>().ToTable("TriggerInvocations");
 			builder.Entity<Blob>().ToTable("Blobs");
+			builder.Entity<SensorLink>().ToTable("SensorLinks");
 
 			builder.Entity<PasswordResetToken>().HasKey( k => k.UserToken );
 			builder.Entity<AuthUserToken>().HasKey(k => new { k.UserId, k.Value });
@@ -54,6 +56,11 @@ namespace SensateService.Infrastructure.Sql
 				.HasName("AlternateKey_UserToken");
 			builder.Entity<ChangePhoneNumberToken>().HasKey(k => new {
 				k.IdentityToken, k.PhoneNumber
+			});
+
+			builder.Entity<SensorLink>(link => {
+				link.HasKey(k => new {k.UserId, k.SensorId});
+				link.HasIndex(k => k.UserId);
 			});
 
 			builder.Entity<SensateApiKey>(key => {
