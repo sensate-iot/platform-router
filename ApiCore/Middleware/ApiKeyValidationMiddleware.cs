@@ -15,7 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
-
+using Newtonsoft.Json.Serialization;
 using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
@@ -29,12 +29,19 @@ namespace SensateService.ApiCore.Middleware
 		private readonly ILogger<ApiKeyValidationMiddleware> _logger;
 		private readonly IServiceProvider _provider;
 		private readonly RequestDelegate _next;
+		private readonly JsonSerializerSettings m_settings;
 
 		public ApiKeyValidationMiddleware(RequestDelegate next, IServiceProvider sp, ILogger<ApiKeyValidationMiddleware> logger)
 		{
 			this._next = next;
 			this._logger = logger;
 			this._provider = sp;
+			this.m_settings = new JsonSerializerSettings {
+				ContractResolver = new DefaultContractResolver {
+					NamingStrategy = new CamelCaseNamingStrategy()
+				},
+				Formatting = Formatting.None
+			};
 		}
 
 		public static bool IsBanned(SensateUser user, SensateRole role)
@@ -47,7 +54,7 @@ namespace SensateService.ApiCore.Middleware
 			return url.Contains("swagger");
 		}
 
-		public static async Task RespondErrorAsync(HttpContext ctx, ReplyCode code, string err, int http)
+		public async Task RespondErrorAsync(HttpContext ctx, ReplyCode code, string err, int http)
 		{
 			Status output = new Status {
 				ErrorCode = code,
@@ -57,7 +64,7 @@ namespace SensateService.ApiCore.Middleware
 			ctx.Response.Headers["Content-Type"] = "application/json";
 			ctx.Response.StatusCode = 400;
 
-			await ctx.Response.WriteAsync(JsonConvert.SerializeObject(output)).AwaitBackground();
+			await ctx.Response.WriteAsync(JsonConvert.SerializeObject(output, this.m_settings)).AwaitBackground();
 		}
 
 		public async Task Invoke(HttpContext ctx)
@@ -70,7 +77,7 @@ namespace SensateService.ApiCore.Middleware
 			}
 
 			if(!query.TryGetValue("key", out var key)) {
-				await RespondErrorAsync(ctx, ReplyCode.NotAllowed, "API key missing!", 400).AwaitBackground();
+				await this.RespondErrorAsync(ctx, ReplyCode.NotAllowed, "API key missing!", 400).AwaitBackground();
 				return;
 			}
 
@@ -81,7 +88,7 @@ namespace SensateService.ApiCore.Middleware
 				var token = await repo.GetByKeyAsync(key, CancellationToken.None).AwaitBackground();
 
 				if(token == null) {
-					await RespondErrorAsync(ctx, ReplyCode.BadInput, "API key not found!", 403).AwaitBackground();
+					await this.RespondErrorAsync(ctx, ReplyCode.BadInput, "API key not found!", 403).AwaitBackground();
 					return;
 				}
 
@@ -89,12 +96,12 @@ namespace SensateService.ApiCore.Middleware
 				var banned = await roles.GetByNameAsync(SensateRole.Banned).AwaitBackground();
 
 				if(IsBanned(token.User, banned)) {
-					await RespondErrorAsync(ctx, ReplyCode.Banned, "Bad API key!", 403).AwaitBackground();
+					await this.RespondErrorAsync(ctx, ReplyCode.Banned, "Bad API key!", 403).AwaitBackground();
 					return;
 				}
 
 				if(token.Revoked) {
-					await RespondErrorAsync(ctx, ReplyCode.NotAllowed, "Bad API key!", 403).AwaitBackground();
+					await this.RespondErrorAsync(ctx, ReplyCode.NotAllowed, "Bad API key!", 403).AwaitBackground();
 					return;
 				}
 

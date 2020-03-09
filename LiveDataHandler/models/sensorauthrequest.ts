@@ -6,7 +6,7 @@
  */
 
 export interface ISensorAuthRequest {
-    SensorID: string;
-    SensorSecret: string;
-    JwtToken: string;
-};
+    sensorId: string;
+    sensorSecret: string;
+    timestamp: string;
+}

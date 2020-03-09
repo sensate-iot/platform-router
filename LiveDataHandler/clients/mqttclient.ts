@@ -6,28 +6,15 @@
  */
 
 import { IClientOptions, Client, connect } from "mqtt";
-import { Guid } from "../guid";
-import * as gzip from "zlib";
-
-declare type MessageHandler = (topic: string, message: string) => void;
+import { Guid } from "../app/guid";
+import { IMessageHandler } from "../app/imessagehandler";
 
 export class MqttClient {
     private client: Client;
-    private handler: MessageHandler;
-    constructor(private readonly host: string, private readonly port: number) { }
+    private readonly handlers: IMessageHandler[];
 
-    private decode(data: string) {
-        const buf = Buffer.from(data, "base64");
-
-        return new Promise((resolve, reject) => {
-            gzip.unzip(buf, (err, buffer) => {
-                if (err)
-                    reject(err);
-
-                const content = buffer.toString('utf-8');
-                resolve(content);
-            });
-        });
+    public constructor(private readonly host: string, private readonly port: number) {
+        this.handlers = [];
     }
 
     public connect(user: string, password: string) {
@@ -47,10 +34,12 @@ export class MqttClient {
         });
 
         this.client.on("message", (topic, msg) => {
-            this.decode(msg.toString()).then((data: string) => {
-                this.handler(topic, data);
-            }).catch(err => {
-                console.warn(`Unable to decode MQTT message: ${err.toString()}`);
+            this.handlers.forEach(handler => {
+                if (handler.getTopic() !== topic) {
+                    return;
+                }
+
+                handler.handle(topic, msg.toString());
             });
         });
 
@@ -61,8 +50,8 @@ export class MqttClient {
         this.client.publish(topic, message);
     }
 
-    public setHandleMessage(msg: MessageHandler) {
-        this.handler = msg;
+    public addHandler(handler: IMessageHandler) {
+        this.handlers.push(handler);
     }
 
     public subscribe(topic: string) {

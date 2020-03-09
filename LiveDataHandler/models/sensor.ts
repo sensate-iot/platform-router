@@ -5,7 +5,7 @@
  * @email  michel.megens@sonatolabs.com
  */
 
-import { Document, Schema, Model, model } from "mongoose";
+import { Document, Schema, model } from "mongoose";
 
 export interface SensorModel extends Document {
     Secret: string;
@@ -16,7 +16,7 @@ export interface SensorModel extends Document {
     Owner: string;
 };
 
-export const SensorSchema: Schema = new Schema({
+export const SensorSchema = new Schema({
     Secret: {
         type: String,
         required: true
@@ -43,4 +43,4 @@ export const SensorSchema: Schema = new Schema({
     },
 });
 
-export const Sensor: Model<SensorModel> = model<SensorModel>("Sensor", SensorSchema, 'Sensors');
+export const Sensor = model<SensorModel>("Sensor", SensorSchema, "Sensors");

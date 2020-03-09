@@ -2,11 +2,16 @@
   "name": "live-data-handler",
   "version": "0.0.1",
   "description": "LiveDataHandler",
-  "main": "app.js",
-  "author": {
-    "name": "Michel Megens"
+  "main": "dist/src/app.js",
+  "scripts": {
+    "start": "ts-node app/live-data-handler.ts",
+    "dev": "nodemon -x \"node ./node_modules/ts-node/dist/bin.js\" ./app/live-data-handler.ts"
   },
-  "license": "Apache-2.0",
+  "author": {
+    "name": "Michel Megens",
+    "email": "michel@michelmegens.net"
+  },
+  "license": "GPL-3.0",
   "repository": "https://github.com/sensate-iot/SensateService",
   "devDependencies": {
     "@types/async": "^2.4.2",
@@ -17,13 +22,16 @@
     "@types/node": "^8.10.59",
     "@types/ws": "^6.0.4",
     "nodemon": "^1.19.4",
+    "ts-node": "^8.6.2",
     "tslint": "^5.20.1",
     "typescript": "^3.7.5"
   },
   "dependencies": {
     "async": "^2.6.3",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
+    "moment": "^2.24.0",
     "mongoose": "^5.8.9",
     "mqtt": "^3.0.0",
     "ws": "^6.2.1",
