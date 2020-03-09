@@ -20,10 +20,12 @@ namespace SensateService.ApiCore.Controllers
 	public class AbstractDataController : AbstractApiController
 	{
 		protected readonly ISensorRepository m_sensors;
+		protected readonly ISensorLinkRepository m_links;
 
-		public AbstractDataController(IHttpContextAccessor ctx, ISensorRepository sensors) : base(ctx)
+		public AbstractDataController(IHttpContextAccessor ctx, ISensorRepository sensors, ISensorLinkRepository links) : base(ctx)
 		{
 			this.m_sensors = sensors;
+			this.m_links = links;
 		}
 
 		protected async Task<bool> AuthenticateUserForSensor(string sensorId, bool strict = false)
@@ -35,6 +37,12 @@ namespace SensateService.ApiCore.Controllers
 			}
 
 			return this.AuthenticateUserForSensor(sensor, strict);
+		}
+
+		protected async Task<bool> IsLinkedSensor(string id)
+		{
+			var links = await this.m_links.GetByUserAsync(this.CurrentUser).AwaitBackground();
+			return links.Any(link => link.SensorId == id);
 		}
 
 		protected bool AuthenticateUserForSensor(Sensor sensor, bool strict)

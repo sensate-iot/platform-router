@@ -39,8 +39,9 @@ namespace SensateService.NetworkApi.Controllers
             IMqttPublishService publisher,
             ILogger<ActuatorsController> logger,
 	        ISensorRepository sensors,
+			ISensorLinkRepository links,
             IOptions<MqttPublishServiceOptions> options,
-	        IControlMessageRepository msgs) : base(ctx, sensors)
+	        IControlMessageRepository msgs) : base(ctx, sensors, links)
         {
 	        this.m_controlMessages = msgs;
 	        this.m_logger = logger;

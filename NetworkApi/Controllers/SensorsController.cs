@@ -23,6 +23,7 @@ using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Models.Json.Out;
 using SensateService.NetworkApi.Models;
+using SensateService.Services;
 
 namespace SensateService.NetworkApi.Controllers
 {
@@ -36,13 +37,18 @@ namespace SensateService.NetworkApi.Controllers
 		private readonly IMessageRepository m_messages;
 		private readonly ITriggerRepository m_triggers;
 		private readonly ISensorStatisticsRepository m_stats;
+		private readonly IUserRepository m_users;
+		private readonly ISensorService m_sensorService;
 
 		public SensorsController(IHttpContextAccessor ctx, ISensorRepository sensors, ILogger<SensorsController> logger,
 			IMeasurementRepository measurements,
 			ITriggerRepository triggers,
 			IMessageRepository messages,
+			IUserRepository users,
+			ISensorLinkRepository links,
 			ISensorStatisticsRepository stats,
-			IApiKeyRepository keys) : base(ctx, sensors)
+			ISensorService sensorService,
+			IApiKeyRepository keys) : base(ctx, sensors, links)
 		{
 			this.m_logger = logger;
 			this.m_apiKeys = keys;
@@ -50,6 +56,8 @@ namespace SensateService.NetworkApi.Controllers
 			this.m_triggers = triggers;
 			this.m_messages = messages;
 			this.m_stats = stats;
+			this.m_users = users;
+			this.m_sensorService = sensorService;
 		}
 
 		[HttpGet]
@@ -60,9 +68,9 @@ namespace SensateService.NetworkApi.Controllers
 			IEnumerable<Sensor> sensors;
 
 			if(string.IsNullOrEmpty(name)) {
-				sensors = await this.m_sensors.GetAsync(this.CurrentUser).AwaitBackground();
+				sensors = await this.m_sensorService.GetSensorsAsync(this.CurrentUser).AwaitBackground();
 			} else {
-				sensors = await this.m_sensors.FindByNameAsync(this.CurrentUser, name).AwaitBackground();
+				sensors = await this.m_sensorService.GetSensorsAsync(this.CurrentUser, name).AwaitBackground();
 			}
 				
 			return this.Ok(sensors);
@@ -91,6 +99,53 @@ namespace SensateService.NetworkApi.Controllers
 			}
 
 			return this.CreatedAtAction(nameof(Get), new {Id = sensor.InternalId}, sensor);
+		}
+
+		[HttpPost("link")]
+		[ReadWriteApiKey, ValidateModel]
+		[ProducesResponseType(typeof(Sensor), StatusCodes.Status201Created)]
+		[ProducesResponseType(typeof(Sensor), StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(typeof(Sensor), StatusCodes.Status403Forbidden)]
+		[ProducesResponseType(typeof(Sensor), StatusCodes.Status422UnprocessableEntity)]
+		public async Task<IActionResult> Link([FromBody] SensorLink link)
+		{
+			var status = new Status();
+
+			try {
+				var sensor = await this.m_sensors.GetAsync(link.SensorId).AwaitBackground();
+				var user = await this.m_users.GetByEmailAsync(link.UserId).AwaitBackground();
+
+				if(!this.AuthenticateUserForSensor(sensor, false)) {
+					return this.Forbid();
+				}
+
+				if(user == null) {
+					status.Message = "Target user not known!";
+					status.ErrorCode = ReplyCode.BadInput;
+
+					return this.NotFound(status);
+				}
+
+				if(sensor == null) {
+					status.Message = "Target sensor not known!";
+					status.ErrorCode = ReplyCode.BadInput;
+
+					return this.NotFound(status);
+				}
+
+				link.UserId = user.Id;
+				await this.m_links.CreateAsync(link).AwaitBackground();
+			} catch(Exception ex) {
+				this.m_logger.LogInformation($"Unable to link sensor: {ex.Message}");
+				this.m_logger.LogDebug(ex.StackTrace);
+
+				return this.BadRequest(new Status {
+					Message = "Unable to link sensor!",
+					ErrorCode = ReplyCode.BadInput
+				});
+			}
+
+			return this.NoContent();
 		}
 
 		[HttpPatch("{id}")]
@@ -251,7 +306,9 @@ namespace SensateService.NetworkApi.Controllers
 				return this.NotFound();
 			}
 
-			if(!this.AuthenticateUserForSensor(sensor, false)) {
+			var linked = await this.IsLinkedSensor(id).AwaitBackground();
+
+			if(!this.AuthenticateUserForSensor(sensor, false) && !linked) {
 				return this.Forbid();
 			}
 

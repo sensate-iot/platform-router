@@ -32,7 +32,9 @@ namespace SensateService.DataApi.Controllers
 		private readonly IMessageRepository m_messages;
 		private readonly ILogger<MessagesController> m_logger;
 
-		public MessagesController(IHttpContextAccessor ctx, IMessageRepository messages, ILogger<MessagesController> logger, ISensorRepository sensors) : base(ctx, sensors)
+		public MessagesController(IHttpContextAccessor ctx, IMessageRepository messages,
+			ISensorLinkRepository links,
+			ILogger<MessagesController> logger, ISensorRepository sensors) : base(ctx, sensors, links)
 		{
 			this.m_messages = messages;
 			this.m_logger = logger;

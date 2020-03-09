@@ -128,6 +128,7 @@ namespace SensateService.NetworkApi.Application
 			services.AddSqlRepositories(cache.Enabled);
 			services.AddDocumentRepositories(cache.Enabled);
 			services.AddMeasurementStorage(cache);
+			services.AddSensorServices();
 
 			if(mail.Provider == "SendGrid") {
 				services.AddSingleton<IEmailSender, SendGridMailer>();

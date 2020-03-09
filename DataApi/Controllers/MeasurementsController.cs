@@ -6,7 +6,9 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
@@ -17,6 +19,7 @@ using MongoDB.Driver.GeoJsonObjectModel;
 using Newtonsoft.Json.Linq;
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
+using SensateService.DataApi.Models;
 using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
@@ -24,6 +27,7 @@ using SensateService.Infrastructure.Storage;
 using SensateService.Models;
 using SensateService.Models.Generic;
 using SensateService.Models.Json.Out;
+using SensateService.Services;
 
 namespace SensateService.DataApi.Controllers
 {
@@ -33,11 +37,15 @@ namespace SensateService.DataApi.Controllers
 	{
 		private readonly IMeasurementCache m_cache;
 		private readonly IMeasurementRepository m_measurements;
+		private readonly ISensorService m_sensorService;
 
-		public MeasurementsController(IMeasurementCache cache, IMeasurementRepository measurements, ISensorRepository sensors, IHttpContextAccessor ctx) : base(ctx, sensors)
+		public MeasurementsController(IMeasurementCache cache, IMeasurementRepository measurements,
+			ISensorService sensorService, ISensorLinkRepository links,
+			ISensorRepository sensors, IHttpContextAccessor ctx) : base(ctx, sensors, links)
 		{
 			this.m_cache = cache;
 			this.m_measurements = measurements;
+			this.m_sensorService = sensorService;
 		}
 
 		[HttpPost("create")]
@@ -94,11 +102,61 @@ namespace SensateService.DataApi.Controllers
 			var measurement = await this.m_measurements.GetMeasurementAsync(idx).AwaitBackground();
 			var auth = await this.AuthenticateUserForSensor(measurement.SensorId.ToString()).AwaitBackground();
 
+			auth |= await this.IsLinkedSensor(measurement.SensorId.ToString()).AwaitBackground();
+
 			if(!auth) {
 				return this.Unauthorized();
 			}
 
 			return this.Ok(measurement);
+		}
+
+		[HttpPost]
+		[ProducesResponseType(StatusCodes.Status200OK)]
+		[ProducesResponseType(StatusCodes.Status403Forbidden)]
+		[ProducesResponseType(StatusCodes.Status400BadRequest)]
+		public async Task<IActionResult> Filter([FromBody] Filter filter)
+		{
+			var status = new Status();
+			IEnumerable<MeasurementsQueryResult> result;
+
+			if(filter.SensorIds == null || filter.SensorIds.Count <= 0) {
+				status.ErrorCode = ReplyCode.BadInput;
+				status.Message = "Sensor ID list cannot be empty!";
+
+				return this.UnprocessableEntity(status);
+			}
+
+			if(filter.Skip == null) {
+				filter.Skip = -1;
+			}
+
+			if(filter.Limit == null) {
+				filter.Limit = -1;
+			}
+
+			var raw = await this.m_sensorService.GetSensorsAsync(this.CurrentUser).AwaitBackground();
+			var sensors = raw.ToList();
+			var filtered = sensors.Where(x => filter.SensorIds.Contains(x.InternalId.ToString())).ToList();
+
+			if(filtered.Count <= 0) {
+				status.Message = "No sensors available!";
+				status.ErrorCode = ReplyCode.NotAllowed;
+
+				return this.UnprocessableEntity(status);
+			}
+
+			if(filter.Latitude != null & filter.Longitude != null && filter.Radius != null && filter.Radius.Value > 0) {
+				var coords = new GeoJson2DGeographicCoordinates(filter.Longitude.Value, filter.Latitude.Value);
+				result = await this.m_measurements
+					.GetMeasurementsNearAsync(filtered, filter.Start, filter.End, coords, filter.Radius.Value,
+						filter.Skip.Value, filter.Limit.Value).AwaitBackground();
+			} else {
+				result = await this.m_measurements
+					.GetMeasurementsBetweenAsync(filtered, filter.Start, filter.End, filter.Skip.Value, filter.Limit.Value).AwaitBackground();
+			}
+
+			return this.Ok(result);
 		}
 
 		[HttpGet]
@@ -109,7 +167,13 @@ namespace SensateService.DataApi.Controllers
 		{
 			var sensor = await this.m_sensors.GetAsync(sensorId).AwaitBackground();
 
-			if(!this.AuthenticateUserForSensor(sensor, false)) {
+			if(sensor == null) {
+				return this.NotFound();
+			}
+
+			var linked = await this.IsLinkedSensor(sensorId).AwaitBackground();
+
+			if(!this.AuthenticateUserForSensor(sensor, false) && !linked) {
 				return this.Unauthorized();
 			}
 

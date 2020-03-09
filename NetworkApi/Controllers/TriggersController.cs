@@ -33,8 +33,10 @@ namespace SensateService.NetworkApi.Controllers
 		private readonly ITriggerRepository m_triggers;
 		private readonly ILogger<TriggersController> m_logger;
 
-		public TriggersController(IHttpContextAccessor ctx, ITriggerRepository triggers, ISensorRepository sensors, ILogger<TriggersController> logger) :
-			base(ctx, sensors)
+		public TriggersController(IHttpContextAccessor ctx, ITriggerRepository triggers,
+			ISensorLinkRepository links,
+			ISensorRepository sensors, ILogger<TriggersController> logger) :
+			base(ctx, sensors, links)
 		{
 			this.m_logger = logger;
 			this.m_triggers = triggers;
@@ -120,7 +122,6 @@ namespace SensateService.NetworkApi.Controllers
 
 		[HttpPost("{triggerId}/add-action")]
 		[ReadWriteApiKey]
-		[ValidateModel]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status422UnprocessableEntity)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status401Unauthorized)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status201Created)]
@@ -283,9 +284,10 @@ namespace SensateService.NetworkApi.Controllers
 				return this.NotFound();
 			}
 
+			var linked = await this.IsLinkedSensor(trigger.SensorId).AwaitBackground();
 			var auth = await this.AuthenticateUserForSensor(trigger.SensorId).AwaitBackground();
 
-			if(!auth) {
+			if(!auth && !linked) {
 				return this.CreateNotAuthorizedResult();
 			}
 
@@ -305,9 +307,10 @@ namespace SensateService.NetworkApi.Controllers
 				});
 			}
 
+			var linked = await this.IsLinkedSensor(sensorId).AwaitBackground();
 			var auth = await this.AuthenticateUserForSensor(sensorId).AwaitBackground();
 
-			if(!auth) {
+			if(!auth && !linked) {
 				return this.CreateNotAuthorizedResult();
 			}
 

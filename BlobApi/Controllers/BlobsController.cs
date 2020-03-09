@@ -38,9 +38,10 @@ namespace SensateService.BlobApi.Controllers
 		private readonly InternalMqttServiceOptions m_mqttOptions;
 
 		public BlobsController(IHttpContextAccessor ctx, ISensorRepository sensors, IBlobRepository blobs,
+			ISensorLinkRepository links,
 			IOptions<BlobStorageSettings> blobOptions, ILogger<BlobsController> logger, IMqttPublishService publisher,
 			IOptions<InternalMqttServiceOptions> mqttOptions 
-			) : base(ctx, sensors)
+			) : base(ctx, sensors, links)
 		{
 			this.m_settings = blobOptions.Value;
 			this.m_blobs = blobs;
