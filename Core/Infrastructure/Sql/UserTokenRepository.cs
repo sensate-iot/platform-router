@@ -117,20 +117,20 @@ namespace SensateService.Infrastructure.Sql
 			List<Claim> claims;
 			JwtSecurityToken token;
 
+			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.JwtKey));
+			var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+			var expires = DateTime.Now.AddMinutes(settings.JwtExpireMinutes);
+
 			claims = new List<Claim> {
-				new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+				new Claim(JwtRegisteredClaimNames.Email, user.Email),
 				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-				new Claim(ClaimTypes.NameIdentifier, user.Id),
-				new Claim(JwtRegisteredClaimNames.NameId, user.Id)
+				new Claim(JwtRegisteredClaimNames.Sub, user.Id),
 			};
 
 			roles.ToList().ForEach(x => {
 				claims.Add(new Claim(ClaimTypes.Role, x));
 			});
 
-			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.JwtKey));
-			var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-			var expires = DateTime.Now.AddMinutes(settings.JwtExpireMinutes);
 			token = new JwtSecurityToken(
 				issuer: settings.JwtIssuer,
 				audience: settings.JwtIssuer,

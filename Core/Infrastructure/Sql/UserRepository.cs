@@ -85,22 +85,22 @@ namespace SensateService.Infrastructure.Sql
 
 		public SensateUser GetByClaimsPrinciple(ClaimsPrincipal cp)
 		{
-			string email;
+			string id;
 
-			email = this._manager.GetUserId(cp);
-			return this.GetByEmail(email);
+			id = this._manager.GetUserId(cp);
+			return this.GetById(id);
 		}
 
 		public async Task<SensateUser> GetByClaimsPrincipleAsync(ClaimsPrincipal cp)
 		{
-			string email;
+			string id;
 
-			email = this._manager.GetUserId(cp);
+			id = this._manager.GetUserId(cp);
 
-			if(email == null)
+			if(id == null)
 				return null;
 
-			return await this.GetByEmailAsync(email);
+			return await this._manager.FindByIdAsync(id).AwaitBackground();
 		}
 
 		public IEnumerable<string> GetRoles(SensateUser user)
