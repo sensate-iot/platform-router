@@ -16,14 +16,13 @@ namespace SensateService.Helpers
 			if(!typeof(T).IsEnum)
 				throw new ArgumentException("Type argument must be an enumerated type!");
 
-			return (int) (IConvertible)source;
+			return (int)(IConvertible)source;
 		}
 	}
 
 	public class Enum<T> where T : struct, IConvertible
 	{
-		public static int Count
-		{
+		public static int Count {
 			get {
 				if(!typeof(T).IsEnum)
 					throw new ArgumentException("Type argument must be an enumerated type!");

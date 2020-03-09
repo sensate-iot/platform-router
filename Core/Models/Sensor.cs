@@ -21,19 +21,19 @@ namespace SensateService.Models
 		public const int SecretLength = 256;
 
 		[BsonId, BsonRequired, JsonConverter(typeof(ObjectIdJsonConverter))]
-		public ObjectId InternalId {get;set;}
+		public ObjectId InternalId { get; set; }
 		[BsonRequired, StringLength(SecretLength, MinimumLength = 4)]
-		public string Secret {get;set;}
+		public string Secret { get; set; }
 		[BsonRequired, Required]
-		public string Name {get;set;}
+		public string Name { get; set; }
 		[Required]
-		public string Description {get;set;}
+		public string Description { get; set; }
 		[BsonRequired]
-		public DateTime CreatedAt {get;set;}
+		public DateTime CreatedAt { get; set; }
 		[BsonRequired]
-		public DateTime UpdatedAt {get;set;}
+		public DateTime UpdatedAt { get; set; }
 		[BsonRequired]
-		public string Owner {get;set;}
+		public string Owner { get; set; }
 
 		public string ToJson()
 		{

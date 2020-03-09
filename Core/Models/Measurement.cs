@@ -22,7 +22,7 @@ namespace SensateService.Models
 	public class Measurement
 	{
 		[BsonRequired]
-		public IDictionary<string, DataPoint> Data { get;set; }
+		public IDictionary<string, DataPoint> Data { get; set; }
 		[BsonRequired]
 		public DateTime Timestamp { get; set; }
 		[BsonRequired]

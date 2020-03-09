@@ -32,7 +32,7 @@ namespace SensateService.DashboardApi.Controllers
 		private readonly ISensorRepository _sensors;
 
 		public AdminDashboardController(IUserRepository users, IHttpContextAccessor ctx,
-			ISensorStatisticsRepository stats, ISensorRepository sensors) : base(users , ctx)
+			ISensorStatisticsRepository stats, ISensorRepository sensors) : base(users, ctx)
 		{
 			this._stats = stats;
 			this._sensors = sensors;
@@ -48,8 +48,7 @@ namespace SensateService.DashboardApi.Controllers
 			var measurementStats = this.GetMeasurementStats();
 			var sensors = this._sensors.CountAsync();
 
-			db = new AdminDashboard
-			{
+			db = new AdminDashboard {
 				Registrations = await this.GetRegistrations().AwaitBackground(),
 				NumberOfUsers = await this._users.CountAsync().AwaitBackground(),
 				NumberOfGhosts = await this._users.CountGhostUsersAsync().AwaitBackground()

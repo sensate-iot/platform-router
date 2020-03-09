@@ -66,7 +66,7 @@ namespace SensateService.DashboardApi.Controllers
 				SecurityTokenCount = await this.CountSecurityTokensAsync(),
 
 
-				MeasurementsToday =  await this.GetMeasurementStatsToday().AwaitBackground(),
+				MeasurementsToday = await this.GetMeasurementStatsToday().AwaitBackground(),
 				ApiCallsLastWeek = await this.GetApiCallsPerDayAsync().AwaitBackground()
 			};
 
@@ -102,13 +102,13 @@ namespace SensateService.DashboardApi.Controllers
 		{
 			var start = DateTime.Now.AddMonths(-1);
 			var logs = await this._logs.CountAsync(entry => entry.AuthorId == this.CurrentUser.Id &&
-			                                              entry.Timestamp >= start &&
-			                                              entry.Timestamp <= DateTime.Now &&
-			                                              (entry.Method == RequestMethod.HttpGet ||
-			                                               entry.Method == RequestMethod.HttpDelete ||
-			                                               entry.Method == RequestMethod.HttpPatch ||
-			                                               entry.Method == RequestMethod.HttpPost ||
-			                                               entry.Method == RequestMethod.HttpPut)).AwaitBackground();
+														  entry.Timestamp >= start &&
+														  entry.Timestamp <= DateTime.Now &&
+														  (entry.Method == RequestMethod.HttpGet ||
+														   entry.Method == RequestMethod.HttpDelete ||
+														   entry.Method == RequestMethod.HttpPatch ||
+														   entry.Method == RequestMethod.HttpPost ||
+														   entry.Method == RequestMethod.HttpPut)).AwaitBackground();
 			return logs;
 		}
 
@@ -143,13 +143,13 @@ namespace SensateService.DashboardApi.Controllers
 			var start = lastweek;
 
 			var logs = await this._logs.GetAsync(entry => entry.AuthorId == this.CurrentUser.Id &&
-			                                              entry.Timestamp >= start &&
-			                                              entry.Timestamp <= DateTime.Now &&
-			                                              (entry.Method == RequestMethod.HttpGet ||
-			                                               entry.Method == RequestMethod.HttpDelete ||
-			                                               entry.Method == RequestMethod.HttpPatch ||
-			                                               entry.Method == RequestMethod.HttpPost ||
-			                                               entry.Method == RequestMethod.HttpPut)).AwaitBackground();
+														  entry.Timestamp >= start &&
+														  entry.Timestamp <= DateTime.Now &&
+														  (entry.Method == RequestMethod.HttpGet ||
+														   entry.Method == RequestMethod.HttpDelete ||
+														   entry.Method == RequestMethod.HttpPatch ||
+														   entry.Method == RequestMethod.HttpPost ||
+														   entry.Method == RequestMethod.HttpPut)).AwaitBackground();
 			var data = logs.GroupBy(log => log.Timestamp.Date).Select(grp => new {
 				DayOfMonth = grp.Key,
 				Count = grp.AsEnumerable().Count()
@@ -183,7 +183,7 @@ namespace SensateService.DashboardApi.Controllers
 			Graph<int, long> data;
 
 			var entries = statistics.GroupBy(entry => entry.Date)
-				.Select(grp => new {DayOfWeek = (int) grp.Key.DayOfWeek, Count = AccumulateStatisticsEntries(grp.AsEnumerable())}).ToList();
+				.Select(grp => new { DayOfWeek = (int)grp.Key.DayOfWeek, Count = AccumulateStatisticsEntries(grp.AsEnumerable()) }).ToList();
 
 			data = new Graph<int, long>();
 

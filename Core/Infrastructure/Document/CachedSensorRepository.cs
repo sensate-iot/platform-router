@@ -33,7 +33,7 @@ namespace SensateService.Infrastructure.Document
 			this._cache.Set(obj.InternalId.ToString(), obj.ToJson());
 		}
 
-		private async Task CommitAsync( Sensor obj, CancellationToken ct = default(CancellationToken) )
+		private async Task CommitAsync(Sensor obj, CancellationToken ct = default(CancellationToken))
 		{
 			await this._cache.SetAsync(
 				obj.InternalId.ToString(),
@@ -77,7 +77,7 @@ namespace SensateService.Infrastructure.Document
 			if(sensors == null)
 				return null;
 
-			await this._cache.SetAsync( key, JsonConvert.SerializeObject(sensors), CacheTimeout.TimeoutMedium.ToInt() ).AwaitBackground();
+			await this._cache.SetAsync(key, JsonConvert.SerializeObject(sensors), CacheTimeout.TimeoutMedium.ToInt()).AwaitBackground();
 			return sensors;
 		}
 
@@ -104,10 +104,10 @@ namespace SensateService.Infrastructure.Document
 		public override async Task UpdateSecretAsync(Sensor sensor, SensateApiKey key)
 		{
 			var tasks = new[] {
-                this._cache.SetAsync(sensor.InternalId.ToString(), sensor.ToJson()),
+				this._cache.SetAsync(sensor.InternalId.ToString(), sensor.ToJson()),
 				this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}"),
 				this._cache.RemoveAsync(sensor.Owner),
-                base.UpdateSecretAsync(sensor, key)
+				base.UpdateSecretAsync(sensor, key)
 			};
 
 			await Task.WhenAll(tasks).AwaitBackground();
@@ -116,9 +116,9 @@ namespace SensateService.Infrastructure.Document
 		public override async Task UpdateAsync(Sensor sensor)
 		{
 			var tasks = new[] {
-                this._cache.SetAsync(sensor.InternalId.ToString(), sensor.ToJson()),
+				this._cache.SetAsync(sensor.InternalId.ToString(), sensor.ToJson()),
 				this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}"),
-                base.UpdateAsync(sensor),
+				base.UpdateAsync(sensor),
 			};
 
 			await Task.WhenAll(tasks).AwaitBackground();

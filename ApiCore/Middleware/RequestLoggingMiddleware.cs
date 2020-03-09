@@ -37,23 +37,23 @@ namespace SensateService.ApiCore.Middleware
 		private static RequestMethod ToRequestMethod(string method)
 		{
 			switch(method.ToUpper()) {
-			case "GET":
-				return RequestMethod.HttpGet;
+				case "GET":
+					return RequestMethod.HttpGet;
 
-			case "POST":
-				return RequestMethod.HttpPost;
+				case "POST":
+					return RequestMethod.HttpPost;
 
-			case "PUT":
-				return RequestMethod.HttpPut;
+				case "PUT":
+					return RequestMethod.HttpPut;
 
-			case "PATCH":
-				return RequestMethod.HttpPatch;
+				case "PATCH":
+					return RequestMethod.HttpPatch;
 
-			case "DELETE":
-				return RequestMethod.HttpDelete;
+				case "DELETE":
+					return RequestMethod.HttpDelete;
 
-			default:
-				return RequestMethod.Any;
+				default:
+					return RequestMethod.Any;
 			}
 
 		}

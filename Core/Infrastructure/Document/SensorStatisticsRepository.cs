@@ -88,11 +88,11 @@ namespace SensateService.Infrastructure.Document
 			var t = to.ThisHour();
 
 			var worker = this._collection.DeleteManyAsync(stat => stat.SensorId == sensor.InternalId &&
-			                                                      stat.Date >= f && stat.Date <= t);
+																  stat.Date >= f && stat.Date <= t);
 			await worker.AwaitBackground();
 		}
 
-#region Entry creation
+		#region Entry creation
 
 		public Task IncrementAsync(Sensor sensor, RequestMethod method)
 		{
@@ -122,19 +122,19 @@ namespace SensateService.Infrastructure.Document
 			updateDefinition = update.Inc(x => x.Measurements, num)
 				.SetOnInsert(x => x.Method, method);
 
-			var opts = new UpdateOptions {IsUpsert = true};
+			var opts = new UpdateOptions { IsUpsert = true };
 			try {
 				await this._collection.UpdateOneAsync(x => x.SensorId == sensor.InternalId &&
-				                                           x.Date == DateTime.Now.ThisHour() && x.Method == method,
+														   x.Date == DateTime.Now.ThisHour() && x.Method == method,
 					updateDefinition, opts, token).AwaitBackground();
 			} catch(Exception ex) {
 				throw new DatabaseException("Unable to update measurement statistics!", "Statistics", ex);
 			}
 		}
 
-#endregion
+		#endregion
 
-#region Entry Getters
+		#region Entry Getters
 
 		public async Task<SensorStatisticsEntry> GetByDateAsync(Sensor sensor, DateTime dt)
 		{
@@ -204,7 +204,7 @@ namespace SensateService.Infrastructure.Document
 			var endDate = end.ThisHour();
 
 			filter = builder.Eq(x => x.SensorId, sensor.InternalId) & builder.Gte(x => x.Date, startDate) &
-			         builder.Lte(x => x.Date, endDate);
+					 builder.Lte(x => x.Date, endDate);
 			var result = await this._stats.FindAsync(filter).AwaitBackground();
 
 			if(result == null)
@@ -212,6 +212,6 @@ namespace SensateService.Infrastructure.Document
 
 			return await result.ToListAsync().AwaitBackground();
 		}
-#endregion
+		#endregion
 	}
 }

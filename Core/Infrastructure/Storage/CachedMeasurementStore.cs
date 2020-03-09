@@ -218,8 +218,9 @@ namespace SensateService.Infrastructure.Storage
 					if(processed_q.Count <= 0L)
 						return 0L;
 
-					var mapped = from measurement in processed_q
-						group measurement by new {measurement.Creator, measurement.Method}
+					var mapped =
+						from measurement in processed_q
+						group measurement by new { measurement.Creator, measurement.Method }
 						into g
 						select new SortedMeasurementEntry {
 							Creator = g.Key.Creator,
@@ -228,7 +229,7 @@ namespace SensateService.Infrastructure.Storage
 						};
 					var sorted = mapped.ToList();
 
-					statsdata = sorted.Select(e => new StatisticsUpdate(e.Method, e.Measurements.Count, e.Creator)) .ToList();
+					statsdata = sorted.Select(e => new StatisticsUpdate(e.Method, e.Measurements.Count, e.Creator)).ToList();
 					asyncio[0] = IncrementStatistics(statsdb, statsdata, cts.Token);
 
 					data = sorted.ToDictionary(key => key.Creator, value => value.Measurements.ToList());

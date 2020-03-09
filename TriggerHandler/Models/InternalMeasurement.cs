@@ -13,7 +13,7 @@ namespace SensateService.TriggerHandler.Models
 	public class InternalMeasurement
 	{
 		public List<Measurement> Measurements { get; set; }
-        public string CreatedBy { get; set; }
+		public string CreatedBy { get; set; }
 	}
 }
 

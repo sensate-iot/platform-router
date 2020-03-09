@@ -17,9 +17,9 @@ namespace SensateService.TriggerHandler
 {
 	public class Program
 	{
-	    public static IHost CreateHost(string[] args)
-	    {
-		    Startup starter = null;
+		public static IHost CreateHost(string[] args)
+		{
+			Startup starter = null;
 
 			var wh = Host.CreateDefaultBuilder(args)
 				.UseContentRoot(Directory.GetCurrentDirectory())
@@ -40,7 +40,7 @@ namespace SensateService.TriggerHandler
 				.ConfigureServices((ctx, services) => {
 					starter = new Startup(ctx.Configuration);
 					starter.ConfigureServices(services);
-				}) ;
+				});
 
 			var host = wh.Build();
 			var provider = host.Services;
@@ -50,14 +50,14 @@ namespace SensateService.TriggerHandler
 
 			starter.Configure(provider);
 			return host;
-	    }
+		}
 
-        public static void Main(string[] args)
-        {
-            Console.WriteLine($"Starting Sensate MQTT client using {Version.VersionString}");
+		public static void Main(string[] args)
+		{
+			Console.WriteLine($"Starting Sensate MQTT client using {Version.VersionString}");
 
 			var program = new Application.Application(CreateHost(args));
 			program.Run();
-        }
+		}
 	}
 }

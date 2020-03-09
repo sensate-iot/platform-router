@@ -138,7 +138,7 @@ namespace SensateService.AuthApi.Controllers
 
 			var error = result.Errors.First();
 			return error != null ? this.InvalidInputResult(error.Description) :
-				new NotFoundObjectResult(new {Message = result.Errors});
+				new NotFoundObjectResult(new { Message = result.Errors });
 		}
 
 		[HttpGet("list")]
@@ -172,7 +172,7 @@ namespace SensateService.AuthApi.Controllers
 				return this.Forbid();
 			}
 
-			unconfirmed = ! await this._manager.IsPhoneNumberConfirmedAsync(user).AwaitBackground();
+			unconfirmed = !await this._manager.IsPhoneNumberConfirmedAsync(user).AwaitBackground();
 			unconfirmed = unconfirmed || user.UnconfirmedPhoneNumber?.Length > 0;
 
 			if(string.IsNullOrEmpty(user.PhoneNumber) && string.IsNullOrEmpty(user.UnconfirmedPhoneNumber)) {

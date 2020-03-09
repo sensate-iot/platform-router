@@ -92,7 +92,7 @@ namespace SensateService.Infrastructure.Sql
 		public async Task AddActionAsync(Trigger trigger, TriggerAction action, CancellationToken ct = default)
 		{
 			this._sqlContext.TriggerActions.Add(action);
-			
+
 			await this.CommitAsync(ct).AwaitBackground();
 			trigger.Actions.Add(action);
 		}

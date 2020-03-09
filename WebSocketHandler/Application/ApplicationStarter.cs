@@ -156,8 +156,7 @@ namespace SensateService.WebSocketHandler.Application
 			.AddJwtBearer(cfg => {
 				cfg.RequireHttpsMetadata = false;
 				cfg.SaveToken = true;
-				cfg.TokenValidationParameters = new TokenValidationParameters
-				{
+				cfg.TokenValidationParameters = new TokenValidationParameters {
 					ValidIssuer = auth.JwtIssuer,
 					ValidAudience = auth.JwtIssuer,
 					IssuerSigningKey = new SymmetricSecurityKey(

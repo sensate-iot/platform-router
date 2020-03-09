@@ -13,8 +13,8 @@ using SensateService.Models;
 
 namespace SensateService.Infrastructure.Repositories
 {
-    public interface IUserRoleRepository
-    {
+	public interface IUserRoleRepository
+	{
 		void Create(SensateRole role);
 		Task CreateAsync(SensateRole role, CancellationToken ct = default(CancellationToken));
 		void Create(string name, string description);
@@ -26,11 +26,11 @@ namespace SensateService.Infrastructure.Repositories
 		Task UpdateAsync(string name, SensateRole role);
 		void Update(string name, SensateRole role);
 
-	    Task<SensateRole> GetByNameAsync(string name);
+		Task<SensateRole> GetByNameAsync(string name);
 		SensateRole GetById(string id);
 		SensateRole GetByName(string name);
 		IEnumerable<SensateUser> GetUsers(string id);
 		IEnumerable<string> GetRolesFor(SensateUser user);
 		Task<IEnumerable<string>> GetRolesForAsync(SensateUser user);
-    }
+	}
 }

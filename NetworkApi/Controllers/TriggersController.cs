@@ -94,7 +94,7 @@ namespace SensateService.NetworkApi.Controllers
 
 			await this.m_triggers.CreateAsync(trigger).AwaitBackground();
 
-			return this.CreatedAtAction(nameof(GetById), new {triggerId = trigger.Id}, trigger);
+			return this.CreatedAtAction(nameof(GetById), new { triggerId = trigger.Id }, trigger);
 		}
 
 		private async Task<bool> CreatedTargetedActionAsync(TriggerAction action)
@@ -105,7 +105,7 @@ namespace SensateService.NetworkApi.Controllers
 				return false;
 
 			if(action.Channel == TriggerActionChannel.ControlMessage) {
-				var actuator = await this.m_sensors.GetAsync(action.Target).AwaitBackground(); 
+				var actuator = await this.m_sensors.GetAsync(action.Target).AwaitBackground();
 
 				if(actuator == null) {
 					return false;
@@ -114,7 +114,7 @@ namespace SensateService.NetworkApi.Controllers
 				auth = this.AuthenticateUserForSensor(actuator, false);
 			} else {
 				auth = Uri.TryCreate(action.Target, UriKind.Absolute, out var result) &&
-				       result.Scheme == Uri.UriSchemeHttp || result.Scheme == Uri.UriSchemeHttps;
+					   result.Scheme == Uri.UriSchemeHttp || result.Scheme == Uri.UriSchemeHttps;
 			}
 
 			return auth;
@@ -134,7 +134,7 @@ namespace SensateService.NetworkApi.Controllers
 				});
 			}
 
-			if(action.Channel > TriggerActionChannel.MQTT && string.IsNullOrEmpty( action.Target)) {
+			if(action.Channel > TriggerActionChannel.MQTT && string.IsNullOrEmpty(action.Target)) {
 				return this.UnprocessableEntity(new Status {
 					Message = "Missing target field.",
 					ErrorCode = ReplyCode.BadInput
@@ -171,7 +171,7 @@ namespace SensateService.NetworkApi.Controllers
 				});
 			}
 
-			return this.CreatedAtAction(nameof(GetById), new {triggerId = trigger.Id}, trigger);
+			return this.CreatedAtAction(nameof(GetById), new { triggerId = trigger.Id }, trigger);
 		}
 
 		[HttpPost("{triggerId}/add-actions")]
@@ -214,7 +214,7 @@ namespace SensateService.NetworkApi.Controllers
 				});
 			}
 
-			return this.CreatedAtAction(nameof(GetById), new {triggerId = trigger.Id}, trigger);
+			return this.CreatedAtAction(nameof(GetById), new { triggerId = trigger.Id }, trigger);
 		}
 
 		[HttpDelete("{triggerId}")]

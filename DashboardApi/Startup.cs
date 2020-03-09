@@ -98,8 +98,7 @@ namespace SensateService.DashboardApi
 			.AddJwtBearer(cfg => {
 				cfg.RequireHttpsMetadata = false;
 				cfg.SaveToken = true;
-				cfg.TokenValidationParameters = new TokenValidationParameters
-				{
+				cfg.TokenValidationParameters = new TokenValidationParameters {
 					ValidIssuer = auth.JwtIssuer,
 					ValidAudience = auth.JwtIssuer,
 					IssuerSigningKey = new SymmetricSecurityKey(
@@ -110,7 +109,7 @@ namespace SensateService.DashboardApi
 			});
 
 			if(cache.Enabled)
-                services.AddCacheStrategy(cache, db);
+				services.AddCacheStrategy(cache, db);
 
 			/* Add repositories */
 			services.AddSqlRepositories(cache.Enabled);
@@ -119,7 +118,7 @@ namespace SensateService.DashboardApi
 			services.AddSwaggerGen(c => {
 				c.SwaggerDoc("v1", new OpenApiInfo {
 					Title = "Sensate Dashboard API - Version 1",
-					Version = "v1" 
+					Version = "v1"
 				});
 			});
 
@@ -157,7 +156,7 @@ namespace SensateService.DashboardApi
 			app.UseSwagger();
 			app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sensate Dashboard API v1"); });
 
-			if (env.IsDevelopment()) {
+			if(env.IsDevelopment()) {
 				app.UseDeveloperExceptionPage();
 			}
 

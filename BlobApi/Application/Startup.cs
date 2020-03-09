@@ -129,8 +129,7 @@ namespace SensateService.BlobApi.Application
 			.AddJwtBearer(cfg => {
 				cfg.RequireHttpsMetadata = false;
 				cfg.SaveToken = true;
-				cfg.TokenValidationParameters = new TokenValidationParameters
-				{
+				cfg.TokenValidationParameters = new TokenValidationParameters {
 					ValidIssuer = auth.JwtIssuer,
 					ValidAudience = auth.JwtIssuer,
 					IssuerSigningKey = new SymmetricSecurityKey(
@@ -140,7 +139,7 @@ namespace SensateService.BlobApi.Application
 				};
 			});
 
-			if (cache.Enabled)
+			if(cache.Enabled)
 				services.AddCacheStrategy(cache, db);
 
 			/* Add repositories */
@@ -148,8 +147,7 @@ namespace SensateService.BlobApi.Application
 			services.AddDocumentRepositories(cache.Enabled);
 			services.AddMeasurementStorage(cache);
 
-			if (mail.Provider == "SendGrid")
-			{
+			if(mail.Provider == "SendGrid") {
 				services.AddSingleton<IEmailSender, SendGridMailer>();
 				services.Configure<SendGridAuthOptions>(opts => {
 					opts.FromName = mail.FromName;
@@ -157,9 +155,7 @@ namespace SensateService.BlobApi.Application
 					opts.Key = mail.SendGrid.Key;
 					opts.Username = mail.SendGrid.Username;
 				});
-			}
-			else if (mail.Provider == "SMTP")
-			{
+			} else if(mail.Provider == "SMTP") {
 				services.AddSingleton<IEmailSender, SmtpMailer>();
 				services.Configure<SmtpAuthOptions>(opts => {
 					opts.FromName = mail.FromName;
@@ -184,15 +180,14 @@ namespace SensateService.BlobApi.Application
 				options.InternalBlobTopic = privatemqtt.InternalBlobTopic;
 			});
 
-			if (text.Provider == "Twillio") {
+			if(text.Provider == "Twillio") {
 				services.AddTwilioTextApi(text);
 			} else {
 				Console.WriteLine("Text message provider not configured!");
 			}
 
 			services.AddSwaggerGen(c => {
-				c.SwaggerDoc("v1", new OpenApiInfo
-				{
+				c.SwaggerDoc("v1", new OpenApiInfo {
 					Title = "Sensate Data API - Version 1",
 					Version = "v1"
 				});
@@ -203,7 +198,7 @@ namespace SensateService.BlobApi.Application
 
 			services.AddLogging((logging) => {
 				logging.AddConsole();
-				if (this._env.IsDevelopment())
+				if(this._env.IsDevelopment())
 					logging.AddDebug();
 			});
 		}
@@ -225,15 +220,13 @@ namespace SensateService.BlobApi.Application
 					.AllowAnyMethod();
 			});
 
-			using (var scope = sp.CreateScope())
-			{
+			using(var scope = sp.CreateScope()) {
 				var ctx = scope.ServiceProvider.GetRequiredService<SensateSqlContext>();
 				ctx.Database.EnsureCreated();
 				ctx.Database.Migrate();
 			}
 
-			if (env.IsDevelopment())
-			{
+			if(env.IsDevelopment()) {
 				app.UseDeveloperExceptionPage();
 			}
 

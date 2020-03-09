@@ -11,7 +11,7 @@ namespace SensateService
 {
 	public class BlobStorageSettings
 	{
-        public string StoragePath { get; set; }
-        public StorageType StorageType { get; set; }
+		public string StoragePath { get; set; }
+		public StorageType StorageType { get; set; }
 	}
 }

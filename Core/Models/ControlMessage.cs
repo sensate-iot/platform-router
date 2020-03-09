@@ -18,12 +18,12 @@ namespace SensateService.Models
 {
 	public class ControlMessage
 	{
-        [BsonId, BsonRequired]
+		[BsonId, BsonRequired]
 		public ObjectId InternalId { get; set; }
-        [BsonRequired, Required, JsonConverter(typeof(ObjectIdJsonConverter))]
-        public ObjectId SensorId { get; set; }
-        [BsonRequired, Required]
-        public string Data { get; set; }
-        public DateTime Timestamp { get; set; }
+		[BsonRequired, Required, JsonConverter(typeof(ObjectIdJsonConverter))]
+		public ObjectId SensorId { get; set; }
+		[BsonRequired, Required]
+		public string Data { get; set; }
+		public DateTime Timestamp { get; set; }
 	}
 }

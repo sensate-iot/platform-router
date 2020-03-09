@@ -18,7 +18,7 @@ namespace SensateService.Services.Processing
 		private readonly CancellationTokenSource _stoppingCts = new CancellationTokenSource();
 
 		public abstract Task ExecuteAsync(CancellationToken token);
-		
+
 		public virtual Task StartAsync(CancellationToken cancellationToken)
 		{
 			this._executor = ExecuteAsync(this._stoppingCts.Token);

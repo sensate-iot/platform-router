@@ -38,7 +38,7 @@ namespace SensateService.AuthApi.Controllers
 			List<User> users;
 			var result = await this._users.FindByEmailAsync(query.Query).AwaitBackground();
 
-			users =  result.Select(user => {
+			users = result.Select(user => {
 				var roles = this._users.GetRoles(user);
 
 				return new User {

@@ -23,6 +23,6 @@ namespace SensateService.Models.Generic
 		public DateTime Timestamp { get; set; }
 		[JsonConverter(typeof(GeoJsonPointJsonConverter))]
 		public GeoJsonPoint<GeoJson2DGeographicCoordinates> Location { get; set; }
-		public IDictionary<string, DataPoint> Data { get;set; }
+		public IDictionary<string, DataPoint> Data { get; set; }
 	}
 }

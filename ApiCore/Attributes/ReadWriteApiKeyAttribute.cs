@@ -13,7 +13,7 @@ using SensateService.Models.Json.Out;
 
 namespace SensateService.ApiCore.Attributes
 {
-	public class ReadWriteApiKeyAttribute : ActionFilterAttribute 
+	public class ReadWriteApiKeyAttribute : ActionFilterAttribute
 	{
 		public override void OnActionExecuting(ActionExecutingContext context)
 		{

@@ -33,7 +33,7 @@ namespace SensateService.DataApi.Controllers
 {
 	[Produces("application/json")]
 	[Route("[controller]")]
-	public class MeasurementsController : AbstractDataController 
+	public class MeasurementsController : AbstractDataController
 	{
 		private readonly IMeasurementCache m_cache;
 		private readonly IMeasurementRepository m_measurements;
@@ -79,7 +79,7 @@ namespace SensateService.DataApi.Controllers
 
 		[HttpGet("{bucketId}/{index}")]
 		[ProducesResponseType(200)]
-		public async Task<IActionResult> Get( string bucketId, int index = -1)
+		public async Task<IActionResult> Get(string bucketId, int index = -1)
 		{
 			if(bucketId == null && index < 0) {
 				return this.UnprocessableEntity(new Status {

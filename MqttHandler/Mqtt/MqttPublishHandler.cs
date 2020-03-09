@@ -21,7 +21,7 @@ using SensateService.Services.Settings;
 
 namespace SensateService.MqttHandler.Mqtt
 {
-	public class MqttPublishHandler : IHostedService 
+	public class MqttPublishHandler : IHostedService
 	{
 		private readonly IServiceProvider _provider;
 		private readonly InternalMqttServiceOptions _options;
@@ -43,13 +43,13 @@ namespace SensateService.MqttHandler.Mqtt
 			await client.PublishOnAsync(this._options.InternalBulkMeasurementTopic, data, false).AwaitBackground();
 		}
 
-		public  Task StartAsync(CancellationToken cancellationToken)
+		public Task StartAsync(CancellationToken cancellationToken)
 		{
 			CachedMeasurementStore.MeasurementsReceived += MeasurementsStored_Handler;
 			return Task.CompletedTask;
 		}
 
-		public  Task StopAsync(CancellationToken cancellationToken)
+		public Task StopAsync(CancellationToken cancellationToken)
 		{
 			CachedMeasurementStore.MeasurementsReceived -= MeasurementsStored_Handler;
 			return Task.CompletedTask;

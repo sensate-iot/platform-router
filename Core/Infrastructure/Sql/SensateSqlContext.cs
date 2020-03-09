@@ -49,17 +49,18 @@ namespace SensateService.Infrastructure.Sql
 			builder.Entity<Blob>().ToTable("Blobs");
 			builder.Entity<SensorLink>().ToTable("SensorLinks");
 
-			builder.Entity<PasswordResetToken>().HasKey( k => k.UserToken );
+			builder.Entity<PasswordResetToken>().HasKey(k => k.UserToken);
 			builder.Entity<AuthUserToken>().HasKey(k => new { k.UserId, k.Value });
 
 			builder.Entity<ChangePhoneNumberToken>().HasAlternateKey(e => e.UserToken)
 				.HasName("AlternateKey_UserToken");
 			builder.Entity<ChangePhoneNumberToken>().HasKey(k => new {
-				k.IdentityToken, k.PhoneNumber
+				k.IdentityToken,
+				k.PhoneNumber
 			});
 
 			builder.Entity<SensorLink>(link => {
-				link.HasKey(k => new {k.UserId, k.SensorId});
+				link.HasKey(k => new { k.UserId, k.SensorId });
 				link.HasIndex(k => k.UserId);
 			});
 
@@ -72,7 +73,7 @@ namespace SensateService.Infrastructure.Sql
 
 			/* Define User => UserRole relationships */
 			builder.Entity<SensateUserRole>(userrole => {
-				userrole.HasKey(role => new {role.UserId, role.RoleId});
+				userrole.HasKey(role => new { role.UserId, role.RoleId });
 				userrole.HasOne(role => role.Role)
 					.WithMany(role => role.UserRoles)
 					.HasForeignKey(role => role.RoleId)
@@ -98,7 +99,7 @@ namespace SensateService.Infrastructure.Sql
 			builder.Entity<TriggerInvocation>().Property(invocation => invocation.Id).UseIdentityByDefaultColumn();
 			builder.Entity<TriggerInvocation>().HasIndex(invocation => invocation.TriggerId);
 			builder.Entity<TriggerAction>(action => {
-				action.HasKey(t => new {t.TriggerId, t.Channel});
+				action.HasKey(t => new { t.TriggerId, t.Channel });
 			});
 
 			builder.Entity<Blob>().Property(blob => blob.Id).UseIdentityByDefaultColumn();

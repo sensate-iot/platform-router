@@ -41,7 +41,7 @@ namespace SensateService.MqttHandler.Mqtt
 			JObject raw;
 
 			try {
-				var reader = new JsonTextReader(new StringReader(message)) {FloatParseHandling = FloatParseHandling.Decimal};
+				var reader = new JsonTextReader(new StringReader(message)) { FloatParseHandling = FloatParseHandling.Decimal };
 
 				raw = JObject.Load(reader);
 				await this.store.StoreAsync(raw, RequestMethod.MqttTcp).AwaitBackground();

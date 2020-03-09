@@ -12,22 +12,22 @@ namespace SensateService.Models
 {
 	public enum StorageType
 	{
-        FileSystem,
-        DigitalOceanSpaces,
-        FTP
+		FileSystem,
+		DigitalOceanSpaces,
+		FTP
 	}
 
 	public class Blob
-    {
-	    [Required, JsonIgnore]
-        public long Id { get; set; }
-        [Required, StringLength(24, MinimumLength = 24)]
-        public string SensorId { get; set; }
-	    [Required]
-		public string FileName { get; set; }
-        [Required, JsonIgnore]
-        public string Path { get; set; }
+	{
 		[Required, JsonIgnore]
-        public StorageType StorageType { get; set; }
+		public long Id { get; set; }
+		[Required, StringLength(24, MinimumLength = 24)]
+		public string SensorId { get; set; }
+		[Required]
+		public string FileName { get; set; }
+		[Required, JsonIgnore]
+		public string Path { get; set; }
+		[Required, JsonIgnore]
+		public StorageType StorageType { get; set; }
 	}
 }

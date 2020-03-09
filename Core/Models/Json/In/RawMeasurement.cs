@@ -18,10 +18,10 @@ namespace SensateService.Models.Json.In
 
 		public string CreatedById { get; set; }
 		public string CreatedBySecret { get; set; }
-		public double? Longitude {get;set;}
-		public double? Latitude {get;set;}
-		public Nullable<DateTime> CreatedAt {get;set;}
-		public JContainer Data { private get;set; }
+		public double? Longitude { get; set; }
+		public double? Latitude { get; set; }
+		public Nullable<DateTime> CreatedAt { get; set; }
+		public JContainer Data { private get; set; }
 
 		public bool IsCreatedBy(Sensor sensor) => this.CreatedBySecret == sensor.Secret;
 

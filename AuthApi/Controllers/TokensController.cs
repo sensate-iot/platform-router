@@ -157,7 +157,7 @@ namespace SensateService.AuthApi.Controllers
 
 			reply.RefreshToken = newToken.Value;
 			reply.ExpiresInMinutes = this._settings.JwtRefreshExpireMinutes;
-			reply.JwtToken = this._tokens.GenerateJwtToken( user, roles, this._settings );
+			reply.JwtToken = this._tokens.GenerateJwtToken(user, roles, this._settings);
 
 			return new OkObjectResult(reply);
 		}

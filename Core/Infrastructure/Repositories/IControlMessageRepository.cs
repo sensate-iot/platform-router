@@ -13,7 +13,7 @@ using SensateService.Models;
 
 namespace SensateService.Infrastructure.Repositories
 {
-	public interface IControlMessageRepository 
+	public interface IControlMessageRepository
 	{
 		Task CreateAsync(ControlMessage msg, CancellationToken ct = default);
 		Task DeleteBeforeAsync(Sensor sensor, DateTime dt, CancellationToken ct = default);

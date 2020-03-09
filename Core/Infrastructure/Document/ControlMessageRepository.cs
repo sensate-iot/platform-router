@@ -19,7 +19,7 @@ namespace SensateService.Infrastructure.Document
 		{
 			var builder = Builders<ControlMessage>.Filter;
 			var filters = builder.Eq(x => x.SensorId, sensor.InternalId) &
-			              builder.Lte(x => x.Timestamp, dt);
+						  builder.Lte(x => x.Timestamp, dt);
 
 			await this._collection.DeleteManyAsync(filters, ct).AwaitBackground();
 		}
@@ -46,8 +46,8 @@ namespace SensateService.Infrastructure.Document
 		{
 			var builder = Builders<ControlMessage>.Filter;
 			var filters = builder.Eq(x => x.SensorId, sensor.InternalId) &
-			              builder.Gte(x => x.Timestamp, start) &
-			              builder.Lte(x => x.Timestamp, end);
+						  builder.Gte(x => x.Timestamp, start) &
+						  builder.Lte(x => x.Timestamp, end);
 			var query = this._collection.Find(filters);
 
 			if(skip > 0) {

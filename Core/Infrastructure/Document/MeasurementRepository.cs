@@ -78,7 +78,7 @@ namespace SensateService.Infrastructure.Document
 				var aslist = await query.ToListAsync().AwaitBackground();
 
 				return this.ConcatMeasurementBuckets(aslist);
-			} catch (Exception ex) {
+			} catch(Exception ex) {
 				this._logger.LogWarning(ex.Message);
 				return null;
 			}
@@ -104,8 +104,8 @@ namespace SensateService.Infrastructure.Document
 				FilterDefinition<MeasurementBucket> fd;
 
 				fd = builder.Gte(x => x.Timestamp, start.ThisHour()) &
-				     builder.Lte(x => x.Timestamp, end.ThisHour()) &
-				     builder.Eq(x => x.SensorId, sensor.InternalId);
+					 builder.Lte(x => x.Timestamp, end.ThisHour()) &
+					 builder.Eq(x => x.SensorId, sensor.InternalId);
 				await this._collection.DeleteManyAsync(fd).AwaitBackground();
 			} catch(Exception ex) {
 				this._logger.LogWarning(ex.Message);
@@ -120,8 +120,8 @@ namespace SensateService.Infrastructure.Document
 			await this._collection.DeleteOneAsync(x => x.InternalId == objectId).AwaitBackground();
 		}
 
-#region Linq getters
-public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index, CancellationToken ct = default)
+		#region Linq getters
+		public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index, CancellationToken ct = default)
 		{
 			var builder = Builders<MeasurementBucket>.Filter;
 			var filter = builder.Eq(x => x.InternalId, index.MeasurementBucketId);
@@ -145,8 +145,8 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 			var builder = Builders<MeasurementBucket>.Filter;
 			var filter = builder.Eq(bucket => bucket.SensorId, sensorId) &
 						 builder.Eq(bucket => bucket.Timestamp, timestamp.ThisHour()) &
-			             builder.Lte(bucket => bucket.First, timestamp) &
-			             builder.Gte(bucket => bucket.Last, timestamp);
+						 builder.Lte(bucket => bucket.First, timestamp) &
+						 builder.Gte(bucket => bucket.Last, timestamp);
 
 			var query = this._collection.Aggregate().Match(filter).Project(new BsonDocument {
 				{"_id", 1},
@@ -219,11 +219,11 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 			};
 
 			if(skip > 0) {
-				pipeline.Add(new BsonDocument { { "$skip", skip }});
+				pipeline.Add(new BsonDocument { { "$skip", skip } });
 			}
 
 			if(limit > 0) {
-				pipeline.Add(new BsonDocument { { "$limit", limit }});
+				pipeline.Add(new BsonDocument { { "$limit", limit } });
 			}
 
 			var query = this._collection.Aggregate<MeasurementsQueryResult>(pipeline, cancellationToken: ct);
@@ -287,11 +287,11 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 			};
 
 			if(skip > 0) {
-				pipeline.Add(new BsonDocument { { "$skip", skip }});
+				pipeline.Add(new BsonDocument { { "$skip", skip } });
 			}
 
 			if(limit > 0) {
-				pipeline.Add(new BsonDocument { { "$limit", limit }});
+				pipeline.Add(new BsonDocument { { "$limit", limit } });
 			}
 
 			var query = this._collection.Aggregate<MeasurementsQueryResult>(pipeline, cancellationToken: ct);
@@ -335,9 +335,9 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 			return measurements;
 		}
 
-#endregion
+		#endregion
 
-#region Measurement creation
+		#region Measurement creation
 
 		private static UpdateDefinition<MeasurementBucket> CreateBucketUpdate(ObjectId sensor, ICollection<Measurement> measurements)
 		{
@@ -364,8 +364,8 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 				var fbuilder = Builders<MeasurementBucket>.Filter;
 
 				var filter = fbuilder.Eq(x => x.Timestamp, DateTime.Now.ThisHour()) &
-				             fbuilder.Eq(x => x.SensorId, kvpair.Key.InternalId) &
-				             fbuilder.Lt(x => x.Count, MeasurementBucketSize);
+							 fbuilder.Eq(x => x.SensorId, kvpair.Key.InternalId) &
+							 fbuilder.Lt(x => x.Count, MeasurementBucketSize);
 
 				for(var idx = 0; idx < kvpair.Value.Count;) {
 					var sublist = kvpair.Value.GetRange(idx,
@@ -382,7 +382,7 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 				}
 			}
 
-			this._logger.LogDebug("Measurements stored: "+ total);
+			this._logger.LogDebug("Measurements stored: " + total);
 
 			var opts = new BulkWriteOptions {
 				IsOrdered = false,
@@ -399,7 +399,7 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 		public async Task StoreAsync(Sensor sensor, Measurement measurement, CancellationToken ct = default(CancellationToken))
 		{
 			var dict = new Dictionary<Sensor, List<Measurement>>();
-			var measurements = new List<Measurement> {measurement};
+			var measurements = new List<Measurement> { measurement };
 
 			dict[sensor] = measurements;
 			await this.StoreAsync(dict, ct).AwaitBackground();
@@ -407,7 +407,7 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 
 		#endregion
 
-#region Time based getters
+		#region Time based getters
 
 		public virtual async Task<IEnumerable<MeasurementsQueryResult>> GetBetweenAsync(Sensor sensor, DateTime start, DateTime end, int skip = -1, int limit = -1)
 		{
@@ -426,6 +426,6 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 			var end = DateTime.Now;
 			return await this.GetBetweenAsync(sensor, pit, end, skip, limit);
 		}
-#endregion
+		#endregion
 	}
 }

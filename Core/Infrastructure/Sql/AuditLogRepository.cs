@@ -45,10 +45,10 @@ namespace SensateService.Infrastructure.Sql
 		public async Task DeleteBetweenAsync(SensateUser user, DateTime start, DateTime end)
 		{
 			var data = from log in this.Data
-				where log.AuthorId == user.Id &&
-				      log.Timestamp >= start &&
-				      log.Timestamp <= end
-				select log;
+					   where log.AuthorId == user.Id &&
+							 log.Timestamp >= start &&
+							 log.Timestamp <= end
+					   select log;
 
 			this.Data.RemoveRange(data);
 			await this._sqlContext.SaveChangesAsync().AwaitBackground();
@@ -57,11 +57,11 @@ namespace SensateService.Infrastructure.Sql
 		public async Task DeleteBetweenAsync(SensateUser user, string route, DateTime start, DateTime end)
 		{
 			var data = from log in this.Data
-				where log.AuthorId == user.Id &&
-					  log.Route == route &&
-				      log.Timestamp >= start &&
-				      log.Timestamp <= end
-				select log;
+					   where log.AuthorId == user.Id &&
+							 log.Route == route &&
+							 log.Timestamp >= start &&
+							 log.Timestamp <= end
+					   select log;
 
 			this.Data.RemoveRange(data);
 			await this._sqlContext.SaveChangesAsync().AwaitBackground();
@@ -70,11 +70,11 @@ namespace SensateService.Infrastructure.Sql
 		public async Task<IEnumerable<AuditLog>> GetByRouteAsync(SensateUser user, string route, DateTime start, DateTime end)
 		{
 			var data = from log in this.Data
-				where log.AuthorId == user.Id &&
-					  log.Route == route &&
-				      log.Timestamp >= start &&
-				      log.Timestamp <= end
-				select log;
+					   where log.AuthorId == user.Id &&
+							 log.Route == route &&
+							 log.Timestamp >= start &&
+							 log.Timestamp <= end
+					   select log;
 
 			var result = await data.ToListAsync().AwaitBackground();
 			return result;
@@ -83,9 +83,9 @@ namespace SensateService.Infrastructure.Sql
 		public async Task<IEnumerable<AuditLog>> GetByRequestTypeAsync(SensateUser user, RequestMethod method)
 		{
 			var data = from log in this.Data
-				where log.AuthorId == user.Id &&
-				      log.Method == method
-				select log;
+					   where log.AuthorId == user.Id &&
+							 log.Method == method
+					   select log;
 
 			var result = await data.ToListAsync().AwaitBackground();
 			return result;
@@ -109,10 +109,10 @@ namespace SensateService.Infrastructure.Sql
 		public async Task<IEnumerable<AuditLog>> GetBetweenAsync(SensateUser user, DateTime start, DateTime end)
 		{
 			var data = from log in this.Data
-				where log.AuthorId == user.Id &&
-				      log.Timestamp >= start &&
-				      log.Timestamp <= end
-				select log;
+					   where log.AuthorId == user.Id &&
+							 log.Timestamp >= start &&
+							 log.Timestamp <= end
+					   select log;
 
 			var result = await data.ToListAsync().AwaitBackground();
 			return result;
@@ -121,9 +121,9 @@ namespace SensateService.Infrastructure.Sql
 		public async Task<IEnumerable<AuditLog>> GetByRouteAsync(SensateUser user, string route)
 		{
 			var data = from log in this.Data
-				where log.AuthorId == user.Id &&
-					  log.Route == route
-				select log;
+					   where log.AuthorId == user.Id &&
+							 log.Route == route
+					   select log;
 
 			var result = await data.ToListAsync().AwaitBackground();
 			return result;

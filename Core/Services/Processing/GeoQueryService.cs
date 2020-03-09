@@ -52,7 +52,7 @@ namespace SensateService.Services.Processing
 			var x = (lng2 - lng1) * Math.Cos((lat1 + lat2) / 2);
 			var y = lat2 - lat1;
 
-			return Math.Sqrt(x*x + y*y) * EarthRadius;
+			return Math.Sqrt(x * x + y * y) * EarthRadius;
 		}
 
 		private delegate double DistanceCalcuationMethod(GeoJson2DGeographicCoordinates p1, GeoJson2DGeographicCoordinates p2);

@@ -58,9 +58,9 @@ namespace SensateService.Infrastructure.Sql
 		public async Task<ChangePhoneNumberToken> GetLatest(SensateUser user)
 		{
 			var tokens = from token in this.Data
-				where token.User.NormalizedUserName == user.NormalizedUserName &&
-				      token.PhoneNumber == user.UnconfirmedPhoneNumber 
-				select token;
+						 where token.User.NormalizedUserName == user.NormalizedUserName &&
+							   token.PhoneNumber == user.UnconfirmedPhoneNumber
+						 select token;
 			var single = tokens.OrderByDescending(t => t.Timestamp);
 
 			return await single.FirstOrDefaultAsync().AwaitBackground();

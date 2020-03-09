@@ -20,7 +20,7 @@ namespace SensateService.Models
 	public class MeasurementBucket
 	{
 		[BsonId, BsonRequired, JsonConverter(typeof(ObjectIdJsonConverter))]
-		public ObjectId InternalId {get;set;}
+		public ObjectId InternalId { get; set; }
 		[BsonIgnore]
 		public ObjectId _id { get; set; }
 		[BsonRequired]

@@ -11,8 +11,8 @@ namespace SensateService.Models.Generic
 {
 	public class SingleMeasurement
 	{
-        public ObjectId Id { get; set; }
+		public ObjectId Id { get; set; }
 		public ObjectId SensorId { get; set; }
-        public Measurement Measurement { get; set; }
+		public Measurement Measurement { get; set; }
 	}
 }

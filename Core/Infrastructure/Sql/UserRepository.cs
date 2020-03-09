@@ -134,7 +134,7 @@ namespace SensateService.Infrastructure.Sql
 		{
 			var query = this.Data.Where(x => x.RegisteredAt >= start)
 				.GroupBy(x => x.RegisteredAt.Date)
-				.Select( x => new Tuple<DateTime, int>(x.Key, x.Count()) );
+				.Select(x => new Tuple<DateTime, int>(x.Key, x.Count()));
 			return await query.ToListAsync().AwaitBackground();
 		}
 

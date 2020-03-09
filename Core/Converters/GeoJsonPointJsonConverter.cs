@@ -16,7 +16,7 @@ using Newtonsoft.Json.Linq;
 
 namespace SensateService.Converters
 {
-	public class GeoJsonPointJsonConverter : JsonConverter 
+	public class GeoJsonPointJsonConverter : JsonConverter
 	{
 		public override bool CanConvert(Type objectType)
 		{
@@ -28,7 +28,7 @@ namespace SensateService.Converters
 			GeoJson2DGeographicCoordinates coords;
 			var token = JToken.Load(reader);
 
-			if(reader.TokenType == JsonToken.String && ((string) reader.Value) == String.Empty) {
+			if(reader.TokenType == JsonToken.String && ((string)reader.Value) == String.Empty) {
 				coords = new GeoJson2DGeographicCoordinates(0, 0);
 			} else {
 				var tmp = JsonConvert.DeserializeObject<GeoJsonPointSerializationHelper>(token.ToString());

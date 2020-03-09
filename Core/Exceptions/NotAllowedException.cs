@@ -9,8 +9,8 @@ using System;
 
 namespace SensateService.Exceptions
 {
-    public class NotAllowedException : SystemException
-    {
+	public class NotAllowedException : SystemException
+	{
 		public NotAllowedException() : this("Operation not allowed!")
 		{ }
 
@@ -19,5 +19,5 @@ namespace SensateService.Exceptions
 
 		public NotAllowedException(string msg, Exception exception) : base(msg, exception)
 		{ }
-    }
+	}
 }

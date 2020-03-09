@@ -103,8 +103,7 @@ namespace SensateService.AuthApi
 			.AddJwtBearer(cfg => {
 				cfg.RequireHttpsMetadata = false;
 				cfg.SaveToken = true;
-				cfg.TokenValidationParameters = new TokenValidationParameters
-				{
+				cfg.TokenValidationParameters = new TokenValidationParameters {
 					ValidIssuer = auth.JwtIssuer,
 					ValidAudience = auth.JwtIssuer,
 					IssuerSigningKey = new SymmetricSecurityKey(
@@ -115,7 +114,7 @@ namespace SensateService.AuthApi
 			});
 
 			if(cache.Enabled)
-                services.AddCacheStrategy(cache, db);
+				services.AddCacheStrategy(cache, db);
 
 			/* Add repositories */
 			services.AddSqlRepositories(cache.Enabled);
@@ -151,7 +150,7 @@ namespace SensateService.AuthApi
 			services.AddSwaggerGen(c => {
 				c.SwaggerDoc("v1", new OpenApiInfo {
 					Title = "Sensate Authentication API - Version 1",
-					Version = "v1" 
+					Version = "v1"
 				});
 			});
 
@@ -173,7 +172,7 @@ namespace SensateService.AuthApi
 
 			app.UseSwagger();
 
-			if (env.IsDevelopment()) {
+			if(env.IsDevelopment()) {
 				app.UseDeveloperExceptionPage();
 			}
 

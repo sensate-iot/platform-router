@@ -18,9 +18,9 @@ namespace SensateService.Exceptions
 		}
 
 		public DatabaseException(string msg) : base(msg)
-		{}
+		{ }
 
-		public DatabaseException(string msg, string database) : base(message:msg)
+		public DatabaseException(string msg, string database) : base(message: msg)
 		{
 			this.Database = database;
 		}

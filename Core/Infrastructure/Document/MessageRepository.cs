@@ -17,7 +17,7 @@ using SensateService.Models;
 
 namespace SensateService.Infrastructure.Document
 {
-	public class MessageRepository : AbstractDocumentRepository<Message>, IMessageRepository 
+	public class MessageRepository : AbstractDocumentRepository<Message>, IMessageRepository
 	{
 		public MessageRepository(SensateContext ctx) : base(ctx.Messages)
 		{
@@ -54,7 +54,7 @@ namespace SensateService.Infrastructure.Document
 				query = query.Limit(take);
 			}
 
-			var results = await query.ToListAsync(cancellationToken:ct).AwaitBackground();
+			var results = await query.ToListAsync(cancellationToken: ct).AwaitBackground();
 			return results;
 		}
 
@@ -63,8 +63,8 @@ namespace SensateService.Infrastructure.Document
 			var fb = Builders<Message>.Filter;
 
 			var filter = fb.Eq(m => m.SensorId, sensor.InternalId) &
-			             fb.Gte(m => m.CreatedAt, start) &
-			             fb.Lte(m => m.CreatedAt, end);
+						 fb.Gte(m => m.CreatedAt, start) &
+						 fb.Lte(m => m.CreatedAt, end);
 
 			var query = this._collection.Find(filter);
 
@@ -74,7 +74,7 @@ namespace SensateService.Infrastructure.Document
 				query = query.Limit(take);
 			}
 
-			var results = await query.ToListAsync(cancellationToken:ct).AwaitBackground();
+			var results = await query.ToListAsync(cancellationToken: ct).AwaitBackground();
 			return results;
 		}
 
@@ -85,7 +85,7 @@ namespace SensateService.Infrastructure.Document
 			}
 
 			var filter = Builders<Message>.Filter.Where(x => x.InternalId == objectId);
-			var result = await this._collection.FindAsync(filter, cancellationToken:ct).AwaitBackground();
+			var result = await this._collection.FindAsync(filter, cancellationToken: ct).AwaitBackground();
 
 			return await result.FirstOrDefaultAsync(cancellationToken: ct).AwaitBackground();
 		}

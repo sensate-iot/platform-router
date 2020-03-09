@@ -73,7 +73,7 @@ namespace SensateService.NetworkApi.Controllers
 			} else {
 				sensors = await this.m_sensorService.GetSensorsAsync(this.CurrentUser, name).AwaitBackground();
 			}
-				
+
 			return this.Ok(sensors);
 		}
 
@@ -99,7 +99,7 @@ namespace SensateService.NetworkApi.Controllers
 				});
 			}
 
-			return this.CreatedAtAction(nameof(Get), new {Id = sensor.InternalId}, sensor);
+			return this.CreatedAtAction(nameof(Get), new { Id = sensor.InternalId }, sensor);
 		}
 
 		[HttpDelete("links")]

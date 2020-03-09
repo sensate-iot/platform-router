@@ -30,7 +30,7 @@ namespace SensateService.Init
 
 		public static void AddPostgres(this IServiceCollection services, string conn)
 		{
-			services .AddDbContextPool<SensateSqlContext>(options => {
+			services.AddDbContextPool<SensateSqlContext>(options => {
 				options.UseNpgsql(conn);
 			}, 2000);
 		}

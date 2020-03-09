@@ -75,8 +75,8 @@ namespace SensateService.Infrastructure.Document
 
 			key = $"{sensor.InternalId}::{start.ToString(CultureInfo.InvariantCulture)}::{end.ToString(CultureInfo.InvariantCulture)}";
 			var tasks = new[] {
-                this._cache.RemoveAsync(key),
-                base.DeleteBetweenAsync(sensor, start, end)
+				this._cache.RemoveAsync(key),
+				base.DeleteBetweenAsync(sensor, start, end)
 			};
 
 			await Task.WhenAll(tasks).AwaitBackground();
@@ -88,7 +88,7 @@ namespace SensateService.Infrastructure.Document
 
 			key = $"Measurements::{sensor.InternalId.ToString()}";
 			return await TryGetMeasurementsAsync(key, x => x.SensorId == sensor.InternalId, CacheTimeout.TimeoutMedium.ToInt(),
-				skip, limit ).AwaitBackground();
+				skip, limit).AwaitBackground();
 		}
 
 		private async Task<IEnumerable<Measurement>> TryGetMeasurementsAsync(string key, Expression<Func<MeasurementBucket, bool>> expression, int tmo, int skip, int limit)
@@ -229,7 +229,7 @@ namespace SensateService.Infrastructure.Document
 			const int seed = 0x2D2816FE;
 			const int prime = 397;
 
-			if (sensors.Count <= 0) {
+			if(sensors.Count <= 0) {
 				return 0;
 			}
 

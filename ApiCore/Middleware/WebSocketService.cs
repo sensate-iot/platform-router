@@ -51,7 +51,7 @@ namespace SensateService.ApiCore.Middleware
 			};
 
 			try {
-				await this.Receive(authws, async(result, buffer) => {
+				await this.Receive(authws, async (result, buffer) => {
 					switch(result.MessageType) {
 						case WebSocketMessageType.Text:
 							await this._handler.Receive(authws, result, buffer);

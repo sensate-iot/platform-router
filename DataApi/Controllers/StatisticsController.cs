@@ -27,7 +27,7 @@ namespace SensateService.DataApi.Controllers
 {
 	[Produces("application/json")]
 	[Route("[controller]")]
-	public class StatisticsController : AbstractApiController 
+	public class StatisticsController : AbstractApiController
 	{
 		private readonly ISensorStatisticsRepository _stats;
 		private readonly ISensorRepository _sensors;
@@ -72,7 +72,7 @@ namespace SensateService.DataApi.Controllers
 		private async Task<IActionResult> GetByMethod(Sensor sensor, RequestMethod method, DateTime start, DateTime end)
 		{
 			var data = await this._stats.GetAsync(e => e.SensorId == sensor.InternalId && e.Method == method &&
-			                                           e.Date >= start && e.Date <= end).AwaitBackground();
+													   e.Date >= start && e.Date <= end).AwaitBackground();
 			var flat = Flatten(data);
 
 			foreach(var entry in flat) {
@@ -89,7 +89,7 @@ namespace SensateService.DataApi.Controllers
 		[ProducesResponseType(typeof(Status), 400)]
 		public async Task<IActionResult> StatisticsBySensor(string sensorid, [FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] RequestMethod method = RequestMethod.Any)
 		{
-			var status = new Status {ErrorCode = ReplyCode.BadInput, Message = "Invalid request!"};
+			var status = new Status { ErrorCode = ReplyCode.BadInput, Message = "Invalid request!" };
 
 			if(string.IsNullOrEmpty(sensorid))
 				return this.BadRequest(status);
@@ -112,7 +112,7 @@ namespace SensateService.DataApi.Controllers
 			return this.Ok(Flatten(data));
 		}
 
-		private const  int DaysPerWeek = 7;
+		private const int DaysPerWeek = 7;
 
 		[HttpGet("cumulative/daily")]
 		public async Task<IActionResult> CumulativePerDay([FromQuery] DateTime start, [FromQuery] DateTime end)
@@ -120,7 +120,7 @@ namespace SensateService.DataApi.Controllers
 			var jobj = new JArray();
 			var statistics = await this.GetStatsFor(this.CurrentUser, start, end).AwaitBackground();
 			var entries = statistics.GroupBy(entry => entry.Date)
-				.Select(grp => new {DayOfWeek = (int) grp.Key.DayOfWeek, Count = AccumulateStatisticsEntries(grp.AsEnumerable())}).ToList();
+				.Select(grp => new { DayOfWeek = (int)grp.Key.DayOfWeek, Count = AccumulateStatisticsEntries(grp.AsEnumerable()) }).ToList();
 
 			for(var idx = 0; idx < DaysPerWeek; idx++) {
 				var entry = entries.Where(e => e.DayOfWeek == idx).ToList();
@@ -141,7 +141,7 @@ namespace SensateService.DataApi.Controllers
 		[ProducesResponseType(typeof(Status), 400)]
 		public async Task<IActionResult> CumulativePerDay(string sensorid, [FromQuery] DateTime start, [FromQuery] DateTime end)
 		{
-			var status = new Status {ErrorCode = ReplyCode.BadInput, Message = "Invalid request!"};
+			var status = new Status { ErrorCode = ReplyCode.BadInput, Message = "Invalid request!" };
 			var jobj = new List<DailyStatisticsEntry>();
 
 			if(string.IsNullOrEmpty(sensorid))
@@ -160,7 +160,7 @@ namespace SensateService.DataApi.Controllers
 
 			var statistics = await this._stats.GetBetweenAsync(sensor, start, end).AwaitBackground();
 			var entries = statistics.GroupBy(entry => entry.Date)
-				.Select(grp => new {DayOfWeek = (int) grp.Key.DayOfWeek, Count = AccumulateStatisticsEntries(grp.AsEnumerable())}).ToList();
+				.Select(grp => new { DayOfWeek = (int)grp.Key.DayOfWeek, Count = AccumulateStatisticsEntries(grp.AsEnumerable()) }).ToList();
 
 			for(var idx = 0; idx < DaysPerWeek; idx++) {
 				var entry = entries.Where(e => e.DayOfWeek == idx).ToList();
@@ -203,7 +203,7 @@ namespace SensateService.DataApi.Controllers
 		{
 			long counter = 0;
 			IDictionary<DateTime, long> totals = new Dictionary<DateTime, long>();
-			var status = new Status {ErrorCode = ReplyCode.BadInput, Message = "Invalid request!"};
+			var status = new Status { ErrorCode = ReplyCode.BadInput, Message = "Invalid request!" };
 
 			if(string.IsNullOrEmpty(sensorid))
 				return this.BadRequest(status);

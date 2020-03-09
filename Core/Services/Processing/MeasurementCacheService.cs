@@ -20,7 +20,7 @@ using SensateService.Services.Settings;
 
 namespace SensateService.Services.Processing
 {
-	public class MeasurementCacheService : TimedBackgroundService 
+	public class MeasurementCacheService : TimedBackgroundService
 	{
 		public const int IntervalInMillis = 2000;
 		private const int StartDelay = 200;
@@ -66,8 +66,8 @@ namespace SensateService.Services.Processing
 
 			if(count > 0) {
 				this._logger.LogInformation($"Number of measurements processed: {count}.{Environment.NewLine}" +
-				                            $"Processing took {sw.ElapsedMilliseconds}ms.{Environment.NewLine}" +
-				                            $"Average measurements per second: {this._totalCount/(totaltime/1000)}.");
+											$"Processing took {sw.ElapsedMilliseconds}ms.{Environment.NewLine}" +
+											$"Average measurements per second: {this._totalCount / (totaltime / 1000)}.");
 			}
 		}
 

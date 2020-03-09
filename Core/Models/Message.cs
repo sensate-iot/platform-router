@@ -17,7 +17,7 @@ namespace SensateService.Models
 	public class Message
 	{
 		[BsonId, BsonRequired, JsonConverter(typeof(ObjectIdJsonConverter))]
-		public ObjectId InternalId {get;set;}
+		public ObjectId InternalId { get; set; }
 		[BsonRequired]
 		public DateTime CreatedAt { get; set; }
 		[BsonRequired]

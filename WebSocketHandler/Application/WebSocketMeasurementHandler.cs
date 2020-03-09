@@ -51,7 +51,7 @@ namespace SensateService.WebSocketHandler.Application
 			msg = Encoding.UTF8.GetString(buffer, 0, result.Count);
 
 			try {
-				var reader = new JsonTextReader(new StringReader(msg)) {FloatParseHandling = FloatParseHandling.Decimal};
+				var reader = new JsonTextReader(new StringReader(msg)) { FloatParseHandling = FloatParseHandling.Decimal };
 				raw = JObject.Load(reader);
 
 				using var scope = this.provider.CreateScope();

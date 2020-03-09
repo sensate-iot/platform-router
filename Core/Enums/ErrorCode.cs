@@ -17,4 +17,4 @@ namespace SensateService.Enums
 		ServerFaultBadGateway = 502,
 		ServerFaultUnavailable = 503
 	}
-} 
+}

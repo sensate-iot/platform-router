@@ -65,7 +65,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public async Task<bool> DeleteAsync(string sensorId, string fileName, CancellationToken ct = default)
 		{
-			var data = await this.Data.FirstOrDefaultAsync( 
+			var data = await this.Data.FirstOrDefaultAsync(
 				blob => blob.SensorId == sensorId && blob.FileName == fileName,
 					ct
 					).AwaitBackground();

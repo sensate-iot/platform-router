@@ -16,7 +16,7 @@ using Microsoft.Extensions.Logging;
 
 using SensateService.WebSocketHandler.Application;
 
-namespace SensateService.WebSocketHandler 
+namespace SensateService.WebSocketHandler
 {
 	public class Program
 	{

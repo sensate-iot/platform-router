@@ -112,7 +112,7 @@ namespace SensateService.TriggerHandler.Mqtt
 			var nextAvailable = last.Timestamp.AddMinutes(timeout);
 			var rv = nextAvailable.DateTime.ToUniversalTime() < DateTime.UtcNow;
 
-			return rv ;
+			return rv;
 		}
 
 		private static string Replace(TriggerAction action, DataPoint dp)
@@ -194,7 +194,7 @@ namespace SensateService.TriggerHandler.Mqtt
 						case TriggerActionChannel.HttpPost:
 						case TriggerActionChannel.HttpGet:
 							var result = Uri.TryCreate(action.Target, UriKind.Absolute, out var output) &&
-							              output.Scheme == Uri.UriSchemeHttp || output.Scheme == Uri.UriSchemeHttps;
+										  output.Scheme == Uri.UriSchemeHttp || output.Scheme == Uri.UriSchemeHttps;
 
 							if(!result) {
 								break;
@@ -222,7 +222,7 @@ namespace SensateService.TriggerHandler.Mqtt
 
 							var actuator = this.m_options.ActuatorTopic.Replace("$sensorId", action.Target);
 
-							var io = new [] {
+							var io = new[] {
 								publishService.PublishOnAsync(actuator, body, false),
 								controldb.CreateAsync(msg)
 							};

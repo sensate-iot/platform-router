@@ -68,56 +68,56 @@ namespace SensateService.Converters
 			long ticks;
 
 			switch(attr) {
-			case "CreatedAt":
-				ticks = reader.ReadDateTime();
-				m.Timestamp = DateTimeOffset.FromUnixTimeMilliseconds(ticks).UtcDateTime;
-				break;
+				case "CreatedAt":
+					ticks = reader.ReadDateTime();
+					m.Timestamp = DateTimeOffset.FromUnixTimeMilliseconds(ticks).UtcDateTime;
+					break;
 
-			case "Data":
-				this.DeserializeDataPoints(reader, ref m);
-				break;
+				case "Data":
+					this.DeserializeDataPoints(reader, ref m);
+					break;
 
-			default:
-				throw new DatabaseException("Unknown document attribute", "Measurements");
+				default:
+					throw new DatabaseException("Unknown document attribute", "Measurements");
 			}
 		}
 
 		private void DeserializeDataPointAttribute(string attr, IBsonReader reader, ref DataPoint dataPoint)
 		{
 			switch(attr) {
-			case "Value":
-				dataPoint.Value = reader.ReadDecimal128().ToDecimal();
-				break;
+				case "Value":
+					dataPoint.Value = reader.ReadDecimal128().ToDecimal();
+					break;
 
-			case "Unit":
-				if(reader.GetCurrentBsonType() == BsonType.Null) {
-					reader.ReadNull();
-					dataPoint.Unit = null;
-				} else {
-					dataPoint.Unit = reader.ReadString();
-				}
-				break;
+				case "Unit":
+					if(reader.GetCurrentBsonType() == BsonType.Null) {
+						reader.ReadNull();
+						dataPoint.Unit = null;
+					} else {
+						dataPoint.Unit = reader.ReadString();
+					}
+					break;
 
-			case "Precision":
-				if(reader.GetCurrentBsonType() == BsonType.Null) {
-					reader.ReadNull();
-					dataPoint.Precision = null;
-				}
+				case "Precision":
+					if(reader.GetCurrentBsonType() == BsonType.Null) {
+						reader.ReadNull();
+						dataPoint.Precision = null;
+					}
 
-				dataPoint.Precision = reader.ReadDecimal128().ToDecimal();
-				break;
+					dataPoint.Precision = reader.ReadDecimal128().ToDecimal();
+					break;
 
-			case "Accuracy":
-				if(reader.GetCurrentBsonType() == BsonType.Null) {
-					reader.ReadNull();
-					dataPoint.Accuracy = null;
-				}
+				case "Accuracy":
+					if(reader.GetCurrentBsonType() == BsonType.Null) {
+						reader.ReadNull();
+						dataPoint.Accuracy = null;
+					}
 
-				dataPoint.Accuracy = reader.ReadDouble();
-				break;
+					dataPoint.Accuracy = reader.ReadDouble();
+					break;
 
-			default:
-				throw new DatabaseException("Unknown document attribute", "Measurements");
+				default:
+					throw new DatabaseException("Unknown document attribute", "Measurements");
 			}
 		}
 
@@ -170,22 +170,22 @@ namespace SensateService.Converters
 		public bool TryGetMemberSerializationInfo(string memberName, out BsonSerializationInfo serializationInfo)
 		{
 			switch(memberName) {
-			case "_id":
-			case "InternalId":
-				serializationInfo = new BsonSerializationInfo(
-					memberName, new ObjectIdSerializer(), typeof(ObjectId)
-				);
-				break;
+				case "_id":
+				case "InternalId":
+					serializationInfo = new BsonSerializationInfo(
+						memberName, new ObjectIdSerializer(), typeof(ObjectId)
+					);
+					break;
 
-			case "CreatedAt":
-				serializationInfo = new BsonSerializationInfo(
-					memberName, new DateTimeSerializer(), typeof(DateTime)
-				);
-				break;
+				case "CreatedAt":
+					serializationInfo = new BsonSerializationInfo(
+						memberName, new DateTimeSerializer(), typeof(DateTime)
+					);
+					break;
 
-			default:
-				serializationInfo = null;
-				return false;
+				default:
+					serializationInfo = null;
+					return false;
 			}
 
 			return true;

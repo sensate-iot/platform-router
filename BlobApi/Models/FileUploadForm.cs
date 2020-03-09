@@ -12,11 +12,11 @@ namespace SensateService.BlobApi.Models
 {
 	public class FileUploadForm
 	{
-        [Required]
+		[Required]
 		public string Name { get; set; }
-        [Required]
-        public IFormFile File { get; set; }
-        [Required]
-        public string SensorId { get; set; }
+		[Required]
+		public IFormFile File { get; set; }
+		[Required]
+		public string SensorId { get; set; }
 	}
 }

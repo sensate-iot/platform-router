@@ -40,7 +40,7 @@ namespace SensateService.BlobApi.Controllers
 		public BlobsController(IHttpContextAccessor ctx, ISensorRepository sensors, IBlobRepository blobs,
 			ISensorLinkRepository links,
 			IOptions<BlobStorageSettings> blobOptions, ILogger<BlobsController> logger, IMqttPublishService publisher,
-			IOptions<InternalMqttServiceOptions> mqttOptions 
+			IOptions<InternalMqttServiceOptions> mqttOptions
 			) : base(ctx, sensors, links)
 		{
 			this.m_settings = blobOptions.Value;
@@ -104,7 +104,7 @@ namespace SensateService.BlobApi.Controllers
 				});
 			}
 
-			return this.CreatedAtAction(nameof(Get), new {sensorId = blob.SensorId, fileName = blob.FileName}, blob);
+			return this.CreatedAtAction(nameof(Get), new { sensorId = blob.SensorId, fileName = blob.FileName }, blob);
 		}
 
 		[HttpGet("{sensorId}/{fileName}")]

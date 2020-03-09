@@ -26,7 +26,7 @@ namespace SensateService.Models
 		[Required]
 		public TriggerActionChannel Channel { get; set; }
 		public string Target { get; set; }
-        [Required, StringLength(255)]
-        public string Message { get; set; }
+		[Required, StringLength(255)]
+		public string Message { get; set; }
 	}
 }

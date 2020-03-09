@@ -14,16 +14,16 @@ using Microsoft.Extensions.Logging;
 
 namespace SensateService.MqttHandler.Application
 {
-    public class Program
-    {
-	    public static string GetAppSettings()
-	    {
+	public class Program
+	{
+		public static string GetAppSettings()
+		{
 			return Environment.GetEnvironmentVariable("SENSATE_MQTTHANDLER_APPSETTINGS") ?? "appsettings.json";
-	    }
+		}
 
-	    public static IHost CreateHost(string[] args)
-	    {
-		    Startup starter = null;
+		public static IHost CreateHost(string[] args)
+		{
+			Startup starter = null;
 
 			var wh = Host.CreateDefaultBuilder(args)
 				.UseContentRoot(Directory.GetCurrentDirectory())
@@ -46,7 +46,7 @@ namespace SensateService.MqttHandler.Application
 				.ConfigureServices((ctx, services) => {
 					starter = new Startup(ctx.Configuration);
 					starter.ConfigureServices(services);
-				}) ;
+				});
 
 			var host = wh.Build();
 			var provider = host.Services;
@@ -56,14 +56,14 @@ namespace SensateService.MqttHandler.Application
 
 			starter.Configure(provider);
 			return host;
-	    }
+		}
 
-        public static void Main(string[] args)
-        {
-            Console.WriteLine($"Starting Sensate IoT MQTT client using {Version.VersionString}");
+		public static void Main(string[] args)
+		{
+			Console.WriteLine($"Starting Sensate IoT MQTT client using {Version.VersionString}");
 
 			var program = new Application(CreateHost(args));
 			program.Run();
-        }
-    }
+		}
+	}
 }

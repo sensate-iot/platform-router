@@ -110,8 +110,7 @@ namespace SensateService.NetworkApi.Application
 			.AddJwtBearer(cfg => {
 				cfg.RequireHttpsMetadata = false;
 				cfg.SaveToken = true;
-				cfg.TokenValidationParameters = new TokenValidationParameters
-				{
+				cfg.TokenValidationParameters = new TokenValidationParameters {
 					ValidIssuer = auth.JwtIssuer,
 					ValidAudience = auth.JwtIssuer,
 					IssuerSigningKey = new SymmetricSecurityKey(
@@ -122,7 +121,7 @@ namespace SensateService.NetworkApi.Application
 			});
 
 			if(cache.Enabled)
-                services.AddCacheStrategy(cache, db);
+				services.AddCacheStrategy(cache, db);
 
 			/* Add repositories */
 			services.AddSqlRepositories(cache.Enabled);
@@ -170,7 +169,7 @@ namespace SensateService.NetworkApi.Application
 			services.AddSwaggerGen(c => {
 				c.SwaggerDoc("v1", new OpenApiInfo {
 					Title = "Sensate Data API - Version 1",
-					Version = "v1" 
+					Version = "v1"
 				});
 			});
 

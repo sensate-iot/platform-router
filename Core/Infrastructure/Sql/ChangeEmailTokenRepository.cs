@@ -43,7 +43,7 @@ namespace SensateService.Infrastructure.Sql
 			return t.UserToken;
 		}
 
-		public  ChangeEmailToken GetById(string id)
+		public ChangeEmailToken GetById(string id)
 		{
 			return this.Data.FirstOrDefault(x => x.UserToken == id);
 		}

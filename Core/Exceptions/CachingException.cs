@@ -18,14 +18,14 @@ namespace SensateService.Exceptions
 		}
 
 		public CachingException(string msg) : base(msg)
-		{}
+		{ }
 
 		public CachingException(string msg, string key) : base(msg)
 		{
 			this.Key = key;
 		}
 
-		public CachingException(string msg, string key, Exception inner) : base (msg, inner)
+		public CachingException(string msg, string key, Exception inner) : base(msg, inner)
 		{
 			this.Key = key;
 		}

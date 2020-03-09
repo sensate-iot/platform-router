@@ -82,7 +82,7 @@ namespace SensateService.Init
 			services.AddMemoryCache();
 
 			if(config.Type == "Distributed") {
-                services.AddDistributedRedisCache(opts => {
+				services.AddDistributedRedisCache(opts => {
 					opts.Configuration = db.Redis.Host;
 					opts.InstanceName = db.Redis.InstanceName;
 				});

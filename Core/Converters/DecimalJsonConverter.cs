@@ -33,7 +33,7 @@ namespace SensateService.Converters
 
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
 		{
-			decimal v = (decimal) value;
+			decimal v = (decimal)value;
 			string raw;
 
 			if(v == Decimal.MinValue || value == null) {

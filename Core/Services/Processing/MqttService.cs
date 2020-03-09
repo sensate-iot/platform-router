@@ -23,7 +23,7 @@ using SensateService.Services.Settings;
 
 namespace SensateService.Services.Processing
 {
-	public class MqttService : AbstractMqttService 
+	public class MqttService : AbstractMqttService
 	{
 		private readonly IServiceProvider _provider;
 		private readonly ConcurrentDictionary<string, Type> _handlers;

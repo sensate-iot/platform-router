@@ -16,6 +16,6 @@ namespace SensateService.Models
 		[Key]
 		public string IdentityToken { get; set; }
 		public string UserToken { get; set; }
-		public string Email {get; set;}
+		public string Email { get; set; }
 	}
 }

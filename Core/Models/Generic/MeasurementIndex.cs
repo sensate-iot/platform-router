@@ -13,8 +13,8 @@ namespace SensateService.Models.Generic
 	public class MeasurementIndex
 	{
 		[Required]
-        public ObjectId MeasurementBucketId { get; set; }
-        [Required]
-        public int Index { get; set; }
+		public ObjectId MeasurementBucketId { get; set; }
+		[Required]
+		public int Index { get; set; }
 	}
 }

@@ -10,7 +10,7 @@ namespace SensateService.NetworkApi.Models
 	public class SensorUpdate
 	{
 		public string Name { get; set; }
-        public string Description { get; set; }
-        public string Secret { get; set; }
+		public string Description { get; set; }
+		public string Secret { get; set; }
 	}
 }

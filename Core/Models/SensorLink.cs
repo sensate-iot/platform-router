@@ -11,9 +11,9 @@ namespace SensateService.Models
 {
 	public class SensorLink
 	{
-        [JsonRequired]
+		[JsonRequired]
 		public string SensorId { get; set; }
-        [JsonRequired]
-        public string UserId { get; set; }
+		[JsonRequired]
+		public string UserId { get; set; }
 	}
 }

@@ -31,7 +31,7 @@ namespace SensateService.ApiCore.Init
 			if(ctx.Roles.Any() || ctx.Users.Any() || ctx.UserRoles.Any())
 				return;
 
-			var uroles = new [] {
+			var uroles = new[] {
 				new SensateRole {
 					Name = UserRoles.Administrator,
 					Description = "System administrators",

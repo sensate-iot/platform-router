@@ -106,7 +106,7 @@ namespace SensateService.TriggerHandler.Application
 			services.AddLogging(builder => { builder.AddConfiguration(this.Configuration.GetSection("Logging")); });
 
 			if(cache.Enabled) {
-                services.AddCacheStrategy(cache, db);
+				services.AddCacheStrategy(cache, db);
 			}
 
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);

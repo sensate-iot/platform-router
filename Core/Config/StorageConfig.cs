@@ -9,7 +9,7 @@ namespace SensateService.Config
 {
 	public class StorageConfig
 	{
-        public string StorageType { get; set; }
-        public string Path { get; set; }
+		public string StorageType { get; set; }
+		public string Path { get; set; }
 	}
 }
