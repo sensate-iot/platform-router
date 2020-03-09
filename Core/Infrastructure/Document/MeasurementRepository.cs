@@ -166,6 +166,79 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 			return idx;
 		}
 
+		public async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsBetweenAsync(
+			IEnumerable<Sensor> sensors,
+			DateTime start,
+			DateTime end,
+			int skip = -1,
+			int limit = -1,
+			CancellationToken ct = default)
+		{
+			var ids = new BsonArray();
+
+			foreach(var sensor in sensors) {
+				ids.Add(sensor.InternalId);
+			}
+
+			var matchTimestamp = new BsonDocument {
+				{
+					"SensorId", new BsonDocument {
+						{"$in", ids }
+					}
+				},
+				{
+					"First", new BsonDocument {
+						{"$lte", end}
+					}
+				},
+				{
+					"Last", new BsonDocument {
+						{"$gte", start}
+					}
+				},
+				{
+					"Measurements.Timestamp", new BsonDocument {
+						{"$gte", start},
+						{"$lte", end}
+					}
+				},
+			};
+
+			var projectRewrite = new BsonDocument {
+				{ "_id", 1 },
+				{ "Timestamp", "$Measurements.Timestamp" },
+				{ "Location", "$Measurements.Location" },
+				{ "Data", "$Measurements.Data" },
+			};
+
+
+			var pipeline = new List<BsonDocument> {
+				new BsonDocument {{"$match", matchTimestamp}},
+				new BsonDocument {{"$unwind", "$Measurements"}},
+				new BsonDocument {{"$project", projectRewrite}},
+			};
+
+			if(skip > 0) {
+				pipeline.Add(new BsonDocument { { "$skip", skip }});
+			}
+
+			if(limit > 0) {
+				pipeline.Add(new BsonDocument { { "$limit", limit }});
+			}
+
+			var query = this._collection.Aggregate<MeasurementsQueryResult>(pipeline, cancellationToken: ct);
+			var results = await query.ToListAsync(ct).AwaitBackground();
+
+			return results;
+		}
+
+		public async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsNearAsync(IEnumerable<Sensor> sensors, DateTime start, DateTime end, GeoJson2DGeographicCoordinates coords,
+			int max = 100, int skip = -1, int limit = -1, CancellationToken ct = default)
+		{
+			var measurements = await this.GetMeasurementsBetweenAsync(sensors, start, end, ct: ct).AwaitBackground();
+			return this.m_geoService.GetMeasurementsNear(measurements.ToList(), coords, max, skip, limit, ct);
+		}
+
 		public virtual async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsNearAsync(Sensor sensor, DateTime start,
 			DateTime end, GeoJson2DGeographicCoordinates coords,
 			int max = 100, int skip = -1, int limit = -1, CancellationToken ct = default)
