@@ -155,7 +155,6 @@ namespace SensateService.AuthApi
 				});
 			});
 
-			//services.AddMvc();
 			services.AddRouting();
 			services.AddControllers().AddNewtonsoftJson();
 
