@@ -6,7 +6,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>SensateService.SqlSetup</RootNamespace>
     <AssemblyName>SensateService.SqlSetup</AssemblyName>
-    <Version>0.0.4</Version>
+    <Version>0.3.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
