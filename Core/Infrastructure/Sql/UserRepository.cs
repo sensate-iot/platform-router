@@ -61,6 +61,12 @@ namespace SensateService.Infrastructure.Sql
 			return worker;
 		}
 
+		public virtual async Task<IEnumerable<SensateUser>> GetAllAsync(CancellationToken ct = default)
+		{
+			var users = await this.Data.ToListAsync(ct).AwaitBackground();
+			return users;
+		}
+
 		public virtual SensateUser Get(string key)
 		{
 			return this.GetById(key);

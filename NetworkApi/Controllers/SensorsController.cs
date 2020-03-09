@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
@@ -101,7 +102,90 @@ namespace SensateService.NetworkApi.Controllers
 			return this.CreatedAtAction(nameof(Get), new {Id = sensor.InternalId}, sensor);
 		}
 
-		[HttpPost("link")]
+		[HttpDelete("links")]
+		[ReadWriteApiKey, ValidateModel]
+		[ProducesResponseType(typeof(Sensor), StatusCodes.Status204NoContent)]
+		[ProducesResponseType(typeof(Sensor), StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(typeof(Sensor), StatusCodes.Status403Forbidden)]
+		[ProducesResponseType(typeof(Sensor), StatusCodes.Status422UnprocessableEntity)]
+		public async Task<IActionResult> DeleteLink([FromBody] SensorLink link)
+		{
+			try {
+				var user = await this.m_users.GetByEmailAsync(link.UserId).AwaitBackground();
+				var myemail = this.CurrentUser.Email;
+
+				if(user == null) {
+					return this.NotFound();
+				}
+
+				var auth = await this.AuthenticateUserForSensor(link.SensorId).AwaitBackground();
+				auth |= myemail == link.UserId;
+
+				if(!auth) {
+					return this.Forbid();
+				}
+
+				link.UserId = user.Id;
+				await this.m_links.DeleteAsync(link).AwaitBackground();
+			} catch(Exception ex) {
+				this.m_logger.LogInformation($"Unable to delete link: {ex.Message}");
+				this.m_logger.LogDebug(ex.StackTrace);
+
+				return this.BadRequest(new Status {
+					Message = "Unable to remove link!",
+					ErrorCode = ReplyCode.BadInput
+				});
+			}
+
+			return this.NoContent();
+		}
+
+		[HttpGet("links")]
+		[ReadWriteApiKey]
+		[ProducesResponseType(typeof(Sensor), StatusCodes.Status200OK)]
+		[ProducesResponseType(typeof(Sensor), StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(typeof(Sensor), StatusCodes.Status403Forbidden)]
+		[ProducesResponseType(typeof(Sensor), StatusCodes.Status422UnprocessableEntity)]
+		public async Task<IActionResult> GetLinks([FromQuery] string sensorId)
+		{
+			IEnumerable<SensorLink> links;
+
+			try {
+				if(string.IsNullOrEmpty(sensorId)) {
+					links = await this.m_links.GetAsync(this.CurrentUser.Id).AwaitBackground();
+				} else {
+					links = await this.m_links.GetAsync(this.CurrentUser.Id, sensorId);
+				}
+
+				var linkList = links.ToList();
+				var users = await this.m_users.GetRangeAsync(linkList.Select(x => x.UserId)).AwaitBackground();
+				var dict = users.ToDictionary(x => x.Id, x => x);
+
+				if(!string.IsNullOrEmpty(sensorId)) {
+					linkList.RemoveAll(x => x.UserId == this.CurrentUser.Id && x.SensorId != sensorId);
+				}
+
+				foreach(var link in linkList) {
+					if(!dict.TryGetValue(link.UserId, out var user)) {
+						continue;
+					}
+
+					link.UserId = user.Email;
+				}
+
+				return this.Ok(linkList);
+			} catch(Exception ex) {
+				this.m_logger.LogInformation($"Unable to delete link: {ex.Message}");
+				this.m_logger.LogDebug(ex.StackTrace);
+
+				return this.BadRequest(new Status {
+					Message = "Unable to remove link!",
+					ErrorCode = ReplyCode.BadInput
+				});
+			}
+		}
+
+		[HttpPost("links")]
 		[ReadWriteApiKey, ValidateModel]
 		[ProducesResponseType(typeof(Sensor), StatusCodes.Status201Created)]
 		[ProducesResponseType(typeof(Sensor), StatusCodes.Status400BadRequest)]
@@ -110,6 +194,12 @@ namespace SensateService.NetworkApi.Controllers
 		public async Task<IActionResult> Link([FromBody] SensorLink link)
 		{
 			var status = new Status();
+
+			if(link.UserId == this.CurrentUser.Email) {
+				status.Message = "Unable to link sensor to own account!";
+				status.ErrorCode = ReplyCode.BadInput;
+				return this.BadRequest(status);
+			}
 
 			try {
 				var sensor = await this.m_sensors.GetAsync(link.SensorId).AwaitBackground();
@@ -123,14 +213,21 @@ namespace SensateService.NetworkApi.Controllers
 					status.Message = "Target user not known!";
 					status.ErrorCode = ReplyCode.BadInput;
 
-					return this.NotFound(status);
+					return this.BadRequest(status);
+				}
+
+				if(!user.EmailConfirmed) {
+					status.Message = "Target user must have a confirmed account!";
+					status.ErrorCode = ReplyCode.BadInput;
+
+					return this.BadRequest(status);
 				}
 
 				if(sensor == null) {
 					status.Message = "Target sensor not known!";
 					status.ErrorCode = ReplyCode.BadInput;
 
-					return this.NotFound(status);
+					return this.BadRequest(status);
 				}
 
 				link.UserId = user.Id;
@@ -283,6 +380,7 @@ namespace SensateService.NetworkApi.Controllers
 
 				await Task.WhenAll(tasks).AwaitBackground();
 				await this.m_triggers.DeleteBySensorAsync(id).AwaitBackground();
+				await this.m_links.DeleteForAsync(sensor).AwaitBackground();
 			} catch(Exception ex) {
 				this.m_logger.LogInformation($"Unable to remove sensor: {ex.Message}");
 				this.m_logger.LogDebug(ex.StackTrace);
