@@ -115,7 +115,7 @@ namespace SensateService.Infrastructure.Storage
 
 				sensors = raw_sensors.ToDictionary(key => key.InternalId.ToString(), sensor => sensor);
 				users = await GetUserInformation(usersrepo, distinct_users).AwaitBackground();
-				measurements = base.AuthorizeMeasurements(new ValidationData(sensors, users), logs.ToList());
+				measurements = this.AuthorizeMeasurements(new ValidationData(sensors, users), logs.ToList());
 			}
 
 			return measurements;
