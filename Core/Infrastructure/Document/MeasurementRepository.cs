@@ -166,7 +166,7 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 			return idx;
 		}
 
-		public async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsBetweenAsync(
+		public virtual async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsBetweenAsync(
 			IEnumerable<Sensor> sensors,
 			DateTime start,
 			DateTime end,
@@ -232,7 +232,7 @@ public async Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index,
 			return results;
 		}
 
-		public async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsNearAsync(IEnumerable<Sensor> sensors, DateTime start, DateTime end, GeoJson2DGeographicCoordinates coords,
+		public virtual async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsNearAsync(IEnumerable<Sensor> sensors, DateTime start, DateTime end, GeoJson2DGeographicCoordinates coords,
 			int max = 100, int skip = -1, int limit = -1, CancellationToken ct = default)
 		{
 			var measurements = await this.GetMeasurementsBetweenAsync(sensors, start, end, ct: ct).AwaitBackground();
