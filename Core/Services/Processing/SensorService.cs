@@ -41,7 +41,11 @@ namespace SensateService.Services.Processing
 			var links = await worker.AwaitBackground();
 
 			var sensorIds = links.Select(x => x.SensorId);
-			var linkedSensors = await this.m_sensors.GetAsync(sensorIds).AwaitBackground();
+			var linkedSensors = (await this.m_sensors.GetAsync(sensorIds).AwaitBackground()).ToList();
+
+			foreach(var linked in linkedSensors) {
+				linked.Secret = "";
+			}
 
 			var rv = ownSensors.ToList();
 			rv.AddRange(linkedSensors);
