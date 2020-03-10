@@ -7,16 +7,19 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 using MongoDB.Bson;
 using MongoDB.Driver.GeoJsonObjectModel;
 using Newtonsoft.Json.Linq;
+
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
 using SensateService.DataApi.Models;
@@ -38,14 +41,20 @@ namespace SensateService.DataApi.Controllers
 		private readonly IMeasurementCache m_cache;
 		private readonly IMeasurementRepository m_measurements;
 		private readonly ISensorService m_sensorService;
+		private readonly ILogger<MeasurementsController> m_logger;
 
-		public MeasurementsController(IMeasurementCache cache, IMeasurementRepository measurements,
-			ISensorService sensorService, ISensorLinkRepository links,
-			ISensorRepository sensors, IHttpContextAccessor ctx) : base(ctx, sensors, links)
+		public MeasurementsController(IMeasurementCache cache,
+									  IMeasurementRepository measurements,
+									  ISensorService sensorService,
+									  ISensorLinkRepository links,
+									  ISensorRepository sensors,
+									  ILogger<MeasurementsController> logger,
+									  IHttpContextAccessor ctx) : base(ctx, sensors, links)
 		{
 			this.m_cache = cache;
 			this.m_measurements = measurements;
 			this.m_sensorService = sensorService;
+			this.m_logger = logger;
 		}
 
 		[HttpPost("create")]
@@ -53,7 +62,7 @@ namespace SensateService.DataApi.Controllers
 		[ProducesResponseType(200)]
 		public async Task<IActionResult> Create([FromBody] JObject raw)
 		{
-			Status status = new Status();
+			var status = new Status();
 
 			if(!(this.HttpContext.Items["ApiKey"] is SensateApiKey key)) {
 				return this.Forbid();
@@ -161,6 +170,7 @@ namespace SensateService.DataApi.Controllers
 
 		[HttpGet]
 		[ProducesResponseType(200)]
+		[ProducesResponseType(401)]
 		public async Task<IActionResult> Get([FromQuery] string sensorId, [FromQuery] DateTime start, [FromQuery] DateTime end,
 			[FromQuery] double? longitude, [FromQuery] double? latitude, [FromQuery] int? radius,
 			[FromQuery] int skip = -1, [FromQuery] int limit = -1)
@@ -189,7 +199,37 @@ namespace SensateService.DataApi.Controllers
 				var data = await this.m_measurements.GetBetweenAsync(sensor, start, end, skip, limit).AwaitBackground();
 				return this.Ok(data);
 			}
+		}
 
+		[HttpDelete]
+		[ReadWriteApiKey]
+		[ProducesResponseType(204)]
+		[ProducesResponseType(401)]
+		public async Task<IActionResult> Delete([FromQuery] string sensorId, [FromQuery] DateTime start, [FromQuery] DateTime end)
+		{
+			Sensor sensor;
+
+			try {
+				sensor = await this.m_sensors.GetAsync(sensorId).AwaitBackground();
+
+				if(sensor == null) {
+					return this.NotFound();
+				}
+
+				if(!this.AuthenticateUserForSensor(sensor, false)) {
+					return this.Unauthorized();
+				}
+
+				await this.m_measurements.DeleteBetweenAsync(sensor, start, end).AwaitBackground();
+			} catch(Exception ex) {
+				this.m_logger.LogInformation($"Unable to delete measurements for sensor {sensorId} between " +
+											 $"{start.ToString("u", CultureInfo.InvariantCulture)} and " +
+											 $"{end.ToString("u", CultureInfo.InvariantCulture)}: {ex.Message}");
+				this.m_logger.LogDebug(ex.StackTrace);
+				return this.BadRequest();
+			}
+
+			return this.NoContent();
 		}
 	}
 }
