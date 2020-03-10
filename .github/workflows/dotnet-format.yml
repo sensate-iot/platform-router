@@ -25,8 +25,5 @@ jobs:
           echo "::add-path::$HOME/.dotnet/tools"
 
       - name: Run dotnet format
-        uses: xt0rted/dotnet-format@v1
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          only-changed-files: "true"
-          action: "check"
+        run: |
+          dotnet format --check --dry-run
