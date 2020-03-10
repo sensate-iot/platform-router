@@ -1,0 +1,48 @@
+name: Docker
+
+on:
+  push:
+      # Publish `master` as Docker `latest` image.
+      branches:
+        - master
+      # Publish `v1.2.3` tags as releases.
+      tags:
+        - v*
+env:
+  # TODO: Change variable to your image's name.
+  IMAGE_NAME: mqtthandler
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+jobs:
+  # Push image to GitHub Packages.
+  # See also https://docs.docker.com/docker-hub/builds/
+  push:
+    # Ensure test job passes before pushing image.
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build image
+        run: |
+          IMAGE_ID=$DOCKER_USERNAME/$IMAGENAME
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          
+          [ "$VERSION" == "master" ] && VERSION=latest
+          
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+          
+          docker build . --file MqttHandler/Dockerfile --tag $IMAGE_ID:$VERSION
+
+      - name: Log into registry
+        run: echo "$DOCKER_PASSWORD" | docker -u $DOCKER_USERNAME --password-stdin
+
+      - name: Push image
+        run: |
+          docker push $IMAGE_ID:$VERSION
