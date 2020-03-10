@@ -10,13 +10,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
-
 using Microsoft.Extensions.Logging;
-
 using MongoDB.Driver;
 using MongoDB.Bson;
 using MongoDB.Driver.GeoJsonObjectModel;
-
 using SensateService.Exceptions;
 using SensateService.Models;
 using SensateService.Infrastructure.Repositories;
@@ -33,7 +30,8 @@ namespace SensateService.Infrastructure.Document
 		private readonly IGeoQueryService m_geoService;
 		protected readonly ILogger<MeasurementRepository> _logger;
 
-		public MeasurementRepository(SensateContext context, IGeoQueryService geo, ILogger<MeasurementRepository> logger) : base(context.Measurements)
+		public MeasurementRepository(SensateContext context, IGeoQueryService geo,
+									 ILogger<MeasurementRepository> logger) : base(context.Measurements)
 		{
 			this._logger = logger;
 			this.m_geoService = geo;
@@ -51,7 +49,8 @@ namespace SensateService.Infrastructure.Document
 			return data.OrderBy(x => x.Timestamp).ToList();
 		}
 
-		public virtual async Task<IEnumerable<Measurement>> GetMeasurementsBySensorAsync(Sensor sensor, int skip = -1, int limit = -1)
+		public virtual async Task<IEnumerable<Measurement>> GetMeasurementsBySensorAsync(
+			Sensor sensor, int skip = -1, int limit = -1)
 		{
 			var fd = Builders<MeasurementBucket>.Filter.Eq(x => x.SensorId, sensor.InternalId);
 
@@ -137,20 +136,17 @@ namespace SensateService.Infrastructure.Document
 			var matchTimestamp = new BsonDocument {
 				{
 					"SensorId", new BsonDocument {
-						{"$in", ids }
+						{"$in", ids}
 					}
-				},
-				{
+				}, {
 					"First", new BsonDocument {
 						{"$lte", end}
 					}
-				},
-				{
+				}, {
 					"Last", new BsonDocument {
 						{"$gte", start}
 					}
-				},
-				{
+				}, {
 					"Measurements.Timestamp", new BsonDocument {
 						{"$gte", start},
 						{"$lte", end}
@@ -159,10 +155,10 @@ namespace SensateService.Infrastructure.Document
 			};
 
 			var projectRewrite = new BsonDocument {
-				{ "_id", 1 },
-				{ "Timestamp", "$Measurements.Timestamp" },
-				{ "Location", "$Measurements.Location" },
-				{ "Data", "$Measurements.Data" },
+				{"_id", 1},
+				{"Timestamp", "$Measurements.Timestamp"},
+				{"Location", "$Measurements.Location"},
+				{"Data", "$Measurements.Data"},
 			};
 
 
@@ -186,14 +182,18 @@ namespace SensateService.Infrastructure.Document
 			return results;
 		}
 
-		public virtual async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsNearAsync(IEnumerable<Sensor> sensors, DateTime start, DateTime end, GeoJson2DGeographicCoordinates coords,
-			int max = 100, int skip = -1, int limit = -1, CancellationToken ct = default)
+		public virtual async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsNearAsync(
+			IEnumerable<Sensor> sensors,
+			DateTime start, DateTime end, GeoJson2DGeographicCoordinates coords,
+			int max = 100, int skip = -1, int limit = -1, CancellationToken ct = default
+		)
 		{
 			var measurements = await this.GetMeasurementsBetweenAsync(sensors, start, end, ct: ct).AwaitBackground();
 			return this.m_geoService.GetMeasurementsNear(measurements.ToList(), coords, max, skip, limit, ct);
 		}
 
-		public virtual async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsNearAsync(Sensor sensor, DateTime start,
+		public virtual async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsNearAsync(
+			Sensor sensor, DateTime start,
 			DateTime end, GeoJson2DGeographicCoordinates coords,
 			int max = 100, int skip = -1, int limit = -1, CancellationToken ct = default)
 		{
@@ -201,24 +201,22 @@ namespace SensateService.Infrastructure.Document
 			return this.m_geoService.GetMeasurementsNear(measurements.ToList(), coords, max, skip, limit, ct);
 		}
 
-		public async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsBetweenAsync(Sensor sensor, DateTime start, DateTime end,
+		public async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsBetweenAsync(
+			Sensor sensor, DateTime start, DateTime end,
 			int skip = -1, int limit = -1, CancellationToken ct = default)
 		{
 			var matchTimestamp = new BsonDocument {
 				{
 					"SensorId", sensor.InternalId
-				},
-				{
+				}, {
 					"First", new BsonDocument {
 						{"$lte", end}
 					}
-				},
-				{
+				}, {
 					"Last", new BsonDocument {
 						{"$gte", start}
 					}
-				},
-				{
+				}, {
 					"Measurements.Timestamp", new BsonDocument {
 						{"$gte", start},
 						{"$lte", end}
@@ -227,10 +225,10 @@ namespace SensateService.Infrastructure.Document
 			};
 
 			var projectRewrite = new BsonDocument {
-				{ "_id", 1 },
-				{ "Timestamp", "$Measurements.Timestamp" },
-				{ "Location", "$Measurements.Location" },
-				{ "Data", "$Measurements.Data" },
+				{"_id", 1},
+				{"Timestamp", "$Measurements.Timestamp"},
+				{"Location", "$Measurements.Location"},
+				{"Data", "$Measurements.Data"},
 			};
 
 
@@ -254,7 +252,8 @@ namespace SensateService.Infrastructure.Document
 			return results;
 		}
 
-		public virtual async Task<IEnumerable<MeasurementsQueryResult>> GetBetweenAsync(Sensor sensor, DateTime start, DateTime end, int skip = -1, int limit = -1)
+		public virtual async Task<IEnumerable<MeasurementsQueryResult>> GetBetweenAsync(
+			Sensor sensor, DateTime start, DateTime end, int skip = -1, int limit = -1)
 		{
 			var data = await this.GetMeasurementsBetweenAsync(sensor, start, end, skip, limit).AwaitBackground();
 			return data;
@@ -262,7 +261,8 @@ namespace SensateService.Infrastructure.Document
 
 		#region Measurement creation
 
-		private static UpdateDefinition<MeasurementBucket> CreateBucketUpdate(ObjectId sensor, ICollection<Measurement> measurements)
+		private static UpdateDefinition<MeasurementBucket> CreateBucketUpdate(
+			ObjectId sensor, ICollection<Measurement> measurements)
 		{
 			var first = measurements.ElementAt(0);
 			var last = measurements.ElementAt(measurements.Count - 1);
@@ -292,7 +292,7 @@ namespace SensateService.Infrastructure.Document
 
 				for(var idx = 0; idx < kvpair.Value.Count;) {
 					var sublist = kvpair.Value.GetRange(idx,
-						Math.Min(MeasurementBucketSize, kvpair.Value.Count - idx));
+														Math.Min(MeasurementBucketSize, kvpair.Value.Count - idx));
 					var update = CreateBucketUpdate(kvpair.Key.InternalId, sublist);
 
 					var upsert = new UpdateOneModel<MeasurementBucket>(filter, update) {
@@ -319,7 +319,8 @@ namespace SensateService.Infrastructure.Document
 			}
 		}
 
-		public async Task StoreAsync(Sensor sensor, Measurement measurement, CancellationToken ct = default(CancellationToken))
+		public async Task StoreAsync(Sensor sensor, Measurement measurement,
+									 CancellationToken ct = default(CancellationToken))
 		{
 			var dict = new Dictionary<Sensor, List<Measurement>>();
 			var measurements = new List<Measurement> { measurement };
