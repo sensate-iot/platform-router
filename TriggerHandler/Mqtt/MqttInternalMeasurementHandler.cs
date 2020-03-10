@@ -159,79 +159,79 @@ namespace SensateService.TriggerHandler.Mqtt
 					var body = Replace(action, dp);
 
 					switch(action.Channel) {
-						case TriggerActionChannel.Email:
-							if(!user.EmailConfirmed) {
-								continue;
-							}
+					case TriggerActionChannel.Email:
+						if(!user.EmailConfirmed) {
+							continue;
+						}
 
-							if(CanExecute(last, this.m_timeoutSettings.MailTimeout)) {
-								var mail = new EmailBody {
-									HtmlBody = body,
-									TextBody = body
-								};
-
-								tasks.Add(emailService.SendEmailAsync(user.Email, "Sensate trigger triggered", mail));
-							}
-
-							break;
-						case TriggerActionChannel.SMS:
-							if(CanExecute(last, this.m_timeoutSettings.MessageTimeout)) {
-								if(!user.PhoneNumberConfirmed)
-									continue;
-
-								tasks.Add(smsService.SendAsync(this.m_textSettings.AlphaCode, user.PhoneNumber, body));
-							}
-
-							break;
-
-						case TriggerActionChannel.MQTT:
-							if(CanExecute(last, this.m_timeoutSettings.MqttTimeout)) {
-								var topic = $"sensate/trigger/{trigger.SensorId}";
-								tasks.Add(publishService.PublishOnAsync(topic, body, false));
-							}
-							break;
-
-						case TriggerActionChannel.HttpPost:
-						case TriggerActionChannel.HttpGet:
-							var result = Uri.TryCreate(action.Target, UriKind.Absolute, out var output) &&
-										  output.Scheme == Uri.UriSchemeHttp || output.Scheme == Uri.UriSchemeHttps;
-
-							if(!result) {
-								break;
-							}
-
-							if(!CanExecute(last, this.m_timeoutSettings.HttpTimeout)) {
-								break;
-							}
-
-							tasks.Add(action.Channel == TriggerActionChannel.HttpGet
-								? client.GetAsync(action.Target)
-								: client.PostAsync(action.Target, body));
-							break;
-
-						case TriggerActionChannel.ControlMessage:
-							if(!ObjectId.TryParse(action.Target, out var id)) {
-								break;
-							}
-
-							var msg = new ControlMessage {
-								Data = body,
-								SensorId = id,
-								Timestamp = DateTime.UtcNow
+						if(CanExecute(last, this.m_timeoutSettings.MailTimeout)) {
+							var mail = new EmailBody {
+								HtmlBody = body,
+								TextBody = body
 							};
 
-							var actuator = this.m_options.ActuatorTopic.Replace("$sensorId", action.Target);
+							tasks.Add(emailService.SendEmailAsync(user.Email, "Sensate trigger triggered", mail));
+						}
 
-							var io = new[] {
+						break;
+					case TriggerActionChannel.SMS:
+						if(CanExecute(last, this.m_timeoutSettings.MessageTimeout)) {
+							if(!user.PhoneNumberConfirmed)
+								continue;
+
+							tasks.Add(smsService.SendAsync(this.m_textSettings.AlphaCode, user.PhoneNumber, body));
+						}
+
+						break;
+
+					case TriggerActionChannel.MQTT:
+						if(CanExecute(last, this.m_timeoutSettings.MqttTimeout)) {
+							var topic = $"sensate/trigger/{trigger.SensorId}";
+							tasks.Add(publishService.PublishOnAsync(topic, body, false));
+						}
+						break;
+
+					case TriggerActionChannel.HttpPost:
+					case TriggerActionChannel.HttpGet:
+						var result = Uri.TryCreate(action.Target, UriKind.Absolute, out var output) &&
+									  output.Scheme == Uri.UriSchemeHttp || output.Scheme == Uri.UriSchemeHttps;
+
+						if(!result) {
+							break;
+						}
+
+						if(!CanExecute(last, this.m_timeoutSettings.HttpTimeout)) {
+							break;
+						}
+
+						tasks.Add(action.Channel == TriggerActionChannel.HttpGet
+							? client.GetAsync(action.Target)
+							: client.PostAsync(action.Target, body));
+						break;
+
+					case TriggerActionChannel.ControlMessage:
+						if(!ObjectId.TryParse(action.Target, out var id)) {
+							break;
+						}
+
+						var msg = new ControlMessage {
+							Data = body,
+							SensorId = id,
+							Timestamp = DateTime.UtcNow
+						};
+
+						var actuator = this.m_options.ActuatorTopic.Replace("$sensorId", action.Target);
+
+						var io = new[] {
 								publishService.PublishOnAsync(actuator, body, false),
 								controldb.CreateAsync(msg)
 							};
 
-							await Task.WhenAll(io).AwaitBackground();
-							break;
+						await Task.WhenAll(io).AwaitBackground();
+						break;
 
-						default:
-							throw new ArgumentOutOfRangeException();
+					default:
+						throw new ArgumentOutOfRangeException();
 					}
 				}
 			}
