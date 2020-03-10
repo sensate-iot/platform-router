@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -35,17 +34,7 @@ namespace SensateService.Infrastructure.Document
 			ILogger<MeasurementRepository> logger,
 			ICacheStrategy<string> cache) : base(context, geo, logger)
 		{
-			_cache = cache;
-		}
-
-		public override async Task DeleteAsync(string id)
-		{
-			var tasks = new[] {
-				_cache.RemoveAsync(id),
-				base.DeleteAsync(id)
-			};
-
-			await Task.WhenAll(tasks).AwaitBackground();
+			this._cache = cache;
 		}
 
 		private async Task CacheDataAsync(string key, object data, int tmo, bool slide = true)
@@ -87,44 +76,16 @@ namespace SensateService.Infrastructure.Document
 			string key;
 
 			key = $"Measurements::{sensor.InternalId.ToString()}";
-			return await TryGetMeasurementsAsync(key, x => x.SensorId == sensor.InternalId, CacheTimeout.TimeoutMedium.ToInt(),
-				skip, limit).AwaitBackground();
-		}
-
-		private async Task<IEnumerable<Measurement>> TryGetMeasurementsAsync(string key, Expression<Func<MeasurementBucket, bool>> expression, int tmo, int skip, int limit)
-		{
-			IEnumerable<Measurement> measurements = null;
-
-			if(key != null)
-				measurements = await _cache.DeserializeAsync<IEnumerable<Measurement>>(key);
-
-			if(measurements != null)
-				return measurements;
-
-			measurements = await base.GetMeasurementsAsync(expression, skip, limit).AwaitBackground();
-			await this.CacheDataAsync(key, measurements, tmo, false).AwaitBackground();
-			return measurements;
-
-		}
-
-		public override async Task<IEnumerable<MeasurementsQueryResult>> GetAfterAsync(Sensor sensor, DateTime pit, int skip = -1, int limit = -1)
-		{
-			string key;
-			IEnumerable<MeasurementsQueryResult> measurements;
-
-			var cache_pit = pit.ThisMinute();
-			key = $"{sensor.InternalId}::after::{cache_pit.ToString("u", CultureInfo.InvariantCulture)}::{skip}::{limit}";
-			measurements = await _cache.DeserializeAsync<IEnumerable<MeasurementsQueryResult>>(key);
+			var measurements = await this._cache.DeserializeAsync<IEnumerable<Measurement>>(key).AwaitBackground();
 
 			if(measurements != null) {
 				return measurements;
 			}
 
-			measurements = await base.GetAfterAsync(sensor, pit, skip, limit).AwaitBackground();
-			await this.CacheDataAsync(key, measurements, CacheTimeout.TimeoutMedium.ToInt(), false).AwaitBackground();
+			measurements = await base.GetMeasurementsBySensorAsync(sensor, skip, limit).AwaitBackground();
+			await this.CacheDataAsync(key, measurements, CacheTimeout.TimeoutShort.ToInt(), false).AwaitBackground();
 
 			return measurements;
-
 		}
 
 		public override async Task<IEnumerable<MeasurementsQueryResult>> GetBetweenAsync(Sensor sensor, DateTime start, DateTime end, int skip = -1, int limit = -1)
@@ -146,24 +107,6 @@ namespace SensateService.Infrastructure.Document
 			return measurements;
 
 
-		}
-
-		public override async Task<IEnumerable<MeasurementsQueryResult>> GetBeforeAsync(Sensor sensor, DateTime pit, int skip = -1, int limit = -1)
-		{
-			string key;
-			IEnumerable<MeasurementsQueryResult> measurements;
-
-			var cache_pit = pit.ThisMinute();
-
-			key = $"{sensor.InternalId}::before::{cache_pit.ToString("u", CultureInfo.InvariantCulture)}::{skip}::{limit}";
-			measurements = await this._cache.DeserializeAsync<IEnumerable<MeasurementsQueryResult>>(key).AwaitBackground();
-
-			if(measurements != null)
-				return null;
-
-			measurements = await base.GetBeforeAsync(sensor, pit, skip, limit).AwaitBackground();
-			await this.CacheDataAsync(key, measurements, CacheTimeout.TimeoutShort.ToInt(), false).AwaitBackground();
-			return measurements;
 		}
 
 		public override async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsNearAsync(Sensor sensor,
@@ -212,7 +155,7 @@ namespace SensateService.Infrastructure.Document
 				$"{cache_end.ToString("u", CultureInfo.InvariantCulture)}::" +
 				$"{skip}::{limit}::";
 
-			var measurements = await _cache.DeserializeAsync<IEnumerable<MeasurementsQueryResult>>(key, ct);
+			var measurements = await this._cache.DeserializeAsync<IEnumerable<MeasurementsQueryResult>>(key, ct);
 
 			if(measurements != null) {
 				return measurements;
@@ -251,7 +194,7 @@ namespace SensateService.Infrastructure.Document
 				$"{skip}::{limit}::" +
 				$"{max}::{coords.Longitude}::{coords.Latitude}";
 
-			var measurements = await _cache.DeserializeAsync<IEnumerable<MeasurementsQueryResult>>(key, ct);
+			var measurements = await this._cache.DeserializeAsync<IEnumerable<MeasurementsQueryResult>>(key, ct);
 
 			if(measurements != null) {
 				return measurements;
