@@ -11,7 +11,7 @@ on:
 env:
   # TODO: Change variable to your image's name.
   IMAGE_NAME: mqtthandler
-  IMAGE_ID: sensateiot/$IMAGE_NAME
+  IMAGE_ID: sensateiot/mqtthandler
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
