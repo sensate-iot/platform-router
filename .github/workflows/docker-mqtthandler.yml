@@ -11,6 +11,7 @@ on:
 env:
   # TODO: Change variable to your image's name.
   IMAGE_NAME: mqtthandler
+  IMAGE_ID: sensateiot/$IMAGE_NAME
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
@@ -25,7 +26,13 @@ jobs:
 
       - name: Build image
         run: |
-          IMAGE_ID=sensateiot/$IMAGE_NAME
+          docker build . --file MqttHandler/Dockerfile --tag $IMAGE_NAME
+
+      - name: Log into registry
+        run: echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin
+
+      - name: Push image
+        run: |
           # Strip git ref prefix from version
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
 
@@ -36,12 +43,5 @@ jobs:
           
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
-          
-          docker build . --file MqttHandler/Dockerfile --tag $IMAGE_ID:$VERSION
-
-      - name: Log into registry
-        run: echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin
-
-      - name: Push image
-        run: |
+          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
