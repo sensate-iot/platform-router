@@ -5,21 +5,21 @@ using System.Net;
 
 namespace SensateService.SqlSetup.Migrations
 {
-    public partial class AddRemoteAddressToAuditLog : Migration
-    {
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.AddColumn<IPAddress>(
-                name: "Address",
-                table: "AspNetAuditLogs",
-                nullable: false);
-        }
+	public partial class AddRemoteAddressToAuditLog : Migration
+	{
+		protected override void Up(MigrationBuilder migrationBuilder)
+		{
+			migrationBuilder.AddColumn<IPAddress>(
+				name: "Address",
+				table: "AspNetAuditLogs",
+				nullable: false);
+		}
 
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropColumn(
-                name: "Address",
-                table: "AspNetAuditLogs");
-        }
-    }
+		protected override void Down(MigrationBuilder migrationBuilder)
+		{
+			migrationBuilder.DropColumn(
+				name: "Address",
+				table: "AspNetAuditLogs");
+		}
+	}
 }

@@ -24,7 +24,7 @@ namespace SensateService.SqlSetup
 		public SensateSqlContext CreateDbContext(string[] args)
 		{
 			var builder = new DbContextOptionsBuilder<SensateSqlContext>();
-			var db = new DatabaseConfig(); 
+			var db = new DatabaseConfig();
 
 			this.BuildConfiguration();
 			this.Configuration.GetSection("Database").Bind(db);
@@ -43,7 +43,7 @@ namespace SensateService.SqlSetup
 			if(Program.IsDevelopment())
 				builder.AddUserSecrets<Program>();
 			else
-                builder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+				builder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
 
 			Configuration = builder.Build();

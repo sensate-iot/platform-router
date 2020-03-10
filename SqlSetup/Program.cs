@@ -11,7 +11,7 @@ namespace SensateService.SqlSetup
 		{
 			Console.WriteLine("Running SensateService setup...");
 			var factory = new SensateSqlContextFactory();
-			var ctx = factory.CreateDbContext(new string[] {});
+			var ctx = factory.CreateDbContext(new string[] { });
 
 			ctx.Database.EnsureCreated();
 			ctx.Database.Migrate();
