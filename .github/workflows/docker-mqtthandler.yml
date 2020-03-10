@@ -25,7 +25,7 @@ jobs:
 
       - name: Build image
         run: |
-          IMAGE_ID=sensateiot/$IMAGENAME
+          IMAGE_ID=sensateiot/$IMAGE_NAME
           # Strip git ref prefix from version
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
 
