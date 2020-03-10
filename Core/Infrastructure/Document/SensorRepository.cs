@@ -43,7 +43,7 @@ namespace SensateService.Infrastructure.Document
 
 			sensor.CreatedAt = now;
 			sensor.UpdatedAt = now;
-			sensor.InternalId = base.GenerateId(now);
+			sensor.InternalId = this.GenerateId(now);
 
 			if(string.IsNullOrEmpty(sensor.Secret))
 				sensor.Secret = this._rng.NextStringWithSymbols(SensorSecretLength);
