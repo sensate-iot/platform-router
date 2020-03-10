@@ -53,16 +53,16 @@ namespace SensateService.ApiCore.Middleware
 			try {
 				await this.Receive(authws, async (result, buffer) => {
 					switch(result.MessageType) {
-						case WebSocketMessageType.Text:
-							await this._handler.Receive(authws, result, buffer);
-							break;
-						case WebSocketMessageType.Close:
-							this._handler.OnDisconnected(authws);
-							break;
-						case WebSocketMessageType.Binary:
-							break;
-						default:
-							throw new ArgumentOutOfRangeException();
+					case WebSocketMessageType.Text:
+						await this._handler.Receive(authws, result, buffer);
+						break;
+					case WebSocketMessageType.Close:
+						this._handler.OnDisconnected(authws);
+						break;
+					case WebSocketMessageType.Binary:
+						break;
+					default:
+						throw new ArgumentOutOfRangeException();
 					}
 				});
 			} catch(WebSocketException) {
