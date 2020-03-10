@@ -40,7 +40,7 @@ jobs:
           docker build . --file MqttHandler/Dockerfile --tag $IMAGE_ID:$VERSION
 
       - name: Log into registry
-        run: echo "$DOCKER_PASSWORD" | docker -u $DOCKER_USERNAME --password-stdin
+        run: echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin
 
       - name: Push image
         run: |
