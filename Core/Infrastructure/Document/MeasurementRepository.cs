@@ -93,10 +93,10 @@ namespace SensateService.Infrastructure.Document
 			try {
 				var builder = Builders<MeasurementBucket>.Filter;
 				var filter = builder.ElemMatch(x => x.Measurements,
-				                               x => x.Timestamp >= start) &
-				             builder.ElemMatch(x => x.Measurements,
-				                               x => x.Timestamp <= end) &
-				             builder.Eq(x => x.SensorId, sensor.InternalId);
+											   x => x.Timestamp >= start) &
+							 builder.ElemMatch(x => x.Measurements,
+											   x => x.Timestamp <= end) &
+							 builder.Eq(x => x.SensorId, sensor.InternalId);
 
 				await this._collection.DeleteManyAsync(filter).AwaitBackground();
 			} catch(Exception ex) {
