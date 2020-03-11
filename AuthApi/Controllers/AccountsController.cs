@@ -445,7 +445,7 @@ namespace SensateService.AuthApi.Controllers
 			url = target != null ? WebUtility.UrlDecode(target) : null;
 
 			if(id == null || code == null) {
-				return BadRequest();
+				return this.BadRequest();
 			}
 
 			user = await this._manager.FindByIdAsync(id).AwaitBackground();
@@ -466,10 +466,11 @@ namespace SensateService.AuthApi.Controllers
 			/* Send phone number validation token */
 			await this.SendConfirmPhoneAsync(user, user.UnconfirmedPhoneNumber).AwaitBackground();
 
-			if(url != null)
+			if(url != null) {
 				return this.Redirect(url);
+			}
 
-			return Ok();
+			return this.NoContent();
 		}
 
 		[NormalUser]
