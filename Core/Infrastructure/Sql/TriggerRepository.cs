@@ -32,6 +32,8 @@ namespace SensateService.Infrastructure.Sql
 			value.UpperEdge = trigger.UpperEdge;
 			value.LowerEdge = trigger.LowerEdge;
 			value.KeyValue = trigger.KeyValue;
+			value.FormalLanguage = trigger.FormalLanguage;
+			value.Type = trigger.Type;
 			await this.EndUpdateAsync(ct).AwaitBackground();
 		}
 
@@ -55,9 +57,24 @@ namespace SensateService.Infrastructure.Sql
 			return triggers;
 		}
 
-		public async Task<IEnumerable<Trigger>> GetAsync(IEnumerable<string> ids, CancellationToken ct = default)
+		public async Task<IEnumerable<Trigger>> GetByTypeAsync(TriggerType type, CancellationToken ct = default)
 		{
-			var query = this.Data.Where(t => ids.Contains(t.SensorId))
+			var query = this.Data.Where(trigger => trigger.Type == type)
+				.Include(t => t.Actions)
+				.Include(t => t.Invocations);
+			var triggers = await query.ToListAsync(ct).AwaitBackground();
+
+			return triggers;
+		}
+
+		public async Task<IEnumerable<Trigger>> GetAsync(IEnumerable<string> ids,
+														 TriggerType type = TriggerType.Number,
+														 CancellationToken ct = default)
+		{
+			var query = this.Data.Where(
+					t => ids.Contains(t.SensorId) &&
+					t.Type == type
+				)
 				.Include(t => t.Invocations)
 				.Include(t => t.Actions);
 
