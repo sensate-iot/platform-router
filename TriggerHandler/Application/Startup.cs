@@ -165,7 +165,7 @@ namespace SensateService.TriggerHandler.Application
 			this.Configuration.GetSection("Cache").Bind(cache);
 			var @private = mqtt.InternalBroker;
 
-			provider.MapInternalMqttTopic<MqttNumberTriggerHandler>(@private.InternalBulkMeasurementTopic);
+			provider.MapInternalMqttTopic<MqttBulkNumberTriggerHandler>(@private.InternalBulkMeasurementTopic);
 			provider.MapInternalMqttTopic<MqttNumberTriggerHandler>(@private.InternalMeasurementTopic);
 			provider.MapInternalMqttTopic<MqttFormalLanguageTriggerHandler>(@private.InternalMessageTopic);
 		}
