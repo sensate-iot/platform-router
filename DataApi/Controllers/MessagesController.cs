@@ -47,7 +47,7 @@ namespace SensateService.DataApi.Controllers
 		[ProducesResponseType(typeof(Status), StatusCodes.Status201Created)]
 		public async Task<IActionResult> Create([FromBody] RawMessage raw)
 		{
-			Message msg = new Message {
+			var msg = new Message {
 				UpdatedAt = DateTime.Now,
 				CreatedAt = raw.CreatedAt ?? DateTime.Now,
 				Data = raw.Data
