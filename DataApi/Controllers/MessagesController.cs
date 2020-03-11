@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-
+using Microsoft.Extensions.Options;
 using MongoDB.Bson;
-
+using Newtonsoft.Json;
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
 using SensateService.Enums;
@@ -22,6 +22,8 @@ using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Models.Json.In;
 using SensateService.Models.Json.Out;
+using SensateService.Services;
+using SensateService.Services.Settings;
 
 namespace SensateService.DataApi.Controllers
 {
@@ -31,13 +33,21 @@ namespace SensateService.DataApi.Controllers
 	{
 		private readonly IMessageRepository m_messages;
 		private readonly ILogger<MessagesController> m_logger;
+		private readonly IMqttPublishService m_publisher;
+		private readonly InternalMqttServiceOptions m_options;
 
-		public MessagesController(IHttpContextAccessor ctx, IMessageRepository messages,
-			ISensorLinkRepository links,
-			ILogger<MessagesController> logger, ISensorRepository sensors) : base(ctx, sensors, links)
+		public MessagesController(IHttpContextAccessor ctx,
+								  ILogger<MessagesController> logger,
+								  IOptions<InternalMqttServiceOptions> mqttOptions,
+								  IMessageRepository messages,
+								  ISensorLinkRepository links,
+								  IMqttPublishService publisher,
+								  ISensorRepository sensors) : base(ctx, sensors, links)
 		{
 			this.m_messages = messages;
 			this.m_logger = logger;
+			this.m_publisher = publisher;
+			this.m_options = mqttOptions.Value;
 		}
 
 		[HttpPost]
@@ -72,7 +82,11 @@ namespace SensateService.DataApi.Controllers
 			}
 
 			try {
-				await this.m_messages.CreateAsync(msg).AwaitBackground();
+				await Task.WhenAll(
+					this.m_messages.CreateAsync(msg),
+					this.m_publisher.PublishOnAsync(this.m_options.InternalMessageTopic,
+													JsonConvert.SerializeObject(msg), false)
+				).AwaitBackground();
 			} catch(Exception ex) {
 				this.m_logger.LogInformation("Unable to store message: " + ex.Message);
 				this.m_logger.LogDebug(ex.StackTrace);
