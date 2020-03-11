@@ -118,6 +118,7 @@ namespace SensateService.TriggerHandler.Application
 			this.SetupCommunicationChannels(services);
 
 			services.AddScoped<ITriggerNumberMatchingService, TriggerNumberMatchingService>();
+			services.AddScoped<ITriggerHandlerService, TriggerHandlerService>();
 
 			services.AddMqttService(options => {
 				options.Ssl = privatemqtt.Ssl;
@@ -164,8 +165,9 @@ namespace SensateService.TriggerHandler.Application
 			this.Configuration.GetSection("Cache").Bind(cache);
 			var @private = mqtt.InternalBroker;
 
-			provider.MapInternalMqttTopic<MqttInternalMeasurementHandler>(@private.InternalBulkMeasurementTopic);
-			provider.MapInternalMqttTopic<MqttInternalMeasurementHandler>(@private.InternalMeasurementTopic);
+			provider.MapInternalMqttTopic<MqttNumberTriggerHandler>(@private.InternalBulkMeasurementTopic);
+			provider.MapInternalMqttTopic<MqttNumberTriggerHandler>(@private.InternalMeasurementTopic);
+			provider.MapInternalMqttTopic<MqttFormalLanguageTriggerHandler>(@private.InternalMessageTopic);
 		}
 	}
 }

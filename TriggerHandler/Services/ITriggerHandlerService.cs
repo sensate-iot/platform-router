@@ -5,16 +5,14 @@
  * @email  michel@michelmegens.net
  */
 
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using SensateService.Models;
 
 namespace SensateService.TriggerHandler.Services
 {
-	public interface ITriggerNumberMatchingService
+	public interface ITriggerHandlerService
 	{
-		Task HandleTriggerAsync(IList<Tuple<Trigger, TriggerInvocation, DataPoint>> invocations);
+		Task HandleTriggerAction(SensateUser user, Trigger trigger, TriggerAction action, TriggerInvocation last, string body);
 	}
 }

@@ -5,14 +5,11 @@
  * @email  michel@michelmegens.net
  */
 
-using System.Collections.Generic;
-using SensateService.Models;
-
 namespace SensateService.TriggerHandler.Models
 {
-	public class InternalMeasurement
+	public class InternalMeasurement<T>
 	{
-		public List<Measurement> Measurements { get; set; }
+		public T Measurements { get; set; }
 		public string CreatedBy { get; set; }
 	}
 }

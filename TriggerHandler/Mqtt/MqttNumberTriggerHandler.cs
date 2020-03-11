@@ -19,23 +19,27 @@ using Microsoft.Extensions.Logging;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
-using SensateService.TriggerHandler.Models;
 using SensateService.TriggerHandler.Services;
 
 using Convert = System.Convert;
 using JsonConvert = Newtonsoft.Json.JsonConvert;
+using MultiInternalMeasurementType =
+	SensateService.TriggerHandler.Models.InternalMeasurement<
+		System.Collections.Generic.IList<SensateService.Models.Measurement>>;
+
+using SingleInternalMeasurementType = SensateService.TriggerHandler.Models.InternalMeasurement<SensateService.Models.Measurement>;
 
 namespace SensateService.TriggerHandler.Mqtt
 {
-	public class MqttInternalMeasurementHandler : Middleware.MqttHandler
+	public class MqttNumberTriggerHandler : Middleware.MqttHandler
 	{
 		private readonly IServiceProvider m_provider;
-		private readonly ILogger<MqttInternalMeasurementHandler> logger;
+		private readonly ILogger<MqttNumberTriggerHandler> logger;
 		private readonly ITriggerNumberMatchingService m_matcher;
 
-		public MqttInternalMeasurementHandler(IServiceProvider provider,
+		public MqttNumberTriggerHandler(IServiceProvider provider,
 			ITriggerNumberMatchingService matcher,
-			ILogger<MqttInternalMeasurementHandler> logger)
+			ILogger<MqttNumberTriggerHandler> logger)
 		{
 			this.m_provider = provider;
 			this.logger = logger;
@@ -95,7 +99,7 @@ namespace SensateService.TriggerHandler.Mqtt
 			this.logger.LogDebug("Message received!");
 
 			var data = Decompress(message);
-			var measurements = JsonConvert.DeserializeObject<IList<InternalMeasurement>>(data);
+			var measurements = JsonConvert.DeserializeObject<IList<MultiInternalMeasurementType>>(data);
 
 			using var scope = this.m_provider.CreateScope();
 			var triggersdb = scope.ServiceProvider.GetRequiredService<ITriggerRepository>();
