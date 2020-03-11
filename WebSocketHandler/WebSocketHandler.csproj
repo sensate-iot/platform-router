@@ -4,7 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>SensateService</UserSecretsId>
     <ServerGarbageCollection>true</ServerGarbageCollection>
-    <Version>0.3.0</Version>
+    <Version>0.4.0</Version>
     <AssemblyName>SensateService.WebSocketHandler</AssemblyName>
     <RootNamespace>SensateService.WebSocketHandler</RootNamespace>
   </PropertyGroup>
