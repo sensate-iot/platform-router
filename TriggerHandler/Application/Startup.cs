@@ -21,6 +21,7 @@ using SensateService.Services.Adapters;
 using SensateService.Services.Settings;
 using SensateService.TriggerHandler.Models;
 using SensateService.TriggerHandler.Mqtt;
+using SensateService.TriggerHandler.Services;
 
 namespace SensateService.TriggerHandler.Application
 {
@@ -36,7 +37,7 @@ namespace SensateService.TriggerHandler.Application
 		private static bool IsDevelopment()
 		{
 #if DEBUG
-			var env = Environment.GetEnvironmentVariable("NETCORE_ENVIRONMENT") ?? "Development";
+			var env = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "Development";
 			return env == "Development";
 #else
 			return false;
@@ -87,10 +88,10 @@ namespace SensateService.TriggerHandler.Application
 			var cache = new CacheConfig();
 			var timeouts = new TimeoutSettings();
 
-			Configuration.GetSection("Mqtt").Bind(mqtt);
-			Configuration.GetSection("Database").Bind(db);
-			Configuration.GetSection("Cache").Bind(cache);
-			Configuration.GetSection("Timeouts").Bind(timeouts);
+			this.Configuration.GetSection("Mqtt").Bind(mqtt);
+			this.Configuration.GetSection("Database").Bind(db);
+			this.Configuration.GetSection("Cache").Bind(cache);
+			this.Configuration.GetSection("Timeouts").Bind(timeouts);
 
 			var privatemqtt = mqtt.InternalBroker;
 			var publicmqtt = mqtt.PublicBroker;
@@ -115,6 +116,8 @@ namespace SensateService.TriggerHandler.Application
 			services.AddMeasurementStorage(cache);
 
 			this.SetupCommunicationChannels(services);
+
+			services.AddScoped<ITriggerNumberMatchingService, TriggerNumberMatchingService>();
 
 			services.AddMqttService(options => {
 				options.Ssl = privatemqtt.Ssl;
@@ -157,8 +160,8 @@ namespace SensateService.TriggerHandler.Application
 			var mqtt = new MqttConfig();
 			var cache = new CacheConfig();
 
-			Configuration.GetSection("Mqtt").Bind(mqtt);
-			Configuration.GetSection("Cache").Bind(cache);
+			this.Configuration.GetSection("Mqtt").Bind(mqtt);
+			this.Configuration.GetSection("Cache").Bind(cache);
 			var @private = mqtt.InternalBroker;
 
 			provider.MapInternalMqttTopic<MqttInternalMeasurementHandler>(@private.InternalBulkMeasurementTopic);
