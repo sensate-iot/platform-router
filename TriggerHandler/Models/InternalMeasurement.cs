@@ -10,9 +10,15 @@ using SensateService.Models;
 
 namespace SensateService.TriggerHandler.Models
 {
+	public class InternalBulkMeasurements
+	{
+		public IList<Measurement> Measurements { get; set; }
+		public string CreatedBy { get; set; }
+	}
+
 	public class InternalMeasurement
 	{
-		public List<Measurement> Measurements { get; set; }
+		public Measurement Measurement { get; set; }
 		public string CreatedBy { get; set; }
 	}
 }

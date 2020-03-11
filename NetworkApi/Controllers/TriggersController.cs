@@ -35,8 +35,7 @@ namespace SensateService.NetworkApi.Controllers
 
 		public TriggersController(IHttpContextAccessor ctx, ITriggerRepository triggers,
 			ISensorLinkRepository links,
-			ISensorRepository sensors, ILogger<TriggersController> logger) :
-			base(ctx, sensors, links)
+			ISensorRepository sensors, ILogger<TriggersController> logger) : base(ctx, sensors, links)
 		{
 			this.m_logger = logger;
 			this.m_triggers = triggers;
@@ -50,19 +49,14 @@ namespace SensateService.NetworkApi.Controllers
 			});
 		}
 
-		[HttpPost]
-		[ReadWriteApiKey]
-		[ValidateModel]
-		[ProducesResponseType(typeof(Status), StatusCodes.Status422UnprocessableEntity)]
-		[ProducesResponseType(typeof(Status), StatusCodes.Status401Unauthorized)]
-		[ProducesResponseType(typeof(Status), StatusCodes.Status201Created)]
-		public async Task<IActionResult> Create([FromBody] RawTrigger raw)
+		private static Trigger CreateNumberTrigger(RawTrigger raw)
 		{
-			if(raw == null) {
-				return this.UnprocessableEntity(new Status {
-					Message = "Invalid input!",
-					ErrorCode = ReplyCode.BadInput
-				});
+			if((raw.LowerEdge != null || raw.UpperEdge != null) && raw.KeyValue == null) {
+				return null;
+			}
+
+			if(string.IsNullOrEmpty(raw.KeyValue)) {
+				return null;
 			}
 
 			var trigger = new Trigger {
@@ -72,18 +66,46 @@ namespace SensateService.NetworkApi.Controllers
 				SensorId = raw.SensorId,
 			};
 
-			if(string.IsNullOrEmpty(raw.KeyValue)) {
-				return this.UnprocessableEntity(new Status {
-					Message = "Invalid key value!",
-					ErrorCode = ReplyCode.BadInput
-				});
+			return trigger;
+		}
+
+		private static Trigger CreateNaturalLanguageTrigger(RawTrigger raw)
+		{
+			if(string.IsNullOrEmpty(raw.FormalLanguage)) {
+				return null;
+			}
+
+			var trigger = new Trigger {
+				FormalLanguage = raw.FormalLanguage,
+				SensorId = raw.SensorId,
+				KeyValue = "Data"
+			};
+
+			return trigger;
+		}
+
+		[HttpPost]
+		[ReadWriteApiKey]
+		[ValidateModel]
+		[ProducesResponseType(typeof(Status), StatusCodes.Status422UnprocessableEntity)]
+		[ProducesResponseType(typeof(Status), StatusCodes.Status401Unauthorized)]
+		[ProducesResponseType(typeof(Status), StatusCodes.Status201Created)]
+		public async Task<IActionResult> Create([FromBody] RawTrigger raw, [FromQuery] TriggerType type = TriggerType.Number)
+		{
+			Trigger trigger;
+			var invalidInput = new Status {
+				Message = "Invalid input!",
+				ErrorCode = ReplyCode.BadInput
+			};
+
+			trigger = null;
+
+			if(raw == null) {
+				return this.UnprocessableEntity(invalidInput);
 			}
 
 			if(string.IsNullOrEmpty(raw.SensorId) || !ObjectId.TryParse(raw.SensorId, out _)) {
-				return this.UnprocessableEntity(new Status {
-					Message = "Invalid sensor ID!",
-					ErrorCode = ReplyCode.BadInput
-				});
+				return this.UnprocessableEntity(invalidInput);
 			}
 
 			var auth = await this.AuthenticateUserForSensor(raw.SensorId).AwaitBackground();
@@ -92,7 +114,26 @@ namespace SensateService.NetworkApi.Controllers
 				return this.CreateNotAuthorizedResult();
 			}
 
-			await this.m_triggers.CreateAsync(trigger).AwaitBackground();
+			if(type == TriggerType.Number) {
+				trigger = CreateNumberTrigger(raw);
+			} else if(type == TriggerType.Regex) {
+				trigger = CreateNaturalLanguageTrigger(raw);
+			}
+
+			if(trigger == null) {
+				invalidInput.Message = "Invalid input provided";
+				return this.UnprocessableEntity(invalidInput);
+			}
+
+			trigger.Type = type;
+
+			try {
+				await this.m_triggers.CreateAsync(trigger).AwaitBackground();
+			} catch(Exception ex) {
+				this.m_logger.LogInformation($"Unable to create trigger: {ex.Message}");
+				this.m_logger.LogDebug(ex.StackTrace);
+				return this.BadRequest(invalidInput);
+			}
 
 			return this.CreatedAtAction(nameof(GetById), new { triggerId = trigger.Id }, trigger);
 		}

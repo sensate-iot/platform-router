@@ -10,15 +10,16 @@ using System.Threading.Tasks;
 using System.Threading;
 
 using Microsoft.Extensions.Caching.Distributed;
+
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+
 using SensateService.Helpers;
 
 namespace SensateService.Infrastructure.Cache
 {
 	public sealed class DistributedCacheStrategy : AbstractCacheStrategy
 	{
-		private IDistributedCache _cache;
+		private readonly IDistributedCache _cache;
 
 		public DistributedCacheStrategy(IDistributedCache cache)
 		{
@@ -48,17 +49,19 @@ namespace SensateService.Infrastructure.Cache
 			data = JsonConvert.SerializeObject(obj);
 			opts = new DistributedCacheEntryOptions();
 
-			if(slide)
+			if(slide) {
 				opts.SetSlidingExpiration(TimeSpan.FromMinutes(tmo));
-			else
+			} else {
 				opts.SetAbsoluteExpiration(TimeSpan.FromMinutes(tmo));
+			}
+
 			await this._cache.SetStringAsync(key, data, opts, ct).AwaitBackground();
 		}
 
 		public override async Task<ObjType> DeserializeAsync<ObjType>(string key, CancellationToken ct = default(CancellationToken))
 		{
 			var data = await this._cache.GetStringAsync(key, ct).AwaitBackground();
-			return data == null ? null : Newtonsoft.Json.JsonConvert.DeserializeObject<ObjType>(data);
+			return data == null ? null : JsonConvert.DeserializeObject<ObjType>(data);
 		}
 
 		public override void Serialize(string key, object obj, int tmo, bool slide)
@@ -69,10 +72,12 @@ namespace SensateService.Infrastructure.Cache
 			data = obj.ToByteArray();
 			opts = new DistributedCacheEntryOptions();
 
-			if(slide)
+			if(slide) {
 				opts.SetSlidingExpiration(TimeSpan.FromMinutes(tmo));
-			else
+			} else {
 				opts.SetAbsoluteExpiration(TimeSpan.FromMinutes(tmo));
+			}
+
 			this._cache.SetAsync(key, data, opts);
 		}
 
@@ -100,10 +105,11 @@ namespace SensateService.Infrastructure.Cache
 
 			options = new DistributedCacheEntryOptions();
 
-			if(slide)
+			if(slide) {
 				options.SetSlidingExpiration(TimeSpan.FromMinutes(tmo));
-			else
+			} else {
 				options.SetAbsoluteExpiration(TimeSpan.FromMinutes(tmo));
+			}
 
 			this._cache.SetString(key, obj, options);
 		}
@@ -123,10 +129,11 @@ namespace SensateService.Infrastructure.Cache
 		{
 			var options = new DistributedCacheEntryOptions();
 
-			if(slide)
+			if(slide) {
 				options.SetSlidingExpiration(TimeSpan.FromMinutes(tmo));
-			else
+			} else {
 				options.SetAbsoluteExpiration(TimeSpan.FromMinutes(tmo));
+			}
 
 			await this._cache.SetStringAsync(key, obj, options, ct).AwaitBackground();
 		}

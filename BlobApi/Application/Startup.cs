@@ -71,17 +71,17 @@ namespace SensateService.BlobApi.Application
 
 			services.Configure<BlobStorageSettings>(settings => {
 				switch(storage.StorageType) {
-					default:
-						settings.StorageType = StorageType.FileSystem;
-						break;
+				default:
+					settings.StorageType = StorageType.FileSystem;
+					break;
 
-					case "DigitalOceanSpaces":
-						settings.StorageType = StorageType.DigitalOceanSpaces;
-						break;
+				case "DigitalOceanSpaces":
+					settings.StorageType = StorageType.DigitalOceanSpaces;
+					break;
 
-					case "FTP":
-						settings.StorageType = StorageType.FTP;
-						break;
+				case "FTP":
+					settings.StorageType = StorageType.FTP;
+					break;
 				}
 
 				settings.StoragePath = storage.Path;

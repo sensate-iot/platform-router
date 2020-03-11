@@ -159,17 +159,17 @@ namespace SensateService.Infrastructure.Storage
 		private IList<ParsedMeasurementEntry> ParseMeasurements(IList<RawMeasurementEntry> raw_q)
 		{
 			var parsed_q = new List<ParsedMeasurementEntry>(raw_q.Count);
-			bool hasNull = false;
+			var hasNull = false;
 
 			for(var idx = 0; idx < raw_q.Count; idx++) {
 				parsed_q.Add(null);
 			}
 
 			Parallel.For(0, raw_q.Count, index => {
-				var raw = raw_q[index];
+				var (method, json) = raw_q[index];
 
 				try {
-					parsed_q[index] = new ParsedMeasurementEntry(raw.Item1, raw.Item2.ToObject<RawMeasurement>(), raw.Item2);
+					parsed_q[index] = new ParsedMeasurementEntry(method, json.ToObject<RawMeasurement>(), json);
 				} catch(Exception ex) {
 					this.Logger.LogInformation($"Unable to parse measurement object: {ex.Message}");
 					hasNull = true;
@@ -212,11 +212,12 @@ namespace SensateService.Infrastructure.Storage
 					IList<StatisticsUpdate> statsdata;
 					var asyncio = new Task[3];
 
-					parsed_q = ParseMeasurements(raw_q);
+					parsed_q = this.ParseMeasurements(raw_q);
 					processed_q = await this.ProcessMeasurementsAsync(parsed_q).AwaitBackground();
 
-					if(processed_q.Count <= 0L)
+					if(processed_q.Count <= 0L) {
 						return 0L;
+					}
 
 					var mapped =
 						from measurement in processed_q

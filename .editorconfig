@@ -3,6 +3,7 @@
 indent_style=tab
 indent_size=tab
 tab_width=4
+end_of_line=crlf
 
 [*.{asax,ascx,aspx,cshtml,css,htm,html,js,jsx,master,razor,skin,ts,tsx,vb,xaml,xamlx,xoml}]
 indent_style=space
@@ -19,6 +20,7 @@ tab_width=2
 
 
 # Microsoft .NET properties
+csharp_indent_switch_labels=false
 csharp_new_line_before_catch=false
 csharp_new_line_before_else=false
 csharp_new_line_before_finally=false
@@ -79,9 +81,12 @@ resharper_too_wide_local_variable_scope_highlighting=none
 
 # ReSharper properties
 resharper_align_linq_query=true
+resharper_align_multiline_argument=true
+resharper_align_multiline_extends_list=true
 resharper_allow_comment_after_lbrace=true
 resharper_blank_lines_after_control_transfer_statements=1
 resharper_cpp_type_declaration_braces=end_of_line
+resharper_csharp_align_multiline_parameter=true
 resharper_csharp_indent_style=tab
 resharper_csharp_use_indent_from_vs=false
 resharper_indent_nested_fixed_stmt=true
@@ -90,10 +95,15 @@ resharper_indent_nested_for_stmt=true
 resharper_indent_nested_lock_stmt=true
 resharper_indent_nested_usings_stmt=true
 resharper_indent_nested_while_stmt=true
+resharper_indent_preprocessor_region=no_indent
 resharper_keep_existing_embedded_arrangement=false
 resharper_keep_existing_switch_expression_arrangement=false
+resharper_max_attribute_length_for_same_line=38
 resharper_new_line_before_finally=false
 resharper_other_braces=end_of_line
+resharper_place_accessorholder_attribute_on_same_line=false
+resharper_place_accessor_attribute_on_same_line=true
+resharper_place_field_attribute_on_same_line=false
 resharper_place_linq_into_on_new_line=false
 resharper_place_simple_embedded_statement_on_same_line=false
 resharper_wrap_before_linq_expression=true

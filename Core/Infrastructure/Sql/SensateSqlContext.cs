@@ -89,6 +89,7 @@ namespace SensateService.Infrastructure.Sql
 			builder.Entity<AuditLog>().HasOne<SensateUser>().WithMany().HasForeignKey(log => log.AuthorId);
 			builder.Entity<AuditLog>().HasIndex(log => log.Method);
 
+			builder.Entity<Trigger>().HasIndex(trigger => trigger.Type);
 			builder.Entity<Trigger>().Property(trigger => trigger.Id).UseIdentityByDefaultColumn();
 			builder.Entity<Trigger>().HasIndex(trigger => trigger.SensorId);
 			builder.Entity<Trigger>().HasMany(trigger => trigger.Invocations).WithOne()

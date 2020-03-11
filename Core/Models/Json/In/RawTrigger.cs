@@ -11,10 +11,10 @@ namespace SensateService.Models.Json.In
 {
 	public class RawTrigger
 	{
-		[Required]
 		public string KeyValue { get; set; }
 		public decimal? LowerEdge { get; set; }
 		public decimal? UpperEdge { get; set; }
+		public string FormalLanguage { get; set; }
 		[Required]
 		public string SensorId { get; set; }
 	}
