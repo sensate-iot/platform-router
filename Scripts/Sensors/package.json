@@ -3,16 +3,16 @@
   "version": "0.1.0",
   "description": "Fake sensors to e2e test the sensate backend services.",
   "main": "bin/sensate-sensor.js",
-  "scripts": { },
+  "scripts": {},
   "bin": {
-	  "sensate-sensor": "./bin/sensate-sensor.js"
+    "sensate-sensor": "./bin/sensate-sensor.js"
   },
   "keywords": [
     "iot",
     "sensors",
-	"measurements",
-	"sensate-iot",
-	"sensate",
+    "measurements",
+    "sensate-iot",
+    "sensate",
     "testing"
   ],
   "author": "Michel Megens",
