@@ -116,7 +116,7 @@ namespace SensateService.MqttHandler.Mqtt
 
 		public void Dispose()
 		{
-			Dispose(true);
+			this.Dispose(true);
 			GC.SuppressFinalize(this);
 		}
 	}
