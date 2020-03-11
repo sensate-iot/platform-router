@@ -7,19 +7,19 @@
 
 using System;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-using MongoDB.Bson;
 using Newtonsoft.Json;
 
-using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
-using SensateService.Models.Json.In;
+using SensateService.MqttHandler.Models;
 using SensateService.Services;
 using SensateService.Services.Settings;
 
@@ -28,9 +28,9 @@ namespace SensateService.MqttHandler.Mqtt
 	public class MqttMessageHandler : Middleware.MqttHandler
 	{
 		private readonly InternalMqttServiceOptions m_options;
-		private IUserRepository m_users;
-		private IMessageRepository m_messages;
-		private ISensorRepository m_sensors;
+		private readonly IUserRepository m_users;
+		private readonly IMessageRepository m_messages;
+		private readonly ISensorRepository m_sensors;
 		private readonly IMqttPublishService m_client;
 		private readonly ILogger<MqttMessageHandler> m_logger;
 
@@ -49,19 +49,30 @@ namespace SensateService.MqttHandler.Mqtt
 		{
 		}
 
+		private static byte[] HexToByteArray(string hex)
+		{
+			var NumberChars = hex.Length;
+			var bytes = new byte[NumberChars / 2];
+
+			for(var i = 0; i < NumberChars; i += 2) {
+				bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
+			}
+
+			return bytes;
+		}
+
+		private static bool CompareHashes(ReadOnlySpan<byte> h1, ReadOnlySpan<byte> h2)
+		{
+			return h1.SequenceEqual(h2);
+		}
+
 		public override async Task OnMessageAsync(string topic, string message)
 		{
 			try {
 				var raw = JsonConvert.DeserializeObject<RawMessage>(message);
 
-				if(!ObjectId.TryParse(raw.SensorId, out var id)) {
-					this.m_logger.LogDebug("Unable to parse a raw message's sensor ID.");
-					return;
-				}
-
-				var sensor = await this.m_sensors.GetAsync(raw.SensorId).AwaitBackground();
+				var sensor = await this.m_sensors.GetAsync(raw.SensorId.ToString()).AwaitBackground();
 				var user = await this.m_users.GetAsync(sensor.Owner).AwaitBackground();
-				var key = user.ApiKeys.FirstOrDefault(x => x.ApiKey == sensor.Secret);
 				var asyncio = new Task[2];
 
 				if(user.UserRoles.Any(x => x.Role.Name == SensateRole.Banned)) {
@@ -69,17 +80,25 @@ namespace SensateService.MqttHandler.Mqtt
 					return;
 				}
 
-				if(key == null || key.Revoked || key.Type != ApiKeyType.SensorKey) {
-					this.m_logger.LogDebug("Attempted to store message using an invalid key.");
+				using var sha = SHA256.Create();
+
+				var withSecret = message.Replace(raw.Secret, sensor.Secret);
+
+				var binary = Encoding.ASCII.GetBytes(withSecret);
+				var computed = sha.ComputeHash(binary);
+				var hash = HexToByteArray(raw.Secret);
+
+				if(!CompareHashes(computed, hash)) {
 					return;
 				}
 
 				var msg = new Message {
 					Data = raw.Data,
-					SensorId = id,
-					CreatedAt = raw.CreatedAt ?? DateTime.UtcNow,
-					UpdatedAt = raw.CreatedAt ?? DateTime.UtcNow
+					SensorId = raw.SensorId,
+					CreatedAt = DateTime.UtcNow,
+					UpdatedAt = DateTime.UtcNow
 				};
+
 				var json = JsonConvert.SerializeObject(msg);
 
 				asyncio[0] = this.m_messages.CreateAsync(msg);
