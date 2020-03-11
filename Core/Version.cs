@@ -18,6 +18,6 @@ namespace SensateService
 
 		public const int Major = 0;
 		public const int Minor = 4;
-		public const int PatchLevel = 0;
+		public const int PatchLevel = 1;
 	}
 }

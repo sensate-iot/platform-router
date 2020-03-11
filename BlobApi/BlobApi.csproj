@@ -5,7 +5,7 @@
     <UserSecretsId>SensateService</UserSecretsId>
     <AssemblyName>SensateService.BlobApi</AssemblyName>
     <RootNamespace>SensateService.BlobApi</RootNamespace>
-    <Version>0.4.0</Version>
+    <Version>0.4.1</Version>
     <PackageLicenseFile>COPYING</PackageLicenseFile>
   </PropertyGroup>
 

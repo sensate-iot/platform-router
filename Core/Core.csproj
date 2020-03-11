@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <StartupObject />
     <AssemblyName>SensateService.Core</AssemblyName>
-    <Version>0.4.0</Version>
+    <Version>0.4.1</Version>
     <Company>Sensate IoT</Company>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
