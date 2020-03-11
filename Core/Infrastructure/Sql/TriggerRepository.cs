@@ -47,9 +47,9 @@ namespace SensateService.Infrastructure.Sql
 			return trigger;
 		}
 
-		public async Task<IEnumerable<Trigger>> GetAsync(string id, CancellationToken ct = default)
+		public async Task<IEnumerable<Trigger>> GetAsync(string id, TriggerType type = TriggerType.Number, CancellationToken ct = default)
 		{
-			var query = this.Data.Where(trigger => trigger.SensorId == id)
+			var query = this.Data.Where(trigger => trigger.SensorId == id && trigger.Type == type)
 				.Include(t => t.Actions)
 				.Include(t => t.Invocations);
 			var triggers = await query.ToListAsync(ct).AwaitBackground();
