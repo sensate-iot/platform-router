@@ -56,12 +56,16 @@
     <TypeScriptCompile Include="app\util.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="clients\auditlogsclient.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="clients\sensorlinksclient.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="clients\websocketclient.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="models\auditlog.ts" />
     <TypeScriptCompile Include="models\measurement.ts" />
     <TypeScriptCompile Include="models\request.ts">
       <SubType>Code</SubType>

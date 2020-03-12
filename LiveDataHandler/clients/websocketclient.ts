@@ -72,6 +72,10 @@ export class WebSocketClient {
         return await this.verifyRequest(req.data);
     }
 
+    public getUserId(): string {
+        return this.userId;
+    }
+
     private unsubscribe(req: IWebSocketRequest<ISensorAuthRequest>) {
         if (!this.sensors.has(req.data.sensorId)) {
             return;

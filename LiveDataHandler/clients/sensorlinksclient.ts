@@ -5,7 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
-import { Pool } from "pg";
+import { Pool, QueryResult } from "pg";
 import { SensorLink } from "../models/sensorlink";
 
 export class SensorLinksClient {
@@ -14,7 +14,16 @@ export class SensorLinksClient {
 
     public async getSensorLinks(sensorId: string) {
         const query = `SELECT * FROM "SensorLinks" WHERE "SensorId" = '${sensorId}'`;
-        const result = await this.pool.query(query);
+        let result: QueryResult;
+
+        try {
+            result = await this.pool.query(query);
+        } catch (ex) {
+            console.log("Unable to fetch sensor links:");
+            console.log(ex);
+
+            return [];
+        }
 
         return result.rows as SensorLink[];
     }
