@@ -43,6 +43,7 @@
     <TypeScriptCompile Include="app\bulkmessagehandler.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="app\guid.ts" />
     <TypeScriptCompile Include="app\imessagehandler.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
