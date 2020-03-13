@@ -99,11 +99,11 @@ namespace SensateService.Infrastructure.Storage
 			ProcessedMeasurement processed;
 			Measurement measurement;
 
-			if (!sensors.TryGetValue(raw.Item2.CreatedById, out Sensor sensor)) {
+			if(!sensors.TryGetValue(raw.Item2.CreatedById, out Sensor sensor)) {
 				return null;
 			}
 
-			if (!users.TryGetValue(sensor.Owner, out SensateUser user)) {
+			if(!users.TryGetValue(sensor.Owner, out SensateUser user)) {
 				return null;
 			}
 

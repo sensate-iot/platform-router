@@ -55,7 +55,7 @@ namespace SensateService.Infrastructure.Storage
 				return null;
 			}
 
-			if (obj.Latitude.HasValue && obj.Longitude.HasValue) {
+			if(obj.Latitude.HasValue && obj.Longitude.HasValue) {
 				var coords = new GeoJson2DGeographicCoordinates(obj.Longitude.Value, obj.Latitude.Value);
 				point = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(coords);
 			} else {

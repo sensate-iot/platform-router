@@ -31,7 +31,7 @@ namespace SensateService.MqttHandler.Mqtt
 
 		private bool disposed;
 
-		public MqttRealTimeMeasurementHandler( IMeasurementStore store, IOptions<InternalMqttServiceOptions> options, IMqttPublishService client)
+		public MqttRealTimeMeasurementHandler(IMeasurementStore store, IOptions<InternalMqttServiceOptions> options, IMqttPublishService client)
 		{
 			this.client = client;
 			this.mqttopts = options.Value;
