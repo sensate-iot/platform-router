@@ -1,4 +1,4 @@
-﻿/**
+﻿/*
  * Admin control API.
  *
  * @author Michel Megens
