@@ -8,7 +8,11 @@
 using System;
 using System.Net;
 using System.ComponentModel.DataAnnotations;
+
+using Newtonsoft.Json;
+
 using SensateService.Enums;
+using SensateService.Converters;
 
 namespace SensateService.Models
 {
@@ -23,7 +27,7 @@ namespace SensateService.Models
 		[Required]
 		public RequestMethod Method { get; set; }
 
-		[Required]
+		[Required, JsonConverter(typeof(IPAddressJsonConverter))]
 		public IPAddress Address { get; set; }
 
 		public string AuthorId { get; set; }
