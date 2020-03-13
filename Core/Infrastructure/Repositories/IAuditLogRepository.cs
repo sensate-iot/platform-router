@@ -22,7 +22,7 @@ namespace SensateService.Infrastructure.Repositories
 		Task<IEnumerable<AuditLog>> GetByUserAsync(SensateUser user, int skip = 0, int limit = 0);
 		Task<IEnumerable<AuditLog>> GetBetweenAsync(SensateUser user, DateTime start, DateTime end, int skip = 0, int limit = 0);
 		Task<IEnumerable<AuditLog>> GetByRouteAsync(SensateUser user, string route, int skip = 0, int limit = 0);
-		Task<IEnumerable<AuditLog>> GetByRouteAsync(SensateUser user, string route, DateTime start, DateTime end, int skip = 0, int limit =0);
+		Task<IEnumerable<AuditLog>> GetByRouteAsync(SensateUser user, string route, DateTime start, DateTime end, int skip = 0, int limit = 0);
 		Task<IEnumerable<AuditLog>> GetByRequestTypeAsync(SensateUser user, RequestMethod method, int skip = 0, int limit = 0);
 		Task<IEnumerable<AuditLog>> GetAsync(Expression<Func<AuditLog, bool>> expr);
 		Task<AuditLog> GetAsync(long id);

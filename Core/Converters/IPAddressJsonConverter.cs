@@ -25,9 +25,9 @@ namespace SensateService.Converters
 		}
 
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
-		                                JsonSerializer serializer)
+										JsonSerializer serializer)
 		{
-			return IPAddress.Parse((string) reader.Value);
+			return IPAddress.Parse((string)reader.Value);
 		}
 	}
 }

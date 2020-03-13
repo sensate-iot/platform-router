@@ -163,9 +163,9 @@ namespace SensateService.Infrastructure.Sql
 			var result =
 				from log in this.Data
 				where log.AuthorId == user.Id &&
-				      log.Route == route &&
-				      log.Timestamp >= start &&
-				      log.Timestamp <= end
+					  log.Route == route &&
+					  log.Timestamp >= start &&
+					  log.Timestamp <= end
 				orderby log.Timestamp
 				select log;
 
@@ -187,7 +187,7 @@ namespace SensateService.Infrastructure.Sql
 			var query =
 				from log in this.Data
 				where log.AuthorId == user.Id &&
-				      log.Method == method
+					  log.Method == method
 				orderby log.Timestamp
 				select log;
 			var data = query.AsQueryable();
@@ -246,8 +246,8 @@ namespace SensateService.Infrastructure.Sql
 			var query =
 				from log in this.Data
 				where log.AuthorId == user.Id &&
-				      log.Timestamp >= start &&
-				      log.Timestamp <= end
+					  log.Timestamp >= start &&
+					  log.Timestamp <= end
 				orderby log.Timestamp
 				select log;
 			var data = query.AsQueryable();
@@ -269,7 +269,7 @@ namespace SensateService.Infrastructure.Sql
 			var query =
 				from log in this.Data
 				where log.AuthorId == user.Id &&
-				      log.Route == route
+					  log.Route == route
 				orderby log.Timestamp
 				select log;
 			var data = query.AsQueryable();
