@@ -7,7 +7,6 @@
 
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,6 +23,7 @@ using SensateService.Helpers;
 using SensateService.Infrastructure.Events;
 using SensateService.Infrastructure.Storage;
 using SensateService.Models.Generic;
+using SensateService.Models.Json.In;
 using SensateService.Services;
 using SensateService.Services.Settings;
 
@@ -46,16 +46,19 @@ namespace SensateService.WebSocketHandler.Application
 		public override async Task Receive(AuthenticatedWebSocket socket, WebSocketReceiveResult result, byte[] buffer)
 		{
 			string msg;
-			JObject raw;
+			RawMeasurement raw;
 
 			msg = Encoding.UTF8.GetString(buffer, 0, result.Count);
 
 			try {
-				var reader = new JsonTextReader(new StringReader(msg)) { FloatParseHandling = FloatParseHandling.Decimal };
-				raw = JObject.Load(reader);
+				raw = JsonConvert.DeserializeObject<RawMeasurement>(msg);
 
 				using var scope = this.provider.CreateScope();
 				var store = scope.ServiceProvider.GetRequiredService<IMeasurementCache>();
+
+				if(raw.CreatedById == null) {
+					return;
+				}
 
 				await store.StoreAsync(raw, RequestMethod.WebSocket).AwaitBackground();
 			} catch(InvalidRequestException ex) {

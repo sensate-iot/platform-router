@@ -7,7 +7,6 @@
 
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,18 +39,21 @@ namespace SensateService.WebSocketHandler.Application
 		public override async Task Receive(AuthenticatedWebSocket socket, WebSocketReceiveResult result, byte[] buffer)
 		{
 			string msg;
-			JObject raw;
+			RawMeasurement raw;
 
 			msg = Encoding.UTF8.GetString(buffer, 0, result.Count);
 
 			try {
-				using var scope = this.provider.CreateScope();
-				var store = scope.ServiceProvider.GetRequiredService<IMeasurementStore>();
-				var reader = new JsonTextReader(new StringReader(msg)) { FloatParseHandling = FloatParseHandling.Decimal };
+				raw = JsonConvert.DeserializeObject<RawMeasurement>(msg);
 
-				raw = JObject.Load(reader);
+				using(var scope = this.provider.CreateScope()) {
+					var store = scope.ServiceProvider.GetRequiredService<IMeasurementStore>();
 
-				await store.StoreAsync(raw, RequestMethod.WebSocket).AwaitBackground();
+					if(raw.CreatedById == null)
+						return;
+
+					await store.StoreAsync(raw, RequestMethod.WebSocket).AwaitBackground();
+				}
 			} catch(InvalidRequestException ex) {
 				Debug.WriteLine($"Unable to store measurement: {ex.Message}");
 				dynamic jobj = new JObject();
