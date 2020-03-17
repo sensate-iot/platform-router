@@ -22,7 +22,7 @@ namespace SensateService.Infrastructure.Repositories
 
 		Task<long> CountAsync(Expression<Func<AuthUserToken, bool>> expr);
 
-		IEnumerable<AuthUserToken> GetByUser(SensateUser user);
+		Task<IEnumerable<AuthUserToken>> GetByUserAsync(SensateUser user, int skip = 0, int limit = 0, CancellationToken ct = default);
 		AuthUserToken GetById(SensateUser user, string value);
 		AuthUserToken GetById(Tuple<SensateUser, string> id);
 
