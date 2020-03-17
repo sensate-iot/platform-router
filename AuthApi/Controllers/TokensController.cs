@@ -172,11 +172,13 @@ namespace SensateService.AuthApi.Controllers
 			AuthUserToken authToken;
 			var user = await this.GetCurrentUserAsync().AwaitBackground();
 
-			if(user == null)
-				return Forbid();
+			if(user == null) {
+				return this.Forbid();
+			}
 
-			if(String.IsNullOrEmpty(token))
-				return InvalidInputResult("Token not found!");
+			if(String.IsNullOrEmpty(token)) {
+				return this.InvalidInputResult("Token not found!");
+			}
 
 			authToken = this._tokens.GetById(user, token);
 
@@ -187,7 +189,7 @@ namespace SensateService.AuthApi.Controllers
 				return this.InvalidInputResult("Token already invalid!");
 
 			await this._tokens.InvalidateTokenAsync(authToken);
-			return Ok();
+			return this.NoContent();
 		}
 
 		[HttpDelete("revoke-all", Name = "RevokeAll")]
@@ -198,10 +200,10 @@ namespace SensateService.AuthApi.Controllers
 			IEnumerable<AuthUserToken> tokens;
 			var user = await this.GetCurrentUserAsync().AwaitBackground();
 
-			tokens = this._tokens.GetByUser(user);
+			tokens = await this._tokens.GetByUserAsync(user).AwaitBackground();
 			await this._tokens.InvalidateManyAsync(tokens);
 
-			return Ok();
+			return this.NoContent();
 		}
 
 		private AuthUserToken CreateAuthUserTokenEntry(SensateUser user)
