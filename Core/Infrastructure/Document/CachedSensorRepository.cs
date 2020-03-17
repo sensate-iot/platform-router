@@ -61,21 +61,23 @@ namespace SensateService.Infrastructure.Document
 			this.Commit(obj);
 		}
 
-		public override async Task<IEnumerable<Sensor>> GetAsync(SensateUser user)
+		public override async Task<IEnumerable<Sensor>> GetAsync(SensateUser user, int skip = 0, int limit = 0)
 		{
 			string key, data;
 			IEnumerable<Sensor> sensors;
 
-			key = $"sensors:uid:{user.Id}";
+			key = $"sensors:uid:{user.Id}::{skip}::{limit}";
 			data = await this._cache.GetAsync(key);
 
-			if(data != null)
+			if(data != null) {
 				return JsonConvert.DeserializeObject<IEnumerable<Sensor>>(data);
+			}
 
-			sensors = await base.GetAsync(user).AwaitBackground();
+			sensors = await base.GetAsync(user, skip, limit).AwaitBackground();
 
-			if(sensors == null)
+			if(sensors == null) {
 				return null;
+			}
 
 			await this._cache.SetAsync(key, JsonConvert.SerializeObject(sensors), CacheTimeout.TimeoutMedium.ToInt()).AwaitBackground();
 			return sensors;
@@ -88,13 +90,15 @@ namespace SensateService.Infrastructure.Document
 
 			data = await this._cache.GetAsync(id).AwaitBackground();
 
-			if(data != null)
+			if(data != null) {
 				return JsonConvert.DeserializeObject<Sensor>(data);
+			}
 
 			sensor = await base.GetAsync(id).AwaitBackground();
 
-			if(sensor == null)
+			if(sensor == null) {
 				return null;
+			}
 
 			await this.CommitAsync(sensor).AwaitBackground();
 			return sensor;

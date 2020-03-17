@@ -51,17 +51,26 @@ namespace SensateService.Infrastructure.Document
 			await base.CreateAsync(sensor, ct).AwaitBackground();
 		}
 
-		public virtual async Task<IEnumerable<Sensor>> GetAsync(SensateUser user)
+		public virtual async Task<IEnumerable<Sensor>> GetAsync(SensateUser user, int skip = 0, int limit = 0)
 		{
 			FilterDefinition<Sensor> filter;
 			var id = user.Id;
 			var builder = Builders<Sensor>.Filter;
 
 			filter = builder.Where(s => s.Owner == id);
-			var sensors = await this._sensors.FindAsync(filter).AwaitBackground();
+			var sensors = this._sensors.Aggregate().Match(filter);
 
-			if(sensors == null)
+			if(sensors == null) {
 				return null;
+			}
+
+			if(skip > 0) {
+				sensors = sensors.Skip(skip);
+			}
+
+			if(limit > 0) {
+				sensors = sensors.Limit(limit);
+			}
 
 			return await sensors.ToListAsync().AwaitBackground();
 		}
@@ -85,15 +94,28 @@ namespace SensateService.Infrastructure.Document
 			return raw.ToList();
 		}
 
-		public async Task<IEnumerable<Sensor>> FindByNameAsync(SensateUser user, string name)
+		public async Task<IEnumerable<Sensor>> FindByNameAsync(SensateUser user, string name, int skip = 0, int limit = 0)
 		{
 			FilterDefinition<Sensor> filter;
 			var builder = Builders<Sensor>.Filter;
 
 			filter = builder.Where(x => x.Name.Contains(name)) &
 					 builder.Eq(x => x.Owner, user.Id);
-			var raw = await this._collection.FindAsync(filter).AwaitBackground();
-			return raw.ToList();
+			var sensors = this._collection.Aggregate().Match(filter);
+
+			if(sensors == null) {
+				return null;
+			}
+
+			if(skip > 0) {
+				sensors = sensors.Skip(skip);
+			}
+
+			if(limit > 0) {
+				sensors = sensors.Limit(limit);
+			}
+
+			return await sensors.ToListAsync().AwaitBackground();
 		}
 
 		public virtual async Task<Sensor> GetAsync(string id)
