@@ -15,7 +15,7 @@ namespace SensateService.Services
 {
 	public interface ISensorService
 	{
-		Task<IEnumerable<Sensor>> GetSensorsAsync(SensateUser user, CancellationToken token = default);
-		Task<IEnumerable<Sensor>> GetSensorsAsync(SensateUser user, string name, CancellationToken token = default);
+		Task<IEnumerable<Sensor>> GetSensorsAsync(SensateUser user, int skip = 0, int limit = 0, CancellationToken token = default);
+		Task<IEnumerable<Sensor>> GetSensorsAsync(SensateUser user, string name, int skip = 0, int limit = 0, CancellationToken token = default);
 	}
 }
