@@ -14,6 +14,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Threading;
+
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 using SensateService.Exceptions;
@@ -41,7 +43,7 @@ namespace SensateService.Infrastructure.Sql
 			asyncResult.RunSynchronously();
 		}
 
-		public override async Task CreateAsync(AuthUserToken obj, CancellationToken ct = default(CancellationToken))
+		public override async Task CreateAsync(AuthUserToken obj, CancellationToken ct = default)
 		{
 			if(obj.Value == null && obj.LoginProvider == JwtRefreshTokenProvider) {
 				obj.Value = this.GenerateRefreshToken();
@@ -67,15 +69,22 @@ namespace SensateService.Infrastructure.Sql
 			);
 		}
 
-		public IEnumerable<AuthUserToken> GetByUser(SensateUser user)
+		public async Task<IEnumerable<AuthUserToken>> GetByUserAsync(SensateUser user, int skip = 0, int limit = 0, CancellationToken ct = default)
 		{
-			IEnumerable<AuthUserToken> data;
+			var data = from token in this.Data
+					   where token.UserId == user.Id
+					   select token;
 
-			data = from token in this.Data
-				   where token.UserId == user.Id
-				   select token;
+			if(skip > 0) {
+				data = data.Skip(skip);
+			}
 
-			return data.ToList();
+			if(limit > 0) {
+				data = data.Take(limit);
+			}
+
+			return await data.ToListAsync(ct).AwaitBackground();
+
 		}
 
 		public void InvalidateToken(AuthUserToken token)

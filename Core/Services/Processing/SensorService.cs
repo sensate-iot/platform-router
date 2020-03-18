@@ -27,14 +27,14 @@ namespace SensateService.Services.Processing
 			this.m_sensors = sensors;
 		}
 
-		public async Task<IEnumerable<Sensor>> GetSensorsAsync(SensateUser user, string name, CancellationToken token = default)
+		public async Task<IEnumerable<Sensor>> GetSensorsAsync(SensateUser user, string name, int skip = 0, int limit = 0, CancellationToken token = default)
 		{
-			var sensors = await this.GetSensorsAsync(user, token).AwaitBackground();
+			var sensors = await this.GetSensorsAsync(user, skip, limit, token).AwaitBackground();
 			var nameLower = name.ToLowerInvariant();
 			return sensors.Where(x => x.Name.ToLowerInvariant().Contains(nameLower));
 		}
 
-		public async Task<IEnumerable<Sensor>> GetSensorsAsync(SensateUser user, CancellationToken token = default)
+		public async Task<IEnumerable<Sensor>> GetSensorsAsync(SensateUser user, int skip = 0, int limit = 0, CancellationToken token = default)
 		{
 			var worker = this.m_links.GetByUserAsync(user, token);
 			var ownSensors = await this.m_sensors.GetAsync(user).AwaitBackground();
@@ -49,6 +49,14 @@ namespace SensateService.Services.Processing
 
 			var rv = ownSensors.ToList();
 			rv.AddRange(linkedSensors);
+
+			if(skip > 0) {
+				rv = rv.Skip(skip).ToList();
+			}
+
+			if(limit > 0) {
+				rv = rv.Take(limit).ToList();
+			}
 
 			return rv;
 		}

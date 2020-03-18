@@ -24,6 +24,7 @@ using SensateService.Helpers;
 using SensateService.Infrastructure.Events;
 using SensateService.Infrastructure.Storage;
 using SensateService.Models.Generic;
+using SensateService.Models.Json.In;
 using SensateService.Services;
 using SensateService.Services.Settings;
 
@@ -46,18 +47,13 @@ namespace SensateService.WebSocketHandler.Application
 		public override async Task Receive(AuthenticatedWebSocket socket, WebSocketReceiveResult result, byte[] buffer)
 		{
 			string msg;
-			JObject raw;
-
-			msg = Encoding.UTF8.GetString(buffer, 0, result.Count);
 
 			try {
-				var reader = new JsonTextReader(new StringReader(msg)) { FloatParseHandling = FloatParseHandling.Decimal };
-				raw = JObject.Load(reader);
-
 				using var scope = this.provider.CreateScope();
 				var store = scope.ServiceProvider.GetRequiredService<IMeasurementCache>();
+				msg = Encoding.UTF8.GetString(buffer, 0, result.Count);
 
-				await store.StoreAsync(raw, RequestMethod.WebSocket).AwaitBackground();
+				await store.StoreAsync(msg, RequestMethod.WebSocket).AwaitBackground();
 			} catch(InvalidRequestException ex) {
 				Debug.WriteLine($"Unable to store measurement: {ex.Message}");
 				dynamic jobj = new JObject();

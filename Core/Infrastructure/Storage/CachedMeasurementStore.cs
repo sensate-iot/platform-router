@@ -21,8 +21,7 @@ using Microsoft.Extensions.Logging;
 
 using MongoDB.Bson;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
+using SensateService.Crypto;
 using SensateService.Enums;
 using SensateService.Exceptions;
 using SensateService.Helpers;
@@ -33,9 +32,9 @@ using SensateService.Models.Json.In;
 
 namespace SensateService.Infrastructure.Storage
 {
-	using RawMeasurementEntry = Tuple<RequestMethod, JObject>;
+	using RawMeasurementEntry = Tuple<RequestMethod, string>;
 	using ValidationData = Tuple<IDictionary<string, Sensor>, IDictionary<string, SensateUser>>;
-	using ParsedMeasurementEntry = Tuple<RequestMethod, RawMeasurement, JObject>;
+	using ParsedMeasurementEntry = Tuple<RequestMethod, RawMeasurement, string>;
 
 	public class CachedMeasurementStore : AbstractMeasurementStore, ICachedMeasurementStore
 	{
@@ -44,13 +43,17 @@ namespace SensateService.Infrastructure.Storage
 		private List<RawMeasurementEntry> m_measurements;
 		private int m_count;
 		private SpinLockWrapper m_lock;
+		private IServiceProvider m_provider;
 
 		private const int InitialListSize = 512;
 		private const int DatabaseTimeout = 20;
 
-		public CachedMeasurementStore(IServiceProvider provider, ILogger<CachedMeasurementStore> logger) :
-			base(provider, logger)
+		public CachedMeasurementStore(
+			IServiceProvider provider,
+			IHashAlgorithm algo,
+			ILogger<CachedMeasurementStore> logger) : base(algo, logger)
 		{
+			this.m_provider = provider;
 			this.m_lock = new SpinLockWrapper();
 
 			this.m_lock.Lock();
@@ -59,9 +62,9 @@ namespace SensateService.Infrastructure.Storage
 			this.m_lock.Unlock();
 		}
 
-		public override Task StoreAsync(JObject obj, RequestMethod method)
+		public override Task StoreAsync(string obj, RequestMethod method)
 		{
-			if(!obj.TryGetValue("CreatedById", out _) || !obj.TryGetValue("CreatedBySecret", out _)) {
+			if(!obj.Contains("CreatedById") || !obj.Contains(RawMeasurement.CreatedBySecretKey)) {
 				return Task.CompletedTask;
 			}
 
@@ -73,7 +76,7 @@ namespace SensateService.Infrastructure.Storage
 			return Task.CompletedTask;
 		}
 
-		public async Task StoreRangeAsync(IEnumerable<JObject> measurements, RequestMethod method)
+		public async Task StoreRangeAsync(IEnumerable<string> measurements, RequestMethod method)
 		{
 			await Task.Run(() => {
 				var data = measurements.Select(m => new RawMeasurementEntry(method, m)).ToList();
@@ -106,7 +109,7 @@ namespace SensateService.Infrastructure.Storage
 
 			sensors_ids = logs.Select(raw => raw.Item2.CreatedById).Distinct().ToList();
 
-			using(var scope = this.Provider.CreateScope()) {
+			using(var scope = this.m_provider.CreateScope()) {
 				var sensorsrepo = scope.ServiceProvider.GetRequiredService<ISensorRepository>();
 				var usersrepo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
 
@@ -169,7 +172,7 @@ namespace SensateService.Infrastructure.Storage
 				var (method, json) = raw_q[index];
 
 				try {
-					parsed_q[index] = new ParsedMeasurementEntry(method, json.ToObject<RawMeasurement>(), json);
+					parsed_q[index] = new ParsedMeasurementEntry(method, JsonConvert.DeserializeObject<RawMeasurement>(json), json);
 				} catch(Exception ex) {
 					this.Logger.LogInformation($"Unable to parse measurement object: {ex.Message}");
 					hasNull = true;
@@ -201,7 +204,7 @@ namespace SensateService.Infrastructure.Storage
 
 			processed_q = null;
 
-			using(var scope = this.Provider.CreateScope()) {
+			using(var scope = this.m_provider.CreateScope()) {
 				var measurementsdb = scope.ServiceProvider.GetRequiredService<IMeasurementRepository>();
 				var statsdb = scope.ServiceProvider.GetRequiredService<ISensorStatisticsRepository>();
 				var cts = new CancellationTokenSource(TimeSpan.FromSeconds(DatabaseTimeout));
@@ -344,4 +347,3 @@ namespace SensateService.Infrastructure.Storage
 		public IList<Measurement> Measurements { get; set; }
 	}
 }
-

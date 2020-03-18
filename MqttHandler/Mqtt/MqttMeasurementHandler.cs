@@ -38,13 +38,8 @@ namespace SensateService.MqttHandler.Mqtt
 
 		public override async Task OnMessageAsync(string topic, string message)
 		{
-			JObject raw;
-
 			try {
-				var reader = new JsonTextReader(new StringReader(message)) { FloatParseHandling = FloatParseHandling.Decimal };
-
-				raw = JObject.Load(reader);
-				await this.store.StoreAsync(raw, RequestMethod.MqttTcp).AwaitBackground();
+				await this.store.StoreAsync(message, RequestMethod.MqttTcp).AwaitBackground();
 			} catch(CachingException ex) {
 				this.logger.LogInformation($"{ex.Key}: {ex.Message}");
 			} catch(Exception ex) {

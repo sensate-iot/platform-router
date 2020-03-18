@@ -83,17 +83,12 @@ namespace SensateService.MqttHandler.Mqtt
 
 		public override async Task OnMessageAsync(string topic, string message)
 		{
-			JObject raw;
-
 			if(this.disposed) {
 				throw new ObjectDisposedException("MeasurementHandler");
 			}
 
 			try {
-				var reader = new JsonTextReader(new StringReader(message)) { FloatParseHandling = FloatParseHandling.Decimal };
-
-				raw = JObject.Load(reader);
-				await this.store.StoreAsync(raw, RequestMethod.MqttTcp).AwaitBackground();
+				await this.store.StoreAsync(message, RequestMethod.MqttTcp).AwaitBackground();
 			} catch(Exception ex) {
 				this.m_Logger.LogInformation($"Error: {ex.Message}");
 			}

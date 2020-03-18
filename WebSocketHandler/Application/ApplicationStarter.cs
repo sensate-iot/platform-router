@@ -68,6 +68,7 @@ namespace SensateService.WebSocketHandler.Application
 			services.AddDocumentRepositories(cache.Enabled);
 			services.AddSqlRepositories(cache.Enabled);
 			services.AddMeasurementStorage(cache);
+			services.AddHashAlgorihms();
 
 			this.SetupAuthentication(services, auth);
 

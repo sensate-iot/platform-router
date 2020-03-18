@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
 using SensateService.Enums;
 using SensateService.Exceptions;
 using SensateService.Helpers;
@@ -36,15 +38,17 @@ namespace SensateService.WebSocketHandler.Application
 		public override async Task Receive(AuthenticatedWebSocket socket, WebSocketReceiveResult result, byte[] buffer)
 		{
 			string msg;
-			IList<JObject> raw;
+			IList<string> raw;
 
-			msg = Encoding.UTF8.GetString(buffer, 0, result.Count);
 
 			try {
 				using var scope = this.provider.CreateScope();
 				var store = scope.ServiceProvider.GetRequiredService<IMeasurementCache>();
+				msg = Encoding.UTF8.GetString(buffer, 0, result.Count);
+				var array = JArray.Parse(msg);
 
-				raw = JsonConvert.DeserializeObject<IList<JObject>>(msg);
+				raw = array.Select(entry => entry.ToString(Formatting.None)).ToList();
+
 				await store.StoreRangeAsync(raw, RequestMethod.WebSocket).AwaitBackground();
 			} catch(InvalidRequestException ex) {
 				Debug.WriteLine($"Unable to store measurement: {ex.Message}");

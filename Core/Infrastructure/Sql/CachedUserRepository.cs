@@ -108,16 +108,16 @@ namespace SensateService.Infrastructure.Sql
 			return obj;
 		}
 
-		public override async Task<IEnumerable<SensateUser>> GetAllAsync(CancellationToken ct = default)
+		public override async Task<IEnumerable<SensateUser>> GetAllAsync(int skip = 0, int limit = 0, CancellationToken ct = default)
 		{
-			var key = "AllUsers";
+			var key = $"all_users::{skip}{limit}";
 			var obj = await this._cache.GetAsync(key, ct).AwaitBackground();
 
 			if(obj != null) {
 				return JsonConvert.DeserializeObject<SensateUser[]>(obj);
 			}
 
-			var users = await base.GetAllAsync(ct).AwaitBackground();
+			var users = await base.GetAllAsync(skip, limit, ct).AwaitBackground();
 			obj = JsonConvert.SerializeObject(users);
 			await this._cache.SetAsync(key, obj, CacheTimeout.Timeout.ToInt(), false, ct);
 

@@ -156,10 +156,19 @@ namespace SensateService.Infrastructure.Sql
 			return this._rng.NextStringWithSymbols(UserTokenLength);
 		}
 
-		public async Task<IEnumerable<SensateApiKey>> GetByUserAsync(SensateUser user, CancellationToken token = default(CancellationToken))
+		public async Task<IEnumerable<SensateApiKey>> GetByUserAsync(SensateUser user, int skip = 0, int limit = 0, CancellationToken token = default(CancellationToken))
 		{
-			var query = this.Data.Where(apikey => apikey.UserId == user.Id).Include(apikey => apikey.User)
+			IQueryable<SensateApiKey> query = this.Data.Where(apikey => apikey.UserId == user.Id).Include(apikey => apikey.User)
 				.ThenInclude(u => u.ApiKeys);
+
+			if(skip > 0) {
+				query = query.Skip(skip);
+			}
+
+			if(limit > 0) {
+				query = query.Take(limit);
+			}
+
 			var keys = await query.ToListAsync(token).AwaitBackground();
 
 			if(keys == null)
@@ -172,14 +181,26 @@ namespace SensateService.Infrastructure.Sql
 			return keys;
 		}
 
-		public async Task<IEnumerable<SensateApiKey>> GetByUserAsync(SensateUser user, ApiKeyType type, CancellationToken token = default(CancellationToken))
+		public async Task<IEnumerable<SensateApiKey>> GetByUserAsync(SensateUser user, ApiKeyType type,
+																	 int skip = 0, int limit = 0,
+																	 CancellationToken token = default(CancellationToken))
 		{
-			var query = this.Data.Where(apikey => apikey.UserId == user.Id && apikey.Type == type).Include(apikey => apikey.User)
+			IQueryable<SensateApiKey> query = this.Data.Where(apikey => apikey.UserId == user.Id && apikey.Type == type).Include(apikey => apikey.User)
 				.ThenInclude(u => u.ApiKeys);
+
+			if(skip > 0) {
+				query = query.Skip(skip);
+			}
+
+			if(limit > 0) {
+				query = query.Take(limit);
+			}
+
 			var keys = await query.ToListAsync(token).AwaitBackground();
 
-			if(keys == null)
+			if(keys == null) {
 				return null;
+			}
 
 			foreach(var key in keys) {
 				key.CreatedOn = DateTime.SpecifyKind(key.CreatedOn, DateTimeKind.Utc);

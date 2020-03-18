@@ -12,9 +12,8 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
-
-using Newtonsoft.Json.Linq;
-
+using Newtonsoft.Json;
+using SensateService.Crypto;
 using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Events;
@@ -24,7 +23,7 @@ using SensateService.Models.Json.In;
 
 namespace SensateService.Infrastructure.Storage
 {
-	using ParsedMeasurementEntry = Tuple<RequestMethod, RawMeasurement, JObject>;
+	using ParsedMeasurementEntry = Tuple<RequestMethod, RawMeasurement, string>;
 
 	public class MeasurementStore : AbstractMeasurementStore
 	{
@@ -36,13 +35,13 @@ namespace SensateService.Infrastructure.Storage
 		private readonly ISensorStatisticsRepository _stats;
 
 		public MeasurementStore(
+			IHashAlgorithm algo,
 			IUserRepository users,
 			ISensorRepository sensors,
 			IMeasurementRepository measurements,
 			ISensorStatisticsRepository stats,
-			IServiceProvider provider,
 			ILogger<MeasurementStore> logger
-		) : base(provider, logger)
+		) : base(algo, logger)
 		{
 			this._sensors = sensors;
 			this._measurements = measurements;
@@ -50,17 +49,18 @@ namespace SensateService.Infrastructure.Storage
 			this._stats = stats;
 		}
 
-		public override async Task StoreAsync(JObject raw, RequestMethod method)
+		public override async Task StoreAsync(string raw, RequestMethod method)
 		{
 			Measurement m;
 			Sensor sensor;
 			SensateUser user;
-			var obj = raw.ToObject<RawMeasurement>();
+			var obj = JsonConvert.DeserializeObject<RawMeasurement>(raw);
 
 			sensor = await this._sensors.GetAsync(obj.CreatedById).AwaitBackground();
 
-			if(sensor == null)
+			if(sensor == null) {
 				return;
+			}
 
 			user = await this._users.GetAsync(sensor.Owner).AwaitBackground();
 
@@ -68,7 +68,7 @@ namespace SensateService.Infrastructure.Storage
 				return;
 			}
 
-			m = base.AuthorizeMeasurement(sensor, user, new ParsedMeasurementEntry(method, obj, raw));
+			m = this.AuthorizeMeasurement(sensor, user, new ParsedMeasurementEntry(method, obj, raw));
 			var measurement_worker = this._measurements.StoreAsync(sensor, m);
 			var stats_worker = this._stats.IncrementAsync(sensor, method);
 			var events_worker = InvokeMeasurementReceivedAsync(sensor, m);

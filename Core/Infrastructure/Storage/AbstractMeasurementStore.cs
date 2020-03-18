@@ -10,7 +10,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -18,9 +17,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 using MongoDB.Driver.GeoJsonObjectModel;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
+using SensateService.Crypto;
 using SensateService.Enums;
 using SensateService.Models;
 using SensateService.Models.Json.In;
@@ -28,21 +26,21 @@ using SensateService.Models.Json.In;
 namespace SensateService.Infrastructure.Storage
 {
 	using ValidationData = Tuple<IDictionary<string, Sensor>, IDictionary<string, SensateUser>>;
-	using ParsedMeasurementEntry = Tuple<RequestMethod, RawMeasurement, JObject>;
+	using ParsedMeasurementEntry = Tuple<RequestMethod, RawMeasurement, string>;
 
 	public abstract class AbstractMeasurementStore : IMeasurementStore
 	{
-		protected IServiceProvider Provider { get; }
 		protected ILogger Logger { get; }
-		private readonly Regex m_shaRegex;
+		private readonly IHashAlgorithm m_algo;
 
 		private const int MaxDatapointLength = 25;
+		private const int SecretSubStringOffset = 3;
+		private const int SecretSubStringStart = 1;
 
-		protected AbstractMeasurementStore(IServiceProvider provider, ILogger logger)
+		protected AbstractMeasurementStore(IHashAlgorithm algo, ILogger logger)
 		{
-			this.Provider = provider;
 			this.Logger = logger;
-			this.m_shaRegex = new Regex(@"^([a-f0-9]{64})$");
+			this.m_algo = algo;
 		}
 
 		protected Measurement ProcessRawMeasurement(RawMeasurement obj)
@@ -81,13 +79,12 @@ namespace SensateService.Infrastructure.Storage
 
 			return measurement;
 		}
-
 		private static byte[] HexToByteArray(string hex)
 		{
-			var NumberChars = hex.Length;
-			var bytes = new byte[NumberChars / 2];
+			var num = hex.Length;
+			var bytes = new byte[num / 2];
 
-			for(var i = 0; i < NumberChars; i += 2) {
+			for(var i = 0; i < num; i += 2) {
 				bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
 			}
 
@@ -102,29 +99,29 @@ namespace SensateService.Infrastructure.Storage
 		protected Measurement AuthorizeMeasurement(Sensor sensor, SensateUser user, ParsedMeasurementEntry raw)
 		{
 			RawMeasurement measurement;
-			JObject obj;
+			Regex search;
+			Regex match;
 
 			if(!this.CanInsert(user)) {
 				return null;
 			}
 
 			measurement = raw.Item2;
+			match = this.m_algo.GetMatchRegex();
+			search = this.m_algo.GetSearchRegex();
 
-			if(this.m_shaRegex.IsMatch(measurement.CreatedBySecret)) {
-				using var sha = SHA256.Create();
-
-				obj = raw.Item3;
-				obj[RawMeasurement.CreatedBySecretKey] = sensor.Secret;
-
-				var binary = Encoding.ASCII.GetBytes(obj.ToString(Formatting.None));
-				var computed = sha.ComputeHash(binary);
-				var hash = HexToByteArray(measurement.CreatedBySecret);
+			if(match.IsMatch(measurement.CreatedBySecret)) {
+				var length = measurement.CreatedBySecret.Length - SecretSubStringOffset;
+				var json = search.Replace(raw.Item3, sensor.Secret, 1);
+				var binary = Encoding.ASCII.GetBytes(json);
+				var computed = this.m_algo.ComputeHash(binary);
+				var hash = HexToByteArray(measurement.CreatedBySecret.Substring(SecretSubStringStart, length));
 
 				if(!CompareHashes(computed, hash)) {
 					return null;
 				}
 			} else {
-				if(!this.InsertAllowed(user, measurement.CreatedBySecret) && measurement.IsCreatedBy(sensor)) {
+				if(!this.InsertAllowed(user, measurement.CreatedBySecret) && !measurement.IsCreatedBy(sensor)) {
 					return null;
 				}
 			}
@@ -165,7 +162,7 @@ namespace SensateService.Infrastructure.Storage
 
 				rv = result.IsCompleted;
 			} catch(Exception ex) {
-				this.Logger.LogInformation($"Unable to authorize measurements: {ex.Message}");
+				this.Logger.LogInformation($"Unable to authorize measurements: {ex.Message}!");
 				this.Logger.LogDebug(ex.StackTrace);
 
 				rv = false;
@@ -197,7 +194,7 @@ namespace SensateService.Infrastructure.Storage
 			return !apikey.Revoked && apikey.Type == ApiKeyType.SensorKey;
 		}
 
-		public abstract Task StoreAsync(JObject obj, RequestMethod method);
+		public abstract Task StoreAsync(string obj, RequestMethod method);
 	}
 
 	public class ProcessedMeasurement

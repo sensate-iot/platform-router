@@ -8,15 +8,13 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using Newtonsoft.Json.Linq;
-
 using SensateService.Enums;
 
 namespace SensateService.Infrastructure.Storage
 {
 	public interface IMeasurementCache
 	{
-		Task StoreAsync(JObject obj, RequestMethod methodd);
-		Task StoreRangeAsync(IEnumerable<JObject> measurements, RequestMethod method);
+		Task StoreAsync(string obj, RequestMethod methodd);
+		Task StoreRangeAsync(IEnumerable<string> measurements, RequestMethod method);
 	}
 }

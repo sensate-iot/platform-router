@@ -6,7 +6,6 @@
  */
 
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 
 using SensateService.Enums;
 
@@ -14,6 +13,6 @@ namespace SensateService.Infrastructure.Storage
 {
 	public interface IMeasurementStore
 	{
-		Task StoreAsync(JObject obj, RequestMethod method);
+		Task StoreAsync(string obj, RequestMethod method);
 	}
 }

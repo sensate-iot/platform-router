@@ -41,10 +41,10 @@ namespace SensateService.Infrastructure.Sql
 			await this._manager.DeleteAsync(user).AwaitBackground();
 		}
 
-		public virtual SensateUser GetById(string id) => String.IsNullOrEmpty(id) ? null : this.Data.FirstOrDefault(x => x.Id == id);
+		public virtual SensateUser GetById(string id) => string.IsNullOrEmpty(id) ? null : this.Data.FirstOrDefault(x => x.Id == id);
 		public SensateUser GetByEmail(string email) => this.Data.FirstOrDefault(x => x.Email == email);
 
-		public async Task<SensateUser> GetByEmailAsync(string email)
+		public async Task<SensateUser> GetByEmailAsync(string email, CancellationToken ct = default)
 		{
 			return await this._manager.FindByEmailAsync(email).AwaitBackground();
 		}
@@ -61,10 +61,19 @@ namespace SensateService.Infrastructure.Sql
 			return worker;
 		}
 
-		public virtual async Task<IEnumerable<SensateUser>> GetAllAsync(CancellationToken ct = default)
+		public virtual async Task<IEnumerable<SensateUser>> GetAllAsync(int skip = 0, int limit = 0, CancellationToken ct = default)
 		{
-			var users = await this.Data.ToListAsync(ct).AwaitBackground();
-			return users;
+			var users = this.Data.AsQueryable();
+
+			if(skip > 0) {
+				users = users.Skip(skip);
+			}
+
+			if(limit > 0) {
+				users = users.Take(limit);
+			}
+
+			return await users.ToListAsync(ct).AwaitBackground();
 		}
 
 		public virtual SensateUser Get(string key)
@@ -114,10 +123,19 @@ namespace SensateService.Infrastructure.Sql
 			return await this._manager.GetRolesAsync(user).AwaitBackground();
 		}
 
-		public async Task<IEnumerable<SensateUser>> FindByEmailAsync(string email)
+		public async Task<IEnumerable<SensateUser>> FindByEmailAsync(string email, int skip = 0, int limit = 0, CancellationToken ct = default)
 		{
 			var result = this.Data.Where(x => x.Email.Contains(email));
-			return await result.ToListAsync().AwaitBackground();
+
+			if(skip > 0) {
+				result = result.Skip(skip);
+			}
+
+			if(limit > 0) {
+				result = result.Take(limit);
+			}
+
+			return await result.ToListAsync(ct).AwaitBackground();
 		}
 
 		public async Task<int> CountAsync()

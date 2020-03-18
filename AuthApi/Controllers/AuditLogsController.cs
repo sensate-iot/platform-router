@@ -54,7 +54,7 @@ namespace SensateService.AuthApi.Controllers
 				Address = log.Address,
 				Method = log.Method,
 				Route = log.Route
-			});
+			}).ToList();
 		}
 
 		private async Task<int> CountAsync(SensateUser user, RequestMethod method)

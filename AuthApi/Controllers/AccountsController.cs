@@ -211,7 +211,7 @@ namespace SensateService.AuthApi.Controllers
 				return this.NotFound();
 
 			token = this._email_tokens.GetById(changeEmail.Token);
-			tokens = this._tokens.GetByUser(user);
+			tokens = await this._tokens.GetByUserAsync(user).AwaitBackground();
 
 			if(token == null) {
 				return this.InvalidInputResult("Token not found!");
