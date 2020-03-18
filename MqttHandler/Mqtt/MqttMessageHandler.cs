@@ -34,6 +34,9 @@ namespace SensateService.MqttHandler.Mqtt
 		private readonly IMqttPublishService m_client;
 		private readonly ILogger<MqttMessageHandler> m_logger;
 
+		private const int SecretSubStringOffset = 3;
+		private const int SecretSubStringStart = 1;
+
 		public MqttMessageHandler(IMessageRepository messages, ISensorRepository sensors, IUserRepository users,
 			IOptions<InternalMqttServiceOptions> options, IMqttPublishService client, ILogger<MqttMessageHandler> logger)
 		{
@@ -84,9 +87,10 @@ namespace SensateService.MqttHandler.Mqtt
 
 				var withSecret = message.Replace(raw.Secret, sensor.Secret);
 
+				var length = raw.Secret.Length - SecretSubStringOffset;
 				var binary = Encoding.ASCII.GetBytes(withSecret);
 				var computed = sha.ComputeHash(binary);
-				var hash = HexToByteArray(raw.Secret);
+				var hash = HexToByteArray(raw.Secret.Substring(SecretSubStringStart, length));
 
 				if(!CompareHashes(computed, hash)) {
 					return;
