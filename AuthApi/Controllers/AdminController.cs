@@ -31,14 +31,14 @@ namespace SensateService.AuthApi.Controllers
 		}
 
 		[HttpPost("find-users")]
-		[ProducesResponseType(typeof(List<User>), 200)]
+		[ProducesResponseType(typeof(PaginationResult<User>), 200)]
 		[ValidateModel]
-		public async Task<IActionResult> Find([FromBody] SearchQuery query)
+		public async Task<IActionResult> Find([FromBody] SearchQuery query, [FromQuery] int skip = 0, [FromQuery] int limit = 0, [FromQuery] bool count = false)
 		{
-			List<User> users;
-			var result = await this._users.FindByEmailAsync(query.Query).AwaitBackground();
+			PaginationResult<User> rv;
+			var result = await this._users.FindByEmailAsync(query.Query, skip, limit).AwaitBackground();
 
-			users = result.Select(user => {
+			var users = result.Select(user => {
 				var roles = this._users.GetRoles(user);
 
 				return new User {
@@ -52,7 +52,12 @@ namespace SensateService.AuthApi.Controllers
 				};
 			}).ToList();
 
-			return new OkObjectResult(users);
+			rv = new PaginationResult<User> {
+				Count = await this._users.CountFindAsync(query.Query).AwaitBackground(),
+				Values = users
+			};
+
+			return new OkObjectResult(rv);
 		}
 
 		[HttpGet("users")]
