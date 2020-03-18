@@ -24,6 +24,7 @@ namespace SensateService.Infrastructure.Repositories
 		Task<IEnumerable<SensateUser>> GetAllAsync(int skip = 0, int limit = 0, CancellationToken ct = default);
 
 		Task<IEnumerable<SensateUser>> FindByEmailAsync(string email, int skip = 0, int limit = 0, CancellationToken ct = default);
+		Task<int> CountFindAsync(string email, CancellationToken ct = default);
 
 		SensateUser GetByClaimsPrinciple(ClaimsPrincipal cp);
 		Task<SensateUser> GetByClaimsPrincipleAsync(ClaimsPrincipal cp);

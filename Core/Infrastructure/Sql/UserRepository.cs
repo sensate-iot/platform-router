@@ -92,6 +92,12 @@ namespace SensateService.Infrastructure.Sql
 			return worker;
 		}
 
+		public async Task<int> CountFindAsync(string email, CancellationToken ct = default)
+		{
+			var result = this.Data.Where(x => x.Email.Contains(email));
+			return await result.CountAsync(ct).AwaitBackground();
+		}
+
 		public SensateUser GetByClaimsPrinciple(ClaimsPrincipal cp)
 		{
 			string id;
