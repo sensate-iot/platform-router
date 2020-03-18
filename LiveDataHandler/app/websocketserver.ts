@@ -13,7 +13,6 @@ import * as url from "url";
 import { BulkMeasurementInfo } from "../models/measurement";
 import { WebSocketClient } from "../clients/websocketclient";
 import { Pool } from "pg";
-import { AuditLog, RequestMethod } from "../models/auditlog";
 import { AuditLogsClient } from "../clients/auditlogsclient";
 
 export function createServer(expr: express.Express) {
@@ -68,7 +67,11 @@ export class WebSocketServer {
     }
 
     private async handleSocketUpgrade(socket: WebSocket, request: any) {
-        const client = new WebSocketClient(socket, this.pool, this.secret);
+        const client = new WebSocketClient(this.auditlogs,
+            this.secret,
+            request.connection.remoteAddress,
+            socket,
+            this.pool);
         const hdr = request.headers["authorization"];
 
         if (hdr !== null && hdr !== undefined) {
@@ -76,15 +79,6 @@ export class WebSocketServer {
             await client.authorize(split[1]);
         }
 
-        const log: AuditLog = {
-            timestamp: new Date(),
-            authorId: client.getUserId(),
-            route: "/measurements/live",
-            method: RequestMethod.WebSocket,
-            ipAddress: request.connection.remoteAddress
-        };
-
-        await this.auditlogs.createEntry(log);
 
         this.clients.push(client);
         this.wss.emit("connection", socket, request);

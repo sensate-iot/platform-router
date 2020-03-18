@@ -18,6 +18,8 @@ import { Pool } from "pg";
 
 // ReSharper disable once UnusedLocalImport
 import moment from "moment";
+import { AuditLogsClient } from "./auditlogsclient";
+import { AuditLog, RequestMethod } from "../models/auditlog";
 
 export class WebSocketClient {
     private readonly sensors: Map<string, SensorModel>;
@@ -28,13 +30,30 @@ export class WebSocketClient {
 
     private static timeout = 250;
 
-    public constructor(socket: WebSocket, pool: Pool, private readonly secret: string) {
+    public constructor(
+        private readonly logs: AuditLogsClient,
+        private readonly secret: string,
+        private readonly remote: string,
+        socket: WebSocket, pool: Pool
+    ) {
         this.socket = socket;
         this.sensors = new Map<string, SensorModel>();
         this.socket.onmessage = this.onMessage.bind(this);
         this.authorized = false;
         this.client = new SensorLinksClient(pool);
         this.userId = null;
+    }
+
+    private async createLog() {
+        const log: AuditLog = {
+            timestamp: new Date(),
+            authorId: this.userId,
+            route: "/measurements/live",
+            method: RequestMethod.WebSocket,
+            ipAddress: this.remote 
+        };
+
+        await this.logs.createEntry(log);
     }
 
     private async onMessage(data: WebSocket.MessageEvent) {
@@ -69,7 +88,9 @@ export class WebSocketClient {
     }
 
     private async auth(req: IWebSocketRequest<string>) {
-        return await this.verifyRequest(req.data);
+        const result = await this.verifyRequest(req.data);
+        this.createLog();
+        return result;
     }
 
     public getUserId(): string {
@@ -148,6 +169,7 @@ export class WebSocketClient {
 
     public async authorize(token: string) {
         this.authorized = await this.verifyRequest(token);
+        await this.createLog();
     }
 
     public isAuthorized() {
