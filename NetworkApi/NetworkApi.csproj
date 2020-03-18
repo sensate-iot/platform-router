@@ -5,7 +5,7 @@
     <AssemblyName>SensateService.NetworkApi</AssemblyName>
     <RootNamespace>SensateService.NetworkApi</RootNamespace>
     <UserSecretsId>SensateService</UserSecretsId>
-    <Version>0.4.1</Version>
+    <Version>0.4.2</Version>
     <Copyright>SensateService</Copyright>
     <PackageLicenseFile>COPYING</PackageLicenseFile>
   </PropertyGroup>
