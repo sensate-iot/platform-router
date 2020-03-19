@@ -21,7 +21,7 @@ using SensateService.ApiCore.Init;
 using SensateService.Infrastructure.Sql;
 using SensateService.Models;
 
-namespace SensateService.AuthApi
+namespace SensateService.AuthApi.Application
 {
 	public class Program
 	{

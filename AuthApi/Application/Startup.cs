@@ -15,10 +15,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+
 using SensateService.ApiCore.Middleware;
 using SensateService.Config;
 using SensateService.Infrastructure.Sql;
@@ -28,7 +29,7 @@ using SensateService.Services;
 using SensateService.Services.Adapters;
 using SensateService.Services.Settings;
 
-namespace SensateService.AuthApi
+namespace SensateService.AuthApi.Application
 {
 	public class Startup
 	{
