@@ -31,7 +31,7 @@ using SensateService.Services;
 using SensateService.Services.Adapters;
 using SensateService.Services.Settings;
 
-namespace SensateService.DataApi
+namespace SensateService.DataApi.Application
 {
 	public class Startup
 	{

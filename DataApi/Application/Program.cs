@@ -14,7 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace SensateService.DataApi
+namespace SensateService.DataApi.Application
 {
 	public class Program
 	{
