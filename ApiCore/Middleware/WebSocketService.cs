@@ -81,7 +81,7 @@ namespace SensateService.ApiCore.Middleware
 
 		private async Task Receive(AuthenticatedWebSocket socket, Action<WebSocketReceiveResult, byte[]> handleMessage)
 		{
-			byte[] buffer = new byte[WebSocketService.RxBufferSize];
+			byte[] buffer = new byte[RxBufferSize];
 
 			while(socket.Raw.State == WebSocketState.Open) {
 				var result = await socket.Raw.ReceiveAsync(
