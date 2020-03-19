@@ -7,13 +7,11 @@
 
 using System;
 using System.IO;
-
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using SensateService.TriggerHandler.Application;
 
-namespace SensateService.TriggerHandler
+namespace SensateService.TriggerHandler.Application
 {
 	public class Program
 	{
@@ -56,7 +54,7 @@ namespace SensateService.TriggerHandler
 		{
 			Console.WriteLine($"Starting Sensate MQTT client using {Version.VersionString}");
 
-			var program = new Application.Application(CreateHost(args));
+			var program = new TriggerHandler.Application.Application(CreateHost(args));
 			program.Run();
 		}
 	}
