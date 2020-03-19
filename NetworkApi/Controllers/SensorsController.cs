@@ -64,15 +64,36 @@ namespace SensateService.NetworkApi.Controllers
 		[HttpGet]
 		[ActionName("FindSensorsByName")]
 		[ProducesResponseType(typeof(IEnumerable<Sensor>), 200)]
-		public async Task<IActionResult> Index([FromQuery] string name)
+		public async Task<IActionResult> Index([FromQuery] string name, [FromQuery] int skip = 0, [FromQuery] int limit = 0, [FromQuery] bool link = true)
 		{
-			IEnumerable<Sensor> sensors;
+			PaginationResult<Sensor> sensors;
 
-			if(string.IsNullOrEmpty(name)) {
-				sensors = await this.m_sensorService.GetSensorsAsync(this.CurrentUser).AwaitBackground();
+			if(!link) {
+				if(string.IsNullOrEmpty(name)) {
+					var s = await this.m_sensors.GetAsync(this.CurrentUser, skip, limit).AwaitBackground();
+					var count = await this.m_sensors.CountAsync(this.CurrentUser).AwaitBackground();
+
+					sensors = new PaginationResult<Sensor> {
+						Count = count.ToInt(),
+						Values = s
+					};
+				} else {
+					var s = await this.m_sensors.FindByNameAsync(this.CurrentUser, name, skip, limit).AwaitBackground();
+					var count = await this.m_sensors.CountAsync(this.CurrentUser, name).AwaitBackground();
+
+					sensors = new PaginationResult<Sensor> {
+						Count = count.ToInt(),
+						Values = s
+					};
+				}
 			} else {
-				sensors = await this.m_sensorService.GetSensorsAsync(this.CurrentUser, name).AwaitBackground();
+				if(string.IsNullOrEmpty(name)) {
+					sensors = await this.m_sensorService.GetSensorsAsync(this.CurrentUser, skip, limit).AwaitBackground();
+				} else {
+					sensors = await this.m_sensorService.GetSensorsAsync(this.CurrentUser, name, skip, limit).AwaitBackground();
+				}
 			}
+
 
 			return this.Ok(sensors);
 		}

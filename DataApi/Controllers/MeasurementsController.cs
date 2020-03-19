@@ -138,9 +138,8 @@ namespace SensateService.DataApi.Controllers
 				filter.Limit = -1;
 			}
 
-			var raw = await this.m_sensorService.GetSensorsAsync(this.CurrentUser).AwaitBackground();
-			var sensors = raw.ToList();
-			var filtered = sensors.Where(x => filter.SensorIds.Contains(x.InternalId.ToString())).ToList();
+			var sensors = await this.m_sensorService.GetSensorsAsync(this.CurrentUser).AwaitBackground();
+			var filtered = sensors.Values.Where(x => filter.SensorIds.Contains(x.InternalId.ToString())).ToList();
 
 			if(filtered.Count <= 0) {
 				status.Message = "No sensors available!";

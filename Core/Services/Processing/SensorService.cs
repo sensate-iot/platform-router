@@ -5,7 +5,6 @@
  * @email  michel@michelmegens.net
  */
 
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,6 +12,7 @@ using System.Threading.Tasks;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
+using SensateService.Models.Json.Out;
 
 namespace SensateService.Services.Processing
 {
@@ -27,14 +27,29 @@ namespace SensateService.Services.Processing
 			this.m_sensors = sensors;
 		}
 
-		public async Task<IEnumerable<Sensor>> GetSensorsAsync(SensateUser user, string name, int skip = 0, int limit = 0, CancellationToken token = default)
+		public async Task<PaginationResult<Sensor>> GetSensorsAsync(SensateUser user, string name, int skip = 0, int limit = 0, CancellationToken token = default)
 		{
-			var sensors = await this.GetSensorsAsync(user, skip, limit, token).AwaitBackground();
+			var sensors = await this.GetSensorsAsync(user, token: token).AwaitBackground();
 			var nameLower = name.ToLowerInvariant();
-			return sensors.Where(x => x.Name.ToLowerInvariant().Contains(nameLower));
+			var list = sensors.Values.ToList();
+
+			list = list.Where(x => x.Name.ToLowerInvariant().Contains(nameLower)).ToList();
+			sensors.Count = list.Count;
+
+			if(skip > 0) {
+				list = list.Skip(skip).ToList();
+			}
+
+			if(limit > 0) {
+				list = list.Take(limit).ToList();
+			}
+
+			sensors.Values = list;
+
+			return sensors;
 		}
 
-		public async Task<IEnumerable<Sensor>> GetSensorsAsync(SensateUser user, int skip = 0, int limit = 0, CancellationToken token = default)
+		public async Task<PaginationResult<Sensor>> GetSensorsAsync(SensateUser user, int skip = 0, int limit = 0, CancellationToken token = default)
 		{
 			var worker = this.m_links.GetByUserAsync(user, token);
 			var ownSensors = await this.m_sensors.GetAsync(user).AwaitBackground();
@@ -49,6 +64,7 @@ namespace SensateService.Services.Processing
 
 			var rv = ownSensors.ToList();
 			rv.AddRange(linkedSensors);
+			var count = rv.Count;
 
 			if(skip > 0) {
 				rv = rv.Skip(skip).ToList();
@@ -58,7 +74,10 @@ namespace SensateService.Services.Processing
 				rv = rv.Take(limit).ToList();
 			}
 
-			return rv;
+			return new PaginationResult<Sensor> {
+				Count = count,
+				Values = rv
+			};
 		}
 	}
 }
