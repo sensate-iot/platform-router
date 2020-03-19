@@ -120,7 +120,7 @@ namespace SensateService.Infrastructure.Document
 
 		public virtual async Task<Sensor> GetAsync(string id)
 		{
-			ObjectId oid = new ObjectId(id);
+			var oid = new ObjectId(id);
 			var filter = Builders<Sensor>.Filter.Where(x => x.InternalId == oid);
 			var result = await this._sensors.FindAsync(filter).AwaitBackground();
 
@@ -134,18 +134,29 @@ namespace SensateService.Infrastructure.Document
 		{
 			FilterDefinition<Sensor> filter;
 
-			if(user == null)
+			if(user == null) {
 				return await this._sensors.CountDocumentsAsync(new BsonDocument()).AwaitBackground();
+			}
 
 			var builder = Builders<Sensor>.Filter;
 			filter = builder.Where(s => s.Owner == user.Id);
 			return await this._sensors.CountDocumentsAsync(filter).AwaitBackground();
 		}
 
+		public async Task<long> CountAsync(SensateUser user, string name)
+		{
+			FilterDefinition<Sensor> filter;
+			var builder = Builders<Sensor>.Filter;
+
+			filter = builder.Where(x => x.Owner == user.Id && x.Name.Contains(name));
+			return await this._sensors.CountDocumentsAsync(filter).AwaitBackground();
+		}
+
 		public virtual async Task RemoveAsync(Sensor sensor)
 		{
-			if(sensor == null)
+			if(sensor == null) {
 				return;
+			}
 
 			await this._sensors.DeleteOneAsync(x => x.InternalId == sensor.InternalId).AwaitBackground();
 		}

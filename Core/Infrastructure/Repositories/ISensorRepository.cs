@@ -22,6 +22,8 @@ namespace SensateService.Infrastructure.Repositories
 		Task<IEnumerable<Sensor>> FindByNameAsync(SensateUser user, string name, int skip = 0, int limit = 0);
 
 		Task<long> CountAsync(SensateUser user = null);
+		Task<long> CountAsync(SensateUser user, string name);
+
 		Task RemoveAsync(Sensor sensor);
 		Task UpdateAsync(Sensor sensor);
 		Task UpdateSecretAsync(Sensor sensor, SensateApiKey key);
