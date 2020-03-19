@@ -30,7 +30,7 @@ using SensateService.Models.Json.In;
 using SensateService.Services;
 using SensateService.Services.Settings;
 
-namespace SensateService.WebSocketHandler.Application
+namespace SensateService.WebSocketHandler.Handlers
 {
 	public class WebSocketMessageHandler : Middleware.WebSocketHandler
 	{

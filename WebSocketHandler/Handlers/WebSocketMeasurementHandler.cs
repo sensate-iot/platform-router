@@ -2,7 +2,7 @@
  * Websocket handler used to receive messages.
  *
  * @author Michel Megens
- * @email  michel.megens@sonatolabs.com
+ * @email  michel@michelmegens.net
  */
 
 using System;
@@ -15,23 +15,30 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 using Newtonsoft.Json.Linq;
+
 using SensateService.Enums;
 using SensateService.Exceptions;
 using SensateService.Helpers;
+using SensateService.Infrastructure.Events;
 using SensateService.Infrastructure.Storage;
 using SensateService.Models.Generic;
 using SensateService.Services;
 using SensateService.Services.Settings;
 
-namespace SensateService.WebSocketHandler.Application
+namespace SensateService.WebSocketHandler.Handlers
 {
-	public class RealTimeWebSocketMeasurementHandler : Middleware.WebSocketHandler
+	public class WebSocketMeasurementHandler : Middleware.WebSocketHandler
 	{
+		private readonly IMqttPublishService client;
+		private readonly InternalMqttServiceOptions mqttopts;
 		private readonly IServiceProvider provider;
 
-		public RealTimeWebSocketMeasurementHandler(IMqttPublishService client, IServiceProvider provider, IOptions<MqttServiceOptions> options)
+		public WebSocketMeasurementHandler(IMqttPublishService client, IServiceProvider provider, IOptions<InternalMqttServiceOptions> options)
 		{
 			this.provider = provider;
+			this.client = client;
+			this.mqttopts = options.Value;
+			CachedMeasurementStore.MeasurementsReceived += this.MeasurementsStored_Handler;
 		}
 
 		public override async Task Receive(AuthenticatedWebSocket socket, WebSocketReceiveResult result, byte[] buffer)
@@ -40,9 +47,9 @@ namespace SensateService.WebSocketHandler.Application
 
 			try {
 				using var scope = this.provider.CreateScope();
-				var store = scope.ServiceProvider.GetRequiredService<IMeasurementStore>();
-
+				var store = scope.ServiceProvider.GetRequiredService<IMeasurementCache>();
 				msg = Encoding.UTF8.GetString(buffer, 0, result.Count);
+
 				await store.StoreAsync(msg, RequestMethod.WebSocket).AwaitBackground();
 			} catch(InvalidRequestException ex) {
 				Debug.WriteLine($"Unable to store measurement: {ex.Message}");
@@ -57,5 +64,9 @@ namespace SensateService.WebSocketHandler.Application
 			}
 		}
 
+		private async Task MeasurementsStored_Handler(object sender, MeasurementsReceivedEventArgs e)
+		{
+			await this.client.PublishOnAsync(this.mqttopts.InternalBulkMeasurementTopic, e.Compressed, false).AwaitBackground();
+		}
 	}
 }

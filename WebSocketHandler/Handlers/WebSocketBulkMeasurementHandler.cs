@@ -24,7 +24,7 @@ using SensateService.Helpers;
 using SensateService.Infrastructure.Storage;
 using SensateService.Models.Generic;
 
-namespace SensateService.WebSocketHandler.Application
+namespace SensateService.WebSocketHandler.Handlers
 {
 	public class WebSocketBulkMeasurementHandler : Middleware.WebSocketHandler
 	{

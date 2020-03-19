@@ -14,9 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-using SensateService.WebSocketHandler.Application;
-
-namespace SensateService.WebSocketHandler
+namespace SensateService.WebSocketHandler.Application
 {
 	public class Program
 	{

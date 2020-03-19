@@ -21,7 +21,7 @@ using SensateService.Infrastructure.Storage;
 using SensateService.Services;
 using SensateService.Services.Settings;
 
-namespace SensateService.WebSocketHandler.Application
+namespace SensateService.WebSocketHandler.Handlers
 {
 	public class MqttPublishHandler : IHostedService
 	{
@@ -64,15 +64,15 @@ namespace SensateService.WebSocketHandler.Application
 
 		public Task StartAsync(CancellationToken cancellationToken)
 		{
-			CachedMeasurementStore.MeasurementsReceived += MeasurementsStored_Handler;
-			MeasurementStore.MeasurementReceived += MeasurementStored_Handler;
+			CachedMeasurementStore.MeasurementsReceived += this.MeasurementsStored_Handler;
+			MeasurementStore.MeasurementReceived += this.MeasurementStored_Handler;
 			return Task.CompletedTask;
 		}
 
 		public Task StopAsync(CancellationToken cancellationToken)
 		{
-			CachedMeasurementStore.MeasurementsReceived -= MeasurementsStored_Handler;
-			MeasurementStore.MeasurementReceived -= MeasurementStored_Handler;
+			CachedMeasurementStore.MeasurementsReceived -= this.MeasurementsStored_Handler;
+			MeasurementStore.MeasurementReceived -= this.MeasurementStored_Handler;
 			return Task.CompletedTask;
 		}
 	}

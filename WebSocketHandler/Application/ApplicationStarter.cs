@@ -23,6 +23,7 @@ using SensateService.Config;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
 using SensateService.Models;
+using SensateService.WebSocketHandler.Handlers;
 
 namespace SensateService.WebSocketHandler.Application
 {
