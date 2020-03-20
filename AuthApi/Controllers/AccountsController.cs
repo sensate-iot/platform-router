@@ -450,8 +450,9 @@ namespace SensateService.AuthApi.Controllers
 
 			user = await this._manager.FindByIdAsync(id).AwaitBackground();
 
-			if(user == null)
-				return NotFound();
+			if(user == null) {
+				return this.NotFound();
+			}
 
 			/*
 			 * For some moronic reason we need to encode and decode to
@@ -460,8 +461,9 @@ namespace SensateService.AuthApi.Controllers
 			code = Base64UrlEncoder.Decode(code);
 			var result = await this._manager.ConfirmEmailAsync(user, code).AwaitBackground();
 
-			if(!result.Succeeded)
+			if(!result.Succeeded) {
 				return this.InvalidInputResult();
+			}
 
 			/* Send phone number validation token */
 			await this.SendConfirmPhoneAsync(user, user.UnconfirmedPhoneNumber).AwaitBackground();
@@ -499,8 +501,9 @@ namespace SensateService.AuthApi.Controllers
 				});
 			}
 
-			if(phonetoken.UserToken != token)
+			if(phonetoken.UserToken != token) {
 				return this.InvalidInputResult("Invalid confirmation token!");
+			}
 
 			var result = await this._manager.ChangePhoneNumberAsync(user, phonetoken.PhoneNumber, phonetoken.IdentityToken).AwaitBackground();
 
@@ -531,14 +534,16 @@ namespace SensateService.AuthApi.Controllers
 
 			user = this.CurrentUser;
 
-			if(user == null)
+			if(user == null) {
 				return this.Unauthorized();
+			}
 
 			if(update.PhoneNumber != null && update.PhoneNumber != user.PhoneNumber) {
 				var valid = await this._text.IsValidNumber(update.PhoneNumber);
 
-				if(!valid)
+				if(!valid) {
 					return this.InvalidInputResult("Invalid phone number");
+				}
 			}
 
 			if(update.PhoneNumber != null && update.PhoneNumber != user.PhoneNumber) {
@@ -546,9 +551,18 @@ namespace SensateService.AuthApi.Controllers
 				usertoken = await this._phonetokens.CreateAsync(user, phonetoken, update.PhoneNumber).AwaitBackground();
 				var worker = this.ReadTextTemplate("Confirm_PhoneNumber.txt", usertoken);
 
-				this._users.StartUpdate(user);
-				user.UnconfirmedPhoneNumber = update.PhoneNumber;
-				await this._users.EndUpdateAsync().AwaitBackground();
+				try {
+					this._users.StartUpdate(user);
+					user.UnconfirmedPhoneNumber = update.PhoneNumber;
+					await this._users.EndUpdateAsync().AwaitBackground();
+				} catch(Exception ex) {
+					this._logger.LogInformation($"Unable to update phone number: {ex.Message}");
+
+					return this.BadRequest(new Status {
+						Message = "Too many attempts",
+						ErrorCode = ReplyCode.NotAllowed
+					});
+				}
 
 				body = await worker.AwaitBackground();
 				this._text.Send(this._text_settings.AlphaCode, update.PhoneNumber, body);
@@ -600,17 +614,21 @@ namespace SensateService.AuthApi.Controllers
 		{
 			var user = this.CurrentUser;
 
-			if(user == null)
+			if(user == null) {
 				return BadRequest();
+			}
 
 			if(userUpdate.Password != null) {
-				if(userUpdate.CurrentPassword == null)
+				if(userUpdate.CurrentPassword == null) {
 					return this.InvalidInputResult("Current password not given");
+				}
 
 				var result = await this._manager.ChangePasswordAsync(user,
 					userUpdate.CurrentPassword, userUpdate.Password);
-				if(!result.Succeeded)
+
+				if(!result.Succeeded) {
 					return this.InvalidInputResult(result.Errors.First().Description);
+				}
 			}
 
 
@@ -623,7 +641,7 @@ namespace SensateService.AuthApi.Controllers
 				user.LastName = userUpdate.LastName;
 
 			await this._users.EndUpdateAsync().AwaitBackground();
-			return Ok();
+			return this.Ok();
 		}
 	}
 }
