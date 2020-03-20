@@ -18,7 +18,6 @@ namespace SensateService.Infrastructure.Repositories
 	{
 		SensateUser Get(string key);
 		Task<SensateUser> GetAsync(string key);
-		SensateUser GetByEmail(string key);
 		Task<SensateUser> GetByEmailAsync(string key, CancellationToken ct = default);
 		Task<IEnumerable<SensateUser>> GetRangeAsync(IEnumerable<string> ids);
 		Task<IEnumerable<SensateUser>> GetAllAsync(int skip = 0, int limit = 0, CancellationToken ct = default);

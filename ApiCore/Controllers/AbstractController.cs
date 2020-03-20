@@ -32,8 +32,9 @@ namespace SensateService.ApiCore.Controllers
 			this._users = users;
 			this.CurrentUser = null;
 
-			if(uid != null)
+			if(uid != null) {
 				this.CurrentUser = this._users.GetByClaimsPrinciple(uid);
+			}
 		}
 
 		protected StatusCodeResult ServerFault()
@@ -53,10 +54,10 @@ namespace SensateService.ApiCore.Controllers
 
 		protected async Task<SensateUser> GetCurrentUserAsync()
 		{
-			if(base.User == null)
+			if(this.User == null)
 				return null;
 
-			return await this._users.GetByClaimsPrincipleAsync(base.User);
+			return await this._users.GetByClaimsPrincipleAsync(this.User);
 		}
 
 		protected IActionResult InvalidInputResult(string msg = "Invalid input!")

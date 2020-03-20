@@ -41,9 +41,6 @@ namespace SensateService.Infrastructure.Sql
 			await this._manager.DeleteAsync(user).AwaitBackground();
 		}
 
-		public virtual SensateUser GetById(string id) => string.IsNullOrEmpty(id) ? null : this.Data.FirstOrDefault(x => x.Id == id);
-		public SensateUser GetByEmail(string email) => this.Data.FirstOrDefault(x => x.Email == email);
-
 		public async Task<SensateUser> GetByEmailAsync(string email, CancellationToken ct = default)
 		{
 			return await this._manager.FindByEmailAsync(email).AwaitBackground();
@@ -76,6 +73,15 @@ namespace SensateService.Infrastructure.Sql
 			return await users.ToListAsync(ct).AwaitBackground();
 		}
 
+		public SensateUser GetById(string key)
+		{
+			var query = this.Data.Where(u => u.Id == key)
+				.Include(u => u.ApiKeys).ThenInclude(k => k.User)
+				.Include(u => u.UserRoles).ThenInclude(ur => ur.Role);
+
+			return query.FirstOrDefault();
+		}
+
 		public virtual SensateUser Get(string key)
 		{
 			return this.GetById(key);
@@ -83,13 +89,9 @@ namespace SensateService.Infrastructure.Sql
 
 		public virtual Task<SensateUser> GetAsync(string key)
 		{
-			var worker = Task.Run(() => {
-				return this.Data.Where(u => u.Id == key)
-					.Include(u => u.ApiKeys).ThenInclude(k => k.User)
-					.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).FirstOrDefault();
-			});
-
-			return worker;
+			return this.Data.Where(u => u.Id == key)
+				.Include(u => u.ApiKeys).ThenInclude(k => k.User)
+				.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).FirstOrDefaultAsync();
 		}
 
 		public async Task<int> CountFindAsync(string email, CancellationToken ct = default)
