@@ -55,7 +55,10 @@ namespace SensateService.ApiCore.Init
 			user = new SensateUser {
 				Email = "root@example.com",
 				FirstName = "System",
-				LastName = "Administrator"
+				LastName = "Administrator",
+				PhoneNumber = "0600000000",
+				PhoneNumberConfirmed = true,
+				EmailConfirmed = true
 			};
 
 			user.UserName = user.Email;
