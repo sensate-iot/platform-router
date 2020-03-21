@@ -58,6 +58,10 @@ namespace SensateService.Infrastructure.Sql
 				k.IdentityToken,
 				k.PhoneNumber
 			});
+			builder.Entity<ChangePhoneNumberToken>()
+				.HasOne<SensateUser>()
+				.WithMany()
+				.HasForeignKey(t => t.UserId);
 
 			builder.Entity<SensorLink>(link => {
 				link.HasKey(k => new { k.UserId, k.SensorId });

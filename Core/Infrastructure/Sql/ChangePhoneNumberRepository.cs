@@ -20,7 +20,7 @@ namespace SensateService.Infrastructure.Sql
 {
 	public class ChangePhoneNumberRepository : AbstractSqlRepository<ChangePhoneNumberToken>, IChangePhoneNumberTokenRepository
 	{
-		private Random _rng;
+		private readonly Random _rng;
 		private const int UserTokenLength = 6;
 
 		public ChangePhoneNumberRepository(SensateSqlContext context) : base(context)
@@ -36,7 +36,7 @@ namespace SensateService.Infrastructure.Sql
 				PhoneNumber = phone,
 				IdentityToken = token,
 				UserToken = this._rng.NextString(UserTokenLength),
-				User = user,
+				UserId = user.Id,
 				Timestamp = DateTime.Now
 			};
 
@@ -58,7 +58,7 @@ namespace SensateService.Infrastructure.Sql
 		public async Task<ChangePhoneNumberToken> GetLatest(SensateUser user)
 		{
 			var tokens = from token in this.Data
-						 where token.User.NormalizedUserName == user.NormalizedUserName &&
+						 where token.UserId == user.Id &&
 							   token.PhoneNumber == user.UnconfirmedPhoneNumber
 						 select token;
 			var single = tokens.OrderByDescending(t => t.Timestamp);
