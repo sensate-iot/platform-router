@@ -23,8 +23,8 @@ namespace SensateService.ApiCore.Middleware
 		private readonly ILogger<UserFetchMiddleware> m_logger;
 
 		public UserFetchMiddleware(RequestDelegate next,
-		                           IServiceProvider sp,
-		                           ILogger<UserFetchMiddleware> logger)
+								   IServiceProvider sp,
+								   ILogger<UserFetchMiddleware> logger)
 		{
 			this.m_logger = logger;
 			this.m_services = sp;
