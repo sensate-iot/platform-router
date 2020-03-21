@@ -215,9 +215,10 @@ namespace SensateService.BlobApi.Application
 			app.UseRouting();
 
 			app.UseCors(p => {
-				p.AllowAnyOrigin()
+				p.SetIsOriginAllowed(host => true)
 					.AllowAnyHeader()
-					.AllowAnyMethod();
+					.AllowAnyMethod()
+					.AllowCredentials();
 			});
 
 			using(var scope = sp.CreateScope()) {

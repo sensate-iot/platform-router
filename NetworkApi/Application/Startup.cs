@@ -196,7 +196,7 @@ namespace SensateService.NetworkApi.Application
 			app.UseRouting();
 
 			app.UseCors(p => {
-				p.WithOrigins("http://localhost:4200", auth.JwtIssuer)
+				p.SetIsOriginAllowed(host => true)
 					.AllowAnyHeader()
 					.AllowAnyMethod()
 					.AllowCredentials();
