@@ -28,12 +28,10 @@ namespace SensateService.ApiCore.Controllers
 
 		protected AbstractController(IUserRepository users, IHttpContextAccessor ctx)
 		{
-			var uid = ctx.HttpContext.User;
 			this._users = users;
-			this.CurrentUser = null;
 
-			if(uid != null) {
-				this.CurrentUser = this._users.GetByClaimsPrinciple(uid);
+			if(this.CurrentUser == null) {
+				this.CurrentUser = ctx.HttpContext.Items["UserData"] as SensateUser;
 			}
 		}
 
