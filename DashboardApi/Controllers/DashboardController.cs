@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
 using SensateService.DashboardApi.Json;
@@ -217,7 +217,7 @@ namespace SensateService.DashboardApi.Controllers
 				totals[entry.Date] = counter;
 			}
 
-			var sorted = totals.Keys.AsEnumerable().OrderBy(value => value).ToArray();
+			var sorted = (totals.Keys.AsEnumerable() ?? throw new InvalidOperationException()).OrderBy(value => value).ToArray();
 
 			if(sorted.Length <= 0)
 				return graph;

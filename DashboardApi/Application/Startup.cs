@@ -141,10 +141,10 @@ namespace SensateService.DashboardApi.Application
 			app.UseRouting();
 
 			app.UseCors(p => {
-				p.WithOrigins("http://localhost:4200", auth.JwtIssuer)
-				.AllowAnyHeader()
-				.AllowAnyMethod()
-				.AllowCredentials();
+				p.SetIsOriginAllowed(host => true)
+					.AllowAnyHeader()
+					.AllowAnyMethod()
+					.AllowCredentials();
 			});
 
 			using(var scope = sp.CreateScope()) {
@@ -163,6 +163,7 @@ namespace SensateService.DashboardApi.Application
 			app.UseAuthentication();
 			app.UseAuthorization();
 			app.UseMiddleware<RequestLoggingMiddleware>();
+			app.UseMiddleware<UserFetchMiddleware>();
 			app.UseEndpoints(ep => { ep.MapControllers(); });
 		}
 	}

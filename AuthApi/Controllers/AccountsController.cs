@@ -124,17 +124,20 @@ namespace SensateService.AuthApi.Controllers
 			user = await this._users.GetByEmailAsync(model.Email).AwaitBackground();
 			token = this._passwd_tokens.GetById(model.Token);
 
-			if(user == null)
+			if(user == null) {
 				return this.NotFound();
+			}
 
-			if(token == null)
+			if(token == null) {
 				return this.InvalidInputResult("Security token invalid!");
+			}
 
 			token.IdentityToken = Base64UrlEncoder.Decode(token.IdentityToken);
 			var result = await this._manager.ResetPasswordAsync(user, token.IdentityToken, model.Password).AwaitBackground();
 
-			if(result.Succeeded)
-				return Ok();
+			if(result.Succeeded) {
+				return this.Ok();
+			}
 
 			var error = result.Errors.First();
 			return error != null ? this.InvalidInputResult(error.Description) :
@@ -201,8 +204,8 @@ namespace SensateService.AuthApi.Controllers
 			ChangeEmailToken token;
 			IEnumerable<AuthUserToken> tokens;
 
-			if(String.IsNullOrEmpty(changeEmail.Token)) {
-				return BadRequest();
+			if(string.IsNullOrEmpty(changeEmail.Token)) {
+				return this.BadRequest();
 			}
 
 			var user = await this.GetCurrentUserAsync();
@@ -243,7 +246,7 @@ namespace SensateService.AuthApi.Controllers
 			EmailBody mail;
 
 			if(string.IsNullOrEmpty(changeEmailModel.NewEmail)) {
-				return BadRequest();
+				return this.BadRequest();
 			}
 
 			user = await this.GetCurrentUserAsync().AwaitBackground();
@@ -256,7 +259,7 @@ namespace SensateService.AuthApi.Controllers
 				return this.StatusCode(500);
 
 			mail.HtmlBody = mail.HtmlBody.Replace("%%TOKEN%%", token);
-			mail.TextBody = String.Format(mail.TextBody, token);
+			mail.TextBody = string.Format(mail.TextBody, token);
 			await this._mailer.SendEmailAsync(changeEmailModel.NewEmail, "Confirm your new mail", mail).AwaitBackground();
 
 			return this.Ok();
@@ -466,7 +469,9 @@ namespace SensateService.AuthApi.Controllers
 			}
 
 			/* Send phone number validation token */
-			await this.SendConfirmPhoneAsync(user, user.UnconfirmedPhoneNumber).AwaitBackground();
+			if(user.UnconfirmedPhoneNumber != null) {
+				await this.SendConfirmPhoneAsync(user, user.UnconfirmedPhoneNumber).AwaitBackground();
+			}
 
 			if(url != null) {
 				return this.Redirect(url);
