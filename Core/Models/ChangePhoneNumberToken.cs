@@ -19,7 +19,7 @@ namespace SensateService.Models
 		[Key]
 		public string PhoneNumber { get; set; }
 		public string UserToken { get; set; }
-		public SensateUser User { get; set; }
+		public string UserId { get; set; }
 		public DateTime Timestamp { get; set; }
 	}
 }
