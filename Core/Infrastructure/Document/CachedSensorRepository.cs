@@ -79,7 +79,7 @@ namespace SensateService.Infrastructure.Document
 				return null;
 			}
 
-			await this._cache.SetAsync(key, JsonConvert.SerializeObject(sensors), CacheTimeout.TimeoutMedium.ToInt()).AwaitBackground();
+			await this._cache.SetAsync(key, JsonConvert.SerializeObject(sensors), CacheTimeout.TimeoutMedium.ToInt(), false).AwaitBackground();
 			return sensors;
 		}
 
