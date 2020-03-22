@@ -95,7 +95,7 @@ namespace SensateService.AuthApi.Controllers
 			var reply = new TokenRequestReply {
 				RefreshToken = token.Value,
 				ExpiresInMinutes = this._settings.JwtRefreshExpireMinutes,
-				JwtToken = this._tokens.GenerateJwtToken(user, roles, _settings),
+				JwtToken = this._tokens.GenerateJwtToken(user, roles, this._settings),
 				JwtExpiresInMinutes = this._settings.JwtExpireMinutes,
 				SystemApiKey = key.ApiKey
 			};
@@ -133,19 +133,20 @@ namespace SensateService.AuthApi.Controllers
 			AuthUserToken token;
 			bool banned;
 
-			if(user == null)
-				return Forbid();
+			if(user == null) {
+				return this.Forbid();
+			}
 
 			banned = await this._users.IsBanned(user);
 			token = this._tokens.GetById(user, login.RefreshToken);
 
 			if(token == null || !token.Valid || banned) {
-				return Forbid();
+				return this.Forbid();
 			}
 
 			if(token.ExpiresAt < DateTime.Now) {
 				await this._tokens.InvalidateTokenAsync(token).AwaitBackground();
-				return Forbid();
+				return this.Forbid();
 			}
 
 			reply = new TokenRequestReply();
