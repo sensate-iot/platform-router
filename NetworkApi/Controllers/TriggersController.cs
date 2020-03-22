@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
@@ -78,7 +79,7 @@ namespace SensateService.NetworkApi.Controllers
 			var trigger = new Trigger {
 				FormalLanguage = raw.FormalLanguage,
 				SensorId = raw.SensorId,
-				KeyValue = "Data"
+				KeyValue = ""
 			};
 
 			return trigger;
@@ -90,9 +91,10 @@ namespace SensateService.NetworkApi.Controllers
 		[ProducesResponseType(typeof(Status), StatusCodes.Status422UnprocessableEntity)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status401Unauthorized)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status201Created)]
-		public async Task<IActionResult> Create([FromBody] RawTrigger raw, [FromQuery] TriggerType type = TriggerType.Number)
+		public async Task<IActionResult> Create([FromBody] RawTrigger raw)
 		{
 			Trigger trigger;
+
 			var invalidInput = new Status {
 				Message = "Invalid input!",
 				ErrorCode = ReplyCode.BadInput
@@ -103,6 +105,8 @@ namespace SensateService.NetworkApi.Controllers
 			if(raw == null) {
 				return this.UnprocessableEntity(invalidInput);
 			}
+
+			var type = raw.Type;
 
 			if(string.IsNullOrEmpty(raw.SensorId) || !ObjectId.TryParse(raw.SensorId, out _)) {
 				return this.UnprocessableEntity(invalidInput);
@@ -339,11 +343,18 @@ namespace SensateService.NetworkApi.Controllers
 		[ProducesResponseType(typeof(Status), StatusCodes.Status422UnprocessableEntity)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status401Unauthorized)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status201Created)]
-		public async Task<IActionResult> Get([FromQuery] string sensorId)
+		public async Task<IActionResult> Get([FromQuery] string sensorId, [FromQuery] TriggerType? type)
 		{
 			if(string.IsNullOrEmpty(sensorId)) {
 				return this.UnprocessableEntity(new Status {
 					Message = "Unknown sensor ID",
+					ErrorCode = ReplyCode.BadInput
+				});
+			}
+
+			if(type == null) {
+				return this.UnprocessableEntity(new Status {
+					Message = "Trigger type not specified!",
 					ErrorCode = ReplyCode.BadInput
 				});
 			}
@@ -355,7 +366,7 @@ namespace SensateService.NetworkApi.Controllers
 				return this.CreateNotAuthorizedResult();
 			}
 
-			var triggers = await this.m_triggers.GetAsync(sensorId).AwaitBackground();
+			var triggers = await this.m_triggers.GetAsync(sensorId, type.Value).AwaitBackground();
 			return this.Ok(triggers);
 		}
 	}

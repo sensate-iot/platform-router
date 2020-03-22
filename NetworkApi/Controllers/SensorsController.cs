@@ -74,7 +74,7 @@ namespace SensateService.NetworkApi.Controllers
 					var count = await this.m_sensors.CountAsync(this.CurrentUser).AwaitBackground();
 
 					sensors = new PaginationResult<Sensor> {
-						Count = count.ToInt(),
+						Count = (int)count,
 						Values = s
 					};
 				} else {
