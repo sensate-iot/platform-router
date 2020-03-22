@@ -137,6 +137,8 @@ namespace SensateService.Infrastructure.Document
 			var tsk = new[] {
 				this._cache.RemoveAsync(sensor.InternalId.ToString()),
 				this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}"),
+				this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}:0:0"),
+				this._cache.RemoveAsync(sensor.InternalId.ToString()),
 				base.RemoveAsync(sensor)
 			};
 
