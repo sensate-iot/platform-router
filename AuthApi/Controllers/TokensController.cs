@@ -28,7 +28,7 @@ using SensateService.Models.Json.Out;
 namespace SensateService.AuthApi.Controllers
 {
 	[Produces("application/json")]
-	[Route("[controller]")]
+	[Route("auth/v1/[controller]")]
 	public class TokensController : AbstractController
 	{
 		private readonly IUserTokenRepository _tokens;

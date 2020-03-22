@@ -35,7 +35,7 @@ using SensateService.Services.Settings;
 namespace SensateService.AuthApi.Controllers
 {
 	[Produces("application/json")]
-	[Route("[controller]")]
+	[Route("auth/v1/[controller]")]
 	public class AccountsController : AbstractController
 	{
 		private const int PhoneTokenTimeout = 5; // Timeout in minutes.

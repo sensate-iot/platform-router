@@ -24,7 +24,7 @@ using SensateService.Models;
 namespace SensateService.AuthApi.Controllers
 {
 	[Produces("application/json")]
-	[Route("[controller]")]
+	[Route("auth/v1/[controller]")]
 	[NormalUser]
 	public class ApiKeysController : AbstractController
 	{

@@ -23,7 +23,7 @@ namespace SensateService.AuthApi.Controllers
 {
 	[AdministratorUser]
 	[Produces("application/json")]
-	[Route("[controller]")]
+	[Route("auth/v1/[controller]")]
 	public class AdminController : AbstractController
 	{
 		public AdminController(IUserRepository users, IHttpContextAccessor ctx) : base(users, ctx)

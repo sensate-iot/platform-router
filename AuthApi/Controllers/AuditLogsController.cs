@@ -26,7 +26,7 @@ namespace SensateService.AuthApi.Controllers
 {
 	[AdministratorUser]
 	[Produces("application/json")]
-	[Route("[controller]")]
+	[Route("auth/v1/[controller]")]
 	public class AuditLogsController : AbstractController
 	{
 		private readonly IAuditLogRepository m_logs;
