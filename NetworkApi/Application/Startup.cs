@@ -6,26 +6,21 @@
  */
 
 using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
 
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
+using SensateService.ApiCore.Init;
 using SensateService.ApiCore.Middleware;
 using SensateService.Config;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
-using SensateService.Models;
 using SensateService.NetworkApi.Mqtt;
 using SensateService.Services;
 using SensateService.Services.Adapters;
@@ -67,61 +62,11 @@ namespace SensateService.NetworkApi.Application
 
 			services.AddPostgres(db.PgSQL.ConnectionString);
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
+			services.AddIdentityFramwork(auth);
 
-			services.Configure<UserAccountSettings>(options => {
-				options.JwtKey = auth.JwtKey;
-				options.JwtIssuer = auth.JwtIssuer;
-				options.JwtExpireMinutes = auth.JwtExpireMinutes;
-				options.JwtRefreshExpireMinutes = auth.JwtRefreshExpireMinutes;
-				options.PublicUrl = auth.PublicUrl;
-				options.Scheme = auth.Scheme;
-			});
-
-			/*
-			 * Setup user authentication
-			 */
-			services.AddIdentity<SensateUser, SensateRole>(config => {
-				config.SignIn.RequireConfirmedEmail = true;
-			})
-			.AddEntityFrameworkStores<SensateSqlContext>()
-			.AddDefaultTokenProviders();
-
-			JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
-
-			services.Configure<IdentityOptions>(options => {
-				options.Password.RequireDigit = true;
-				options.Password.RequireLowercase = true;
-				options.Password.RequireUppercase = true;
-				options.Password.RequiredLength = 8;
-				options.Password.RequiredUniqueChars = 5;
-
-				options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-				options.Lockout.MaxFailedAccessAttempts = 5;
-				options.Lockout.AllowedForNewUsers = true;
-
-				options.User.RequireUniqueEmail = true;
-			});
-
-			services.AddAuthentication(options => {
-				options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-				options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-				options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-			})
-			.AddJwtBearer(cfg => {
-				cfg.RequireHttpsMetadata = false;
-				cfg.SaveToken = true;
-				cfg.TokenValidationParameters = new TokenValidationParameters {
-					ValidIssuer = auth.JwtIssuer,
-					ValidAudience = auth.JwtIssuer,
-					IssuerSigningKey = new SymmetricSecurityKey(
-						Encoding.UTF8.GetBytes(auth.JwtKey)
-					),
-					ClockSkew = TimeSpan.Zero
-				};
-			});
-
-			if(cache.Enabled)
+			if(cache.Enabled) {
 				services.AddCacheStrategy(cache, db);
+			}
 
 			/* Add repositories */
 			services.AddSqlRepositories(cache.Enabled);

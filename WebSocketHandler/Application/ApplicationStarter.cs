@@ -71,7 +71,7 @@ namespace SensateService.WebSocketHandler.Application
 			services.AddMeasurementStorage(cache);
 			services.AddHashAlgorihms();
 
-			this.SetupAuthentication(services, auth);
+			services.AddIdentityFramwork(auth);
 
 			services.AddInternalMqttService(options => {
 				options.Ssl = mqtt.InternalBroker.Ssl;
@@ -117,56 +117,6 @@ namespace SensateService.WebSocketHandler.Application
 			app.UseAuthentication();
 			app.UseAuthorization();
 			app.UseEndpoints(ep => { ep.MapControllers(); });
-		}
-
-		private void SetupAuthentication(IServiceCollection services, AuthenticationConfig auth)
-		{
-			services.AddIdentity<SensateUser, SensateRole>(config => {
-				config.SignIn.RequireConfirmedEmail = true;
-			})
-			.AddEntityFrameworkStores<SensateSqlContext>()
-			.AddDefaultTokenProviders();
-
-			services.Configure<UserAccountSettings>(options => {
-				options.JwtKey = auth.JwtKey;
-				options.JwtIssuer = auth.JwtIssuer;
-				options.JwtExpireMinutes = auth.JwtExpireMinutes;
-				options.JwtRefreshExpireMinutes = auth.JwtRefreshExpireMinutes;
-				options.PublicUrl = auth.PublicUrl;
-				options.Scheme = auth.Scheme;
-			});
-
-			services.Configure<IdentityOptions>(options => {
-				options.Password.RequireDigit = true;
-				options.Password.RequireLowercase = true;
-				options.Password.RequireUppercase = true;
-				options.Password.RequiredLength = 8;
-				options.Password.RequiredUniqueChars = 5;
-
-				options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-				options.Lockout.MaxFailedAccessAttempts = 5;
-				options.Lockout.AllowedForNewUsers = true;
-
-				options.User.RequireUniqueEmail = true;
-			});
-
-			services.AddAuthentication(options => {
-				options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-				options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-				options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-			})
-			.AddJwtBearer(cfg => {
-				cfg.RequireHttpsMetadata = false;
-				cfg.SaveToken = true;
-				cfg.TokenValidationParameters = new TokenValidationParameters {
-					ValidIssuer = auth.JwtIssuer,
-					ValidAudience = auth.JwtIssuer,
-					IssuerSigningKey = new SymmetricSecurityKey(
-						Encoding.UTF8.GetBytes(auth.JwtKey)
-					),
-					ClockSkew = TimeSpan.Zero
-				};
-			});
 		}
 	}
 }
