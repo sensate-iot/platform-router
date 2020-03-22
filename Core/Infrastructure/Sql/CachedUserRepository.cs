@@ -104,7 +104,7 @@ namespace SensateService.Infrastructure.Sql
 			if(obj == null)
 				return null;
 
-			await this.SetCacheAsync(obj, default(CancellationToken)).ConfigureAwait(false);
+			await this.SetCacheAsync(obj, default).ConfigureAwait(false);
 			return obj;
 		}
 
