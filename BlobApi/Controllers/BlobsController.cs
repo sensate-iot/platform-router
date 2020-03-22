@@ -28,7 +28,7 @@ using SensateService.Services.Settings;
 namespace SensateService.BlobApi.Controllers
 {
 	[Produces("application/json")]
-	[Route("[controller]")]
+	[Route("storage/v1/[controller]")]
 	public class BlobsController : AbstractDataController
 	{
 		private readonly ILogger<BlobsController> m_logger;
