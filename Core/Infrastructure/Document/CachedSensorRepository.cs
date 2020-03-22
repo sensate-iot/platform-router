@@ -109,11 +109,10 @@ namespace SensateService.Infrastructure.Document
 		{
 			var tasks = new[] {
 				this._cache.SetAsync(sensor.InternalId.ToString(), sensor.ToJson(),
-				                     CacheTimeout.TimeoutMedium.ToInt(), false),
+									 CacheTimeout.TimeoutMedium.ToInt(), false),
 				this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}"),
 				this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}:0:0"),
 				this._cache.RemoveAsync(sensor.Owner),
-				this._cache.RemoveAsync(sensor.InternalId.ToString()),
 				base.UpdateSecretAsync(sensor, key)
 			};
 
@@ -126,7 +125,6 @@ namespace SensateService.Infrastructure.Document
 				this._cache.SetAsync(sensor.InternalId.ToString(), sensor.ToJson()),
 				this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}"),
 				this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}:0:0"),
-				this._cache.RemoveAsync(sensor.InternalId.ToString()),
 				this._cache.RemoveAsync(sensor.Owner),
 				base.UpdateAsync(sensor),
 			};
