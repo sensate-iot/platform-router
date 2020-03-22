@@ -359,8 +359,19 @@ namespace SensateService.NetworkApi.Controllers
 
 				sensor.Secret = string.IsNullOrEmpty(update.Secret) ? this.m_apiKeys.GenerateApiKey() : update.Secret;
 
-				await this.m_apiKeys.RefreshAsync(old, sensor.Secret).AwaitBackground();
-				await this.m_sensors.UpdateSecretAsync(sensor, old).AwaitBackground();
+				if(!string.IsNullOrEmpty(update.Name)) {
+					sensor.Name = update.Name;
+				}
+
+				if(!string.IsNullOrEmpty(update.Description)) {
+					sensor.Description = update.Description;
+				}
+
+				await Task.WhenAll(
+					this.m_apiKeys.RefreshAsync(old, sensor.Secret),
+					this.m_sensors.UpdateSecretAsync(sensor, old)
+					).AwaitBackground();
+				await this.m_sensors.UpdateAsync(sensor).AwaitBackground();
 			} catch(Exception ex) {
 				this.m_logger.LogInformation($"Unable to update sensor: {ex.Message}");
 
