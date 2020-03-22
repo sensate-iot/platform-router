@@ -28,7 +28,7 @@ using SensateService.Models.Json.Out;
 namespace SensateService.NetworkApi.Controllers
 {
 	[Produces("application/json")]
-	[Route("[controller]")]
+	[Route("network/v1/[controller]")]
 	public class TriggersController : AbstractDataController
 	{
 		private readonly ITriggerRepository m_triggers;

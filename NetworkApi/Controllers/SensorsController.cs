@@ -29,7 +29,7 @@ using SensateService.Services;
 namespace SensateService.NetworkApi.Controllers
 {
 	[Produces("application/json")]
-	[Route("[controller]")]
+	[Route("network/v1/[controller]")]
 	public class SensorsController : AbstractDataController
 	{
 		private readonly ILogger<SensorsController> m_logger;

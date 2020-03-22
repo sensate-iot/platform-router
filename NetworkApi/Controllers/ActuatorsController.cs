@@ -27,7 +27,7 @@ namespace SensateService.NetworkApi.Controllers
 {
 	[ApiController]
 	[Produces("application/json")]
-	[Route("[controller]")]
+	[Route("network/v1/[controller]")]
 	public class ActuatorsController : AbstractDataController
 	{
 		private readonly IControlMessageRepository m_controlMessages;
