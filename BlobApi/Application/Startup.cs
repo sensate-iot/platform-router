@@ -145,7 +145,6 @@ namespace SensateService.BlobApi.Application
 			/* Add repositories */
 			services.AddSqlRepositories(cache.Enabled);
 			services.AddDocumentRepositories(cache.Enabled);
-			services.AddMeasurementStorage(cache);
 
 			if(mail.Provider == "SendGrid") {
 				services.AddSingleton<IEmailSender, SendGridMailer>();
