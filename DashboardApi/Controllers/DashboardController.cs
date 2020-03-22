@@ -26,7 +26,7 @@ namespace SensateService.DashboardApi.Controllers
 {
 	[NormalUser]
 	[Produces("application/json")]
-	[Route("[controller]")]
+	[Route("stats/v1/[controller]")]
 	public class DashboardController : AbstractController
 	{
 		private const int HoursPerDay = 24;

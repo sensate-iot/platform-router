@@ -22,7 +22,7 @@ namespace SensateService.DashboardApi.Controllers
 {
 	[AdministratorUser]
 	[Produces("application/json")]
-	[Route("dashboard/admin")]
+	[Route("stats/v1/dashboard/admin")]
 	public class AdminDashboardController : AbstractController
 	{
 		private const int DaysPerWeek = 7;
