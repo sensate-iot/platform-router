@@ -57,36 +57,14 @@ namespace SensateService.AuthApi.Controllers
 			}).ToList();
 		}
 
-		private async Task<int> CountAsync(SensateUser user, RequestMethod method)
-		{
-			int count;
-
-			if(user == null) {
-				if(method == RequestMethod.Any) {
-					count = await this.m_logs.CountAsync().AwaitBackground();
-				} else {
-					count = await this.m_logs.CountAsync(x => x.Method == method).AwaitBackground();
-				}
-			} else {
-				if(method == RequestMethod.Any) {
-					count = await this.m_logs.CountAsync(x => x.AuthorId == user.Id).AwaitBackground();
-				} else {
-					count = await this.m_logs.CountAsync(x => x.Method == method && x.AuthorId == user.Id).AwaitBackground();
-				}
-			}
-
-			return count;
-		}
-
 		[HttpGet]
 		public async Task<IActionResult> Index([FromQuery] int skip = 0,
 											   [FromQuery] int limit = 0,
 											   [FromQuery] RequestMethod method = RequestMethod.Any,
-											   [FromQuery] string email = null,
-											   [FromQuery] bool count = false)
+											   [FromQuery] string email = null)
 		{
-			IEnumerable<AuditLog> logs;
-			IEnumerable<Json.AuditLog> rv = new List<Json.AuditLog>();
+			PaginationResult<AuditLog> logs;
+			var rv = new PaginationResult<Json.AuditLog>();
 
 			try {
 				SensateUser user;
@@ -98,20 +76,13 @@ namespace SensateService.AuthApi.Controllers
 						return this.Ok(rv);
 					}
 
-					if(count) {
-						var c = await this.CountAsync(user, method).AwaitBackground();
-						return this.Ok(new {
-							Count = c
-						});
-					}
-
 					if(method != RequestMethod.Any) {
 						logs = await this.m_logs.GetByRequestTypeAsync(user, method, skip, limit).AwaitBackground();
 					} else {
 						logs = await this.m_logs.GetByUserAsync(user, skip, limit).AwaitBackground();
 					}
 
-					rv = logs.Select(log => new Json.AuditLog {
+					rv.Values = logs.Values.Select(log => new Json.AuditLog {
 						Id = log.Id,
 						Email = user.Email,
 						Timestamp = log.Timestamp,
@@ -119,22 +90,16 @@ namespace SensateService.AuthApi.Controllers
 						Method = log.Method,
 						Route = log.Route
 					});
+					rv.Count = logs.Count;
 				} else {
-					if(count) {
-						var c = await this.CountAsync(null, method).AwaitBackground();
-						return this.Ok(new {
-							Count = c
-						});
-					}
-
 					logs = await this.m_logs.GetAllAsync(method, skip, limit).AwaitBackground();
-					var list = logs.ToList();
 
-					var ids = list.DistinctBy(x => x.AuthorId).Select(x => x.AuthorId);
+					var ids = logs.Values.DistinctBy(x => x.AuthorId).Select(x => x.AuthorId);
 					var @enum = await this._users.GetRangeAsync(ids).AwaitBackground();
-
 					var users = @enum.ToList();
-					rv = GetJsonLogAsync(list, users);
+
+					rv.Values = GetJsonLogAsync(logs.Values, users);
+					rv.Count = logs.Count;
 				}
 			} catch(Exception ex) {
 				this.m_logger.LogInformation($"Unable to fetch logging data: {ex.Message}!");
@@ -157,29 +122,27 @@ namespace SensateService.AuthApi.Controllers
 											  [FromQuery] RequestMethod method = RequestMethod.Any,
 											  [FromQuery] string email = null)
 		{
-			IList<AuditLog> logs;
-			IEnumerable<Json.AuditLog> rv;
 			IList<SensateUser> users;
 			var result = new PaginationResult<Json.AuditLog>();
+			PaginationResult<AuditLog> logs;
 
 			try {
 				if(email != null) {
 					users = (await this._users.FindByEmailAsync(email).AwaitBackground()).ToList();
 					var ids = users.Select(x => x.Id);
 
-					logs = (await this.m_logs.FindAsync(ids, query, method, skip, limit).AwaitBackground()).ToList();
+					logs = await this.m_logs.FindAsync(ids, query, method, skip, limit).AwaitBackground();
 				} else {
-					logs = (await this.m_logs.FindAsync(query, method, skip, limit).AwaitBackground()).ToList();
+					logs = await this.m_logs.FindAsync(query, method, skip, limit).AwaitBackground();
 
-					var ids = logs.DistinctBy(x => x.AuthorId).Select(x => x.AuthorId);
+					var ids = logs.Values.DistinctBy(x => x.AuthorId).Select(x => x.AuthorId);
 					var @enum = await this._users.GetRangeAsync(ids).AwaitBackground();
 
 					users = @enum.ToList();
 				}
 
-				rv = GetJsonLogAsync(logs, users).ToList();
-				result.Count = rv.Count();
-				result.Values = rv;
+				result.Values = GetJsonLogAsync(logs.Values, users).ToList();
+				result.Count = logs.Count;
 			} catch(Exception ex) {
 				this.m_logger.LogInformation($"Unable to fetch logging data: {ex.Message}!");
 				this.m_logger.LogDebug(ex.StackTrace);
