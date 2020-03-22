@@ -66,7 +66,7 @@ namespace SensateService.Infrastructure.Document
 			string key, data;
 			IEnumerable<Sensor> sensors;
 
-			key = $"sensors:uid:{user.Id}::{skip}::{limit}";
+			key = $"sensors:uid:{user.Id}:{skip}:{limit}";
 			data = await this._cache.GetAsync(key);
 
 			if(data != null) {
@@ -108,9 +108,12 @@ namespace SensateService.Infrastructure.Document
 		public override async Task UpdateSecretAsync(Sensor sensor, SensateApiKey key)
 		{
 			var tasks = new[] {
-				this._cache.SetAsync(sensor.InternalId.ToString(), sensor.ToJson()),
+				this._cache.SetAsync(sensor.InternalId.ToString(), sensor.ToJson(),
+				                     CacheTimeout.TimeoutMedium.ToInt(), false),
 				this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}"),
+				this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}:0:0"),
 				this._cache.RemoveAsync(sensor.Owner),
+				this._cache.RemoveAsync(sensor.InternalId.ToString()),
 				base.UpdateSecretAsync(sensor, key)
 			};
 
@@ -122,6 +125,9 @@ namespace SensateService.Infrastructure.Document
 			var tasks = new[] {
 				this._cache.SetAsync(sensor.InternalId.ToString(), sensor.ToJson()),
 				this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}"),
+				this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}:0:0"),
+				this._cache.RemoveAsync(sensor.InternalId.ToString()),
+				this._cache.RemoveAsync(sensor.Owner),
 				base.UpdateAsync(sensor),
 			};
 
