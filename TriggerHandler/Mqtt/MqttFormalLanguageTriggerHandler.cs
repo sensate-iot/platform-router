@@ -53,6 +53,8 @@ namespace SensateService.TriggerHandler.Mqtt
 
 		public override async Task OnMessageAsync(string topic, string message)
 		{
+			this.m_logger.LogDebug("Message received!");
+
 			try {
 				var msg = JsonConvert.DeserializeObject<Message>(message);
 				var triggers_enum = await this.m_triggers.GetAsync(msg.SensorId.ToString(), TriggerType.Regex).AwaitBackground();
