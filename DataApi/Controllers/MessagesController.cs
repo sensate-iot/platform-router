@@ -30,7 +30,7 @@ using SensateService.Services.Settings;
 namespace SensateService.DataApi.Controllers
 {
 	[Produces("application/json")]
-	[Route("[controller]")]
+	[Route("data/v1/[controller]")]
 	public class MessagesController : AbstractDataController
 	{
 		private readonly IMessageRepository m_messages;

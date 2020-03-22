@@ -33,7 +33,7 @@ using SensateService.Services;
 namespace SensateService.DataApi.Controllers
 {
 	[Produces("application/json")]
-	[Route("[controller]")]
+	[Route("data/v1/[controller]")]
 	public class MeasurementsController : AbstractDataController
 	{
 		private readonly IMeasurementCache m_cache;
