@@ -208,10 +208,11 @@ namespace SensateService.AuthApi.Controllers
 				return this.BadRequest();
 			}
 
-			var user = await this.GetCurrentUserAsync();
+			var user = await this.GetCurrentUserAsync().AwaitBackground();
 
-			if(user == null)
+			if(user == null) {
 				return this.NotFound();
+			}
 
 			token = this._email_tokens.GetById(changeEmail.Token);
 			tokens = await this._tokens.GetByUserAsync(user).AwaitBackground();
@@ -489,7 +490,7 @@ namespace SensateService.AuthApi.Controllers
 			SensateUser user;
 			ChangePhoneNumberToken phonetoken;
 
-			user = this.CurrentUser;
+			user = await this.GetCurrentUserAsync().AwaitBackground();
 
 			if(string.IsNullOrEmpty(user.UnconfirmedPhoneNumber)) {
 				return this.InvalidInputResult("No confirmable phone number found!");
@@ -617,7 +618,7 @@ namespace SensateService.AuthApi.Controllers
 		[ProducesResponseType(200)]
 		public async Task<IActionResult> UpdateUser([FromBody] UpdateUser userUpdate)
 		{
-			var user = this.CurrentUser;
+			var user = await this.GetCurrentUserAsync().AwaitBackground();
 
 			if(user == null) {
 				return BadRequest();
