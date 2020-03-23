@@ -56,13 +56,13 @@ namespace SensateService.ApiCore.Middleware
 
 		public async Task RespondErrorAsync(HttpContext ctx, ReplyCode code, string err, int http)
 		{
-			Status output = new Status {
+			var output = new Status {
 				ErrorCode = code,
 				Message = err
 			};
 
 			ctx.Response.Headers["Content-Type"] = "application/json";
-			ctx.Response.StatusCode = 400;
+			ctx.Response.StatusCode = http;
 
 			await ctx.Response.WriteAsync(JsonConvert.SerializeObject(output, this.m_settings)).AwaitBackground();
 		}
@@ -88,7 +88,7 @@ namespace SensateService.ApiCore.Middleware
 				var token = await repo.GetByKeyAsync(key, CancellationToken.None).AwaitBackground();
 
 				if(token == null) {
-					await this.RespondErrorAsync(ctx, ReplyCode.BadInput, "API key not found!", 403).AwaitBackground();
+					await this.RespondErrorAsync(ctx, ReplyCode.BadInput, "API key not found!", 401).AwaitBackground();
 					return;
 				}
 
