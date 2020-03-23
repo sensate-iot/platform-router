@@ -98,8 +98,15 @@ namespace SensateService.DashboardApi.Application
 				ctx.Database.Migrate();
 			}
 
-			app.UseSwagger();
-			app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sensate Dashboard API v1"); });
+			app.UseSwagger(c =>
+			{
+				c.RouteTemplate = "stats/swagger/{documentName}/swagger.json";
+			});
+
+			app.UseSwaggerUI(c => {
+				c.SwaggerEndpoint("/stats/swagger/v1/swagger.json", "Sensate Dashboard API v1");
+				c.RoutePrefix = "stats/swagger";
+			});
 
 			if(env.IsDevelopment()) {
 				app.UseDeveloperExceptionPage();

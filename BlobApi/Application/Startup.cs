@@ -180,8 +180,16 @@ namespace SensateService.BlobApi.Application
 				app.UseDeveloperExceptionPage();
 			}
 
-			app.UseSwagger();
-			app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sensate Data API v1"); });
+			app.UseSwagger(c =>
+			{
+				c.RouteTemplate = "storage/swagger/{documentName}/swagger.json";
+			});
+
+			app.UseSwaggerUI(c => {
+				c.SwaggerEndpoint("/storage/swagger/v1/swagger.json", "Sensate Storage API v1");
+				c.RoutePrefix = "storage/swagger";
+			});
+
 
 			app.UseMiddleware<ApiKeyValidationMiddleware>();
 			app.UseMiddleware<RequestLoggingMiddleware>();

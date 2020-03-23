@@ -161,8 +161,15 @@ namespace SensateService.DataApi.Application
 				app.UseDeveloperExceptionPage();
 			}
 
-			app.UseSwagger();
-			app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sensate Data API v1"); });
+			app.UseSwagger(c =>
+			{
+				c.RouteTemplate = "data/swagger/{documentName}/swagger.json";
+			});
+
+			app.UseSwaggerUI(c => {
+				c.SwaggerEndpoint("/data/swagger/v1/swagger.json", "Sensate Data API v1");
+				c.RoutePrefix = "data/swagger";
+			});
 
 			app.UseMiddleware<ApiKeyValidationMiddleware>();
 			app.UseMiddleware<RequestLoggingMiddleware>();
