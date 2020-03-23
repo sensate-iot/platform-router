@@ -62,10 +62,36 @@ namespace SensateService.DashboardApi.Application
 
 			services.AddSwaggerGen(c => {
 				c.SwaggerDoc("v1", new OpenApiInfo {
-					Title = "Sensate Dashboard API - Version 1",
+					Title = "Sensate IoT Dashboard API - Version 1",
 					Version = "v1"
 				});
+
+				c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme {
+					In = ParameterLocation.Header,
+					Name = "Authorization",
+					Type = SecuritySchemeType.ApiKey,
+					Description = "API key needed to access the endpoints."
+				});
+
+				c.AddSecurityRequirement(new OpenApiSecurityRequirement
+				{
+					{
+						new OpenApiSecurityScheme
+						{
+							Name = "Authorization",
+							Type = SecuritySchemeType.ApiKey,
+							In = ParameterLocation.Header,
+							Reference = new OpenApiReference
+							{
+								Type = ReferenceType.SecurityScheme,
+								Id = "Bearer"
+							},
+						},
+						new string[] {}
+					}
+				});
 			});
+
 
 			services.AddRouting();
 			services.AddControllers().AddNewtonsoftJson();
@@ -98,8 +124,7 @@ namespace SensateService.DashboardApi.Application
 				ctx.Database.Migrate();
 			}
 
-			app.UseSwagger(c =>
-			{
+			app.UseSwagger(c => {
 				c.RouteTemplate = "stats/swagger/{documentName}/swagger.json";
 			});
 

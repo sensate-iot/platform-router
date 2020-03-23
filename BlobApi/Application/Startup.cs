@@ -137,10 +137,36 @@ namespace SensateService.BlobApi.Application
 
 			services.AddSwaggerGen(c => {
 				c.SwaggerDoc("v1", new OpenApiInfo {
-					Title = "Sensate Data API - Version 1",
+					Title = "Sensate IoT Storage API - Version 1",
 					Version = "v1"
 				});
+
+				c.AddSecurityDefinition("key", new OpenApiSecurityScheme {
+					In = ParameterLocation.Query,
+					Name = "key",
+					Type = SecuritySchemeType.ApiKey,
+					Description = "API key needed to access the endpoints."
+				});
+
+				c.AddSecurityRequirement(new OpenApiSecurityRequirement
+				{
+					{
+						new OpenApiSecurityScheme
+						{
+							Name = "key",
+							Type = SecuritySchemeType.ApiKey,
+							In = ParameterLocation.Query,
+							Reference = new OpenApiReference
+							{
+								Type = ReferenceType.SecurityScheme,
+								Id = "key"
+							},
+						},
+						new string[] {}
+					}
+				});
 			});
+
 
 			services.AddRouting();
 			services.AddControllers().AddNewtonsoftJson();
@@ -180,8 +206,7 @@ namespace SensateService.BlobApi.Application
 				app.UseDeveloperExceptionPage();
 			}
 
-			app.UseSwagger(c =>
-			{
+			app.UseSwagger(c => {
 				c.RouteTemplate = "storage/swagger/{documentName}/swagger.json";
 			});
 
