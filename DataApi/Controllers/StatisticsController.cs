@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-
+using MongoDB.Bson;
 using Newtonsoft.Json.Linq;
 
 using SensateService.ApiCore.Controllers;
@@ -22,6 +22,7 @@ using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Models.Json.Out;
+using SensorStatisticsEntry = SensateService.Models.SensorStatisticsEntry;
 
 namespace SensateService.DataApi.Controllers
 {
@@ -41,7 +42,7 @@ namespace SensateService.DataApi.Controllers
 
 		[HttpGet(Name = "StatsIndex")]
 		[ActionName("QueryAllStats")]
-		[ProducesResponseType(typeof(IEnumerable<SensorStatisticsEntry>), 200)]
+		[ProducesResponseType(typeof(IEnumerable<StatisticsEntry>), 200)]
 		[ProducesResponseType(403)]
 		[ProducesResponseType(typeof(Status), 400)]
 		public async Task<IActionResult> Index()
@@ -61,9 +62,9 @@ namespace SensateService.DataApi.Controllers
 			}
 
 			var data = await Task.WhenAll(workers).AwaitBackground();
-			var jobj = data.Select(Flatten).Select((flat, idx) => new {
-				SensorId = sensors[idx].InternalId.ToString(),
-				Statistics = flat
+			var jobj = data.Select(Flatten).Select((flat, idx) => {
+				var entry = new StatisticsEntry {SensorId = sensors[idx].InternalId.ToString(), Statistics = flat};
+				return entry;
 			}).ToList();
 
 			return this.Ok(jobj);
@@ -272,9 +273,11 @@ namespace SensateService.DataApi.Controllers
 
 				var first = stats_entries.FirstOrDefault();
 
-				if(first == null)
+				if(first == null) {
 					continue;
+				}
 
+				new_entry.InternalId = ObjectId.GenerateNewId();
 				new_entry.Measurements = stats_entries.Aggregate(0, (current, entry) => current + entry.Measurements);
 				new_entry.Date = first.Date;
 				new_entry.SensorId = first.SensorId;
