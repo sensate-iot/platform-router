@@ -246,24 +246,36 @@ namespace SensateService.AuthApi.Controllers
 			SensateUser user;
 			EmailBody mail;
 
-			if(string.IsNullOrEmpty(changeEmailModel.NewEmail)) {
-				return this.BadRequest();
+			if(changeEmailModel == null || string.IsNullOrEmpty(changeEmailModel.NewEmail)) {
+				return this.BadRequest(new Status {
+					Message = "Invalid email!",
+					ErrorCode = ReplyCode.BadInput
+				});
 			}
 
 			user = await this.GetCurrentUserAsync().AwaitBackground();
+			var exists = await this._users.GetByEmailAsync(changeEmailModel.NewEmail).AwaitBackground();
+
+			if(exists != null) {
+				return this.UnprocessableEntity(new Status {
+					Message = "Email already in use!",
+					ErrorCode = ReplyCode.BadInput
+				});
+			}
 
 			resetToken = await this._manager.GenerateChangeEmailTokenAsync(user, changeEmailModel.NewEmail).AwaitBackground();
 			token = this._email_tokens.Create(resetToken, changeEmailModel.NewEmail);
 			mail = await this.ReadMailTemplate("Confirm_Update_Email.html", "Confirm_Update_Email.txt").AwaitBackground();
 
-			if(mail == null)
+			if(mail == null) {
 				return this.StatusCode(500);
+			}
 
 			mail.HtmlBody = mail.HtmlBody.Replace("%%TOKEN%%", token);
 			mail.TextBody = string.Format(mail.TextBody, token);
 			await this._mailer.SendEmailAsync(changeEmailModel.NewEmail, "Confirm your new mail", mail).AwaitBackground();
 
-			return this.Ok();
+			return this.NoContent();
 		}
 
 		[HttpGet("roles")]
