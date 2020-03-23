@@ -63,7 +63,7 @@ namespace SensateService.DataApi.Controllers
 
 			var data = await Task.WhenAll(workers).AwaitBackground();
 			var jobj = data.Select(Flatten).Select((flat, idx) => {
-				var entry = new StatisticsEntry {SensorId = sensors[idx].InternalId.ToString(), Statistics = flat};
+				var entry = new StatisticsEntry { SensorId = sensors[idx].InternalId.ToString(), Statistics = flat };
 				return entry;
 			}).ToList();
 
