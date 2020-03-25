@@ -13,6 +13,7 @@ namespace SensateService.Enums
 		NotAllowed = 401,
 		NotFound = 402,
 		Banned = 403,
+		UnknownError = 500,
 		Ok = 200
 	}
 }

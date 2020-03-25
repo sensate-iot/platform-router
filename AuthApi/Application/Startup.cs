@@ -57,10 +57,6 @@ namespace SensateService.AuthApi.Application
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.AddIdentityFramwork(auth);
 
-			/*
-			 * Setup user authentication
-			 */
-
 			if(cache.Enabled) {
 				services.AddCacheStrategy(cache, db);
 			}
@@ -68,6 +64,8 @@ namespace SensateService.AuthApi.Application
 			/* Add repositories */
 			services.AddSqlRepositories(cache.Enabled);
 			services.AddDocumentRepositories(cache.Enabled);
+			services.AddSensorServices();
+			services.AddUserService();
 
 			if(mail.Provider == "SendGrid") {
 				services.AddSingleton<IEmailSender, SendGridMailer>();
