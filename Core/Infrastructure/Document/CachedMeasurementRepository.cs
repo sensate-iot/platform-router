@@ -45,27 +45,27 @@ namespace SensateService.Infrastructure.Document
 			await this._cache.SerializeAsync(key, data, tmo, slide).AwaitBackground();
 		}
 
-		public override async Task DeleteBySensorAsync(Sensor sensor)
+		public override async Task DeleteBySensorAsync(Sensor sensor, CancellationToken ct = default)
 		{
 			string key;
 
 			key = $"Measurements::{sensor.InternalId.ToString()}";
 			var tasks = new[] {
 				this._cache.RemoveAsync(key),
-				base.DeleteBySensorAsync(sensor)
+				base.DeleteBySensorAsync(sensor, ct)
 			};
 
 			await Task.WhenAll(tasks).AwaitBackground();
 		}
 
-		public override async Task DeleteBetweenAsync(Sensor sensor, DateTime start, DateTime end)
+		public override async Task DeleteBetweenAsync(Sensor sensor, DateTime start, DateTime end, CancellationToken ct = default)
 		{
 			string key;
 
 			key = $"{sensor.InternalId}::{start.ToString(CultureInfo.InvariantCulture)}::{end.ToString(CultureInfo.InvariantCulture)}";
 			var tasks = new[] {
 				this._cache.RemoveAsync(key),
-				base.DeleteBetweenAsync(sensor, start, end)
+				base.DeleteBetweenAsync(sensor, start, end, ct)
 			};
 
 			await Task.WhenAll(tasks).AwaitBackground();
