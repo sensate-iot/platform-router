@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
@@ -34,29 +35,19 @@ namespace SensateService.NetworkApi.Controllers
 	{
 		private readonly ILogger<SensorsController> m_logger;
 		private readonly IApiKeyRepository m_apiKeys;
-		private readonly IMeasurementRepository m_measurements;
-		private readonly IMessageRepository m_messages;
-		private readonly ITriggerRepository m_triggers;
-		private readonly ISensorStatisticsRepository m_stats;
 		private readonly IUserRepository m_users;
 		private readonly ISensorService m_sensorService;
 
-		public SensorsController(IHttpContextAccessor ctx, ISensorRepository sensors, ILogger<SensorsController> logger,
-			IMeasurementRepository measurements,
-			ITriggerRepository triggers,
-			IMessageRepository messages,
-			IUserRepository users,
-			ISensorLinkRepository links,
-			ISensorStatisticsRepository stats,
-			ISensorService sensorService,
-			IApiKeyRepository keys) : base(ctx, sensors, links)
+		public SensorsController(IHttpContextAccessor ctx,
+		                         ISensorRepository sensors,
+		                         ILogger<SensorsController> logger,
+		                         IUserRepository users,
+		                         ISensorLinkRepository links,
+		                         ISensorService sensorService,
+		                         IApiKeyRepository keys) : base(ctx, sensors, links)
 		{
 			this.m_logger = logger;
 			this.m_apiKeys = keys;
-			this.m_measurements = measurements;
-			this.m_triggers = triggers;
-			this.m_messages = messages;
-			this.m_stats = stats;
 			this.m_users = users;
 			this.m_sensorService = sensorService;
 		}
@@ -162,7 +153,6 @@ namespace SensateService.NetworkApi.Controllers
 		}
 
 		[HttpGet("links")]
-		[ReadWriteApiKey]
 		[ProducesResponseType(typeof(Sensor), StatusCodes.Status200OK)]
 		[ProducesResponseType(typeof(Sensor), StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(typeof(Sensor), StatusCodes.Status403Forbidden)]
@@ -402,24 +392,14 @@ namespace SensateService.NetworkApi.Controllers
 					return this.Forbid();
 				}
 
-				var tasks = new[] {
-					this.m_sensors.RemoveAsync(sensor),
-					this.m_apiKeys.DeleteAsync(this.CurrentUser, sensor.Secret),
-					this.m_messages.DeleteBySensorAsync(sensor),
-					this.m_stats.DeleteBySensorAsync(sensor),
-					this.m_measurements.DeleteBySensorAsync(sensor)
-				};
-
-				await Task.WhenAll(tasks).AwaitBackground();
-				await this.m_triggers.DeleteBySensorAsync(id).AwaitBackground();
-				await this.m_links.DeleteForAsync(sensor).AwaitBackground();
+				await this.m_sensorService.DeleteAsync(sensor, CancellationToken.None).AwaitBackground();
 			} catch(Exception ex) {
 				this.m_logger.LogInformation($"Unable to remove sensor: {ex.Message}");
 				this.m_logger.LogDebug(ex.StackTrace);
 
 				return this.BadRequest(new Status {
 					Message = "Unable to delete sensor.",
-					ErrorCode = ReplyCode.BadInput
+					ErrorCode = ReplyCode.UnknownError
 				});
 			}
 
