@@ -12,10 +12,8 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Microsoft.Extensions.Logging;
-
-using MongoDB.Bson;
 using MongoDB.Driver;
+
 using SensateService.Enums;
 using SensateService.Exceptions;
 using SensateService.Helpers;
@@ -26,12 +24,10 @@ namespace SensateService.Infrastructure.Document
 {
 	public class SensorStatisticsRepository : AbstractDocumentRepository<SensorStatisticsEntry>, ISensorStatisticsRepository
 	{
-		private readonly ILogger<SensorStatisticsRepository> _logger;
 		private readonly IMongoCollection<SensorStatisticsEntry> _stats;
 
-		public SensorStatisticsRepository(SensateContext context, ILogger<SensorStatisticsRepository> logger) : base(context.Statistics)
+		public SensorStatisticsRepository(SensateContext context) : base(context.Statistics)
 		{
-			this._logger = logger;
 			this._stats = context.Statistics;
 		}
 
@@ -55,48 +51,29 @@ namespace SensateService.Infrastructure.Document
 			return data.ToList();
 		}
 
-		public void Delete(string id)
+		public async Task DeleteBySensorAsync(Sensor sensor, CancellationToken ct = default)
 		{
-			ObjectId objectId;
-
-			objectId = ObjectId.Parse(id);
-			this._stats.DeleteOne(x => x.InternalId == objectId);
+			var filter = Builders<SensorStatisticsEntry>.Filter
+				.Eq(x => x.InternalId, sensor.InternalId);
+			await this._collection.DeleteManyAsync(filter, ct).AwaitBackground();
 		}
 
-		public async Task DeleteAsync(string id)
+		public async Task DeleteBySensorAsync(Sensor sensor, DateTime @from, DateTime to, CancellationToken ct = default)
 		{
-			ObjectId objectId;
-
-			objectId = ObjectId.Parse(id);
-			await this._stats.DeleteOneAsync(x => x.InternalId == objectId).AwaitBackground();
-		}
-
-		public async Task DeleteBySensorAsync(Sensor sensor)
-		{
-			var query = Builders<SensorStatisticsEntry>.Filter.Eq(x => x.SensorId, sensor.InternalId);
-
-			try {
-				await this._stats.DeleteManyAsync(query).AwaitBackground();
-			} catch(Exception ex) {
-				this._logger.LogWarning(ex.Message);
-			}
-		}
-
-		public async Task DeleteBySensorAsync(Sensor sensor, DateTime from, DateTime to)
-		{
-			var f = from.ThisHour();
-			var t = to.ThisHour();
-
-			var worker = this._collection.DeleteManyAsync(stat => stat.SensorId == sensor.InternalId &&
-																  stat.Date >= f && stat.Date <= t);
-			await worker.AwaitBackground();
+			var startHour = @from.ThisHour();
+			var endHour = to.ThisHour();
+			var builder = Builders<SensorStatisticsEntry>.Filter;
+			var filter = builder.Eq(x => x.InternalId, sensor.InternalId) &
+			             builder.Gte(x => x.Date, startHour) &
+			             builder.Lte(x => x.Date, endHour);
+			await this._collection.DeleteManyAsync(filter, ct).AwaitBackground();
 		}
 
 		#region Entry creation
 
 		public Task IncrementAsync(Sensor sensor, RequestMethod method)
 		{
-			return this.IncrementManyAsync(sensor, method, 1, default(CancellationToken));
+			return this.IncrementManyAsync(sensor, method, 1, default);
 		}
 
 		public async Task<SensorStatisticsEntry> CreateForAsync(Sensor sensor)
@@ -104,7 +81,7 @@ namespace SensateService.Infrastructure.Document
 			SensorStatisticsEntry entry;
 
 			entry = new SensorStatisticsEntry {
-				InternalId = base.GenerateId(DateTime.Now),
+				InternalId = this.GenerateId(DateTime.Now),
 				Date = DateTime.Now.ThisHour(),
 				Measurements = 0,
 				SensorId = sensor.InternalId

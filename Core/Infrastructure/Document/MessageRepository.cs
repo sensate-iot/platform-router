@@ -95,5 +95,15 @@ namespace SensateService.Infrastructure.Document
 			var filter = Builders<Message>.Filter.Eq(x => x.SensorId, sensor.InternalId);
 			return this._collection.DeleteManyAsync(filter, ct);
 		}
+
+		public async Task DeleteBySensorAsync(Sensor sensor, DateTime start, DateTime end, CancellationToken ct = default)
+		{
+			var builder = Builders<Message>.Filter;
+			var filter = builder.Eq(x => x.SensorId, sensor.InternalId) &
+			             builder.Gte(x => x.CreatedAt, start) &
+			             builder.Lte(x => x.CreatedAt, end);
+
+			await this._collection.DeleteManyAsync(filter, ct).AwaitBackground();
+		}
 	}
 }

@@ -69,5 +69,23 @@ namespace SensateService.Infrastructure.Document
 			var msg = await this._collection.FindAsync(filters, cancellationToken: ct).AwaitBackground();
 			return await msg.FirstOrDefaultAsync(ct).AwaitBackground();
 		}
+
+		public async Task DeleteBySensorAsync(Sensor sensor, CancellationToken ct = default)
+		{
+			var builder = Builders<ControlMessage>.Filter;
+			var filter = builder.Eq(x => x.SensorId, sensor.InternalId);
+
+			await this._collection.DeleteManyAsync(filter, ct).AwaitBackground();
+		}
+
+		public async Task DeleteBySensorAsync(Sensor sensor, DateTime start, DateTime end, CancellationToken ct = default)
+		{
+			var builder = Builders<ControlMessage>.Filter;
+			var filter = builder.Eq(x => x.SensorId, sensor.InternalId) &
+			             builder.Gte(x => x.Timestamp, start) &
+			             builder.Lte(x => x.Timestamp, end);
+
+			await this._collection.DeleteManyAsync(filter, ct).AwaitBackground();
+		}
 	}
 }
