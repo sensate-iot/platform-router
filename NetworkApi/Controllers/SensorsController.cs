@@ -39,12 +39,12 @@ namespace SensateService.NetworkApi.Controllers
 		private readonly ISensorService m_sensorService;
 
 		public SensorsController(IHttpContextAccessor ctx,
-		                         ISensorRepository sensors,
-		                         ILogger<SensorsController> logger,
-		                         IUserRepository users,
-		                         ISensorLinkRepository links,
-		                         ISensorService sensorService,
-		                         IApiKeyRepository keys) : base(ctx, sensors, links)
+								 ISensorRepository sensors,
+								 ILogger<SensorsController> logger,
+								 IUserRepository users,
+								 ISensorLinkRepository links,
+								 ISensorService sensorService,
+								 IApiKeyRepository keys) : base(ctx, sensors, links)
 		{
 			this.m_logger = logger;
 			this.m_apiKeys = keys;
