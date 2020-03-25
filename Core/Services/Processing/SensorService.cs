@@ -20,11 +20,33 @@ namespace SensateService.Services.Processing
 	{
 		private readonly ISensorRepository m_sensors;
 		private readonly ISensorLinkRepository m_links;
+		private readonly IApiKeyRepository m_apiKeys;
+		private readonly IMeasurementRepository m_measurements;
+		private readonly IMessageRepository m_messages;
+		private readonly IControlMessageRepository m_control;
+		private readonly ITriggerRepository m_triggers;
+		private readonly IBlobRepository m_blobs;
 
-		public SensorService(ISensorRepository sensors, ISensorLinkRepository links)
+		public SensorService(
+			ISensorRepository sensors,
+			ISensorLinkRepository links,
+			IMeasurementRepository measurements,
+			ITriggerRepository triggers,
+			IControlMessageRepository control,
+			IMessageRepository messages,
+			ISensorStatisticsRepository stats,
+			IApiKeyRepository keys,
+			IBlobRepository blobs
+			)
 		{
 			this.m_links = links;
+			this.m_blobs = blobs;
 			this.m_sensors = sensors;
+			this.m_control = control;
+			this.m_apiKeys = keys;
+			this.m_measurements = measurements;
+			this.m_triggers = triggers;
+			this.m_messages = messages;
 		}
 
 		public async Task<PaginationResult<Sensor>> GetSensorsAsync(SensateUser user, string name, int skip = 0, int limit = 0, CancellationToken token = default)
@@ -47,6 +69,22 @@ namespace SensateService.Services.Processing
 			sensors.Values = list;
 
 			return sensors;
+		}
+
+		public async Task DeleteAsync(Sensor sensor, CancellationToken ct = default)
+		{
+			var tasks = new[] {
+				this.m_sensors.DeleteAsync(sensor, ct),
+				this.m_messages.DeleteBySensorAsync(sensor, ct),
+				this.m_control.DeleteBySensorAsync(sensor, ct),
+				this.m_measurements.DeleteBySensorAsync(sensor, ct),
+			};
+
+			await this.m_links.DeleteBySensorAsync(sensor, ct).AwaitBackground();
+			await this.m_triggers.DeleteBySensorAsync(sensor.InternalId.ToString(), ct);
+			await this.m_blobs.DeleteAsync(sensor, ct).AwaitBackground();
+			await this.m_apiKeys.DeleteAsync(sensor.Secret, ct).AwaitBackground();
+			await Task.WhenAll(tasks).AwaitBackground();
 		}
 
 		public async Task<PaginationResult<Sensor>> GetSensorsAsync(SensateUser user, int skip = 0, int limit = 0, CancellationToken token = default)
