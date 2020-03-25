@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+
 using SensateService.Models;
 
 namespace SensateService.Infrastructure.Repositories
@@ -24,7 +25,8 @@ namespace SensateService.Infrastructure.Repositories
 		Task<long> CountAsync(SensateUser user = null);
 		Task<long> CountAsync(SensateUser user, string name);
 
-		Task RemoveAsync(Sensor sensor);
+		Task DeleteAsync(SensateUser user, CancellationToken ct = default);
+		Task DeleteAsync(Sensor sensor, CancellationToken ct = default);
 		Task UpdateAsync(Sensor sensor);
 		Task UpdateSecretAsync(Sensor sensor, SensateApiKey key);
 	}
