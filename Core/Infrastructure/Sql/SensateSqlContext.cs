@@ -61,11 +61,13 @@ namespace SensateService.Infrastructure.Sql
 			builder.Entity<ChangePhoneNumberToken>()
 				.HasOne<SensateUser>()
 				.WithMany()
-				.HasForeignKey(t => t.UserId);
+				.HasForeignKey(t => t.UserId).IsRequired().OnDelete(DeleteBehavior.Cascade);
 
 			builder.Entity<SensorLink>(link => {
 				link.HasKey(k => new { k.UserId, k.SensorId });
 				link.HasIndex(k => k.UserId);
+				link.HasOne<SensateUser>().WithMany().HasForeignKey(x => x.UserId)
+					.IsRequired().OnDelete(DeleteBehavior.Cascade);
 			});
 
 			builder.Entity<SensateApiKey>(key => {
@@ -90,7 +92,8 @@ namespace SensateService.Infrastructure.Sql
 			});
 
 			builder.Entity<AuditLog>().Property(log => log.Id).UseIdentityByDefaultColumn();
-			builder.Entity<AuditLog>().HasOne<SensateUser>().WithMany().HasForeignKey(log => log.AuthorId);
+			builder.Entity<AuditLog>().HasOne<SensateUser>().WithMany().HasForeignKey(log => log.AuthorId)
+				.OnDelete(DeleteBehavior.Cascade);
 			builder.Entity<AuditLog>().HasIndex(log => log.Method);
 
 			builder.Entity<Trigger>().HasIndex(trigger => trigger.Type);
