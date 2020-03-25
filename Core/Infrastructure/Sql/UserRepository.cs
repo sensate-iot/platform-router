@@ -35,8 +35,9 @@ namespace SensateService.Infrastructure.Sql
 		{
 			var user = await this._manager.FindByIdAsync(id).AwaitBackground();
 
-			if(ct.IsCancellationRequested)
+			if(ct.IsCancellationRequested) {
 				throw new OperationCanceledException();
+			}
 
 			await this._manager.DeleteAsync(user).AwaitBackground();
 		}
