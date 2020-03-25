@@ -74,7 +74,7 @@ namespace SensateService.Infrastructure.Sql
 			return _apikey;
 		}
 
-		public async Task<SensateApiKey> GetByIdAsync(string id, CancellationToken token = default(CancellationToken))
+		public async Task<SensateApiKey> GetByIdAsync(string id, CancellationToken token = default)
 		{
 			var query = this.Data.Where(apikey => apikey.Id == id).Include(apikey => apikey.User)
 				.ThenInclude(user => user.ApiKeys);
@@ -88,15 +88,19 @@ namespace SensateService.Infrastructure.Sql
 			return _apikey;
 		}
 
-		public async Task DeleteAsync(SensateUser owner, string key, CancellationToken ct = default)
+		public async Task DeleteAsync(SensateUser user, CancellationToken ct = default)
 		{
-			var apiKey = await this.Data.Where(apikey => apikey.UserId == owner.Id && apikey.ApiKey == key)
-				.FirstOrDefaultAsync(ct).AwaitBackground();
+			var query = this.Data.Where(x => x.UserId == user.Id);
+			this.Data.RemoveRange(query);
 
-			if(apiKey == null)
-				return;
+			await this.CommitAsync(ct).AwaitBackground();
+		}
 
-			this.Data.Remove(apiKey);
+		public async Task DeleteAsync(string key, CancellationToken ct = default)
+		{
+			var apiKey = this.Data.Where(apikey => apikey.ApiKey == key);
+
+			this.Data.RemoveRange(apiKey);
 			await this.CommitAsync(ct).AwaitBackground();
 		}
 

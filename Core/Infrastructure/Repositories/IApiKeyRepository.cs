@@ -23,13 +23,15 @@ namespace SensateService.Infrastructure.Repositories
 		Task MarkRevokedAsync(SensateApiKey key, CancellationToken token = default(CancellationToken));
 		Task MarkRevokedRangeAsync(IEnumerable<SensateApiKey> keys, CancellationToken token = default(CancellationToken));
 		Task<SensateApiKey> RefreshAsync(SensateApiKey apikey, string key, CancellationToken token = default);
-		Task<SensateApiKey> RefreshAsync(SensateApiKey key, CancellationToken token = default(CancellationToken));
-		Task<SensateApiKey> RefreshAsync(string id, CancellationToken token = default(CancellationToken));
+		Task<SensateApiKey> RefreshAsync(SensateApiKey key, CancellationToken token = default);
+		Task<SensateApiKey> RefreshAsync(string id, CancellationToken token = default);
 		string GenerateApiKey();
 		Task<IEnumerable<SensateApiKey>> GetByUserAsync(SensateUser user, int skip = 0, int limit = 0, CancellationToken token = default(CancellationToken));
 		Task<IEnumerable<SensateApiKey>> GetByUserAsync(SensateUser user, ApiKeyType type,
 														int skip = 0, int limit = 0,
-														CancellationToken token = default(CancellationToken));
-		Task DeleteAsync(SensateUser user, string key, CancellationToken ct = default);
+														CancellationToken token = default);
+
+		Task DeleteAsync(SensateUser user, CancellationToken ct = default);
+		Task DeleteAsync(string key, CancellationToken ct = default);
 	}
 }

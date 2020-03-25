@@ -39,7 +39,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public async Task<Blob> GetAsync(long blobId, CancellationToken ct = default)
 		{
-			var blob = await this.Data.FirstOrDefaultAsync(blob => blob.Id == blobId, ct).AwaitBackground();
+			var blob = await this.Data.FirstOrDefaultAsync(b => b.Id == blobId, ct).AwaitBackground();
 			return blob;
 		}
 
@@ -92,6 +92,15 @@ namespace SensateService.Infrastructure.Sql
 			await this.CommitAsync(ct).AwaitBackground();
 
 			return true;
+		}
+
+		public async Task DeleteAsync(Sensor sensor, CancellationToken ct = default)
+		{
+			var id = sensor.ToString();
+			var query = this.Data.Where(x => x.SensorId == id);
+
+			this.Data.RemoveRange(query);
+			await this.CommitAsync(ct).AwaitBackground();
 		}
 	}
 }

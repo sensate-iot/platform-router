@@ -24,5 +24,6 @@ namespace SensateService.Infrastructure.Repositories
 
 		Task<bool> DeleteAsync(string sensorId, string fileName, CancellationToken ct = default);
 		Task<bool> DeleteAsync(long id, CancellationToken ct = default);
+		Task DeleteAsync(Sensor sensor, CancellationToken ct = default);
 	}
 }
