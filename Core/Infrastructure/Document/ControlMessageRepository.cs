@@ -82,8 +82,8 @@ namespace SensateService.Infrastructure.Document
 		{
 			var builder = Builders<ControlMessage>.Filter;
 			var filter = builder.Eq(x => x.SensorId, sensor.InternalId) &
-			             builder.Gte(x => x.Timestamp, start) &
-			             builder.Lte(x => x.Timestamp, end);
+						 builder.Gte(x => x.Timestamp, start) &
+						 builder.Lte(x => x.Timestamp, end);
 
 			await this._collection.DeleteManyAsync(filter, ct).AwaitBackground();
 		}

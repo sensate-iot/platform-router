@@ -64,8 +64,8 @@ namespace SensateService.Infrastructure.Document
 			var endHour = to.ThisHour();
 			var builder = Builders<SensorStatisticsEntry>.Filter;
 			var filter = builder.Eq(x => x.InternalId, sensor.InternalId) &
-			             builder.Gte(x => x.Date, startHour) &
-			             builder.Lte(x => x.Date, endHour);
+						 builder.Gte(x => x.Date, startHour) &
+						 builder.Lte(x => x.Date, endHour);
 			await this._collection.DeleteManyAsync(filter, ct).AwaitBackground();
 		}
 
