@@ -34,7 +34,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public UserTokenRepository(SensateSqlContext context) : base(context)
 		{
-			this._rng = new Random();
+			this._rng = new Random(StaticRandom.Next());
 		}
 
 		public override void Create(AuthUserToken obj)

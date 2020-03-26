@@ -144,7 +144,7 @@ namespace SensateService.Infrastructure.Sql
 				Route = route,
 				Method = method,
 				Address = address,
-				Timestamp = DateTime.Now,
+				Timestamp = DateTime.UtcNow,
 			};
 
 			await this.CreateAsync(al).AwaitBackground();

@@ -17,12 +17,12 @@ namespace SensateService.Infrastructure.Sql
 {
 	public class PasswordResetTokenRepository : AbstractSqlRepository<PasswordResetToken>, IPasswordResetTokenRepository
 	{
-		private Random _rng;
+		private readonly Random _rng;
 		private const int UserTokenLength = 12;
 
 		public PasswordResetTokenRepository(SensateSqlContext context) : base(context)
 		{
-			this._rng = new Random();
+			this._rng = new Random(StaticRandom.Next());
 		}
 
 		public string Create(string token)

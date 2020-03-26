@@ -25,7 +25,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public ChangePhoneNumberRepository(SensateSqlContext context) : base(context)
 		{
-			this._rng = new Random();
+			this._rng = new Random(StaticRandom.Next());
 		}
 
 		public async Task<string> CreateAsync(SensateUser user, string token, string phone)

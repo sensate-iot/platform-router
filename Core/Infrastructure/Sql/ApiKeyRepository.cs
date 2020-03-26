@@ -28,7 +28,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public ApiKeyRepository(SensateSqlContext context) : base(context)
 		{
-			this._rng = new Random(DateTime.Now.Millisecond);
+			this._rng = new Random(StaticRandom.Next());
 		}
 
 		public override Task CreateAsync(SensateApiKey key, CancellationToken token = default(CancellationToken))
@@ -90,11 +90,11 @@ namespace SensateService.Infrastructure.Sql
 		}
 
 		public async Task<PaginationResult<SensateApiKey>> FilterAsync(SensateUser user,
-		                                                               IList<ApiKeyType> types,
-		                                                               string query = null,
-		                                                               bool revoked = true,
-		                                                               int skip = 0,
-		                                                               int limit = 0)
+																	   IList<ApiKeyType> types,
+																	   string query = null,
+																	   bool revoked = true,
+																	   int skip = 0,
+																	   int limit = 0)
 		{
 			var rv = new PaginationResult<SensateApiKey>();
 			var q = this.Data.Where(x => x.UserId == user.Id && types.Contains(x.Type));
