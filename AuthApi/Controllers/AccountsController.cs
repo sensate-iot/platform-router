@@ -515,7 +515,7 @@ namespace SensateService.AuthApi.Controllers
 			phonetoken = await this._phonetokens.GetLatest(user);
 			var tmo = phonetoken.Timestamp.AddMinutes(PhoneTokenTimeout);
 
-			if(DateTime.Now > tmo) {
+			if(DateTime.UtcNow > tmo) {
 				await this.SendConfirmPhoneAsync(user, phonetoken.PhoneNumber).AwaitBackground();
 				return this.BadRequest(new Status {
 					Message = "Phone number expired!",
