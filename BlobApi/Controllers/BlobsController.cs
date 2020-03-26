@@ -63,7 +63,7 @@ namespace SensateService.BlobApi.Controllers
 		[ProducesResponseType(typeof(Status), StatusCodes.Status201Created)]
 		public async Task<IActionResult> Create([FromForm] FileUploadForm upload)
 		{
-			IFormFile file = upload.File;
+			var file = upload.File;
 
 			if(file == null) {
 				return this.UnprocessableEntity(new Status {
@@ -76,6 +76,7 @@ namespace SensateService.BlobApi.Controllers
 			var blob = new Blob {
 				SensorId = upload.SensorId,
 				FileName = upload.Name,
+				Timestamp = DateTime.UtcNow,
 				Path = $"{this.m_settings.StoragePath}{Path.DirectorySeparatorChar}{upload.SensorId}",
 				StorageType = StorageType.FileSystem
 			};
