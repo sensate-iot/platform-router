@@ -34,7 +34,7 @@ namespace SensateService.AuthApi.Controllers
 
 		public ApiKeysController(IUserRepository users, IApiKeyRepository keys,
 								 ILogger<ApiKeysController> logger,
-		                         IHttpContextAccessor ctx) : base(users, ctx)
+								 IHttpContextAccessor ctx) : base(users, ctx)
 		{
 			this._keys = keys;
 			this.m_logger = logger;
@@ -151,7 +151,7 @@ namespace SensateService.AuthApi.Controllers
 
 			try {
 				keys = await this._keys.FilterAsync(this.CurrentUser, filter.Types, filter.Query, filter.IncludeRevoked,
-				                              filter.Skip.Value, filter.Limit.Value).AwaitBackground();
+											  filter.Skip.Value, filter.Limit.Value).AwaitBackground();
 			} catch(Exception ex) {
 				this.m_logger.LogInformation(ex, "Failed to fetch keys!");
 
