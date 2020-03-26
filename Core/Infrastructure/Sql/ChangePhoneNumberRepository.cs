@@ -37,7 +37,7 @@ namespace SensateService.Infrastructure.Sql
 				IdentityToken = token,
 				UserToken = this._rng.NextString(UserTokenLength),
 				UserId = user.Id,
-				Timestamp = DateTime.Now
+				Timestamp = DateTime.UtcNow
 			};
 
 			try {
@@ -52,7 +52,15 @@ namespace SensateService.Infrastructure.Sql
 
 		public ChangePhoneNumberToken GetById(string id)
 		{
-			return this.Data.FirstOrDefault(x => x.UserToken == id);
+			var value = this.Data.FirstOrDefault(x => x.UserToken == id);
+
+			if(value == null) {
+				return null;
+			}
+
+			value.Timestamp = DateTime.SpecifyKind(value.Timestamp, DateTimeKind.Utc);
+
+			return value;
 		}
 
 		public async Task<ChangePhoneNumberToken> GetLatest(SensateUser user)
@@ -63,7 +71,15 @@ namespace SensateService.Infrastructure.Sql
 						 select token;
 			var single = tokens.OrderByDescending(t => t.Timestamp);
 
-			return await single.FirstOrDefaultAsync().AwaitBackground();
+			var value = await single.FirstOrDefaultAsync().AwaitBackground();
+
+			if(value == null) {
+				return null;
+			}
+
+			value.Timestamp = DateTime.SpecifyKind(value.Timestamp, DateTimeKind.Utc);
+
+			return value;
 		}
 	}
 }
