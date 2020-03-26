@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+
 using Microsoft.OpenApi.Models;
 
 using SensateService.ApiCore.Init;
@@ -94,6 +95,7 @@ namespace SensateService.AuthApi.Application
 				Console.WriteLine("Text message provider not configured!");
 			}
 
+
 			services.AddSwaggerGen(c => {
 				c.SwaggerDoc("v1", new OpenApiInfo {
 					Title = "Sensate IoT Auth API - Version 1",
@@ -132,8 +134,9 @@ namespace SensateService.AuthApi.Application
 
 			services.AddLogging((logging) => {
 				logging.AddConsole();
-				if(this._env.IsDevelopment())
+				if(this._env.IsDevelopment()) {
 					logging.AddDebug();
+				}
 			});
 		}
 
