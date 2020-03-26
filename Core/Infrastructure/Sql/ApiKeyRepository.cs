@@ -17,6 +17,7 @@ using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
+using SensateService.Models.Json.Out;
 
 namespace SensateService.Infrastructure.Sql
 {
@@ -86,6 +87,45 @@ namespace SensateService.Infrastructure.Sql
 			_apikey.CreatedOn = DateTime.SpecifyKind(_apikey.CreatedOn, DateTimeKind.Utc);
 
 			return _apikey;
+		}
+
+		public async Task<PaginationResult<SensateApiKey>> FilterAsync(SensateUser user,
+		                                                               IList<ApiKeyType> types,
+		                                                               string query = null,
+		                                                               bool revoked = true,
+		                                                               int skip = 0,
+		                                                               int limit = 0)
+		{
+			var rv = new PaginationResult<SensateApiKey>();
+			var q = this.Data.Where(x => x.UserId == user.Id && types.Contains(x.Type));
+
+			if(!string.IsNullOrEmpty(query)) {
+				q = q.Where(x => x.Name.Contains(query));
+			}
+
+			if(!revoked) {
+				q = q.Where(x => !x.Revoked);
+			}
+
+			rv.Count = await q.CountAsync().AwaitBackground();
+
+			if(skip > 0) {
+				q = q.Skip(skip);
+			}
+
+			if(limit > 0) {
+				q = q.Take(limit);
+			}
+
+			q = q.Include(key => key.User).ThenInclude(u => u.ApiKeys);
+
+			rv.Values = await q.ToListAsync().AwaitBackground();
+
+			foreach(var key in rv.Values) {
+				key.CreatedOn = DateTime.SpecifyKind(key.CreatedOn, DateTimeKind.Utc);
+			}
+
+			return rv;
 		}
 
 		public async Task DeleteAsync(SensateUser user, CancellationToken ct = default)
@@ -175,8 +215,9 @@ namespace SensateService.Infrastructure.Sql
 
 			var keys = await query.ToListAsync(token).AwaitBackground();
 
-			if(keys == null)
+			if(keys == null) {
 				return null;
+			}
 
 			foreach(var key in keys) {
 				key.CreatedOn = DateTime.SpecifyKind(key.CreatedOn, DateTimeKind.Utc);

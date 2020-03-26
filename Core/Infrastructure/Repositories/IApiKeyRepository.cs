@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 using SensateService.Enums;
 using SensateService.Models;
+using SensateService.Models.Json.Out;
 
 namespace SensateService.Infrastructure.Repositories
 {
@@ -30,6 +31,8 @@ namespace SensateService.Infrastructure.Repositories
 		Task<IEnumerable<SensateApiKey>> GetByUserAsync(SensateUser user, ApiKeyType type,
 														int skip = 0, int limit = 0,
 														CancellationToken token = default);
+
+		Task<PaginationResult<SensateApiKey>> FilterAsync(SensateUser user, IList<ApiKeyType> types, string query = null, bool revoked = true, int skip = 0, int limit = 0);
 
 		Task DeleteAsync(SensateUser user, CancellationToken ct = default);
 		Task DeleteAsync(string key, CancellationToken ct = default);
