@@ -7,6 +7,7 @@
 
 using System;
 
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -98,11 +99,13 @@ namespace SensateService.TriggerHandler.Application
 
 			services.AddPostgres(db.PgSQL.ConnectionString);
 
-			services.AddIdentity<SensateUser, SensateRole>(config => {
-				config.SignIn.RequireConfirmedEmail = true;
-			})
-			.AddEntityFrameworkStores<SensateSqlContext>()
-			.AddDefaultTokenProviders();
+			services.AddIdentity<SensateUser, SensateRole>()
+				.AddEntityFrameworkStores<SensateSqlContext>()
+				.AddDefaultTokenProviders();
+
+			services.AddDataProtection()
+				.PersistKeysToDbContext<SensateSqlContext>()
+				.DisableAutomaticKeyGeneration();
 
 			services.AddLogging(builder => { builder.AddConfiguration(this.Configuration.GetSection("Logging")); });
 
@@ -142,8 +145,9 @@ namespace SensateService.TriggerHandler.Application
 
 			services.AddLogging(builder => {
 				builder.AddConfiguration(Configuration.GetSection("Logging"));
-				if(IsDevelopment())
+				if(IsDevelopment()) {
 					builder.AddDebug();
+				}
 
 				builder.AddConsole();
 			});

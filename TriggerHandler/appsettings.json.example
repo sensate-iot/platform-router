@@ -40,6 +40,16 @@
     }
   },
 
+  "Authentication": {
+    "PublicUrl": "localhost:5000",
+    "Scheme":  "http", 
+    "JwtRefreshExpireMinutes": 43200,
+    "JwtKey": "",
+    "JwtIssuer": "http://localhost:5000/",
+    "PrimaryAuthHost": false,
+    "JwtExpireMinutes": 43200
+  },
+
   "Timeouts": {
     "MessageTimeout": 5,
     "MailTimeout": 2,
