@@ -41,7 +41,13 @@ namespace SensateService.ApiCore.Init
 
 			JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
 
-			services.AddDataProtection().PersistKeysToDbContext<SensateSqlContext>();
+			if(auth.PrimaryAuthHost) {
+				services.AddDataProtection().PersistKeysToDbContext<SensateSqlContext>();
+			} else {
+				services.AddDataProtection()
+					.PersistKeysToDbContext<SensateSqlContext>()
+					.DisableAutomaticKeyGeneration();
+			}
 
 			services.Configure<IdentityOptions>(options => {
 				options.Password.RequireDigit = true;
