@@ -22,9 +22,6 @@ using SensateService.Config;
 using SensateService.DataApi.Services;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
-using SensateService.Services;
-using SensateService.Services.Adapters;
-using SensateService.Services.Settings;
 
 namespace SensateService.DataApi.Application
 {
@@ -44,8 +41,6 @@ namespace SensateService.DataApi.Application
 		{
 			var cache = new CacheConfig();
 			var db = new DatabaseConfig();
-			var mail = new MailConfig();
-			var text = new TextConfig();
 			var auth = new AuthenticationConfig();
 			var mqtt = new MqttConfig();
 
@@ -53,8 +48,6 @@ namespace SensateService.DataApi.Application
 			this._configuration.GetSection("Authentication").Bind(auth);
 			this._configuration.GetSection("Cache").Bind(cache);
 			this._configuration.GetSection("Database").Bind(db);
-			this._configuration.GetSection("Mail").Bind(mail);
-			this._configuration.GetSection("Text").Bind(text);
 
 			var privatemqtt = mqtt.InternalBroker;
 
@@ -75,27 +68,6 @@ namespace SensateService.DataApi.Application
 			services.AddSensorServices();
 			services.AddHashAlgorihms();
 
-			if(mail.Provider == "SendGrid") {
-				services.AddSingleton<IEmailSender, SendGridMailer>();
-				services.Configure<SendGridAuthOptions>(opts => {
-					opts.FromName = mail.FromName;
-					opts.From = mail.From;
-					opts.Key = mail.SendGrid.Key;
-					opts.Username = mail.SendGrid.Username;
-				});
-			} else if(mail.Provider == "SMTP") {
-				services.AddSingleton<IEmailSender, SmtpMailer>();
-				services.Configure<SmtpAuthOptions>(opts => {
-					opts.FromName = mail.FromName;
-					opts.From = mail.From;
-					opts.Password = mail.Smtp.Password;
-					opts.Username = mail.Smtp.Username;
-					opts.Ssl = mail.Smtp.Ssl;
-					opts.Port = mail.Smtp.Port;
-					opts.Host = mail.Smtp.Host;
-				});
-			}
-
 			services.AddInternalMqttService(options => {
 				options.Ssl = privatemqtt.Ssl;
 				options.Host = privatemqtt.Host;
@@ -109,12 +81,6 @@ namespace SensateService.DataApi.Application
 			});
 
 			services.AddHostedService<MqttPublishHandler>();
-
-			if(text.Provider == "Twillio") {
-				services.AddTwilioTextApi(text);
-			} else {
-				Console.WriteLine("Text message provider not configured!");
-			}
 
 			services.AddSwaggerGen(c => {
 				c.SwaggerDoc("v1", new OpenApiInfo {
@@ -199,9 +165,6 @@ namespace SensateService.DataApi.Application
 
 			app.UseMiddleware<ApiKeyValidationMiddleware>();
 			app.UseMiddleware<RequestLoggingMiddleware>();
-
-			app.UseAuthentication();
-			app.UseAuthorization();
 			app.UseEndpoints(ep => { ep.MapControllers(); });
 		}
 	}
