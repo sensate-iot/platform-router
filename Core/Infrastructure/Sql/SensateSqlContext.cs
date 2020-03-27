@@ -5,6 +5,7 @@
  * @email:  michel.megens@sonatolabs.com
  */
 
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -15,7 +16,7 @@ namespace SensateService.Infrastructure.Sql
 {
 	public class SensateSqlContext : IdentityDbContext<SensateUser, SensateRole, string,
 		IdentityUserClaim<string>, SensateUserRole, IdentityUserLogin<string>,
-		IdentityRoleClaim<string>, IdentityUserToken<string>>
+		IdentityRoleClaim<string>, IdentityUserToken<string>>, IDataProtectionKeyContext
 	{
 		public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 		public DbSet<ChangeEmailToken> ChangeEmailTokens { get; set; }
@@ -28,6 +29,7 @@ namespace SensateService.Infrastructure.Sql
 		public DbSet<TriggerInvocation> TriggerInvocations { get; set; }
 		public DbSet<Blob> Blobs { get; set; }
 		public DbSet<SensorLink> SensorLinks { get; set; }
+		public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
 
 		public SensateSqlContext(DbContextOptions<SensateSqlContext> options) : base(options)
 		{ }
@@ -48,6 +50,7 @@ namespace SensateService.Infrastructure.Sql
 			builder.Entity<TriggerInvocation>().ToTable("TriggerInvocations");
 			builder.Entity<Blob>().ToTable("Blobs");
 			builder.Entity<SensorLink>().ToTable("SensorLinks");
+			builder.Entity<DataProtectionKey>().ToTable("DataProtectionKeys");
 
 			builder.Entity<PasswordResetToken>().HasKey(k => k.UserToken);
 			builder.Entity<AuthUserToken>().HasKey(k => new { k.UserId, k.Value });
