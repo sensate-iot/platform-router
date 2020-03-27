@@ -8,7 +8,7 @@
     <Version>0.4.2</Version>
     <ServerGarbageCollection>true</ServerGarbageCollection>
     <RootNamespace>SensateService.DataApi</RootNamespace>
-    <AssemblyName>SensateService.DataApi</AssemblyName>
+    <AssemblyName>DataApi</AssemblyName>
     <Company>Sensate IoT</Company>
   </PropertyGroup>
 
