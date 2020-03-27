@@ -18,6 +18,11 @@ namespace SensateService.DashboardApi.Application
 {
 	public class Program
 	{
+		public static string GetAppSettings()
+		{
+			return Environment.GetEnvironmentVariable("SENSATE_DASHBOARDAPI_APPSETTINGS") ?? "appsettings.json";
+		}
+
 		public static void Main(string[] args)
 		{
 			IWebHost wh;
@@ -39,7 +44,7 @@ namespace SensateService.DashboardApi.Application
 				.UseContentRoot(Directory.GetCurrentDirectory())
 				.ConfigureAppConfiguration((hostingContext, config) => {
 					if(hostingContext.HostingEnvironment.IsProduction())
-						config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+						config.AddJsonFile(GetAppSettings(), optional: false, reloadOnChange: true);
 					else
 						config.AddUserSecrets<Startup>();
 					config.AddEnvironmentVariables();
