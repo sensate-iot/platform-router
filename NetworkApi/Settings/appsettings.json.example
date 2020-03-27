@@ -17,39 +17,27 @@
     }
   },
 
-  "InstanceName": "kerby",
+  "InstanceName": "kerby-mqtt",
 
   "Cache" : {
     "Enabled": true,
-    "Type": "Distributed",
-    "Workers": 4,
-    "Interval": 1000
+    "Interval": 1000,
+    "Type": "Distributed"
   },
 
-  "Database": {
-    "MongoDB": {
+  "Database" : {
+    "MongoDB" : {
       "DatabaseName": "Sensate",
-      "ConnectionString": "mongodb://sensate:mongopass@127.0.0.1:27017/Sensate",
+      "ConnectionString": "mongodb://localhost:27017/Sensate",
       "MaxConnections": 300
     },
-    "PgSQL": {
-      "ConnectionString": "User ID = postgres;Password=DefaultPassword;Server=127.0.0.1;Port=5432;Database=Sensate"
+    "PgSQL" : {
+      "ConnectionString": "User ID = Username;Password=SomePassword;Server=localhost;Port=5432;Database=Sensate"
     },
-    "Redis": {
-      "Host": "127.0.0.1",
+    "Redis" : {
+      "Host": "localhost",
       "InstanceName": "Sensate"
     }
-  },
-
-  "PublicUrl": "http://localhost:5000", 
-
-  "Authentication" : {
-    "JwtRefreshExpireMinutes": 43200,
-    "JwtKey": "<key>",
-    "JwtIssuer": "http://localhost:5000/",
-    "JwtExpireMinutes": 43200,
-    "PrimaryAuthHost": false,
-	  "Scheme": "https"
   },
 
   "Mqtt": {
@@ -62,7 +50,7 @@
       "RealTimeShareTopic": "sensate/measurements/rt",
       "ShareTopic": "sensate/measurements",
       "BulkShareTopic": "sensate/measurements/bulk",
-      "ActuatorTopic": "sensate/actuator/$sensorId"
+      "MessageTopic":  "sensate/messages"
     },
     "InternalBroker": {
       "Username": "",
@@ -71,7 +59,8 @@
       "Port": 1883,
       "Host": "",
       "InternalMeasurementTopic": "sensate/internal/measurements",
-      "InternalBulkMeasurementTopic": "sensate/internal/measurements/bulk"
+      "InternalBulkMeasurementTopic": "sensate/internal/measurements/bulk",
+      "InternalMessageTopic": "sensate/internal/messages"
     } 
   }
 }

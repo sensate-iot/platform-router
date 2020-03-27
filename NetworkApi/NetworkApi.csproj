@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <AssemblyName>SensateService.NetworkApi</AssemblyName>
+    <AssemblyName>NetworkApi</AssemblyName>
     <RootNamespace>SensateService.NetworkApi</RootNamespace>
     <UserSecretsId>SensateService</UserSecretsId>
     <Version>0.4.2</Version>
