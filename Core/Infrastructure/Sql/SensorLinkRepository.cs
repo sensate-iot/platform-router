@@ -57,6 +57,10 @@ namespace SensateService.Infrastructure.Sql
 
 		public async Task<IEnumerable<SensorLink>> GetByUserAsync(SensateUser user, CancellationToken token = default)
 		{
+			if(user == null) {
+				return null;
+			}
+
 			var results = this.Data.Where(x => x.UserId == user.Id);
 			return await results.ToListAsync(token).AwaitBackground();
 		}
