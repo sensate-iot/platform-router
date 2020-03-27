@@ -6,23 +6,17 @@
  */
 
 using System;
-using System.Text;
 
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 
 using SensateService.ApiCore.Init;
 using SensateService.Config;
-using SensateService.Infrastructure.Sql;
 using SensateService.Init;
-using SensateService.Models;
 using SensateService.WebSocketHandler.Handlers;
 
 namespace SensateService.WebSocketHandler.Application
@@ -70,7 +64,6 @@ namespace SensateService.WebSocketHandler.Application
 			services.AddSqlRepositories(cache.Enabled);
 			services.AddMeasurementStorage(cache);
 			services.AddHashAlgorihms();
-
 			services.AddIdentityFramwork(auth);
 
 			services.AddInternalMqttService(options => {
