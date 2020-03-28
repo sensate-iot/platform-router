@@ -41,7 +41,7 @@ export class WebSocketClient {
         this.socket.onmessage = this.onMessage.bind(this);
         this.authorized = false;
         this.client = new SensorLinksClient(pool);
-        this.userId = null;
+        this.userId = "";
     }
 
     private async createLog() {
@@ -120,10 +120,16 @@ export class WebSocketClient {
         if (date.isBefore(moment().utc())) {
             this.socket.close();
             console.log(`Authorization request to late (ID: ${auth.sensorId})`);
+            return;
         }
 
         const hash = auth.sensorSecret;
         const sensor = await Sensor.findById(new Types.ObjectId(auth.sensorId));
+
+        if (sensor === null || sensor === undefined) {
+            return;
+        }
+
         auth.sensorSecret = sensor.Secret;
 
         const computed = createHash("sha256").update(JSON.stringify(auth)).digest("hex");
