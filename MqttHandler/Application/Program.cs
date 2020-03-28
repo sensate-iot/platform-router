@@ -60,7 +60,7 @@ namespace SensateService.MqttHandler.Application
 
 		public static void Main(string[] args)
 		{
-			Console.WriteLine($"Starting Sensate IoT MQTT client using {Version.VersionString}");
+			Console.WriteLine($"Starting MqttHandler using {Version.VersionString}");
 
 			var program = new Application(CreateHost(args));
 			program.Run();
