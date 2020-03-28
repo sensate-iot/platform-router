@@ -5,7 +5,7 @@
     <UserSecretsId>SensateService</UserSecretsId>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>SensateService.TriggerHandler</RootNamespace>
-    <Version>0.4.2</Version>
+    <Version>0.5.0</Version>
     <Company>Sensate IoT</Company>
     <Authors>Sensate IoT</Authors>
     <PackageLicenseFile>COPYING</PackageLicenseFile>

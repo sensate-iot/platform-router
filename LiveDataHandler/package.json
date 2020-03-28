@@ -1,6 +1,6 @@
 {
   "name": "live-data-handler",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "description": "LiveDataHandler",
   "main": "dist/src/live-data-handler.js",
   "scripts": {
