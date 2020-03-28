@@ -15,7 +15,7 @@ using Microsoft.Extensions.Configuration;
 using SensateService.Config;
 using SensateService.Infrastructure.Sql;
 
-namespace SensateService.SqlSetup
+namespace SensateService.SqlSetup.Application
 {
 	public class SensateSqlContextFactory : IDesignTimeDbContextFactory<SensateSqlContext>
 	{

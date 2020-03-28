@@ -3,7 +3,7 @@ using System;
 
 using Microsoft.EntityFrameworkCore;
 
-namespace SensateService.SqlSetup
+namespace SensateService.SqlSetup.Application
 {
 	public class Program
 	{
