@@ -157,6 +157,7 @@ namespace SensateService.AuthApi.Controllers
 			await this._tokens.InvalidateTokenAsync(token).AwaitBackground();
 
 			reply.RefreshToken = newToken.Value;
+			reply.JwtExpiresInMinutes = this._settings.JwtRefreshExpireMinutes;
 			reply.ExpiresInMinutes = this._settings.JwtRefreshExpireMinutes;
 			reply.JwtToken = this._tokens.GenerateJwtToken(user, roles, this._settings);
 
