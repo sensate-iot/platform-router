@@ -6,9 +6,9 @@
  */
 
 import { IMessageHandler } from "./imessagehandler";
-import { WebSocketServer } from "./websocketserver";
+import { WebSocketServer } from "../app/websocketserver";
 import { BulkMeasurementInfo } from "../models/measurement";
-import { toCamelCase } from "./util";
+import { toCamelCase } from "../app/util";
 import * as gzip from "zlib";
 
 export class BulkMessageHandler implements IMessageHandler {

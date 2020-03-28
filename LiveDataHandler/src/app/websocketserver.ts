@@ -73,6 +73,7 @@ export class WebSocketServer {
             socket,
             this.pool);
         const hdr = request.headers["authorization"];
+        console.log(`New client connection from ${request.connection.remoteAddress}!`);
 
         if (hdr !== null && hdr !== undefined) {
             const split = hdr.split(" ");

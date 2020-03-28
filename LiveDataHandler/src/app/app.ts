@@ -7,7 +7,7 @@
 
 import { MqttClient } from "../clients/mqttclient";
 import { Settings } from "../models/settings";
-import settings from "../settings/appsettings.json";
+import settings from "../../settings/appsettings.json";
 import * as mongodb from "./mongodb";
 import { WebSocketServer } from "./websocketserver";
 import { Express } from "express";
