@@ -6,9 +6,9 @@
  */
 
 import { IMessageHandler } from "./imessagehandler";
-import { WebSocketServer } from "./websocketserver";
+import { WebSocketServer } from "../app/websocketserver";
 import { MeasurementInfo, BulkMeasurementInfo } from "../models/measurement";
-import { toCamelCase } from "./util";
+import { toCamelCase } from "../app/util";
 
 export class MessageHandler implements IMessageHandler {
     public constructor(private readonly wss: WebSocketServer, private readonly topic: string) {

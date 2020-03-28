@@ -7,7 +7,7 @@
 
 import { IClientOptions, Client, connect } from "mqtt";
 import { Guid } from "../app/guid";
-import { IMessageHandler } from "../app/imessagehandler";
+import { IMessageHandler } from "../handlers/imessagehandler";
 
 export class MqttClient {
     private client: Client;

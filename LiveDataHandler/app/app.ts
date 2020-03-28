@@ -17,8 +17,8 @@ import { connect } from "./postgresql";
 import express from "express";
 import cors from "cors";
 import "./jsonmodule";
-import { MessageHandler } from "./messagehandler";
-import { BulkMessageHandler } from "./bulkmessagehandler";
+import { MessageHandler } from "../handlers/messagehandler";
+import { BulkMessageHandler } from "../handlers/bulkmessagehandler";
 
 class Application {
     private readonly client: MqttClient;

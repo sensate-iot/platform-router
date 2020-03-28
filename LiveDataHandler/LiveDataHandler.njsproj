@@ -40,15 +40,15 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="tsconfig.json" />
-    <TypeScriptCompile Include="app\bulkmessagehandler.ts">
+    <TypeScriptCompile Include="handlers\bulkmessagehandler.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="app\guid.ts" />
-    <TypeScriptCompile Include="app\imessagehandler.ts">
+    <TypeScriptCompile Include="handlers\imessagehandler.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="app\live-data-handler.ts" />
-    <TypeScriptCompile Include="app\messagehandler.ts">
+    <TypeScriptCompile Include="handlers\messagehandler.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="app\postgresql.ts">
@@ -89,6 +89,7 @@
   <ItemGroup>
     <Folder Include="app\" />
     <Folder Include="models\" />
+    <Folder Include="handlers\" />
     <Folder Include="settings\" />
     <Folder Include="clients\" />
   </ItemGroup>
