@@ -5,15 +5,17 @@
  * @email  michel.megens@sonatolabs.com
  */
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.Extensions.Logging;
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
+using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models.Json.In;
@@ -26,8 +28,11 @@ namespace SensateService.AuthApi.Controllers
 	[Route("auth/v1/[controller]")]
 	public class AdminController : AbstractController
 	{
-		public AdminController(IUserRepository users, IHttpContextAccessor ctx) : base(users, ctx)
+		private readonly ILogger<AdminController> m_logger;
+
+		public AdminController(IUserRepository users, IHttpContextAccessor ctx, ILogger<AdminController> logger) : base(users, ctx)
 		{
+			this.m_logger = logger;
 		}
 
 		[HttpPost("find-users")]
@@ -61,25 +66,39 @@ namespace SensateService.AuthApi.Controllers
 		}
 
 		[HttpGet("users")]
-		[ProducesResponseType(typeof(List<User>), 200)]
-		public async Task<IActionResult> GetMostRecentUsers()
+		[ProducesResponseType(typeof(PaginationResult<User>), 200)]
+		public async Task<IActionResult> GetMostRecentUsers(int skip = 0, int limit = 10)
 		{
 			List<User> users;
+			var rv = new PaginationResult<User>();
 
-			var userWorker = this._users.GetMostRecentAsync(10);
-			var query = await userWorker.AwaitBackground();
+			try {
+				var userWorker = this._users.GetMostRecentAsync(skip, limit);
+				var query = await userWorker.AwaitBackground();
 
-			users = query.Select(user => new User {
-				Email = user.Email,
-				FirstName = user.FirstName,
-				LastName = user.LastName,
-				PhoneNumber = user.PhoneNumber,
-				Id = user.Id,
-				RegisteredAt = user.RegisteredAt.ToUniversalTime(),
-				Roles = this._users.GetRoles(user)
-			}).ToList();
+				users = query.Values.Select(user => new User {
+					Email = user.Email,
+					FirstName = user.FirstName,
+					LastName = user.LastName,
+					PhoneNumber = user.PhoneNumber,
+					Id = user.Id,
+					RegisteredAt = user.RegisteredAt.ToUniversalTime(),
+					Roles = this._users.GetRoles(user)
+				}).ToList();
 
-			return this.Ok(users);
+				rv.Values = users;
+				rv.Count = query.Count;
+			} catch(Exception ex) {
+				this.m_logger.LogInformation(ex, "Unable to fetch recent users!");
+
+				return this.BadRequest(new Status {
+					Message = "Unable to fetch recent users!",
+					ErrorCode = ReplyCode.UnknownError
+				});
+			}
+
+
+			return this.Ok(rv);
 		}
 	}
 }

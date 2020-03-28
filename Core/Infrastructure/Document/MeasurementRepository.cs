@@ -75,19 +75,19 @@ namespace SensateService.Infrastructure.Document
 			}
 		}
 
-		public virtual async Task DeleteBySensorAsync(Sensor sensor)
+		public virtual async Task DeleteBySensorAsync(Sensor sensor, CancellationToken ct = default)
 		{
 			try {
 				FilterDefinition<MeasurementBucket> fd;
 
 				fd = Builders<MeasurementBucket>.Filter.Eq(x => x.SensorId, sensor.InternalId);
-				await this._collection.DeleteManyAsync(fd).AwaitBackground();
+				await this._collection.DeleteManyAsync(fd, ct).AwaitBackground();
 			} catch(Exception ex) {
 				this._logger.LogWarning(ex.Message);
 			}
 		}
 
-		public virtual async Task DeleteBetweenAsync(Sensor sensor, DateTime start, DateTime end)
+		public virtual async Task DeleteBetweenAsync(Sensor sensor, DateTime start, DateTime end, CancellationToken ct = default)
 		{
 			try {
 				var builder = Builders<MeasurementBucket>.Filter;
@@ -97,7 +97,7 @@ namespace SensateService.Infrastructure.Document
 											   x => x.Timestamp <= end) &
 							 builder.Eq(x => x.SensorId, sensor.InternalId);
 
-				await this._collection.DeleteManyAsync(filter).AwaitBackground();
+				await this._collection.DeleteManyAsync(filter, ct).AwaitBackground();
 			} catch(Exception ex) {
 				this._logger.LogInformation($"Unable to delete measurements: {ex.Message}");
 				this._logger.LogDebug(ex.StackTrace);

@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Hosting;
@@ -47,6 +48,7 @@ namespace SensateService.AuthApi.Controllers
 		private readonly IChangeEmailTokenRepository _email_tokens;
 		private readonly IWebHostEnvironment _env;
 		private readonly IUserTokenRepository _tokens;
+		private readonly IUserService m_userService;
 		private readonly ITextSendService _text;
 		private readonly IChangePhoneNumberTokenRepository _phonetokens;
 		private readonly TextServiceSettings _text_settings;
@@ -62,12 +64,14 @@ namespace SensateService.AuthApi.Controllers
 			IChangePhoneNumberTokenRepository phoneTokens,
 			IUserTokenRepository tokenRepository,
 			ITextSendService text,
+			IUserService userService,
 			IOptions<TextServiceSettings> text_opts,
 			IWebHostEnvironment env,
 			IHttpContextAccessor ctx,
 			ILogger<AccountsController> logger
 		) : base(repo, ctx)
 		{
+			this.m_userService = userService;
 			this._logger = logger;
 			this._manager = userManager;
 			this._mailer = emailer;
@@ -511,7 +515,7 @@ namespace SensateService.AuthApi.Controllers
 			phonetoken = await this._phonetokens.GetLatest(user);
 			var tmo = phonetoken.Timestamp.AddMinutes(PhoneTokenTimeout);
 
-			if(DateTime.Now > tmo) {
+			if(DateTime.UtcNow > tmo) {
 				await this.SendConfirmPhoneAsync(user, phonetoken.PhoneNumber).AwaitBackground();
 				return this.BadRequest(new Status {
 					Message = "Phone number expired!",
@@ -622,11 +626,33 @@ namespace SensateService.AuthApi.Controllers
 			return this.Ok();
 		}
 
+		[HttpDelete]
+		[NormalUser]
+		[ProducesResponseType(201)]
+		[ProducesResponseType(typeof(Status), 422)]
+		[ProducesResponseType(typeof(Status), 401)]
+		public async Task<IActionResult> DeleteUser()
+		{
+			try {
+				var user = await this.GetCurrentUserAsync().AwaitBackground();
+				await this.m_userService.DeleteAsync(user, CancellationToken.None).AwaitBackground();
+			} catch(Exception ex) {
+				this._logger.LogInformation($"Unable to delete user: {ex.Message}");
+				this._logger.LogDebug(ex.StackTrace);
+
+				return this.BadRequest(new Status {
+					ErrorCode = ReplyCode.UnknownError,
+					Message = "Unable to delete user!"
+				});
+			}
+
+			return this.NoContent();
+		}
+
 		[ValidateModel]
 		[NormalUser]
 		[HttpPatch("update")]
 		[ProducesResponseType(typeof(Status), 400)]
-		[ProducesResponseType(404)]
 		[ProducesResponseType(200)]
 		public async Task<IActionResult> UpdateUser([FromBody] UpdateUser userUpdate)
 		{

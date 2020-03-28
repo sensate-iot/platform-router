@@ -42,8 +42,9 @@ namespace SensateService.Infrastructure.Sql
 		{
 			var obj = await this._cache.GetAsync(id, ct).AwaitBackground();
 
-			if(obj == null)
+			if(obj == null) {
 				return null;
+			}
 
 			return JsonConvert.DeserializeObject<SensateUser>(obj);
 		}
@@ -110,7 +111,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public override async Task<IEnumerable<SensateUser>> GetAllAsync(int skip = 0, int limit = 0, CancellationToken ct = default)
 		{
-			var key = $"all_users::{skip}{limit}";
+			var key = $"all_users::{skip}::{limit}";
 			var obj = await this._cache.GetAsync(key, ct).AwaitBackground();
 
 			if(obj != null) {
@@ -126,10 +127,11 @@ namespace SensateService.Infrastructure.Sql
 
 		public override async Task DeleteAsync(string id, CancellationToken ct = default)
 		{
-			var workers = new Task[2];
+			var workers = new Task[3];
 
 			workers[0] = this._cache.RemoveAsync(id);
-			workers[1] = base.DeleteAsync(id, ct);
+			workers[1] = this._cache.RemoveAsync($"all_users::0::0");
+			workers[2] = base.DeleteAsync(id, ct);
 			await Task.WhenAll(workers);
 		}
 

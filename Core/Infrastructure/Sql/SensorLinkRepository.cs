@@ -41,7 +41,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public async Task<IEnumerable<SensorLink>> GetAsync(string userId, string sensorId, CancellationToken ct = default)
 		{
-			var links = this.Data.Where(link => link.SensorId == sensorId || link.UserId == userId);
+			var links = this.Data.Where(link => link.SensorId == sensorId && link.UserId == userId);
 			var rv = await links.ToListAsync(ct).AwaitBackground();
 
 			return rv;
@@ -57,8 +57,29 @@ namespace SensateService.Infrastructure.Sql
 
 		public async Task<IEnumerable<SensorLink>> GetByUserAsync(SensateUser user, CancellationToken token = default)
 		{
+			if(user == null) {
+				return null;
+			}
+
 			var results = this.Data.Where(x => x.UserId == user.Id);
 			return await results.ToListAsync(token).AwaitBackground();
+		}
+
+		public async Task DeleteBySensorAsync(Sensor sensor, CancellationToken ct = default)
+		{
+			var id = sensor.InternalId.ToString();
+			var query = this.Data.Where(x => x.SensorId == id);
+
+			this.Data.RemoveRange(query);
+			await this.CommitAsync(ct).AwaitBackground();
+		}
+
+		public async Task DeleteByUserAsync(SensateUser user, CancellationToken ct = default)
+		{
+			var query = this.Data.Where(x => x.UserId == user.Id);
+
+			this.Data.RemoveRange(query);
+			await this.CommitAsync(ct).AwaitBackground();
 		}
 	}
 }

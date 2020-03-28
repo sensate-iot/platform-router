@@ -55,6 +55,11 @@ namespace SensateService.Infrastructure.Sql
 			}
 
 			rv.Values = await query.ToListAsync().AwaitBackground();
+
+			foreach(var log in rv.Values) {
+				log.Timestamp = DateTime.SpecifyKind(log.Timestamp, DateTimeKind.Utc);
+			}
+
 			return rv;
 		}
 
@@ -101,6 +106,11 @@ namespace SensateService.Infrastructure.Sql
 			}
 
 			rv.Values = await logs.ToListAsync().AwaitBackground();
+
+			foreach(var log in rv.Values) {
+				log.Timestamp = DateTime.SpecifyKind(log.Timestamp, DateTimeKind.Utc);
+			}
+
 			return rv;
 		}
 
@@ -117,6 +127,11 @@ namespace SensateService.Infrastructure.Sql
 			}
 
 			var result = await query.ToListAsync().AwaitBackground();
+
+			foreach(var log in result) {
+				log.Timestamp = DateTime.SpecifyKind(log.Timestamp, DateTimeKind.Utc);
+			}
+
 			return result;
 		}
 
@@ -129,7 +144,7 @@ namespace SensateService.Infrastructure.Sql
 				Route = route,
 				Method = method,
 				Address = address,
-				Timestamp = DateTime.Now,
+				Timestamp = DateTime.UtcNow,
 			};
 
 			await this.CreateAsync(al).AwaitBackground();
@@ -192,6 +207,11 @@ namespace SensateService.Infrastructure.Sql
 			}
 
 			var rv = await data.ToListAsync().AwaitBackground();
+
+			foreach(var log in result) {
+				log.Timestamp = DateTime.SpecifyKind(log.Timestamp, DateTimeKind.Utc);
+			}
+
 			return rv;
 		}
 
@@ -218,6 +238,11 @@ namespace SensateService.Infrastructure.Sql
 			}
 
 			rv.Values = await data.ToListAsync().AwaitBackground();
+
+			foreach(var log in rv.Values) {
+				log.Timestamp = DateTime.SpecifyKind(log.Timestamp, DateTimeKind.Utc);
+			}
+
 			return rv;
 		}
 
@@ -226,14 +251,20 @@ namespace SensateService.Infrastructure.Sql
 			var data = this.Data.Where(expr);
 			var result = await data.ToListAsync().AwaitBackground();
 
+			foreach(var log in result) {
+				log.Timestamp = DateTime.SpecifyKind(log.Timestamp, DateTimeKind.Utc);
+			}
+
 			return result;
 		}
 
-		public Task<AuditLog> GetAsync(long id)
+		public async Task<AuditLog> GetAsync(long id)
 		{
 			var data = this.Data.Where(x => x.Id == id);
+			var log = await data.FirstOrDefaultAsync().AwaitBackground();
 
-			return data.FirstOrDefaultAsync();
+			log.Timestamp = DateTime.SpecifyKind(log.Timestamp, DateTimeKind.Utc);
+			return log;
 		}
 
 		public async Task<PaginationResult<AuditLog>> GetAllAsync(RequestMethod method, int skip = 0, int limit = 0)
@@ -258,6 +289,11 @@ namespace SensateService.Infrastructure.Sql
 			}
 
 			rv.Values = await result.ToListAsync().AwaitBackground();
+
+			foreach(var log in rv.Values) {
+				log.Timestamp = DateTime.SpecifyKind(log.Timestamp, DateTimeKind.Utc);
+			}
+
 			return rv;
 		}
 
@@ -281,6 +317,11 @@ namespace SensateService.Infrastructure.Sql
 			}
 
 			var result = await data.ToListAsync().AwaitBackground();
+
+			foreach(var log in result) {
+				log.Timestamp = DateTime.SpecifyKind(log.Timestamp, DateTimeKind.Utc);
+			}
+
 			return result;
 		}
 
@@ -303,6 +344,11 @@ namespace SensateService.Infrastructure.Sql
 			}
 
 			var result = await data.ToListAsync().AwaitBackground();
+
+			foreach(var log in result) {
+				log.Timestamp = DateTime.SpecifyKind(log.Timestamp, DateTimeKind.Utc);
+			}
+
 			return result;
 		}
 
@@ -331,6 +377,10 @@ namespace SensateService.Infrastructure.Sql
 			}
 
 			rv.Values = await data.ToListAsync().AwaitBackground();
+
+			foreach(var log in rv.Values) {
+				log.Timestamp = DateTime.SpecifyKind(log.Timestamp, DateTimeKind.Utc);
+			}
 
 			return rv;
 		}

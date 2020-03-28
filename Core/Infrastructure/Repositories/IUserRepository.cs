@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading;
 using SensateService.Models;
+using SensateService.Models.Json.Out;
 
 namespace SensateService.Infrastructure.Repositories
 {
@@ -38,7 +39,7 @@ namespace SensateService.Infrastructure.Repositories
 		Task<int> CountAsync();
 		Task<List<Tuple<DateTime, int>>> CountByDay(DateTime start);
 
-		Task<List<SensateUser>> GetMostRecentAsync(int number);
+		Task<PaginationResult<SensateUser>> GetMostRecentAsync(int skip = 0, int limit = 0, CancellationToken ct = default);
 
 		Task<bool> IsBanned(SensateUser user);
 		Task<bool> IsAdministrator(SensateUser user);

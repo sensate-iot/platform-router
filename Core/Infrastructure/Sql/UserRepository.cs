@@ -13,10 +13,11 @@ using System.Security.Claims;
 using System.Threading;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using SensateService.Constants;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
+using SensateService.Models.Json.Out;
+using UserRoles = SensateService.Constants.UserRoles;
 
 namespace SensateService.Infrastructure.Sql
 {
@@ -35,8 +36,9 @@ namespace SensateService.Infrastructure.Sql
 		{
 			var user = await this._manager.FindByIdAsync(id).AwaitBackground();
 
-			if(ct.IsCancellationRequested)
+			if(ct.IsCancellationRequested) {
 				throw new OperationCanceledException();
+			}
 
 			await this._manager.DeleteAsync(user).AwaitBackground();
 		}
@@ -164,12 +166,30 @@ namespace SensateService.Infrastructure.Sql
 			return await query.ToListAsync().AwaitBackground();
 		}
 
-		public async Task<List<SensateUser>> GetMostRecentAsync(int number)
+		public async Task<PaginationResult<SensateUser>> GetMostRecentAsync(int skip = 0, int limit = 0, CancellationToken ct = default)
 		{
-			var query = this.Data.OrderByDescending(x => x.RegisteredAt);
-			var ordered = query.Take(number);
+			var query = this.Data.OrderByDescending(x => x.RegisteredAt).AsQueryable();
 
-			return await ordered.ToListAsync().AwaitBackground();
+			var count = await query.CountAsync(ct).AwaitBackground();
+
+			if(skip > 0) {
+				query = query.Skip(skip);
+			}
+
+			if(limit > 0) {
+				query = query.Take(limit);
+			}
+
+			var result = await query.ToListAsync(ct).AwaitBackground();
+
+			foreach(var value in result) {
+				value.RegisteredAt = DateTime.SpecifyKind(value.RegisteredAt, DateTimeKind.Utc);
+			}
+
+			return new PaginationResult<SensateUser> {
+				Count = count,
+				Values = result
+			};
 		}
 
 		public async Task<bool> IsBanned(SensateUser user)
@@ -177,8 +197,9 @@ namespace SensateService.Infrastructure.Sql
 			var raw = await this.GetRolesAsync(user).AwaitBackground();
 			var roles = raw.ToArray();
 
-			if(roles.Length == 0)
+			if(roles.Length == 0) {
 				return true;
+			}
 
 			return this.IsInRole(roles, UserRoles.Banned);
 		}

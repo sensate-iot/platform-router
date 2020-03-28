@@ -57,6 +57,12 @@ namespace SensateService.Init
 			return services;
 		}
 
+		public static IServiceCollection AddUserService(this IServiceCollection services)
+		{
+			services.AddScoped<IUserService, UserService>();
+			return services;
+		}
+
 		public static IServiceCollection AddDocumentRepositories(this IServiceCollection services, bool cache)
 		{
 			BsonSerializer.RegisterSerializer(typeof(DateTime), new BsonUtcDateTimeSerializer());

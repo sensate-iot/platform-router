@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+
 using Microsoft.OpenApi.Models;
 
 using SensateService.ApiCore.Init;
@@ -57,10 +58,6 @@ namespace SensateService.AuthApi.Application
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.AddIdentityFramwork(auth);
 
-			/*
-			 * Setup user authentication
-			 */
-
 			if(cache.Enabled) {
 				services.AddCacheStrategy(cache, db);
 			}
@@ -68,6 +65,8 @@ namespace SensateService.AuthApi.Application
 			/* Add repositories */
 			services.AddSqlRepositories(cache.Enabled);
 			services.AddDocumentRepositories(cache.Enabled);
+			services.AddSensorServices();
+			services.AddUserService();
 
 			if(mail.Provider == "SendGrid") {
 				services.AddSingleton<IEmailSender, SendGridMailer>();
@@ -95,6 +94,7 @@ namespace SensateService.AuthApi.Application
 			} else {
 				Console.WriteLine("Text message provider not configured!");
 			}
+
 
 			services.AddSwaggerGen(c => {
 				c.SwaggerDoc("v1", new OpenApiInfo {
@@ -134,8 +134,9 @@ namespace SensateService.AuthApi.Application
 
 			services.AddLogging((logging) => {
 				logging.AddConsole();
-				if(this._env.IsDevelopment())
+				if(this._env.IsDevelopment()) {
 					logging.AddDebug();
+				}
 			});
 		}
 

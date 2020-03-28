@@ -15,5 +15,6 @@ namespace SensateService.Config
 		public string JwtIssuer { get; set; }
 		public string PublicUrl { get; set; }
 		public string Scheme { get; set; }
+		public bool PrimaryAuthHost { get; set; }
 	}
 }

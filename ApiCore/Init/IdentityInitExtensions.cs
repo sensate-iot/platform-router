@@ -9,6 +9,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -39,6 +40,14 @@ namespace SensateService.ApiCore.Init
 			.AddDefaultTokenProviders();
 
 			JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
+
+			if(auth.PrimaryAuthHost) {
+				services.AddDataProtection().PersistKeysToDbContext<SensateSqlContext>();
+			} else {
+				services.AddDataProtection()
+					.PersistKeysToDbContext<SensateSqlContext>()
+					.DisableAutomaticKeyGeneration();
+			}
 
 			services.Configure<IdentityOptions>(options => {
 				options.Password.RequireDigit = true;

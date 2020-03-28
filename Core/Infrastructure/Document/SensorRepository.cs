@@ -152,13 +152,25 @@ namespace SensateService.Infrastructure.Document
 			return await this._sensors.CountDocumentsAsync(filter).AwaitBackground();
 		}
 
-		public virtual async Task RemoveAsync(Sensor sensor)
+		public async Task DeleteAsync(SensateUser user, CancellationToken ct = default)
+		{
+			if(user == null) {
+				return;
+			}
+
+			var builder = Builders<Sensor>.Filter;
+			var filter = builder.Eq(x => x.Owner, user.Id);
+
+			await this._sensors.DeleteManyAsync(filter, ct).AwaitBackground();
+		}
+
+		public virtual async Task DeleteAsync(Sensor sensor, CancellationToken ct = default)
 		{
 			if(sensor == null) {
 				return;
 			}
 
-			await this._sensors.DeleteOneAsync(x => x.InternalId == sensor.InternalId).AwaitBackground();
+			await this._sensors.DeleteOneAsync(x => x.InternalId == sensor.InternalId, ct).AwaitBackground();
 		}
 
 		public virtual async Task UpdateSecretAsync(Sensor sensor, SensateApiKey key)

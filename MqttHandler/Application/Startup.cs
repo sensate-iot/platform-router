@@ -7,6 +7,7 @@
 
 using System;
 
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -47,25 +48,27 @@ namespace SensateService.MqttHandler.Application
 			var db = new DatabaseConfig();
 			var cache = new CacheConfig();
 
-			Configuration.GetSection("Mqtt").Bind(mqtt);
-			Configuration.GetSection("Database").Bind(db);
-			Configuration.GetSection("Cache").Bind(cache);
+			this.Configuration.GetSection("Mqtt").Bind(mqtt);
+			this.Configuration.GetSection("Database").Bind(db);
+			this.Configuration.GetSection("Cache").Bind(cache);
 
 			var publicmqtt = mqtt.PublicBroker;
 			var privatemqtt = mqtt.InternalBroker;
 
 			services.AddPostgres(db.PgSQL.ConnectionString);
 
-			services.AddIdentity<SensateUser, SensateRole>(config => {
-				config.SignIn.RequireConfirmedEmail = true;
-			})
-			.AddEntityFrameworkStores<SensateSqlContext>()
-			.AddDefaultTokenProviders();
+			services.AddIdentity<SensateUser, SensateRole>()
+				.AddEntityFrameworkStores<SensateSqlContext>()
+				.AddDefaultTokenProviders();
+			services.AddDataProtection()
+				.PersistKeysToDbContext<SensateSqlContext>()
+				.DisableAutomaticKeyGeneration();
 
 			services.AddLogging(builder => { builder.AddConfiguration(this.Configuration.GetSection("Logging")); });
 
-			if(cache.Enabled)
+			if(cache.Enabled) {
 				services.AddCacheStrategy(cache, db);
+			}
 
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.AddDocumentRepositories(cache.Enabled);
@@ -99,9 +102,11 @@ namespace SensateService.MqttHandler.Application
 
 			services.AddLogging(builder => {
 				builder.AddConfiguration(Configuration.GetSection("Logging"));
+
 				if(IsDevelopment()) {
 					builder.AddDebug();
 				}
+
 				builder.AddConsole();
 			});
 		}
@@ -111,8 +116,8 @@ namespace SensateService.MqttHandler.Application
 			var mqtt = new MqttConfig();
 			var cache = new CacheConfig();
 
-			Configuration.GetSection("Mqtt").Bind(mqtt);
-			Configuration.GetSection("Cache").Bind(cache);
+			this.Configuration.GetSection("Mqtt").Bind(mqtt);
+			this.Configuration.GetSection("Cache").Bind(cache);
 			var @public = mqtt.PublicBroker;
 
 			provider.MapMqttTopic<MqttRealTimeMeasurementHandler>(@public.RealTimeShareTopic);

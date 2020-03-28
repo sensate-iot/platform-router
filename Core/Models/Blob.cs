@@ -5,8 +5,12 @@
  * @email  michel@michelmegens.net
  */
 
+using System;
 using System.ComponentModel.DataAnnotations;
+
 using Newtonsoft.Json;
+
+using SensateService.Converters;
 
 namespace SensateService.Models
 {
@@ -29,5 +33,7 @@ namespace SensateService.Models
 		public string Path { get; set; }
 		[Required, JsonIgnore]
 		public StorageType StorageType { get; set; }
+		[Required]
+		public DateTime Timestamp { get; set; }
 	}
 }

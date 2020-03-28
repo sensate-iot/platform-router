@@ -87,8 +87,9 @@ namespace SensateService.Infrastructure.Sql
 		{
 			var entity = await this.Data.Where(t => t.Id == id).FirstOrDefaultAsync(ct).AwaitBackground();
 
-			if(entity == null)
+			if(entity == null) {
 				return;
+			}
 
 			this.Data.Remove(entity);
 			await this.CommitAsync(ct).AwaitBackground();

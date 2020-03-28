@@ -47,6 +47,7 @@
     "JwtKey": "<key>",
     "JwtIssuer": "http://localhost:5000/",
     "JwtExpireMinutes": 43200,
+    "PrimaryAuthHost": true,
     "Scheme": "https"
   },
 

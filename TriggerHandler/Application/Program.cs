@@ -7,6 +7,7 @@
 
 using System;
 using System.IO;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -15,6 +16,11 @@ namespace SensateService.TriggerHandler.Application
 {
 	public class Program
 	{
+		public static string GetAppSettings()
+		{
+			return Environment.GetEnvironmentVariable("SENSATE_TRIGGERHANDLER_APPSETTINGS") ?? "appsettings.json";
+		}
+
 		public static IHost CreateHost(string[] args)
 		{
 			Startup starter = null;
@@ -23,7 +29,7 @@ namespace SensateService.TriggerHandler.Application
 				.UseContentRoot(Directory.GetCurrentDirectory())
 				.ConfigureAppConfiguration((hostingContext, config) => {
 					if(hostingContext.HostingEnvironment.IsProduction())
-						config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+						config.AddJsonFile(GetAppSettings(), optional: false, reloadOnChange: true);
 					else
 						config.AddUserSecrets<Startup>();
 					config.AddEnvironmentVariables();
@@ -54,7 +60,7 @@ namespace SensateService.TriggerHandler.Application
 		{
 			Console.WriteLine($"Starting Sensate MQTT client using {Version.VersionString}");
 
-			var program = new TriggerHandler.Application.Application(CreateHost(args));
+			var program = new Application(CreateHost(args));
 			program.Run();
 		}
 	}

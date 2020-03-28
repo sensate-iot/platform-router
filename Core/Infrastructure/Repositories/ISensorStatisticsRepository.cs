@@ -30,9 +30,7 @@ namespace SensateService.Infrastructure.Repositories
 		Task<IEnumerable<SensorStatisticsEntry>> GetBetweenAsync(IEnumerable<Sensor> sensors, DateTime start, DateTime end);
 		Task<IEnumerable<SensorStatisticsEntry>> GetAsync(Expression<Func<SensorStatisticsEntry, bool>> expr);
 
-		void Delete(string id);
-		Task DeleteAsync(string id);
-		Task DeleteBySensorAsync(Sensor sensor);
-		Task DeleteBySensorAsync(Sensor sensor, DateTime from, DateTime to);
+		Task DeleteBySensorAsync(Sensor sensor, CancellationToken ct = default);
+		Task DeleteBySensorAsync(Sensor sensor, DateTime from, DateTime to, CancellationToken ct = default);
 	}
 }

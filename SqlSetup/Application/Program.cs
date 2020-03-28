@@ -19,7 +19,7 @@ namespace SensateService.SqlSetup.Application
 
 		public static bool IsDevelopment()
 		{
-			var env = Environment.GetEnvironmentVariable("NETCORE_ENVIRONMENT") ?? "Development";
+			var env = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "Development";
 			return env == "Development";
 		}
 	}
