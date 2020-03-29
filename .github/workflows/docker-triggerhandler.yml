@@ -1,0 +1,46 @@
+name: Docker
+
+on:
+  push:
+      # Publish `master` as Docker `latest` image.
+      branches:
+        - master
+        - develop
+      # Publish `v1.2.3` tags as releases.
+      tags:
+        - v*
+env:
+  IMAGE_NAME: triggerhandler
+  IMAGE_ID: sensateiot/triggerhandler
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+jobs:
+  push-triggerhandler:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build image
+        run: |
+          docker build . --file TriggerHandler/Dockerfile --tag $IMAGE_NAME
+
+      - name: Log into registry
+        run: echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin
+
+      - name: Push image
+        run: |
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^//')
+          
+          [ "$VERSION" == "master" ] && VERSION=latest
+          [ "$VERSION" == "develop" ] && VERSION=staging
+          
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
