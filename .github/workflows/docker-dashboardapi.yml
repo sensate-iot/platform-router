@@ -10,13 +10,13 @@ on:
       tags:
         - v*
 env:
-  IMAGE_NAME: auth-api
-  IMAGE_ID: sensateiot/auth-api
+  IMAGE_NAME: dashboard-api
+  IMAGE_ID: sensateiot/dashboard-api
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
 jobs:
-  push-auth-api:
+  push-dashboard-api:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,7 +24,7 @@ jobs:
 
       - name: Build image
         run: |
-          docker build . --file AuthApi/Dockerfile --tag $IMAGE_NAME
+          docker build . --file DashboardApi/Dockerfile --tag $IMAGE_NAME
 
       - name: Log into registry
         run: echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin
