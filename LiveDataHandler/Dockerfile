@@ -25,7 +25,6 @@ COPY ./LiveDataHandler/package*.json ./
 RUN npm ci --quit --only=production
 
 COPY --from=builder /usr/src/app/dist ./live-data-handler
-RUN rm -rf ./live-data-handler/settings
 
 EXPOSE 5000
-CMD ["node", "live-data-handler/src/app/live-data-handler.js"]
+CMD ["node", "live-data-handler/app/live-data-handler.js"]
