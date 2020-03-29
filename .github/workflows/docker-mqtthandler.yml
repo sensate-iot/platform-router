@@ -5,6 +5,7 @@ on:
       # Publish `master` as Docker `latest` image.
       branches:
         - master
+        - develop
       # Publish `v1.2.3` tags as releases.
       tags:
         - v*
@@ -37,6 +38,7 @@ jobs:
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^//')
           
           [ "$VERSION" == "master" ] && VERSION=latest
+          [ "$VERSION" == "develop" ] && VERSION=staging
           
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
