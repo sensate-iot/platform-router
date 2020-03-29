@@ -24,7 +24,7 @@ ENV APP_PORT=5000
 COPY ./LiveDataHandler/package*.json ./
 RUN npm ci --quit --only=production
 
-COPY --from=builder /usr/src/app/dist/ ./dist/
+COPY --from=builder /usr/src/app/dist/ /app/dist/
 
 EXPOSE 5000
 CMD ["node", "dist/src/app/live-data-handler.js"]
