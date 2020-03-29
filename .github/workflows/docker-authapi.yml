@@ -5,17 +5,18 @@ on:
       # Publish `master` as Docker `latest` image.
       branches:
         - master
+        - develop
       # Publish `v1.2.3` tags as releases.
       tags:
         - v*
 env:
-  IMAGE_NAME: mqtthandler
-  IMAGE_ID: sensateiot/mqtthandler
+  IMAGE_NAME: auth-api
+  IMAGE_ID: sensateiot/auth-api
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
 jobs:
-  push-mqtthandler:
+  push-auth-api:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,7 +24,7 @@ jobs:
 
       - name: Build image
         run: |
-          docker build . --file MqttHandler/Dockerfile --tag $IMAGE_NAME
+          docker build . --file AuthApi/Dockerfile --tag $IMAGE_NAME
 
       - name: Log into registry
         run: echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin
