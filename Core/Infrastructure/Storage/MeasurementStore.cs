@@ -61,9 +61,7 @@ namespace SensateService.Infrastructure.Storage
 			if(user == null)
 				return;
 
-			var roles = await this._users.GetRolesAsync(user).AwaitBackground();
-
-			if(!base.CanInsert(roles) || !base.InsertAllowed(user, obj.CreatedBySecret))
+			if(!base.CanInsert(user) || !base.InsertAllowed(user, obj.CreatedBySecret))
 				return;
 
 			m = base.ProcessRawMeasurement(sensor, obj);

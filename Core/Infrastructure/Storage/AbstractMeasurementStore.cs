@@ -71,11 +71,6 @@ namespace SensateService.Infrastructure.Storage
 			return measurement;
 		}
 
-		protected bool CanInsert(IEnumerable<string> roles)
-		{
-			return !roles.Contains(SensateRole.Banned);
-		}
-
 		protected bool CanInsert(SensateUser user)
 		{
 			var banned = SensateRole.Banned.ToUpperInvariant();
@@ -86,8 +81,9 @@ namespace SensateService.Infrastructure.Storage
 		{
 			var apikey = user.ApiKeys.FirstOrDefault(k => k.ApiKey == key);
 
-			if(apikey == null)
+			if(apikey == null) {
 				return false;
+			}
 
 			return !apikey.Revoked && apikey.Type == ApiKeyType.SensorKey;
 		}
