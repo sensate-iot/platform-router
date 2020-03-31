@@ -63,7 +63,6 @@ namespace SensateService.WebSocketHandler.Application
 			services.AddDocumentRepositories(cache.Enabled);
 			services.AddSqlRepositories(cache.Enabled);
 			services.AddMeasurementStorage(cache);
-			services.AddHashAlgorihms();
 			services.AddIdentityFramwork(auth);
 
 			services.AddInternalMqttService(options => {

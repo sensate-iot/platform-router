@@ -66,7 +66,6 @@ namespace SensateService.NetworkApi.Application
 			services.AddDocumentRepositories(cache.Enabled);
 			services.AddMeasurementStorage(cache);
 			services.AddSensorServices();
-			services.AddHashAlgorihms();
 
 			services.AddMqttPublishService<MqttPublishService>(options => {
 				options.Ssl = publicmqtt.Ssl;

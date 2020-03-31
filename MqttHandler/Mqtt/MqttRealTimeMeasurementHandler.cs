@@ -6,19 +6,18 @@
  */
 
 using System;
-using System.IO;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+
 using Microsoft.Extensions.Options;
 
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Events;
 using SensateService.Infrastructure.Storage;
 using SensateService.Models;
+using SensateService.Models.Json.In;
 using SensateService.Services;
 using SensateService.Services.Settings;
 
@@ -29,18 +28,14 @@ namespace SensateService.MqttHandler.Mqtt
 		private readonly IMqttPublishService client;
 		private readonly InternalMqttServiceOptions mqttopts;
 		private readonly IMeasurementStore store;
-		private readonly ILogger<MqttRealTimeMeasurementHandler> m_Logger;
 
 		private bool disposed;
 
-		public MqttRealTimeMeasurementHandler(IMeasurementStore store,
-			ILogger<MqttRealTimeMeasurementHandler> logger,
-			IOptions<InternalMqttServiceOptions> options, IMqttPublishService client)
+		public MqttRealTimeMeasurementHandler(IMeasurementStore store, IOptions<InternalMqttServiceOptions> options, IMqttPublishService client)
 		{
 			this.client = client;
 			this.mqttopts = options.Value;
 			this.store = store;
-			this.m_Logger = logger;
 
 			MeasurementStore.MeasurementReceived += this.InternalMqttMeasurementPublish_Handler;
 #if DEBUG
@@ -55,7 +50,7 @@ namespace SensateService.MqttHandler.Mqtt
 			if(!(sender is Sensor sensor))
 				return Task.CompletedTask;
 
-			this.m_Logger.LogDebug($"Received measurement from {{{sensor.Name}}}:{{{sensor.InternalId}}}");
+			Console.WriteLine($"Received measurement from {{{sensor.Name}}}:{{{sensor.InternalId}}}");
 			return Task.CompletedTask;
 		}
 #endif
@@ -83,14 +78,21 @@ namespace SensateService.MqttHandler.Mqtt
 
 		public override async Task OnMessageAsync(string topic, string message)
 		{
-			if(this.disposed) {
+			RawMeasurement raw;
+
+			if(this.disposed)
 				throw new ObjectDisposedException("MeasurementHandler");
-			}
 
 			try {
-				await this.store.StoreAsync(message, RequestMethod.MqttTcp).AwaitBackground();
+				raw = JsonConvert.DeserializeObject<RawMeasurement>(message);
+
+				if(raw.CreatedById == null)
+					return;
+
+				await this.store.StoreAsync(raw, RequestMethod.MqttTcp).AwaitBackground();
 			} catch(Exception ex) {
-				this.m_Logger.LogInformation($"Error: {ex.Message}");
+				Console.WriteLine($"Error: {ex.Message}");
+				Console.WriteLine($"Received a buggy MQTT message: {message}");
 			}
 		}
 

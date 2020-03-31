@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using SensateService.Enums;
@@ -21,6 +22,7 @@ using SensateService.Exceptions;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Storage;
 using SensateService.Models.Generic;
+using SensateService.Models.Json.In;
 using SensateService.Services;
 using SensateService.Services.Settings;
 
@@ -38,13 +40,21 @@ namespace SensateService.WebSocketHandler.Handlers
 		public override async Task Receive(AuthenticatedWebSocket socket, WebSocketReceiveResult result, byte[] buffer)
 		{
 			string msg;
+			RawMeasurement raw;
+
+			msg = Encoding.UTF8.GetString(buffer, 0, result.Count);
 
 			try {
-				using var scope = this.provider.CreateScope();
-				var store = scope.ServiceProvider.GetRequiredService<IMeasurementStore>();
+				raw = JsonConvert.DeserializeObject<RawMeasurement>(msg);
 
-				msg = Encoding.UTF8.GetString(buffer, 0, result.Count);
-				await store.StoreAsync(msg, RequestMethod.WebSocket).AwaitBackground();
+				using(var scope = this.provider.CreateScope()) {
+					var store = scope.ServiceProvider.GetRequiredService<IMeasurementStore>();
+
+					if(raw.CreatedById == null)
+						return;
+
+					await store.StoreAsync(raw, RequestMethod.WebSocket).AwaitBackground();
+				}
 			} catch(InvalidRequestException ex) {
 				Debug.WriteLine($"Unable to store measurement: {ex.Message}");
 				dynamic jobj = new JObject();
