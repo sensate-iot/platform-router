@@ -26,4 +26,5 @@ COPY WebSocketHandler/Settings/hosting.json /app/hosting.json
 WORKDIR /app
 RUN apk add --no-cache libstdc++ libintl icu
 
+EXPOSE 5000 
 ENTRYPOINT ["bin/WebSocketHandler"]
