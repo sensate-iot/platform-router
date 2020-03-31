@@ -78,7 +78,8 @@ namespace SensateService.Infrastructure.Storage
 
 		protected bool CanInsert(SensateUser user)
 		{
-			return user.UserRoles.Any(role => role.Role.Name != SensateRole.Banned);
+			var banned = SensateRole.Banned.ToUpperInvariant();
+			return user.UserRoles.All(role => role.Role.NormalizedName != banned);
 		}
 
 		protected bool InsertAllowed(SensateUser user, string key)
