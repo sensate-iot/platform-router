@@ -43,7 +43,9 @@ namespace SensateService.NetworkApi.Application
 			var db = new DatabaseConfig();
 			var auth = new AuthenticationConfig();
 			var mqtt = new MqttConfig();
+			var sys = new SystemConfig();
 
+			this._configuration.GetSection("System").Bind(sys);
 			this._configuration.GetSection("Mqtt").Bind(mqtt);
 			this._configuration.GetSection("Authentication").Bind(auth);
 			this._configuration.GetSection("Cache").Bind(cache);
@@ -52,6 +54,7 @@ namespace SensateService.NetworkApi.Application
 			var publicmqtt = mqtt.PublicBroker;
 
 			services.AddCors();
+			services.AddReverseProxy(sys);
 
 			services.AddPostgres(db.PgSQL.ConnectionString);
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
@@ -128,6 +131,7 @@ namespace SensateService.NetworkApi.Application
 			this._configuration.GetSection("Authentication").Bind(auth);
 			this._configuration.GetSection("Cache").Bind(cache);
 
+			app.UseForwardedHeaders();
 			app.UseRouting();
 
 			app.UseCors(p => {
