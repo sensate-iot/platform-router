@@ -66,6 +66,7 @@ namespace SensateService.DataApi.Application
 			services.AddDocumentRepositories(cache.Enabled);
 			services.AddMeasurementStorage(cache);
 			services.AddSensorServices();
+			services.AddHashAlgorihms();
 
 			services.AddInternalMqttService(options => {
 				options.Ssl = privatemqtt.Ssl;

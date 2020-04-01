@@ -14,12 +14,14 @@ namespace SensateService.Models.Json.In
 {
 	public class RawMeasurement
 	{
-		public JContainer Data { private get; set; }
+		public const string CreatedBySecretKey = "CreatedBySecret";
+
+		public string CreatedById { get; set; }
+		public string CreatedBySecret { get; set; }
 		public double? Longitude { get; set; }
 		public double? Latitude { get; set; }
-		public Nullable<DateTime> CreatedAt { get; set; }
-		public string CreatedBySecret { get; set; }
-		public string CreatedById { get; set; }
+		public DateTime? CreatedAt { get; set; }
+		public JContainer Data { private get; set; }
 
 		public bool IsCreatedBy(Sensor sensor) => this.CreatedBySecret == sensor.Secret;
 

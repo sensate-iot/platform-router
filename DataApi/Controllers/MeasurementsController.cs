@@ -8,16 +8,17 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using DnsClient.Protocol;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 using MongoDB.Bson;
 using MongoDB.Driver.GeoJsonObjectModel;
-
+using Newtonsoft.Json.Linq;
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
 using SensateService.DataApi.Models;
@@ -27,7 +28,6 @@ using SensateService.Infrastructure.Repositories;
 using SensateService.Infrastructure.Storage;
 using SensateService.Models;
 using SensateService.Models.Generic;
-using SensateService.Models.Json.In;
 using SensateService.Models.Json.Out;
 using SensateService.Services;
 
@@ -58,8 +58,8 @@ namespace SensateService.DataApi.Controllers
 
 		[HttpPost("create")]
 		[ReadWriteApiKey]
-		[ProducesResponseType(200)]
-		public async Task<IActionResult> Create([FromBody] RawMeasurement raw)
+		[ProducesResponseType(typeof(Status), 202)]
+		public async Task<IActionResult> Create([FromBody] string raw)
 		{
 			var status = new Status();
 
@@ -77,8 +77,8 @@ namespace SensateService.DataApi.Controllers
 			status.ErrorCode = ReplyCode.Ok;
 			status.Message = "Measurement queued!";
 
-			await this.m_cache.StoreAsync(raw, RequestMethod.HttpPost).AwaitBackground();
-			return this.Ok(status);
+			await this.m_cache.StoreAsync(raw, RequestMethod.HttpPost);
+			return this.Accepted(status);
 		}
 
 		[HttpGet("{bucketId}/{index}")]

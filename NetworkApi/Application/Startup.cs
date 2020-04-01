@@ -64,7 +64,6 @@ namespace SensateService.NetworkApi.Application
 			/* Add repositories */
 			services.AddSqlRepositories(cache.Enabled);
 			services.AddDocumentRepositories(cache.Enabled);
-			services.AddMeasurementStorage(cache);
 			services.AddSensorServices();
 
 			services.AddMqttPublishService<MqttPublishService>(options => {

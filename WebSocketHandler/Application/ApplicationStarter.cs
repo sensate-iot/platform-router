@@ -64,6 +64,7 @@ namespace SensateService.WebSocketHandler.Application
 			services.AddSqlRepositories(cache.Enabled);
 			services.AddMeasurementStorage(cache);
 			services.AddIdentityFramwork(auth);
+			services.AddHashAlgorihms();
 
 			services.AddInternalMqttService(options => {
 				options.Ssl = mqtt.InternalBroker.Ssl;
