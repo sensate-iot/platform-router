@@ -25,8 +25,6 @@ namespace SensateService.Models
 		public IDictionary<string, DataPoint> Data { get; set; }
 		[BsonRequired]
 		public DateTime Timestamp { get; set; }
-		[BsonRequired]
-		public DateTime PlatformTime { get; set; }
 		[JsonConverter(typeof(GeoJsonPointJsonConverter))]
 		public GeoJsonPoint<GeoJson2DGeographicCoordinates> Location { get; set; }
 
