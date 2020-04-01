@@ -27,7 +27,10 @@
   },
   
   "AllowedHosts": "*",
-  "InstanceName": "kerby-ws",
+  "System": {
+    "ProxyLevel": 1,
+    "InstanceName": "kerby"
+  },
 
   "Cache" : {
     "Enabled": true,
