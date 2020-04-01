@@ -47,11 +47,13 @@ namespace SensateService.WebSocketHandler.Application
 			var db = new DatabaseConfig();
 			var cache = new CacheConfig();
 			var auth = new AuthenticationConfig();
+			var sys = new SystemConfig();
 
-			Configuration.GetSection("Mqtt").Bind(mqtt);
-			Configuration.GetSection("Database").Bind(db);
-			Configuration.GetSection("Authentication").Bind(auth);
-			Configuration.GetSection("Cache").Bind(cache);
+			this.Configuration.GetSection("System").Bind(sys);
+			this.Configuration.GetSection("Mqtt").Bind(mqtt);
+			this.Configuration.GetSection("Database").Bind(db);
+			this.Configuration.GetSection("Authentication").Bind(auth);
+			this.Configuration.GetSection("Cache").Bind(cache);
 
 			services.AddPostgres(db.PgSQL.ConnectionString);
 			services.AddLogging(builder => { builder.AddConfiguration(this.Configuration.GetSection("Logging")); });
@@ -64,6 +66,8 @@ namespace SensateService.WebSocketHandler.Application
 			services.AddSqlRepositories(cache.Enabled);
 			services.AddMeasurementStorage(cache);
 			services.AddIdentityFramwork(auth);
+			services.AddHashAlgorihms();
+			services.AddReverseProxy(sys);
 
 			services.AddInternalMqttService(options => {
 				options.Ssl = mqtt.InternalBroker.Ssl;
@@ -88,8 +92,9 @@ namespace SensateService.WebSocketHandler.Application
 			services.AddLogging((builder) => {
 				builder.AddConsole();
 
-				if(IsDevelopment())
+				if(IsDevelopment()) {
 					builder.AddDebug();
+				}
 			});
 		}
 
@@ -97,9 +102,11 @@ namespace SensateService.WebSocketHandler.Application
 		{
 			var cache = new CacheConfig();
 
+			app.UseForwardedHeaders();
 			app.UseRouting();
 			app.UseWebSockets();
-			Configuration.GetSection("Cache").Bind(cache);
+
+			this.Configuration.GetSection("Cache").Bind(cache);
 
 			app.MapWebSocketService("/measurement/rt", sp.GetService<RealTimeWebSocketMeasurementHandler>());
 			app.MapWebSocketService("/measurement", sp.GetService<WebSocketMeasurementHandler>());

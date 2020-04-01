@@ -17,13 +17,16 @@
     }
   },
 
-  "InstanceName": "kerby",
+  "System": {
+    "ProxyLevel": 1,
+    "InstanceName": "kerby"
+  },
 
-  "Cache" : {
+  "Cache": {
     "Enabled": true,
     "Type": "Distributed",
     "Workers": 4,
-    "Interval":  1000
+    "Interval": 1000
   },
 
   "Database": {
@@ -41,7 +44,7 @@
     }
   },
 
-  "Authentication" : {
+  "Authentication": {
     "PublicUrl": "localhost:4200/confirm",
     "JwtRefreshExpireMinutes": 43200,
     "JwtKey": "<key>",
@@ -70,7 +73,7 @@
       "Host": "",
       "InternalMeasurementTopic": "sensate/internal/measurements",
       "InternalBulkMeasurementTopic": "sensate/internal/measurements/bulk"
-    } 
+    }
   },
 
   "Mail": {
@@ -88,13 +91,13 @@
     }
   },
 
-  "Text" : {
+  "Text": {
     "Provider": "Twilio",
     "AlphaCode": "Sensate IoT",
     "Twilio": {
       "AccountSid": "<sid>",
       "AuthToken": "<auth token>",
-      "PhoneSid": "<name>" 
-    } 
-  } 
+      "PhoneSid": "<name>"
+    }
+  }
 }

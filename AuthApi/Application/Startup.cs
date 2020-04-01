@@ -45,11 +45,13 @@ namespace SensateService.AuthApi.Application
 			var auth = new AuthenticationConfig();
 			var mail = new MailConfig();
 			var text = new TextConfig();
+			var sys = new SystemConfig();
 
 			this._configuration.GetSection("Cache").Bind(cache);
 			this._configuration.GetSection("Authentication").Bind(auth);
 			this._configuration.GetSection("Database").Bind(db);
 			this._configuration.GetSection("Mail").Bind(mail);
+			this._configuration.GetSection("System").Bind(sys);
 			this._configuration.GetSection("Text").Bind(text);
 
 			services.AddCors();
@@ -61,6 +63,8 @@ namespace SensateService.AuthApi.Application
 			if(cache.Enabled) {
 				services.AddCacheStrategy(cache, db);
 			}
+
+			services.AddReverseProxy(sys);
 
 			/* Add repositories */
 			services.AddSqlRepositories(cache.Enabled);
@@ -146,6 +150,7 @@ namespace SensateService.AuthApi.Application
 			var auth = new AuthenticationConfig();
 			this._configuration.GetSection("Authentication").Bind(auth);
 
+			app.UseForwardedHeaders();
 			app.UseSwagger();
 
 			if(env.IsDevelopment()) {

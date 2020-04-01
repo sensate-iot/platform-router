@@ -74,6 +74,7 @@ namespace SensateService.MqttHandler.Application
 			services.AddDocumentRepositories(cache.Enabled);
 			services.AddSqlRepositories(cache.Enabled);
 			services.AddMeasurementStorage(cache);
+			services.AddHashAlgorihms();
 
 			services.AddMqttService(options => {
 				options.Ssl = publicmqtt.Ssl;

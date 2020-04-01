@@ -41,7 +41,9 @@ namespace SensateService.DashboardApi.Application
 			var cache = new CacheConfig();
 			var db = new DatabaseConfig();
 			var auth = new AuthenticationConfig();
+			var sys = new SystemConfig();
 
+			this._configuration.GetSection("System").Bind(sys);
 			this._configuration.GetSection("Cache").Bind(cache);
 			this._configuration.GetSection("Authentication").Bind(auth);
 			this._configuration.GetSection("Database").Bind(db);
@@ -51,6 +53,7 @@ namespace SensateService.DashboardApi.Application
 			services.AddPostgres(db.PgSQL.ConnectionString);
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.AddIdentityFramwork(auth);
+			services.AddReverseProxy(sys);
 
 			if(cache.Enabled) {
 				services.AddCacheStrategy(cache, db);
@@ -98,8 +101,9 @@ namespace SensateService.DashboardApi.Application
 
 			services.AddLogging((logging) => {
 				logging.AddConsole();
-				if(this._env.IsDevelopment())
+				if(this._env.IsDevelopment()) {
 					logging.AddDebug();
+				}
 			});
 		}
 
@@ -109,6 +113,7 @@ namespace SensateService.DashboardApi.Application
 			var auth = new AuthenticationConfig();
 			this._configuration.GetSection("Authentication").Bind(auth);
 
+			app.UseForwardedHeaders();
 			app.UseRouting();
 
 			app.UseCors(p => {
