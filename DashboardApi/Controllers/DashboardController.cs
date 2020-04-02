@@ -94,7 +94,7 @@ namespace SensateService.DashboardApi.Controllers
 			var start = DateTime.Now.Date;
 
 			var sensors = await this._sensors.GetAsync(this.CurrentUser).AwaitBackground();
-			var stats = await this._stats.GetBetweenAsync(sensors, start, DateTime.Now).AwaitBackground();
+			var stats = await this._stats.GetBetweenAsync(sensors.ToList(), start, DateTime.Now).AwaitBackground();
 			return stats.Aggregate(0L, (value, current) => value + current.Measurements);
 		}
 
