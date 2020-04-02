@@ -5,6 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,6 +20,7 @@ namespace SensateService.Infrastructure.Repositories
 
 		Task<Blob> GetAsync(long blobId, CancellationToken ct = default);
 		Task<IEnumerable<Blob>> GetAsync(string sensorId, int skip = -1, int limit = -1, CancellationToken ct = default);
+		Task<IEnumerable<Blob>> GetAsync(IList<Sensor> sensors, DateTime start, DateTime end, int skip = -1, int limit = -1, CancellationToken ct = default);
 		Task<IEnumerable<Blob>> GetLikeAsync(string sensorId, string fileName, int skip = -1, int limit = -1, CancellationToken ct = default);
 		Task<Blob> GetAsync(string sensorId, string fileName, CancellationToken ct = default);
 

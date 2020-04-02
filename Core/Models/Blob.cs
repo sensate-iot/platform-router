@@ -10,8 +10,6 @@ using System.ComponentModel.DataAnnotations;
 
 using Newtonsoft.Json;
 
-using SensateService.Converters;
-
 namespace SensateService.Models
 {
 	public enum StorageType
@@ -33,6 +31,8 @@ namespace SensateService.Models
 		public string Path { get; set; }
 		[Required, JsonIgnore]
 		public StorageType StorageType { get; set; }
+		[Required]
+		public long FileSize { get; set; }
 		[Required]
 		public DateTime Timestamp { get; set; }
 	}
