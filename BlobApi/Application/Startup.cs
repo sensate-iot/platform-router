@@ -91,7 +91,6 @@ namespace SensateService.BlobApi.Application
 			/* Add repositories */
 			services.AddSqlRepositories(cache.Enabled);
 			services.AddDocumentRepositories(cache.Enabled);
-			services.AddIdentityFramwork(auth);
 
 			services.AddInternalMqttService(options => {
 				options.Ssl = privatemqtt.Ssl;

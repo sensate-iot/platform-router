@@ -78,7 +78,8 @@ namespace SensateService.BlobApi.Controllers
 				FileName = upload.Name,
 				Timestamp = DateTime.UtcNow,
 				Path = $"{this.m_settings.StoragePath}{Path.DirectorySeparatorChar}{upload.SensorId}",
-				StorageType = StorageType.FileSystem
+				StorageType = StorageType.FileSystem,
+				FileSize = upload.File.Length
 			};
 
 			var auth = await this.AuthenticateUserForSensor(upload.SensorId, true).AwaitBackground();
