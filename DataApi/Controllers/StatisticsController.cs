@@ -12,8 +12,9 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+
 using MongoDB.Bson;
-using Newtonsoft.Json.Linq;
 
 using SensateService.ApiCore.Controllers;
 using SensateService.DataApi.Json;
@@ -28,16 +29,33 @@ namespace SensateService.DataApi.Controllers
 {
 	[Produces("application/json")]
 	[Route("data/v1/[controller]")]
-	public class StatisticsController : AbstractApiController
+	public class StatisticsController : AbstractDataController 
 	{
 		private readonly ISensorStatisticsRepository _stats;
 		private readonly ISensorRepository _sensors;
+		private readonly IAuditLogRepository m_auditlogs;
+		private readonly ITriggerRepository m_triggers;
+		private readonly ILogger<StatisticsController> m_logger;
+		private readonly IUserRepository m_users;
+		private readonly IMessageRepository m_messages;
 
-		public StatisticsController(ISensorStatisticsRepository stats, ISensorRepository sensors,
-			IHttpContextAccessor ctx) : base(ctx)
+		public StatisticsController(ISensorStatisticsRepository stats,
+		                            ISensorRepository sensors,
+									ISensorLinkRepository links,
+									IAuditLogRepository logs,
+									IUserRepository users,
+									ITriggerRepository triggers,
+									IMessageRepository messages,
+									ILogger<StatisticsController> loger,
+		                            IHttpContextAccessor ctx) : base(ctx, sensors, links)
 		{
 			this._stats = stats;
 			this._sensors = sensors;
+			this.m_logger = loger;
+			this.m_auditlogs = logs;
+			this.m_triggers = triggers;
+			this.m_users = users;
+			this.m_messages = messages;
 		}
 
 		[HttpGet(Name = "StatsIndex")]
@@ -116,9 +134,12 @@ namespace SensateService.DataApi.Controllers
 		private const int DaysPerWeek = 7;
 
 		[HttpGet("cumulative/daily")]
+		[ProducesResponseType(typeof(IEnumerable<DailyStatisticsEntry>), 200)]
+		[ProducesResponseType(403)]
+		[ProducesResponseType(typeof(Status), 400)]
 		public async Task<IActionResult> CumulativePerDay([FromQuery] DateTime start, [FromQuery] DateTime end)
 		{
-			var jobj = new JArray();
+			var jobj = new List<DailyStatisticsEntry>();
 			var statistics = await this.GetStatsFor(this.CurrentUser, start, end).AwaitBackground();
 			var entries = statistics.GroupBy(entry => entry.Date)
 				.Select(grp => new { DayOfWeek = (int)grp.Key.DayOfWeek, Count = AccumulateStatisticsEntries(grp.AsEnumerable()) }).ToList();
@@ -127,10 +148,10 @@ namespace SensateService.DataApi.Controllers
 				var entry = entries.Where(e => e.DayOfWeek == idx).ToList();
 				var count = entry.Aggregate(0L, (current, value) => current + value.Count);
 
-				jobj.Add(JToken.FromObject(new {
-					dayOfTheWeek = idx,
-					measurements = count
-				}));
+				jobj.Add(new DailyStatisticsEntry {
+					DayOfTheWeek = idx,
+					Measurements = count
+				});
 			}
 
 			return this.Ok(jobj);
@@ -174,6 +195,109 @@ namespace SensateService.DataApi.Controllers
 			}
 
 			return this.Ok(jobj);
+		}
+
+		[HttpGet("count/{userId}")]
+		[ProducesResponseType(typeof(Count), 200)]
+		[ProducesResponseType(403)]
+		[ProducesResponseType(typeof(Status), 400)]
+		public async Task<IActionResult> Count(string userId,
+		                                       [FromQuery] string sensorId,
+		                                       [FromQuery] DateTime start,
+		                                       [FromQuery] DateTime end)
+		{ 
+			var admin = await this.m_users.IsAdministrator(this.CurrentUser).AwaitBackground();
+
+			if(!admin) {
+				return this.Forbid();
+			}
+
+			var user = await this.m_users.GetAsync(userId).AwaitBackground();
+
+			return await this.CountAsync(user, sensorId, start, end).AwaitBackground();
+		}
+
+		[HttpGet("count")]
+		[ProducesResponseType(typeof(Count), 200)]
+		[ProducesResponseType(403)]
+		[ProducesResponseType(typeof(Status), 400)]
+		public async Task<IActionResult> Count([FromQuery] string sensorId,
+		                                       [FromQuery] DateTime start,
+		                                       [FromQuery] DateTime end)
+		{
+			return await this.CountAsync(this.CurrentUser, sensorId, start, end).AwaitBackground();
+		}
+
+		private async Task<IActionResult> CountAsync(SensateUser user,
+		                                       string sensorId,
+		                                       DateTime start,
+		                                       DateTime end)
+		{
+			IList<Sensor> sensors;
+			Count count;
+
+			try {
+
+				if(user == null) {
+					return this.NotFound();
+				}
+
+				if(!string.IsNullOrEmpty(sensorId)) {
+					var s = await this._sensors.GetAsync(sensorId).AwaitBackground();
+
+					if(s == null) {
+						return this.NotFound();
+					}
+
+					if(!this.AuthenticateUserForSensor(s, false)) {
+						return this.Forbid();
+					}
+
+					sensors = new List<Sensor> {s};
+				} else {
+					var tmp = await this._sensors.GetAsync(user).AwaitBackground();
+					sensors = tmp.ToList();
+				}
+
+				var messages = this.m_messages.CountAsync(sensors, start, end);
+				var result = await this._stats.GetBetweenAsync(sensors, start, end).AwaitBackground();
+				var aggregated = result.Aggregate(0L, (r, item) => r + item.Measurements);
+				var logs = await this.m_auditlogs.CountAsync(entry => entry.AuthorId == user.Id &&
+														  entry.Timestamp >= start.ToUniversalTime() &&
+														  entry.Timestamp <= end.ToUniversalTime() &&
+														  (entry.Method == RequestMethod.HttpGet ||
+														   entry.Method == RequestMethod.MqttWebSocket ||
+														   entry.Method == RequestMethod.HttpDelete ||
+														   entry.Method == RequestMethod.HttpPatch ||
+														   entry.Method == RequestMethod.HttpPost ||
+														   entry.Method == RequestMethod.HttpPut)).AwaitBackground();
+
+				var text = await this.m_triggers.GetAsync(user.Id, TriggerType.Regex)
+					.AwaitBackground();
+				var num = await this.m_triggers.GetAsync(user.Id).AwaitBackground();
+				var triggers = num.ToList();
+
+				triggers.AddRange(text);
+
+				count = new Count {
+					Sensors = await this._sensors.CountAsync(user).AwaitBackground(),
+					Measurements = aggregated,
+					Links = await this.m_links.CountAsync(user).AwaitBackground(),
+					TriggerInvocations = triggers.Aggregate(0L, (v, trigger) => v + trigger.Invocations.Count),
+					ApiCalls = logs,
+					Messages = await messages.AwaitBackground()
+				};
+			} catch(Exception ex) {
+				this.m_logger.LogDebug(ex, $"Unable to count statistics between {start} and {end}");
+				this.m_logger.LogInformation($"Unable to count statistics between {start} and {end}");
+
+				return this.BadRequest(new Status {
+					Message = "Unable to count statistics",
+					ErrorCode = ReplyCode.BadInput
+				});
+			}
+
+			return this.Ok(count);
 		}
 
 		[HttpGet("cumulative")]
