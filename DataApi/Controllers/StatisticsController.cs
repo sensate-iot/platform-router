@@ -38,6 +38,7 @@ namespace SensateService.DataApi.Controllers
 		private readonly ILogger<StatisticsController> m_logger;
 		private readonly IUserRepository m_users;
 		private readonly IMessageRepository m_messages;
+		private readonly IBlobRepository m_blobs;
 
 		public StatisticsController(ISensorStatisticsRepository stats,
 		                            ISensorRepository sensors,
@@ -46,6 +47,7 @@ namespace SensateService.DataApi.Controllers
 									IUserRepository users,
 									ITriggerRepository triggers,
 									IMessageRepository messages,
+									IBlobRepository blobs,
 									ILogger<StatisticsController> loger,
 		                            IHttpContextAccessor ctx) : base(ctx, sensors, links)
 		{
@@ -55,6 +57,7 @@ namespace SensateService.DataApi.Controllers
 			this.m_auditlogs = logs;
 			this.m_triggers = triggers;
 			this.m_users = users;
+			this.m_blobs = blobs;
 			this.m_messages = messages;
 		}
 
@@ -260,7 +263,12 @@ namespace SensateService.DataApi.Controllers
 				}
 
 				var messages = this.m_messages.CountAsync(sensors, start, end);
+				var blobTask = this.m_blobs.GetAsync(sensors, start, end);
 				var result = await this._stats.GetBetweenAsync(sensors, start, end).AwaitBackground();
+
+				var blobs = await blobTask.AwaitBackground();
+				var bytes = blobs.Aggregate(0L, (x, blob) => x + blob.FileSize);
+
 				var aggregated = result.Aggregate(0L, (r, item) => r + item.Measurements);
 				var logs = await this.m_auditlogs.CountAsync(entry => entry.AuthorId == user.Id &&
 														  entry.Timestamp >= start.ToUniversalTime() &&
@@ -280,6 +288,7 @@ namespace SensateService.DataApi.Controllers
 				triggers.AddRange(text);
 
 				count = new Count {
+					BlobStorage = bytes,
 					Sensors = await this._sensors.CountAsync(user).AwaitBackground(),
 					Measurements = aggregated,
 					Links = await this.m_links.CountAsync(user).AwaitBackground(),

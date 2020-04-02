@@ -15,5 +15,6 @@ namespace SensateService.DataApi.Json
 		public long Links { get; set; }
 		public long TriggerInvocations { get; set; }
 		public long ApiCalls { get; set; }
+		public long BlobStorage { get; set; }
 	}
 }
