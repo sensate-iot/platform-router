@@ -65,6 +65,14 @@ namespace SensateService.Infrastructure.Sql
 			return await results.ToListAsync(token).AwaitBackground();
 		}
 
+		public async Task<int> CountAsync(SensateUser user, CancellationToken ct = default)
+		{
+			var query = this.Data.Where(x => x.UserId == user.Id);
+			var count = await query.CountAsync(ct).AwaitBackground();
+
+			return count;
+		}
+
 		public async Task DeleteBySensorAsync(Sensor sensor, CancellationToken ct = default)
 		{
 			var id = sensor.InternalId.ToString();
