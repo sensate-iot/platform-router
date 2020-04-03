@@ -27,7 +27,7 @@ namespace SensateService.WebSocketHandler.Application
 		{
 			IWebHost wh;
 
-			Console.WriteLine($"Starting {Version.VersionString}");
+			Console.WriteLine($"Starting WebSocketHandler using {Version.VersionString}");
 			wh = BuildWebHost(args);
 			wh.Run();
 		}

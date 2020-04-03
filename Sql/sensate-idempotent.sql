@@ -1836,3 +1836,18 @@ BEGIN
     VALUES ('20200326181831_AddDataProtectionKeyTable', '3.1.3');
     END IF;
 END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20200402131550_AddFileSizeToBlobsTable') THEN
+    ALTER TABLE "Blobs" ADD "FileSize" bigint NOT NULL DEFAULT 0;
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20200402131550_AddFileSizeToBlobsTable') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20200402131550_AddFileSizeToBlobsTable', '3.1.3');
+    END IF;
+END $$;

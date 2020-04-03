@@ -60,7 +60,7 @@ namespace SensateService.AuthApi.Application
 		{
 			IWebHost wh;
 
-			Console.WriteLine($"Starting {Version.VersionString}");
+			Console.WriteLine($"Starting AuthApi {Version.VersionString}");
 			wh = BuildWebHost(args);
 			CreateUserRoles(wh);
 			wh.Run();

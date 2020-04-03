@@ -11,7 +11,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-
+using Microsoft.AspNetCore.Authentication;
 using MongoDB.Driver;
 
 using SensateService.Enums;
@@ -31,17 +31,18 @@ namespace SensateService.Infrastructure.Document
 			this._stats = context.Statistics;
 		}
 
-		public async Task<IEnumerable<SensorStatisticsEntry>> GetBetweenAsync(IEnumerable<Sensor> sensors, DateTime start, DateTime end)
+		public async Task<IEnumerable<SensorStatisticsEntry>> GetBetweenAsync(IList<Sensor> sensors, DateTime start, DateTime end)
 		{
-			FilterDefinition<SensorStatisticsEntry> filter;
-
 			var builder = Builders<SensorStatisticsEntry>.Filter;
 			var ids = sensors.Select(x => x.InternalId);
+			var startHour = start.ThisHour();
+			var endHour = end.ThisHour();
+			var filter = builder.In(x => x.SensorId, ids) &
+						 builder.Gte(x => x.Date, startHour) &
+						 builder.Lte(x => x.Date, endHour);
 
-			filter = builder.In(x => x.SensorId, ids);
-			var raw = await this._collection.FindAsync(filter).AwaitBackground();
-
-			return raw.ToList();
+			var result = await this._stats.FindAsync(filter).AwaitBackground();
+			return await result.ToListAsync().AwaitBackground();
 		}
 
 		public async Task<IEnumerable<SensorStatisticsEntry>> GetAsync(Expression<Func<SensorStatisticsEntry, bool>> expr)

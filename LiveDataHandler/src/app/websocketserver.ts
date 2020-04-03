@@ -15,11 +15,6 @@ import { WebSocketClient } from "../clients/websocketclient";
 import { Pool } from "pg";
 import { AuditLogsClient } from "../clients/auditlogsclient";
 
-export function createServer(expr: express.Express) {
-    const server = http.createServer(expr);
-    return server;
-}
-
 export class WebSocketServer {
     private readonly server: http.Server;
     private readonly wss: WebSocket.Server;
@@ -67,13 +62,16 @@ export class WebSocketServer {
     }
 
     private async handleSocketUpgrade(socket: WebSocket, request: any) {
+        const ip = request.headers["x-client-ip"] || request.connection.remoteAddress;
+
         const client = new WebSocketClient(this.auditlogs,
             this.secret,
-            request.connection.remoteAddress,
+            ip,
             socket,
             this.pool);
+
         const hdr = request.headers["authorization"];
-        console.log(`New client connection from ${request.connection.remoteAddress}!`);
+        console.log(`New client connection from ${ip}!`);
 
         if (hdr !== null && hdr !== undefined) {
             const split = hdr.split(" ");

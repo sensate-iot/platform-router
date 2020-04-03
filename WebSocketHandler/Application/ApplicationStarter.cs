@@ -58,8 +58,9 @@ namespace SensateService.WebSocketHandler.Application
 			services.AddPostgres(db.PgSQL.ConnectionString);
 			services.AddLogging(builder => { builder.AddConfiguration(this.Configuration.GetSection("Logging")); });
 
-			if(cache.Enabled)
+			if(cache.Enabled) {
 				services.AddCacheStrategy(cache, db);
+			}
 
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.AddDocumentRepositories(cache.Enabled);

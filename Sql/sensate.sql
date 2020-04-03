@@ -671,3 +671,8 @@ CREATE TABLE "DataProtectionKeys" (
 INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
 VALUES ('20200326181831_AddDataProtectionKeyTable', '3.1.3');
 
+ALTER TABLE "Blobs" ADD "FileSize" bigint NOT NULL DEFAULT 0;
+
+INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+VALUES ('20200402131550_AddFileSizeToBlobsTable', '3.1.3');
+

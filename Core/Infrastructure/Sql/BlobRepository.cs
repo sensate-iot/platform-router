@@ -57,6 +57,29 @@ namespace SensateService.Infrastructure.Sql
 			return this.FetchData(blobs, skip, limit, ct);
 		}
 
+		public async Task<IEnumerable<Blob>> GetAsync(IList<Sensor> sensors,
+													  DateTime start,
+													  DateTime end,
+													  int skip = -1,
+													  int limit = -1,
+													  CancellationToken ct = default)
+		{
+			var ids = sensors.Select(x => x.InternalId.ToString());
+			var query = this.Data.Where(x => ids.Contains(x.SensorId) &&
+											 x.Timestamp >= start &&
+											 x.Timestamp <= end);
+
+			if(skip > 0) {
+				query = query.Skip(skip);
+			}
+
+			if(limit > 0) {
+				query = query.Take(limit);
+			}
+
+			return await query.ToListAsync(ct).AwaitBackground();
+		}
+
 		public Task<IEnumerable<Blob>> GetLikeAsync(string sensorId, string fileName, int skip = -1, int limit = -1, CancellationToken ct = default)
 		{
 			var blobs = this.Data.Where(blob => blob.SensorId == sensorId && blob.FileName.Contains(fileName));

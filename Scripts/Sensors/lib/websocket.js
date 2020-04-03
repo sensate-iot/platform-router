@@ -7,6 +7,7 @@
 
 const socket = require('ws');
 const generate = require('./generate');
+const NanoTimer = require('nanotimer');
 
 function publish(ws, args) {
 	const measurement = generate.generateMeasurement(args);
@@ -24,14 +25,20 @@ function publishMessage(ws, args) {
 	ws.send(JSON.stringify(message));
 }
 
+
+var timer = undefined;
+
 module.exports.run = function (args) {
+	timer = new NanoTimer();
+	const secret = args.config.webSocket.secret;
+
 	if(args.messages) {
 		const host = args.host + ':' + args.port + '/messages';
 		const ws = new socket('ws://' + host);
 
 		ws.on('open', () => {
 			console.log('Websocket connected!');
-			setInterval(publishMessage, args.interval, ws, args);
+			timer.setInterval(publishMessage, [ws, args], args.interval.toString() + 'u');
 		});
 	} else {
 		const host = args.host + ':' + args.port + '/measurement';
@@ -39,7 +46,7 @@ module.exports.run = function (args) {
 
 		ws.on('open', () => {
 			console.log('Websocket connected!');
-			setInterval(publish, args.interval, ws, args);
+			timer.setInterval(publish, [ws, args], args.interval.toString() + 'u');
 		});
 	}
 
