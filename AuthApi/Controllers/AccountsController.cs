@@ -448,6 +448,11 @@ namespace SensateService.AuthApi.Controllers
 		{
 			var phonetoken = await this._manager.GenerateChangePhoneNumberTokenAsync(user, number).AwaitBackground();
 			var usertoken = await this._phonetokens.CreateAsync(user, phonetoken, number).AwaitBackground();
+
+			if(usertoken == null) {
+				return;
+			}
+
 			var worker = this.ReadTextTemplate("Confirm_PhoneNumber.txt", usertoken);
 
 			var body = await worker.AwaitBackground();
@@ -571,6 +576,14 @@ namespace SensateService.AuthApi.Controllers
 			if(update.PhoneNumber != null && update.PhoneNumber != user.PhoneNumber) {
 				phonetoken = await this._manager.GenerateChangePhoneNumberTokenAsync(user, update.PhoneNumber).AwaitBackground();
 				usertoken = await this._phonetokens.CreateAsync(user, phonetoken, update.PhoneNumber).AwaitBackground();
+
+				if(usertoken == null) {
+					return this.BadRequest(new Status {
+						Message = "Unable to generate token!",
+						ErrorCode = ReplyCode.UnknownError
+					});
+				}
+
 				var worker = this.ReadTextTemplate("Confirm_PhoneNumber.txt", usertoken);
 
 				try {
