@@ -1,7 +1,7 @@
 # Coding style
 
-ETA/OS is free, open source software and is currently maintained and
-written by hobbyists. All help to make ETA/OS a better system is welcome
+Sensate IoT is free, open source software and is currently maintained and
+written by hobbyists. All help to make Sensate IoT a better system is welcome
 ofcourse, but in order to keep things simple there are some regulations
 or 'best practises'. Please read them carefully if you are planning to
 send a patch.
@@ -28,8 +28,9 @@ you have to many nested identations. Stop producing _WTF code_.
 Don't ever put statements on a single line. Use
 
 ```C#
-if(condition)
+if(condition) {
     yo_bro();
+}
 ```
 
 instead of
@@ -71,8 +72,14 @@ The next issue that always comes up when its about C/C++ coding style is
 the placement of braces.
 
 The general rule is, place the opening brace on the same line as the
-statement and the closing brace on the next empty line. The only exception
-to this rule are functions, where both braces are placed on an empty line.
+statement and the closing brace on the next empty line. The only exceptions
+to this rule are:
+
+* Type definitions;
+* Namespaces;
+* Functions.
+
+These exeptions have both brances on the next empty line.
 
 Class + method example:
 
@@ -81,11 +88,11 @@ namespace SensateService
 {
     public class Example
     {
-        private readonly string _obj;
+        private readonly string m_obj;
 
         public Example(string obj)
         {
-            this._obj = obj;
+            this.m_obj = obj;
         }
 
         public void DoPrint()
@@ -120,22 +127,11 @@ if(condition is true) {
 }
 ```
 
-Do not place braces when they are not necessary:
-
-```C#
-if(condition is true)
-    DoThis();
-```
-
-The last rule doesn't apply when only 1 branch of a conditional statement is
-a single line:
+Always place braces, even if they are not necessary:
 
 ```C#
 if(condition is true) {
-    do_this;
-    do_that;
-} else {
-    Otherwise();
+    DoThis();
 }
 ```
 
@@ -164,120 +160,29 @@ line comments. All comments using multiple lines should use the ANSI style.
 ## Patches
 
 Now then. Lets imagine that you have written some code or fixed up some
-existing code and you want it to stick it into the main stream ETA/OS
-repository. There's a few options you have, sending a patch using email
-(preferred, and required with small patches) or sending a pull request.
+existing code and you want it to stick it into the main stream Sensate IoT
+repository. There's a few options you have:
 
-Pull requests are only an option when you are submitting a large patch. In
-this case, large is defined as 10 commits and more. A succesful pull request
-contains:
+* Sending a pull request via GitHub;
+* Sensing a pull request via email;
+* Sending a patch via email.
+
+When sending a pull request via email, please specify:
 
 * a link to your git repository
 * a specification of the branch you want mainstream
 * a summary of what you've been doing
 
-All patches that are 1-9 commits are to be sent by email.
+### Creating pull requests
 
-### Creating patches
+An explanation on how you should create your pull request. First of all,
+make sure you adhere to all the style rules. When you think you do, you
+can create your GitHub pull request. When you do so please keep the
+following in mind:
 
-An explanation on how you should create your patch patch. Lets say, that
-your patch is 2 commits long and you want to generate the .patch files.
+* Make sure the pull request is able to merge;
+* Make sure to fill out the entire pull request template;
+* Assign labels, reviewrs, and milestones when able.
 
-Enter the following command:
-
-```bash
-git format-patch --to etaos@googlegroups.net HEAD~2..HEAD
-```
-
-git format-patch will generate a patch-file-per-commit of the given range
-(which is HEAD-2 to HEAD in our case). The --to argument is used to set
-a receiver which will be used later on by git send-email.
-
-@subsection snt-patch Sending patches
-Once your patch has been created sent them <b>inline</b> to the ETA/OS
-mailing list (etaos@googlegroups.net). If you want to you can also CC
-the maintainer of the file you have patched, his or her email should
-be in the top of the file.
-
-To send your email using git, run the following command:
-
-```bash
-git send-email *.patch
-```
-
-To use git send-email, you need to have it configured. To do so, please
-read the git scm documentation on `git send-email'.
-
-Patches can also be manually sent using email clients. Please note that
-patches should be sent as plain text. No MIME, links, compression or
-attachments.
-
-Exception to the rule: if your email client is mangling up your patch
-a maintainer may ask you to resend it using MIME or attachments.
-
-### Email clients
-
-Below follow some email settings which make sure that your patch arrives
-as a clean plain-text patch.
-
-#### Evolution
-
-Some people use this successfully for patches.
-
-When composing mail select: Preformat
-from Format->Heading->Preformatted (Ctrl-7) or the toolbar
-
-Then use: Insert->Text File... (Alt-n x)
-to insert the patch.
-
-You can also "diff -Nru old.c new.c | xclip", select Preformat, then
-paste with the middle button.
-
-#### Mutt
-
-This editor is most likely going to be the most succesful for sending
-plain-text patches.
-
-Mutt doesn't come with an editor, so whatever editor you use should be
-used in a way that there are no automatic linebreaks.  Most editors have
-an "insert file" option that inserts the contents of a file unaltered.
-
-To use 'vim' with mutt:
-set editor="vi"
-
-If using xclip, type the command
-
-* :set paste
-* before middle button
-* shift-insert
-* use :r filename
-
-If you want to include the patch inline. (a)ttach works fine without
-"set paste".
-
-Config options:
-It should work with default settings. However, it's a good idea to set the
-"send_charset" to: set send_charset="us-ascii:utf-8"
-
-@subsubsection thunder Thunderbird
-Thunderbird is an Outlook clone that likes to mangle text, but there are ways
-to coerce it into behaving.
-
-* Allows use of an external editor:
-  The easiest thing to do with Thunderbird and patches is to use an
-  "external editor" extension and then just use your favorite $EDITOR
-  for reading/merging patches into the body text.  To do this, download
-  and install the extension, then add a button for it using
-  View->Toolbars->Customize... and finally just click on it when in the
-  Compose dialog.
-
-To beat some sense out of the internal editor, do this:
-
-* Edit your Thunderbird config settings so that it won't use format=flowed.
-  Go to "edit->preferences->advanced->config editor" to bring up the
-  thunderbird's registry editor.
-
-* Set "mailnews.send_plaintext_flowed" to "false"
-* Set "mailnews.wraplength" from "72" to "0"
-* "View" > "Message Body As" > "Plain Text"
-* "View" > "Character Encoding" > "Unicode (UTF-8)"
+Make sure to keep an eye on your pull request after you have opened it. Failing
+to reply to comments will probably get your pull request closed.
