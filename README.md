@@ -81,5 +81,5 @@ writing code isn't the only way to contribute:
 
 When you pick up an existing issue in order to resolve it, *please let us know*. This will
 prevent two people working on the same issue. If you are creating a new issue
-please use one of the supplied github templates. Section that are not applicable should
+please use one of the supplied github templates. Sections that are not applicable should
 be removed.

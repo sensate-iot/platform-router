@@ -21,7 +21,7 @@ propose it on the mailing list or sent in a pull request with your changes.
 [Style guide](#style-guide)
 
 * [Git](#git-commit-messages)
-* [C#](#c#)
+* [C#](#cnet)
 
 ## Before you start
 
