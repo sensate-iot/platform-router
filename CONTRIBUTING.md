@@ -1,4 +1,4 @@
-# Contributing to Sensate
+# Contributing to Sensate IoT
 
 First off, thanks for taking the time to contribute to Sensate. Below you'll find
 a set of guidelines for contributing to Sensate (and any of its side
@@ -21,7 +21,7 @@ propose it on the mailing list or sent in a pull request with your changes.
 [Style guide](#style-guide)
 
 * [Git](#git-commit-messages)
-* [C/C++](#cc)
+* [C#](#cnet)
 
 ## Before you start
 
@@ -68,13 +68,13 @@ You can provide more context by:
 There is two types of suggestions you can make: a well defined new feature, and an
 idea. The fundamental difference between the two is how well the suggestion is
 developed. The former is, as the name implies, a well rounded suggestion - ready to be
-implemented. These kind of suggestions are tracked as GitLab issue's. See the
+implemented. These kind of suggestions are tracked as GitHub issue's. See the
 checklist below to see what information such a suggestion has to contain. Because
 we don't want to kill any idea's you can always put less well rounded suggestions on
-the [mailing list](mailto:sensate@googlegroups.com). You can sign up to the mailing
-list [here](https://groups.google.com/forum/#!forum/sensate). Please note that public API
-functions should not be changed. Their internals can be changed, but not the
-return value or its parameters.
+email [mailing list](mailto:ideas@sensateiot.com). Please note that public API
+functions should not be broken. Their internals can be changed, but not the
+return value or its parameters. The exception to this rule is de development of a new version
+of an existing API. In this case the version in the API URL will also be incremented by one.
 
 #### How to submit a proper suggestion
 
@@ -99,25 +99,20 @@ close as possible when submitting a new patch.
 
 ## Style guide
 
-Please try and follow the style guides below at all times. Keep in mind that patches
-**can be rejected** based on style errors.
+Please try and follow the style guides below at all times. An attempt has been made to
+provide a document containing all style rules. However, the `.editorconfig` and CI/CD rules
+are leading at all times. Keep in mind that patches **can be rejected** based on style errors.
 
 ### Git commit messages
 
 * Use the present tense ("Add feature", not "Added feature").
 * On the first line, include subsystem (and module) your patch belongs to (e.g.
-  "sched: core: optimize __schedule_need_resched()").
+  "infra: storage: improve measurement authorization").
 * Limit the first line to 72 characters or less
 * If applicable, include references to issue's and pull requests.
-
-### C
-
-Sensate follows a slightly modified version of the Linux kernel C/C++ style guide.
-There is a separate [document](http://etaos.bietje.net/docs/codestyle.html)
-available containing the entire C/C++ style guide.
 
 #### C#.NET
 
 C# follows the rules mentioned above, with the exception of the naming convention. In
-the naming convention the C# standard is followed, which is CamelCase. The full code style
+the naming convention the C# standard is followed, which is PascalCase. The full code style
 can be found in CODESTYLE.md.
