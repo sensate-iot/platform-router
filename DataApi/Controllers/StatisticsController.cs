@@ -29,7 +29,7 @@ namespace SensateService.DataApi.Controllers
 {
 	[Produces("application/json")]
 	[Route("data/v1/[controller]")]
-	public class StatisticsController : AbstractDataController 
+	public class StatisticsController : AbstractDataController
 	{
 		private readonly ISensorStatisticsRepository _stats;
 		private readonly ISensorRepository _sensors;
@@ -41,7 +41,7 @@ namespace SensateService.DataApi.Controllers
 		private readonly IBlobRepository m_blobs;
 
 		public StatisticsController(ISensorStatisticsRepository stats,
-		                            ISensorRepository sensors,
+									ISensorRepository sensors,
 									ISensorLinkRepository links,
 									IAuditLogRepository logs,
 									IUserRepository users,
@@ -49,7 +49,7 @@ namespace SensateService.DataApi.Controllers
 									IMessageRepository messages,
 									IBlobRepository blobs,
 									ILogger<StatisticsController> loger,
-		                            IHttpContextAccessor ctx) : base(ctx, sensors, links)
+									IHttpContextAccessor ctx) : base(ctx, sensors, links)
 		{
 			this._stats = stats;
 			this._sensors = sensors;
@@ -205,10 +205,10 @@ namespace SensateService.DataApi.Controllers
 		[ProducesResponseType(403)]
 		[ProducesResponseType(typeof(Status), 400)]
 		public async Task<IActionResult> Count(string userId,
-		                                       [FromQuery] string sensorId,
-		                                       [FromQuery] DateTime start,
-		                                       [FromQuery] DateTime end)
-		{ 
+											   [FromQuery] string sensorId,
+											   [FromQuery] DateTime start,
+											   [FromQuery] DateTime end)
+		{
 			var admin = await this.m_users.IsAdministrator(this.CurrentUser).AwaitBackground();
 
 			if(!admin) {
@@ -225,16 +225,16 @@ namespace SensateService.DataApi.Controllers
 		[ProducesResponseType(403)]
 		[ProducesResponseType(typeof(Status), 400)]
 		public async Task<IActionResult> Count([FromQuery] string sensorId,
-		                                       [FromQuery] DateTime start,
-		                                       [FromQuery] DateTime end)
+											   [FromQuery] DateTime start,
+											   [FromQuery] DateTime end)
 		{
 			return await this.CountAsync(this.CurrentUser, sensorId, start, end).AwaitBackground();
 		}
 
 		private async Task<IActionResult> CountAsync(SensateUser user,
-		                                       string sensorId,
-		                                       DateTime start,
-		                                       DateTime end)
+											   string sensorId,
+											   DateTime start,
+											   DateTime end)
 		{
 			IList<Sensor> sensors;
 			Count count;
@@ -256,7 +256,7 @@ namespace SensateService.DataApi.Controllers
 						return this.Forbid();
 					}
 
-					sensors = new List<Sensor> {s};
+					sensors = new List<Sensor> { s };
 				} else {
 					var tmp = await this._sensors.GetAsync(user).AwaitBackground();
 					sensors = tmp.ToList();
