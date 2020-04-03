@@ -27,7 +27,7 @@ namespace SensateService.BlobApi.Application
 		{
 			IWebHost wh;
 
-			Console.WriteLine($"Starting {Version.VersionString}");
+			Console.WriteLine($"Starting BlobApi {Version.VersionString}");
 			wh = BuildWebHost(args);
 			wh.Run();
 		}

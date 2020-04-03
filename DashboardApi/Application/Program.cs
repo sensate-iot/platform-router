@@ -27,7 +27,7 @@ namespace SensateService.DashboardApi.Application
 		{
 			IWebHost wh;
 
-			Console.WriteLine($"Starting {Version.VersionString}");
+			Console.WriteLine($"Starting DashboardApi {Version.VersionString}");
 			wh = BuildWebHost(args);
 			wh.Run();
 		}

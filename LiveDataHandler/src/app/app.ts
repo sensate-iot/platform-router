@@ -61,6 +61,7 @@ class Application {
 }
 
 export function main() {
+    console.log(`Starting LiveDataHandler`);
     const app = new Application();
     app.run();
 }

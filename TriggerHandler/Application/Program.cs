@@ -58,7 +58,7 @@ namespace SensateService.TriggerHandler.Application
 
 		public static void Main(string[] args)
 		{
-			Console.WriteLine($"Starting Sensate MQTT client using {Version.VersionString}");
+			Console.WriteLine($"Starting TriggerHandler using {Version.VersionString}");
 
 			var program = new Application(CreateHost(args));
 			program.Run();

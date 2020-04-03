@@ -9,7 +9,7 @@ namespace SensateService.SqlSetup.Application
 	{
 		public static void Main(string[] args)
 		{
-			Console.WriteLine("Running SensateService setup...");
+			Console.WriteLine("Running SensateService SQL setup...");
 			var factory = new SensateSqlContextFactory();
 			var ctx = factory.CreateDbContext(new string[] { });
 
