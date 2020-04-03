@@ -96,8 +96,8 @@ namespace SensateService.Infrastructure.Document
 			var builder = Builders<Message>.Filter;
 			var ids = sensors.Select(x => x.InternalId);
 			var filter = builder.In(x => x.SensorId, ids) &
-			             builder.Gte(x => x.CreatedAt, start) &
-			             builder.Lte(x => x.CreatedAt, end);
+						 builder.Gte(x => x.CreatedAt, start) &
+						 builder.Lte(x => x.CreatedAt, end);
 
 			var result = await this._collection.CountDocumentsAsync(filter, cancellationToken: ct).AwaitBackground();
 			return result;

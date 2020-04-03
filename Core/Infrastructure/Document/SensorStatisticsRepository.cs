@@ -38,8 +38,8 @@ namespace SensateService.Infrastructure.Document
 			var startHour = start.ThisHour();
 			var endHour = end.ThisHour();
 			var filter = builder.In(x => x.SensorId, ids) &
-			             builder.Gte(x => x.Date, startHour) &
-			             builder.Lte(x => x.Date, endHour);
+						 builder.Gte(x => x.Date, startHour) &
+						 builder.Lte(x => x.Date, endHour);
 
 			var result = await this._stats.FindAsync(filter).AwaitBackground();
 			return await result.ToListAsync().AwaitBackground();
