@@ -50,7 +50,6 @@ namespace SensateService.AuthApi.Controllers
 				CreatedOn = DateTime.Now.ToUniversalTime(),
 				Revoked = false,
 				Type = ApiKeyType.ApiKey,
-				User = this.CurrentUser,
 				ReadOnly = request.ReadOnly,
 				Name = request.Name
 			};
