@@ -99,7 +99,7 @@ export class WebSocketServer {
         this.server.on("upgrade", async (request, socket, head) => {
             const pathname = url.parse(request.url).pathname;
 
-            if (pathname === "/measurements/live") {
+            if (pathname === "/live/v1/measurements") {
                 this.wss.handleUpgrade(request, socket, head, async (ws: WebSocket) => {
                     await this.handleSocketUpgrade(ws, request);
                 });

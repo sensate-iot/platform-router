@@ -109,10 +109,10 @@ namespace SensateService.WebSocketHandler.Application
 
 			this.Configuration.GetSection("Cache").Bind(cache);
 
-			app.MapWebSocketService("/measurement/rt", sp.GetService<RealTimeWebSocketMeasurementHandler>());
-			app.MapWebSocketService("/measurement", sp.GetService<WebSocketMeasurementHandler>());
-			app.MapWebSocketService("/measurement/bulk", sp.GetService<WebSocketBulkMeasurementHandler>());
-			app.MapWebSocketService("/messages", sp.GetService<WebSocketMessageHandler>());
+			app.MapWebSocketService("/ingress/v1/measurement/rt", sp.GetService<RealTimeWebSocketMeasurementHandler>());
+			app.MapWebSocketService("/ingress/v1/measurement", sp.GetService<WebSocketMeasurementHandler>());
+			app.MapWebSocketService("/ingress/v1/measurement/bulk", sp.GetService<WebSocketBulkMeasurementHandler>());
+			app.MapWebSocketService("/ingress/v1/messages", sp.GetService<WebSocketMessageHandler>());
 
 			app.UseAuthentication();
 			app.UseAuthorization();
