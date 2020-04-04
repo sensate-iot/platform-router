@@ -86,7 +86,6 @@ namespace SensateService.WebSocketHandler.Application
 
 			services.AddWebSocketHandler<WebSocketMessageHandler>();
 			services.AddWebSocketHandler<RealTimeWebSocketMeasurementHandler>();
-			services.AddWebSocketHandler<WebSocketBulkMeasurementHandler>();
 			services.AddWebSocketHandler<WebSocketMeasurementHandler>();
 			services.AddControllers().AddNewtonsoftJson();
 
@@ -109,10 +108,9 @@ namespace SensateService.WebSocketHandler.Application
 
 			this.Configuration.GetSection("Cache").Bind(cache);
 
+			app.MapWebSocketService("/ingress/v1/message", sp.GetService<WebSocketMessageHandler>());
 			app.MapWebSocketService("/ingress/v1/measurement/rt", sp.GetService<RealTimeWebSocketMeasurementHandler>());
 			app.MapWebSocketService("/ingress/v1/measurement", sp.GetService<WebSocketMeasurementHandler>());
-			app.MapWebSocketService("/ingress/v1/measurement/bulk", sp.GetService<WebSocketBulkMeasurementHandler>());
-			app.MapWebSocketService("/ingress/v1/messages", sp.GetService<WebSocketMessageHandler>());
 
 			app.UseAuthentication();
 			app.UseAuthorization();
