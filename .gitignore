@@ -15,6 +15,7 @@ dist/
 appsettings.json
 *.csproj.user
 docker-compose-dev.yaml
+docker-compose-staging.yaml
 
 MqttHandler/settings/
 
