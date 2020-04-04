@@ -33,16 +33,19 @@ module.exports.run = function (args) {
 	const secret = args.config.webSocket.secret;
 
 	if(args.messages) {
-		const host = args.host + ':' + args.port + '/messages';
-		const ws = new socket('ws://' + host);
+		const host = args.host + ':' + args.port + '/ingress/v1/messages';
+		console.log(host);
+		const ws = new socket(host);
 
 		ws.on('open', () => {
 			console.log('Websocket connected!');
 			timer.setInterval(publishMessage, [ws, args], args.interval.toString() + 'u');
 		});
 	} else {
-		const host = args.host + ':' + args.port + '/measurement';
-		const ws = new socket('ws://' + host);
+		const host = args.host + ':' + args.port + '/ingress/v1/measurement';
+
+		console.log(host);
+		const ws = new socket(host);
 
 		ws.on('open', () => {
 			console.log('Websocket connected!');
