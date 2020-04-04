@@ -23,6 +23,7 @@ FROM alpine:3.11
 
 COPY --from=build-env /app /app
 COPY AuthApi/Settings/hosting.json /app/hosting.json
+COPY AuthApi/Templates /app/Templates
 WORKDIR /app
 RUN apk add --no-cache libstdc++ libintl icu
 
