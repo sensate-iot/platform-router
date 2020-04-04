@@ -117,8 +117,10 @@ export class WebSocketClient {
         date.add(WebSocketClient.timeout, "ms");
 
         // ReSharper disable once TsResolvedFromInaccessibleModule
-        if (date.isBefore(moment().utc())) {
+        if (moment.utc().isSameOrAfter(date)) {
             this.socket.close();
+            console.log(date.toISOString());
+            console.log(moment().utc().toISOString());
             console.log(`Authorization request to late (ID: ${auth.sensorId})`);
             return;
         }
