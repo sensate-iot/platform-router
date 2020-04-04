@@ -21,8 +21,8 @@ export class AuditLogsClient {
         try {
             await this.pool.query(query);
         } catch (ex) {
-            console.log("Unable to create audit log entry:");
-            console.log(ex);
+            console.log(`Unable to create audit log entry (User: ${log.authorId}`);
+            console.debug(ex);
         }
     }
 }

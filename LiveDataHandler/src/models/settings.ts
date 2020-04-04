@@ -20,6 +20,7 @@ interface MongoDB {
 interface WebServerSettings {
     port: number;
     secret: string;
+    timeout: number;
 }
 
 interface PostgresQL {

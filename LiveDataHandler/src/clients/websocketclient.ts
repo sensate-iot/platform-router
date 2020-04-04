@@ -28,12 +28,11 @@ export class WebSocketClient {
     private readonly client: SensorLinksClient;
     private userId: string;
 
-    private static timeout = 250;
-
     public constructor(
         private readonly logs: AuditLogsClient,
         private readonly secret: string,
         private readonly remote: string,
+        private readonly timeout: number,
         socket: WebSocket, pool: Pool
     ) {
         this.socket = socket;
@@ -114,13 +113,11 @@ export class WebSocketClient {
 
         // ReSharper disable once TsResolvedFromInaccessibleModule
         const date = moment(auth.timestamp).utc(true);
-        date.add(WebSocketClient.timeout, "ms");
+        date.add(this.timeout, "ms");
 
         // ReSharper disable once TsResolvedFromInaccessibleModule
         if (moment.utc().isSameOrAfter(date)) {
             this.socket.close();
-            console.log(date.toISOString());
-            console.log(moment().utc().toISOString());
             console.log(`Authorization request to late (ID: ${auth.sensorId})`);
             return;
         }

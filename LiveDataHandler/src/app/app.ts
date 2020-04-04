@@ -35,7 +35,7 @@ class Application {
         const pool = connect(this.config);
 
         app.use(cors());
-        this.wss = new WebSocketServer(app, pool, this.config.web.secret);
+        this.wss = new WebSocketServer(app, pool, this.config.web.timeout, this.config.web.secret);
     }
 
     public run() {

@@ -22,7 +22,11 @@ export class WebSocketServer {
     private readonly clients: WebSocketClient[];
     private readonly auditlogs: AuditLogsClient;
 
-    public constructor(expr: express.Express, private readonly pool: Pool, private readonly secret: string) {
+    public constructor(expr: express.Express,
+        private readonly pool: Pool,
+        private readonly timeout: number,
+        private readonly secret: string
+    ) {
         const server = http.createServer(expr);
         this.server = server;
         this.wss = new WebSocket.Server({ noServer: true });
@@ -67,6 +71,7 @@ export class WebSocketServer {
         const client = new WebSocketClient(this.auditlogs,
             this.secret,
             ip,
+            this.timeout,
             socket,
             this.pool);
 
