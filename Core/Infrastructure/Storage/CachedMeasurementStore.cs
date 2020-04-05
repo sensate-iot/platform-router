@@ -64,10 +64,6 @@ namespace SensateService.Infrastructure.Storage
 
 		public override Task StoreAsync(string obj, RequestMethod method)
 		{
-			if(!obj.Contains("CreatedById") || !obj.Contains(RawMeasurement.CreatedBySecretKey)) {
-				return Task.CompletedTask;
-			}
-
 			this.m_lock.Lock();
 			this.m_measurements.Add(new RawMeasurementEntry(method, obj));
 			this.m_count += 1;
