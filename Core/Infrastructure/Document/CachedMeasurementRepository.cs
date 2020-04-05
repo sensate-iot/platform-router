@@ -49,7 +49,7 @@ namespace SensateService.Infrastructure.Document
 		{
 			string key;
 
-			key = $"Measurements::{sensor.InternalId.ToString()}";
+			key = $"measurements::{sensor.InternalId.ToString()}";
 			var tasks = new[] {
 				this._cache.RemoveAsync(key),
 				base.DeleteBySensorAsync(sensor, ct)
@@ -75,7 +75,7 @@ namespace SensateService.Infrastructure.Document
 		{
 			string key;
 
-			key = $"Measurements::{sensor.InternalId.ToString()}";
+			key = $"measurements::{sensor.InternalId.ToString()}";
 			var measurements = await this._cache.DeserializeAsync<IEnumerable<Measurement>>(key).AwaitBackground();
 
 			if(measurements != null) {
@@ -150,7 +150,7 @@ namespace SensateService.Infrastructure.Document
 			var cache_start = start.ThisMinute();
 
 			var key =
-				$"Near::{ordered.GetHashCode()}::" +
+				$"near::{ordered.GetHashCode()}::" +
 				$"{cache_start.ToString("u", CultureInfo.InvariantCulture)}::" +
 				$"{cache_end.ToString("u", CultureInfo.InvariantCulture)}::" +
 				$"{skip}::{limit}::";
@@ -188,7 +188,7 @@ namespace SensateService.Infrastructure.Document
 			var cache_start = start.ThisMinute();
 
 			var key =
-				$"Near::{GetSensorListHashCode(ordered)}::" +
+				$"near::{GetSensorListHashCode(ordered)}::" +
 				$"{cache_start.ToString("u", CultureInfo.InvariantCulture)}::" +
 				$"{cache_end.ToString("u", CultureInfo.InvariantCulture)}::" +
 				$"{skip}::{limit}::" +
