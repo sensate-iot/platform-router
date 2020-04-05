@@ -60,8 +60,9 @@ namespace SensateService.Infrastructure.Sql
 		{
 			var obj = this._cache.Get(id);
 
-			if(obj == null)
+			if(obj == null) {
 				return null;
+			}
 
 			return JsonConvert.DeserializeObject<SensateUser>(obj);
 		}
@@ -75,8 +76,10 @@ namespace SensateService.Infrastructure.Sql
 				return obj;
 
 			obj = base.Get(key);
-			if(obj == null)
+
+			if(obj == null) {
 				return null;
+			}
 
 			this.SetCache(obj);
 			return obj;
@@ -102,8 +105,10 @@ namespace SensateService.Infrastructure.Sql
 			}
 
 			obj = await base.GetAsync(key).AwaitBackground();
-			if(obj == null)
+
+			if(obj == null) {
 				return null;
+			}
 
 			await this.SetCacheAsync(obj, default).ConfigureAwait(false);
 			return obj;
@@ -137,11 +142,12 @@ namespace SensateService.Infrastructure.Sql
 
 		public override async Task<IEnumerable<string>> GetRolesAsync(SensateUser user)
 		{
-			var id = $"{{roles}}:{user.Id}";
+			var id = $"user_roles:{user.Id}";
 			var obj = await this._cache.GetAsync(id, CancellationToken.None).ConfigureAwait(false);
 
-			if(obj != null)
+			if(obj != null) {
 				return JsonConvert.DeserializeObject<IEnumerable<string>>(obj);
+			}
 
 			var roles = await base.GetRolesAsync(user).ConfigureAwait(false);
 
