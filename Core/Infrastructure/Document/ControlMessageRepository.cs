@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
@@ -60,6 +61,18 @@ namespace SensateService.Infrastructure.Document
 
 			var result = await query.ToListAsync(ct).AwaitBackground();
 			return result;
+		}
+
+		public async Task<long> CountAsync(IList<Sensor> sensors, DateTime start, DateTime end, int skip = -1, int limit = -1,
+		                                   CancellationToken ct = default)
+		{
+			var ids = sensors.Select(x => x.InternalId);
+			var builder = Builders<ControlMessage>.Filter;
+			var filter = builder.In(x => x.SensorId, ids) &
+			             builder.Gte(x => x.Timestamp, start) &
+			             builder.Lte(x => x.Timestamp, end);
+
+			return await this._collection.CountDocumentsAsync(filter, cancellationToken:ct).AwaitBackground();
 		}
 
 		public async Task<ControlMessage> GetAsync(string messageId, CancellationToken ct = default)
