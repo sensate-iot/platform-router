@@ -17,3 +17,12 @@ export function toCamelCase(key: any, value: any) {
 
     return value;
 }
+
+export function getClientIP(forwardedHeader: string): string {
+    if (forwardedHeader === null || forwardedHeader === undefined || forwardedHeader === "") {
+        return null;
+    }
+
+    const result = forwardedHeader.split(",");
+    return result[0].replace(/\s/g, "");
+}

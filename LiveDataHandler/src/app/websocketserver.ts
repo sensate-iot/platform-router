@@ -14,6 +14,7 @@ import { BulkMeasurementInfo } from "../models/measurement";
 import { WebSocketClient } from "../clients/websocketclient";
 import { Pool } from "pg";
 import { AuditLogsClient } from "../clients/auditlogsclient";
+import { getClientIP } from "./util";
 
 export class WebSocketServer {
     private readonly server: http.Server;
@@ -66,7 +67,11 @@ export class WebSocketServer {
     }
 
     private async handleSocketUpgrade(socket: WebSocket, request: any) {
-        const ip = request.headers["x-client-ip"] || request.connection.remoteAddress;
+        let ip = getClientIP(request.headers["x-forwarded-for"]);
+
+        if (ip === null) {
+            ip = request.connection.remoteAddress.toString();
+        }
 
         const client = new WebSocketClient(this.auditlogs,
             this.secret,
