@@ -14,8 +14,6 @@ namespace SensateService.Models.Json.In
 {
 	public class RawMeasurement
 	{
-		public const string CreatedBySecretKey = "CreatedBySecret";
-
 		public string CreatedById { get; set; }
 		public string CreatedBySecret { get; set; }
 		public double? Longitude { get; set; }
