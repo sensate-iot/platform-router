@@ -5,7 +5,7 @@
  * @email  michel.megens@sonatolabs.com
  */
 
-namespace SensateService.Infrastructure
+namespace SensateService.Enums
 {
 	public enum CacheTimeout
 	{

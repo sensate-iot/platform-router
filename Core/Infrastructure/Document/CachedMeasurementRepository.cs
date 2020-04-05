@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 using MongoDB.Driver.GeoJsonObjectModel;
-
+using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Cache;
 using SensateService.Models;

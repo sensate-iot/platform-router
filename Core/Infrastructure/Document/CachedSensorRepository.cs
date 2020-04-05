@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-
+using SensateService.Enums;
 using SensateService.Infrastructure.Cache;
 using SensateService.Models;
 using SensateService.Helpers;

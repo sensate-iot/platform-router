@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 
 using Newtonsoft.Json;
-
+using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Cache;
 using SensateService.Models;

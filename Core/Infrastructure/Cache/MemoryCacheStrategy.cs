@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Threading;
 
 using Microsoft.Extensions.Caching.Memory;
+using SensateService.Enums;
 using SensateService.Helpers;
 
 namespace SensateService.Infrastructure.Cache

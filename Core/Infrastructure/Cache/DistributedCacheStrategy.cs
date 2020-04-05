@@ -12,7 +12,7 @@ using System.Threading;
 using Microsoft.Extensions.Caching.Distributed;
 
 using Newtonsoft.Json;
-
+using SensateService.Enums;
 using SensateService.Helpers;
 
 namespace SensateService.Infrastructure.Cache
