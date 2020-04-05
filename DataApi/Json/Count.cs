@@ -16,5 +16,6 @@ namespace SensateService.DataApi.Json
 		public long TriggerInvocations { get; set; }
 		public long ApiCalls { get; set; }
 		public long BlobStorage { get; set; }
+		public long ActuatorMessages { get; set; }
 	}
 }

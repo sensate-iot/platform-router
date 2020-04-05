@@ -39,6 +39,7 @@ namespace SensateService.DataApi.Controllers
 		private readonly IUserRepository m_users;
 		private readonly IMessageRepository m_messages;
 		private readonly IBlobRepository m_blobs;
+		private readonly IControlMessageRepository m_control;
 
 		public StatisticsController(ISensorStatisticsRepository stats,
 									ISensorRepository sensors,
@@ -46,6 +47,7 @@ namespace SensateService.DataApi.Controllers
 									IAuditLogRepository logs,
 									IUserRepository users,
 									ITriggerRepository triggers,
+									IControlMessageRepository control,
 									IMessageRepository messages,
 									IBlobRepository blobs,
 									ILogger<StatisticsController> loger,
@@ -58,6 +60,7 @@ namespace SensateService.DataApi.Controllers
 			this.m_triggers = triggers;
 			this.m_users = users;
 			this.m_blobs = blobs;
+			this.m_control = control;
 			this.m_messages = messages;
 		}
 
@@ -263,6 +266,7 @@ namespace SensateService.DataApi.Controllers
 				}
 
 				var messages = this.m_messages.CountAsync(sensors, start, end);
+				var actuators = this.m_control.CountAsync(sensors, start, end);
 				var blobTask = this.m_blobs.GetAsync(sensors, start, end);
 				var result = await this._stats.GetBetweenAsync(sensors, start, end).AwaitBackground();
 
@@ -294,7 +298,8 @@ namespace SensateService.DataApi.Controllers
 					Links = await this.m_links.CountAsync(user).AwaitBackground(),
 					TriggerInvocations = triggers.Aggregate(0L, (v, trigger) => v + trigger.Invocations.Count),
 					ApiCalls = logs,
-					Messages = await messages.AwaitBackground()
+					Messages = await messages.AwaitBackground(),
+					ActuatorMessages = await actuators.AwaitBackground()
 				};
 			} catch(Exception ex) {
 				this.m_logger.LogDebug(ex, $"Unable to count statistics between {start} and {end}");
