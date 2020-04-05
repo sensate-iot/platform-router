@@ -6,13 +6,11 @@
  */
 
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 using SensateService.Enums;
 using SensateService.Helpers;
