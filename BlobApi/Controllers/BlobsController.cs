@@ -24,6 +24,7 @@ using SensateService.Models;
 using SensateService.Models.Json.Out;
 using SensateService.Services;
 using SensateService.Services.Settings;
+using SensateService.Settings;
 
 namespace SensateService.BlobApi.Controllers
 {
