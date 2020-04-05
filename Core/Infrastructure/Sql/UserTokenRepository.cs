@@ -22,6 +22,7 @@ using SensateService.Exceptions;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Helpers;
+using SensateService.Settings;
 
 namespace SensateService.Infrastructure.Sql
 {

@@ -32,6 +32,7 @@ using SensateService.Models.Json.In;
 using SensateService.Models.Json.Out;
 using SensateService.Services;
 using SensateService.Services.Settings;
+using SensateService.Settings;
 
 namespace SensateService.AuthApi.Controllers
 {

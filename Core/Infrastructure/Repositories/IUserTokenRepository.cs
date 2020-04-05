@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using SensateService.Models;
+using SensateService.Settings;
 
 namespace SensateService.Infrastructure.Repositories
 {

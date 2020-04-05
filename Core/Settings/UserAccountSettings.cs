@@ -5,7 +5,7 @@
  * @email:  michel.megens@sonatolabs.com
  */
 
-namespace SensateService
+namespace SensateService.Settings
 {
 	public class UserAccountSettings
 	{

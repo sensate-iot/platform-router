@@ -24,6 +24,7 @@ using SensateService.Infrastructure.Sql;
 using SensateService.Models;
 using SensateService.Models.Json.In;
 using SensateService.Models.Json.Out;
+using SensateService.Settings;
 
 namespace SensateService.AuthApi.Controllers
 {
