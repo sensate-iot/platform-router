@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 using MongoDB.Bson;
-
+using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
 using SensateService.DataApi.Json;
 using SensateService.Enums;
@@ -205,21 +205,16 @@ namespace SensateService.DataApi.Controllers
 
 		[HttpGet("count/{userId}")]
 		[ProducesResponseType(typeof(Count), 200)]
-		[ProducesResponseType(403)]
 		[ProducesResponseType(typeof(Status), 400)]
+		[ProducesResponseType(StatusCodes.Status403Forbidden)]
+		[AdminApiKey]
 		public async Task<IActionResult> Count(string userId,
 											   [FromQuery] string sensorId,
 											   [FromQuery] DateTime start,
 											   [FromQuery] DateTime end)
 		{
-			var admin = await this.m_users.IsAdministrator(this.CurrentUser).AwaitBackground();
-
-			if(!admin) {
-				return this.Forbid();
-			}
 
 			var user = await this.m_users.GetAsync(userId).AwaitBackground();
-
 			return await this.CountAsync(user, sensorId, start, end).AwaitBackground();
 		}
 
