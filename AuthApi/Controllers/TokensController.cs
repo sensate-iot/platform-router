@@ -56,6 +56,8 @@ namespace SensateService.AuthApi.Controllers
 		[ValidateModel]
 		[ProducesResponseType(typeof(Status), 400)]
 		[ProducesResponseType(typeof(TokenRequestReply), 200)]
+		[ProducesResponseType(401)]
+		[ProducesResponseType(404)]
 		public async Task<ActionResult> RequestToken([FromBody] Login login)
 		{
 			var user = await this._users.GetByEmailAsync(login.Email).AwaitBackground();
@@ -64,7 +66,7 @@ namespace SensateService.AuthApi.Controllers
 			AuthUserToken token;
 
 			if(user == null)
-				return NotFound();
+				return this.NotFound();
 
 			result = await this._signin_manager.CanSignInAsync(user);
 			var banned = await this._users.IsBanned(user);
@@ -84,7 +86,7 @@ namespace SensateService.AuthApi.Controllers
 			signInResult = await this._signin_manager.PasswordSignInAsync(user, login.Password, false, false);
 
 			if(!signInResult.Succeeded) {
-				return new UnauthorizedResult();
+				return this.Unauthorized();
 			}
 
 			token = this.CreateAuthUserTokenEntry(user);
@@ -126,7 +128,8 @@ namespace SensateService.AuthApi.Controllers
 		[HttpPost("refresh")]
 		[ValidateModel]
 		[ProducesResponseType(typeof(Status), 400)]
-		[ProducesResponseType(typeof(TokenRequestReply), 400)]
+		[ProducesResponseType(403)]
+		[ProducesResponseType(401)]
 		public async Task<ActionResult> RefreshToken([FromBody] RefreshLogin login)
 		{
 			var user = await this._users.GetByEmailAsync(login.Email).AwaitBackground();
@@ -165,11 +168,13 @@ namespace SensateService.AuthApi.Controllers
 			return new OkObjectResult(reply);
 		}
 
-		[HttpDelete("revoke/{token}", Name = "RevokeToken")]
 		[NormalUser]
+		[HttpDelete("revoke/{token}", Name = "RevokeToken")]
+		[ProducesResponseType(204)]
 		[ProducesResponseType(typeof(Status), 404)]
 		[ProducesResponseType(typeof(Status), 400)]
-		[ProducesResponseType(200)]
+		[ProducesResponseType(403)]
+		[ProducesResponseType(401)]
 		public async Task<IActionResult> Revoke(string token)
 		{
 			AuthUserToken authToken;
@@ -179,7 +184,7 @@ namespace SensateService.AuthApi.Controllers
 				return this.Forbid();
 			}
 
-			if(String.IsNullOrEmpty(token)) {
+			if(string.IsNullOrEmpty(token)) {
 				return this.InvalidInputResult("Token not found!");
 			}
 
@@ -195,9 +200,11 @@ namespace SensateService.AuthApi.Controllers
 			return this.NoContent();
 		}
 
-		[HttpDelete("revoke-all", Name = "RevokeAll")]
 		[NormalUser]
-		[ProducesResponseType(200)]
+		[HttpDelete("revoke-all", Name = "RevokeAll")]
+		[ProducesResponseType(204)]
+		[ProducesResponseType(403)]
+		[ProducesResponseType(401)]
 		public async Task<IActionResult> RevokeAll()
 		{
 			IEnumerable<AuthUserToken> tokens;

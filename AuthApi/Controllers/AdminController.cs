@@ -35,9 +35,9 @@ namespace SensateService.AuthApi.Controllers
 			this.m_logger = logger;
 		}
 
+		[ValidateModel]
 		[HttpPost("find-users")]
 		[ProducesResponseType(typeof(PaginationResult<User>), 200)]
-		[ValidateModel]
 		public async Task<IActionResult> Find([FromBody] SearchQuery query, [FromQuery] int skip = 0, [FromQuery] int limit = 0, [FromQuery] bool count = false)
 		{
 			PaginationResult<User> rv;
@@ -67,6 +67,7 @@ namespace SensateService.AuthApi.Controllers
 
 		[HttpGet("users")]
 		[ProducesResponseType(typeof(PaginationResult<User>), 200)]
+		[ProducesResponseType(typeof(Status), 400)]
 		public async Task<IActionResult> GetMostRecentUsers(int skip = 0, int limit = 10)
 		{
 			List<User> users;

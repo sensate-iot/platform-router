@@ -42,6 +42,7 @@ namespace SensateService.AuthApi.Controllers
 
 		[HttpPost("create")]
 		[ActionName("CreateApiKey")]
+		[ProducesResponseType(typeof(SensateApiKey), 200)]
 		public async Task<IActionResult> Create([FromBody] CreateApiKey request)
 		{
 			var key = new SensateApiKey {
@@ -71,12 +72,15 @@ namespace SensateService.AuthApi.Controllers
 		}
 
 		[HttpDelete("revoke")]
+		[ProducesResponseType(typeof(Status), 400)]
+		[ProducesResponseType(400)]
 		public async Task<IActionResult> Revoke([FromQuery] string id, [FromQuery] string key, [FromQuery] bool system = true)
 		{
 			SensateApiKey apikey;
 
-			if(string.IsNullOrEmpty(id) && string.IsNullOrEmpty(key))
+			if(string.IsNullOrEmpty(id) && string.IsNullOrEmpty(key)) {
 				return await this.RevokeAll(system).AwaitBackground();
+			}
 
 			if(id != null) {
 				apikey = await this._keys.GetByIdAsync(id).AwaitBackground();
@@ -98,11 +102,15 @@ namespace SensateService.AuthApi.Controllers
 			}
 
 			await this._keys.MarkRevokedAsync(apikey).AwaitBackground();
-			return this.Ok();
+			return this.NoContent();
 		}
 
 		[HttpPatch("{key}")]
 		[ActionName("RefreshApiKey")]
+		[ProducesResponseType(typeof(Status), 400)]
+		[ProducesResponseType(typeof(SensateApiKey), 200)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(404)]
 		public async Task<IActionResult> Refresh(string key)
 		{
 			var apikey = await this._keys.GetByIdAsync(key).AwaitBackground();
@@ -120,6 +128,10 @@ namespace SensateService.AuthApi.Controllers
 		}
 
 		[HttpPost]
+		[ProducesResponseType(typeof(PaginationResult<SensateApiKey>), 200)]
+		[ProducesResponseType(typeof(Status), 400)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(404)]
 		public async Task<IActionResult> Filter([FromBody] ApiKeyFilter filter)
 		{
 			PaginationResult<SensateApiKey> keys;
@@ -164,6 +176,9 @@ namespace SensateService.AuthApi.Controllers
 		}
 
 		[HttpGet]
+		[ProducesResponseType(typeof(IEnumerable<SensateApiKey>), 200)]
+		[ProducesResponseType(typeof(Status), 400)]
+		[ProducesResponseType(400)]
 		public async Task<IActionResult> Index()
 		{
 			var keys = await this._keys.GetByUserAsync(this.CurrentUser).AwaitBackground();

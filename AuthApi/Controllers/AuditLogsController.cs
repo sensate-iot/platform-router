@@ -58,6 +58,10 @@ namespace SensateService.AuthApi.Controllers
 		}
 
 		[HttpGet]
+		[ProducesResponseType(typeof(PaginationResult<Json.AuditLog>), 200)]
+		[ProducesResponseType(typeof(Status), 400)]
+		[ProducesResponseType(401)]
+		[ProducesResponseType(403)]
 		public async Task<IActionResult> Index([FromQuery] int skip = 0,
 											   [FromQuery] int limit = 0,
 											   [FromQuery] RequestMethod method = RequestMethod.Any,
@@ -116,6 +120,10 @@ namespace SensateService.AuthApi.Controllers
 
 
 		[HttpGet("find")]
+		[ProducesResponseType(typeof(PaginationResult<Json.AuditLog>), 200)]
+		[ProducesResponseType(typeof(Status), 400)]
+		[ProducesResponseType(401)]
+		[ProducesResponseType(403)]
 		public async Task<IActionResult> Find([FromQuery] string query = null,
 											  [FromQuery] int skip = 0,
 											  [FromQuery] int limit = 0,

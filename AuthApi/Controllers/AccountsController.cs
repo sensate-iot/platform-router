@@ -120,6 +120,7 @@ namespace SensateService.AuthApi.Controllers
 		[HttpPost("reset-password")]
 		[ProducesResponseType(200)]
 		[ProducesResponseType(204)]
+		[ProducesResponseType(typeof(Status), 400)]
 		[ValidateModel]
 		public async Task<IActionResult> Resetpassword([FromBody] ResetPassword model)
 		{
@@ -152,6 +153,7 @@ namespace SensateService.AuthApi.Controllers
 		[HttpGet("list")]
 		[NormalUser]
 		[ProducesResponseType(typeof(string[]), 200)]
+		[ProducesResponseType(403)]
 		public async Task<IActionResult> GetAllEmail()
 		{
 			var user = await this.GetCurrentUserAsync().AwaitBackground();
@@ -165,9 +167,10 @@ namespace SensateService.AuthApi.Controllers
 			return this.Ok(mail);
 		}
 
-		[HttpGet("phone-confirmed")]
 		[NormalUser]
+		[HttpGet("phone-confirmed")]
 		[ProducesResponseType(typeof(Status), 200)]
+		[ProducesResponseType(403)]
 		public async Task<IActionResult> PhoneNumberConfirmed()
 		{
 			SensateUser user;
@@ -204,6 +207,7 @@ namespace SensateService.AuthApi.Controllers
 		[ValidateModel]
 		[ProducesResponseType(200)]
 		[ProducesResponseType(400)]
+		[ProducesResponseType(typeof(Status), 400)]
 		public async Task<IActionResult> ConfirmChangeEmail([FromBody] ConfirmUpdateEmail changeEmail)
 		{
 			ChangeEmailToken token;
@@ -239,11 +243,12 @@ namespace SensateService.AuthApi.Controllers
 			return this.Ok();
 		}
 
-		[HttpPost("update-email")]
 		[ValidateModel]
+		[NormalUser]
+		[HttpPost("update-email")]
 		[ProducesResponseType(200)]
 		[ProducesResponseType(400)]
-		[NormalUser]
+		[ProducesResponseType(typeof(Status), 400)]
 		public async Task<IActionResult> UpdateEmail([FromBody] UpdateEmail changeEmailModel)
 		{
 			string token;
@@ -283,8 +288,8 @@ namespace SensateService.AuthApi.Controllers
 			return this.NoContent();
 		}
 
-		[HttpGet("roles")]
 		[NormalUser]
+		[HttpGet("roles")]
 		[ProducesResponseType(typeof(UserRoles), 200)]
 		public async Task<IActionResult> GetRoles()
 		{
@@ -345,8 +350,8 @@ namespace SensateService.AuthApi.Controllers
 			return status;
 		}
 
-		[HttpPost("register")]
 		[ValidateModel]
+		[HttpPost("register")]
 		[ProducesResponseType(typeof(Status), 400)]
 		[ProducesResponseType(200)]
 		public async Task<object> Register([FromBody] Register register)
@@ -364,8 +369,9 @@ namespace SensateService.AuthApi.Controllers
 
 			var valid = await this._text.IsValidNumber(register.PhoneNumber);
 
-			if(!valid)
+			if(!valid) {
 				return this.InvalidInputResult("Invalid phone number!");
+			}
 
 			var result = await this._manager.CreateAsync(user, register.Password).AwaitBackground();
 
@@ -403,8 +409,9 @@ namespace SensateService.AuthApi.Controllers
 			User viewuser;
 			var user = await this._users.GetAsync(uid);
 
-			if(user == null)
-				return NotFound();
+			if(user == null) {
+				return this.NotFound();
+			}
 
 			viewuser = new User {
 				Email = user.Email,
@@ -419,10 +426,10 @@ namespace SensateService.AuthApi.Controllers
 			return new ObjectResult(viewuser);
 		}
 
+		[NormalUser]
 		[HttpGet("show")]
 		[ProducesResponseType(404)]
 		[ProducesResponseType(typeof(User), 200)]
-		[NormalUser]
 		public async Task<IActionResult> Show()
 		{
 			User viewuser;
@@ -462,6 +469,7 @@ namespace SensateService.AuthApi.Controllers
 
 		[HttpGet("confirm/{id}/{code}")]
 		[ProducesResponseType(404)]
+		[ProducesResponseType(400)]
 		[ProducesResponseType(200)]
 		public async Task<IActionResult> ConfirmEmail(string id, string code, [FromQuery(Name = "target")] string target)
 		{
@@ -506,7 +514,7 @@ namespace SensateService.AuthApi.Controllers
 		[NormalUser]
 		[HttpGet("confirm-phone-number/{token}")]
 		[ProducesResponseType(typeof(Status), 400)]
-		[ProducesResponseType(200)]
+		[ProducesResponseType(204)]
 		public async Task<IActionResult> ConfirmPhoneNumber(string token)
 		{
 			SensateUser user;
@@ -547,7 +555,7 @@ namespace SensateService.AuthApi.Controllers
 			user.UnconfirmedPhoneNumber = null;
 			await this._users.EndUpdateAsync().AwaitBackground();
 
-			return this.Ok();
+			return this.NoContent();
 		}
 
 		[ValidateModel, NormalUser]
@@ -614,6 +622,8 @@ namespace SensateService.AuthApi.Controllers
 
 		[AdministratorUser, ValidateModel]
 		[HttpPost("update-roles")]
+		[ProducesResponseType(204)]
+		[ProducesResponseType(400)]
 		public async Task<IActionResult> SetRoles([FromBody] IList<SetRole> userroles)
 		{
 			foreach(var role in userroles) {
@@ -623,12 +633,12 @@ namespace SensateService.AuthApi.Controllers
 				bool status = await this._users.ClearRolesForAsync(user);
 
 				if(!status)
-					return this.StatusCode(500);
+					return this.BadRequest();
 
 				status = await this._users.AddToRolesAsync(user, roles);
 
 				if(!status)
-					return this.StatusCode(500);
+					return this.BadRequest();
 
 				var dbgroles = await this._users.GetRolesAsync(user);
 				this._logger.LogInformation($"New roles for {role.UserId}:");
@@ -637,7 +647,7 @@ namespace SensateService.AuthApi.Controllers
 				}
 			}
 
-			return this.Ok();
+			return this.NoContent();
 		}
 
 		[HttpDelete]
@@ -667,13 +677,13 @@ namespace SensateService.AuthApi.Controllers
 		[NormalUser]
 		[HttpPatch("update")]
 		[ProducesResponseType(typeof(Status), 400)]
-		[ProducesResponseType(200)]
+		[ProducesResponseType(204)]
 		public async Task<IActionResult> UpdateUser([FromBody] UpdateUser userUpdate)
 		{
 			var user = await this.GetCurrentUserAsync().AwaitBackground();
 
 			if(user == null) {
-				return BadRequest();
+				return this.BadRequest();
 			}
 
 			if(userUpdate.Password != null) {
@@ -692,14 +702,16 @@ namespace SensateService.AuthApi.Controllers
 
 			this._users.StartUpdate(user);
 
-			if(userUpdate.FirstName != null)
+			if(userUpdate.FirstName != null) {
 				user.FirstName = userUpdate.FirstName;
+			}
 
-			if(userUpdate.LastName != null)
+			if(userUpdate.LastName != null) {
 				user.LastName = userUpdate.LastName;
+			}
 
 			await this._users.EndUpdateAsync().AwaitBackground();
-			return this.Ok();
+			return this.NoContent();
 		}
 	}
 }
