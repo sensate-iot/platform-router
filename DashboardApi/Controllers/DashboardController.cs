@@ -51,6 +51,8 @@ namespace SensateService.DashboardApi.Controllers
 
 		[HttpGet]
 		[ProducesResponseType(typeof(UserDashboard), 200)]
+		[ProducesResponseType(401)]
+		[ProducesResponseType(403)]
 		public async Task<IActionResult> Index()
 		{
 			UserDashboard board;

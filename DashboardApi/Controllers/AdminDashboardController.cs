@@ -40,6 +40,8 @@ namespace SensateService.DashboardApi.Controllers
 
 		[HttpGet]
 		[ProducesResponseType(typeof(AdminDashboard), 200)]
+		[ProducesResponseType(401)]
+		[ProducesResponseType(403)]
 		public async Task<IActionResult> Index()
 		{
 			AdminDashboard db;
