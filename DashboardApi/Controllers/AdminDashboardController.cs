@@ -77,16 +77,18 @@ namespace SensateService.DashboardApi.Controllers
 
 			var measurements = await this._stats.GetAfterAsync(today).AwaitBackground();
 			foreach(var entry in measurements) {
-				if(!totals.TryGetValue(entry.Date.Ticks, out var value))
+				if(!totals.TryGetValue(entry.Date.Ticks, out var value)) {
 					value = 0L;
+				}
 
 				value += entry.Measurements;
 				totals[entry.Date.Ticks] = value;
 			}
 
 			for(var idx = 0; idx < HoursPerDay; idx++) {
-				if(!totals.TryGetValue(today.Ticks, out var value))
+				if(!totals.TryGetValue(today.Ticks, out var value)) {
 					value = 0L;
+				}
 
 				graph.Add(today, value);
 				today = today.AddHours(1D);
@@ -98,7 +100,7 @@ namespace SensateService.DashboardApi.Controllers
 		private async Task<Graph<DateTime, int>> GetRegistrations()
 		{
 			var now = DateTime.Now;
-			Graph<DateTime, int> graph = new Graph<DateTime, int>();
+			var graph = new Graph<DateTime, int>();
 
 			/* Include today */
 			var lastweek = now.AddDays((DaysPerWeek - 1) * -1).ToUniversalTime().Date;

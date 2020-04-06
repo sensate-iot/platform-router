@@ -118,8 +118,9 @@ namespace SensateService.DashboardApi.Controllers
 			var sensors = raw.ToList();
 			List<SensorStatisticsEntry> rv;
 
-			if(sensors.Count <= 0)
+			if(sensors.Count <= 0) {
 				return null;
+			}
 
 			var tasks = new Task<IEnumerable<SensorStatisticsEntry>>[sensors.Count];
 			for(var i = 0; i < sensors.Count; i++) {
@@ -139,7 +140,7 @@ namespace SensateService.DashboardApi.Controllers
 		private async Task<Graph<DateTime, long>> GetApiCallsPerDayAsync()
 		{
 			Graph<DateTime, long> graph;
-			DateTime lastweek = DateTime.Now.Date.AddDays(-DaysPerWeek + 1);
+			var lastweek = DateTime.Now.Date.AddDays(-DaysPerWeek + 1);
 			var start = lastweek;
 
 			var logs = await this._logs.GetAsync(entry => entry.AuthorId == this.CurrentUser.Id &&
@@ -219,8 +220,9 @@ namespace SensateService.DashboardApi.Controllers
 
 			var sorted = (totals.Keys.AsEnumerable() ?? throw new InvalidOperationException()).OrderBy(value => value).ToArray();
 
-			if(sorted.Length <= 0)
+			if(sorted.Length <= 0) {
 				return graph;
+			}
 
 			graph.Add(sorted[0].Date.AddDays(-1), 0L);
 
@@ -242,20 +244,23 @@ namespace SensateService.DashboardApi.Controllers
 			totals = new Dictionary<long, long>();
 			var measurements = await this.GetStatsFor(this.CurrentUser, today).AwaitBackground();
 
-			if(measurements == null)
+			if(measurements == null) {
 				return graph;
+			}
 
 			foreach(var entry in measurements) {
-				if(!totals.TryGetValue(entry.Date.Ticks, out var value))
+				if(!totals.TryGetValue(entry.Date.Ticks, out var value)) {
 					value = 0L;
+				}
 
 				value += entry.Measurements;
 				totals[entry.Date.Ticks] = value;
 			}
 
 			for(var idx = 0; idx < HoursPerDay; idx++) {
-				if(!totals.TryGetValue(today.Ticks, out var value))
+				if(!totals.TryGetValue(today.Ticks, out var value)) {
 					value = 0L;
+				}
 
 				graph.Add(today, value);
 				today = today.AddHours(1D);
