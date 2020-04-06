@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -161,23 +162,27 @@ namespace SensateService.NetworkApi.Controllers
 		[ProducesResponseType(typeof(Status), StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status422UnprocessableEntity)]
-		public async Task<IActionResult> GetLinks([FromQuery] string sensorId)
+		public async Task<IActionResult> GetLinks([FromQuery][NotNull] string sensorId)
 		{
 			IEnumerable<SensorLink> links;
 
 			try {
-				if(string.IsNullOrEmpty(sensorId)) {
-					links = await this.m_links.GetAsync(this.CurrentUser.Id).AwaitBackground();
-				} else {
-					links = await this.m_links.GetAsync(this.CurrentUser.Id, sensorId);
+				var sensorTask = this.m_sensors.GetAsync(sensorId);
+
+				links = await this.m_links.GetAsync(sensorId);
+
+				var sensor = await sensorTask.AwaitBackground();
+
+				if(sensor == null) {
+					return this.NotFound();
 				}
 
 				var linkList = links.ToList();
 				var users = await this.m_users.GetRangeAsync(linkList.Select(x => x.UserId)).AwaitBackground();
 				var dict = users.ToDictionary(x => x.Id, x => x);
 
-				if(!string.IsNullOrEmpty(sensorId)) {
-					linkList.RemoveAll(x => x.UserId == this.CurrentUser.Id && x.SensorId != sensorId);
+				if(!string.IsNullOrEmpty(sensorId) && this.CurrentUser.Id != sensor.Owner) {
+					linkList.RemoveAll(x => x.UserId != this.CurrentUser.Id);
 				}
 
 				foreach(var link in linkList) {
@@ -190,11 +195,11 @@ namespace SensateService.NetworkApi.Controllers
 
 				return this.Ok(linkList);
 			} catch(Exception ex) {
-				this.m_logger.LogInformation($"Unable to delete link: {ex.Message}");
+				this.m_logger.LogInformation($"Unable get links: {ex.Message}");
 				this.m_logger.LogDebug(ex.StackTrace);
 
 				return this.BadRequest(new Status {
-					Message = "Unable to remove link!",
+					Message = "Unable get links!",
 					ErrorCode = ReplyCode.BadInput
 				});
 			}
