@@ -69,7 +69,7 @@ export class WebSocketServer {
     private async handleSocketUpgrade(socket: WebSocket, request: any) {
         let ip = getClientIP(request.headers["x-forwarded-for"]);
 
-        if (ip === null) {
+        if (ip === "") {
             ip = request.connection.remoteAddress.toString();
         }
 

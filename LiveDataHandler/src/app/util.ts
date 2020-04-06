@@ -18,9 +18,9 @@ export function toCamelCase(key: any, value: any) {
     return value;
 }
 
-export function getClientIP(forwardedHeader: string): string | null {
+export function getClientIP(forwardedHeader: string): string {
     if (forwardedHeader === null || forwardedHeader === undefined || forwardedHeader === "") {
-        return null;
+        return "";
     }
 
     const result = forwardedHeader.split(",");
