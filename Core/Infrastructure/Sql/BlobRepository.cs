@@ -72,11 +72,11 @@ namespace SensateService.Infrastructure.Sql
 		}
 
 		public async Task<IEnumerable<Blob>> GetAsync(IList<Sensor> sensors,
-		                                              DateTime start,
-		                                              DateTime end,
-		                                              int skip = -1,
-		                                              int limit = -1,
-		                                              CancellationToken ct = default)
+													  DateTime start,
+													  DateTime end,
+													  int skip = -1,
+													  int limit = -1,
+													  CancellationToken ct = default)
 		{
 			var ids = sensors.Select(x => x.InternalId.ToString());
 			var query = this.Data.Where(x => ids.Contains(x.SensorId) &&
