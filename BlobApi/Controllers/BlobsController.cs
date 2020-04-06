@@ -7,6 +7,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
@@ -151,10 +152,29 @@ namespace SensateService.BlobApi.Controllers
 			return file;
 		}
 
+		[HttpGet]
+		[ProducesResponseType(typeof(Status), StatusCodes.Status403Forbidden)]
+		[ProducesResponseType(typeof(PaginationResult<Blob>), StatusCodes.Status200OK)]
+		[ProducesResponseType(StatusCodes.Status404NotFound)]
+		[ProducesResponseType(StatusCodes.Status403Forbidden)]
+		public async Task<IActionResult> GetAsync(string sensorId, int skip = -1, int limit = -1)
+		{
+			PaginationResult<Blob> blobs;
+
+			if(string.IsNullOrEmpty(sensorId)) {
+				var sensors = await this.m_sensors.GetAsync(this.CurrentUser).AwaitBackground();
+				blobs = await this.m_blobs.GetRangeAsync(sensors.ToList(), skip, limit).AwaitBackground();
+			} else {
+				blobs = await this.m_blobs.GetAsync(sensorId, skip, limit).AwaitBackground();
+			}
+
+			return this.Ok(blobs);
+		}
+
 		[HttpDelete("{sensorId}/{fileName}")]
 		[ReadWriteApiKey]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status403Forbidden)]
-		[ProducesResponseType(typeof(Status), StatusCodes.Status200OK)]
+		[ProducesResponseType(StatusCodes.Status204NoContent)]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
 		[ProducesResponseType(StatusCodes.Status403Forbidden)]
 		public async Task<IActionResult> Delete(string sensorId, string fileName)
