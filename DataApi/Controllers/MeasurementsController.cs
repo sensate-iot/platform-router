@@ -57,7 +57,8 @@ namespace SensateService.DataApi.Controllers
 
 		[HttpPost("create")]
 		[ReadWriteApiKey]
-		[ProducesResponseType(typeof(Status), 202)]
+		[ProducesResponseType(typeof(Status), StatusCodes.Status202Accepted)]
+		[ProducesResponseType(typeof(Status), StatusCodes.Status400BadRequest)]
 		public async Task<IActionResult> Create([FromBody] string raw)
 		{
 			var status = new Status();
@@ -81,7 +82,8 @@ namespace SensateService.DataApi.Controllers
 		}
 
 		[HttpGet("{bucketId}/{index}")]
-		[ProducesResponseType(200)]
+		[ProducesResponseType(typeof(SingleMeasurement), StatusCodes.Status200OK)]
+		[ProducesResponseType(typeof(Status), StatusCodes.Status422UnprocessableEntity)]
 		public async Task<IActionResult> Get(string bucketId, int index = -1)
 		{
 			if(bucketId == null && index < 0) {
@@ -115,9 +117,8 @@ namespace SensateService.DataApi.Controllers
 		}
 
 		[HttpPost]
-		[ProducesResponseType(StatusCodes.Status200OK)]
-		[ProducesResponseType(StatusCodes.Status403Forbidden)]
-		[ProducesResponseType(StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(typeof(IEnumerable<MeasurementsQueryResult>), StatusCodes.Status200OK)]
+		[ProducesResponseType(typeof(Status), StatusCodes.Status422UnprocessableEntity)]
 		public async Task<IActionResult> Filter([FromBody] Filter filter)
 		{
 			var status = new Status();
@@ -162,8 +163,9 @@ namespace SensateService.DataApi.Controllers
 		}
 
 		[HttpGet]
-		[ProducesResponseType(200)]
-		[ProducesResponseType(401)]
+		[ProducesResponseType(typeof(IEnumerable<MeasurementsQueryResult>), StatusCodes.Status200OK)]
+		[ProducesResponseType(StatusCodes.Status404NotFound)]
+		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 		public async Task<IActionResult> Get([FromQuery] string sensorId, [FromQuery] DateTime start, [FromQuery] DateTime end,
 			[FromQuery] double? longitude, [FromQuery] double? latitude, [FromQuery] int? radius,
 			[FromQuery] int skip = -1, [FromQuery] int limit = -1)
@@ -198,6 +200,7 @@ namespace SensateService.DataApi.Controllers
 		[ReadWriteApiKey]
 		[ProducesResponseType(204)]
 		[ProducesResponseType(401)]
+		[ProducesResponseType(404)]
 		public async Task<IActionResult> Delete([FromQuery] string sensorId, [FromQuery] DateTime start, [FromQuery] DateTime end)
 		{
 			Sensor sensor;

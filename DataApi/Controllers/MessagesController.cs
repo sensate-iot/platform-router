@@ -6,6 +6,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
@@ -56,7 +57,7 @@ namespace SensateService.DataApi.Controllers
 		[ReadWriteApiKey]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status422UnprocessableEntity)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status401Unauthorized)]
-		[ProducesResponseType(typeof(Status), StatusCodes.Status201Created)]
+		[ProducesResponseType(typeof(Message), StatusCodes.Status201Created)]
 		public async Task<IActionResult> Create([FromBody] RawMessage raw)
 		{
 			var msg = new Message {
@@ -112,8 +113,8 @@ namespace SensateService.DataApi.Controllers
 
 		[HttpGet("{messageId}")]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status401Unauthorized)]
-		[ProducesResponseType(typeof(Status), StatusCodes.Status404NotFound)]
-		[ProducesResponseType(typeof(Status), StatusCodes.Status200OK)]
+		[ProducesResponseType(StatusCodes.Status404NotFound)]
+		[ProducesResponseType(typeof(Message), StatusCodes.Status200OK)]
 		public async Task<IActionResult> Get(string messageId)
 		{
 			var msg = await this.m_messages.GetAsync(messageId).AwaitBackground();
@@ -129,8 +130,8 @@ namespace SensateService.DataApi.Controllers
 
 		[HttpGet]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status401Unauthorized)]
-		[ProducesResponseType(typeof(Status), StatusCodes.Status404NotFound)]
-		[ProducesResponseType(typeof(Status), StatusCodes.Status200OK)]
+		[ProducesResponseType(StatusCodes.Status404NotFound)]
+		[ProducesResponseType(typeof(IEnumerable<Message>), StatusCodes.Status200OK)]
 		public async Task<IActionResult> Get([FromQuery] string sensorId, [FromQuery] DateTime? start, [FromQuery] DateTime? end, [FromQuery] int skip = 0, [FromQuery] int take = -1)
 		{
 			if(start == null) {

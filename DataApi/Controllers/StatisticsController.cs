@@ -67,6 +67,7 @@ namespace SensateService.DataApi.Controllers
 		[HttpGet(Name = "StatsIndex")]
 		[ActionName("QueryAllStats")]
 		[ProducesResponseType(typeof(IEnumerable<StatisticsEntry>), 200)]
+		[ProducesResponseType(200)]
 		[ProducesResponseType(403)]
 		[ProducesResponseType(typeof(Status), 400)]
 		public async Task<IActionResult> Index()
@@ -111,6 +112,7 @@ namespace SensateService.DataApi.Controllers
 		[ActionName("QueryStatsByDate")]
 		[ProducesResponseType(typeof(IEnumerable<SensorStatisticsEntry>), 200)]
 		[ProducesResponseType(403)]
+		[ProducesResponseType(typeof(Status), 403)]
 		[ProducesResponseType(typeof(Status), 400)]
 		public async Task<IActionResult> StatisticsBySensor(string sensorid, [FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] RequestMethod method = RequestMethod.Any)
 		{
@@ -141,7 +143,7 @@ namespace SensateService.DataApi.Controllers
 
 		[HttpGet("cumulative/daily")]
 		[ProducesResponseType(typeof(IEnumerable<DailyStatisticsEntry>), 200)]
-		[ProducesResponseType(403)]
+		[ProducesResponseType(typeof(Status), 403)]
 		[ProducesResponseType(typeof(Status), 400)]
 		public async Task<IActionResult> CumulativePerDay([FromQuery] DateTime start, [FromQuery] DateTime end)
 		{
@@ -166,25 +168,30 @@ namespace SensateService.DataApi.Controllers
 		[HttpGet("{sensorid}/cumulative/daily")]
 		[ProducesResponseType(typeof(IEnumerable<DailyStatisticsEntry>), 200)]
 		[ProducesResponseType(403)]
+		[ProducesResponseType(typeof(Status), 403)]
 		[ProducesResponseType(typeof(Status), 400)]
 		public async Task<IActionResult> CumulativePerDay(string sensorid, [FromQuery] DateTime start, [FromQuery] DateTime end)
 		{
 			var status = new Status { ErrorCode = ReplyCode.BadInput, Message = "Invalid request!" };
 			var jobj = new List<DailyStatisticsEntry>();
 
-			if(string.IsNullOrEmpty(sensorid))
+			if(string.IsNullOrEmpty(sensorid)) {
 				return this.BadRequest(status);
+			}
 
 			var sensor = await this._sensors.GetAsync(sensorid).AwaitBackground();
 
-			if(sensor == null)
+			if(sensor == null) {
 				return this.BadRequest(status);
+			}
 
-			if(sensor.Owner != this.CurrentUser.Id)
+			if(sensor.Owner != this.CurrentUser.Id) {
 				return this.Forbid();
+			}
 
-			if(end == DateTime.MinValue)
+			if(end == DateTime.MinValue) {
 				end = DateTime.Now;
+			}
 
 			var statistics = await this._stats.GetBetweenAsync(sensor, start, end).AwaitBackground();
 			var entries = statistics.GroupBy(entry => entry.Date)
@@ -220,8 +227,10 @@ namespace SensateService.DataApi.Controllers
 
 		[HttpGet("count")]
 		[ProducesResponseType(typeof(Count), 200)]
-		[ProducesResponseType(403)]
+		[ProducesResponseType(typeof(Status), 403)]
 		[ProducesResponseType(typeof(Status), 400)]
+		[ProducesResponseType(403)]
+		[ProducesResponseType(404)]
 		public async Task<IActionResult> Count([FromQuery] string sensorId,
 											   [FromQuery] DateTime start,
 											   [FromQuery] DateTime end)
@@ -310,6 +319,8 @@ namespace SensateService.DataApi.Controllers
 		}
 
 		[HttpGet("cumulative")]
+		[ProducesResponseType(typeof(MeasurementsAtDateTime), 200)]
+		[ProducesResponseType(typeof(Status), 403)]
 		public async Task<IActionResult> Cumulative([FromQuery] DateTime start, [FromQuery] DateTime end)
 		{
 			var statistics = await this.GetStatsFor(this.CurrentUser, start, end).AwaitBackground();
@@ -326,13 +337,17 @@ namespace SensateService.DataApi.Controllers
 				totals[entry.Timestamp] = counter;
 			}
 
-			return this.Ok(totals.Select(kvp => new {
+			return this.Ok(totals.Select(kvp => new MeasurementsAtDateTime {
 				Timestamp = kvp.Key,
 				Measurements = kvp.Value
 			}));
 		}
 
 		[HttpGet("{sensorid}/cumulative")]
+		[ProducesResponseType(typeof(MeasurementsAtDateTime), 200)]
+		[ProducesResponseType(typeof(Status), 403)]
+		[ProducesResponseType(403)]
+		[ProducesResponseType(typeof(Status), 400)]
 		public async Task<IActionResult> Cumulative(string sensorid, [FromQuery] DateTime start, [FromQuery] DateTime end)
 		{
 			long counter = 0;
@@ -344,11 +359,13 @@ namespace SensateService.DataApi.Controllers
 
 			var sensor = await this._sensors.GetAsync(sensorid).AwaitBackground();
 
-			if(sensor == null)
+			if(sensor == null) {
 				return this.BadRequest(status);
+			}
 
-			if(sensor.Owner != this.CurrentUser.Id)
+			if(sensor.Owner != this.CurrentUser.Id) {
 				return this.Forbid();
+			}
 
 			if(end == DateTime.MinValue)
 				end = DateTime.Now;
@@ -365,7 +382,7 @@ namespace SensateService.DataApi.Controllers
 				totals[entry.Timestamp] = counter;
 			}
 
-			return this.Ok(totals.Select(kvp => new {
+			return this.Ok(totals.Select(kvp => new MeasurementsAtDateTime {
 				Timestamp = kvp.Key,
 				Measurements = kvp.Value
 			}));
