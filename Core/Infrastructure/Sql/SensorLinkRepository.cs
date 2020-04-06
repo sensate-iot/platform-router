@@ -39,17 +39,9 @@ namespace SensateService.Infrastructure.Sql
 			await this.CommitAsync(token).AwaitBackground();
 		}
 
-		public async Task<IEnumerable<SensorLink>> GetAsync(string userId, string sensorId, CancellationToken ct = default)
+		public async Task<IEnumerable<SensorLink>> GetAsync(string sensorId, CancellationToken ct = default)
 		{
-			var links = this.Data.Where(link => link.SensorId == sensorId && link.UserId == userId);
-			var rv = await links.ToListAsync(ct).AwaitBackground();
-
-			return rv;
-		}
-
-		public async Task<IEnumerable<SensorLink>> GetAsync(string userId, CancellationToken ct = default)
-		{
-			var links = this.Data.Where(link => link.UserId == userId);
+			var links = this.Data.Where(link => link.SensorId == sensorId);
 			var rv = await links.ToListAsync(ct).AwaitBackground();
 
 			return rv;
