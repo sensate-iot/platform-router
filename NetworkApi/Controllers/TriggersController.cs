@@ -89,7 +89,7 @@ namespace SensateService.NetworkApi.Controllers
 		[ValidateModel]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status422UnprocessableEntity)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status401Unauthorized)]
-		[ProducesResponseType(typeof(Status), StatusCodes.Status201Created)]
+		[ProducesResponseType(typeof(Trigger), StatusCodes.Status201Created)]
 		public async Task<IActionResult> Create([FromBody] RawTrigger raw)
 		{
 			Trigger trigger;
@@ -168,7 +168,8 @@ namespace SensateService.NetworkApi.Controllers
 		[ReadWriteApiKey]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status422UnprocessableEntity)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status401Unauthorized)]
-		[ProducesResponseType(typeof(Status), StatusCodes.Status201Created)]
+		[ProducesResponseType(typeof(Status), StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(typeof(Trigger), StatusCodes.Status201Created)]
 		public async Task<IActionResult> AddAction(long triggerId, [FromBody] TriggerAction action)
 		{
 			if(action == null) {
@@ -222,8 +223,9 @@ namespace SensateService.NetworkApi.Controllers
 		[ReadWriteApiKey]
 		[ValidateModel]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status422UnprocessableEntity)]
-		[ProducesResponseType(typeof(Status), StatusCodes.Status403Forbidden)]
-		[ProducesResponseType(typeof(Status), StatusCodes.Status201Created)]
+		[ProducesResponseType(StatusCodes.Status403Forbidden)]
+		[ProducesResponseType(typeof(Status), StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(typeof(Trigger), StatusCodes.Status201Created)]
 		public async Task<IActionResult> AddActions(long triggerId, [FromBody] List<TriggerAction> actions)
 		{
 			if(actions == null) {
@@ -264,9 +266,10 @@ namespace SensateService.NetworkApi.Controllers
 		[HttpDelete("{triggerId}")]
 		[ReadWriteApiKey]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status422UnprocessableEntity)]
-		[ProducesResponseType(typeof(Status), StatusCodes.Status403Forbidden)]
-		[ProducesResponseType(typeof(Status), StatusCodes.Status404NotFound)]
-		[ProducesResponseType(typeof(Status), StatusCodes.Status204NoContent)]
+		[ProducesResponseType(StatusCodes.Status403Forbidden)]
+		[ProducesResponseType(StatusCodes.Status404NotFound)]
+		[ProducesResponseType(typeof(Status), StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(StatusCodes.Status204NoContent)]
 		public async Task<IActionResult> Delete(long triggerId)
 		{
 			var trigger = await this.m_triggers.GetAsync(triggerId).AwaitBackground();
@@ -290,7 +293,8 @@ namespace SensateService.NetworkApi.Controllers
 		[ProducesResponseType(typeof(Status), StatusCodes.Status422UnprocessableEntity)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status404NotFound)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status403Forbidden)]
-		[ProducesResponseType(typeof(Status), StatusCodes.Status204NoContent)]
+		[ProducesResponseType(typeof(Status), StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(StatusCodes.Status204NoContent)]
 		public async Task<IActionResult> RemoveAction(long triggerId, [FromQuery] TriggerActionChannel? channel)
 		{
 			if(channel == null) {
@@ -319,7 +323,7 @@ namespace SensateService.NetworkApi.Controllers
 		[HttpGet("{triggerId}")]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status422UnprocessableEntity)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status401Unauthorized)]
-		[ProducesResponseType(typeof(Status), StatusCodes.Status201Created)]
+		[ProducesResponseType(typeof(Trigger), StatusCodes.Status200OK)]
 		public async Task<IActionResult> GetById(long triggerId)
 		{
 			var trigger = await this.m_triggers.GetAsync(triggerId).AwaitBackground();
@@ -341,7 +345,7 @@ namespace SensateService.NetworkApi.Controllers
 		[HttpGet]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status422UnprocessableEntity)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status401Unauthorized)]
-		[ProducesResponseType(typeof(Status), StatusCodes.Status201Created)]
+		[ProducesResponseType(typeof(IEnumerable<Trigger>), StatusCodes.Status200OK)]
 		public async Task<IActionResult> Get([FromQuery] string sensorId, [FromQuery] TriggerType? type)
 		{
 			if(string.IsNullOrEmpty(sensorId)) {

@@ -53,7 +53,7 @@ namespace SensateService.NetworkApi.Controllers
 		[ValidateModel]
 		[ReadWriteApiKey]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status403Forbidden)]
-		[ProducesResponseType(typeof(Status), StatusCodes.Status204NoContent)]
+		[ProducesResponseType(StatusCodes.Status204NoContent)]
 		public async Task<IActionResult> Post([FromBody] ControlMessage msg)
 		{
 			var auth = await this.AuthenticateUserForSensor(msg.SensorId.ToString(), true).AwaitBackground();
