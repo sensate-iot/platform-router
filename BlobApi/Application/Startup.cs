@@ -81,10 +81,6 @@ namespace SensateService.BlobApi.Application
 				settings.StoragePath = storage.Path;
 			});
 
-			/*
-			 * Setup user authentication
-			 */
-
 			if(cache.Enabled) {
 				services.AddCacheStrategy(cache, db);
 			}
