@@ -80,7 +80,7 @@ namespace SensateService.BlobApi.Controllers
 				SensorId = upload.SensorId,
 				FileName = upload.Name,
 				Timestamp = DateTime.UtcNow,
-				Path = $"{this.m_settings.StoragePath}{Path.DirectorySeparatorChar}{upload.SensorId}",
+				Path = this.CreatePath(upload.SensorId),
 				StorageType = StorageType.FileSystem,
 				FileSize = upload.File.Length
 			};
