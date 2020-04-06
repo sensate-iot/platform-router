@@ -63,6 +63,7 @@ namespace SensateService.BlobApi.Controllers
 		[ReadWriteApiKey]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status422UnprocessableEntity)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status403Forbidden)]
+		[ProducesResponseType(StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status201Created)]
 		public async Task<IActionResult> Create([FromForm] FileUploadForm upload)
 		{
@@ -114,7 +115,8 @@ namespace SensateService.BlobApi.Controllers
 
 		[HttpGet("{sensorId}/{fileName}")]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status403Forbidden)]
-		[ProducesResponseType(typeof(Status), StatusCodes.Status404NotFound)]
+		[ProducesResponseType(StatusCodes.Status404NotFound)]
+		[ProducesResponseType(StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status200OK)]
 		public async Task<IActionResult> Get(string sensorId, string fileName)
 		{
@@ -135,7 +137,7 @@ namespace SensateService.BlobApi.Controllers
 
 				var filePath = $"{blob.Path}{Path.DirectorySeparatorChar}{blob.FileName}";
 				var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-				file = File(stream, "application/octet-stream");
+				file = this.File(stream, "application/octet-stream");
 			} catch(Exception ex) {
 				this.m_logger.LogInformation($"Unable to fetch blob: {ex.Message}");
 				this.m_logger.LogDebug(ex.StackTrace);
@@ -153,6 +155,8 @@ namespace SensateService.BlobApi.Controllers
 		[ReadWriteApiKey]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status200OK)]
+		[ProducesResponseType(StatusCodes.Status404NotFound)]
+		[ProducesResponseType(StatusCodes.Status403Forbidden)]
 		public async Task<IActionResult> Delete(string sensorId, string fileName)
 		{
 			try {
