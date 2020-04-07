@@ -86,26 +86,26 @@ namespace SensateService.DashboardApi.Controllers
 		private async Task<long> CountSecurityTokensAsync()
 		{
 			var count = await this._tokens.CountAsync(token =>
-					token.UserId == this.CurrentUser.Id && token.Valid && token.ExpiresAt >= DateTime.Now)
+					token.UserId == this.CurrentUser.Id && token.Valid && token.ExpiresAt >= DateTime.UtcNow)
 				.AwaitBackground();
 			return count;
 		}
 
 		private async Task<long> CountMeasurementsAsync()
 		{
-			var start = DateTime.Now.Date;
+			var start = DateTime.UtcNow.Date;
 
 			var sensors = await this._sensors.GetAsync(this.CurrentUser).AwaitBackground();
-			var stats = await this._stats.GetBetweenAsync(sensors.ToList(), start, DateTime.Now).AwaitBackground();
+			var stats = await this._stats.GetBetweenAsync(sensors.ToList(), start, DateTime.UtcNow).AwaitBackground();
 			return stats.Aggregate(0L, (value, current) => value + current.Measurements);
 		}
 
 		private async Task<long> GetApiCallCountAsync()
 		{
-			var start = DateTime.Now.AddMonths(-1);
+			var start = DateTime.UtcNow.AddMonths(-1);
 			var logs = await this._logs.CountAsync(entry => entry.AuthorId == this.CurrentUser.Id &&
 														  entry.Timestamp >= start &&
-														  entry.Timestamp <= DateTime.Now &&
+														  entry.Timestamp <= DateTime.UtcNow &&
 														  (entry.Method == RequestMethod.HttpGet ||
 														   entry.Method == RequestMethod.HttpDelete ||
 														   entry.Method == RequestMethod.HttpPatch ||
@@ -142,12 +142,12 @@ namespace SensateService.DashboardApi.Controllers
 		private async Task<Graph<DateTime, long>> GetApiCallsPerDayAsync()
 		{
 			Graph<DateTime, long> graph;
-			var lastweek = DateTime.Now.Date.AddDays(-DaysPerWeek + 1);
+			var lastweek = DateTime.UtcNow.Date.AddDays(-DaysPerWeek + 1);
 			var start = lastweek;
 
 			var logs = await this._logs.GetAsync(entry => entry.AuthorId == this.CurrentUser.Id &&
 														  entry.Timestamp >= start &&
-														  entry.Timestamp <= DateTime.Now &&
+														  entry.Timestamp <= DateTime.UtcNow &&
 														  (entry.Method == RequestMethod.HttpGet ||
 														   entry.Method == RequestMethod.HttpDelete ||
 														   entry.Method == RequestMethod.HttpPatch ||

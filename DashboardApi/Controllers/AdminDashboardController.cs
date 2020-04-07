@@ -101,7 +101,7 @@ namespace SensateService.DashboardApi.Controllers
 
 		private async Task<Graph<DateTime, int>> GetRegistrations()
 		{
-			var now = DateTime.Now;
+			var now = DateTime.UtcNow;
 			var graph = new Graph<DateTime, int>();
 
 			/* Include today */
