@@ -56,7 +56,7 @@ namespace SensateService.DashboardApi.Controllers
 				NumberOfGhosts = await this._users.CountGhostUsersAsync().AwaitBackground()
 			};
 
-			var measurements = await this._stats.GetAfterAsync(DateTime.Now.ThisHour()).AwaitBackground();
+			var measurements = await this._stats.GetAfterAsync(DateTime.UtcNow.ThisHour()).AwaitBackground();
 
 			measurementCount = measurements.Aggregate(0L, (current, entry) => current + entry.Measurements);
 
