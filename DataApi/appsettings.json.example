@@ -76,30 +76,5 @@
       "InternalBulkMeasurementTopic": "sensate/internal/measurements/bulk",
       "InternalMessageTopic": "sensate/internal/messages" 
     } 
-  },
-
-  "Mail": {
-    "Provider": "SendGrid",
-    "SendGrid": {
-      "Username": "u-name",
-      "Key": "<sendgrid-key>"
-    },
-    "Smtp": {
-      "Ssl": true,
-      "Port": 587,
-      "Host": "mail.example.com",
-      "Username": "root@mail.com",
-      "Password": "SomePassword"
-    }
-  },
-
-  "Text" : {
-    "Provider": "Twilio",
-    "AlphaCode": "Sensate IoT",
-    "Twilio": {
-      "AccountSid": "<sid>",
-      "AuthToken": "<auth token>",
-      "PhoneSid": "<name>" 
-    } 
-  } 
+  }
 }
