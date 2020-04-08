@@ -78,6 +78,7 @@ namespace SensateService.BlobApi.Controllers
 			}
 
 			this.m_logger.LogDebug($"Creating file/blob: {file.Name}");
+
 			var blob = new Blob {
 				SensorId = upload.SensorId,
 				FileName = upload.Name,
@@ -118,7 +119,7 @@ namespace SensateService.BlobApi.Controllers
 		[ProducesResponseType(typeof(Status), StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
 		[ProducesResponseType(StatusCodes.Status403Forbidden)]
-		[ProducesResponseType(typeof(Status), StatusCodes.Status200OK)]
+		[ProducesResponseType(StatusCodes.Status200OK)]
 		public async Task<IActionResult> Get(string sensorId, string fileName)
 		{
 			FileStreamResult file;
@@ -157,15 +158,22 @@ namespace SensateService.BlobApi.Controllers
 		[ProducesResponseType(typeof(PaginationResult<Blob>), StatusCodes.Status200OK)]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
 		[ProducesResponseType(StatusCodes.Status403Forbidden)]
-		public async Task<IActionResult> GetAsync(string sensorId, int skip = -1, int limit = -1)
+		public async Task<IActionResult> GetAsync(string sensorId, int skip = -1, int limit = -1, string order = "")
 		{
 			PaginationResult<Blob> blobs;
 
+			var orderDirection = order switch
+			{
+				"asc" => OrderDirection.Ascending,
+				"desc" => OrderDirection.Descending,
+				_ => OrderDirection.None,
+			};
+
 			if(string.IsNullOrEmpty(sensorId)) {
 				var sensors = await this.m_sensors.GetAsync(this.CurrentUser).AwaitBackground();
-				blobs = await this.m_blobs.GetRangeAsync(sensors.ToList(), skip, limit).AwaitBackground();
+				blobs = await this.m_blobs.GetRangeAsync(sensors.ToList(), skip, limit, orderDirection).AwaitBackground();
 			} else {
-				blobs = await this.m_blobs.GetAsync(sensorId, skip, limit).AwaitBackground();
+				blobs = await this.m_blobs.GetAsync(sensorId, skip, limit, orderDirection).AwaitBackground();
 			}
 
 			return this.Ok(blobs);
