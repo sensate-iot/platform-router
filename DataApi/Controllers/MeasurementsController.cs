@@ -149,14 +149,28 @@ namespace SensateService.DataApi.Controllers
 				return this.UnprocessableEntity(status);
 			}
 
+			OrderDirection direction;
+
+			if(string.IsNullOrEmpty(filter.OrderDirection)) {
+				filter.OrderDirection = "";
+			}
+
+			direction = filter.OrderDirection switch
+			{
+				"asc" => OrderDirection.Ascending,
+				"desc" => OrderDirection.Descending,
+				_ => OrderDirection.None,
+			};
+
 			if(filter.Latitude != null & filter.Longitude != null && filter.Radius != null && filter.Radius.Value > 0) {
 				var coords = new GeoJson2DGeographicCoordinates(filter.Longitude.Value, filter.Latitude.Value);
 				result = await this.m_measurements
 					.GetMeasurementsNearAsync(filtered, filter.Start, filter.End, coords, filter.Radius.Value,
-						filter.Skip.Value, filter.Limit.Value).AwaitBackground();
+						filter.Skip.Value, filter.Limit.Value, direction).AwaitBackground();
 			} else {
 				result = await this.m_measurements
-					.GetMeasurementsBetweenAsync(filtered, filter.Start, filter.End, filter.Skip.Value, filter.Limit.Value).AwaitBackground();
+					.GetMeasurementsBetweenAsync(filtered, filter.Start, filter.End, filter.Skip.Value,
+												 filter.Limit.Value, direction).AwaitBackground();
 			}
 
 			return this.Ok(result);
@@ -168,9 +182,15 @@ namespace SensateService.DataApi.Controllers
 		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 		public async Task<IActionResult> Get([FromQuery] string sensorId, [FromQuery] DateTime start, [FromQuery] DateTime end,
 			[FromQuery] double? longitude, [FromQuery] double? latitude, [FromQuery] int? radius,
-			[FromQuery] int skip = -1, [FromQuery] int limit = -1)
+			[FromQuery] int skip = -1, [FromQuery] int limit = -1, [FromQuery] string order = "")
 		{
 			var sensor = await this.m_sensors.GetAsync(sensorId).AwaitBackground();
+			var orderDirection = order switch
+			{
+				"asc" => OrderDirection.Ascending,
+				"desc" => OrderDirection.Descending,
+				_ => OrderDirection.None,
+			};
 
 			if(sensor == null) {
 				return this.NotFound();
@@ -187,11 +207,13 @@ namespace SensateService.DataApi.Controllers
 				var coords = new GeoJson2DGeographicCoordinates(longitude.Value, latitude.Value);
 
 				var data = await this.m_measurements
-					.GetMeasurementsNearAsync(sensor, start, end, coords, maxDist, skip, limit).AwaitBackground();
+					.GetMeasurementsNearAsync(sensor, start, end, coords, maxDist, skip, limit, orderDirection)
+					.AwaitBackground();
 
 				return this.Ok(data);
 			} else {
-				var data = await this.m_measurements.GetBetweenAsync(sensor, start, end, skip, limit).AwaitBackground();
+				var data = await this.m_measurements.GetBetweenAsync(sensor, start, end,
+																	 skip, limit, orderDirection).AwaitBackground();
 				return this.Ok(data);
 			}
 		}
