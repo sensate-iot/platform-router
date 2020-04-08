@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
@@ -42,14 +43,22 @@ namespace SensateService.Infrastructure.Document
 			return this._collection.DeleteOneAsync(filter, ct);
 		}
 
-		public async Task<IEnumerable<Message>> GetAsync(Sensor sensor, int skip = 0, int take = -1, CancellationToken ct = default)
+		public async Task<IEnumerable<Message>> GetAsync(Sensor sensor, int skip = 0, int take = -1, OrderDirection order = OrderDirection.None, CancellationToken ct = default)
 		{
 			var fb = Builders<Message>.Filter;
 
 			var filter = fb.Eq(m => m.SensorId, sensor.InternalId);
 			var query = this._collection.Find(filter);
 
-			query = query.Skip(0);
+			if(order == OrderDirection.Ascending) {
+				query = query.SortBy(x => x.CreatedAt);
+			} else if(order == OrderDirection.Descending) {
+				query = query.SortByDescending(x => x.CreatedAt);
+			}
+
+			if(skip > 0) {
+				query = query.Skip(skip);
+			}
 
 			if(take > 0) {
 				query = query.Limit(take);
@@ -59,7 +68,9 @@ namespace SensateService.Infrastructure.Document
 			return results;
 		}
 
-		public async Task<IEnumerable<Message>> GetAsync(Sensor sensor, DateTime start, DateTime end, int skip = 0, int take = -1, CancellationToken ct = default)
+		public async Task<IEnumerable<Message>> GetAsync(Sensor sensor, DateTime start, DateTime end,
+														 int skip = 0, int take = -1,
+														 OrderDirection order = OrderDirection.None, CancellationToken ct = default)
 		{
 			var fb = Builders<Message>.Filter;
 
@@ -69,7 +80,15 @@ namespace SensateService.Infrastructure.Document
 
 			var query = this._collection.Find(filter);
 
-			query = query.Skip(0);
+			if(order == OrderDirection.Ascending) {
+				query = query.SortBy(x => x.CreatedAt);
+			} else if(order == OrderDirection.Descending) {
+				query = query.SortByDescending(x => x.CreatedAt);
+			}
+
+			if(skip > 0) {
+				query = query.Skip(skip);
+			}
 
 			if(take > 0) {
 				query = query.Limit(take);
