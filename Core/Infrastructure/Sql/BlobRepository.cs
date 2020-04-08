@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
@@ -24,11 +25,17 @@ namespace SensateService.Infrastructure.Sql
 		{
 		}
 
-		private static async Task<PaginationResult<Blob>> FetchData(IQueryable<Blob> blobs, int skip, int limit, CancellationToken ct)
+		private static async Task<PaginationResult<Blob>> FetchData(IQueryable<Blob> blobs, int skip, int limit, OrderDirection order, CancellationToken ct)
 		{
 			var result = new PaginationResult<Blob> {
 				Count = await blobs.CountAsync(ct).AwaitBackground()
 			};
+
+			if(order == OrderDirection.Ascending) {
+				blobs = blobs.OrderBy(x => x.Timestamp);
+			} else if(order == OrderDirection.Descending) {
+				blobs = blobs.OrderByDescending(x => x.Timestamp);
+			}
 
 			if(skip > 0) {
 				blobs = blobs.Skip(skip);
@@ -57,18 +64,18 @@ namespace SensateService.Infrastructure.Sql
 			return blob;
 		}
 
-		public Task<PaginationResult<Blob>> GetAsync(string sensorId, int skip = -1, int limit = -1, CancellationToken ct = default)
+		public Task<PaginationResult<Blob>> GetAsync(string sensorId, int skip = -1, int limit = -1, OrderDirection order = OrderDirection.None, CancellationToken ct = default)
 		{
 			var blobs = this.Data.Where(blob => blob.SensorId == sensorId);
-			return FetchData(blobs, skip, limit, ct);
+			return FetchData(blobs, skip, limit, order, ct);
 		}
 
-		public async Task<PaginationResult<Blob>> GetRangeAsync(IList<Sensor> sensors, int skip = -1, int limit = -1, CancellationToken ct = default)
+		public async Task<PaginationResult<Blob>> GetRangeAsync(IList<Sensor> sensors, int skip = -1, int limit = -1, OrderDirection order = OrderDirection.None, CancellationToken ct = default)
 		{
 			var ids = sensors.Select(x => x.InternalId.ToString());
 			var query = this.Data.Where(x => ids.Contains(x.SensorId));
 
-			return await FetchData(query, skip, limit, ct).AwaitBackground();
+			return await FetchData(query, skip, limit, order, ct).AwaitBackground();
 		}
 
 		public async Task<IEnumerable<Blob>> GetAsync(IList<Sensor> sensors,
@@ -76,12 +83,19 @@ namespace SensateService.Infrastructure.Sql
 													  DateTime end,
 													  int skip = -1,
 													  int limit = -1,
+													  OrderDirection order = OrderDirection.None,
 													  CancellationToken ct = default)
 		{
 			var ids = sensors.Select(x => x.InternalId.ToString());
 			var query = this.Data.Where(x => ids.Contains(x.SensorId) &&
 											 x.Timestamp >= start &&
 											 x.Timestamp <= end);
+
+			if(order == OrderDirection.Ascending) {
+				query = query.OrderBy(x => x.Timestamp);
+			} else if(order == OrderDirection.Descending) {
+				query = query.OrderByDescending(x => x.Timestamp);
+			}
 
 			if(skip > 0) {
 				query = query.Skip(skip);
@@ -94,10 +108,10 @@ namespace SensateService.Infrastructure.Sql
 			return await query.ToListAsync(ct).AwaitBackground();
 		}
 
-		public Task<PaginationResult<Blob>> GetLikeAsync(string sensorId, string fileName, int skip = -1, int limit = -1, CancellationToken ct = default)
+		public Task<PaginationResult<Blob>> GetLikeAsync(string sensorId, string fileName, int skip = -1, int limit = -1, OrderDirection order = OrderDirection.None, CancellationToken ct = default)
 		{
 			var blobs = this.Data.Where(blob => blob.SensorId == sensorId && blob.FileName.Contains(fileName));
-			return FetchData(blobs, skip, limit, ct);
+			return FetchData(blobs, skip, limit, order, ct);
 		}
 
 		public async Task<Blob> GetAsync(string sensorId, string fileName, CancellationToken ct = default)
