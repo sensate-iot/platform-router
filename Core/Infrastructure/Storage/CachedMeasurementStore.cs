@@ -21,6 +21,7 @@ using Microsoft.Extensions.Logging;
 
 using MongoDB.Bson;
 using Newtonsoft.Json;
+
 using SensateService.Crypto;
 using SensateService.Enums;
 using SensateService.Exceptions;
@@ -93,7 +94,10 @@ namespace SensateService.Infrastructure.Storage
 		private static async Task<IDictionary<string, SensateUser>> GetUserInformation(IUserRepository users, IEnumerable<string> ids)
 		{
 			var userdata = await users.GetRangeAsync(ids).AwaitBackground();
-			return userdata.ToDictionary(user => user.Id);
+			var userList = userdata.ToList();
+
+			userList.RemoveAll(x => x.BillingLockout);
+			return userList.ToDictionary(user => user.Id);
 		}
 
 		private async Task<IList<ProcessedMeasurement>> ProcessMeasurementsAsync(ICollection<ParsedMeasurementEntry> logs)
