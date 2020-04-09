@@ -364,7 +364,8 @@ namespace SensateService.AuthApi.Controllers
 				FirstName = register.FirstName,
 				LastName = register.LastName,
 				RegisteredAt = DateTime.Now,
-				UnconfirmedPhoneNumber = register.PhoneNumber
+				UnconfirmedPhoneNumber = register.PhoneNumber,
+				BillingLockout = false
 			};
 
 			var valid = await this._text.IsValidNumber(register.PhoneNumber);

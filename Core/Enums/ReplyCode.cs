@@ -7,12 +7,13 @@
 
 namespace SensateService.Enums
 {
-	public enum ReplyCode : int
+	public enum ReplyCode 
 	{
 		BadInput = 400,
 		NotAllowed = 401,
 		NotFound = 402,
 		Banned = 403,
+		BillingLockout = 404,
 		UnknownError = 500,
 		Ok = 200
 	}
