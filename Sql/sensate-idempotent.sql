@@ -1851,3 +1851,25 @@ BEGIN
     VALUES ('20200402131550_AddFileSizeToBlobsTable', '3.1.3');
     END IF;
 END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20200408213239_AddBillingLockoutToUsers') THEN
+    ALTER TABLE "Users" ADD "BillingLockout" boolean NOT NULL DEFAULT FALSE;
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20200408213239_AddBillingLockoutToUsers') THEN
+    CREATE INDEX "IX_Users_BillingLockout" ON "Users" ("BillingLockout");
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20200408213239_AddBillingLockoutToUsers') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20200408213239_AddBillingLockoutToUsers', '3.1.3');
+    END IF;
+END $$;

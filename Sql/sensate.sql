@@ -676,3 +676,10 @@ ALTER TABLE "Blobs" ADD "FileSize" bigint NOT NULL DEFAULT 0;
 INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
 VALUES ('20200402131550_AddFileSizeToBlobsTable', '3.1.3');
 
+ALTER TABLE "Users" ADD "BillingLockout" boolean NOT NULL DEFAULT FALSE;
+
+CREATE INDEX "IX_Users_BillingLockout" ON "Users" ("BillingLockout");
+
+INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+VALUES ('20200408213239_AddBillingLockoutToUsers', '3.1.3');
+
