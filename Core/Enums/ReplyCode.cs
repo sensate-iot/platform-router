@@ -7,7 +7,7 @@
 
 namespace SensateService.Enums
 {
-	public enum ReplyCode 
+	public enum ReplyCode
 	{
 		BadInput = 400,
 		NotAllowed = 401,
