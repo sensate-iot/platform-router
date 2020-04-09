@@ -61,6 +61,9 @@ namespace SensateService.Infrastructure.Sql
 				k.IdentityToken,
 				k.PhoneNumber
 			});
+
+			builder.Entity<SensateUser>(x => { x.HasIndex(u => u.BillingLockout); });
+
 			builder.Entity<ChangePhoneNumberToken>()
 				.HasOne<SensateUser>()
 				.WithMany()
