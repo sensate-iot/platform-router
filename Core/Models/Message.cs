@@ -20,7 +20,7 @@ namespace SensateService.Models
 		public ObjectId InternalId { get; set; }
 		[BsonRequired]
 		public DateTime CreatedAt { get; set; }
-		[BsonRequired]
+		[BsonRequired, JsonIgnore]
 		public DateTime UpdatedAt { get; set; }
 		[BsonRequired, JsonConverter(typeof(ObjectIdJsonConverter))]
 		public ObjectId SensorId { get; set; }

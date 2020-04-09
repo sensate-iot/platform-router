@@ -10,10 +10,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
+
 using Microsoft.Extensions.Logging;
+
 using MongoDB.Driver;
 using MongoDB.Bson;
 using MongoDB.Driver.GeoJsonObjectModel;
+
+using SensateService.Enums;
 using SensateService.Exceptions;
 using SensateService.Models;
 using SensateService.Infrastructure.Repositories;
@@ -125,6 +129,7 @@ namespace SensateService.Infrastructure.Document
 			DateTime end,
 			int skip = -1,
 			int limit = -1,
+			OrderDirection order = OrderDirection.None,
 			CancellationToken ct = default)
 		{
 			var ids = new BsonArray();
@@ -185,25 +190,27 @@ namespace SensateService.Infrastructure.Document
 		public virtual async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsNearAsync(
 			IEnumerable<Sensor> sensors,
 			DateTime start, DateTime end, GeoJson2DGeographicCoordinates coords,
-			int max = 100, int skip = -1, int limit = -1, CancellationToken ct = default
+			int max = 100, int skip = -1, int limit = -1, OrderDirection order = OrderDirection.None, CancellationToken ct = default
 		)
 		{
 			var measurements = await this.GetMeasurementsBetweenAsync(sensors, start, end, ct: ct).AwaitBackground();
-			return this.m_geoService.GetMeasurementsNear(measurements.ToList(), coords, max, skip, limit, ct);
+			return this.m_geoService.GetMeasurementsNear(measurements.ToList(), coords, max, skip, limit, order, ct);
 		}
 
 		public virtual async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsNearAsync(
 			Sensor sensor, DateTime start,
 			DateTime end, GeoJson2DGeographicCoordinates coords,
-			int max = 100, int skip = -1, int limit = -1, CancellationToken ct = default)
+			int max = 100, int skip = -1, int limit = -1,
+			OrderDirection order = OrderDirection.None, CancellationToken ct = default)
 		{
 			var measurements = await this.GetMeasurementsBetweenAsync(sensor, start, end, ct: ct).AwaitBackground();
-			return this.m_geoService.GetMeasurementsNear(measurements.ToList(), coords, max, skip, limit, ct);
+			return this.m_geoService.GetMeasurementsNear(measurements.ToList(), coords, max, skip, limit, order, ct);
 		}
 
 		public async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsBetweenAsync(
 			Sensor sensor, DateTime start, DateTime end,
-			int skip = -1, int limit = -1, CancellationToken ct = default)
+			int skip = -1, int limit = -1,
+			OrderDirection order = OrderDirection.None, CancellationToken ct = default)
 		{
 			var matchTimestamp = new BsonDocument {
 				{
@@ -231,12 +238,23 @@ namespace SensateService.Infrastructure.Document
 				{"Data", "$Measurements.Data"},
 			};
 
+			var tSort = new BsonDocument {
+				{ "Timestamp", order.ToInt() }
+			};
+
+			var sort = new BsonDocument {
+				{ "$sort", tSort }
+			};
 
 			var pipeline = new List<BsonDocument> {
 				new BsonDocument {{"$match", matchTimestamp}},
 				new BsonDocument {{"$unwind", "$Measurements"}},
 				new BsonDocument {{"$project", projectRewrite}},
 			};
+
+			if(order != OrderDirection.None) {
+				pipeline.Add(sort);
+			}
 
 			if(skip > 0) {
 				pipeline.Add(new BsonDocument { { "$skip", skip } });
@@ -253,9 +271,9 @@ namespace SensateService.Infrastructure.Document
 		}
 
 		public virtual async Task<IEnumerable<MeasurementsQueryResult>> GetBetweenAsync(
-			Sensor sensor, DateTime start, DateTime end, int skip = -1, int limit = -1)
+			Sensor sensor, DateTime start, DateTime end, int skip = -1, int limit = -1, OrderDirection order = OrderDirection.None)
 		{
-			var data = await this.GetMeasurementsBetweenAsync(sensor, start, end, skip, limit).AwaitBackground();
+			var data = await this.GetMeasurementsBetweenAsync(sensor, start, end, skip, limit, order).AwaitBackground();
 			return data;
 		}
 

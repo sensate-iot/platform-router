@@ -64,7 +64,7 @@ namespace SensateService.Infrastructure.Storage
 
 			user = await this._users.GetAsync(sensor.Owner).AwaitBackground();
 
-			if(user == null) {
+			if(user == null || user.BillingLockout) {
 				return;
 			}
 

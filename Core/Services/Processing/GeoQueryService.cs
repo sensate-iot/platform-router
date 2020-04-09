@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using MongoDB.Driver.GeoJsonObjectModel;
-
+using SensateService.Enums;
 using SensateService.Models.Generic;
 
 namespace SensateService.Services.Processing
@@ -59,7 +59,7 @@ namespace SensateService.Services.Processing
 
 		public IList<MeasurementsQueryResult> GetMeasurementsNear(
 			List<MeasurementsQueryResult> measurements, GeoJson2DGeographicCoordinates coords,
-			int radius = 100, int skip = -1, int limit = -1, CancellationToken ct = default)
+			int radius = 100, int skip = -1, int limit = -1, OrderDirection order = OrderDirection.None, CancellationToken ct = default)
 		{
 			DistanceCalcuationMethod calc;
 			var queryResults = new List<MeasurementsQueryResult>(measurements.Count);
@@ -89,6 +89,12 @@ namespace SensateService.Services.Processing
 			});
 
 			queryResults.RemoveAll(x => x == null);
+
+			if(order == OrderDirection.Descending) {
+				queryResults = queryResults.OrderByDescending(x => x.Timestamp).ToList();
+			} else if(order == OrderDirection.Ascending) {
+				queryResults = queryResults.OrderBy(x => x.Timestamp).ToList();
+			}
 
 			if(skip > 0) {
 				queryResults = queryResults.Skip(skip).ToList();

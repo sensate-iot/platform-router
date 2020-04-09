@@ -88,7 +88,12 @@ namespace SensateService.Infrastructure.Document
 			return measurements;
 		}
 
-		public override async Task<IEnumerable<MeasurementsQueryResult>> GetBetweenAsync(Sensor sensor, DateTime start, DateTime end, int skip = -1, int limit = -1)
+		public override async Task<IEnumerable<MeasurementsQueryResult>> GetBetweenAsync(Sensor sensor,
+																						 DateTime start,
+																						 DateTime end,
+																						 int skip = -1,
+																						 int limit = -1,
+																						 OrderDirection order = OrderDirection.None)
 		{
 			string key;
 			IEnumerable<MeasurementsQueryResult> measurements;
@@ -96,13 +101,14 @@ namespace SensateService.Infrastructure.Document
 			var cache_end = end.ThisMinute();
 			var cache_start = start.ThisMinute();
 
-			key = $"{sensor.InternalId}::{cache_start.ToString("u", CultureInfo.InvariantCulture)}::{cache_end.ToString("u", CultureInfo.InvariantCulture)}::{skip}::{limit}";
+			key = $"{sensor.InternalId}::{cache_start.ToString("u", CultureInfo.InvariantCulture)}::{cache_end.ToString("u", CultureInfo.InvariantCulture)}::{skip}::{limit}::{order}";
 			measurements = await _cache.DeserializeAsync<IEnumerable<MeasurementsQueryResult>>(key);
 
-			if(measurements != null)
+			if(measurements != null) {
 				return measurements;
+			}
 
-			measurements = await base.GetBetweenAsync(sensor, start, end, skip, limit).AwaitBackground();
+			measurements = await base.GetBetweenAsync(sensor, start, end, skip, limit, order).AwaitBackground();
 			await this.CacheDataAsync(key, measurements, CacheTimeout.TimeoutShort.ToInt(), false).AwaitBackground();
 			return measurements;
 
@@ -112,7 +118,8 @@ namespace SensateService.Infrastructure.Document
 		public override async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsNearAsync(Sensor sensor,
 			DateTime start,
 			DateTime end, GeoJson2DGeographicCoordinates coords,
-			int max = 100, int skip = -1, int limit = -1, CancellationToken ct = default)
+			int max = 100, int skip = -1, int limit = -1, OrderDirection order = OrderDirection.None,
+			CancellationToken ct = default)
 		{
 			IEnumerable<MeasurementsQueryResult> measurements;
 			var cache_end = end.ThisMinute();
@@ -123,14 +130,15 @@ namespace SensateService.Infrastructure.Document
 				$"{cache_start.ToString("u", CultureInfo.InvariantCulture)}::" +
 				$"{cache_end.ToString("u", CultureInfo.InvariantCulture)}::" +
 				$"{skip}::{limit}::" +
-				$"{max}::{coords.Longitude}::{coords.Latitude}";
+				$"{max}::{coords.Longitude}::{coords.Latitude}::" +
+				$"{order}";
 			measurements = await _cache.DeserializeAsync<IEnumerable<MeasurementsQueryResult>>(key, ct);
 
 			if(measurements != null) {
 				return measurements;
 			}
 
-			measurements = await base.GetMeasurementsNearAsync(sensor, start, end, coords, max, skip, limit, ct).AwaitBackground();
+			measurements = await base.GetMeasurementsNearAsync(sensor, start, end, coords, max, skip, limit, order, ct).AwaitBackground();
 			await this.CacheDataAsync(key, measurements, CacheTimeout.TimeoutShort.ToInt(), false).AwaitBackground();
 
 			return measurements;
@@ -143,6 +151,7 @@ namespace SensateService.Infrastructure.Document
 			DateTime end,
 			int skip = -1,
 			int limit = -1,
+			OrderDirection order = OrderDirection.None,
 			CancellationToken ct = default)
 		{
 			var ordered = sensors.OrderBy(x => x.InternalId).ToList();
@@ -153,7 +162,7 @@ namespace SensateService.Infrastructure.Document
 				$"near::{ordered.GetHashCode()}::" +
 				$"{cache_start.ToString("u", CultureInfo.InvariantCulture)}::" +
 				$"{cache_end.ToString("u", CultureInfo.InvariantCulture)}::" +
-				$"{skip}::{limit}::";
+				$"{skip}::{limit}::{order}";
 
 			var measurements = await this._cache.DeserializeAsync<IEnumerable<MeasurementsQueryResult>>(key, ct);
 
@@ -161,7 +170,7 @@ namespace SensateService.Infrastructure.Document
 				return measurements;
 			}
 
-			measurements = await base.GetMeasurementsBetweenAsync(ordered, start, end, skip, limit, ct).AwaitBackground();
+			measurements = await base.GetMeasurementsBetweenAsync(ordered, start, end, skip, limit, order, ct).AwaitBackground();
 			await this.CacheDataAsync(key, measurements, CacheTimeout.TimeoutShort.ToInt(), false).AwaitBackground();
 
 			return measurements;
@@ -181,7 +190,9 @@ namespace SensateService.Infrastructure.Document
 
 		public override async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsNearAsync(IEnumerable<Sensor> sensors,
 			DateTime start, DateTime end, GeoJson2DGeographicCoordinates coords,
-			int max = 100, int skip = -1, int limit = -1, CancellationToken ct = default)
+			int max = 100, int skip = -1, int limit = -1,
+			OrderDirection order = OrderDirection.None,
+			CancellationToken ct = default)
 		{
 			var ordered = sensors.OrderBy(x => x.InternalId).ToList();
 			var cache_end = end.ThisMinute();
@@ -192,7 +203,8 @@ namespace SensateService.Infrastructure.Document
 				$"{cache_start.ToString("u", CultureInfo.InvariantCulture)}::" +
 				$"{cache_end.ToString("u", CultureInfo.InvariantCulture)}::" +
 				$"{skip}::{limit}::" +
-				$"{max}::{coords.Longitude}::{coords.Latitude}";
+				$"{max}::{coords.Longitude}::{coords.Latitude}::" +
+				$"{order}";
 
 			var measurements = await this._cache.DeserializeAsync<IEnumerable<MeasurementsQueryResult>>(key, ct);
 
@@ -200,7 +212,9 @@ namespace SensateService.Infrastructure.Document
 				return measurements;
 			}
 
-			measurements = await base.GetMeasurementsNearAsync(ordered, start, end, coords, max, skip, limit, ct).AwaitBackground();
+			measurements = await base.GetMeasurementsNearAsync(ordered, start, end,
+															   coords, max, skip, limit,
+															   order, ct).AwaitBackground();
 			await this.CacheDataAsync(key, measurements, CacheTimeout.TimeoutShort.ToInt(), false).AwaitBackground();
 
 			return measurements;

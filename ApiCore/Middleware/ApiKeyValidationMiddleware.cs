@@ -105,6 +105,11 @@ namespace SensateService.ApiCore.Middleware
 					return;
 				}
 
+				if(token.User.BillingLockout) {
+					await this.RespondErrorAsync(ctx, ReplyCode.BillingLockout, "Billing lockout!", 402);
+					return;
+				}
+
 				ctx.Items["ApiKey"] = token;
 				await this._next(ctx).AwaitBackground();
 			}

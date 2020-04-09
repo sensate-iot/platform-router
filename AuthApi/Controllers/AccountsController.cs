@@ -23,6 +23,7 @@ using Microsoft.IdentityModel.Tokens;
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
 using SensateService.AuthApi.Helpers;
+using SensateService.AuthApi.Json;
 using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
@@ -364,7 +365,8 @@ namespace SensateService.AuthApi.Controllers
 				FirstName = register.FirstName,
 				LastName = register.LastName,
 				RegisteredAt = DateTime.Now,
-				UnconfirmedPhoneNumber = register.PhoneNumber
+				UnconfirmedPhoneNumber = register.PhoneNumber,
+				BillingLockout = false
 			};
 
 			var valid = await this._text.IsValidNumber(register.PhoneNumber);
@@ -402,7 +404,7 @@ namespace SensateService.AuthApi.Controllers
 
 		[HttpGet("show/{uid}")]
 		[ProducesResponseType(404)]
-		[ProducesResponseType(typeof(User), 200)]
+		[ProducesResponseType(typeof(AdminUserView), 200)]
 		[AdministratorUser]
 		public async Task<IActionResult> Show(string uid)
 		{
@@ -413,14 +415,19 @@ namespace SensateService.AuthApi.Controllers
 				return this.NotFound();
 			}
 
-			viewuser = new User {
+			viewuser = new AdminUserView {
 				Email = user.Email,
 				FirstName = user.FirstName,
 				LastName = user.LastName,
 				PhoneNumber = user.PhoneNumber,
 				Id = user.Id,
 				RegisteredAt = user.RegisteredAt.ToUniversalTime(),
-				Roles = this._users.GetRoles(user)
+				Roles = this._users.GetRoles(user),
+				BillingLockout = user.BillingLockout,
+				UnconfirmedPhoneNumber = user.UnconfirmedPhoneNumber,
+				EmailConfirmed = user.EmailConfirmed,
+				PasswordLockout = user.LockoutEnd?.UtcDateTime,
+				PasswordLockoutEnabled = user.LockoutEnabled
 			};
 
 			return new ObjectResult(viewuser);
@@ -672,6 +679,33 @@ namespace SensateService.AuthApi.Controllers
 
 			return this.NoContent();
 		}
+
+		[ValidateModel]
+		[AdministratorUser]
+		[HttpPatch("update-billing")]
+		[ProducesResponseType(typeof(Status), 400)]
+		[ProducesResponseType(204)]
+		public async Task<IActionResult> UpdateBilling([FromBody] BillingLockoutUpdate userUpdate)
+		{
+			try {
+				var user = await this.GetCurrentUserAsync().AwaitBackground();
+
+				this._users.StartUpdate(user);
+				user.BillingLockout = userUpdate.BillingLockout;
+				await this._users.EndUpdateAsync().AwaitBackground();
+
+				return this.NoContent();
+			} catch(Exception ex) {
+				this._logger.LogInformation($"Unable to set billing locket: {ex.Message}");
+				this._logger.LogDebug(ex.StackTrace);
+
+				return this.BadRequest(new Status {
+					Message = "Unable to set billing lockout!",
+					ErrorCode = ReplyCode.UnknownError
+				});
+			}
+		}
+
 
 		[ValidateModel]
 		[NormalUser]

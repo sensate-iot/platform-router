@@ -7,10 +7,10 @@
 
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 
 using MongoDB.Driver.GeoJsonObjectModel;
 
+using SensateService.Enums;
 using SensateService.Models.Generic;
 
 namespace SensateService.Services
@@ -19,7 +19,8 @@ namespace SensateService.Services
 	{
 		IList<MeasurementsQueryResult> GetMeasurementsNear(
 			List<MeasurementsQueryResult> measurements, GeoJson2DGeographicCoordinates coords,
-			int radius = 100, int skip = -1, int limit = -1, CancellationToken ct = default
+			int radius = 100, int skip = -1, int limit = -1,
+			OrderDirection order = OrderDirection.None, CancellationToken ct = default
 		);
 	}
 }

@@ -8,6 +8,8 @@
 using System;
 using System.Collections.Generic;
 
+using SensateService.Enums;
+
 namespace SensateService.DataApi.Models
 {
 	public class Filter
@@ -20,5 +22,6 @@ namespace SensateService.DataApi.Models
 		public double? Longitude { get; set; }
 		public double? Latitude { get; set; }
 		public int? Radius { get; set; }
+		public string OrderDirection { get; set; }
 	}
 }

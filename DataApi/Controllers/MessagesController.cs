@@ -132,8 +132,17 @@ namespace SensateService.DataApi.Controllers
 		[ProducesResponseType(typeof(Status), StatusCodes.Status401Unauthorized)]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
 		[ProducesResponseType(typeof(IEnumerable<Message>), StatusCodes.Status200OK)]
-		public async Task<IActionResult> Get([FromQuery] string sensorId, [FromQuery] DateTime? start, [FromQuery] DateTime? end, [FromQuery] int skip = 0, [FromQuery] int take = -1)
+		public async Task<IActionResult> Get([FromQuery] string sensorId, [FromQuery] DateTime? start, [FromQuery] DateTime? end,
+											 [FromQuery] int skip = 0, [FromQuery] int take = 0,
+											 [FromQuery] string order = "asc")
 		{
+			var orderDirection = order switch
+			{
+				"asc" => OrderDirection.Ascending,
+				"desc" => OrderDirection.Descending,
+				_ => OrderDirection.None,
+			};
+
 			if(start == null) {
 				start = DateTime.MinValue;
 			}
@@ -157,7 +166,7 @@ namespace SensateService.DataApi.Controllers
 				return this.NotFound();
 			}
 
-			var msgs = await this.m_messages.GetAsync(sensor, start.Value, end.Value, skip, take).AwaitBackground();
+			var msgs = await this.m_messages.GetAsync(sensor, start.Value, end.Value, skip, take, orderDirection).AwaitBackground();
 			return this.Ok(msgs);
 		}
 	}

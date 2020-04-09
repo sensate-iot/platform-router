@@ -78,6 +78,10 @@ namespace SensateService.MqttHandler.Mqtt
 				var user = await this.m_users.GetAsync(sensor.Owner).AwaitBackground();
 				var asyncio = new Task[2];
 
+				if(user.BillingLockout) {
+					return;
+				}
+
 				if(user.UserRoles.Any(x => x.Role.Name == SensateRole.Banned)) {
 					this.m_logger.LogDebug("Banned user attempted to store a message.");
 					return;
