@@ -35,5 +35,7 @@ namespace SensateService.Models
 		public string Name { get; set; }
 		[Required]
 		public bool ReadOnly { get; set; }
+		[Required]
+		public long RequestCount { get; set; }
 	}
 }
