@@ -52,7 +52,8 @@ namespace SensateService.AuthApi.Controllers
 				Revoked = false,
 				Type = ApiKeyType.ApiKey,
 				ReadOnly = request.ReadOnly,
-				Name = request.Name
+				Name = request.Name,
+				RequestCount = 0
 			};
 
 			await this._keys.CreateAsync(key).AwaitBackground();
