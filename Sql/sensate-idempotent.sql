@@ -1873,3 +1873,18 @@ BEGIN
     VALUES ('20200408213239_AddBillingLockoutToUsers', '3.1.3');
     END IF;
 END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20200410172420_AddRequestCountToApiKeyTable') THEN
+    ALTER TABLE "ApiKeys" ADD "RequestCount" bigint NOT NULL DEFAULT 0;
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20200410172420_AddRequestCountToApiKeyTable') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20200410172420_AddRequestCountToApiKeyTable', '3.1.3');
+    END IF;
+END $$;

@@ -683,3 +683,8 @@ CREATE INDEX "IX_Users_BillingLockout" ON "Users" ("BillingLockout");
 INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
 VALUES ('20200408213239_AddBillingLockoutToUsers', '3.1.3');
 
+ALTER TABLE "ApiKeys" ADD "RequestCount" bigint NOT NULL DEFAULT 0;
+
+INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+VALUES ('20200410172420_AddRequestCountToApiKeyTable', '3.1.3');
+
