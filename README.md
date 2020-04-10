@@ -71,13 +71,13 @@ between 1 and 25 data points.
 
 ## Contributing
 
-Contributing to the Sensate IoT project is verry much appriciated. Please note that
+Contributing to the Sensate IoT project is very much appriciated. Please note that
 writing code isn't the only way to contribute:
 
-* You can submit bug reports on the issue system
-* You can submit feature requests on the same issue system
-* You can pick up existing issue's and implement them
-* You can help design features by replying on existing issue's
+* You can submit bug reports on the issue system;
+* You can submit feature requests on the same issue system;
+* You can pick up existing issue's and implement them;
+* You can help design features by replying on existing issue's.
 
 When you pick up an existing issue in order to resolve it, *please let us know*. This will
 prevent two people working on the same issue. If you are creating a new issue
