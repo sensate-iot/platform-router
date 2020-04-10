@@ -38,7 +38,7 @@ namespace SensateService.AuthApi.Controllers
 		[ValidateModel]
 		[HttpPost("find-users")]
 		[ProducesResponseType(typeof(PaginationResult<User>), 200)]
-		public async Task<IActionResult> Find([FromBody] SearchQuery query, [FromQuery] int skip = 0, [FromQuery] int limit = 0, [FromQuery] bool count = false)
+		public async Task<IActionResult> Find([FromBody] SearchQuery query, [FromQuery] int skip = 0, [FromQuery] int limit = 0)
 		{
 			PaginationResult<User> rv;
 			var result = await this._users.FindByEmailAsync(query.Query, skip, limit).AwaitBackground();

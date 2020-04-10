@@ -402,7 +402,7 @@ namespace SensateService.AuthApi.Controllers
 			return this.Ok();
 		}
 
-		[HttpGet("show/{uid}")]
+		[HttpGet("{uid}")]
 		[ProducesResponseType(404)]
 		[ProducesResponseType(typeof(AdminUserView), 200)]
 		[AdministratorUser]
@@ -434,7 +434,7 @@ namespace SensateService.AuthApi.Controllers
 		}
 
 		[NormalUser]
-		[HttpGet("show")]
+		[HttpGet]
 		[ProducesResponseType(404)]
 		[ProducesResponseType(typeof(User), 200)]
 		public async Task<IActionResult> Show()
@@ -682,19 +682,17 @@ namespace SensateService.AuthApi.Controllers
 
 		[ValidateModel]
 		[AdministratorUser]
-		[HttpPatch("update-billing")]
+		[HttpPatch("{uuid}/update-billing")]
 		[ProducesResponseType(typeof(Status), 400)]
 		[ProducesResponseType(204)]
-		public async Task<IActionResult> UpdateBilling([FromBody] BillingLockoutUpdate userUpdate)
+		public async Task<IActionResult> UpdateBilling(string uuid, [FromBody] BillingLockoutUpdate userUpdate)
 		{
 			try {
-				var user = await this.GetCurrentUserAsync().AwaitBackground();
+				var user = await this._users.GetAsync(uuid).AwaitBackground();
 
 				this._users.StartUpdate(user);
 				user.BillingLockout = userUpdate.BillingLockout;
 				await this._users.EndUpdateAsync().AwaitBackground();
-
-				return this.NoContent();
 			} catch(Exception ex) {
 				this._logger.LogInformation($"Unable to set billing locket: {ex.Message}");
 				this._logger.LogDebug(ex.StackTrace);
@@ -704,6 +702,8 @@ namespace SensateService.AuthApi.Controllers
 					ErrorCode = ReplyCode.UnknownError
 				});
 			}
+
+			return this.NoContent();
 		}
 
 
