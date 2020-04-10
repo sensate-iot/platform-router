@@ -87,6 +87,8 @@ namespace SensateService.ApiCore.Middleware
 				var users = scope.ServiceProvider.GetRequiredService<IUserRepository>();
 				var token = await repo.GetByKeyAsync(key, CancellationToken.None).AwaitBackground();
 
+				await repo.IncrementRequestCountAsync(token).AwaitBackground();
+
 				if(token == null) {
 					await this.RespondErrorAsync(ctx, ReplyCode.BadInput, "API key not found!", 401).AwaitBackground();
 					return;
