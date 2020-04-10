@@ -128,6 +128,13 @@ namespace SensateService.Infrastructure.Sql
 			return rv;
 		}
 
+		public Task IncrementRequestCountAsync(SensateApiKey key, CancellationToken ct = default)
+		{
+			this.StartUpdate(key);
+			key.RequestCount += 1;
+			return this.EndUpdateAsync(ct);
+		}
+
 		public async Task DeleteAsync(SensateUser user, CancellationToken ct = default)
 		{
 			var query = this.Data.Where(x => x.UserId == user.Id);

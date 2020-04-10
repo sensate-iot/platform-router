@@ -34,6 +34,7 @@ namespace SensateService.Infrastructure.Repositories
 
 		Task<PaginationResult<SensateApiKey>> FilterAsync(SensateUser user, IList<ApiKeyType> types, string query = null, bool revoked = true, int skip = 0, int limit = 0);
 
+		Task IncrementRequestCountAsync(SensateApiKey key, CancellationToken ct = default);
 		Task DeleteAsync(SensateUser user, CancellationToken ct = default);
 		Task DeleteAsync(string key, CancellationToken ct = default);
 	}
