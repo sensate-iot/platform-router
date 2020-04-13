@@ -54,7 +54,7 @@ namespace SensateService.Infrastructure.Sql
 
 			builder.Entity<PasswordResetToken>().HasKey(k => k.UserToken);
 			builder.Entity<AuthUserToken>(token => {
-				token.HasKey(k => new {k.UserId, k.Value});
+				token.HasKey(k => new { k.UserId, k.Value });
 				token.HasIndex(x => x.UserId);
 				token.HasIndex(x => x.Value);
 			});
