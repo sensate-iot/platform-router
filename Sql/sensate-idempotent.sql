@@ -1888,3 +1888,53 @@ BEGIN
     VALUES ('20200410172420_AddRequestCountToApiKeyTable', '3.1.3');
     END IF;
 END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20200413131928_UpdateIndexes') THEN
+    ALTER TABLE "PhoneNumberTokens" DROP CONSTRAINT "AlternateKey_UserToken";
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20200413131928_UpdateIndexes') THEN
+    ALTER TABLE "PhoneNumberTokens" ADD CONSTRAINT "AK_PhoneNumberTokens_UserToken" UNIQUE ("UserToken");
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20200413131928_UpdateIndexes') THEN
+    CREATE INDEX "IX_PhoneNumberTokens_PhoneNumber" ON "PhoneNumberTokens" ("PhoneNumber");
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20200413131928_UpdateIndexes') THEN
+    CREATE INDEX "IX_AuthTokens_UserId" ON "AuthTokens" ("UserId");
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20200413131928_UpdateIndexes') THEN
+    CREATE INDEX "IX_AuthTokens_Value" ON "AuthTokens" ("Value");
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20200413131928_UpdateIndexes') THEN
+    CREATE INDEX "IX_ApiKeys_Type" ON "ApiKeys" ("Type");
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20200413131928_UpdateIndexes') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20200413131928_UpdateIndexes', '3.1.3');
+    END IF;
+END $$;

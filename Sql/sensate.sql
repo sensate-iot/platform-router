@@ -688,3 +688,18 @@ ALTER TABLE "ApiKeys" ADD "RequestCount" bigint NOT NULL DEFAULT 0;
 INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
 VALUES ('20200410172420_AddRequestCountToApiKeyTable', '3.1.3');
 
+ALTER TABLE "PhoneNumberTokens" DROP CONSTRAINT "AlternateKey_UserToken";
+
+ALTER TABLE "PhoneNumberTokens" ADD CONSTRAINT "AK_PhoneNumberTokens_UserToken" UNIQUE ("UserToken");
+
+CREATE INDEX "IX_PhoneNumberTokens_PhoneNumber" ON "PhoneNumberTokens" ("PhoneNumber");
+
+CREATE INDEX "IX_AuthTokens_UserId" ON "AuthTokens" ("UserId");
+
+CREATE INDEX "IX_AuthTokens_Value" ON "AuthTokens" ("Value");
+
+CREATE INDEX "IX_ApiKeys_Type" ON "ApiKeys" ("Type");
+
+INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+VALUES ('20200413131928_UpdateIndexes', '3.1.3');
+
