@@ -53,21 +53,28 @@ namespace SensateService.Infrastructure.Sql
 			builder.Entity<DataProtectionKey>().ToTable("DataProtectionKeys");
 
 			builder.Entity<PasswordResetToken>().HasKey(k => k.UserToken);
-			builder.Entity<AuthUserToken>().HasKey(k => new { k.UserId, k.Value });
+			builder.Entity<AuthUserToken>(token => {
+				token.HasKey(k => new {k.UserId, k.Value});
+				token.HasIndex(x => x.UserId);
+				token.HasIndex(x => x.Value);
+			});
 
-			builder.Entity<ChangePhoneNumberToken>().HasAlternateKey(e => e.UserToken)
-				.HasName("AlternateKey_UserToken");
-			builder.Entity<ChangePhoneNumberToken>().HasKey(k => new {
-				k.IdentityToken,
-				k.PhoneNumber
+			builder.Entity<ChangePhoneNumberToken>(token => {
+				token.HasKey(k => new {
+					k.IdentityToken,
+					k.PhoneNumber
+				});
+
+				token.HasAlternateKey(e => e.UserToken);
+
+				token.HasIndex(x => x.PhoneNumber);
+
+				token.HasOne<SensateUser>()
+					.WithMany()
+					.HasForeignKey(t => t.UserId).IsRequired().OnDelete(DeleteBehavior.Cascade);
 			});
 
 			builder.Entity<SensateUser>(x => { x.HasIndex(u => u.BillingLockout); });
-
-			builder.Entity<ChangePhoneNumberToken>()
-				.HasOne<SensateUser>()
-				.WithMany()
-				.HasForeignKey(t => t.UserId).IsRequired().OnDelete(DeleteBehavior.Cascade);
 
 			builder.Entity<SensorLink>(link => {
 				link.HasKey(k => new { k.UserId, k.SensorId });
@@ -78,6 +85,7 @@ namespace SensateService.Infrastructure.Sql
 
 			builder.Entity<SensateApiKey>(key => {
 				key.HasIndex(u => u.ApiKey).IsUnique();
+				key.HasIndex(u => u.Type);
 				key.HasOne(k => k.User).WithMany(user => user.ApiKeys)
 					.HasForeignKey(k => k.UserId)
 					.IsRequired();
@@ -101,6 +109,7 @@ namespace SensateService.Infrastructure.Sql
 			builder.Entity<AuditLog>().HasOne<SensateUser>().WithMany().HasForeignKey(log => log.AuthorId)
 				.OnDelete(DeleteBehavior.Cascade);
 			builder.Entity<AuditLog>().HasIndex(log => log.Method);
+			builder.Entity<AuditLog>().HasIndex(log => log.AuthorId);
 
 			builder.Entity<Trigger>().HasIndex(trigger => trigger.Type);
 			builder.Entity<Trigger>().Property(trigger => trigger.Id).UseIdentityByDefaultColumn();

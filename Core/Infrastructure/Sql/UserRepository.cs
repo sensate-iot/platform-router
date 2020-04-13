@@ -98,16 +98,9 @@ namespace SensateService.Infrastructure.Sql
 
 		public async Task<int> CountFindAsync(string email, CancellationToken ct = default)
 		{
-			var result = this.Data.Where(x => x.Email.Contains(email));
+			var upper = email.ToUpperInvariant();
+			var result = this.Data.Where(x => x.NormalizedEmail.Contains(upper));
 			return await result.CountAsync(ct).AwaitBackground();
-		}
-
-		public SensateUser GetByClaimsPrinciple(ClaimsPrincipal cp)
-		{
-			string id;
-
-			id = this._manager.GetUserId(cp);
-			return this.GetById(id);
 		}
 
 		public async Task<SensateUser> GetByClaimsPrincipleAsync(ClaimsPrincipal cp)
@@ -135,7 +128,8 @@ namespace SensateService.Infrastructure.Sql
 
 		public async Task<IEnumerable<SensateUser>> FindByEmailAsync(string email, int skip = 0, int limit = 0, CancellationToken ct = default)
 		{
-			var result = this.Data.Where(x => x.Email.Contains(email));
+			var upper = email.ToUpperInvariant();
+			var result = this.Data.Where(x => x.NormalizedEmail.Contains(upper));
 
 			if(skip > 0) {
 				result = result.Skip(skip);
