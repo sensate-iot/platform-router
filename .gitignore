@@ -39,3 +39,4 @@ MqttHandler/settings/
 **/.idea/**/contentModel.xml
 **/.idea/**/modules.xml
 
+AuthService/build/
