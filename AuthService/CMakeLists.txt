@@ -1,10 +1,14 @@
-cmake_minimum_required(VERSION 2.8.12)
-project(AuthService)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
+PROJECT(AuthService)
 
-add_definitions("-std=c++17")
+SET(CMAKE_CXX_STANDARD 17)
+SET(CMAKE_C_STANDARD 11)
 
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+INCLUDE(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
-add_executable(auth-service source/main.c)
-target_link_libraries(auth-service ${CONAN_LIBS})
+add_subdirectory(libauthorize)
+
+ADD_EXECUTABLE(auth-service source/main.c)
+TARGET_LINK_LIBRARIES(auth-service ${CONAN_LIBS} authorize)
+

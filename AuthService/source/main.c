@@ -7,9 +7,12 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
+
+extern bool test_regex();
 
 int main()
 {
-	printf("Started!\n");
+//	printf("Started: %u\n", test_regex());
 	return -EXIT_SUCCESS;
 }

@@ -1,0 +1,31 @@
+/*
+ * Sensor model.
+ *
+ * @author Michel Megens
+ * @email  michel@michelmegens.net
+ */
+
+#include <auth/sensor.h>
+
+namespace sensateiot::auth
+{
+	void Sensor::SetId(std::string id)
+	{
+		this->m_id = std::move(id);
+	}
+
+	void Sensor::SetSecret(std::string secret)
+	{
+		this->m_secret = std::move(secret);
+	}
+
+	const std::string &Sensor::GetId() const
+	{
+		return this->m_id;
+	}
+
+	const std::string &Sensor::GetSecret() const
+	{
+		return this->m_secret;
+	}
+}
