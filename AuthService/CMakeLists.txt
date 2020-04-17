@@ -7,7 +7,7 @@ SET(CMAKE_C_STANDARD 11)
 INCLUDE(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
-add_subdirectory(libauthorize)
+add_subdirectory(libauthorization)
 
 ADD_EXECUTABLE(auth-service source/main.c)
 TARGET_LINK_LIBRARIES(auth-service ${CONAN_LIBS} authorize)

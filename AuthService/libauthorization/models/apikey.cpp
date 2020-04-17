@@ -5,7 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
-#include <auth/apikey.h>
+#include <authorization/apikey.h>
 
 namespace sensateiot::auth
 {

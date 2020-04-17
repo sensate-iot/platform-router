@@ -9,7 +9,7 @@ SET(SOURCES
 )
 
 include_directories(
-	${PROJECT_SOURCE_DIR}/libauthorize/include
+	${PROJECT_SOURCE_DIR}/libauthorization/include
 	${PROJECT_SOURCE_DIR}/external/ctre/single-header
 )
 

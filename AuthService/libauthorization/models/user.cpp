@@ -5,7 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
-#include <auth/user.h>
+#include <authorization/user.h>
 
 namespace sensateiot::auth
 {
