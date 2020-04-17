@@ -6,10 +6,11 @@ SET(SOURCES
 	models/apikey.cpp
 	models/user.cpp
 	models/sensor.cpp
+
+	config/config.cpp
+	config/database.cpp
+	config/mqttbroker.cpp
+	config/mqtt.cpp
 )
 
-include_directories(
-	${PROJECT_SOURCE_DIR}/libauthorization/include
-)
-
-add_library(authorize SHARED ${SOURCES})
+add_library(authorization SHARED ${SOURCES})
