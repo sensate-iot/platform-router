@@ -1,0 +1,3 @@
+[submodule "AuthService/external/ctre"]
+	path = AuthService/external/ctre
+	url = https://github.com/sensate-iot/compile-time-regular-expressions.git
