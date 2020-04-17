@@ -7,6 +7,11 @@ SET(CMAKE_C_STANDARD 11)
 INCLUDE(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
+include_directories(
+	${PROJECT_SOURCE_DIR}/external/ctre/single-header
+	${PROJECT_SOURCE_DIR}/external/json
+)
+
 add_subdirectory(libauthorization)
 
 ADD_EXECUTABLE(auth-service source/main.c)
