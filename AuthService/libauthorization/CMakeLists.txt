@@ -11,6 +11,10 @@ SET(SOURCES
 	config/database.cpp
 	config/mqttbroker.cpp
 	config/mqtt.cpp
+
+	mqtt/mqttclient.cpp
+	mqtt/mqttcallback.cpp
 )
 
 add_library(authorization SHARED ${SOURCES})
+target_link_libraries(authorization ${CONAN_LIBS})

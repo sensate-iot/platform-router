@@ -6,6 +6,8 @@
  */
 
 #include <sensateiot/application.h>
+#include <authorization/mqttclient.h>
+
 #include <json.hpp>
 
 #include <fstream>
@@ -27,7 +29,10 @@ namespace sensateiot::auth
 	void Application::Run()
 	{
 		this->ParseConfig();
-//		while(true) { }
+
+		MqttClient client("tcp://127.0.0.1:1883", false);
+		client.connect(this->m_config.GetMqtt());
+		while(true) { }
 	}
 
 	void Application::ParseConfig()

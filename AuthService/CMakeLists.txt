@@ -22,5 +22,5 @@ include_directories(
 add_subdirectory(libauthorization)
 
 ADD_EXECUTABLE(auth-service ${AUTHSERVICE_SOURCES})
-TARGET_LINK_LIBRARIES(auth-service ${CONAN_LIBS} authorization)
+TARGET_LINK_LIBRARIES(auth-service authorization ${CONAN_LIBS})
 
