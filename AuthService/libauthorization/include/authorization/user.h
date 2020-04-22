@@ -7,11 +7,13 @@
 
 #pragma once
 
+#include <sensateiot.h>
+
 #include <string>
 
 namespace sensateiot::auth
 {
-	class User {
+	class DLL_EXPORT User {
 	public:
 		void SetId(const std::string& id);
 		void SetLockout(bool lockout);
@@ -24,6 +26,6 @@ namespace sensateiot::auth
 
 	private:
 		std::string m_id;
-		bool m_lockout;
+		bool m_lockout{};
 	};
 }

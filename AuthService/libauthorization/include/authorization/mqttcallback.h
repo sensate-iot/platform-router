@@ -7,13 +7,14 @@
 
 #pragma once
 
+#include <sensateiot.h>
 #include <authorization/mqttclient.h>
 
 #include <mqtt/async_client.h>
 
 namespace sensateiot::auth::detail
 {
-	class MqttCallback :
+	class DLL_EXPORT MqttCallback :
 			public mqtt::callback,
 			public virtual mqtt::iaction_listener {
 	public:
@@ -32,7 +33,7 @@ namespace sensateiot::auth::detail
 		int m_retry;
 	};
 
-	class InternalMqttCallback {
+	class DLL_EXPORT InternalMqttCallback {
 
 	};
 }

@@ -7,11 +7,13 @@
 
 #pragma once
 
+#include <sensateiot.h>
+
 #include <string>
 
 namespace sensateiot::auth::config
 {
-	class MongoDB {
+	class DLL_EXPORT MongoDB {
 	public:
 		[[nodiscard]]
 		const std::string& GetConnectionString() const;
@@ -26,7 +28,7 @@ namespace sensateiot::auth::config
 		std::string m_connStr;
 	};
 
-	class PostgreSQL {
+	class DLL_EXPORT PostgreSQL {
 	public:
 		[[nodiscard]]
 		const std::string &GetConnectionString() const;
@@ -36,7 +38,7 @@ namespace sensateiot::auth::config
 		std::string m_connStr;
 	};
 
-	class Database {
+	class DLL_EXPORT Database {
 	public:
 		[[nodiscard]]
 		PostgreSQL& GetPostgreSQL();

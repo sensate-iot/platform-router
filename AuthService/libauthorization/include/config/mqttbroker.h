@@ -7,12 +7,14 @@
 
 #pragma once
 
+#include <sensateiot.h>
+
 #include <cstdint>
 #include <string>
 
 namespace sensateiot::auth::config
 {
-	class MqttBroker {
+	class DLL_EXPORT MqttBroker {
 	public:
 		[[nodiscard]]
 		const std::string& GetHostName() const;
@@ -42,7 +44,7 @@ namespace sensateiot::auth::config
 		bool m_ssl;
 	};
 
-	class PublicBroker {
+	class DLL_EXPORT PublicBroker {
 	public:
 		MqttBroker& GetBroker() ;
 
@@ -65,7 +67,7 @@ namespace sensateiot::auth::config
 		std::string m_messageTopic;
 	};
 
-	class PrivateBroker {
+	class DLL_EXPORT PrivateBroker {
 	public:
 		MqttBroker& GetBroker() ;
 

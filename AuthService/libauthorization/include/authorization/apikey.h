@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <sensateiot.h>
+
 #include <string>
 
 namespace sensateiot::auth
@@ -20,7 +22,7 @@ namespace sensateiot::auth
 		};
 	}
 
-	class ApiKey {
+	class DLL_EXPORT ApiKey {
 	public:
 		typedef detail::ApiKeyType Type;
 

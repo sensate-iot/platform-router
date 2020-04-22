@@ -7,11 +7,13 @@
 
 #pragma once
 
+#include <sensateiot.h>
+
 #include <string>
 
 namespace sensateiot::auth
 {
-	class Sensor {
+	class DLL_EXPORT Sensor {
 	public:
 		void SetId(std::string id);
 		void SetSecret(std::string secret);

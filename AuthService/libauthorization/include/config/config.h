@@ -7,12 +7,14 @@
 
 #pragma once
 
+#include <sensateiot.h>
+
 #include <config/database.h>
 #include <config/mqtt.h>
 
 namespace sensateiot::auth::config
 {
-	class Config {
+	class DLL_EXPORT Config {
 	public:
 		[[nodiscard]]
 		Database& GetDatabase();

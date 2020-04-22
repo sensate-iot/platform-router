@@ -7,14 +7,15 @@
 
 #pragma once
 
+#include <sensateiot.h>
 #include <config/mqtt.h>
-#include <mqtt/client.h>
 
+#include <mqtt/client.h>
 #include <mqtt/async_client.h>
 
 namespace sensateiot::auth
 {
-	class MqttClient {
+	class DLL_EXPORT MqttClient {
 	public:
 		explicit MqttClient(const std::string& uri, bool internal);
 		virtual ~MqttClient();
