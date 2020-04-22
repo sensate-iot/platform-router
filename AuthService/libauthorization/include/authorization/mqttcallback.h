@@ -8,7 +8,6 @@
 #pragma once
 
 #include <sensateiot.h>
-#include <authorization/mqttclient.h>
 
 #include <mqtt/async_client.h>
 

@@ -13,6 +13,9 @@
 #include <mqtt/client.h>
 #include <mqtt/async_client.h>
 
+#include <authorization/mqttcallback.h>
+
+
 namespace sensateiot::auth
 {
 	class DLL_EXPORT MqttClient {
@@ -30,6 +33,9 @@ namespace sensateiot::auth
 
 	private:
 		mqtt::async_client m_client;
+		mqtt::connect_options m_opts;
+		sensateiot::auth::detail::MqttCallback m_cb;
+
 		bool m_internal;
 	};
 }

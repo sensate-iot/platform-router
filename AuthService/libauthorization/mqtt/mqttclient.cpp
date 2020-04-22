@@ -11,8 +11,10 @@
 namespace sensateiot::auth
 {
 	MqttClient::MqttClient(const std::string& host, bool internal) :
-		m_client(host, "1lasdfjlasdfj234"), m_internal(internal)
+		m_client(host, "1lasdfjlasdfj234"), m_internal(internal),
+		m_cb(m_client, m_opts)
 	{
+		this->m_client.set_callback(this->m_cb);
 	}
 
 	MqttClient::~MqttClient()
@@ -28,15 +30,6 @@ namespace sensateiot::auth
 	void MqttClient::connect(const config::Mqtt &config)
 	{
 		try {
-			mqtt::connect_options opts;
-
-			opts.set_keep_alive_interval(20);
-			opts.set_clean_session(true);
-			opts.set_automatic_reconnect(true);
-
-			detail::MqttCallback cb(this->m_client, opts);
-			this->m_client.set_callback(cb);
-
 			std::cout << "Connecting..." << std::endl;
 			auto token = this->m_client.connect();
 			token->wait();
