@@ -7,8 +7,13 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <string.h>
+
+#ifdef WIN32
+#include <sensateiot/getopt.h>
+#else
+#include <unistd.h>
+#endif
 
 #include <sensateiot/application.h>
 
@@ -48,6 +53,7 @@ int main(int argc, char* argv[])
 
 	printf("Starting Sensate IoT Authorization Service\n");
 	CreateApplication(path);
+	free(path);
 
 	return -EXIT_SUCCESS;
 }

@@ -12,6 +12,8 @@
 
 #include <fstream>
 #include <iostream>
+#include <chrono>
+#include <thread>
 
 namespace sensateiot::auth
 {
@@ -30,9 +32,13 @@ namespace sensateiot::auth
 	{
 		this->ParseConfig();
 
+		using namespace std::chrono_literals;
+
 		MqttClient client("tcp://127.0.0.1:1883", false);
 		client.connect(this->m_config.GetMqtt());
-		while(true) { }
+		std::cin.get();
+
+		// TODO: run queue timer
 	}
 
 	void Application::ParseConfig()
