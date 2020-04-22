@@ -17,9 +17,10 @@ namespace sensateiot::auth::detail
 	{
 
 	}
+
 	void MqttCallback::on_failure(const mqtt::token &tok)
 	{
-
+		std::cout << "MQTT client failure!" << std::endl;
 	}
 
 	void MqttCallback::delivery_complete(mqtt::delivery_token_ptr token)
@@ -34,12 +35,13 @@ namespace sensateiot::auth::detail
 	void MqttCallback::connected(const std::string &cause)
 	{
 		std::cout << "MQTT client connected!" << std::endl;
-		callback::connected(cause);
+//		callback::connected(cause);
 	}
 
 	void MqttCallback::connection_lost(const std::string &cause)
 	{
-		callback::connection_lost(cause);
+		std::cout << "MQTT connection lost!" << std::endl;
+//		callback::connection_lost(cause);
 	}
 
 	void MqttCallback::message_arrived(mqtt::const_message_ptr msg)

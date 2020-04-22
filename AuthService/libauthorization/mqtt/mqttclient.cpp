@@ -11,7 +11,7 @@
 namespace sensateiot::auth
 {
 	MqttClient::MqttClient(const std::string& host, bool internal) :
-		m_client(host, "1234"), m_internal(internal)
+		m_client(host, "1lasdfjlasdfj234"), m_internal(internal)
 	{
 	}
 
@@ -40,7 +40,6 @@ namespace sensateiot::auth
 			std::cout << "Connecting..." << std::endl;
 			auto token = this->m_client.connect();
 			token->wait();
-
 		} catch(const mqtt::exception& ex) {
 			std::cerr << "Unable to connect MQTT client: " <<
 				ex.what() << std::endl;
