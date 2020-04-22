@@ -40,3 +40,4 @@ MqttHandler/settings/
 **/.idea/**/modules.xml
 
 AuthService/build/
+AuthService/cmake-build-debug-win32
