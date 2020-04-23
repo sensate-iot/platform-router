@@ -15,27 +15,36 @@
 
 #include <authorization/mqttcallback.h>
 
-
-namespace sensateiot::auth
+namespace sensateiot::mqtt
 {
-	class DLL_EXPORT MqttClient {
+	class BaseMqttClient {
 	public:
-		explicit MqttClient(const std::string& uri, bool internal);
-		virtual ~MqttClient();
+		BaseMqttClient(const std::string& host, const std::string& id);
+		virtual ~BaseMqttClient();
 
-		MqttClient(MqttClient&& rhs) noexcept = delete ;
-		MqttClient& operator=(MqttClient&& rhs) noexcept = delete;
+		BaseMqttClient(BaseMqttClient&& rhs) noexcept = delete ;
+		BaseMqttClient& operator=(BaseMqttClient&& rhs) noexcept = delete;
 
-		MqttClient(const MqttClient&) = delete;
-		MqttClient& operator=(const MqttClient&) = delete;
+		BaseMqttClient(const BaseMqttClient&) = delete;
+		BaseMqttClient& operator=(const BaseMqttClient&) = delete;
 
-		void connect(const config::Mqtt& config);
+		virtual void Connect(const config::Mqtt &config);
+
+	protected:
+		void SetCallback(::mqtt::callback& cb);
 
 	private:
-		mqtt::async_client m_client;
-		mqtt::connect_options m_opts;
-		sensateiot::auth::detail::MqttCallback m_cb;
+		::mqtt::async_client m_client;
+		::mqtt::connect_options m_opts;
+	};
 
-		bool m_internal;
+	class DLL_EXPORT MqttClient : public BaseMqttClient {
+	public:
+		MqttClient(const std::string& host, const std::string& id, MqttCallback cb);
+
+		void Connect(const config::Mqtt &config) override;
+
+	private:
+		MqttCallback m_cb;
 	};
 }

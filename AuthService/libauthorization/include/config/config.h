@@ -12,7 +12,7 @@
 #include <config/database.h>
 #include <config/mqtt.h>
 
-namespace sensateiot::auth::config
+namespace sensateiot::config
 {
 	class DLL_EXPORT Config {
 	public:

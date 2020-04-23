@@ -12,8 +12,9 @@ SET(SOURCES
 	config/mqttbroker.cpp
 	config/mqtt.cpp
 
-	mqtt/mqttclient.cpp
 	mqtt/mqttcallback.cpp
+	mqtt/mqttclient.cpp
+	mqtt/mqttinternalcallback.cpp
 )
 
 add_library(authorization SHARED ${SOURCES})

@@ -7,7 +7,7 @@
 
 #include <config/mqttbroker.h>
 
-namespace sensateiot::auth::config
+namespace sensateiot::config
 {
 	// Generic broker
 

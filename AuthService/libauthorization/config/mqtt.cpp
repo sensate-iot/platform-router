@@ -7,7 +7,7 @@
 
 #include <config/mqtt.h>
 
-namespace sensateiot::auth::config
+namespace sensateiot::config
 {
 	PublicBroker &Mqtt::GetPublicBroker()
 	{

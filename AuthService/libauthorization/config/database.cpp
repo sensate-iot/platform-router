@@ -7,7 +7,7 @@
 
 #include <config/database.h>
 
-namespace sensateiot::auth::config
+namespace sensateiot::config
 {
 	void PostgreSQL::SetConnectionString(const std::string& string)
 	{

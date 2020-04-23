@@ -11,7 +11,7 @@
 
 #include <string>
 
-namespace sensateiot::auth::config
+namespace sensateiot::config
 {
 	class DLL_EXPORT MongoDB {
 	public:

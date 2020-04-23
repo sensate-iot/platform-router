@@ -8,7 +8,7 @@
 #include <config/config.h>
 #include <config/mqtt.h>
 
-namespace sensateiot::auth::config
+namespace sensateiot::config
 {
 
 	Database& Config::GetDatabase()

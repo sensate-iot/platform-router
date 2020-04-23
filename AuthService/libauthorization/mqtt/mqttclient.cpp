@@ -5,37 +5,56 @@
  * @email michel@michelmegens.net
  */
 
-#include <authorization/mqttclient.h>
 #include <authorization/mqttcallback.h>
+#include <authorization/mqttclient.h>
 
-namespace sensateiot::auth
+#include <iostream>
+
+namespace sensateiot::mqtt
 {
-	MqttClient::MqttClient(const std::string& host, bool internal) :
-		m_client(host, "1lasdfjlasdfj234"), m_internal(internal),
-		m_cb(m_client, m_opts)
-	{
-		this->m_client.set_callback(this->m_cb);
-	}
-
-	MqttClient::~MqttClient()
-	{
-		try {
-			this->m_client.disconnect()->wait();
-		} catch(const mqtt::exception& ex) {
-			std::cerr << "Unable to close MQTT client: ";
-			std::cerr << ex.what() << std::endl;
-		}
-	}
-
-	void MqttClient::connect(const config::Mqtt &config)
+	void BaseMqttClient::Connect(const config::Mqtt &config)
 	{
 		try {
 			std::cout << "Connecting..." << std::endl;
 			auto token = this->m_client.connect();
 			token->wait();
-		} catch(const mqtt::exception& ex) {
+		} catch(const ::mqtt::exception& ex) {
 			std::cerr << "Unable to connect MQTT client: " <<
-				ex.what() << std::endl;
+			          ex.what() << std::endl;
 		}
+	}
+
+	BaseMqttClient::BaseMqttClient(const std::string &host, const std::string &id) :
+		m_client(host, id)
+	{
+		this->m_opts.set_automatic_reconnect(true);
+		this->m_opts.set_clean_session(true);
+		this->m_opts.set_keep_alive_interval(20);
+	}
+
+	BaseMqttClient::~BaseMqttClient()
+	{
+		try {
+			this->m_client.disconnect()->wait();
+		} catch(const ::mqtt::exception& ex) {
+			std::cerr << "Unable to close MQTT client: ";
+			std::cerr << ex.what() << std::endl;
+		}
+	}
+
+	void BaseMqttClient::SetCallback(::mqtt::callback& cb)
+	{
+		this->m_client.set_callback(cb);
+	}
+
+	MqttClient::MqttClient(const std::string &host, const std::string &id, MqttCallback cb) :
+		BaseMqttClient(host, id), m_cb(std::move(cb))
+	{
+	}
+
+	void MqttClient::Connect(const config::Mqtt &config)
+	{
+		this->SetCallback(this->m_cb);
+		BaseMqttClient::Connect(config);
 	}
 }

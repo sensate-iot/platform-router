@@ -32,3 +32,7 @@ add_subdirectory(libauthorization)
 ADD_EXECUTABLE(auth-service ${AUTHSERVICE_SOURCES})
 TARGET_LINK_LIBRARIES(auth-service authorization ${CONAN_LIBS})
 
+if (MSVC)
+	SET_TARGET_PROPERTIES(auth-service PROPERTIES LINK_FLAGS /ignore:4099)
+endif()
+

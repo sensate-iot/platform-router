@@ -11,7 +11,7 @@
 
 #include <config/mqttbroker.h>
 
-namespace sensateiot::auth::config
+namespace sensateiot::config
 {
 	class DLL_EXPORT Mqtt {
 	public:

@@ -16,7 +16,7 @@
 
 extern "C" void CreateApplication(const char*);
 
-namespace sensateiot::auth
+namespace sensateiot
 {
 	class Application {
 	public:

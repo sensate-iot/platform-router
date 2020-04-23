@@ -12,10 +12,8 @@
 
 #include <fstream>
 #include <iostream>
-#include <chrono>
-#include <thread>
 
-namespace sensateiot::auth
+namespace sensateiot
 {
 
 	config::Config &Application::GetConfig()
@@ -32,10 +30,9 @@ namespace sensateiot::auth
 	{
 		this->ParseConfig();
 
-		using namespace std::chrono_literals;
-
-		MqttClient client("tcp://127.0.0.1:1883", false);
-		client.connect(this->m_config.GetMqtt());
+		mqtt::MqttCallback cb;
+		mqtt::MqttClient client("tcp://127.0.0.1:1883", "a23fa-badf", std::move(cb));
+		client.Connect(this->m_config.GetMqtt());
 		std::cin.get();
 
 		// TODO: run queue timer
@@ -118,7 +115,7 @@ namespace sensateiot::auth
 
 void CreateApplication(const char *path)
 {
-	auto& app = sensateiot::auth::Application::GetApplication();
+	auto& app = sensateiot::Application::GetApplication();
 
 	try {
 		app.SetConfig(path);
