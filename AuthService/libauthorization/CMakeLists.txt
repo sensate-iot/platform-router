@@ -11,6 +11,9 @@ SET(SOURCES
 	config/database.cpp
 	config/mqttbroker.cpp
 	config/mqtt.cpp
+	config/logging.cpp
+
+	util/log.cpp
 
 	mqtt/mqttcallback.cpp
 	mqtt/mqttclient.cpp

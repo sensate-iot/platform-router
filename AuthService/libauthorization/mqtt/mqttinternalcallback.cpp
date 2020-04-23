@@ -5,13 +5,15 @@
  * @email michel@michelmegens.net
  */
 
-#include <authorization/mqttinternalcallback.h>
+#include <sensateiot/mqttinternalcallback.h>
 #include <iostream>
 
 namespace sensateiot::mqtt
 {
-	MqttInternalCallback::MqttInternalCallback(::mqtt::async_client& cli, ::mqtt::connect_options& connOpts)
-			: m_retry(0), m_cli(cli), m_connOpts(connOpts)
+	MqttInternalCallback::MqttInternalCallback(
+			ns_base::mqtt::async_client& cli,
+			ns_base::mqtt::connect_options& connOpts
+	) : m_retry(0), m_cli(cli), m_connOpts(connOpts)
 	{
 
 	}

@@ -11,6 +11,7 @@
 
 #include <config/database.h>
 #include <config/mqtt.h>
+#include <config/logging.h>
 
 namespace sensateiot::config
 {
@@ -30,10 +31,13 @@ namespace sensateiot::config
 		int GetWorkers() const;
 		void SetWorkers(int workers);
 
+		Logging& GetLogging();
+
 	private:
-		Database m_db;
-		Mqtt m_mqtt;
-		int m_workers;
-		int m_interval;
+		Database m_db{};
+		Mqtt m_mqtt{};
+		Logging m_logging{};
+		int m_workers{};
+		int m_interval{};
 	};
 }

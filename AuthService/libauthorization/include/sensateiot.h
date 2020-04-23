@@ -12,7 +12,7 @@
 #include <type_traits>
 #include <cstdint>
 
-#include <compiler/compiler.h>
+#include <sensateiot/compiler/compiler.h>
 
 namespace sensateiot::auth
 {
@@ -20,4 +20,10 @@ namespace sensateiot::auth
 	typedef unsigned long word_t;
 }
 
+#ifndef ns_base
+#define ns_base
 #endif
+
+#endif
+
+#define UNUSED(x) (void)x;

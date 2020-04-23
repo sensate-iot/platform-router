@@ -65,7 +65,7 @@ namespace sensateiot::config
 
 	const std::string &PublicBroker::GetMeasurementTopic() const
 	{
-		return this->m_bulkMeasurementTopic;
+		return this->m_measurementTopic;
 	}
 
 	void PublicBroker::SetMeasurementTopic(const std::string &topic)

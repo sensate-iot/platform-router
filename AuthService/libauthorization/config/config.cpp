@@ -6,7 +6,6 @@
  */
 
 #include <config/config.h>
-#include <config/mqtt.h>
 
 namespace sensateiot::config
 {
@@ -39,5 +38,10 @@ namespace sensateiot::config
 	int Config::GetInterval() const
 	{
 		return this->m_interval;
+	}
+
+	Logging &Config::GetLogging()
+	{
+		return this->m_logging;
 	}
 }

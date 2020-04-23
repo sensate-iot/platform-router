@@ -13,7 +13,7 @@
 #include <mqtt/client.h>
 #include <mqtt/async_client.h>
 
-#include <authorization/mqttcallback.h>
+#include <sensateiot/mqttcallback.h>
 
 namespace sensateiot::mqtt
 {
@@ -33,9 +33,8 @@ namespace sensateiot::mqtt
 	protected:
 		void SetCallback(::mqtt::callback& cb);
 
-	private:
-		::mqtt::async_client m_client;
-		::mqtt::connect_options m_opts;
+		ns_base::mqtt::async_client m_client;
+		ns_base::mqtt::connect_options m_opts;
 	};
 
 	class DLL_EXPORT MqttClient : public BaseMqttClient {
