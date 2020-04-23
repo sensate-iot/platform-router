@@ -6,7 +6,7 @@
  */
 
 #include <sensateiot/application.h>
-#include <authorization/mqttclient.h>
+#include <sensateiot/mqttclient.h>
 
 #include <json.hpp>
 
@@ -15,7 +15,6 @@
 
 namespace sensateiot
 {
-
 	config::Config &Application::GetConfig()
 	{
 		return this->m_config;
@@ -29,9 +28,16 @@ namespace sensateiot
 	void Application::Run()
 	{
 		this->ParseConfig();
+		util::Log::StartLogging(this->m_config.GetLogging());
+
+		auto& log = util::Log::GetLog();
+		log << "Starting Sensate IoT AuthService..." << util::Log::NewLine;
+
+		std::string hostname = this->m_config.GetMqtt().GetPublicBroker().GetBroker().GetHostName();
+		hostname += ":" + std::to_string(this->m_config.GetMqtt().GetPublicBroker().GetBroker().GetPort());
 
 		mqtt::MqttCallback cb;
-		mqtt::MqttClient client("tcp://127.0.0.1:1883", "a23fa-badf", std::move(cb));
+		mqtt::MqttClient client(hostname, "a23fa-badf", std::move(cb));
 		client.Connect(this->m_config.GetMqtt());
 		std::cin.get();
 
@@ -56,6 +62,7 @@ namespace sensateiot
 
 			this->ParseMqtt(j);
 			this->ParseDatabase(j);
+			this->ParseLogging(j);
 		} catch(json::exception& ex) {
 			std::cerr << "Unable to parse configuration file: " <<
 				ex.what() << std::endl;
@@ -94,11 +101,11 @@ namespace sensateiot
 				.GetBroker().SetPassword(j["Mqtt"]["PublicBroker"]["Password"]);
 		this->m_config.GetMqtt().GetPublicBroker()
 				.GetBroker().SetSsl(j["Mqtt"]["PublicBroker"]["Ssl"] == "true");
-		this->m_config.GetMqtt().GetPrivateBroker()
+		this->m_config.GetMqtt().GetPublicBroker()
 				.SetBulkMeasurementTopic(j["Mqtt"]["PublicBroker"]["BulkMeasurementTopic"]);
-		this->m_config.GetMqtt().GetPrivateBroker()
+		this->m_config.GetMqtt().GetPublicBroker()
 				.SetMeasurementTopic(j["Mqtt"]["PublicBroker"]["MeasurementTopic"]);
-		this->m_config.GetMqtt().GetPrivateBroker()
+		this->m_config.GetMqtt().GetPublicBroker()
 				.SetMessageTopic(j["Mqtt"]["PublicBroker"]["MessageTopic"]);
 	}
 
@@ -110,6 +117,12 @@ namespace sensateiot
 				.SetDatabaseName(json["Database"]["MongoDB"]["DatabaseName"]);
 		this->m_config.GetDatabase().GetPostgreSQL()
 				.SetConnectionString(json["Database"]["MongoDB"]["ConnectionString"]);
+	}
+
+	void Application::ParseLogging(nlohmann::json& json)
+	{
+		this->m_config.GetLogging().SetLevel(json["Logging"]["Level"]);
+		this->m_config.GetLogging().SetPath(json["Logging"]["File"]);
 	}
 }
 

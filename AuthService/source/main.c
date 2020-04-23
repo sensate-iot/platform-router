@@ -51,7 +51,6 @@ int main(int argc, char* argv[])
 		return -EXIT_FAILURE;
 	}
 
-	printf("Starting Sensate IoT Authorization Service\n");
 	CreateApplication(path);
 	free(path);
 

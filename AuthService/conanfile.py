@@ -23,14 +23,8 @@ class AuthService(ConanFile):
             self.requires("mongo-c-driver/1.16.1@bincrafters/stable", override=True)
             self.requires("paho-mqtt-cpp/1.1", override=False)
             self.requires("libpqxx/7.0.5", override=False)
-
-            # self.requires = [
-            #     "mongo-cxx-driver/3.3.0@bincrafters/stable",
-            #     ("mongo-c-driver/1.16.1@bincrafters/stable", "override"),
-            #     "paho-mqtt-cpp/1.1",
-            #     "libpqxx/7.0.5",
-            #     ("openssl/1.1.1f", "override")
-            # ]
+            self.requires("boost_log/1.67.0@bincrafters/stable")
+            self.requires("zlib/1.2.11", override=True)
         else:
             self.default_options = {
                 "libpq:with_openssl": False,
@@ -39,15 +33,11 @@ class AuthService(ConanFile):
 
             self.requires("mongo-cxx-driver/3.3.0@bincrafters/stable")
             self.requires("mongo-c-driver/1.16.1@bincrafters/stable", override=True)
+            self.requires("boost_log/1.67.0@bincrafters/stable")
+            self.requires("zlib/1.2.11", override=True)
             self.requires("paho-mqtt-cpp/1.1", override=False)
             self.requires("libpqxx/7.0.5", override=False)
             self.requires("openssl/1.1.1f", override=False)
-            # self.requires = [
-            #     "mongo-cxx-driver/3.3.0@bincrafters/stable",
-            #     "mongo-c-driver/1.16.1@bincrafters/stable",
-            #     "paho-mqtt-cpp/1.1",
-            #     "libpqxx/7.0.5",
-            # ]
 
     def build(self):
         cmake = CMake(self)
