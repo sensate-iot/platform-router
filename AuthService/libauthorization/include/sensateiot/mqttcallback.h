@@ -18,8 +18,8 @@
 namespace sensateiot::mqtt
 {
 	class DLL_EXPORT MqttCallback :
-			public ::mqtt::callback,
-			public virtual ::mqtt::iaction_listener {
+			public ns_base::mqtt::callback,
+			public virtual ns_base::mqtt::iaction_listener {
 	public:
 		explicit MqttCallback() = default;
 		explicit MqttCallback(ns_base::mqtt::async_client& cli, ns_base::mqtt::connect_options& connOpts);

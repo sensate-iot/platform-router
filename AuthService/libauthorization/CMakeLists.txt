@@ -15,6 +15,8 @@ SET(SOURCES
 
 	util/log.cpp
 
+	mqtt/messageservice.cpp
+	mqtt/measurementhandler.cpp
 	mqtt/mqttcallback.cpp
 	mqtt/mqttclient.cpp
 	mqtt/mqttinternalcallback.cpp

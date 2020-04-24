@@ -60,4 +60,16 @@ namespace sensateiot::mqtt
 		this->m_cb.set_config(config);
 		BaseMqttClient::Connect(config);
 	}
+
+
+	InternalMqttClient::InternalMqttClient(const std::string& host, const std::string& id, MqttInternalCallback cb) :
+		BaseMqttClient(host, id), m_cb(std::move(cb))
+	{
+	}
+
+	void InternalMqttClient::Connect(const config::Mqtt &config)
+	{
+		this->SetCallback(this->m_cb);
+		BaseMqttClient::Connect(config);
+	}
 }

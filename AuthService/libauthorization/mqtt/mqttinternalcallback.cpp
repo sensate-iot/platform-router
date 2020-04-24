@@ -6,6 +6,8 @@
  */
 
 #include <sensateiot/mqttinternalcallback.h>
+#include <sensateiot/log.h>
+
 #include <iostream>
 
 namespace sensateiot::mqtt
@@ -20,7 +22,8 @@ namespace sensateiot::mqtt
 
 	void MqttInternalCallback::on_failure(const ::mqtt::token &tok)
 	{
-		std::cout << "MQTT client failure!" << std::endl;
+		auto& log = util::Log::GetLog();
+		log << "Internal MQTT client failure!" << util::Log::NewLine;
 	}
 
 	void MqttInternalCallback::delivery_complete(::mqtt::delivery_token_ptr token)
@@ -34,16 +37,24 @@ namespace sensateiot::mqtt
 
 	void MqttInternalCallback::connected(const std::string &cause)
 	{
-		std::cout << "MQTT client connected!" << std::endl;
+		auto& log = util::Log::GetLog();
+		log << "Internal MQTT client connected!" << util::Log::NewLine;
 	}
 
 	void MqttInternalCallback::connection_lost(const std::string &cause)
 	{
-		std::cout << "MQTT connection lost!" << std::endl;
+		auto& log = util::Log::GetLog();
+		log << "Internal MQTT client connection lost!" << util::Log::NewLine;
 	}
 
 	void MqttInternalCallback::message_arrived(::mqtt::const_message_ptr msg)
 	{
 		callback::message_arrived(msg);
+	}
+
+	void MqttInternalCallback::set_client(ns_base::mqtt::async_client &cli, ns_base::mqtt::connect_options &opts)
+	{
+		this->m_cli = cli;
+		this->m_connOpts = opts;
 	}
 }

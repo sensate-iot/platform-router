@@ -36,6 +36,9 @@ namespace sensateiot::config
 		bool GetSsl() const;
 		void SetSsl(bool enable);
 
+		[[nodiscard]]
+		std::string GetUri() const;
+
 	private:
 		std::string m_host;
 		std::string m_username;

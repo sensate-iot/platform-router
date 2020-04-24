@@ -61,6 +61,14 @@ namespace sensateiot::config
 		this->m_ssl = enable;
 	}
 
+	std::string MqttBroker::GetUri() const
+	{
+		std::string rv = this->GetHostName() + ':';
+		rv += std::to_string(this->GetPort());
+
+		return rv;
+	}
+
 	// Public broker
 
 	const std::string &PublicBroker::GetMeasurementTopic() const
