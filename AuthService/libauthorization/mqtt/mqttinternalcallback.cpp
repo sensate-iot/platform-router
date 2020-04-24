@@ -13,7 +13,7 @@ namespace sensateiot::mqtt
 	MqttInternalCallback::MqttInternalCallback(
 			ns_base::mqtt::async_client& cli,
 			ns_base::mqtt::connect_options& connOpts
-	) : m_retry(0), m_cli(cli), m_connOpts(connOpts)
+	) : m_cli(cli), m_connOpts(connOpts)
 	{
 
 	}

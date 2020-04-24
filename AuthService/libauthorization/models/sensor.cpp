@@ -5,7 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
-#include <sensateiot/sensor.h>
+#include <sensateiot/models/sensor.h>
 
 namespace sensateiot::auth
 {

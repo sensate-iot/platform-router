@@ -26,3 +26,5 @@ target_link_libraries(authorization ${CONAN_LIBS})
 if (MSVC)
 	SET_TARGET_PROPERTIES(authorization PROPERTIES LINK_FLAGS /ignore:4099)
 endif()
+
+install(TARGETS authorization LIBRARY DESTINATION lib)

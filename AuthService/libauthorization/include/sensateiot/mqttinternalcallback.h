@@ -28,6 +28,5 @@ namespace sensateiot::mqtt
 	private:
 		std::reference_wrapper<::mqtt::async_client> m_cli;
 		std::reference_wrapper<::mqtt::connect_options> m_connOpts;
-		int m_retry;
 	};
 }

@@ -12,7 +12,7 @@
 #include <config/mqtt.h>
 #include <mqtt/async_client.h>
 
-#include <sensateiot/referencewrapper.h>
+#include <sensateiot/stl/referencewrapper.h>
 #include <sensateiot/log.h>
 
 namespace sensateiot::mqtt
