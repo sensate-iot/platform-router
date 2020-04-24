@@ -7,6 +7,7 @@
 
 #include <sensateiot/application.h>
 #include <sensateiot/mqttclient.h>
+#include <sensateiot/messageservice.h>
 
 #include <json.hpp>
 
@@ -33,12 +34,22 @@ namespace sensateiot
 		auto& log = util::Log::GetLog();
 		log << "Starting Sensate IoT AuthService..." << util::Log::NewLine;
 
-		std::string hostname = this->m_config.GetMqtt().GetPublicBroker().GetBroker().GetHostName();
-		hostname += ":" + std::to_string(this->m_config.GetMqtt().GetPublicBroker().GetBroker().GetPort());
+//		std::string hostname = this->m_config.GetMqtt().GetPublicBroker().GetBroker().GetHostName();
+//		hostname += ":" + std::to_string(this->m_config.GetMqtt().GetPublicBroker().GetBroker().GetPort());
+		auto hostname = this->m_config.GetMqtt().GetPublicBroker().GetBroker().GetUri();
 
 		mqtt::MqttCallback cb;
 		mqtt::MqttClient client(hostname, "a23fa-badf", std::move(cb));
 		client.Connect(this->m_config.GetMqtt());
+
+		// Internal client
+		mqtt::MqttInternalCallback icb;
+		auto ihost = this->m_config.GetMqtt().GetPublicBroker().GetBroker().GetUri();
+		mqtt::InternalMqttClient iclient(ihost, "3lasdfjlas", std::move(icb));
+		iclient.Connect(this->m_config.GetMqtt());
+
+		mqtt::MessageService service(iclient, this->m_config);
+
 		std::cin.get();
 
 		// TODO: run queue timer
