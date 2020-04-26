@@ -22,11 +22,11 @@ SET(SOURCES
 	mqtt/mqttinternalcallback.cpp
 )
 
-add_library(authorization SHARED ${SOURCES})
-target_link_libraries(authorization ${CONAN_LIBS})
+add_library(sensateiot SHARED ${SOURCES})
+target_link_libraries(sensateiot ${CONAN_LIBS})
 
 if (MSVC)
-	SET_TARGET_PROPERTIES(authorization PROPERTIES LINK_FLAGS /ignore:4099)
+	SET_TARGET_PROPERTIES(sensateiot PROPERTIES LINK_FLAGS /ignore:4099)
 endif()
 
-install(TARGETS authorization LIBRARY DESTINATION lib)
+install(TARGETS sensateiot LIBRARY DESTINATION lib)

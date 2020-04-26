@@ -34,13 +34,13 @@ include_directories(
 	${PROJECT_SOURCE_DIR}/external/ctre/single-header
 	${PROJECT_SOURCE_DIR}/external/json
 	${PROJECT_SOURCE_DIR}/include
-	${PROJECT_SOURCE_DIR}/libauthorization/include
+	${PROJECT_SOURCE_DIR}/libsensateiot/include
 )
 
-add_subdirectory(libauthorization)
+add_subdirectory(libsensateiot)
 
 ADD_EXECUTABLE(auth-service ${AUTHSERVICE_SOURCES})
-TARGET_LINK_LIBRARIES(auth-service authorization ${CONAN_LIBS})
+TARGET_LINK_LIBRARIES(auth-service sensateiot ${CONAN_LIBS})
 
 if (MSVC)
 	SET_TARGET_PROPERTIES(auth-service PROPERTIES LINK_FLAGS /ignore:4099)
