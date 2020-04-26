@@ -9,7 +9,7 @@
 
 #include <config/mqtt.h>
 
-#include <sensateiot/mqttclient.h>
+#include <sensateiot/imqttclient.h>
 #include <sensateiot/stl/referencewrapper.h>
 
 #include <string>
@@ -20,7 +20,7 @@ namespace sensateiot::mqtt
 {
 	class MeasurementHandler {
 	public:
-		explicit MeasurementHandler(InternalMqttClient& client);
+		explicit MeasurementHandler(IMqttClient& client);
 		virtual ~MeasurementHandler();
 
 		void PushMeasurement(std::string json);
@@ -30,7 +30,7 @@ namespace sensateiot::mqtt
 		MeasurementHandler& operator=(MeasurementHandler&& rhs) noexcept;
 
 	private:
-		stl::ReferenceWrapper<InternalMqttClient> m_internal;
+		stl::ReferenceWrapper<IMqttClient> m_internal;
 		std::vector<std::string> m_measurements;
 		std::mutex m_lock;
 

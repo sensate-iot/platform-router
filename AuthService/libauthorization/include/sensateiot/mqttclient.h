@@ -14,11 +14,12 @@
 #include <mqtt/async_client.h>
 
 #include <sensateiot/mqttcallback.h>
-#include "mqttinternalcallback.h"
+#include <sensateiot/mqttinternalcallback.h>
+#include <sensateiot/imqttclient.h>
 
 namespace sensateiot::mqtt
 {
-	class BaseMqttClient {
+	class BaseMqttClient : public IMqttClient {
 	public:
 		BaseMqttClient(const std::string& host, const std::string& id);
 		virtual ~BaseMqttClient();
@@ -29,7 +30,7 @@ namespace sensateiot::mqtt
 		BaseMqttClient(const BaseMqttClient&) = delete;
 		BaseMqttClient& operator=(const BaseMqttClient&) = delete;
 
-		virtual void Connect(const config::Mqtt &config);
+		void Connect(const config::Mqtt &config) override;
 
 	protected:
 		void SetCallback(::mqtt::callback& cb);

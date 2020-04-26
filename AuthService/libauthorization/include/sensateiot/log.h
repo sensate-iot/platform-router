@@ -8,6 +8,7 @@
 #pragma once
 
 #include <string>
+#include <mutex>
 
 #include <sensateiot.h>
 #include <config/logging.h>
@@ -36,6 +37,7 @@ namespace sensateiot::util
 	private:
 		config::Logging m_config;
 		std::string m_buffer;
+		std::mutex m_lock;
 	};
 }
 

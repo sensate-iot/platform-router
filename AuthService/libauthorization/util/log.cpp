@@ -55,6 +55,8 @@ namespace sensateiot::util
 
 	Log& Log::operator<<(const std::string &input)
 	{
+		std::scoped_lock l(this->m_lock);
+
 		this->m_buffer += input;
 		return *this;
 	}
@@ -68,6 +70,8 @@ namespace sensateiot::util
 
 	void Log::Flush()
 	{
+		std::scoped_lock l(this->m_lock);
+
 		boost::log::sources::severity_logger<boost::log::trivial::severity_level> lg;
 		BOOST_LOG_SEV(lg, info) << this->m_buffer;
 		this->m_buffer.clear();

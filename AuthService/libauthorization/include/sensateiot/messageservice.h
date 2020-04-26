@@ -11,15 +11,27 @@
 #include <config/config.h>
 
 #include <sensateiot/measurementhandler.h>
+#include <sensateiot/imqttclient.h>
+
+#include <string>
+#include <atomic>
+#include <shared_mutex>
 
 namespace sensateiot::mqtt
 {
 	class MessageService {
 	public:
-		explicit MessageService(InternalMqttClient& client, const config::Config& conf);
+		explicit MessageService(IMqttClient& client, const config::Config& conf);
+
+		void Process();
+		void AddMessage(std::string msg);
 
 	private:
+		mutable std::shared_mutex m_lock;
 		config::Config m_conf;
+		std::atomic_size_t m_index;
 		std::vector<MeasurementHandler> m_handlers;
+
+		static constexpr int Increment = 1;
 	};
 }
