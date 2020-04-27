@@ -28,4 +28,14 @@ namespace sensateiot::models
 	{
 		return this->m_secret;
 	}
+
+	void Sensor::SetOwner(std::string owner)
+	{
+		this->m_owner = owner;
+	}
+
+	const std::string &Sensor::GetOwner() const
+	{
+		return this->m_owner;
+	}
 }
