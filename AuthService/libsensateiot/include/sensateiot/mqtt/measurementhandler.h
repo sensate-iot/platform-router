@@ -9,7 +9,7 @@
 
 #include <config/mqtt.h>
 
-#include <sensateiot/imqttclient.h>
+#include <sensateiot/mqtt/imqttclient.h>
 #include <sensateiot/stl/referencewrapper.h>
 
 #include <string>

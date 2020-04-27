@@ -5,7 +5,7 @@
  * @email michel@michelmegens.net
  */
 
-#include <sensateiot/mqttinternalcallback.h>
+#include <sensateiot/mqtt/mqttinternalcallback.h>
 #include <sensateiot/log.h>
 
 #include <iostream>

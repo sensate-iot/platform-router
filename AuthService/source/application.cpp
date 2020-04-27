@@ -6,7 +6,7 @@
  */
 
 #include <sensateiot/application.h>
-#include <sensateiot/mqttclient.h>
+#include <sensateiot/mqtt/mqttclient.h>
 #include <sensateiot/messageservice.h>
 
 #include <json.hpp>

@@ -10,8 +10,8 @@
 #include <sensateiot.h>
 #include <config/config.h>
 
-#include <sensateiot/measurementhandler.h>
-#include <sensateiot/imqttclient.h>
+#include <sensateiot/mqtt/measurementhandler.h>
+#include <sensateiot/mqtt/imqttclient.h>
 
 #include <string>
 #include <atomic>

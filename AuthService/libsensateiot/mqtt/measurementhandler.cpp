@@ -5,7 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
-#include <sensateiot/measurementhandler.h>
+#include <sensateiot/mqtt/measurementhandler.h>
 
 #include <iostream>
 
@@ -45,7 +45,6 @@ namespace sensateiot::mqtt
 	{
 		std::scoped_lock l(this->m_lock);
 
-		std::cout << json;
 		this->m_measurements.emplace_back(std::move(json));
 	}
 

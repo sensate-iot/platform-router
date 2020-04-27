@@ -13,9 +13,9 @@
 #include <mqtt/client.h>
 #include <mqtt/async_client.h>
 
-#include <sensateiot/mqttcallback.h>
-#include <sensateiot/mqttinternalcallback.h>
-#include <sensateiot/imqttclient.h>
+#include <sensateiot/mqtt/mqttcallback.h>
+#include <sensateiot/mqtt/mqttinternalcallback.h>
+#include <sensateiot/mqtt/imqttclient.h>
 
 namespace sensateiot::mqtt
 {

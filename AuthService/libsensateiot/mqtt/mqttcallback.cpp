@@ -5,7 +5,7 @@
  * @email michel@michelmegens.net
  */
 
-#include <sensateiot/mqttcallback.h>
+#include <sensateiot/mqtt/mqttcallback.h>
 
 #include <iostream>
 
