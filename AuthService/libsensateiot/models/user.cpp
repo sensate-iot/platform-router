@@ -7,7 +7,7 @@
 
 #include <sensateiot/models/user.h>
 
-namespace sensateiot::auth
+namespace sensateiot::models
 {
 	const std::string& User::GetId() const
 	{
@@ -27,6 +27,16 @@ namespace sensateiot::auth
 	bool User::GetLockout() const
 	{
 		return this->m_lockout;
+	}
+
+	bool User::GetBanned() const
+	{
+		return this->m_banned;
+	}
+
+	void User::SetBanned(bool banned)
+	{
+		this->m_banned = banned;
 	}
 }
 

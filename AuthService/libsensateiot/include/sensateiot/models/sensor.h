@@ -11,7 +11,7 @@
 
 #include <string>
 
-namespace sensateiot::auth
+namespace sensateiot::models
 {
 	class DLL_EXPORT Sensor {
 	public:

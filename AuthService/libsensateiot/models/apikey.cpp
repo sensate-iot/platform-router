@@ -7,16 +7,11 @@
 
 #include <sensateiot/models/apikey.h>
 
-namespace sensateiot::auth
+namespace sensateiot::models
 {
 	void ApiKey::SetKey(const std::string& str)
 	{
 		this->m_key = str;
-	}
-
-	void ApiKey::SetType(Type type)
-	{
-		this->m_type = type;
 	}
 
 	void ApiKey::SetRevoked(bool revoked)
@@ -29,13 +24,18 @@ namespace sensateiot::auth
 		return this->m_key;
 	}
 
-	auto ApiKey::GetType() const -> ApiKey::Type
-	{
-		return this->m_type;
-	}
-
 	auto ApiKey::GetRevoked() const -> bool
 	{
 		return this->m_revoked;
+	}
+
+	void ApiKey::SetUserId(const std::string &value)
+	{
+		this->m_userId = value;
+	}
+
+	auto ApiKey::GetUserId() const -> std::string
+	{
+		return this->m_userId;
 	}
 }

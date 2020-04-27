@@ -17,11 +17,15 @@
 #include <atomic>
 #include <shared_mutex>
 
+#include <sensateiot/abstractuserrepository.h>
+
 namespace sensateiot::mqtt
 {
 	class MessageService {
 	public:
-		explicit MessageService(IMqttClient& client, const config::Config& conf);
+		explicit MessageService(IMqttClient& client,
+				const services::AbstractUserRepository& users,
+				const config::Config& conf);
 
 		void Process();
 		void AddMessage(std::string msg);

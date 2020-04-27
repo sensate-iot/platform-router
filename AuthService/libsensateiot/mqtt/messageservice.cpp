@@ -10,11 +10,13 @@
 
 namespace sensateiot::mqtt
 {
-	MessageService::MessageService(IMqttClient &client, const config::Config &conf) :
-		m_conf(conf), m_index(0)
+	MessageService::MessageService(
+			IMqttClient &client,
+			const services::AbstractUserRepository& users,
+			const config::Config &conf
+	) : m_conf(conf), m_index(0)
 	{
 		std::unique_lock lock(this->m_lock);
-
 		std::string uri = this->m_conf.GetMqtt().GetPrivateBroker().GetBroker().GetUri();
 
 		for(int idx = 0; idx < conf.GetWorkers(); idx++) {

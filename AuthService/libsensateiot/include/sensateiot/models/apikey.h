@@ -11,7 +11,7 @@
 
 #include <string>
 
-namespace sensateiot::auth
+namespace sensateiot::models
 {
 	namespace detail
 	{
@@ -27,20 +27,21 @@ namespace sensateiot::auth
 		typedef detail::ApiKeyType Type;
 
 		void SetKey(const std::string& value);
-		void SetType(Type type);
 		void SetRevoked(bool revoked);
+		void SetUserId(const std::string& value);
 
 		[[nodiscard]]
 		auto GetKey() const -> const std::string&;
 
 		[[nodiscard]]
-		auto GetType() const -> Type;
+		auto GetRevoked() const -> bool;
 
 		[[nodiscard]]
-		auto GetRevoked() const -> bool;
+		auto GetUserId() const -> std::string;
 
 	private:
 		std::string m_key;
+		std::string m_userId;
 		Type m_type;
 		bool m_revoked;
 	};

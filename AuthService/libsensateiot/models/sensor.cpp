@@ -7,7 +7,7 @@
 
 #include <sensateiot/models/sensor.h>
 
-namespace sensateiot::auth
+namespace sensateiot::models
 {
 	void Sensor::SetId(std::string id)
 	{
