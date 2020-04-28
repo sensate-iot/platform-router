@@ -51,29 +51,6 @@ namespace sensateiot::services
 		return users;
 	}
 
-	std::vector<models::ApiKey> UserRepository::GetAllSensorKeys()
-	{
-		auto query = "SELECT \"UserId\", \"ApiKey\", \"Revoked\"\n"
-		             "FROM \"ApiKeys\"\n"
-		             "WHERE \"Type\" = 0";
-
-		pqxx::nontransaction q(this->m_connection);
-		pqxx::result res(q.exec(query));
-		std::vector<models::ApiKey> keys;
-
-		for(auto row : res) {
-			models::ApiKey key;
-
-			key.SetUserId(row[0].as<std::string>());
-			key.SetKey(row[1].as<std::string>());
-			key.SetRevoked(row[2].as<bool>());
-
-			keys.emplace_back(std::move(key));
-		}
-
-		return keys;
-	}
-
 	std::vector<models::User> UserRepository::GetRange(const std::vector<std::string> &ids)
 	{
 		std::string rv("(");
@@ -102,12 +79,11 @@ namespace sensateiot::services
 		pos = query.find('%', pos);
 		query.replace(pos, sizeof(char), rv);
 
-
 		pqxx::nontransaction q(this->m_connection);
 		pqxx::result res(q.exec(query));
 		std::vector<models::User> users;
 
-		for(auto row: res) {
+		for(const auto& row: res) {
 			models::User user;
 
 			user.SetId(row[0].as<std::string>());

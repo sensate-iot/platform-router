@@ -7,13 +7,12 @@
 
 #include <sensateiot/messageservice.h>
 
-#include <iostream>
-
 namespace sensateiot::mqtt
 {
 	MessageService::MessageService(
 			IMqttClient &client,
 			const services::AbstractUserRepository& users,
+			const services::AbstractApiKeyRepository& keys,
 			const config::Config &conf
 	) : m_conf(conf), m_index(0)
 	{

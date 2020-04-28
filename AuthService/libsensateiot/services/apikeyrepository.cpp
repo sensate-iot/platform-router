@@ -5,9 +5,6 @@
  * @email  michel@michelmegens.net
  */
 
-#pragma once
-
-#include <sensateiot.h>
 #include <config/database.h>
 
 #include <sensateiot/models/apikey.h>
@@ -16,10 +13,12 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 namespace sensateiot::services
 {
-	ApiKeyRepository::ApiKeyRepository(const config::PostgreSQL &pgsql)
+	ApiKeyRepository::ApiKeyRepository(const config::PostgreSQL &pgsql) : AbstractApiKeyRepository(pgsql),
+		m_connection(pgsql.GetConnectionString())
 	{
 		auto& log = util::Log::GetLog();
 
@@ -32,11 +31,68 @@ namespace sensateiot::services
 
 	std::vector<models::ApiKey> ApiKeyRepository::GetAllSensorKeys()
 	{
-		return std::vector<models::ApiKey>();
+		std::string query("SELECT \"UserId\", \"ApiKey\", \"Revoked\"\n"
+		             "FROM \"ApiKeys\"\n"
+		             "WHERE \"Type\" = 0");
+
+		pqxx::nontransaction q(this->m_connection);
+		pqxx::result res(q.exec(query));
+		std::vector<models::ApiKey> keys;
+
+		for(const auto& row : res) {
+			models::ApiKey key;
+
+			key.SetUserId(row[0].as<std::string>());
+			key.SetKey(row[1].as<std::string>());
+			key.SetRevoked(row[2].as<bool>());
+
+			keys.emplace_back(std::move(key));
+		}
+
+		return keys;
 	}
 
 	std::vector<models::ApiKey> ApiKeyRepository::GetKeys(const std::vector<std::string> &ids)
 	{
-		return std::vector<models::ApiKey>();
+		std::string rv("(");
+
+		for(auto idx = 0U; idx < ids.size(); idx++) {
+			rv += '\'' + ids[idx] + '\'';
+
+			if((idx + 1) != ids.size()) {
+				rv += ",";
+			}
+		}
+
+		rv += ")";
+
+		std::string::size_type pos = 0u;
+		std::string query(
+				"SELECT \"ApiKeys\".\"Id\", \"ApiKeys\".\"ApiKey\", \"ApiKeys\".\"Type\", \"ApiKeys\".\"Revoked\"\n"
+					  "FROM \"ApiKeys\"\n"
+					  "WHERE \"ApiKeys\".\"ApiKey\" IN ?");
+
+		pos = query.find('?', pos);
+		query.replace(pos, sizeof(char), rv);
+
+
+		pqxx::nontransaction q(this->m_connection);
+		pqxx::result res(q.exec(query));
+		std::vector<models::ApiKey> keys;
+
+		for(const auto& row: res) {
+			models::ApiKey key;
+
+			key.SetUserId(row[0].as<std::string>());
+			key.SetKey(row[1].as<std::string>());
+			key.SetType(static_cast<models::ApiKey::Type>(row[2].as<std::uint16_t>()));
+			key.SetRevoked(row[3].as<bool>());
+
+			std::cout << key.GetKey() << std::endl;
+
+			keys.emplace_back(std::move(key));
+		}
+
+		return keys;
 	}
 }

@@ -15,7 +15,7 @@ namespace sensateiot::models
 {
 	namespace detail
 	{
-		enum ApiKeyType {
+		enum DLL_EXPORT ApiKeyType {
 			SensorKey,
 			SystemKey,
 			ApiKey
@@ -28,6 +28,7 @@ namespace sensateiot::models
 
 		void SetKey(const std::string& value);
 		void SetRevoked(bool revoked);
+		void SetType(Type type);
 		void SetUserId(const std::string& value);
 
 		[[nodiscard]]
@@ -38,6 +39,9 @@ namespace sensateiot::models
 
 		[[nodiscard]]
 		auto GetUserId() const -> std::string;
+
+		[[nodiscard]]
+		auto GetType() const -> Type;
 
 	private:
 		std::string m_key;

@@ -19,7 +19,6 @@ namespace sensateiot::services
 		~UserRepository() override = default;
 
 		std::vector<models::User> GetAllUsers() override;
-		std::vector<models::ApiKey> GetAllSensorKeys() override;
 		std::vector<models::User> GetRange(const std::vector<std::string> &ids) override;
 
 	private:

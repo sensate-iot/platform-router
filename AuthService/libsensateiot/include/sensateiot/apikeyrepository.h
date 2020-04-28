@@ -26,10 +26,10 @@ namespace sensateiot::services
 	public:
 		explicit ApiKeyRepository() = default;
 		explicit ApiKeyRepository(const config::PostgreSQL& pgsql);
-		virtual ~ApiKeyRepository() = default;
+		~ApiKeyRepository() override = default;
 
 		std::vector<models::ApiKey> GetAllSensorKeys() override;
-		std::vector<models::ApiKey> GetKeys(const std::vector<std::string> &ids) override;
+		std::vector<models::ApiKey> GetKeys(const std::vector<std::string>& ids) override;
 
 	private:
 		pqxx::connection m_connection;

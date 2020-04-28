@@ -13,11 +13,12 @@
 #include <sensateiot/mqtt/measurementhandler.h>
 #include <sensateiot/mqtt/imqttclient.h>
 
+#include <sensateiot/abstractuserrepository.h>
+#include <sensateiot/abstractapikeyrepository.h>
+
 #include <string>
 #include <atomic>
 #include <shared_mutex>
-
-#include <sensateiot/abstractuserrepository.h>
 
 namespace sensateiot::mqtt
 {
@@ -25,6 +26,7 @@ namespace sensateiot::mqtt
 	public:
 		explicit MessageService(IMqttClient& client,
 				const services::AbstractUserRepository& users,
+				const services::AbstractApiKeyRepository& keys,
 				const config::Config& conf);
 
 		void Process();

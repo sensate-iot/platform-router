@@ -38,4 +38,14 @@ namespace sensateiot::models
 	{
 		return this->m_userId;
 	}
+
+	auto ApiKey::GetType() const -> ApiKey::Type
+	{
+		return this->m_type;
+	}
+
+	void ApiKey::SetType(ApiKey::Type type)
+	{
+		this->m_type = type;
+	}
 }

@@ -25,7 +25,6 @@ namespace sensateiot::services
 		virtual ~AbstractUserRepository() = default;
 
 		virtual std::vector<models::User> GetAllUsers() = 0;
-		virtual std::vector<models::ApiKey> GetAllSensorKeys() = 0;
 		virtual std::vector<models::User> GetRange(const std::vector<std::string>& ids) = 0;
 
 	protected:
