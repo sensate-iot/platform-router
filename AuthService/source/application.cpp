@@ -8,6 +8,7 @@
 #include <sensateiot/application.h>
 #include <sensateiot/mqtt/mqttclient.h>
 #include <sensateiot/messageservice.h>
+#include <sensateiot//userrepository.h>
 
 #include <json.hpp>
 
@@ -48,7 +49,8 @@ namespace sensateiot
 		mqtt::InternalMqttClient iclient(ihost, "3lasdfjlas", std::move(icb));
 		iclient.Connect(this->m_config.GetMqtt());
 
-		mqtt::MessageService service(iclient, this->m_config);
+		services::UserRepository repo(this->m_config.GetDatabase().GetPostgreSQL());
+		mqtt::MessageService service(iclient, repo, this->m_config);
 
 		std::cin.get();
 
@@ -126,7 +128,7 @@ namespace sensateiot
 				.SetConnectionString(json["Database"]["PgSQL"]["ConnectionString"]);
 		this->m_config.GetDatabase().GetMongoDB()
 				.SetDatabaseName(json["Database"]["MongoDB"]["DatabaseName"]);
-		this->m_config.GetDatabase().GetPostgreSQL()
+		this->m_config.GetDatabase().GetMongoDB()
 				.SetConnectionString(json["Database"]["MongoDB"]["ConnectionString"]);
 	}
 
