@@ -17,6 +17,8 @@ SET(SOURCES
 
 	services/userrepository.cpp
 	services/abstractuserrepository.cpp
+	services/abstractapikeyrepository.cpp
+	services/apikeyrepository.cpp
 
 	mqtt/messageservice.cpp
 	mqtt/measurementhandler.cpp

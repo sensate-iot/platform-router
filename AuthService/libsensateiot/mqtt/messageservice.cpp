@@ -6,6 +6,7 @@
  */
 
 #include <sensateiot/messageservice.h>
+
 #include <iostream>
 
 namespace sensateiot::mqtt
