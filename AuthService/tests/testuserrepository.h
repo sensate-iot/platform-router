@@ -23,11 +23,6 @@ namespace sensateiot::test
 			return std::vector<models::User>();
 		}
 
-		std::vector<models::ApiKey> GetAllSensorKeys() override
-		{
-			return std::vector<models::ApiKey>();
-		}
-
 		std::vector<models::User> GetRange(const std::vector<std::string> &ids) override
 		{
 			return std::vector<models::User>();

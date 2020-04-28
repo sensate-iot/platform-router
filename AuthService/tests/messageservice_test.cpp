@@ -14,6 +14,7 @@
 #include <sensateiot/messageservice.h>
 
 #include "testmqttclient.h"
+#include "testapikeyrepository.h"
 #include "testuserrepository.h"
 
 int main(int argc, char** argv)
@@ -31,7 +32,8 @@ int main(int argc, char** argv)
 	client.Connect(config.GetMqtt());
 
 	sensateiot::test::UserRepository psql(config.GetDatabase().GetPostgreSQL());
-	sensateiot::mqtt::MessageService service(client, psql, config);
+	sensateiot::test::ApiKeyRepository key(config.GetDatabase().GetPostgreSQL());
+	sensateiot::mqtt::MessageService service(client, psql, key, config);
 
 	using namespace std::chrono_literals;
 	auto t1 = std::thread([&]() {
