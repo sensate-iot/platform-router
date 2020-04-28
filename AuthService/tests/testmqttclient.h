@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <sensateiot/imqttclient.h>
+#include <sensateiot/mqtt/imqttclient.h>
 
 namespace sensateiot::test
 {

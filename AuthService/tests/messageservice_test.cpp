@@ -9,11 +9,12 @@
 #include <thread>
 #include <chrono>
 
-#include <sensateiot/imqttclient.h>
-#include <sensateiot/mqttclient.h>
+#include <sensateiot/mqtt/imqttclient.h>
+#include <sensateiot/mqtt/mqttclient.h>
 #include <sensateiot/messageservice.h>
 
 #include "testmqttclient.h"
+#include "testuserrepository.h"
 
 int main(int argc, char** argv)
 {
@@ -29,7 +30,8 @@ int main(int argc, char** argv)
 	sensateiot::test::TestMqttClient client;
 	client.Connect(config.GetMqtt());
 
-	sensateiot::mqtt::MessageService service(client, config);
+	sensateiot::test::UserRepository psql(config.GetDatabase().GetPostgreSQL());
+	sensateiot::mqtt::MessageService service(client, psql, config);
 
 	using namespace std::chrono_literals;
 	auto t1 = std::thread([&]() {
