@@ -8,13 +8,13 @@
 #include <sensateiot/application.h>
 #include <sensateiot/mqtt/mqttclient.h>
 #include <sensateiot/messageservice.h>
-#include <sensateiot//userrepository.h>
+#include <sensateiot/services/userrepository.h>
 
 #include <json.hpp>
 
 #include <fstream>
 #include <iostream>
-#include <sensateiot/apikeyrepository.h>
+#include <sensateiot/services/apikeyrepository.h>
 
 namespace sensateiot
 {

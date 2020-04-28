@@ -9,7 +9,7 @@
 
 #include <pqxx/pqxx>
 
-#include <sensateiot/abstractuserrepository.h>
+#include <sensateiot/services/abstractuserrepository.h>
 
 namespace sensateiot::services
 {

@@ -14,7 +14,7 @@
 #include <sensateiot/models/apikey.h>
 #include <sensateiot/models/sensor.h>
 
-#include <sensateiot/abstractapikeyrepository.h>
+#include <sensateiot/services/abstractapikeyrepository.h>
 
 #include <string>
 #include <vector>

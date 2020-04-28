@@ -13,8 +13,8 @@
 #include <sensateiot/mqtt/measurementhandler.h>
 #include <sensateiot/mqtt/imqttclient.h>
 
-#include <sensateiot/abstractuserrepository.h>
-#include <sensateiot/abstractapikeyrepository.h>
+#include <sensateiot/services/abstractuserrepository.h>
+#include <sensateiot/services/abstractapikeyrepository.h>
 
 #include <string>
 #include <atomic>

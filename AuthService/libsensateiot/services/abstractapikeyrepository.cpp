@@ -5,7 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
-#include <sensateiot/abstractapikeyrepository.h>
+#include <sensateiot/services/abstractapikeyrepository.h>
 
 #include <utility>
 

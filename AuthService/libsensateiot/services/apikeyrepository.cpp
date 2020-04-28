@@ -8,7 +8,7 @@
 #include <config/database.h>
 
 #include <sensateiot/models/apikey.h>
-#include <sensateiot/apikeyrepository.h>
+#include <sensateiot/services/apikeyrepository.h>
 #include <sensateiot/log.h>
 
 #include <string>

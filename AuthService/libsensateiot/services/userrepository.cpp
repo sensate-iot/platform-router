@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include <sensateiot/userrepository.h>
+#include <sensateiot/services/userrepository.h>
 #include <sensateiot/log.h>
 
 namespace sensateiot::services

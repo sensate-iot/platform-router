@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <sensateiot/abstractapikeyrepository.h>
+#include <sensateiot/services/abstractapikeyrepository.h>
 
 namespace sensateiot::test
 {
