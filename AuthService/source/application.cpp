@@ -14,6 +14,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <sensateiot/apikeyrepository.h>
 
 namespace sensateiot
 {
@@ -35,8 +36,6 @@ namespace sensateiot
 		auto& log = util::Log::GetLog();
 		log << "Starting Sensate IoT AuthService..." << util::Log::NewLine;
 
-//		std::string hostname = this->m_config.GetMqtt().GetPublicBroker().GetBroker().GetHostName();
-//		hostname += ":" + std::to_string(this->m_config.GetMqtt().GetPublicBroker().GetBroker().GetPort());
 		auto hostname = this->m_config.GetMqtt().GetPublicBroker().GetBroker().GetUri();
 
 		mqtt::MqttCallback cb;
@@ -49,8 +48,9 @@ namespace sensateiot
 		mqtt::InternalMqttClient iclient(ihost, "3lasdfjlas", std::move(icb));
 		iclient.Connect(this->m_config.GetMqtt());
 
-		services::UserRepository repo(this->m_config.GetDatabase().GetPostgreSQL());
-		mqtt::MessageService service(iclient, repo, this->m_config);
+		services::UserRepository users(this->m_config.GetDatabase().GetPostgreSQL());
+		services::ApiKeyRepository keys(this->m_config.GetDatabase().GetPostgreSQL());
+		mqtt::MessageService service(iclient, users, keys, this->m_config);
 
 		std::cin.get();
 
