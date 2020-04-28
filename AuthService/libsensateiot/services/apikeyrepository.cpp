@@ -17,8 +17,8 @@
 
 namespace sensateiot::services
 {
-	ApiKeyRepository::ApiKeyRepository(const config::PostgreSQL &pgsql) : AbstractApiKeyRepository(pgsql),
-		m_connection(pgsql.GetConnectionString())
+	ApiKeyRepository::ApiKeyRepository(config::PostgreSQL pgsql) :
+		AbstractApiKeyRepository(std::move(pgsql)), m_connection(pgsql.GetConnectionString())
 	{
 		auto& log = util::Log::GetLog();
 

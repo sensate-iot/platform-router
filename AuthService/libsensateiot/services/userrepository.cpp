@@ -12,8 +12,8 @@
 
 namespace sensateiot::services
 {
-	UserRepository::UserRepository(const config::PostgreSQL &pgsql) :
-		AbstractUserRepository(pgsql), m_connection(pgsql.GetConnectionString())
+	UserRepository::UserRepository(config::PostgreSQL pgsql) :
+		AbstractUserRepository(std::move(pgsql)), m_connection(pgsql.GetConnectionString())
 	{
 		auto& log = util::Log::GetLog();
 
@@ -26,19 +26,19 @@ namespace sensateiot::services
 
 	std::vector<models::User> UserRepository::GetAllUsers()
 	{
-		auto query = "SELECT \"Users\".\"Id\",\n"
+		std::string query("SELECT \"Users\".\"Id\",\n"
 		             "       \"BillingLockout\",\n"
 		             "       \"Roles\".\"NormalizedName\" = 'BANNED' as \"Banned\"\n"
 		             "FROM \"Users\"\n"
 		             "         INNER JOIN \"UserRoles\" ON \"Users\".\"Id\" = \"UserRoles\".\"UserId\"\n"
 		             "         INNER JOIN \"Roles\" ON \"UserRoles\".\"RoleId\" = \"Roles\".\"Id\"\n"
-		             "GROUP BY \"Users\".\"Id\", \"BillingLockout\", \"Roles\".\"NormalizedName\" = 'BANNED'";
+		             "GROUP BY \"Users\".\"Id\", \"BillingLockout\", \"Roles\".\"NormalizedName\" = 'BANNED'");
 
 		pqxx::nontransaction q(this->m_connection);
 		pqxx::result res(q.exec(query));
 		std::vector<models::User> users;
 
-		for(auto row: res) {
+		for(const auto& row: res) {
 			models::User user;
 
 			user.SetId(row[0].as<std::string>());
@@ -67,7 +67,7 @@ namespace sensateiot::services
 
 		std::string::size_type pos = 0u;
 
-		auto query = std::string("SELECT \"Users\".\"Id\",\n"
+		std::string query("SELECT \"Users\".\"Id\",\n"
 		             "       \"BillingLockout\",\n"
 		             "       \"Roles\".\"NormalizedName\" = 'BANNED' as \"Banned\"\n"
 		             "FROM \"Users\"\n"

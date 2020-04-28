@@ -9,8 +9,8 @@
 
 namespace sensateiot::services
 {
-	AbstractUserRepository::AbstractUserRepository(const config::PostgreSQL &pgsql) :
-		m_pgsql(pgsql)
+	AbstractUserRepository::AbstractUserRepository(config::PostgreSQL pgsql) :
+		m_pgsql(std::move(pgsql))
 	{
 	}
 }

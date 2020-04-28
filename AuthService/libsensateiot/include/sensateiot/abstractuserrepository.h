@@ -21,7 +21,7 @@ namespace sensateiot::services
 	class DLL_EXPORT AbstractUserRepository {
 	public:
 		explicit AbstractUserRepository() = default;
-		explicit AbstractUserRepository(const config::PostgreSQL& pgsql);
+		explicit AbstractUserRepository(config::PostgreSQL pgsql);
 		virtual ~AbstractUserRepository() = default;
 
 		virtual std::vector<models::User> GetAllUsers() = 0;

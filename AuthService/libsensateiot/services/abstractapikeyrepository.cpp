@@ -7,10 +7,12 @@
 
 #include <sensateiot/abstractapikeyrepository.h>
 
+#include <utility>
+
 namespace sensateiot::services
 {
-	AbstractApiKeyRepository::AbstractApiKeyRepository(const config::PostgreSQL &pgsql) :
-		m_pgsql(pgsql)
+	AbstractApiKeyRepository::AbstractApiKeyRepository(config::PostgreSQL pgsql) :
+		m_pgsql(std::move(pgsql))
 	{
 	}
 }
