@@ -32,7 +32,9 @@ bld/
 [Oo]bj/
 [Ll]og/
 
-AuthService/cmake-*
+cmake-build-debug-win64/
+cmake-build-release/
+[Bb]uild/
 
 # Visual Studio 2015 cache/options directory
 .vs/
