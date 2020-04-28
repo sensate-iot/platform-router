@@ -14,6 +14,7 @@ SET(SOURCES
 	config/logging.cpp
 
 	util/log.cpp
+	util/mongodbclient.cpp
 
 	services/userrepository.cpp
 	services/abstractuserrepository.cpp

@@ -8,13 +8,15 @@
 #include <sensateiot/application.h>
 #include <sensateiot/mqtt/mqttclient.h>
 #include <sensateiot/messageservice.h>
+#include <sensateiot/mongodbclient.h>
+
 #include <sensateiot/services/userrepository.h>
+#include <sensateiot/services/apikeyrepository.h>
 
 #include <json.hpp>
 
 #include <fstream>
 #include <iostream>
-#include <sensateiot/services/apikeyrepository.h>
 
 namespace sensateiot
 {
@@ -51,6 +53,9 @@ namespace sensateiot
 		services::UserRepository users(this->m_config.GetDatabase().GetPostgreSQL());
 		services::ApiKeyRepository keys(this->m_config.GetDatabase().GetPostgreSQL());
 		mqtt::MessageService service(iclient, users, keys, this->m_config);
+
+		util::MongoDBClient::Init(this->m_config.GetDatabase().GetMongoDB());
+		auto& mongo = util::MongoDBClient::GetClient();
 
 		std::cin.get();
 
