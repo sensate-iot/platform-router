@@ -25,7 +25,7 @@ namespace sensateiot::services
 	class DLL_EXPORT ApiKeyRepository : public AbstractApiKeyRepository {
 	public:
 		explicit ApiKeyRepository() = default;
-		explicit ApiKeyRepository(config::PostgreSQL pgsql);
+		explicit ApiKeyRepository(const config::PostgreSQL& pgsql);
 		~ApiKeyRepository() override = default;
 
 		std::vector<models::ApiKey> GetAllSensorKeys() override;

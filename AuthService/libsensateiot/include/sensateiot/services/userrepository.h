@@ -15,7 +15,7 @@ namespace sensateiot::services
 {
 	class DLL_EXPORT UserRepository : public AbstractUserRepository {
 	public:
-		explicit UserRepository(config::PostgreSQL pgsql);
+		explicit UserRepository(const config::PostgreSQL& pgsql);
 		~UserRepository() override = default;
 
 		std::vector<models::User> GetAllUsers() override;

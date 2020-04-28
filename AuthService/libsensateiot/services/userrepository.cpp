@@ -12,8 +12,8 @@
 
 namespace sensateiot::services
 {
-	UserRepository::UserRepository(config::PostgreSQL pgsql) :
-		AbstractUserRepository(std::move(pgsql)), m_connection(pgsql.GetConnectionString())
+	UserRepository::UserRepository(const config::PostgreSQL& pgsql) :
+		AbstractUserRepository(pgsql), m_connection(pgsql.GetConnectionString())
 	{
 		auto& log = util::Log::GetLog();
 
