@@ -28,11 +28,56 @@ SET(SOURCES
 	mqtt/mqttinternalcallback.cpp
 )
 
-add_library(sensateiot SHARED ${SOURCES})
+set(GENERIC_HEADERS
+	libsensateiot/include/auth.h
+	libsensateiot/include/config/config.h
+	libsensateiot/include/config/database.h
+	libsensateiot/include/config/logging.h
+	libsensateiot/include/config/mqtt.h
+	libsensateiot/include/config/mqttbroker.h
+	libsensateiot/include/sensateiot/compiler/compiler-msvc.h
+	libsensateiot/include/sensateiot/compiler/compiler.h
+	libsensateiot/include/sensateiot/log.h
+	libsensateiot/include/sensateiot/messageservice.h
+	libsensateiot/include/sensateiot/models/apikey.h
+	libsensateiot/include/sensateiot/models/sensor.h
+	libsensateiot/include/sensateiot/models/user.h
+	libsensateiot/include/sensateiot/mongodbclient.h
+	libsensateiot/include/sensateiot/mqtt/imqttclient.h
+	libsensateiot/include/sensateiot/mqtt/measurementhandler.h
+	libsensateiot/include/sensateiot/mqtt/mqttcallback.h
+	libsensateiot/include/sensateiot/mqtt/mqttclient.h
+	libsensateiot/include/sensateiot/mqtt/mqttinternalcallback.h
+	libsensateiot/include/sensateiot/services/abstractapikeyrepository.h
+	libsensateiot/include/sensateiot/services/abstractuserrepository.h
+	libsensateiot/include/sensateiot/services/apikeyrepository.h
+	libsensateiot/include/sensateiot/services/userrepository.h
+	libsensateiot/include/sensateiot/stl/referencewrapper.h
+	libsensateiot/include/sensateiot.h
+)
+
+FUNCTION( prepend_path SOURCE_FILES INC_PATH )
+	FOREACH( SOURCE_FILE ${${SOURCE_FILES}} )
+		SET( MODIFIED ${MODIFIED} ${INC_PATH}/${SOURCE_FILE} )
+	ENDFOREACH()
+	SET( ${SOURCE_FILES} ${MODIFIED} PARENT_SCOPE )
+ENDFUNCTION()
+
+SET(INCLUDE_DIR ${PROJECT_SOURCE_DIR})
+prepend_path(GENERIC_HEADERS ${INCLUDE_DIR})
+
+add_library(sensateiot SHARED ${SOURCES} ${GENERIC_HEADERS})
 target_link_libraries(sensateiot ${CONAN_LIBS})
 
 if (MSVC)
 	SET_TARGET_PROPERTIES(sensateiot PROPERTIES LINK_FLAGS /ignore:4099)
 endif()
 
-install(TARGETS sensateiot LIBRARY DESTINATION lib)
+install(TARGETS sensateiot
+	EXPORT SnappyTargets
+	# RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} # DESTINATION error
+	RUNTIME DESTINATION bin ${CMAKE_INSTALL_BINDIR} # should add bin or other dir
+	LIBRARY DESTINATION lib ${CMAKE_INSTALL_LIBDIR}
+	# ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR # DESTINATION error
+	ARCHIVE DESTINATION lib ${CMAKE_INSTALL_LIBDIR} # should add lib
+	)
