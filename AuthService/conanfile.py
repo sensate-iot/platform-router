@@ -22,7 +22,7 @@ class AuthService(ConanFile):
         if not self.is_windows():
             return
 
-        self.default_options['mongo-cxx-driver:shared'] = False
+        self.options['mongo-cxx-driver'].shared = False
 
     def is_windows(self):
         return os.name == 'nt'
