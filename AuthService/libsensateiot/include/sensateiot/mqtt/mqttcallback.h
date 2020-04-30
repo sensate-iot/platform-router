@@ -14,6 +14,7 @@
 
 #include <sensateiot/stl/referencewrapper.h>
 #include <sensateiot/log.h>
+#include <sensateiot/messageservice.h>
 
 namespace sensateiot::mqtt
 {
@@ -22,7 +23,7 @@ namespace sensateiot::mqtt
 			public virtual ns_base::mqtt::iaction_listener {
 	public:
 		explicit MqttCallback() = default;
-		explicit MqttCallback(ns_base::mqtt::async_client& cli, ns_base::mqtt::connect_options& connOpts);
+		explicit MqttCallback(MessageService& service);
 
 		void on_failure(const ::mqtt::token& tok) override;
 		void delivery_complete(::mqtt::delivery_token_ptr token) override;

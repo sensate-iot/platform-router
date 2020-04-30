@@ -11,10 +11,8 @@
 
 namespace sensateiot::mqtt
 {
-	MqttCallback::MqttCallback(ns_base::mqtt::async_client& cli, ns_base::mqtt::connect_options& connOpts)
-		: m_cli(cli), m_connOpts(connOpts)
+	MqttCallback::MqttCallback(MessageService& service)
 	{
-
 	}
 
 	void MqttCallback::on_failure(const ns_base::mqtt::token &tok)

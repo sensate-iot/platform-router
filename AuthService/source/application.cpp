@@ -40,10 +40,6 @@ namespace sensateiot
 
 		auto hostname = this->m_config.GetMqtt().GetPublicBroker().GetBroker().GetUri();
 
-		mqtt::MqttCallback cb;
-		mqtt::MqttClient client(hostname, "a23fa-badf", std::move(cb));
-		client.Connect(this->m_config.GetMqtt());
-
 		// Internal client
 		mqtt::MqttInternalCallback icb;
 		auto ihost = this->m_config.GetMqtt().GetPublicBroker().GetBroker().GetUri();
@@ -53,6 +49,11 @@ namespace sensateiot
 		services::UserRepository users(this->m_config.GetDatabase().GetPostgreSQL());
 		services::ApiKeyRepository keys(this->m_config.GetDatabase().GetPostgreSQL());
 		mqtt::MessageService service(iclient, users, keys, this->m_config);
+
+		mqtt::MqttCallback cb(service);
+		mqtt::MqttClient client(hostname, "a23fa-badf", std::move(cb));
+		client.Connect(this->m_config.GetMqtt());
+
 
 		util::MongoDBClient::Init(this->m_config.GetDatabase().GetMongoDB());
 		auto& mongo = util::MongoDBClient::GetClient();
