@@ -20,6 +20,8 @@ SET(SOURCES
 	services/abstractuserrepository.cpp
 	services/abstractapikeyrepository.cpp
 	services/apikeyrepository.cpp
+	services/sensorrepository.cpp
+	services/abstractsensorrepository.cpp
 
 	mqtt/messageservice.cpp
 	mqtt/measurementhandler.cpp
@@ -50,8 +52,10 @@ set(GENERIC_HEADERS
 	libsensateiot/include/sensateiot/mqtt/mqttinternalcallback.h
 	libsensateiot/include/sensateiot/services/abstractapikeyrepository.h
 	libsensateiot/include/sensateiot/services/abstractuserrepository.h
+	libsensateiot/include/sensateiot/services/abstractsensorrepository.h
 	libsensateiot/include/sensateiot/services/apikeyrepository.h
 	libsensateiot/include/sensateiot/services/userrepository.h
+	libsensateiot/include/sensateiot/services/sensorrepository.h
 	libsensateiot/include/sensateiot/stl/referencewrapper.h
 	libsensateiot/include/sensateiot.h
 )
