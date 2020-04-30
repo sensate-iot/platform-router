@@ -43,3 +43,4 @@ AuthService/build/
 AuthService/cmake-build-debug-win32
 AuthService/cmake-build-debug-win64
 AuthService/cmake-build-release
+AuthService/cmake-vs
