@@ -11,7 +11,6 @@
 
 #include <sensateiot/mqtt/imqttclient.h>
 #include <sensateiot/mqtt/mqttclient.h>
-#include <sensateiot/messageservice.h>
 
 #include "testmqttclient.h"
 #include "testapikeyrepository.h"
