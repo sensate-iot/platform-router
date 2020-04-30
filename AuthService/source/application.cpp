@@ -7,11 +7,11 @@
 
 #include <sensateiot/application.h>
 #include <sensateiot/mqtt/mqttclient.h>
-#include <sensateiot/messageservice.h>
 #include <sensateiot/mongodbclient.h>
 
 #include <sensateiot/services/userrepository.h>
 #include <sensateiot/services/apikeyrepository.h>
+#include <sensateiot/services/sensorrepository.h>
 
 #include <json.hpp>
 
@@ -39,6 +39,7 @@ namespace sensateiot
 		log << "Starting Sensate IoT AuthService..." << util::Log::NewLine;
 
 		auto hostname = this->m_config.GetMqtt().GetPublicBroker().GetBroker().GetUri();
+		util::MongoDBClient::Init(this->m_config.GetDatabase().GetMongoDB());
 
 		// Internal client
 		mqtt::MqttInternalCallback icb;
@@ -54,11 +55,10 @@ namespace sensateiot
 		mqtt::MqttClient client(hostname, "a23fa-badf", std::move(cb));
 		client.Connect(this->m_config.GetMqtt());
 
-
-		util::MongoDBClient::Init(this->m_config.GetDatabase().GetMongoDB());
-		auto& mongo = util::MongoDBClient::GetClient();
+		services::SensorRepository sensors(this->m_config.GetDatabase().GetMongoDB());
 
 		std::cin.get();
+
 
 		// TODO: run queue timer
 	}
@@ -152,6 +152,7 @@ void CreateApplication(const char *path)
 	try {
 		app.SetConfig(path);
 		app.Run();
+		sensateiot::util::MongoDBClient::Destroy();
 	} catch(std::runtime_error& ex) {
 		std::cerr << "Unable to run application: " << ex.what();
 	} catch(std::exception& ex) {
