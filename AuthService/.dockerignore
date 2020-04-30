@@ -34,6 +34,7 @@ bld/
 
 cmake-build-debug-win64/
 cmake-build-release/
+cmake-vs/
 [Bb]uild/
 
 # Visual Studio 2015 cache/options directory

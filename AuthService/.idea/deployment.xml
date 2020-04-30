@@ -30,6 +30,13 @@
           </mappings>
         </serverdata>
       </paths>
+      <paths name="WSL (clang) (50478e7f-c86b-4040-a1e2-8cc9d163c3a7)">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
       <paths name="WSL (fb433b0d-f6b3-4460-9bf1-0eabbbd2529e)">
         <serverdata>
           <mappings>
