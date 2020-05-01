@@ -26,8 +26,8 @@ namespace sensateiot::services
 	public:
 		explicit SensorRepository(config::MongoDB mongodb);
 
-		std::vector<models::ApiKey> GetAllSensors() override;
-		std::vector<models::ApiKey> GetRange(const std::vector<std::string> &ids) override;
+		std::vector<models::Sensor> GetAllSensors() override;
+		std::vector<models::Sensor> GetRange(const std::vector<std::string> &ids) override;
 
 	private:
 		util::MongoDBClient::PoolClient m_client;

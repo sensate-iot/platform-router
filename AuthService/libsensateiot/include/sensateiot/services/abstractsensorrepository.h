@@ -25,8 +25,8 @@ namespace sensateiot::services
 		explicit AbstractSensorRepository(config::MongoDB mongodb);
 		virtual ~AbstractSensorRepository() = default;
 
-		virtual std::vector<models::ApiKey> GetAllSensors() = 0;
-		virtual std::vector<models::ApiKey> GetRange(const std::vector<std::string>& ids) = 0;
+		virtual std::vector<models::Sensor> GetAllSensors() = 0;
+		virtual std::vector<models::Sensor> GetRange(const std::vector<std::string>& ids) = 0;
 
 	protected:
 		config::MongoDB m_mongodb;

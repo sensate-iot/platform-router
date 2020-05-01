@@ -15,13 +15,13 @@ namespace sensateiot::services
 	{
 	}
 
-	std::vector<models::ApiKey> SensorRepository::GetAllSensors()
+	std::vector<models::Sensor> SensorRepository::GetAllSensors()
 	{
-		return std::vector<models::ApiKey>();
+		return std::vector<models::Sensor>();
 	}
 
-	std::vector<models::ApiKey> SensorRepository::GetRange(const std::vector<std::string> &ids)
+	std::vector<models::Sensor> SensorRepository::GetRange(const std::vector<std::string> &ids)
 	{
-		return std::vector<models::ApiKey>();
+		return std::vector<models::Sensor>();
 	}
 }
