@@ -5,8 +5,6 @@
  * @email  michel@michelmegens.net
  */
 
-#pragma once
-
 #include <sensateiot/services/abstractsensorrepository.h>
 
 namespace sensateiot::services
