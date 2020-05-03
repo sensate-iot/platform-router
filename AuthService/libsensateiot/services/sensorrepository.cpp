@@ -66,7 +66,7 @@ namespace sensateiot::services
 
 		for(auto&& id : ids) {
 			bsoncxx::oid oid(id);
-			ary.append(std::move(oid));
+			ary.append(oid);
 		}
 
 		stages.match(
