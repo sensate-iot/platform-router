@@ -18,9 +18,9 @@ namespace sensateiot::services
 		auto& log = util::Log::GetLog();
 
 		if(this->m_connection.is_open()) {
-			log << "Connected to PostgreSQL!" << util::Log::NewLine;
+			log << "Users: Connected to PostgreSQL!" << util::Log::NewLine;
 		} else {
-			log << "Unable to connect to PostgreSQL!" << util::Log::NewLine;
+			log << "Users: Unable to connect to PostgreSQL!" << util::Log::NewLine;
 		}
 	}
 
