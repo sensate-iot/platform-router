@@ -70,7 +70,7 @@ namespace sensateiot::services
 		std::string query(
 				"SELECT \"ApiKeys\".\"Id\", \"ApiKeys\".\"ApiKey\", \"ApiKeys\".\"Type\", \"ApiKeys\".\"Revoked\"\n"
 					  "FROM \"ApiKeys\"\n"
-					  "WHERE \"ApiKeys\".\"ApiKey\" IN ?");
+					  "WHERE \"Type\" = 0 AND \"ApiKeys\".\"ApiKey\" IN ?");
 
 		pos = query.find('?', pos);
 		query.replace(pos, sizeof(char), rv);
@@ -86,8 +86,6 @@ namespace sensateiot::services
 			key.SetKey(row[1].as<std::string>());
 			key.SetType(static_cast<models::ApiKey::Type>(row[2].as<std::uint16_t>()));
 			key.SetRevoked(row[3].as<bool>());
-
-			std::cout << key.GetKey() << std::endl;
 
 			keys.emplace_back(std::move(key));
 		}
