@@ -35,7 +35,6 @@ namespace sensateiot::services
 
 		using sv = std::string_view;
 		constexpr static auto ObjectId = sv("_id");
-		constexpr static auto Name = sv("Name");
 		constexpr static auto Secret = sv("Secret");
 		constexpr static auto Owner = sv("Owner");
 

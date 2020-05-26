@@ -91,6 +91,32 @@ namespace sensateiot::stl
 			return *this;
 		}
 
+		bool operator==(const ReferenceWrapper& other) const
+		{
+			if(this->_value == other._value) {
+				return true;
+			}
+
+			if(this->_value == nullptr || other._value == nullptr) {
+				return false;
+			}
+
+			return this->get() == other.get();
+		}
+
+		bool operator!=(const ReferenceWrapper& other) const
+		{
+			if(this->_value == other._value) {
+				return false;
+			}
+
+			if(this->_value == nullptr || other._value == nullptr) {
+				return true;
+			}
+
+			return this->get() != other.get();
+		}
+
 		/**
 		 * @brief Boolean conversion operator.
 		 * @return True or false based on the validity of \p *this.
@@ -108,6 +134,16 @@ namespace sensateiot::stl
 		{
 			assert(this->_value != nullptr);
 			return *this->_value;
+		}
+
+		/**
+		 * @brief Get the underlying reference.
+		 * @return The underlying reference.
+		 */
+		constexpr type* get_ptr() const noexcept
+		{
+			assert(this->_value != nullptr);
+			return this->_value;
 		}
 
 		/**

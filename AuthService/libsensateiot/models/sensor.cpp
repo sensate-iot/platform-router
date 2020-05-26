@@ -34,18 +34,17 @@ namespace sensateiot::models
 		this->m_owner = owner;
 	}
 
-	void Sensor::SetName(std::string name)
-	{
-		this->m_name = std::move(name);
-	}
-
 	const std::string &Sensor::GetOwner() const
 	{
 		return this->m_owner;
 	}
 
-	const std::string& Sensor::GetName() const
+
+	size_t Sensor::size() const
 	{
-		return this->m_name;
+		return sizeof(*this) +
+			this->m_owner.length() +
+			this->m_secret.length() +
+			this->m_id.length();
 	}
 }

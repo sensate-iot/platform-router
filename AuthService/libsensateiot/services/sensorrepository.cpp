@@ -8,13 +8,8 @@
 #include <sensateiot/services/abstractsensorrepository.h>
 #include <sensateiot/services/sensorrepository.h>
 
-#include <mongocxx/pipeline.hpp>
 #include <bsoncxx/json.hpp>
 
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/kvp.hpp>
-#include <iostream>
 
 using bsoncxx::builder::basic::kvp;
 using bsoncxx::builder::basic::make_document;
@@ -23,7 +18,7 @@ using bsoncxx::builder::basic::make_array;
 namespace sensateiot::services
 {
 	SensorRepository::SensorRepository(config::MongoDB mongodb) :
-		AbstractSensorRepository(mongodb), m_client(util::MongoDBClient::GetClient().acquire())
+		AbstractSensorRepository(std::move(mongodb)), m_client(util::MongoDBClient::GetClient().acquire())
 	{
 	}
 
@@ -35,7 +30,6 @@ namespace sensateiot::services
 		stages.project(
 			make_document(
 				kvp(std::string(ObjectId), 1),
-				kvp(std::string(Name), 1),
 				kvp(std::string(Owner), 1),
 				kvp(std::string(Secret), 1)
 			)
@@ -50,7 +44,6 @@ namespace sensateiot::services
 			sensor.SetId(doc[ObjectId.data()].get_oid().value.to_string());
 			sensor.SetOwner(doc[Owner.data()].get_utf8().value.to_string());
 			sensor.SetSecret(doc[Secret.data()].get_utf8().value.to_string());
-			sensor.SetName(doc[Name.data()].get_utf8().value.to_string());
 
 			sensors.emplace_back(sensor);
 		}
@@ -80,7 +73,6 @@ namespace sensateiot::services
 		stages.project(
 				make_document(
 						kvp(std::string(ObjectId), 1),
-						kvp(std::string(Name), 1),
 						kvp(std::string(Owner), 1),
 						kvp(std::string(Secret), 1)
 				)
@@ -95,7 +87,6 @@ namespace sensateiot::services
 			sensor.SetId(doc[ObjectId.data()].get_oid().value.to_string());
 			sensor.SetOwner(doc[Owner.data()].get_utf8().value.to_string());
 			sensor.SetSecret(doc[Secret.data()].get_utf8().value.to_string());
-			sensor.SetName(doc[Name.data()].get_utf8().value.to_string());
 
 			sensors.emplace_back(sensor);
 		}
