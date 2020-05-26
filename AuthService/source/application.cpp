@@ -56,6 +56,20 @@ namespace sensateiot
 		client.Connect(this->m_config.GetMqtt());
 
 		services::SensorRepository sensors(this->m_config.GetDatabase().GetMongoDB());
+		std::vector<std::string> ids = {"5c86276c785b6f3c58369a31", "5e89f7e16de4f20001eecea5"};
+//		std::vector<std::string> ids = {"3We1XMy$3TA_NPkOHI%q6SCdI2s5cT!F", "_LMh_OcZGws1qv!UW127eEgBvWtBbgwH", "Nt_s56!XrUaY6$zEkQw9SdeiLk2rdOTY"};
+//		auto apiKeys = keys.GetKeys(ids);
+
+//		for(auto&& s: apiKeys) {
+//			log << "Key value: " << s.GetKey() << " Key ID: " << s.GetUserId() << util::Log::NewLine;
+//		}
+		auto sensorData = sensors.GetAllSensors();
+//		auto sensorData = sensors.GetRange(ids);
+//
+		for(auto&& s: sensorData) {
+			log << "Sensor ID: " << s.GetId() << " Sensor secret: " << s.GetSecret()
+				<< " Size: " << std::to_string(s.size()) << util::Log::NewLine;
+		}
 
 		std::cin.get();
 
