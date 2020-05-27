@@ -7,7 +7,7 @@
 
 #include <sensateiot/application.h>
 #include <sensateiot/mqtt/mqttclient.h>
-#include <sensateiot/mongodbclient.h>
+#include <sensateiot/mongodbclientpool.h>
 
 #include <sensateiot/services/userrepository.h>
 #include <sensateiot/services/apikeyrepository.h>
@@ -39,7 +39,7 @@ namespace sensateiot
 		log << "Starting Sensate IoT AuthService..." << util::Log::NewLine;
 
 		auto hostname = this->m_config.GetMqtt().GetPublicBroker().GetBroker().GetUri();
-		util::MongoDBClient::Init(this->m_config.GetDatabase().GetMongoDB());
+		util::MongoDBClientPool::Init(this->m_config.GetDatabase().GetMongoDB());
 
 		// Internal client
 		mqtt::MqttInternalCallback icb;
@@ -110,7 +110,7 @@ namespace sensateiot
 		this->m_config.GetMqtt().GetPrivateBroker()
 				.GetBroker().SetHostName(j["Mqtt"]["InternalBroker"]["Host"]);
 		this->m_config.GetMqtt().GetPrivateBroker()
-				.GetBroker().SetPort(j["Mqtt"]["InternalBroker"]["Port"]);
+				.GetBroker().SetPortNumber(j["Mqtt"]["InternalBroker"]["Port"]);
 		this->m_config.GetMqtt().GetPrivateBroker()
 				.GetBroker().SetUsername(j["Mqtt"]["InternalBroker"]["Username"]);
 		this->m_config.GetMqtt().GetPrivateBroker()
@@ -127,7 +127,7 @@ namespace sensateiot
 		this->m_config.GetMqtt().GetPublicBroker()
 				.GetBroker().SetHostName(j["Mqtt"]["PublicBroker"]["Host"]);
 		this->m_config.GetMqtt().GetPublicBroker()
-				.GetBroker().SetPort(j["Mqtt"]["PublicBroker"]["Port"]);
+				.GetBroker().SetPortNumber(j["Mqtt"]["PublicBroker"]["Port"]);
 		this->m_config.GetMqtt().GetPublicBroker()
 				.GetBroker().SetUsername(j["Mqtt"]["PublicBroker"]["Username"]);
 		this->m_config.GetMqtt().GetPublicBroker()
@@ -166,7 +166,7 @@ void CreateApplication(const char *path)
 	try {
 		app.SetConfig(path);
 		app.Run();
-		sensateiot::util::MongoDBClient::Destroy();
+		sensateiot::util::MongoDBClientPool::Destroy();
 	} catch(std::runtime_error& ex) {
 		std::cerr << "Unable to run application: " << ex.what();
 	} catch(std::exception& ex) {

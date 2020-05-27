@@ -8,88 +8,119 @@
 #include <sensateiot/services/abstractsensorrepository.h>
 #include <sensateiot/services/sensorrepository.h>
 
-#include <bsoncxx/json.hpp>
-
-
-using bsoncxx::builder::basic::kvp;
-using bsoncxx::builder::basic::make_document;
-using bsoncxx::builder::basic::make_array;
+#include <mongoc.h>
 
 namespace sensateiot::services
 {
 	SensorRepository::SensorRepository(config::MongoDB mongodb) :
-		AbstractSensorRepository(std::move(mongodb)), m_client(util::MongoDBClient::GetClient().acquire())
+		AbstractSensorRepository(std::move(mongodb)), m_pool(util::MongoDBClientPool::GetClientPool())
 	{
 	}
 
 	std::vector<models::Sensor> SensorRepository::GetAllSensors()
 	{
-		mongocxx::pipeline stages;
-		auto db = this->m_client->database(this->m_mongodb.GetDatabaseName());
+		auto* project = BCON_NEW("$project", "{", "_id", BCON_BOOL(1), "Secret", BCON_BOOL(1), "Owner", BCON_BOOL(1), "}");
+		auto* pipeline = BCON_NEW("pipeline", "[", BCON_DOCUMENT(project), "]");
 
-		stages.project(
-			make_document(
-				kvp(std::string(ObjectId), 1),
-				kvp(std::string(Owner), 1),
-				kvp(std::string(Secret), 1)
-			)
-		);
+		util::MongoDBClient cli( this->m_pool->Acquire());
+		auto* client = cli.Get();
+		auto* collection = mongoc_client_get_collection(client, this->m_mongodb.GetDatabaseName().c_str(), Collection.data());
 
-		auto cursor = db[Collection.data()].aggregate(stages);
-		std::vector<models::Sensor> sensors;
+		auto rv = ExecuteQuery(collection, pipeline);
 
-		for(auto&& doc: cursor) {
-			models::Sensor sensor;
+		mongoc_collection_destroy(collection);
+		bson_destroy(project);
+		bson_destroy(pipeline);
 
-			sensor.SetId(doc[ObjectId.data()].get_oid().value.to_string());
-			sensor.SetOwner(doc[Owner.data()].get_utf8().value.to_string());
-			sensor.SetSecret(doc[Secret.data()].get_utf8().value.to_string());
-
-			sensors.emplace_back(sensor);
-		}
-
-		return sensors;
+		return rv;
 	}
 
 	std::vector<models::Sensor> SensorRepository::GetRange(const std::vector<std::string> &ids)
 	{
-		bsoncxx::builder::basic::array ary{};
-		mongocxx::pipeline stages;
-		auto db = this->m_client->database(this->m_mongodb.GetDatabaseName());
+		bson_t* parent;
+		bson_t array;
+		bson_oid_t oid;
 
-		for(auto&& id : ids) {
-			bsoncxx::oid oid(id);
-			ary.append(oid);
+		bson_oid_init(&oid, nullptr);
+
+		parent = bson_new();
+		bson_append_array_begin(parent, "$in", 3, &array);
+
+		for(size_t idx = 0UL; idx < ids.size(); idx++) {
+			const auto& id = ids.at(idx);
+			bson_oid_t objid;
+
+			bson_oid_init_from_string(&objid, id.c_str());
+			bson_append_oid(&array, std::to_string(idx).c_str(), -1, &objid);
 		}
 
-		stages.match(
-			make_document(
-				kvp(std::string(ObjectId),make_document(
-					kvp("$in", ary)
-					)
-				)
-		));
+		bson_append_array_end(parent, &array);
 
-		stages.project(
-				make_document(
-						kvp(std::string(ObjectId), 1),
-						kvp(std::string(Owner), 1),
-						kvp(std::string(Secret), 1)
-				)
-		);
+		auto* match = BCON_NEW("$match", "{", "_id", "{", "$in", BCON_ARRAY(&array), "}", "}");
+		auto* project = BCON_NEW("$project", "{", "_id", BCON_BOOL(1), "Secret", BCON_BOOL(1), "Owner", BCON_BOOL(1), "}");
+		auto* pipeline = BCON_NEW("pipeline", "[", BCON_DOCUMENT(match), BCON_DOCUMENT(project), "]");
 
-		auto cursor = db[Collection.data()].aggregate(stages);
+		util::MongoDBClient cli( this->m_pool->Acquire());
+		auto* client = cli.Get();
+		auto* collection = mongoc_client_get_collection(client, this->m_mongodb.GetDatabaseName().c_str(), Collection.data());
+
+		auto rv = ExecuteQuery(collection, pipeline);
+
+		mongoc_collection_destroy(collection);
+		bson_destroy(parent);
+		bson_destroy(match);
+		bson_destroy(project);
+		bson_destroy(pipeline);
+
+		return rv;
+	}
+
+	std::vector<models::Sensor>
+	SensorRepository::ExecuteQuery(mongoc_collection_t *col, const bson_t *pipeline)
+	{
+		const bson_t* doc;
+
+		auto* cursor = mongoc_collection_aggregate(col, MONGOC_QUERY_NONE, pipeline, nullptr, nullptr);
 		std::vector<models::Sensor> sensors;
 
-		for(auto&& doc: cursor) {
-			models::Sensor sensor;
+		while(mongoc_cursor_next(cursor, &doc)) {
+			bson_iter_t iter;
+			uint32_t length;
+			const char* name;
+			const char* owner;
+			const bson_oid_t* sensorId;
+			char id[25];
 
-			sensor.SetId(doc[ObjectId.data()].get_oid().value.to_string());
-			sensor.SetOwner(doc[Owner.data()].get_utf8().value.to_string());
-			sensor.SetSecret(doc[Secret.data()].get_utf8().value.to_string());
+			bson_iter_init(&iter, doc);
+			bson_iter_next(&iter);
 
-			sensors.emplace_back(sensor);
+			do {
+				std::string_view key(bson_iter_key(&iter), bson_iter_key_len(&iter));
+
+				if(BSON_ITER_HOLDS_OID(&iter) && key == "_id") {
+					sensorId = bson_iter_oid(&iter);
+					bson_oid_to_string(sensorId, id);
+				}
+
+				if(BSON_ITER_HOLDS_UTF8(&iter) && key == "Secret") {
+					name = bson_iter_utf8(&iter, &length);
+				}
+
+				if(BSON_ITER_HOLDS_UTF8(&iter) && key == "Owner") {
+					owner = bson_iter_utf8(&iter, &length);
+				}
+			} while(bson_iter_next(&iter));
+
+			models::Sensor s;
+			s.SetSecret(name);
+			s.SetOwner(owner);
+			s.SetId(id);
+
+			sensors.emplace_back(std::move(s));
 		}
+
+		mongoc_cursor_destroy(cursor);
+
 
 		return sensors;
 	}

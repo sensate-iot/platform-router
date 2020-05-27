@@ -6,6 +6,10 @@ from conans import ConanFile, CMake
 import os
 
 
+def is_windows():
+    return os.name == 'nt'
+
+
 class AuthService(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
@@ -15,31 +19,25 @@ class AuthService(ConanFile):
         "paho-mqtt-c:ssl": True,
         "libpq:shared": False,
         "libpqxx:shared": False,
-        "mongo-cxx-driver:shared": True
     }
 
     def configure(self):
-        if not self.is_windows():
+        if not is_windows():
             return
 
         self.options['mongo-cxx-driver'].shared = False
 
-    def is_windows(self):
-        return os.name == 'nt'
-
     def requirements(self):
-        if self.is_windows():
-            self.requires("mongo-cxx-driver/3.3.0@bincrafters/stable")
-            self.requires("mongo-c-driver/1.16.1@bincrafters/stable", override=True)
+        if is_windows():
+            self.requires("mongo-c-driver/1.16.1@bincrafters/stable")
             self.requires("paho-mqtt-cpp/1.1", override=False)
             self.requires("libpqxx/7.0.5", override=False)
             self.requires("libpq/11.5", override=True)
-            self.requires("boost_log/1.67.0@bincrafters/stable")
+            self.requires("boost/1.73.0")
             self.requires("zlib/1.2.11", override=True)
         else:
-            self.requires("mongo-cxx-driver/3.3.0@bincrafters/stable")
-            self.requires("mongo-c-driver/1.16.1@bincrafters/stable", override=True)
-            self.requires("boost_log/1.67.0@bincrafters/stable")
+            self.requires("mongo-c-driver/1.16.1@bincrafters/stable")
+            self.requires("boost/1.73.0")
             self.requires("zlib/1.2.11", override=True)
             self.requires("paho-mqtt-cpp/1.1", override=False)
             self.requires("paho-mqtt-c/1.3.1", override=True)

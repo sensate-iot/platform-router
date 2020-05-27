@@ -46,7 +46,7 @@ namespace sensateiot::config
 		return this->m_port;
 	}
 
-	void MqttBroker::SetPort(std::uint16_t port)
+	void MqttBroker::SetPortNumber(std::uint16_t port)
 	{
 		this->m_port = port;
 	}

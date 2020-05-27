@@ -14,6 +14,7 @@ SET(SOURCES
 	config/logging.cpp
 
 	util/log.cpp
+	util/mongodbclientpool.cpp
 	util/mongodbclient.cpp
 
 	services/userrepository.cpp
@@ -44,7 +45,7 @@ set(GENERIC_HEADERS
 	libsensateiot/include/sensateiot/models/apikey.h
 	libsensateiot/include/sensateiot/models/sensor.h
 	libsensateiot/include/sensateiot/models/user.h
-	libsensateiot/include/sensateiot/mongodbclient.h
+	libsensateiot/include/sensateiot/mongodbclientpool.h
 	libsensateiot/include/sensateiot/mqtt/imqttclient.h
 	libsensateiot/include/sensateiot/mqtt/measurementhandler.h
 	libsensateiot/include/sensateiot/mqtt/mqttcallback.h

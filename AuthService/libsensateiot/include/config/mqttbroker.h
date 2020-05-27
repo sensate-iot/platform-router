@@ -30,7 +30,7 @@ namespace sensateiot::config
 
 		[[nodiscard]]
 		std::uint16_t GetPort() const;
-		void SetPort(std::uint16_t port);
+		void SetPortNumber(std::uint16_t port);
 
 		[[nodiscard]]
 		bool GetSsl() const;
