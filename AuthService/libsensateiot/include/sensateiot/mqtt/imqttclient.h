@@ -13,6 +13,7 @@ namespace sensateiot::mqtt
 {
 	class IMqttClient {
 	public:
+		virtual ~IMqttClient() = default;
 		virtual void Connect(const config::Mqtt&) = 0;
 	};
 }

@@ -24,9 +24,17 @@ INCLUDE(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
 if(NOT MSVC)
-	SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}  -mtune=generic -ffast-math")
-	SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}  -mtune=generic -ffast-math")
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-parentheses")
+	SET(WARNING_FLAGS "\
+	-Wconversion \
+	-Wnull-dereference \
+	-Wdouble-promotion \
+	-Wduplicated-cond \
+	-Wduplicated-branches \
+	-Wlogical-op \
+	-Wnon-virtual-dtor")
+	SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${WARNING_FLAGS} -mtune=generic -ffast-math")
+	SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -mtune=generic -ffast-math")
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNING_FLAGS} -Wall -Wno-parentheses")
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-parentheses")
 endif()
 
@@ -38,6 +46,7 @@ include_directories(
 	${PROJECT_SOURCE_DIR}/external/json
 	${PROJECT_SOURCE_DIR}/include
 	${PROJECT_SOURCE_DIR}/libsensateiot/include
+	SYSTEM ${CONAN_INCLUDE_DIRS}
 )
 
 add_subdirectory(libsensateiot)

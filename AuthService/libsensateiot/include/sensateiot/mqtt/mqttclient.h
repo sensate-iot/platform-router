@@ -22,7 +22,7 @@ namespace sensateiot::mqtt
 	class BaseMqttClient : public IMqttClient {
 	public:
 		BaseMqttClient(const std::string& host, const std::string& id);
-		virtual ~BaseMqttClient();
+		~BaseMqttClient() override;
 
 		BaseMqttClient(BaseMqttClient&& rhs) noexcept = delete ;
 		BaseMqttClient& operator=(BaseMqttClient&& rhs) noexcept = delete;
