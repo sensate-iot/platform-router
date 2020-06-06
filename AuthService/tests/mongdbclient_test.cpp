@@ -11,7 +11,7 @@
 
 #include <config/config.h>
 #include <config/database.h>
-#include <sensateiot/mongodbclient.h>
+#include <sensateiot/util/mongodbclientpool.h>
 
 int main(int argc, char** argv)
 {
@@ -22,27 +22,27 @@ int main(int argc, char** argv)
 	config.GetDatabase().GetMongoDB().SetConnectionString("mongodb://root:root@127.0.0.1:27017/admin");
 	config.GetDatabase().GetMongoDB().SetDatabaseName("Sensate");
 
-	sensateiot::util::MongoDBClient::Init(config.GetDatabase().GetMongoDB());
+	sensateiot::util::MongoDBClientPool::Init(config.GetDatabase().GetMongoDB());
 
 	using namespace std::chrono_literals;
 
 	auto t1 = std::thread([&]() {
-		sensateiot::util::MongoDBClient::GetClient();
+		sensateiot::util::MongoDBClientPool::GetClientPool();
 		std::this_thread::sleep_for(1ms);
 	});
 
 	auto t2 = std::thread([&]() {
-		sensateiot::util::MongoDBClient::GetClient();
+		sensateiot::util::MongoDBClientPool::GetClientPool();
 		std::this_thread::sleep_for(1ms);
 	});
 
 	auto t3 = std::thread([&]() {
-		sensateiot::util::MongoDBClient::GetClient();
+		sensateiot::util::MongoDBClientPool::GetClientPool();
 		std::this_thread::sleep_for(1ms);
 	});
 
 	auto t4 = std::thread([&]() {
-		sensateiot::util::MongoDBClient::GetClient();
+		sensateiot::util::MongoDBClientPool::GetClientPool();
 		std::this_thread::sleep_for(1ms);
 	});
 
@@ -51,7 +51,7 @@ int main(int argc, char** argv)
 	t3.join();
 	t4.join();
 
-	sensateiot::util::MongoDBClient::Destroy();
+	sensateiot::util::MongoDBClientPool::Destroy();
 
 	return -EXIT_SUCCESS;
 }

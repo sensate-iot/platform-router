@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 
 	auto& mqtt = config.GetMqtt().GetPrivateBroker();
 	mqtt.GetBroker().SetHostName("tcp://127.0.0.1");
-	mqtt.GetBroker().SetPort(1883);
+	mqtt.GetBroker().SetPortNumber(1883);
 
 	sensateiot::test::TestMqttClient client;
 	client.Connect(config.GetMqtt());
