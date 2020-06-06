@@ -9,7 +9,7 @@
 
 #include <sensateiot/models/apikey.h>
 #include <sensateiot/services/apikeyrepository.h>
-#include <sensateiot/log.h>
+#include <sensateiot/util/log.h>
 
 #include <string>
 #include <vector>

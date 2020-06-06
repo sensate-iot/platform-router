@@ -8,7 +8,7 @@
 #include <iostream>
 
 #include <sensateiot/services/userrepository.h>
-#include <sensateiot/log.h>
+#include <sensateiot/util/log.h>
 
 namespace sensateiot::services
 {
