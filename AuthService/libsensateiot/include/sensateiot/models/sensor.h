@@ -31,6 +31,9 @@ namespace sensateiot::models
 		[[nodiscard]]
 		size_t size() const;
 
+		bool operator==(const Sensor& other) const;
+		bool operator!=(const Sensor& other) const;
+
 	private:
 		std::string m_id;
 		std::string m_secret;

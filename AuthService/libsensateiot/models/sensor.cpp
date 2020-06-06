@@ -47,4 +47,14 @@ namespace sensateiot::models
 			this->m_secret.length() +
 			this->m_id.length();
 	}
+
+	bool Sensor::operator==(const Sensor &other) const
+	{
+		return this->m_id == other.m_id;
+	}
+
+	bool Sensor::operator!=(const Sensor &other) const
+	{
+		return this->m_id != other.m_id;
+	}
 }
