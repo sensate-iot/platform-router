@@ -2,6 +2,8 @@
 # CMakeLists for libauthservice.
 #
 
+# Lib sensateiot source / header files
+
 SET(SOURCES
 	models/apikey.cpp
 	models/user.cpp
@@ -40,13 +42,11 @@ set(GENERIC_HEADERS
 	libsensateiot/include/config/mqttbroker.h
 	libsensateiot/include/sensateiot/compiler/compiler-msvc.h
 	libsensateiot/include/sensateiot/compiler/compiler.h
-	libsensateiot/include/sensateiot/log.h
-	libsensateiot/include/sensateiot/messageservice.h
 	libsensateiot/include/sensateiot/models/apikey.h
 	libsensateiot/include/sensateiot/models/sensor.h
 	libsensateiot/include/sensateiot/models/user.h
-	libsensateiot/include/sensateiot/mongodbclientpool.h
 	libsensateiot/include/sensateiot/mqtt/imqttclient.h
+	libsensateiot/include/sensateiot/mqtt/messageservice.h
 	libsensateiot/include/sensateiot/mqtt/measurementhandler.h
 	libsensateiot/include/sensateiot/mqtt/mqttcallback.h
 	libsensateiot/include/sensateiot/mqtt/mqttclient.h
@@ -58,6 +58,8 @@ set(GENERIC_HEADERS
 	libsensateiot/include/sensateiot/services/userrepository.h
 	libsensateiot/include/sensateiot/services/sensorrepository.h
 	libsensateiot/include/sensateiot/stl/referencewrapper.h
+	libsensateiot/include/sensateiot/util/log.h
+	libsensateiot/include/sensateiot/util/mongodbclientpool.h
 	libsensateiot/include/sensateiot.h
 )
 
