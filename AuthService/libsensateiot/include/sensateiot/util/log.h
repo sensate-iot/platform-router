@@ -27,6 +27,13 @@ namespace sensateiot::util
 		static Log& GetLog();
 
 		Log& operator<<(const std::string& input);
+
+		Log& operator<<(std::size_t input)
+		{
+			*this << std::to_string(input);
+			return *this;
+		}
+
 		Log& operator<<(NewLineType nl);
 
 		void Flush();

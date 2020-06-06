@@ -5,8 +5,8 @@
  * @email  michel@michelmegens.net
  */
 
-#include <sensateiot/mongodbclientpool.h>
-#include <sensateiot/log.h>
+#include <sensateiot/util/mongodbclientpool.h>
+#include <sensateiot/util/log.h>
 
 #include <iostream>
 
