@@ -166,6 +166,15 @@ namespace sensateiot::stl
 		}
 
 		/**
+		 * @brief Get the underlying reference.
+		 * @return The underlying reference.
+		 */
+		constexpr const type& operator*() const
+		{
+			return *this->_value;
+		}
+
+		/**
 		 * @brief Access the underlying reference.
 		 * @return The underlying object.
 		 */

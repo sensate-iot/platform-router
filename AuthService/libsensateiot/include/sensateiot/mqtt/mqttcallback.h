@@ -13,8 +13,8 @@
 #include <mqtt/async_client.h>
 
 #include <sensateiot/stl/referencewrapper.h>
-#include <sensateiot/log.h>
-#include <sensateiot/messageservice.h>
+#include <sensateiot/util/log.h>
+#include <sensateiot/mqtt/messageservice.h>
 
 namespace sensateiot::mqtt
 {

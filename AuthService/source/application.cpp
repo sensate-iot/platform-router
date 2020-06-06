@@ -7,7 +7,7 @@
 
 #include <sensateiot/application.h>
 #include <sensateiot/mqtt/mqttclient.h>
-#include <sensateiot/mongodbclientpool.h>
+#include <sensateiot/util/mongodbclientpool.h>
 
 #include <sensateiot/services/userrepository.h>
 #include <sensateiot/services/apikeyrepository.h>

@@ -10,7 +10,7 @@
 #include <sensateiot.h>
 
 #include <config/database.h>
-#include <sensateiot/mongodbclientpool.h>
+#include <sensateiot/util/mongodbclientpool.h>
 
 #include <sensateiot/models/user.h>
 #include <sensateiot/models/apikey.h>

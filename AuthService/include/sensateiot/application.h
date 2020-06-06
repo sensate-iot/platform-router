@@ -10,7 +10,7 @@
 #ifdef __cplusplus
 
 #include <config/config.h>
-#include <sensateiot/log.h>
+#include <sensateiot/util/log.h>
 
 #include <string>
 #include <json.hpp>

@@ -6,7 +6,7 @@
  */
 
 #include <sensateiot/mqtt/mqttinternalcallback.h>
-#include <sensateiot/log.h>
+#include <sensateiot/util/log.h>
 
 #include <iostream>
 

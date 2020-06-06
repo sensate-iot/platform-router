@@ -5,7 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
-#include <sensateiot/messageservice.h>
+#include <sensateiot/mqtt/messageservice.h>
 
 namespace sensateiot::mqtt
 {

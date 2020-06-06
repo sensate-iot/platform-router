@@ -8,7 +8,7 @@
 #include <iostream>
 
 #include <sensateiot.h>
-#include <sensateiot/log.h>
+#include <sensateiot/util/log.h>
 
 #include <boost/log/core.hpp>
 #include <boost/log/trivial.hpp>
