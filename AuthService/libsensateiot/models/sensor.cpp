@@ -7,11 +7,19 @@
 
 #include <sensateiot/models/sensor.h>
 
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/lexical_cast.hpp>
+
 namespace sensateiot::models
 {
-	void Sensor::SetId(std::string id)
+	void Sensor::SetId(const ObjectId& id)
 	{
-		this->m_id = std::move(id);
+		this->m_id = id;
+	}
+
+	void Sensor::SetId(const std::string &id)
+	{
+		this->m_id = ObjectId(id);
 	}
 
 	void Sensor::SetSecret(std::string secret)
@@ -19,7 +27,7 @@ namespace sensateiot::models
 		this->m_secret = std::move(secret);
 	}
 
-	const std::string &Sensor::GetId() const
+	const ObjectId& Sensor::GetId() const
 	{
 		return this->m_id;
 	}
@@ -29,12 +37,12 @@ namespace sensateiot::models
 		return this->m_secret;
 	}
 
-	void Sensor::SetOwner(std::string owner)
+	void Sensor::SetOwner( const std::string& owner)
 	{
-		this->m_owner = owner;
+		this->m_owner = boost::lexical_cast<boost::uuids::uuid>(owner);
 	}
 
-	const std::string &Sensor::GetOwner() const
+	const boost::uuids::uuid &Sensor::GetOwner() const
 	{
 		return this->m_owner;
 	}
@@ -43,18 +51,22 @@ namespace sensateiot::models
 	size_t Sensor::size() const
 	{
 		return sizeof(*this) +
-			this->m_owner.length() +
-			this->m_secret.length() +
-			this->m_id.length();
+			this->m_owner.size() +
+			this->m_secret.length();
 	}
 
 	bool Sensor::operator==(const Sensor &other) const
 	{
-		return this->m_id == other.m_id;
+		return this->m_id.Value() == other.m_id.Value();
 	}
 
 	bool Sensor::operator!=(const Sensor &other) const
 	{
-		return this->m_id != other.m_id;
+		return this->m_id.Value() != other.m_id.Value();
+	}
+
+	void Sensor::SetOwner(boost::uuids::uuid owner)
+	{
+		this->m_owner = owner;
 	}
 }

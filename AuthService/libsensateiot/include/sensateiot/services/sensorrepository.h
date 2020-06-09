@@ -15,6 +15,7 @@
 #include <sensateiot/models/user.h>
 #include <sensateiot/models/apikey.h>
 #include <sensateiot/models/sensor.h>
+#include <sensateiot/models/objectid.h>
 
 #include <sensateiot/util/mongodbclient.h>
 #include <sensateiot/stl/referencewrapper.h>
@@ -30,8 +31,8 @@ namespace sensateiot::services
 	public:
 		explicit SensorRepository(config::MongoDB mongodb);
 
-		std::vector<models::Sensor> GetAllSensors() override;
-		std::vector<models::Sensor> GetRange(const std::vector<std::string> &ids) override;
+		std::vector<models::Sensor> GetAllSensors(long skip, long limit) override;
+		std::vector<models::Sensor> GetRange(const std::vector<std::string> &ids, long skip, long limit) override;
 
 	private:
 		using sv = std::string_view;

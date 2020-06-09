@@ -13,41 +13,51 @@
 namespace sensateiot::services
 {
 	SensorRepository::SensorRepository(config::MongoDB mongodb) :
-		AbstractSensorRepository(std::move(mongodb)), m_pool(util::MongoDBClientPool::GetClientPool())
+			AbstractSensorRepository(std::move(mongodb)), m_pool(util::MongoDBClientPool::GetClientPool())
 	{
 	}
 
-	std::vector<models::Sensor> SensorRepository::GetAllSensors()
+	std::vector<models::Sensor> SensorRepository::GetAllSensors(long skip, long limit)
 	{
-		auto* project = BCON_NEW("$project", "{", "_id", BCON_BOOL(1), "Secret", BCON_BOOL(1), "Owner", BCON_BOOL(1), "}");
-		auto* pipeline = BCON_NEW("pipeline", "[", BCON_DOCUMENT(project), "]");
+		auto *project = BCON_NEW("$project", "{", "_id", BCON_BOOL(1), "Secret", BCON_BOOL(1), "Owner", BCON_BOOL(1),
+		                         "}");
+		auto *_skip = BCON_NEW("$skip", BCON_INT64(skip));
+		auto *_limit = BCON_NEW("$limit", BCON_INT64(limit));
+		bson_t* pipeline;
 
-		util::MongoDBClient cli( this->m_pool->Acquire());
-		auto* client = cli.Get();
-		auto* collection = mongoc_client_get_collection(client, this->m_mongodb.GetDatabaseName().c_str(), Collection.data());
+		if(limit > 0) {
+			pipeline = BCON_NEW("pipeline", "[", BCON_DOCUMENT(project), BCON_DOCUMENT(_skip), BCON_DOCUMENT(_limit), "]");
+		} else {
+			pipeline = BCON_NEW("pipeline", "[", BCON_DOCUMENT(project), "]");
+		}
+
+		util::MongoDBClient cli(this->m_pool->Acquire());
+		auto *client = cli.Get();
+		auto *collection = mongoc_client_get_collection(client, this->m_mongodb.GetDatabaseName().c_str(),
+		                                                Collection.data());
 
 		auto rv = ExecuteQuery(collection, pipeline);
 
 		mongoc_collection_destroy(collection);
+		bson_destroy(_skip);
+		bson_destroy(_limit);
 		bson_destroy(project);
 		bson_destroy(pipeline);
 
 		return rv;
 	}
 
-	std::vector<models::Sensor> SensorRepository::GetRange(const std::vector<std::string> &ids)
+	std::vector<models::Sensor> SensorRepository::GetRange(const std::vector<std::string> &ids, long skip, long limit)
 	{
-		bson_t* parent;
+		bson_t *parent;
 		bson_t array;
-		bson_oid_t oid;
-
-		bson_oid_init(&oid, nullptr);
+		bson_t *pipeline;
 
 		parent = bson_new();
 		bson_append_array_begin(parent, "$in", 3, &array);
 
 		for(size_t idx = 0UL; idx < ids.size(); idx++) {
-			const auto& id = ids.at(idx);
+			const auto &id = ids.at(idx);
 			bson_oid_t objid;
 
 			bson_oid_init_from_string(&objid, id.c_str());
@@ -56,19 +66,31 @@ namespace sensateiot::services
 
 		bson_append_array_end(parent, &array);
 
-		auto* match = BCON_NEW("$match", "{", "_id", "{", "$in", BCON_ARRAY(&array), "}", "}");
-		auto* project = BCON_NEW("$project", "{", "_id", BCON_BOOL(1), "Secret", BCON_BOOL(1), "Owner", BCON_BOOL(1), "}");
-		auto* pipeline = BCON_NEW("pipeline", "[", BCON_DOCUMENT(match), BCON_DOCUMENT(project), "]");
+		auto *match = BCON_NEW("$match", "{", "_id", "{", "$in", BCON_ARRAY(&array), "}", "}");
+		auto *project = BCON_NEW("$project", "{", "_id", BCON_BOOL(1), "Secret", BCON_BOOL(1), "Owner", BCON_BOOL(1),
+		                         "}");
+		auto *_skip = BCON_NEW("$skip", BCON_INT64(skip));
+		auto *_limit = BCON_NEW("$limit", BCON_INT64(limit));
 
-		util::MongoDBClient cli( this->m_pool->Acquire());
-		auto* client = cli.Get();
-		auto* collection = mongoc_client_get_collection(client, this->m_mongodb.GetDatabaseName().c_str(), Collection.data());
+		if(limit > 0) {
+			pipeline = BCON_NEW("pipeline", "[", BCON_DOCUMENT(match), BCON_DOCUMENT(project), BCON_DOCUMENT(_skip),
+			                    BCON_DOCUMENT(_limit), "]");
+		} else {
+			pipeline = BCON_NEW("pipeline", "[", BCON_DOCUMENT(match), BCON_DOCUMENT(project), "]");
+		}
+
+		util::MongoDBClient cli(this->m_pool->Acquire());
+		auto *client = cli.Get();
+		auto *collection = mongoc_client_get_collection(client, this->m_mongodb.GetDatabaseName().c_str(),
+		                                                Collection.data());
 
 		auto rv = ExecuteQuery(collection, pipeline);
 
 		mongoc_collection_destroy(collection);
 		bson_destroy(parent);
 		bson_destroy(match);
+		bson_destroy(_skip);
+		bson_destroy(_limit);
 		bson_destroy(project);
 		bson_destroy(pipeline);
 
@@ -78,17 +100,17 @@ namespace sensateiot::services
 	std::vector<models::Sensor>
 	SensorRepository::ExecuteQuery(mongoc_collection_t *col, const bson_t *pipeline)
 	{
-		const bson_t* doc;
+		const bson_t *doc;
 
-		auto* cursor = mongoc_collection_aggregate(col, MONGOC_QUERY_NONE, pipeline, nullptr, nullptr);
+		auto *cursor = mongoc_collection_aggregate(col, MONGOC_QUERY_NONE, pipeline, nullptr, nullptr);
 		std::vector<models::Sensor> sensors;
 
 		while(mongoc_cursor_next(cursor, &doc)) {
 			bson_iter_t iter;
 			uint32_t length;
-			const char* name;
-			const char* owner;
-			const bson_oid_t* sensorId;
+			const char *name;
+			const char *owner;
+			const bson_oid_t *sensorId;
 			char id[25];
 
 			bson_iter_init(&iter, doc);
@@ -99,6 +121,8 @@ namespace sensateiot::services
 
 				if(BSON_ITER_HOLDS_OID(&iter) && key == "_id") {
 					sensorId = bson_iter_oid(&iter);
+					models::ObjectId objId(sensorId->bytes);
+
 					bson_oid_to_string(sensorId, id);
 				}
 

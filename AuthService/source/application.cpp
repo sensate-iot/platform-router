@@ -17,6 +17,16 @@
 
 #include <fstream>
 #include <iostream>
+#include <string>
+
+template<typename T>
+std::string ToHex(const T &value, size_t padding = 1)
+{
+	std::stringstream ss;
+
+	ss << std::hex << value;
+	return ss.str();
+}
 
 namespace sensateiot
 {
@@ -35,7 +45,7 @@ namespace sensateiot
 		this->ParseConfig();
 		util::Log::StartLogging(this->m_config.GetLogging());
 
-		auto& log = util::Log::GetLog();
+		auto &log = util::Log::GetLog();
 		log << "Starting Sensate IoT AuthService..." << util::Log::NewLine;
 
 		auto hostname = this->m_config.GetMqtt().GetPublicBroker().GetBroker().GetUri();
@@ -63,12 +73,16 @@ namespace sensateiot
 //		for(auto&& s: apiKeys) {
 //			log << "Key value: " << s.GetKey() << " Key ID: " << s.GetUserId() << util::Log::NewLine;
 //		}
-		auto sensorData = sensors.GetAllSensors();
-//		auto sensorData = sensors.GetRange(ids);
+		auto sensorData = sensors.GetAllSensors(2, 2);
+//		auto sensorData = sensors.GetRange(ids, 1, 1);
 //
-		for(auto&& s: sensorData) {
-			log << "Sensor ID: " << s.GetId() << " Sensor secret: " << s.GetSecret()
-				<< " Size: " << std::to_string(s.size()) << util::Log::NewLine;
+
+		log << "Boost UUID size: " << std::to_string(sizeof(boost::uuids::uuid))
+		    << util::Log::NewLine;
+
+		for(auto &&s: sensorData) {
+			log << "Sensor ID: " << ToHex(s.GetId().Value()) << " Sensor secret: " << s.GetSecret()
+			    << " Size: " << std::to_string(s.size()) << util::Log::NewLine;
 		}
 
 		std::cin.get();
@@ -88,7 +102,7 @@ namespace sensateiot
 
 		std::string content(
 				(std::istreambuf_iterator<char>(file)),
-				        std::istreambuf_iterator<char>());
+				std::istreambuf_iterator<char>());
 
 		try {
 			auto j = json::parse(content);
@@ -96,13 +110,13 @@ namespace sensateiot
 			this->ParseMqtt(j);
 			this->ParseDatabase(j);
 			this->ParseLogging(j);
-		} catch(json::exception& ex) {
+		} catch(json::exception &ex) {
 			std::cerr << "Unable to parse configuration file: " <<
-				ex.what() << std::endl;
+			          ex.what() << std::endl;
 		}
 	}
 
-	void Application::ParseMqtt(nlohmann::json& j)
+	void Application::ParseMqtt(nlohmann::json &j)
 	{
 		this->m_config.SetInterval(j["Interval"]);
 		this->m_config.SetWorkers(j["Workers"]);
@@ -152,7 +166,7 @@ namespace sensateiot
 				.SetConnectionString(json["Database"]["MongoDB"]["ConnectionString"]);
 	}
 
-	void Application::ParseLogging(nlohmann::json& json)
+	void Application::ParseLogging(nlohmann::json &json)
 	{
 		this->m_config.GetLogging().SetLevel(json["Logging"]["Level"]);
 		this->m_config.GetLogging().SetPath(json["Logging"]["File"]);
@@ -161,15 +175,15 @@ namespace sensateiot
 
 void CreateApplication(const char *path)
 {
-	auto& app = sensateiot::Application::GetApplication();
+	auto &app = sensateiot::Application::GetApplication();
 
 	try {
 		app.SetConfig(path);
 		app.Run();
 		sensateiot::util::MongoDBClientPool::Destroy();
-	} catch(std::runtime_error& ex) {
+	} catch(std::runtime_error &ex) {
 		std::cerr << "Unable to run application: " << ex.what();
-	} catch(std::exception& ex) {
+	} catch(std::exception &ex) {
 		std::cerr << "Unable to run application: " << ex.what();
 	}
 }
