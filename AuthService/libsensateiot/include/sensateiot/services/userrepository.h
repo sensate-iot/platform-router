@@ -19,7 +19,7 @@ namespace sensateiot::services
 		~UserRepository() override = default;
 
 		std::vector<models::User> GetAllUsers() override;
-		std::vector<models::User> GetRange(const std::vector<std::string> &ids) override;
+		std::vector<models::User> GetRange(const boost::unordered_set<boost::uuids::uuid> &ids) override;
 
 	private:
 		pqxx::connection m_connection;

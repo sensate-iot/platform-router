@@ -7,14 +7,15 @@
 
 #pragma once
 
-#include <vector>
-#include <string>
-
 #include <sensateiot.h>
 
 #include <config/database.h>
 #include <sensateiot/models/user.h>
 #include <sensateiot/models/apikey.h>
+
+#include <boost/unordered_set.hpp>
+#include <vector>
+#include <string>
 
 namespace sensateiot::services
 {
@@ -25,7 +26,7 @@ namespace sensateiot::services
 		virtual ~AbstractUserRepository() = default;
 
 		virtual std::vector<models::User> GetAllUsers() = 0;
-		virtual std::vector<models::User> GetRange(const std::vector<std::string>& ids) = 0;
+		virtual std::vector<models::User> GetRange(const boost::unordered_set<boost::uuids::uuid> &ids) = 0;
 
 	protected:
 		config::PostgreSQL m_pgsql;

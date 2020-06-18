@@ -10,6 +10,10 @@
 #include <sensateiot/services/userrepository.h>
 #include <sensateiot/util/log.h>
 
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/lexical_cast.hpp>
+
 namespace sensateiot::services
 {
 	UserRepository::UserRepository(const config::PostgreSQL& pgsql) :
@@ -51,12 +55,13 @@ namespace sensateiot::services
 		return users;
 	}
 
-	std::vector<models::User> UserRepository::GetRange(const std::vector<std::string> &ids)
+	std::vector<models::User> UserRepository::GetRange(const boost::unordered_set<boost::uuids::uuid> &ids)
 	{
 		std::string rv("(");
+		auto idx = 0UL;
 
-		for(auto idx = 0U; idx < ids.size(); idx++) {
-			rv += '\'' + ids[idx] + '\'';
+		for(auto iter = ids.begin(); idx < ids.size(); idx++, ++iter) {
+			rv += '\'' + boost::lexical_cast<std::string>(*iter) + '\'';
 
 			if((idx + 1) != ids.size()) {
 				rv += ",";
@@ -78,6 +83,8 @@ namespace sensateiot::services
 
 		pos = query.find('%', pos);
 		query.replace(pos, sizeof(char), rv);
+
+		std::cout << query << std::endl;
 
 		pqxx::nontransaction q(this->m_connection);
 		pqxx::result res(q.exec(query));

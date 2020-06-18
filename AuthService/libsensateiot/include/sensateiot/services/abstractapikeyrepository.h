@@ -16,6 +16,7 @@
 
 #include <string>
 #include <vector>
+#include <boost/unordered_set.hpp>
 
 namespace sensateiot::services
 {
@@ -25,8 +26,9 @@ namespace sensateiot::services
 		explicit AbstractApiKeyRepository(config::PostgreSQL  pgsql);
 		virtual ~AbstractApiKeyRepository() = default;
 
-		virtual std::vector<models::ApiKey> GetAllSensorKeys() = 0;
-		virtual std::vector<models::ApiKey> GetKeys(const std::vector<std::string>& ids) = 0;
+		virtual std::vector<std::string> GetAllSensorKeys() = 0;
+		virtual std::vector<std::string> GetKeys(const std::vector<std::string>& ids) = 0;
+		virtual std::vector<std::string> GetKeysByOwners(const boost::unordered_set<boost::uuids::uuid>& ids) = 0;
 
 	protected:
 		config::PostgreSQL m_pgsql;

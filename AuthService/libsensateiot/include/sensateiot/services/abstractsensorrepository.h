@@ -26,6 +26,7 @@ namespace sensateiot::services
 		virtual ~AbstractSensorRepository() = default;
 
 		virtual std::vector<models::Sensor> GetAllSensors(long skip, long limit) = 0;
+		virtual std::vector<models::Sensor> GetRange(const std::vector<models::ObjectId>& ids, long skip, long limit) = 0;
 		virtual std::vector<models::Sensor> GetRange(const std::vector<std::string>& ids, long skip, long limit) = 0;
 
 	protected:

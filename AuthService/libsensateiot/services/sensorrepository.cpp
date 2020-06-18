@@ -7,6 +7,7 @@
 
 #include <sensateiot/services/abstractsensorrepository.h>
 #include <sensateiot/services/sensorrepository.h>
+#include <sensateiot/stl/smallvector.h>
 
 #include <mongoc.h>
 
@@ -45,6 +46,66 @@ namespace sensateiot::services
 		bson_destroy(pipeline);
 
 		return rv;
+	}
+
+	std::vector<models::Sensor> SensorRepository::GetRange(const std::vector<models::ObjectId>& ids, long skip, long limit)
+	{
+		std::vector<stl::SmallVector<std::uint8_t, models::ObjectId::ObjectIdSize>> byteIds;
+		byteIds.reserve(ids.size());
+
+		for(const auto& id : ids) {
+			stl::SmallVector<std::uint8_t, models::ObjectId::ObjectIdSize> bytes;
+			boost::multiprecision::export_bits(id.Value(), std::back_inserter(bytes), 8);
+			byteIds.push_back(std::move(bytes));
+		}
+
+		bson_t *parent;
+		bson_t array;
+		bson_t *pipeline;
+
+		parent = bson_new();
+		bson_append_array_begin(parent, "$in", 3, &array);
+
+		for(size_t idx = 0UL; idx < ids.size(); idx++) {
+			const auto &id = byteIds.at(idx);
+			bson_oid_t objid;
+
+			bson_oid_init_from_data(&objid, id.data());
+			bson_append_oid(&array, std::to_string(idx).c_str(), -1, &objid);
+		}
+
+		bson_append_array_end(parent, &array);
+
+		auto *match = BCON_NEW("$match", "{", "_id", "{", "$in", BCON_ARRAY(&array), "}", "}");
+		auto *project = BCON_NEW("$project", "{", "_id", BCON_BOOL(1), "Secret", BCON_BOOL(1), "Owner", BCON_BOOL(1),
+		                         "}");
+		auto *_skip = BCON_NEW("$skip", BCON_INT64(skip));
+		auto *_limit = BCON_NEW("$limit", BCON_INT64(limit));
+
+		if(limit > 0) {
+			pipeline = BCON_NEW("pipeline", "[", BCON_DOCUMENT(match), BCON_DOCUMENT(project), BCON_DOCUMENT(_skip),
+			                    BCON_DOCUMENT(_limit), "]");
+		} else {
+			pipeline = BCON_NEW("pipeline", "[", BCON_DOCUMENT(match), BCON_DOCUMENT(project), "]");
+		}
+
+		util::MongoDBClient cli(this->m_pool->Acquire());
+		auto *client = cli.Get();
+		auto *collection = mongoc_client_get_collection(client, this->m_mongodb.GetDatabaseName().c_str(),
+		                                                Collection.data());
+
+		auto rv = ExecuteQuery(collection, pipeline);
+
+		mongoc_collection_destroy(collection);
+		bson_destroy(parent);
+		bson_destroy(match);
+		bson_destroy(_skip);
+		bson_destroy(_limit);
+		bson_destroy(project);
+		bson_destroy(pipeline);
+
+		return rv;
+
 	}
 
 	std::vector<models::Sensor> SensorRepository::GetRange(const std::vector<std::string> &ids, long skip, long limit)
