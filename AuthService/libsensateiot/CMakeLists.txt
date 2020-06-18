@@ -19,6 +19,8 @@ SET(SOURCES
 	util/mongodbclientpool.cpp
 	util/mongodbclient.cpp
 
+	data/datacache.cpp
+
 	services/userrepository.cpp
 	services/abstractuserrepository.cpp
 	services/abstractapikeyrepository.cpp
