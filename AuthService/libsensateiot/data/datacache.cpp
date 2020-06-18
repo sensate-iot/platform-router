@@ -43,7 +43,7 @@ namespace sensateiot::data
 		this->m_sensors.Cleanup(millis);
 	}
 
-	std::tuple<bool, models::Sensor, bool> DataCache::GetSensor(const models::ObjectId& id) const
+	std::pair<bool, std::optional<models::Sensor>> DataCache::GetSensor(const models::ObjectId& id) const
 	{
 		try {
 			auto sensor = this->m_sensors.At(id);
@@ -52,10 +52,10 @@ namespace sensateiot::data
 
 			validated = validated && !user.GetBanned() && !user.GetLockout();
 
-			return std::make_tuple(true, std::move(sensor), validated);
+			return std::make_pair(validated, std::move(sensor));
 		} catch(std::out_of_range& ex) {
 			/* Thrown if not found */
-			return std::make_tuple(false, models::Sensor(), false);
+			return std::make_pair(false, std::optional<models::Sensor>());
 		}
 	}
 

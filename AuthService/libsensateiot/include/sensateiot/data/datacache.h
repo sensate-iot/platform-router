@@ -19,7 +19,7 @@
 #include <vector>
 #include <string>
 #include <utility>
-#include <tuple>
+#include <optional>
 
 namespace sensateiot::data
 {
@@ -35,8 +35,8 @@ namespace sensateiot::data
 		void Clear();
 		void Cleanup();
 
-		/* Found, Sensor data, valid user */
-		std::tuple<bool, models::Sensor, bool> GetSensor(const models::ObjectId& id) const;
+		/* Found, valid user, sensor data */
+		std::pair<bool, std::optional<models::Sensor>> GetSensor(const models::ObjectId& id) const;
 
 	private:
 		stl::Map<models::ObjectId, models::Sensor> m_sensors;

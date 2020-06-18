@@ -73,6 +73,15 @@ namespace sensateiot::models
 			return this->m_objId.compare(other.m_objId) == 0;
 		}
 
+		[[nodiscard]]
+		std::string ToString() const
+		{
+			std::stringstream sstream;
+
+			sstream << std::hex << this->m_objId;
+			return sstream.str();
+		}
+
 	private:
 		ObjectIdType m_objId;
 	};
