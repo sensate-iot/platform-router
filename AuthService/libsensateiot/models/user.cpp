@@ -7,9 +7,17 @@
 
 #include <sensateiot/models/user.h>
 
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/lexical_cast.hpp>
+
 namespace sensateiot::models
 {
-	const std::string& User::GetId() const
+	void User::SetId(const User::IdType &id)
+	{
+		this->m_id = id;
+	}
+
+	const User::IdType& User::GetId() const
 	{
 		return this->m_id;
 	}
@@ -21,7 +29,7 @@ namespace sensateiot::models
 
 	void User::SetId(const std::string &id)
 	{
-		this->m_id = id;
+		this->m_id = boost::lexical_cast<IdType>(id);
 	}
 
 	bool User::GetLockout() const
