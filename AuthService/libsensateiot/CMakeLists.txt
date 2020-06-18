@@ -8,6 +8,7 @@ SET(SOURCES
 	models/apikey.cpp
 	models/user.cpp
 	models/sensor.cpp
+	models/rawmeasurement.cpp
 
 	config/config.cpp
 	config/database.cpp
@@ -20,6 +21,7 @@ SET(SOURCES
 	util/mongodbclient.cpp
 
 	data/datacache.cpp
+	data/measurementvalidator.cpp
 
 	services/userrepository.cpp
 	services/abstractuserrepository.cpp
