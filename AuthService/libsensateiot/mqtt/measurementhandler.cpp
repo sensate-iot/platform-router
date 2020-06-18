@@ -41,15 +41,18 @@ namespace sensateiot::mqtt
 		this->m_measurements = std::move(rhs.m_measurements);
 	}
 
-	void MeasurementHandler::PushMeasurement(std::string json)
+	void MeasurementHandler::PushMeasurement(MeasurementPair measurement)
 	{
 		std::scoped_lock l(this->m_lock);
-
-		this->m_measurements.emplace_back(std::move(json));
+		this->m_measurements.emplace_back(std::move(measurement));
 	}
 
 	std::vector<models::ObjectId> MeasurementHandler::Process()
 	{
+		std::vector<MeasurementPair> data;
+		std::scoped_lock l(this->m_lock);
+
+		std::swap(this->m_measurements, data);
 		return std::vector<models::ObjectId>();
 	}
 }

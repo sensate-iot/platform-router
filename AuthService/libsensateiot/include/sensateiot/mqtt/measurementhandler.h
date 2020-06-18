@@ -12,6 +12,7 @@
 #include <sensateiot/mqtt/imqttclient.h>
 #include <sensateiot/stl/referencewrapper.h>
 #include <sensateiot/models/objectid.h>
+#include <sensateiot/models/rawmeasurement.h>
 
 #include <string>
 #include <vector>
@@ -24,7 +25,9 @@ namespace sensateiot::mqtt
 		explicit MeasurementHandler(IMqttClient& client);
 		virtual ~MeasurementHandler();
 
-		void PushMeasurement(std::string json);
+		typedef std::pair<std::string, models::RawMeasurement> MeasurementPair;
+
+		void PushMeasurement(MeasurementPair measurement);
 		std::vector<models::ObjectId> Process();
 
 		MeasurementHandler(MeasurementHandler&& rhs) noexcept ;
@@ -32,7 +35,7 @@ namespace sensateiot::mqtt
 
 	private:
 		stl::ReferenceWrapper<IMqttClient> m_internal;
-		std::vector<std::string> m_measurements;
+		std::vector<MeasurementPair> m_measurements;
 		std::mutex m_lock;
 
 		static constexpr int VectorSize = 10000;

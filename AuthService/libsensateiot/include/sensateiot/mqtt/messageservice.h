@@ -15,8 +15,8 @@
 #include <sensateiot/mqtt/measurementhandler.h>
 #include <sensateiot/mqtt/imqttclient.h>
 
-#include <sensateiot/stl/map.h>
 #include <sensateiot/data/datacache.h>
+#include <sensateiot/data/measurementvalidator.h>
 
 #include <sensateiot/services/abstractuserrepository.h>
 #include <sensateiot/services/abstractapikeyrepository.h>
@@ -54,6 +54,7 @@ namespace sensateiot::mqtt
 		std::vector<MeasurementHandler> m_handlers;
 
 		data::DataCache m_cache;
+		data::MeasurementValidator m_validator;
 
 		stl::ReferenceWrapper<services::AbstractApiKeyRepository> m_keyRepo;
 		stl::ReferenceWrapper<services::AbstractUserRepository> m_userRepo;

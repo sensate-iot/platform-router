@@ -47,6 +47,13 @@ namespace sensateiot::mqtt
 
 	void MessageService::AddMessage(std::string msg)
 	{
+		auto measurement = this->m_validator(msg);
+
+		if(!measurement.first) {
+			return;
+		}
+
+		auto pair = std::make_pair(std::move(msg), std::move(measurement.second));
 		std::shared_lock lock(this->m_lock);
 
 		auto current = this->m_index.fetch_add(1);
@@ -58,7 +65,7 @@ namespace sensateiot::mqtt
 		}
 
 		auto& repo = this->m_handlers[id];
-		repo.PushMeasurement(std::move(msg));
+		repo.PushMeasurement(std::move(pair));
 	}
 
 	void MessageService::ReloadAll()
