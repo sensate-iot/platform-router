@@ -11,6 +11,7 @@
 
 #include <sensateiot/mqtt/imqttclient.h>
 #include <sensateiot/stl/referencewrapper.h>
+#include <sensateiot/models/objectid.h>
 
 #include <string>
 #include <vector>
@@ -24,7 +25,7 @@ namespace sensateiot::mqtt
 		virtual ~MeasurementHandler();
 
 		void PushMeasurement(std::string json);
-		void Process();
+		std::vector<models::ObjectId> Process();
 
 		MeasurementHandler(MeasurementHandler&& rhs) noexcept ;
 		MeasurementHandler& operator=(MeasurementHandler&& rhs) noexcept;

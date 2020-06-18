@@ -48,8 +48,8 @@ namespace sensateiot::mqtt
 		this->m_measurements.emplace_back(std::move(json));
 	}
 
-	void MeasurementHandler::Process()
+	std::vector<models::ObjectId> MeasurementHandler::Process()
 	{
-
+		return std::vector<models::ObjectId>();
 	}
 }
