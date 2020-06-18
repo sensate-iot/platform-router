@@ -13,17 +13,24 @@ namespace sensateiot::test
 {
 	class DLL_EXPORT ApiKeyRepository : public services::AbstractApiKeyRepository {
 	public:
-		explicit ApiKeyRepository(const config::PostgreSQL& pgsql)
-		{ }
-
-		std::vector<models::ApiKey> GetAllSensorKeys() override
+		explicit ApiKeyRepository(const config::PostgreSQL &pgsql)
 		{
-			return std::vector<models::ApiKey>();
 		}
 
-		std::vector<models::ApiKey> GetKeys(const std::vector<std::string> &ids) override
+		std::vector<std::string> GetAllSensorKeys() override
 		{
-			return std::vector<models::ApiKey>();
+			return std::vector<std::string>();
+		}
+
+		std::vector<std::string> GetKeys(const std::vector<std::string>& ids) override
+		{
+			return std::vector<std::string>();
+		}
+
+		std::vector<std::string>
+		GetKeysByOwners(const boost::unordered_set<boost::uuids::uuid> &ids) override
+		{
+			return std::vector<std::string>();
 		}
 
 	};
