@@ -42,9 +42,9 @@ namespace sensateiot::mqtt
 		                        const config::Config& conf);
 
 		void Process();
-		void AddMessage(std::string msg);
+		void AddMeasurement(std::string msg);
 		void ReloadAll();
-		void Load(std::vector<models::ObjectId> ids);
+		void Load(const std::vector<models::ObjectId>& ids);
 
 	private:
 

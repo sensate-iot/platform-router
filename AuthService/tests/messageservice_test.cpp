@@ -94,23 +94,23 @@ int main(int argc, char** argv)
 	sensateiot::test::SensorRepository sensors(config.GetDatabase().GetMongoDB());
 	sensateiot::mqtt::MessageService service(client, users, key, sensors, config);
 
-	service.AddMessage(std::string(json));
+	service.AddMeasurement(std::string(json));
 
 	using namespace std::chrono_literals;
 	auto t1 = std::thread([&]() {
-		service.AddMessage("t1 Hello 1\n");
-		service.AddMessage("t1 Hello 2\n");
+		service.AddMeasurement("t1 Hello 1\n");
+		service.AddMeasurement("t1 Hello 2\n");
 		std::this_thread::sleep_for(1ms);
-		service.AddMessage("t1 Hello 3\n");
-		service.AddMessage("t1 Hello 4\n");
+		service.AddMeasurement("t1 Hello 3\n");
+		service.AddMeasurement("t1 Hello 4\n");
 		service.Process();
 	});
 
 	auto t2 = std::thread([&]() {
-		service.AddMessage("t2 Hello 8\n");
-		service.AddMessage("t2 Hello\n");
-		service.AddMessage("t2 Hello 7\n");
-		service.AddMessage("t2 Hello 6\n");
+		service.AddMeasurement("t2 Hello 8\n");
+		service.AddMeasurement("t2 Hello\n");
+		service.AddMeasurement("t2 Hello 7\n");
+		service.AddMeasurement("t2 Hello 6\n");
 		service.Process();
 	});
 

@@ -45,7 +45,7 @@ namespace sensateiot::mqtt
 		this->Load(objIds);
 	}
 
-	void MessageService::AddMessage(std::string msg)
+	void MessageService::AddMeasurement(std::string msg)
 	{
 		auto measurement = this->m_validator(msg);
 
@@ -81,7 +81,7 @@ namespace sensateiot::mqtt
 		this->m_cache.Append(keys);
 	}
 
-	void MessageService::Load(std::vector<models::ObjectId> ids)
+	void MessageService::Load(const std::vector<models::ObjectId>& ids)
 	{
 		auto sensors = this->m_sensorRepo->GetRange(ids, 0, 0);
 		boost::unordered_set<boost::uuids::uuid> uuids;
