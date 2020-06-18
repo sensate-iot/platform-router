@@ -7,6 +7,7 @@
 
 #include <sensateiot/application.h>
 #include <sensateiot/mqtt/mqttclient.h>
+#include <sensateiot/mqtt/messageservice.h>
 #include <sensateiot/util/mongodbclientpool.h>
 
 #include <sensateiot/services/userrepository.h>
@@ -15,6 +16,7 @@
 
 #include <json.hpp>
 
+#include <unordered_set>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -59,36 +61,48 @@ namespace sensateiot
 
 		services::UserRepository users(this->m_config.GetDatabase().GetPostgreSQL());
 		services::ApiKeyRepository keys(this->m_config.GetDatabase().GetPostgreSQL());
-		mqtt::MessageService service(iclient, users, keys, this->m_config);
+		services::SensorRepository sensors(this->m_config.GetDatabase().GetMongoDB());
+		mqtt::MessageService service(iclient, users, keys, sensors, this->m_config);
 
 		mqtt::MqttCallback cb(service);
 		mqtt::MqttClient client(hostname, "a23fa-badf", std::move(cb));
 		client.Connect(this->m_config.GetMqtt());
 
-		services::SensorRepository sensors(this->m_config.GetDatabase().GetMongoDB());
 		std::vector<std::string> ids = {"5c86276c785b6f3c58369a31", "5e89f7e16de4f20001eecea5"};
 //		std::vector<std::string> ids = {"3We1XMy$3TA_NPkOHI%q6SCdI2s5cT!F", "_LMh_OcZGws1qv!UW127eEgBvWtBbgwH", "Nt_s56!XrUaY6$zEkQw9SdeiLk2rdOTY"};
-//		auto apiKeys = keys.GetKeys(ids);
-
-//		for(auto&& s: apiKeys) {
-//			log << "Key value: " << s.GetKey() << " Key ID: " << s.GetUserId() << util::Log::NewLine;
-//		}
-		auto sensorData = sensors.GetAllSensors(2, 2);
-//		auto sensorData = sensors.GetRange(ids, 1, 1);
+//		auto apiKeys = keys.GetAllSensorKeys();
 //
+//		for(auto&& s: apiKeys) {
+//			log << "Key value: " << s << util::Log::NewLine;
+//		}
 
-		log << "Boost UUID size: " << std::to_string(sizeof(boost::uuids::uuid))
-		    << util::Log::NewLine;
+		auto sensorData = sensors.GetAllSensors(0, 0);
+		std::vector<models::ObjectId> objIds;
+
+		for(auto& sensor: sensorData) {
+			objIds.push_back(sensor.GetId());
+		}
+
+		sensorData.clear();
+		sensorData = sensors.GetRange(objIds, 0, 0);
+
+
+		service.ReloadAll();
+
+		boost::unordered_set<boost::uuids::uuid> owners;
 
 		for(auto &&s: sensorData) {
 			log << "Sensor ID: " << ToHex(s.GetId().Value()) << " Sensor secret: " << s.GetSecret()
 			    << " Size: " << std::to_string(s.size()) << util::Log::NewLine;
+			owners.insert(s.GetOwner());
 		}
 
-		std::cin.get();
+		auto apiKeys = keys.GetKeysByOwners(owners);
+		auto sensateUsers = users.GetRange(owners);
 
-
-		// TODO: run queue timer
+		for(auto&& s: apiKeys) {
+			log << "Key value: " << s << util::Log::NewLine;
+		}
 	}
 
 	void Application::ParseConfig()
