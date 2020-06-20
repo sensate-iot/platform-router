@@ -86,9 +86,6 @@ namespace sensateiot
 		sensorData.clear();
 		sensorData = sensors.GetRange(objIds, 0, 0);
 
-
-		service.ReloadAll();
-
 		boost::unordered_set<boost::uuids::uuid> owners;
 
 		for(auto &&s: sensorData) {
@@ -103,6 +100,14 @@ namespace sensateiot
 		for(auto&& s: apiKeys) {
 			log << "Key value: " << s << util::Log::NewLine;
 		}
+
+		for(int idx = 0; idx < 10; idx++) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+			service.Process();
+		}
+
+		auto& pool = util::MongoDBClientPool::GetClientPool();
+		pool.Ping();
 	}
 
 	void Application::ParseConfig()
