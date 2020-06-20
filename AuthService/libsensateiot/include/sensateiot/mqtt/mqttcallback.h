@@ -32,12 +32,16 @@ namespace sensateiot::mqtt
 		void connection_lost(const std::string& cause) override;
 		void message_arrived(::mqtt::const_message_ptr msg) override;
 		void set_config(const config::Mqtt& mqtt);
+		void reconnect();
 
 		void set_client(ns_base::mqtt::async_client& cli, ns_base::mqtt::connect_options& opts);
 
 	private:
 		sensateiot::stl::ReferenceWrapper<::mqtt::async_client> m_cli;
 		sensateiot::stl::ReferenceWrapper<::mqtt::connect_options> m_connOpts;
+		sensateiot::stl::ReferenceWrapper<MessageService> m_messageService;
 		config::Mqtt m_config;
+
+		static constexpr int ReconnectTimeout = 1000;
 	};
 }

@@ -24,6 +24,8 @@ namespace sensateiot::mqtt
 	{
 		auto& log = util::Log::GetLog();
 		log << "Internal MQTT client failure!" << util::Log::NewLine;
+
+		this->reconnect();
 	}
 
 	void MqttInternalCallback::delivery_complete(::mqtt::delivery_token_ptr token)
@@ -45,6 +47,8 @@ namespace sensateiot::mqtt
 	{
 		auto& log = util::Log::GetLog();
 		log << "Internal MQTT client connection lost!" << util::Log::NewLine;
+
+		this->reconnect();
 	}
 
 	void MqttInternalCallback::message_arrived(::mqtt::const_message_ptr msg)
@@ -56,5 +60,17 @@ namespace sensateiot::mqtt
 	{
 		this->m_cli = cli;
 		this->m_connOpts = opts;
+	}
+
+	void MqttInternalCallback::reconnect()
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(ReconnectTimeout));
+
+		try {
+			auto token = this->m_cli->connect(*this->m_connOpts, nullptr, *this);
+		} catch(const ::mqtt::exception& ex) {
+			auto& log = util::Log::GetLog();
+			log << "Unable to reconnect: " << ex.what() << util::Log::NewLine;
+		}
 	}
 }

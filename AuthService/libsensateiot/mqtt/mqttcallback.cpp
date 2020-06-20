@@ -8,10 +8,11 @@
 #include <sensateiot/mqtt/mqttcallback.h>
 
 #include <iostream>
+#include <thread>
 
 namespace sensateiot::mqtt
 {
-	MqttCallback::MqttCallback(MessageService& service)
+	MqttCallback::MqttCallback(MessageService& service) : m_messageService(service)
 	{
 	}
 
@@ -19,6 +20,8 @@ namespace sensateiot::mqtt
 	{
 		auto& log = util::Log::GetLog();
 		log << "MQTT client failure!" << util::Log::NewLine;
+
+		this->reconnect();
 	}
 
 	void MqttCallback::delivery_complete(ns_base::mqtt::delivery_token_ptr token)
@@ -58,12 +61,13 @@ namespace sensateiot::mqtt
 	{
 		auto& log = util::Log::GetLog();
 		log << "MQTT connection lost!" << util::Log::NewLine;
+
+		this->reconnect();
 	}
 
 	void MqttCallback::message_arrived(ns_base::mqtt::const_message_ptr msg)
 	{
-		auto& log = util::Log::GetLog();
-		log << "Got message on: " << msg->get_topic() << util::Log::NewLine;
+		this->m_messageService->AddMeasurement(msg->get_payload_str());
 	}
 
 	void MqttCallback::set_config(const config::Mqtt &mqtt)
@@ -75,5 +79,17 @@ namespace sensateiot::mqtt
 	{
 		this->m_cli = cli;
 		this->m_connOpts = opts;
+	}
+
+	void MqttCallback::reconnect()
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(ReconnectTimeout));
+
+		try {
+			auto token = this->m_cli->connect(*this->m_connOpts, nullptr, *this);
+		} catch(const ns_base::mqtt::exception& ex) {
+			auto& log = util::Log::GetLog();
+			log << "Unable to reconnect: " << ex.what() << util::Log::NewLine;
+		}
 	}
 }
