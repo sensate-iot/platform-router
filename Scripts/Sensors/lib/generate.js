@@ -42,22 +42,22 @@ function generateMeasurement(args) {
 	const location = generateLocationAround(51.59137, 4.7786, 1200);
 
 	const measurement = {
-		Longitude: location[1],
-		Latitude: location[0],
-		CreatedById: args.sensors[idx].sensor,
-		CreatedBySecret: args.sensors[idx].secret,
-		Data: {
+		longitude: location[1],
+		latitude: location[0],
+		createdById: args.sensors[idx].sensor,
+		createdBySecret: args.sensors[idx].secret,
+		data: {
 			x: {
-				Value: Math.random() * 10,
-				Unit: "m/s2"
+				value: Math.random() * 10,
+				unit: "m/s2"
 			},
 			y: {
-				Value: Math.random() * 100,
-				Unit: "m/s2"
+				value: Math.random() * 100,
+				unit: "m/s2"
 			},
 			z: {
-				Value: Math.random() * 20,
-				Unit: "m/s2"
+				value: Math.random() * 20,
+				unit: "m/s2"
 			}
 		}
 	}
