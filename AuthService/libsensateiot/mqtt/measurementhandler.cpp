@@ -8,6 +8,7 @@
 #include <sensateiot/mqtt/measurementhandler.h>
 
 #include <iostream>
+#include <sensateiot/util/log.h>
 
 namespace sensateiot::mqtt
 {
@@ -52,7 +53,13 @@ namespace sensateiot::mqtt
 		std::vector<MeasurementPair> data;
 		std::scoped_lock l(this->m_lock);
 
+		data.reserve(this->m_measurements.size());
 		std::swap(this->m_measurements, data);
+		this->m_measurements.clear();
+
+//		auto& log = util::Log::GetLog();
+
+//		log << "Processing: " << std::to_string(data.size()) << util::Log::NewLine;
 		return std::vector<models::ObjectId>();
 	}
 }

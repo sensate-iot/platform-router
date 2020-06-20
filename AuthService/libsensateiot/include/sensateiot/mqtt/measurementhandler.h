@@ -36,6 +36,7 @@ namespace sensateiot::mqtt
 	private:
 		stl::ReferenceWrapper<IMqttClient> m_internal;
 		std::vector<MeasurementPair> m_measurements;
+		std::vector<MeasurementPair> m_leftOver;
 		std::mutex m_lock;
 
 		static constexpr int VectorSize = 10000;
