@@ -8,8 +8,6 @@
 #include <sensateiot/util/mongodbclientpool.h>
 #include <sensateiot/util/log.h>
 
-#include <iostream>
-
 namespace sensateiot::util
 {
 	MongoDBClientPool::MongoDBClientPool(const config::MongoDB& config) :

@@ -27,6 +27,17 @@ namespace sensateiot::util
 		static MongoDBClientPool& GetClientPool();
 		static void Destroy();
 
+		void Ping()
+		{
+			bson_t reply;
+			bson_error_t error;
+			auto* client = mongoc_client_pool_pop(this->m_pool);
+
+			auto* cmd = BCON_NEW("ping", BCON_INT32(1));
+			mongoc_client_command_simple(client, "admin", cmd, nullptr, &reply, &error);
+			mongoc_client_pool_push(this->m_pool, client);
+		}
+
 		std::pair<mongoc_client_pool_t*, mongoc_client_t*> Acquire();
 
 	private:
