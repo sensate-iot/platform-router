@@ -41,10 +41,8 @@ namespace sensateiot::mqtt
 		                        services::AbstractSensorRepository& sensors,
 		                        const config::Config& conf);
 
-		void Process();
+		std::time_t Process();
 		void AddMeasurement(std::string msg);
-		void ReloadAll();
-		void Load(const std::vector<models::ObjectId>& ids);
 
 	private:
 
@@ -55,11 +53,15 @@ namespace sensateiot::mqtt
 
 		data::DataCache m_cache;
 		data::MeasurementValidator m_validator;
+		std::atomic_uint m_count;
 
 		stl::ReferenceWrapper<services::AbstractApiKeyRepository> m_keyRepo;
 		stl::ReferenceWrapper<services::AbstractUserRepository> m_userRepo;
 		stl::ReferenceWrapper<services::AbstractSensorRepository> m_sensorRepo;
 
 		static constexpr int Increment = 1;
+
+		void RawProcess();
+		void Load(std::vector<models::ObjectId>& objIds);
 	};
 }
