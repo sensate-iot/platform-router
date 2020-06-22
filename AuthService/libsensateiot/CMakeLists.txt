@@ -19,6 +19,8 @@ SET(SOURCES
 	util/log.cpp
 	util/mongodbclientpool.cpp
 	util/mongodbclient.cpp
+	util/sha256.c
+	util/sha256.cpp
 
 	data/datacache.cpp
 	data/measurementvalidator.cpp
