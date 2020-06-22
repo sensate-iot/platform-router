@@ -27,18 +27,19 @@ namespace sensateiot::models
 
 		void SetObjectId(const ObjectId& id);
 		const ObjectId& SetObjectId();
+		[[nodiscard]] const ObjectId& GetObjectId() const;
 
 		void SetKey(const std::string& key);
-		const std::string& GetKey() const;
+		[[nodiscard]] const std::string& GetKey() const;
 
 		void SetCreatedTimestamp(const std::string& timestamp);
-		const std::string& GetCreatedTimestamp() const;
+		[[nodiscard]] const std::string& GetCreatedTimestamp() const;
 
 		void SetCoordinates(double lon, double lat);
-		std::pair<double, double> GetCoordinates() const;
+		[[nodiscard]] std::pair<double, double> GetCoordinates() const;
 
 		void SetData(std::vector<DataEntry>&& data);
-		const std::vector<DataEntry>& GetData() const;
+		[[nodiscard]] const std::vector<DataEntry>& GetData() const;
 
 		static constexpr std::string_view DataValue = std::string_view("value");
 		static constexpr std::string_view DataUnit = std::string_view("unit");

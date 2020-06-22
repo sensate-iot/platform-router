@@ -19,6 +19,11 @@ namespace sensateiot::models
 		return this->m_id;
 	}
 
+	const ObjectId &RawMeasurement::GetObjectId() const
+	{
+		return this->m_id;
+	}
+
 	void RawMeasurement::SetKey(const std::string &key)
 	{
 		this->m_key = key;
