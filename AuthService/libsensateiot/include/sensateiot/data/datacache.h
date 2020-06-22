@@ -35,7 +35,7 @@ namespace sensateiot::data
 		void Clear();
 		void Cleanup();
 
-		/* Found, valid user, sensor data */
+		/* Found, sensor data */
 		std::pair<bool, std::optional<models::Sensor>> GetSensor(const models::ObjectId& id) const;
 
 	private:

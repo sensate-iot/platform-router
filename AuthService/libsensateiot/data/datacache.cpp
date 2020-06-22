@@ -52,8 +52,13 @@ namespace sensateiot::data
 
 			validated = validated && !user.GetBanned() && !user.GetLockout();
 
-			return std::make_pair(validated, std::move(sensor));
+			if(validated) {
+				return std::make_pair(true, std::move(sensor));
+			}
+
+			return std::make_pair(true, std::optional<models::Sensor>());
 		} catch(std::out_of_range& ex) {
+			(void)ex;
 			/* Thrown if not found */
 			return std::make_pair(false, std::optional<models::Sensor>());
 		}
