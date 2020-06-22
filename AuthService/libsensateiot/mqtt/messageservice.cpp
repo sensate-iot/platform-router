@@ -27,7 +27,7 @@ namespace sensateiot::mqtt
 		std::string uri = this->m_conf.GetMqtt().GetPrivateBroker().GetBroker().GetUri();
 
 		for(int idx = 0; idx < conf.GetWorkers(); idx++) {
-			MeasurementHandler handler(client);
+			MeasurementHandler handler(client, this->m_cache);
 			this->m_handlers.emplace_back(std::move(handler));
 		}
 	}

@@ -11,6 +11,7 @@
 
 #include <sensateiot/mqtt/imqttclient.h>
 #include <sensateiot/stl/referencewrapper.h>
+#include <sensateiot/data/datacache.h>
 #include <sensateiot/models/objectid.h>
 #include <sensateiot/models/rawmeasurement.h>
 
@@ -22,7 +23,7 @@ namespace sensateiot::mqtt
 {
 	class MeasurementHandler {
 	public:
-		explicit MeasurementHandler(IMqttClient& client);
+		explicit MeasurementHandler(IMqttClient& client, data::DataCache& cache);
 		virtual ~MeasurementHandler();
 
 		typedef std::pair<std::string, models::RawMeasurement> MeasurementPair;
@@ -35,6 +36,7 @@ namespace sensateiot::mqtt
 
 	private:
 		stl::ReferenceWrapper<IMqttClient> m_internal;
+		stl::ReferenceWrapper<data::DataCache> m_cache;
 		std::vector<MeasurementPair> m_measurements;
 		std::vector<MeasurementPair> m_leftOver;
 		std::mutex m_lock;
