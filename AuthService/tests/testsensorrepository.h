@@ -20,17 +20,39 @@ namespace sensateiot::test
 
 		std::vector<models::Sensor> GetAllSensors(long skip, long limit) override
 		{
-			return std::vector<models::Sensor>();
+			return this->m_sensors;
 		}
 
 		std::vector<models::Sensor> GetRange(const std::vector<std::string> &ids, long skip, long limit) override
 		{
+			abort();
 			return std::vector<models::Sensor>();
 		}
 
 		std::vector<models::Sensor> GetRange(const std::vector<models::ObjectId>& ids, long skip, long limit) override
 		{
-			return std::vector<models::Sensor>();
+			std::vector<models::Sensor> rv;
+
+			for(const auto& sensor : this->m_sensors) {
+				for(auto& id : ids) {
+					if(sensor.GetId() != id) {
+						continue;
+					}
+
+					rv.push_back(sensor);
+					break;
+				}
+			}
+
+			return rv;
 		}
+
+		void AddSensor(const models::Sensor& sensor)
+		{
+			this->m_sensors.push_back(sensor);
+		}
+
+	private:
+		std::vector<models::Sensor> m_sensors;
 	};
 }

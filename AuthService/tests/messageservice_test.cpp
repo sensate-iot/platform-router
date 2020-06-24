@@ -23,7 +23,84 @@
 #include "testuserrepository.h"
 #include "testsensorrepository.h"
 
-static constexpr std::string_view json("{\"longitude\":4.774186840897145,\"latitude\":51.59384817617493,\"createdById\":\"5c7c3bbd80e8ae3154d04912\",\"createdBySecret\":\"$5e7a36d90554c9b805345533de22eafbb55b081c69fed55c8311f46b0e45527b==\",\"data\":{\"x\":{\"value\":3.7348298850142325,\"unit\":\"m/s2\"},\"y\":{\"value\":95.1696675190223,\"unit\":\"m/s2\"},\"z\":{\"value\":15.24488164994629,\"unit\":\"m/s2\"}}}");
+static constexpr std::string_view json(R"({"longitude":4.774186840897145,"latitude":51.59384817617493,"createdById":"5c7c3bbd80e8ae3154d04912","createdBySecret":"$76d0d71b0abb9681a5984de91d07b7f434424492933d3069efa2a18e325bd911==","data":{"x":{"value":3.7348298850142325,"unit":"m/s2"},"y":{"value":95.1696675190223,"unit":"m/s2"},"z":{"value":15.24488164994629,"unit":"m/s2"}}})");
+
+static void generate_data(sensateiot::test::SensorRepository& sensors, sensateiot::test::UserRepository& users, sensateiot::test::ApiKeyRepository& keys)
+{
+	using namespace sensateiot;
+	boost::uuids::random_generator gen;
+	sensateiot::models::ObjectId testId;
+
+	for(auto idx = 0; idx < 10; idx++) {
+		models::Sensor s;
+		models::User u;
+		bson_oid_t oid;
+		auto owner = gen();
+
+		bson_oid_init(&oid, nullptr);
+		sensateiot::models::ObjectId id(oid.bytes);
+		testId = id;
+
+		s.SetId(id);
+		s.SetOwner(owner);
+		s.SetSecret(std::to_string(idx));
+
+		u.SetId(owner);
+		u.SetLockout(false);
+		u.SetBanned(false);
+
+		sensors.AddSensor(s);
+		users.AddUser(u);
+		keys.AddKey(std::to_string(idx));
+	}
+}
+
+static void test_measurement_processing()
+{
+	using namespace sensateiot;
+	sensateiot::config::Config config;
+	boost::uuids::random_generator gen;
+
+	config.SetWorkers(3);
+	config.SetInterval(1000);
+
+	auto& mqtt = config.GetMqtt().GetPrivateBroker();
+	mqtt.GetBroker().SetHostName("tcp://127.0.0.1");
+	mqtt.GetBroker().SetPortNumber(1883);
+
+	sensateiot::test::TestMqttClient client;
+	client.Connect(config.GetMqtt());
+
+	sensateiot::test::UserRepository users(config.GetDatabase().GetPostgreSQL());
+	sensateiot::test::ApiKeyRepository keys(config.GetDatabase().GetPostgreSQL());
+	sensateiot::test::SensorRepository sensors(config.GetDatabase().GetMongoDB());
+	sensateiot::mqtt::MessageService service(client, users, keys, sensors, config);
+
+	generate_data(sensors, users, keys);
+	models::Sensor s;
+	models::User u;
+	std::string key = "Hello, World!";
+
+	s.SetSecret(key);
+	s.SetId("5c7c3bbd80e8ae3154d04912");
+	s.SetOwner(gen());
+
+	u.SetBanned(false);
+	u.SetLockout(false);
+	u.SetId(s.GetOwner());
+
+	sensors.AddSensor(s);
+	users.AddUser(u);
+	keys.AddKey(key);
+
+	service.AddMeasurement(std::string(json));
+	service.AddMeasurement(std::string(json));
+	service.AddMeasurement(std::string(json));
+	service.AddMeasurement(std::string(json));
+	service.AddMeasurement(std::string(json));
+
+	service.Process();
+}
 
 static void test_datacache()
 {
@@ -77,47 +154,10 @@ static void test_datacache()
 
 int main(int argc, char** argv)
 {
-	sensateiot::config::Config config;
-
-	config.SetWorkers(3);
-	config.SetInterval(1000);
-
-	auto& mqtt = config.GetMqtt().GetPrivateBroker();
-	mqtt.GetBroker().SetHostName("tcp://127.0.0.1");
-	mqtt.GetBroker().SetPortNumber(1883);
-
-	sensateiot::test::TestMqttClient client;
-	client.Connect(config.GetMqtt());
-
-	sensateiot::test::UserRepository users(config.GetDatabase().GetPostgreSQL());
-	sensateiot::test::ApiKeyRepository key(config.GetDatabase().GetPostgreSQL());
-	sensateiot::test::SensorRepository sensors(config.GetDatabase().GetMongoDB());
-	sensateiot::mqtt::MessageService service(client, users, key, sensors, config);
-
-	service.AddMeasurement(std::string(json));
-
-	using namespace std::chrono_literals;
-	auto t1 = std::thread([&]() {
-		service.AddMeasurement("t1 Hello 1\n");
-		service.AddMeasurement("t1 Hello 2\n");
-		std::this_thread::sleep_for(1ms);
-		service.AddMeasurement("t1 Hello 3\n");
-		service.AddMeasurement("t1 Hello 4\n");
-		service.Process();
-	});
-
-	auto t2 = std::thread([&]() {
-		service.AddMeasurement("t2 Hello 8\n");
-		service.AddMeasurement("t2 Hello\n");
-		service.AddMeasurement("t2 Hello 7\n");
-		service.AddMeasurement("t2 Hello 6\n");
-		service.Process();
-	});
-
-	t1.join();
-	t2.join();
-
+	mongoc_init();
 	test_datacache();
+	test_measurement_processing();
+	mongoc_cleanup();
 
 	return -EXIT_SUCCESS;
 }

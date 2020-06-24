@@ -24,14 +24,34 @@ namespace sensateiot::test
 
 		std::vector<std::string> GetKeys(const std::vector<std::string>& ids) override
 		{
-			return std::vector<std::string>();
+			std::vector<std::string> rv;
+
+			for(const auto& key : this->m_keys) {
+				for(auto& id : ids) {
+					if(key != id) {
+						continue;
+					}
+
+					rv.push_back(key);
+					break;
+				}
+			}
+
+			return rv;
 		}
 
 		std::vector<std::string>
 		GetKeysByOwners(const boost::unordered_set<boost::uuids::uuid> &ids) override
 		{
-			return std::vector<std::string>();
+			return this->m_keys;
 		}
 
+		void AddKey(const std::string& key)
+		{
+			this->m_keys.push_back(key);
+		}
+
+	private:
+		std::vector<std::string> m_keys;
 	};
 }
