@@ -25,14 +25,7 @@ namespace sensateiot::mqtt
 		this->m_lock.unlock();
 	}
 
-	MeasurementHandler &MeasurementHandler::operator=(MeasurementHandler &&rhs) noexcept
-	{
-		std::scoped_lock l(this->m_lock, rhs.m_lock);
-
-		this->m_internal = std::move(rhs.m_internal);
-		this->m_measurements = std::move(rhs.m_measurements);
-		return *this;
-	}
+	re2::RE2 MeasurementHandler::SearchRegex = re2::RE2("\\$[a-f0-9]{64}==");
 
 	MeasurementHandler::MeasurementHandler(MeasurementHandler &&rhs) noexcept
 	{
@@ -40,6 +33,24 @@ namespace sensateiot::mqtt
 
 		this->m_internal = std::move(rhs.m_internal);
 		this->m_measurements = std::move(rhs.m_measurements);
+		this->m_cache = std::move(rhs.m_cache);
+		this->m_leftOver = std::move(rhs.m_leftOver);
+	}
+
+	MeasurementHandler &MeasurementHandler::operator=(MeasurementHandler &&rhs) noexcept
+	{
+		std::scoped_lock l(this->m_lock, rhs.m_lock);
+
+		this->m_internal = std::move(rhs.m_internal);
+		this->m_measurements = std::move(rhs.m_measurements);
+		this->m_cache = std::move(rhs.m_cache);
+		this->m_leftOver = std::move(rhs.m_leftOver);
+		return *this;
+	}
+
+	bool MeasurementHandler::ValidateMeasurement(const models::Sensor& sensor, const MeasurementPair & pair) const
+	{
+		return false;
 	}
 
 	void MeasurementHandler::PushMeasurement(MeasurementPair measurement)
@@ -48,23 +59,61 @@ namespace sensateiot::mqtt
 		this->m_measurements.emplace_back(std::move(measurement));
 	}
 
+	void MeasurementHandler::ProcessLeftOvers()
+	{
+		std::vector<MeasurementPair> data;
+		SensorLookupType sensor;
+
+		this->m_lock.lock();
+		data.reserve(this->m_leftOver.size());
+		std::swap(this->m_leftOver, data);
+		this->m_leftOver.clear();
+		this->m_lock.unlock();
+
+		std::sort(std::begin(data), std::end(data), [](const MeasurementPair& x, const MeasurementPair& y)
+		{
+			return x.second.GetObjectId().compare(y.second.GetObjectId()) < 0;
+		});
+
+		for(auto& pair : data) {
+			if(!sensor.second.has_value() || sensor.second->GetId() != pair.second.GetObjectId()) {
+				sensor = this->m_cache->GetSensor(pair.second.GetObjectId());
+			}
+
+			if(!sensor.first || !sensor.second.has_value()) {
+				continue;
+			}
+
+			/* Valid sensor. Validate the measurement. */
+			if(!this->ValidateMeasurement(sensor.second.value(), pair)) {
+				continue;
+			}
+		}
+	}
+
 	std::vector<models::ObjectId> MeasurementHandler::Process()
 	{
 		std::vector<MeasurementPair> data;
 		std::vector<models::ObjectId> notFound;
-		std::pair<bool, std::optional<models::Sensor>> sensor;
+		SensorLookupType sensor;
 
-		std::scoped_lock l(this->m_lock);
+		this->m_lock.lock();
 
 		data.reserve(this->m_measurements.size());
 		std::swap(this->m_measurements, data);
 		this->m_measurements.clear();
 
-		/* Optimize by sorting vector by sensor */
+		this->m_lock.unlock();
 
-		for(auto&& pair : this->m_measurements) {
+		/* TODO: Optimize by sorting vector by sensor */
+		std::sort(std::begin(data), std::end(data), [](const MeasurementPair& x, const MeasurementPair& y)
+		{
+			return x.second.GetObjectId().compare(y.second.GetObjectId()) < 0;
+		});
+
+		for(auto&& pair : data) {
 //			if(sensor.GetId() != pair.second.GetObjectId()) {
-			if(!sensor.second.has_value() || sensor.second->GetId().compare(pair.second.GetObjectId()) == 0) {
+			if(!sensor.second.has_value() || sensor.second->GetId() != pair.second.GetObjectId()) {
 				sensor = this->m_cache->GetSensor(pair.second.GetObjectId());
 			}
 
@@ -80,7 +129,10 @@ namespace sensateiot::mqtt
 				continue;
 			}
 
-			/* Valid sensor, user and key for current measurement */
+			/* Valid sensor, validate the measurement */
+			if(!this->ValidateMeasurement(sensor.second.value(), pair)) {
+				continue;
+			}
 		}
 
 //		auto& log = util::Log::GetLog();

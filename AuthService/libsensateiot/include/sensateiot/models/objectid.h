@@ -42,8 +42,6 @@ namespace sensateiot::models
 		explicit ObjectId(const std::uint8_t (&bits)[ObjectIdSize])
 		{
 			boost::multiprecision::import_bits(this->m_objId, std::begin(bits), std::end(bits));
-//			std::cout << std::hex << "Object ID: " << this->m_objId << std::endl;
-//			std::cout << std::dec << "Object ID size: " << sizeof(ObjectId) << std::endl;
 		}
 
 		explicit ObjectId(const std::string &hex)
@@ -71,6 +69,11 @@ namespace sensateiot::models
 		bool operator==(const ObjectId& other) const
 		{
 			return this->m_objId.compare(other.m_objId) == 0;
+		}
+
+		bool operator!=(const ObjectId& other) const
+		{
+			return this->m_objId.compare(other.m_objId) != 0;
 		}
 
 		[[nodiscard]]

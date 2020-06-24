@@ -10,6 +10,7 @@
 #pragma warning(disable : 4834)
 #pragma warning(disable : 4251)
 #pragma warning(disable : 4275)
+#pragma warning(disable : 4099)
 
 #ifndef DLL_EXPORT
 #define DLL_EXPORT __declspec(dllexport)

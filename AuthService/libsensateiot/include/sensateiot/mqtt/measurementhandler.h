@@ -15,6 +15,8 @@
 #include <sensateiot/models/objectid.h>
 #include <sensateiot/models/rawmeasurement.h>
 
+#include <re2/re2.h>
+
 #include <string>
 #include <vector>
 #include <mutex>
@@ -30,6 +32,7 @@ namespace sensateiot::mqtt
 
 		void PushMeasurement(MeasurementPair measurement);
 		std::vector<models::ObjectId> Process();
+		void ProcessLeftOvers();
 
 		MeasurementHandler(MeasurementHandler&& rhs) noexcept ;
 		MeasurementHandler& operator=(MeasurementHandler&& rhs) noexcept;
@@ -42,5 +45,9 @@ namespace sensateiot::mqtt
 		std::mutex m_lock;
 
 		static constexpr int VectorSize = 10000;
+		static re2::RE2 SearchRegex;
+		typedef data::DataCache::SensorLookupType SensorLookupType;
+
+		bool ValidateMeasurement(const models::Sensor& sensors, const MeasurementPair& pair) const;
 	};
 }

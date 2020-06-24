@@ -25,7 +25,9 @@ namespace sensateiot::data
 {
 	class DataCache {
 	public:
+		typedef std::pair<bool, std::optional<models::Sensor>> SensorLookupType;
 		static constexpr long DefaultTimeout = 30 * 60 * 1000; // 30 minutes in millis
+
 		explicit DataCache(long tmo = DefaultTimeout);
 
 		void Append(std::vector<models::Sensor>& sensors);

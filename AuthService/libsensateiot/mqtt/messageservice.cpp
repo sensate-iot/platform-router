@@ -26,9 +26,10 @@ namespace sensateiot::mqtt
 		std::unique_lock lock(this->m_lock);
 		std::string uri = this->m_conf.GetMqtt().GetPrivateBroker().GetBroker().GetUri();
 
-		for(int idx = 0; idx < conf.GetWorkers(); idx++) {
+		//for(int idx = 0; idx < conf.GetWorkers(); idx++) {
+		for(int idx = 0; idx < 1; idx++) {
 			MeasurementHandler handler(client, this->m_cache);
-			this->m_handlers.emplace_back(std::move(handler));
+			this->m_handlers.push_back(std::move(handler));
 		}
 	}
 
@@ -44,10 +45,10 @@ namespace sensateiot::mqtt
 
 		for(auto &handler : this->m_handlers) {
 			std::packaged_task<std::vector<models::ObjectId>()> tsk([&] {
-				std::shared_lock lock(this->m_lock);
 				return handler.Process();
 			});
-			queue.push_back(std::move(tsk));
+
+			queue.emplace_back(std::move(tsk));
 		}
 
 		std::vector<std::future<std::vector<models::ObjectId>>> results(queue.size());
@@ -66,14 +67,25 @@ namespace sensateiot::mqtt
 
 		std::vector<models::ObjectId> ids;
 
-		for(auto &future : results) {
-			if(ids.empty()) {
-				ids = future.get();
-			} else {
-				auto tmp = future.get();
-				ids.resize(ids.size() + tmp.size());
-				std::move(std::begin(tmp), std::end(tmp), std::back_inserter(ids));
+		try {
+			for(auto &future : results) {
+				if(!future.valid()) {
+					continue;
+				}
+
+				future.wait();
+
+				if(ids.empty()) {
+					ids = future.get();
+				} else {
+					auto tmp = future.get();
+					ids.resize(ids.size() + tmp.size());
+					std::move(std::begin(tmp), std::end(tmp), std::back_inserter(ids));
+				}
 			}
+		} catch(std::future_error& error) {
+			auto& log = util::Log::GetLog();
+			log << "Unable to get data from future: " << error.what() << util::Log::NewLine;
 		}
 
 		if(!ids.empty()) {
