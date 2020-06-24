@@ -46,7 +46,7 @@ include_directories(
 	${PROJECT_SOURCE_DIR}/external/json
 	${PROJECT_SOURCE_DIR}/include
 	${PROJECT_SOURCE_DIR}/libsensateiot/include
-	SYSTEM ${CONAN_INCLUDE_DIRS}
+	SYSTEM INTERFACE ${CONAN_INCLUDE_DIRS}
 )
 
 add_subdirectory(libsensateiot)
