@@ -18,6 +18,9 @@ if(MSVC)
 		${AUTHSERVICE_SOURCES}
 		${PROJECT_SOURCE_DIR}/source/getopt_win32.c
 	)
+
+	set(${CMAKE_SHARED_LINKER_FLAGS} "/ignore:4099 ${CMAKE_SHARED_LINKER_FLAGS}")
+	set(${CMAKE_EXE_LINKER_FLAGS} "/ignore:4099 ${CMAKE_EXE_LINKER_FLAGS}")
 endif()
 
 INCLUDE(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)

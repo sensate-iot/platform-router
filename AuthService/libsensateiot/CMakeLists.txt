@@ -40,6 +40,10 @@ SET(SOURCES
 )
 
 set(GENERIC_HEADERS
+
+	include/sensateiot/application.h
+	include/sensateiot/getopt.h
+
 	libsensateiot/include/auth.h
 	libsensateiot/include/config/config.h
 	libsensateiot/include/config/database.h
@@ -48,25 +52,41 @@ set(GENERIC_HEADERS
 	libsensateiot/include/config/mqttbroker.h
 	libsensateiot/include/sensateiot/compiler/compiler-msvc.h
 	libsensateiot/include/sensateiot/compiler/compiler.h
+	libsensateiot/include/sensateiot/data/datacache.h
+	libsensateiot/include/sensateiot/data/measurementvalidator.h
+	libsensateiot/include/sensateiot/detail/redblacktree.h
+	libsensateiot/include/sensateiot/detail/redblacktree.hpp
+	libsensateiot/include/sensateiot/detail/redblacktreeiterator.h
+	libsensateiot/include/sensateiot/detail/redblacktreeiterator.hpp
+	libsensateiot/include/sensateiot/detail/redblacktreenode.h
+	libsensateiot/include/sensateiot/detail/redblacktreenode.hpp
 	libsensateiot/include/sensateiot/models/apikey.h
+	libsensateiot/include/sensateiot/models/objectid.h
+	libsensateiot/include/sensateiot/models/rawmeasurement.h
 	libsensateiot/include/sensateiot/models/sensor.h
 	libsensateiot/include/sensateiot/models/user.h
 	libsensateiot/include/sensateiot/mqtt/imqttclient.h
-	libsensateiot/include/sensateiot/mqtt/messageservice.h
 	libsensateiot/include/sensateiot/mqtt/measurementhandler.h
+	libsensateiot/include/sensateiot/mqtt/messageservice.h
 	libsensateiot/include/sensateiot/mqtt/mqttcallback.h
 	libsensateiot/include/sensateiot/mqtt/mqttclient.h
 	libsensateiot/include/sensateiot/mqtt/mqttinternalcallback.h
 	libsensateiot/include/sensateiot/services/abstractapikeyrepository.h
-	libsensateiot/include/sensateiot/services/abstractuserrepository.h
 	libsensateiot/include/sensateiot/services/abstractsensorrepository.h
+	libsensateiot/include/sensateiot/services/abstractuserrepository.h
 	libsensateiot/include/sensateiot/services/apikeyrepository.h
-	libsensateiot/include/sensateiot/services/userrepository.h
 	libsensateiot/include/sensateiot/services/sensorrepository.h
+	libsensateiot/include/sensateiot/services/userrepository.h
+	libsensateiot/include/sensateiot/stl/clist.h
+	libsensateiot/include/sensateiot/stl/map.h
 	libsensateiot/include/sensateiot/stl/referencewrapper.h
+	libsensateiot/include/sensateiot/stl/smallvector.h
 	libsensateiot/include/sensateiot/util/log.h
+	libsensateiot/include/sensateiot/util/mongodbclient.h
 	libsensateiot/include/sensateiot/util/mongodbclientpool.h
+	libsensateiot/include/sensateiot/util/sha256.h
 	libsensateiot/include/sensateiot.h
+
 )
 
 FUNCTION( prepend_path SOURCE_FILES INC_PATH )

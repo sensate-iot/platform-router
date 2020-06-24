@@ -41,6 +41,6 @@ namespace sensateiot::models
 	private:
 		ObjectId m_id;
 		std::string m_secret;
-		boost::uuids::uuid m_owner;
+		boost::uuids::uuid m_owner{};
 	};
 }
