@@ -22,7 +22,6 @@ SET(SOURCES
 	util/sha256.c
 	util/sha256.cpp
 	util/protobuf.cpp
-	util/gzip.cpp
 	util/base64.cpp
 
 	services/userrepository.cpp
@@ -99,7 +98,6 @@ set(LIB_HEADERS
 	sensateiot/util/mongodbclientpool.h
 	sensateiot/util/sha256.h
 	sensateiot/util/protobuf.h
-	sensateiot/util/gzip.h
 	sensateiot/util/base64.h
 
 	sensateiot.h
