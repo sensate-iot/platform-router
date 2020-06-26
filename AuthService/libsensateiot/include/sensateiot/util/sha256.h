@@ -13,6 +13,7 @@
 
 #ifdef __cplusplus
 
+#include <sensateiot.h>
 #include <array>
 #include <string>
 #include <sensateiot/stl/smallvector.h>
@@ -20,8 +21,8 @@
 namespace sensateiot::util
 {
 	static constexpr std::size_t Sha256Size = SHA256_BLOCK_SIZE;
-	extern stl::SmallVector<std::uint8_t, Sha256Size> sha256(const std::string& data);
-	extern bool sha256_compare(const std::string& data, const std::string& other);
+	extern DLL_EXPORT stl::SmallVector<std::uint8_t, Sha256Size> sha256(const std::string& data);
+	extern DLL_EXPORT bool sha256_compare(const std::string& data, const std::string& other);
 }
 
 extern "C" {

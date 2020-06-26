@@ -18,6 +18,7 @@
 #include <re2/re2.h>
 
 #include <string>
+#include <string_view>
 #include <vector>
 #include <mutex>
 
@@ -43,11 +44,14 @@ namespace sensateiot::mqtt
 		std::vector<MeasurementPair> m_measurements;
 		std::vector<MeasurementPair> m_leftOver;
 		std::mutex m_lock;
+		RE2 m_regex;
 
+		static constexpr int SecretSubStringOffset = 3;
+		static constexpr int SecretSubstringStart = 1;
 		static constexpr int VectorSize = 10000;
-		static re2::RE2 SearchRegex;
+		static constexpr auto SearchRegex = std::string_view("\\$[a-f0-9]{64}==");
 		typedef data::DataCache::SensorLookupType SensorLookupType;
 
-		bool ValidateMeasurement(const models::Sensor& sensors, const MeasurementPair& pair) const;
+		bool ValidateMeasurement(const models::Sensor& sensor, MeasurementPair& pair) const;
 	};
 }

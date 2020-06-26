@@ -21,9 +21,9 @@ SET(SOURCES
 	util/mongodbclient.cpp
 	util/sha256.c
 	util/sha256.cpp
-
-	data/datacache.cpp
-	data/measurementvalidator.cpp
+	util/protobuf.cpp
+	util/gzip.cpp
+	util/base64.cpp
 
 	services/userrepository.cpp
 	services/abstractuserrepository.cpp
@@ -32,6 +32,9 @@ SET(SOURCES
 	services/sensorrepository.cpp
 	services/abstractsensorrepository.cpp
 
+	data/datacache.cpp
+	data/measurementvalidator.cpp
+
 	mqtt/messageservice.cpp
 	mqtt/measurementhandler.cpp
 	mqtt/mqttcallback.cpp
@@ -39,54 +42,85 @@ SET(SOURCES
 	mqtt/mqttinternalcallback.cpp
 )
 
-set(GENERIC_HEADERS
-
+SET(APP_HEADERS
 	include/sensateiot/application.h
 	include/sensateiot/getopt.h
+)
 
-	libsensateiot/include/auth.h
-	libsensateiot/include/config/config.h
-	libsensateiot/include/config/database.h
-	libsensateiot/include/config/logging.h
-	libsensateiot/include/config/mqtt.h
-	libsensateiot/include/config/mqttbroker.h
-	libsensateiot/include/sensateiot/compiler/compiler-msvc.h
-	libsensateiot/include/sensateiot/compiler/compiler.h
-	libsensateiot/include/sensateiot/data/datacache.h
-	libsensateiot/include/sensateiot/data/measurementvalidator.h
-	libsensateiot/include/sensateiot/detail/redblacktree.h
-	libsensateiot/include/sensateiot/detail/redblacktree.hpp
-	libsensateiot/include/sensateiot/detail/redblacktreeiterator.h
-	libsensateiot/include/sensateiot/detail/redblacktreeiterator.hpp
-	libsensateiot/include/sensateiot/detail/redblacktreenode.h
-	libsensateiot/include/sensateiot/detail/redblacktreenode.hpp
-	libsensateiot/include/sensateiot/models/apikey.h
-	libsensateiot/include/sensateiot/models/objectid.h
-	libsensateiot/include/sensateiot/models/rawmeasurement.h
-	libsensateiot/include/sensateiot/models/sensor.h
-	libsensateiot/include/sensateiot/models/user.h
-	libsensateiot/include/sensateiot/mqtt/imqttclient.h
-	libsensateiot/include/sensateiot/mqtt/measurementhandler.h
-	libsensateiot/include/sensateiot/mqtt/messageservice.h
-	libsensateiot/include/sensateiot/mqtt/mqttcallback.h
-	libsensateiot/include/sensateiot/mqtt/mqttclient.h
-	libsensateiot/include/sensateiot/mqtt/mqttinternalcallback.h
-	libsensateiot/include/sensateiot/services/abstractapikeyrepository.h
-	libsensateiot/include/sensateiot/services/abstractsensorrepository.h
-	libsensateiot/include/sensateiot/services/abstractuserrepository.h
-	libsensateiot/include/sensateiot/services/apikeyrepository.h
-	libsensateiot/include/sensateiot/services/sensorrepository.h
-	libsensateiot/include/sensateiot/services/userrepository.h
-	libsensateiot/include/sensateiot/stl/clist.h
-	libsensateiot/include/sensateiot/stl/map.h
-	libsensateiot/include/sensateiot/stl/referencewrapper.h
-	libsensateiot/include/sensateiot/stl/smallvector.h
-	libsensateiot/include/sensateiot/util/log.h
-	libsensateiot/include/sensateiot/util/mongodbclient.h
-	libsensateiot/include/sensateiot/util/mongodbclientpool.h
-	libsensateiot/include/sensateiot/util/sha256.h
-	libsensateiot/include/sensateiot.h
+set(LIB_HEADERS
+	auth.h
 
+	config/config.h
+	config/database.h
+	config/logging.h
+	config/mqtt.h
+	config/mqttbroker.h
+
+	sensateiot/compiler/compiler-msvc.h
+	sensateiot/compiler/compiler.h
+
+	sensateiot/data/datacache.h
+	sensateiot/data/measurementvalidator.h
+
+	sensateiot/detail/redblacktree.h
+	sensateiot/detail/redblacktree.hpp
+	sensateiot/detail/redblacktreeiterator.h
+	sensateiot/detail/redblacktreeiterator.hpp
+	sensateiot/detail/redblacktreenode.h
+	sensateiot/detail/redblacktreenode.hpp
+
+	sensateiot/models/apikey.h
+	sensateiot/models/objectid.h
+	sensateiot/models/rawmeasurement.h
+	sensateiot/models/sensor.h
+	sensateiot/models/user.h
+
+	sensateiot/mqtt/imqttclient.h
+	sensateiot/mqtt/measurementhandler.h
+	sensateiot/mqtt/messageservice.h
+	sensateiot/mqtt/mqttcallback.h
+	sensateiot/mqtt/mqttclient.h
+	sensateiot/mqtt/mqttinternalcallback.h
+
+	sensateiot/services/abstractapikeyrepository.h
+	sensateiot/services/abstractsensorrepository.h
+	sensateiot/services/abstractuserrepository.h
+	sensateiot/services/apikeyrepository.h
+	sensateiot/services/sensorrepository.h
+	sensateiot/services/userrepository.h
+
+	sensateiot/stl/clist.h
+	sensateiot/stl/map.h
+	sensateiot/stl/referencewrapper.h
+	sensateiot/stl/smallvector.h
+
+	sensateiot/util/log.h
+	sensateiot/util/mongodbclient.h
+	sensateiot/util/mongodbclientpool.h
+	sensateiot/util/sha256.h
+	sensateiot/util/protobuf.h
+	sensateiot/util/gzip.h
+	sensateiot/util/base64.h
+
+	sensateiot.h
+)
+
+SET(PROTO_FILES
+	${PROJECT_SOURCE_DIR}/libsensateiot/proto/datapoint.proto
+)
+
+SET(PROTO_OUTPUT
+	${CMAKE_BINARY_DIR}/libsensateiot/proto/datapoint.pb.cc
+	${CMAKE_BINARY_DIR}/libsensateiot/proto/datapoint.pb.h
+)
+add_custom_command(
+	OUTPUT ${PROTO_OUTPUT}
+	COMMAND ${CONAN_BIN_DIRS_PROTOBUF}/protoc --cpp_out=${CMAKE_BINARY_DIR}/libsensateiot
+			-I ${PROJECT_SOURCE_DIR}/libsensateiot ${PROTO_FILES}
+	WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/libsensateiot
+	DEPENDS ${PROTO_FILES}
+	COMMENT "Generating protobuf files"
+	VERBATIM
 )
 
 FUNCTION( prepend_path SOURCE_FILES INC_PATH )
@@ -96,11 +130,27 @@ FUNCTION( prepend_path SOURCE_FILES INC_PATH )
 	SET( ${SOURCE_FILES} ${MODIFIED} PARENT_SCOPE )
 ENDFUNCTION()
 
+SET(GENERIC_HEADERS 
+	${LIB_HEADERS}
+)
+
+prepend_path(GENERIC_HEADERS "libsensateiot/include" )
+
+SET(GENERIC_HEADERS 
+	${GENERIC_HEADERS}
+	${APP_HEADERS}
+)
+
 SET(INCLUDE_DIR ${PROJECT_SOURCE_DIR})
 prepend_path(GENERIC_HEADERS ${INCLUDE_DIR})
 
-add_library(sensateiot SHARED ${SOURCES} ${GENERIC_HEADERS})
+#add_custom_target(proto-dep DEPENDS ${PROTO_SRCS} ${PROTO_HDRS})
+
+add_library(sensateiot SHARED ${SOURCES} ${GENERIC_HEADERS} ${PROTO_OUTPUT})
+#add_dependencies(sensateiot proto-dep)
 target_link_libraries(sensateiot ${CONAN_LIBS})
+MESSAGE( STATUS ${PROJECT_BINARY_DIR}/libsensateiot/proto)
+target_include_directories(sensateiot PRIVATE ${PROJECT_BINARY_DIR}/libsensateiot)
 
 if (MSVC)
 	SET_TARGET_PROPERTIES(sensateiot PROPERTIES LINK_FLAGS /ignore:4099)
@@ -114,3 +164,20 @@ install(TARGETS sensateiot
 	# ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR # DESTINATION error
 	ARCHIVE DESTINATION lib ${CMAKE_INSTALL_LIBDIR} # should add lib
 )
+
+SET(${SOURCES} ${SOURCES})
+SET(${LIB_HEADERS} ${LIB_HEADERS})
+
+message(STATUS "Generating MSVS filters.")
+foreach(source IN LISTS ${SOURCES})
+    get_filename_component(source_path "${source}" PATH)
+    string(REPLACE "/" "\\" source_path_msvc "Source Files\\${source_path}")
+    source_group("${source_path_msvc}" FILES "${source}")
+endforeach()
+
+foreach(source IN LISTS ${LIB_HEADERS})
+    get_filename_component(source_path "${source}" PATH)
+	SET(source "include/${source}")
+    string(REPLACE "/" "\\" header_path_msvc "Header Files\\${source_path}")
+    source_group("${header_path_msvc}" FILES "${source}")
+endforeach()

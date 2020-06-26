@@ -20,14 +20,13 @@ namespace sensateiot::mqtt
 			services::AbstractApiKeyRepository &keys,
 			services::AbstractSensorRepository &sensors,
 			const config::Config &conf
-	) : m_conf(conf), m_index(0), m_cache(), m_count(0),
+	) : m_conf(conf), m_index(0), m_count(0),
 	    m_keyRepo(keys), m_userRepo(users), m_sensorRepo(sensors)
 	{
 		std::unique_lock lock(this->m_lock);
 		std::string uri = this->m_conf.GetMqtt().GetPrivateBroker().GetBroker().GetUri();
 
-		//for(int idx = 0; idx < conf.GetWorkers(); idx++) {
-		for(int idx = 0; idx < 1; idx++) {
+		for(auto idx = 0U; idx < std::thread::hardware_concurrency(); idx++) {
 			MeasurementHandler handler(client, this->m_cache);
 			this->m_handlers.push_back(std::move(handler));
 		}
@@ -84,7 +83,6 @@ namespace sensateiot::mqtt
 				}
 			}
 		} catch(std::future_error& error) {
-			auto& log = util::Log::GetLog();
 			log << "Unable to get data from future: " << error.what() << util::Log::NewLine;
 		}
 
@@ -96,23 +94,8 @@ namespace sensateiot::mqtt
 		using Millis = boost::chrono::milliseconds;
 		auto duration = boost::chrono::duration_cast<Millis>(diff);
 
-		log << "Processing took: " << std::to_string(duration.count())
-		    << "ms." << sensateiot::util::Log::NewLine;
-
+		log << "Processing took: " << std::to_string(duration.count()) << "ms." << util::Log::NewLine; 
 		return duration.count();
-	}
-
-	void MessageService::RawProcess()
-	{
-		std::vector<models::ObjectId> objIds;
-		std::unique_lock lock(this->m_lock);
-
-		for(auto &handler : this->m_handlers) {
-			auto result = handler.Process();
-			std::move(std::begin(result), std::end(result), std::back_inserter(objIds));
-		}
-
-		this->Load(objIds);
 	}
 
 	void MessageService::AddMeasurement(std::string msg)
@@ -133,7 +116,7 @@ namespace sensateiot::mqtt
 			newValue = current % this->m_handlers.size();
 		}
 
-		this->m_count++;
+		++this->m_count;
 
 		std::shared_lock lock(this->m_lock);
 		auto &repo = this->m_handlers[id];
@@ -142,7 +125,7 @@ namespace sensateiot::mqtt
 
 	void MessageService::Load(std::vector<models::ObjectId> &objIds)
 	{
-		std::sort(objIds.begin(), objIds.end(), [](const models::ObjectId &a, const models::ObjectId &b) {
+		std::sort(objIds.begin(), objIds.end(), [](const auto &a, const auto &b) {
 			return a.compare(b) < 0;
 		});
 

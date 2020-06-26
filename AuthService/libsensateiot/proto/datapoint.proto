@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package sensateiot;
+
+message DataPoint {
+	double value = 1;
+	string unit = 2;
+	double accuracy = 3;
+	double precision = 4;
+}
+
+message Measurement {
+	repeated DataPoint datapoints = 1;
+}
+
+message MeasurementData {
+	repeated Measurement measurements = 1;
+	string sensor_id = 2;
+}

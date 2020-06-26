@@ -45,7 +45,6 @@ namespace sensateiot::mqtt
 		void AddMeasurement(std::string msg);
 
 	private:
-
 		mutable std::shared_mutex m_lock;
 		config::Config m_conf;
 		std::atomic_size_t m_index;
@@ -61,7 +60,6 @@ namespace sensateiot::mqtt
 
 		static constexpr int Increment = 1;
 
-		void RawProcess();
 		void Load(std::vector<models::ObjectId>& objIds);
 	};
 }

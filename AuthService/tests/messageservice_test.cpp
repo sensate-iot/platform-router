@@ -24,12 +24,13 @@
 #include "testsensorrepository.h"
 
 static constexpr std::string_view json(R"({"longitude":4.774186840897145,"latitude":51.59384817617493,"createdById":"5c7c3bbd80e8ae3154d04912","createdBySecret":"$76d0d71b0abb9681a5984de91d07b7f434424492933d3069efa2a18e325bd911==","data":{"x":{"value":3.7348298850142325,"unit":"m/s2"},"y":{"value":95.1696675190223,"unit":"m/s2"},"z":{"value":15.24488164994629,"unit":"m/s2"}}})");
+static constexpr std::string_view json_noauth(R"({"longitude":4.774186840897145,"latitude":51.59384817617493,"createdById":"5c7c3bbd80e8ae3154d04912","createdBySecret":"$86d0d71b0abb9681a5984de91d07b7f434424492933d3069efa2a18e325bd911==","data":{"x":{"value":3.7348298850142325,"unit":"m/s2"},"y":{"value":95.1696675190223,"unit":"m/s2"},"z":{"value":15.24488164994629,"unit":"m/s2"}}})");
+static constexpr std::string_view json_notfound(R"({"longitude":4.774186840897145,"latitude":51.59384817617493,"createdById":"6c7c3bbd80e8ae3154d04912","createdBySecret":"$76d0d71b0abb9681a5984de91d07b7f434424492933d3069efa2a18e325bd911==","data":{"x":{"value":3.7348298850142325,"unit":"m/s2"},"y":{"value":95.1696675190223,"unit":"m/s2"},"z":{"value":15.24488164994629,"unit":"m/s2"}}})");
 
 static void generate_data(sensateiot::test::SensorRepository& sensors, sensateiot::test::UserRepository& users, sensateiot::test::ApiKeyRepository& keys)
 {
 	using namespace sensateiot;
 	boost::uuids::random_generator gen;
-	sensateiot::models::ObjectId testId;
 
 	for(auto idx = 0; idx < 10; idx++) {
 		models::Sensor s;
@@ -38,8 +39,7 @@ static void generate_data(sensateiot::test::SensorRepository& sensors, sensateio
 		auto owner = gen();
 
 		bson_oid_init(&oid, nullptr);
-		sensateiot::models::ObjectId id(oid.bytes);
-		testId = id;
+		models::ObjectId id(oid.bytes);
 
 		s.SetId(id);
 		s.SetOwner(owner);
@@ -58,7 +58,7 @@ static void generate_data(sensateiot::test::SensorRepository& sensors, sensateio
 static void test_measurement_processing()
 {
 	using namespace sensateiot;
-	sensateiot::config::Config config;
+	config::Config config;
 	boost::uuids::random_generator gen;
 
 	config.SetWorkers(3);
@@ -68,12 +68,12 @@ static void test_measurement_processing()
 	mqtt.GetBroker().SetHostName("tcp://127.0.0.1");
 	mqtt.GetBroker().SetPortNumber(1883);
 
-	sensateiot::test::TestMqttClient client;
+	test::TestMqttClient client;
 	client.Connect(config.GetMqtt());
 
-	sensateiot::test::UserRepository users(config.GetDatabase().GetPostgreSQL());
-	sensateiot::test::ApiKeyRepository keys(config.GetDatabase().GetPostgreSQL());
-	sensateiot::test::SensorRepository sensors(config.GetDatabase().GetMongoDB());
+	test::UserRepository users(config.GetDatabase().GetPostgreSQL());
+	test::ApiKeyRepository keys(config.GetDatabase().GetPostgreSQL());
+	test::SensorRepository sensors(config.GetDatabase().GetMongoDB());
 	sensateiot::mqtt::MessageService service(client, users, keys, sensors, config);
 
 	generate_data(sensors, users, keys);
@@ -93,12 +93,48 @@ static void test_measurement_processing()
 	users.AddUser(u);
 	keys.AddKey(key);
 
+	for(auto idx = 0U; idx < 100000; idx++) {
+	//for(auto idx = 0U; idx < 1; idx++) {
+		service.AddMeasurement(std::string(json));
+	}
+	/*service.AddMeasurement(std::string(json));
 	service.AddMeasurement(std::string(json));
 	service.AddMeasurement(std::string(json));
 	service.AddMeasurement(std::string(json));
 	service.AddMeasurement(std::string(json));
 	service.AddMeasurement(std::string(json));
+	service.AddMeasurement(std::string(json));
+	service.AddMeasurement(std::string(json));
+	service.AddMeasurement(std::string(json));
+	service.AddMeasurement(std::string(json));*/
 
+	service.AddMeasurement(std::string(json_noauth));
+	service.AddMeasurement(std::string(json_noauth));
+	service.AddMeasurement(std::string(json_noauth));
+	service.AddMeasurement(std::string(json_noauth));
+	service.AddMeasurement(std::string(json_noauth));
+	service.AddMeasurement(std::string(json_noauth));
+	service.AddMeasurement(std::string(json_noauth));
+	service.AddMeasurement(std::string(json_noauth));
+	service.AddMeasurement(std::string(json_noauth));
+	service.AddMeasurement(std::string(json_noauth));
+	service.AddMeasurement(std::string(json_noauth));
+	
+	service.AddMeasurement(std::string(json_notfound));
+	service.AddMeasurement(std::string(json_notfound));
+	service.AddMeasurement(std::string(json_notfound));
+	service.AddMeasurement(std::string(json_notfound));
+	service.AddMeasurement(std::string(json_notfound));
+	service.AddMeasurement(std::string(json_notfound));
+	service.AddMeasurement(std::string(json_notfound));
+	service.AddMeasurement(std::string(json_notfound));
+	service.AddMeasurement(std::string(json_notfound));
+	service.AddMeasurement(std::string(json_notfound));
+	service.AddMeasurement(std::string(json_notfound));
+	service.AddMeasurement(std::string(json_notfound));
+	service.AddMeasurement(std::string(json_notfound));
+
+	service.Process();
 	service.Process();
 }
 
@@ -110,7 +146,7 @@ static void test_datacache()
 	std::vector<models::User> users;
 	std::vector<std::string> keys;
 	boost::uuids::random_generator gen;
-	sensateiot::models::ObjectId testId;
+	models::ObjectId testId;
 
 	for(auto idx = 0; idx < 10; idx++) {
 		models::Sensor s;
@@ -119,7 +155,7 @@ static void test_datacache()
 		auto owner = gen();
 
 		bson_oid_init(&oid, nullptr);
-		sensateiot::models::ObjectId id(oid.bytes);
+		models::ObjectId id(oid.bytes);
 		testId = id;
 
 		s.SetId(id);
@@ -141,7 +177,7 @@ static void test_datacache()
 
 	bson_oid_t oid;
 	bson_oid_init(&oid, nullptr);
-	sensateiot::models::ObjectId id(oid.bytes);
+	models::ObjectId id(oid.bytes);
 
 	auto sensor = cache.GetSensor(id);
 	assert(!std::get<0>(sensor));

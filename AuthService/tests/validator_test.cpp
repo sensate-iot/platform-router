@@ -28,20 +28,6 @@ static void authorize_message()
 	auto result = RE2::Replace(&message, search_regex, "Hello, World!");
 	assert(result);
 
-	//auto match = ctre::search<search_regex>(message);
-
-	//if(!match) {
-	//	abort();
-	//}
-
-	//auto begin = match. get<0>().begin();
-	//auto end = match. get<0>().end();
-	//auto value = match. get<0>().to_string();
-
-	//value.erase(0, 1);
-	//value.erase(value.size() - 2);
-
-	//message.replace(begin, end, "Hello, World!");
 	std::cout << message << std::endl;
 
 	auto compare = sensateiot::util::sha256_compare(message, "76d0d71b0abb9681a5984de91d07b7f434424492933d3069efa2a18e325bd911");
