@@ -49,7 +49,7 @@ namespace sensateiot::models
 		this->m_coords = std::make_pair(lon, lat);
 	}
 
-	std::pair<double, double> RawMeasurement::GetCoordinates() const
+	const std::pair<double, double>& RawMeasurement::GetCoordinates() const
 	{
 		return this->m_coords;
 	}

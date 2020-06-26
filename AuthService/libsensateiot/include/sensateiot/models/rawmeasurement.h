@@ -36,7 +36,7 @@ namespace sensateiot::models
 		[[nodiscard]] const std::string& GetCreatedTimestamp() const;
 
 		void SetCoordinates(double lon, double lat);
-		[[nodiscard]] std::pair<double, double> GetCoordinates() const;
+		[[nodiscard]] const std::pair<double, double>& GetCoordinates() const;
 
 		void SetData(std::vector<DataEntry>&& data);
 		[[nodiscard]] const std::vector<DataEntry>& GetData() const;
