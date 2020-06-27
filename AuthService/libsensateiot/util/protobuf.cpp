@@ -10,7 +10,8 @@
 
 #include <proto/datapoint.pb.h>
 
-namespace sensateiot::util {
+namespace sensateiot::util
+{
 	template <>
 	std::string to_protobuf<std::vector<models::RawMeasurement>>(const std::vector<models::RawMeasurement>& value)
 	{

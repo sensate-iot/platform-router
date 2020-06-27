@@ -36,10 +36,11 @@ namespace sensateiot::mqtt
 	{
 		auto &log = util::Log::GetLog();
 		unsigned int count = this->m_count.exchange(0);
+		std::vector<models::ObjectId> ids;
 
 		auto start = boost::chrono::system_clock::now();
 		log << "Processing " << std::to_string(count) << " measurements!" << util::Log::NewLine;
-		std::deque<std::packaged_task<std::vector<models::ObjectId>()>> queue;
+		/*std::deque<std::packaged_task<std::vector<models::ObjectId>()>> queue;
 		std::shared_lock lock(this->m_lock);
 
 		for(auto &handler : this->m_handlers) {
@@ -53,7 +54,8 @@ namespace sensateiot::mqtt
 		std::vector<std::future<std::vector<models::ObjectId>>> results(queue.size());
 
 		for(auto &entry : queue) {
-			results.push_back(entry.get_future());
+			//results.push_back(entry.get_future());
+			results.emplace_back(std::move(entry.get_future()));
 		}
 
 		while(!queue.empty()) {
@@ -67,12 +69,10 @@ namespace sensateiot::mqtt
 		std::vector<models::ObjectId> ids;
 
 		try {
-			for(auto &future : results) {
+			for(auto&& future : results) {
 				if(!future.valid()) {
 					continue;
 				}
-
-				future.wait();
 
 				if(ids.empty()) {
 					ids = future.get();
@@ -84,7 +84,9 @@ namespace sensateiot::mqtt
 			}
 		} catch(std::future_error& error) {
 			log << "Unable to get data from future: " << error.what() << util::Log::NewLine;
-		}
+		} catch(std::logic_error& error) {
+			log << "Processing error: " << error.what() << util::Log::NewLine;
+		}*/
 
 		if(!ids.empty()) {
 			this->Load(ids);
@@ -132,6 +134,8 @@ namespace sensateiot::mqtt
 		auto iter = std::unique(objIds.begin(), objIds.end());
 		objIds.resize(static_cast<unsigned long>(std::distance(objIds.begin(), iter)));
 
+		this->m_cache.AppendBlackList(objIds);
+
 		auto sensors = this->m_sensorRepo->GetRange(objIds, 0, 0);
 		boost::unordered_set<boost::uuids::uuid> uuids;
 
@@ -139,6 +143,7 @@ namespace sensateiot::mqtt
 			uuids.insert(sensor.GetOwner());
 		}
 
+		/* TODO: Async? */
 		auto users = this->m_userRepo->GetRange(uuids);
 		auto keys = this->m_keyRepo->GetKeysByOwners(uuids);
 

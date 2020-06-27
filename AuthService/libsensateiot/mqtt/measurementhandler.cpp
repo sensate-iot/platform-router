@@ -117,6 +117,7 @@ namespace sensateiot::mqtt
 		}
 
 		auto json = util::to_protobuf(authorized);
+		//std::cout << json << std::endl;
 		(void)json;
 	}
 
@@ -150,9 +151,12 @@ namespace sensateiot::mqtt
 			}
 
 			if(!sensor.first) {
-				/* Add to not found list & continue */
-				notFound.push_back(pair.second.GetObjectId());
-				leftOver.emplace_back(std::forward<MeasurementPair>(pair));
+				if(!this->m_cache->IsBlackListed(pair.second.GetObjectId())) {
+					/* Add to not found list & continue */
+					notFound.push_back(pair.second.GetObjectId());
+					leftOver.emplace_back(std::forward<MeasurementPair>(pair));
+				}
+
 				continue;
 			}
 
@@ -169,7 +173,17 @@ namespace sensateiot::mqtt
 			authorized.emplace_back(std::move(pair));
 		}
 
-		log << "Unable to process " << std::to_string(leftOver.size()) << " measurements." << util::Log::NewLine;
+		if(!authorized.empty()) {
+			auto buf = util::to_protobuf(authorized);
+			(void)buf;
+		}
+
+		std::stringstream stream;
+
+		stream << "Unable to process " << leftOver.size() << " measurements.";
+		log << stream.str() << util::Log::NewLine;
+
+		std::scoped_lock l(this->m_lock);
 		this->m_leftOver = std::move(leftOver);
 
 		return notFound;

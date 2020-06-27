@@ -11,7 +11,7 @@
 
 namespace sensateiot::data
 {
-	DataCache::DataCache(long tmo) : m_sensors(tmo), m_users(tmo), m_keys(tmo)
+	DataCache::DataCache(long tmo) : m_sensors(tmo), m_users(tmo), m_keys(tmo), m_blackList(tmo)
 	{
 	}
 
@@ -36,11 +36,16 @@ namespace sensateiot::data
 		}
 	}
 
-	void DataCache::CleanupFor(boost::chrono::milliseconds millis)
+	void DataCache::AppendBlackList(const models::ObjectId& objId)
 	{
-		this->m_users.Cleanup(millis);
-		this->m_keys.Cleanup(millis);
-		this->m_sensors.Cleanup(millis);
+		this->m_blackList.Insert(objId);
+	}
+
+	void DataCache::AppendBlackList(const std::vector<models::ObjectId>& objIds)
+	{
+		for(auto& id : objIds) {
+			this->AppendBlackList(id);
+		}
 	}
 
 	std::pair<bool, std::optional<models::Sensor>> DataCache::GetSensor(const models::ObjectId& id) const
@@ -64,11 +69,25 @@ namespace sensateiot::data
 		}
 	}
 
+	bool DataCache::IsBlackListed(const models::ObjectId& objId) const
+	{
+		return this->m_blackList.Contains(objId);
+	}
+
+	void DataCache::CleanupFor(boost::chrono::milliseconds millis)
+	{
+		this->m_users.Cleanup(millis);
+		this->m_keys.Cleanup(millis);
+		this->m_sensors.Cleanup(millis);
+		this->m_blackList.Cleanup(millis);
+	}
+
 	void DataCache::Clear()
 	{
 		this->m_sensors.Clear();
 		this->m_users.Clear();
 		this->m_keys.Clear();
+		this->m_blackList.Clear();
 	}
 
 	void DataCache::Cleanup()
@@ -76,5 +95,6 @@ namespace sensateiot::data
 		this->m_users.Cleanup();
 		this->m_keys.Cleanup();
 		this->m_sensors.Cleanup();
+		this->m_blackList.Cleanup();
 	}
 }

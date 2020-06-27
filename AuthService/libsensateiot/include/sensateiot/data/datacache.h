@@ -33,16 +33,21 @@ namespace sensateiot::data
 		void Append(std::vector<models::Sensor>& sensors);
 		void Append(std::vector<models::User>& users);
 		void Append(std::vector<std::string>& keys);
+		void AppendBlackList(const models::ObjectId& objId);
+		void AppendBlackList(const std::vector<models::ObjectId>& objIds);
+
 		void CleanupFor(boost::chrono::milliseconds millis);
 		void Clear();
 		void Cleanup();
 
 		/* Found, sensor data */
 		std::pair<bool, std::optional<models::Sensor>> GetSensor(const models::ObjectId& id) const;
+		bool IsBlackListed(const models::ObjectId& objId) const;
 
 	private:
 		stl::Map<models::ObjectId, models::Sensor> m_sensors;
 		stl::Map<boost::uuids::uuid, models::User> m_users;
 		stl::Set<std::string> m_keys;
+		stl::Set<models::ObjectId> m_blackList;
 	};
 }

@@ -84,8 +84,6 @@ namespace sensateiot::services
 		pos = query.find('%', pos);
 		query.replace(pos, sizeof(char), rv);
 
-		std::cout << query << std::endl;
-
 		pqxx::nontransaction q(this->m_connection);
 		pqxx::result res(q.exec(query));
 		std::vector<models::User> users;
