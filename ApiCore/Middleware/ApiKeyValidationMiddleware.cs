@@ -85,7 +85,7 @@ namespace SensateService.ApiCore.Middleware
 				var repo = scope.ServiceProvider.GetRequiredService<IApiKeyRepository>();
 				var roles = scope.ServiceProvider.GetRequiredService<IUserRoleRepository>();
 				var users = scope.ServiceProvider.GetRequiredService<IUserRepository>();
-				var token = await repo.GetByKeyAsync(key, CancellationToken.None).AwaitBackground();
+				var token = await repo.GetAsync(key, CancellationToken.None).AwaitBackground();
 
 				await repo.IncrementRequestCountAsync(token).AwaitBackground();
 

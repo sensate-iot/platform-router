@@ -61,6 +61,19 @@ namespace SensateService.Infrastructure.Sql
 			await this.CommitAsync(token).AwaitBackground();
 		}
 
+		public async Task<SensateApiKey> GetAsync(string key, CancellationToken token = default(CancellationToken))
+		{
+			var query = this.Data.Where(k => k.ApiKey == key);
+			var apikey = await query.FirstOrDefaultAsync(token);
+
+			if(apikey == null) {
+				return null;
+			}
+
+			apikey.CreatedOn = DateTime.SpecifyKind(apikey.CreatedOn, DateTimeKind.Utc);
+			return apikey;
+		}
+
 		public async Task<SensateApiKey> GetByKeyAsync(string key, CancellationToken token = default(CancellationToken))
 		{
 			var query = this.Data.Where(apikey => apikey.ApiKey == key).Include(apikey => apikey.User)

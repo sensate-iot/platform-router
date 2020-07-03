@@ -100,7 +100,6 @@ namespace SensateService.Infrastructure.Sql
 					return obj;
 				}
 
-				this._sqlContext.Attach(obj);
 				return obj;
 			}
 
