@@ -99,6 +99,7 @@ set(LIB_HEADERS
 	sensateiot/util/sha256.h
 	sensateiot/util/protobuf.h
 	sensateiot/util/base64.h
+	sensateiot/util/time.h
 
 	sensateiot.h
 )
