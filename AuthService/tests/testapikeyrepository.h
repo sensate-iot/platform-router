@@ -39,6 +39,11 @@ namespace sensateiot::test
 
 			return rv;
 		}
+		
+		std::vector<std::string> GetKeysFor(const std::vector<models::Sensor>& sensors) override
+		{
+			return this->m_keys;
+		}
 
 		std::vector<std::string>
 		GetKeysByOwners(const boost::unordered_set<boost::uuids::uuid> &ids) override

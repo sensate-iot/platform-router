@@ -16,3 +16,6 @@ TARGET_LINK_LIBRARIES(sha256_test sensateiot ${CONAN_LIBS})
 
 ADD_EXECUTABLE(map_test map_test.cpp)
 TARGET_LINK_LIBRARIES(map_test sensateiot ${CONAN_LIBS})
+
+ADD_EXECUTABLE(messageserviceintegration_test messageserviceintegration_test.cpp)
+TARGET_LINK_LIBRARIES(messageserviceintegration_test sensateiot ${CONAN_LIBS})

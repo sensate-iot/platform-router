@@ -8,8 +8,12 @@
 #include <cstdlib>
 #include <thread>
 #include <chrono>
+#include <vector>
+#include <fstream>
 #include <iostream>
 #include <mongoc.h>
+
+#include <google/protobuf/any.h>
 
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/random_generator.hpp>
@@ -23,9 +27,12 @@
 #include "testuserrepository.h"
 #include "testsensorrepository.h"
 
+//static constexpr std::string_view json(R"({"longitude":4.774186840897145,"latitude":51.59384817617493,"createdById":"5c7c3bbd80e8ae3154d04912","createdBySecret":"$76d0d71b0abb9681a5984de91d07b7f434424492933d3069efa2a18e325bd911==","data":{"x":{"value":3.7348298850142325,"unit":"m/s2"},"y":{"value":95.1696675190223,"unit":"m/s2"},"z":{"value":15.24488164994629,"unit":"m/s2"}}})");
 static constexpr std::string_view json(R"({"longitude":4.774186840897145,"latitude":51.59384817617493,"createdById":"5c7c3bbd80e8ae3154d04912","createdBySecret":"$76d0d71b0abb9681a5984de91d07b7f434424492933d3069efa2a18e325bd911==","data":{"x":{"value":3.7348298850142325,"unit":"m/s2"},"y":{"value":95.1696675190223,"unit":"m/s2"},"z":{"value":15.24488164994629,"unit":"m/s2"}}})");
 static constexpr std::string_view json_noauth(R"({"longitude":4.774186840897145,"latitude":51.59384817617493,"createdById":"5c7c3bbd80e8ae3154d04912","createdBySecret":"$86d0d71b0abb9681a5984de91d07b7f434424492933d3069efa2a18e325bd911==","data":{"x":{"value":3.7348298850142325,"unit":"m/s2"},"y":{"value":95.1696675190223,"unit":"m/s2"},"z":{"value":15.24488164994629,"unit":"m/s2"}}})");
 static constexpr std::string_view json_notfound(R"({"longitude":4.774186840897145,"latitude":51.59384817617493,"createdById":"6c7c3bbd80e8ae3154d04912","createdBySecret":"$76d0d71b0abb9681a5984de91d07b7f434424492933d3069efa2a18e325bd911==","data":{"x":{"value":3.7348298850142325,"unit":"m/s2"},"y":{"value":95.1696675190223,"unit":"m/s2"},"z":{"value":15.24488164994629,"unit":"m/s2"}}})");
+
+static std::vector<std::pair<std::string, std::string>> sensors;
 
 static void generate_data(sensateiot::test::SensorRepository& sensors, sensateiot::test::UserRepository& users, sensateiot::test::ApiKeyRepository& keys)
 {
@@ -55,11 +62,29 @@ static void generate_data(sensateiot::test::SensorRepository& sensors, sensateio
 	}
 }
 
-static void test_measurement_processing()
+static void load_sensors(const std::string& path)
+{
+	std::ifstream file(path);
+	std::stringstream sstream;
+	std::string json;
+
+	while( std::getline(file, json) ) {
+		sstream << json;
+	}
+
+	sstream << std::endl;
+	json = sstream.str();
+
+	std::cout << json << std::endl;
+}
+
+static void test_measurement_processing(std::string path)
 {
 	using namespace sensateiot;
 	config::Config config;
 	boost::uuids::random_generator gen;
+
+	load_sensors(path);
 
 	config.SetWorkers(3);
 	config.SetInterval(1000);
@@ -93,8 +118,8 @@ static void test_measurement_processing()
 	users.AddUser(u);
 	keys.AddKey(key);
 
-	for(auto idx = 0U; idx < 100000; idx++) {
-	//for(auto idx = 0U; idx < 1; idx++) {
+	//for(auto idx = 0U; idx < 75000; idx++) {
+	for(auto idx = 0U; idx < 10; idx++) {
 		service.AddMeasurement(std::string(json));
 	}
 	/*service.AddMeasurement(std::string(json));
@@ -108,7 +133,7 @@ static void test_measurement_processing()
 	service.AddMeasurement(std::string(json));
 	service.AddMeasurement(std::string(json));*/
 
-	service.AddMeasurement(std::string(json_noauth));
+	/*service.AddMeasurement(std::string(json_noauth));
 	service.AddMeasurement(std::string(json_noauth));
 	service.AddMeasurement(std::string(json_noauth));
 	service.AddMeasurement(std::string(json_noauth));
@@ -132,10 +157,22 @@ static void test_measurement_processing()
 	service.AddMeasurement(std::string(json_notfound));
 	service.AddMeasurement(std::string(json_notfound));
 	service.AddMeasurement(std::string(json_notfound));
-	service.AddMeasurement(std::string(json_notfound));
+	service.AddMeasurement(std::string(json_notfound));*/
 
 	service.Process();
 	service.Process();
+
+	auto& log = util::Log::GetLog();
+	auto start = boost::chrono::system_clock::now();
+
+	for (auto idx = 0U; idx < 100000; idx++) {
+		service.AddMeasurement(std::string(json));
+	}
+
+	auto diff = boost::chrono::system_clock::now() - start;
+	auto duration = boost::chrono::duration_cast<boost::chrono::milliseconds>(diff);
+
+	log << "Adding measurements took: " << std::to_string(duration.count()) << "ms." << util::Log::NewLine;
 }
 
 static void test_datacache()
@@ -192,8 +229,10 @@ int main(int argc, char** argv)
 {
 	mongoc_init();
 	test_datacache();
-	test_measurement_processing();
+	test_measurement_processing(argv[1]);
 	mongoc_cleanup();
+
+	google::protobuf::ShutdownProtobufLibrary();
 
 	return -EXIT_SUCCESS;
 }
