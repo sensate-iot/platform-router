@@ -67,47 +67,20 @@ namespace sensateiot
 		mqtt::MqttCallback cb(service);
 		mqtt::MqttClient client(hostname, "a23fa-badf", std::move(cb));
 		client.Connect(this->m_config.GetMqtt());
+		//auto& pool = util::MongoDBClientPool::GetClientPool();
 
-		std::vector<std::string> ids = {"5c86276c785b6f3c58369a31", "5e89f7e16de4f20001eecea5"};
-//		std::vector<std::string> ids = {"3We1XMy$3TA_NPkOHI%q6SCdI2s5cT!F", "_LMh_OcZGws1qv!UW127eEgBvWtBbgwH", "Nt_s56!XrUaY6$zEkQw9SdeiLk2rdOTY"};
-//		auto apiKeys = keys.GetAllSensorKeys();
-//
-//		for(auto&& s: apiKeys) {
-//			log << "Key value: " << s << util::Log::NewLine;
-//		}
+		for(;;) {
+			auto time = service.Process();
+			time_t interval = this->m_config.GetInterval();
 
-		auto sensorData = sensors.GetAllSensors(0, 0);
-		std::vector<models::ObjectId> objIds;
+			if(time > interval) {
+				interval = 10;
+			} else {
+				interval = interval - time;
+			}
 
-		for(auto& sensor: sensorData) {
-			objIds.push_back(sensor.GetId());
+			std::this_thread::sleep_for(std::chrono::milliseconds(interval));
 		}
-
-		sensorData.clear();
-		sensorData = sensors.GetRange(objIds, 0, 0);
-
-		boost::unordered_set<boost::uuids::uuid> owners;
-
-		for(auto &&s: sensorData) {
-			log << "Sensor ID: " << ToHex(s.GetId().Value()) << " Sensor secret: " << s.GetSecret()
-			    << " Size: " << std::to_string(s.size()) << util::Log::NewLine;
-			owners.insert(s.GetOwner());
-		}
-
-		auto apiKeys = keys.GetKeysByOwners(owners);
-		auto sensateUsers = users.GetRange(owners);
-
-		for(auto&& s: apiKeys) {
-			log << "Key value: " << s << util::Log::NewLine;
-		}
-
-		for(int idx = 0; idx < 10; idx++) {
-			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-			service.Process();
-		}
-
-		auto& pool = util::MongoDBClientPool::GetClientPool();
-		pool.Ping();
 	}
 
 	void Application::ParseConfig()
@@ -126,6 +99,7 @@ namespace sensateiot
 		try {
 			auto j = json::parse(content);
 
+			this->m_config.SetInternalBatchSize(j["InternalBatchSize"]);
 			this->ParseMqtt(j);
 			this->ParseDatabase(j);
 			this->ParseLogging(j);
@@ -202,7 +176,9 @@ void CreateApplication(const char *path)
 		sensateiot::util::MongoDBClientPool::Destroy();
 	} catch(std::runtime_error &ex) {
 		std::cerr << "Unable to run application: " << ex.what();
+		throw ex;
 	} catch(std::exception &ex) {
 		std::cerr << "Unable to run application: " << ex.what();
+		throw ex;
 	}
 }
