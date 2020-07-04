@@ -31,6 +31,10 @@ namespace sensateiot::config
 		int GetWorkers() const;
 		void SetWorkers(int workers);
 
+		[[nodiscard]]
+		std::size_t GetInternalBatchSize() const;
+		void SetInternalBatchSize(std::size_t size);
+
 		Logging& GetLogging();
 
 	private:
@@ -39,5 +43,6 @@ namespace sensateiot::config
 		Logging m_logging{};
 		int m_workers{};
 		int m_interval{};
+		std::size_t m_internalBatchSize{};
 	};
 }

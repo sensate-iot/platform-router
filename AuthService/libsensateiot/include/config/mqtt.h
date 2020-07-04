@@ -19,7 +19,7 @@ namespace sensateiot::config
 		PublicBroker& GetPublicBroker();
 
 	private:
-		PrivateBroker m_private;
-		PublicBroker m_public;
+		PrivateBroker m_private{};
+		PublicBroker m_public{};
 	};
 }

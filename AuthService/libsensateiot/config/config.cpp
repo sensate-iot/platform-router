@@ -25,6 +25,11 @@ namespace sensateiot::config
 		this->m_workers = workers;
 	}
 
+	std::size_t Config::GetInternalBatchSize() const
+	{
+		return this->m_internalBatchSize;
+	}
+
 	int Config::GetWorkers() const
 	{
 		return this->m_workers;
@@ -38,6 +43,11 @@ namespace sensateiot::config
 	int Config::GetInterval() const
 	{
 		return this->m_interval;
+	}
+
+	void Config::SetInternalBatchSize(std::size_t size)
+	{
+		this->m_internalBatchSize = size;
 	}
 
 	Logging &Config::GetLogging()

@@ -43,8 +43,8 @@ namespace sensateiot::config
 		std::string m_host;
 		std::string m_username;
 		std::string m_password;
-		std::uint16_t m_port;
-		bool m_ssl;
+		std::uint16_t m_port{};
+		bool m_ssl{};
 	};
 
 	class DLL_EXPORT PublicBroker {
@@ -64,7 +64,7 @@ namespace sensateiot::config
 		void SetBulkMeasurementTopic(const std::string& topic);
 
 	private:
-		MqttBroker m_broker;
+		MqttBroker m_broker{};
 		std::string m_measurementTopic;
 		std::string m_bulkMeasurementTopic;
 		std::string m_messageTopic;
@@ -87,7 +87,7 @@ namespace sensateiot::config
 		void SetBulkMeasurementTopic(const std::string& topic);
 
 	private:
-		MqttBroker m_broker;
+		MqttBroker m_broker{};
 		std::string m_internalMeasurementTopic;
 		std::string m_internalBulkMeasurementTopic;
 		std::string m_internalMessageTopic;
