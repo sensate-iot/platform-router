@@ -4,6 +4,7 @@
 
 const program = require('commander');
 const mqtt = require('../lib/mqtt');
+const generate = require('../lib/create-sensors');
 const websocket = require('../lib/websocket');
 const settings = require('../lib/settings-parser');
 
@@ -11,6 +12,7 @@ main();
 
 function main() {
 	program.version('0.1.0', '-v, --version')
+		.option('-g, --generate', 'generate Sensate IoT sensors', false)
 		.option('-m, --mqtt', 'run the MQTT client')
 		.option('-M, --messages', 'generate message\'s')
 		.option('-w, --websocket', 'run the websocket client')
@@ -32,6 +34,7 @@ function main() {
 	}
 
 	const args = {
+		generate: program.generate,
 		username: program.user,
 		password: program.pw,
 		secret: program.secret,
@@ -55,8 +58,11 @@ function main() {
 		args.websocket = args.config.webSocket;
 	}
 
-	if(program.mqtt)
+	if(program.generate) {
+		generate.generateSensors(25000).then(() => {});
+	} else if(program.mqtt) {
 		mqtt.run(args);
-	else
+	} else {
 		websocket.run(args);
+	}
 }
