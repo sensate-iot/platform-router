@@ -19,6 +19,14 @@ namespace sensateiot::stl
 
 	public:
 		explicit Map(long timeout = DefaultTimeout) : detail::RedBlackTree<K,V,C,H>(timeout) {}
+
+		template <typename Func>
+		auto Process(const typename Base::KeyType& key, Func&& f) const
+		{
+			std::shared_lock l(this->m_lock);
+			auto& ref = this->At(key);
+			return f(ref);
+		}
 	};
 
 	template <typename K, typename C = detail::Compare<K>, typename H = detail::HashAlgorithm<K>>
