@@ -172,7 +172,7 @@ namespace sensateiot::services
 			const char *name;
 			const char *owner;
 			const bson_oid_t *sensorId;
-			char id[25];
+			models::Sensor s;
 
 			bson_iter_init(&iter, doc);
 			bson_iter_next(&iter);
@@ -183,23 +183,20 @@ namespace sensateiot::services
 				if(BSON_ITER_HOLDS_OID(&iter) && key == "_id") {
 					sensorId = bson_iter_oid(&iter);
 					models::ObjectId objId(sensorId->bytes);
-
-					bson_oid_to_string(sensorId, id);
+					s.SetId(objId);
 				}
 
 				if(BSON_ITER_HOLDS_UTF8(&iter) && key == "Secret") {
 					name = bson_iter_utf8(&iter, &length);
+					s.SetSecret(name);
 				}
 
 				if(BSON_ITER_HOLDS_UTF8(&iter) && key == "Owner") {
 					owner = bson_iter_utf8(&iter, &length);
+					s.SetOwner(owner);
 				}
 			} while(bson_iter_next(&iter));
 
-			models::Sensor s;
-			s.SetSecret(name);
-			s.SetOwner(owner);
-			s.SetId(id);
 
 			sensors.emplace_back(std::move(s));
 		}

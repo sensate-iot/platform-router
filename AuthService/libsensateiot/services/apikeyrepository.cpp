@@ -48,11 +48,47 @@ namespace sensateiot::services
 		return keys;
 	}
 
+	std::vector<std::string> ApiKeyRepository::GetKeysFor(const std::vector<models::Sensor>& sensors)
+	{
+		std::string query(
+				"SELECT \"ApiKeys\".\"ApiKey\"\n"
+				"FROM \"ApiKeys\"\n"
+				"WHERE \"Type\" = 0 AND \"Revoked\" = FALSE AND\n"
+				"\"ApiKeys\".\"ApiKey\" IN ?");
+		std::stringstream sstream;
+
+		sstream << '(';
+
+		for(std::vector<models::ObjectId>::size_type idx = 0UL; idx < sensors.size(); idx++) {
+			sstream << '\'' << sensors[idx].GetSecret() << '\'';
+			
+			if((idx + 1UL) != sensors.size()) {
+				sstream << ',';
+			}
+		}
+
+		sstream << ')';
+		
+		std::string::size_type pos = 0u;
+		pos = query.find('?', pos);
+		query.replace(pos, sizeof(char), sstream.str());
+
+		pqxx::nontransaction q(this->m_connection);
+		pqxx::result res(q.exec(query));
+		std::vector<std::string> keys;
+
+		for(const auto &row: res) {
+			keys.emplace_back(row[0].as<std::string>());
+		}
+
+		return keys;
+	}
+
 	std::vector<std::string> ApiKeyRepository::GetKeys(const std::vector<std::string> &ids)
 	{
 		std::string rv("(");
 
-		for(auto idx = 0U; idx < ids.size(); idx++) {
+		for(std::size_t idx = 0UL; idx < ids.size(); idx++) {
 			rv += '\'' + ids[idx] + '\'';
 
 			if((idx + 1) != ids.size()) {
@@ -86,7 +122,7 @@ namespace sensateiot::services
 	std::vector<std::string> ApiKeyRepository::GetKeysByOwners(const boost::unordered_set<boost::uuids::uuid> &ids)
 	{
 		std::string rv("(");
-		auto idx = 0UL;
+		std::size_t idx = 0UL;
 
 		for(auto iter = ids.begin(); idx < ids.size(); ++iter, idx++) {
 			rv += '\'' + boost::lexical_cast<std::string>(*iter) + '\'';
