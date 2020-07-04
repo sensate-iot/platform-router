@@ -6,8 +6,7 @@
  */
 
 #include <sensateiot/data/datacache.h>
-
-
+#include <sensateiot/models/rawmeasurement.h>
 
 namespace sensateiot::data
 {
@@ -43,7 +42,7 @@ namespace sensateiot::data
 
 	void DataCache::AppendBlackList(const std::vector<models::ObjectId>& objIds)
 	{
-		for(auto& id : objIds) {
+		for(const auto& id : objIds) {
 			this->AppendBlackList(id);
 		}
 	}
@@ -51,9 +50,10 @@ namespace sensateiot::data
 	std::pair<bool, std::optional<models::Sensor>> DataCache::GetSensor(const models::ObjectId& id) const
 	{
 		try {
-			auto sensor = this->m_sensors.At(id);
-			auto user = this->m_users.At(sensor.GetOwner());
-			auto validated = this->m_keys.Has(sensor.GetSecret());
+			auto now = boost::chrono::high_resolution_clock::now();
+			auto sensor = this->m_sensors.At(id, now);
+			auto user = this->m_users.At(sensor.GetOwner(), now);
+			auto validated = this->m_keys.Has(sensor.GetSecret(), now);
 
 			validated = validated && !user.GetBanned() && !user.GetLockout();
 
@@ -62,8 +62,7 @@ namespace sensateiot::data
 			}
 
 			return std::make_pair(true, std::optional<models::Sensor>());
-		} catch(std::out_of_range& ex) {
-			(void)ex;
+		} catch(std::out_of_range& ) {
 			/* Thrown if not found */
 			return std::make_pair(false, std::optional<models::Sensor>());
 		}
@@ -72,6 +71,29 @@ namespace sensateiot::data
 	bool DataCache::IsBlackListed(const models::ObjectId& objId) const
 	{
 		return this->m_blackList.Contains(objId);
+	}
+
+	DataCache::SensorStatus DataCache::CanProcess(const models::RawMeasurement& raw) const
+	{
+		SensorStatus rv = SensorStatus::Unknown;
+		auto now = boost::chrono::high_resolution_clock::now();
+
+		try {
+			auto sensor = this->m_sensors.At(raw.GetObjectId(), now);
+			auto validKey = this->m_keys.Has(sensor.GetSecret(), now);
+
+			if (validKey) {
+				rv = SensorStatus::Available;
+			} else if (this->m_blackList.Has(sensor.GetId(), now)) {
+				rv = SensorStatus::Unavailable;
+			}
+		} catch (std::out_of_range&) {
+			if (this->m_blackList.Has(raw.GetObjectId(), now)) {
+				rv = SensorStatus::Unavailable;
+			}
+		}
+
+		return rv;
 	}
 
 	void DataCache::CleanupFor(boost::chrono::milliseconds millis)

@@ -9,6 +9,7 @@
 
 #include <sensateiot/models/sensor.h>
 #include <sensateiot/models/user.h>
+#include <sensateiot/models/rawmeasurement.h>
 
 #include <sensateiot/stl/map.h>
 
@@ -25,6 +26,13 @@ namespace sensateiot::data
 {
 	class DataCache {
 	public:
+		enum class SensorStatus {
+			Available,
+			Unavailable,
+			Unknown
+		};
+
+
 		typedef std::pair<bool, std::optional<models::Sensor>> SensorLookupType;
 		static constexpr long DefaultTimeout = 30 * 60 * 1000; // 30 minutes in millis
 
@@ -43,6 +51,7 @@ namespace sensateiot::data
 		/* Found, sensor data */
 		std::pair<bool, std::optional<models::Sensor>> GetSensor(const models::ObjectId& id) const;
 		bool IsBlackListed(const models::ObjectId& objId) const;
+		SensorStatus CanProcess(const models::RawMeasurement& raw) const;
 
 	private:
 		stl::Map<models::ObjectId, models::Sensor> m_sensors;

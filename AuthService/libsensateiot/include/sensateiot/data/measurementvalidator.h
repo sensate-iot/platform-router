@@ -16,6 +16,6 @@
 namespace sensateiot::data
 {
 	struct MeasurementValidator {
-		std::pair<bool, models::RawMeasurement> operator()(const std::string& str);
+		std::pair<bool, models::RawMeasurement> operator()(const std::string& str) const;
 	};
 }
