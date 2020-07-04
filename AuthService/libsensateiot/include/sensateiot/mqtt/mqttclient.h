@@ -31,6 +31,7 @@ namespace sensateiot::mqtt
 		BaseMqttClient& operator=(const BaseMqttClient&) = delete;
 
 		void Connect(const config::Mqtt &config) override;
+		void Publish(const std::string& topic, const std::string& msg) override;
 
 	protected:
 		void SetCallback(::mqtt::callback& cb);

@@ -18,10 +18,16 @@ namespace sensateiot::util
 	{
 		throw new std::logic_error("Method not implemented!");
 	}
+	
 
 	template <>
 	std::string to_protobuf<models::RawMeasurement>(const models::RawMeasurement& value);
 
 	template <>
 	std::string to_protobuf<std::vector<models::RawMeasurement>>(const std::vector<models::RawMeasurement>& value);
+
+	std::string to_protobuf(
+		std::vector<models::RawMeasurement>::const_iterator begin,
+		std::vector<models::RawMeasurement>::const_iterator end
+	);
 }
