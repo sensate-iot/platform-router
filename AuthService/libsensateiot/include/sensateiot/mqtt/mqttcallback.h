@@ -14,7 +14,7 @@
 
 #include <sensateiot/stl/referencewrapper.h>
 #include <sensateiot/util/log.h>
-#include <sensateiot/mqtt/messageservice.h>
+#include <sensateiot/services/messageservice.h>
 
 namespace sensateiot::mqtt
 {

@@ -5,7 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
-#include <sensateiot/mqtt/messageservice.h>
+#include <sensateiot/services/messageservice.h>
 #include <boost/fiber/future/future.hpp>
 #include <boost/fiber/future/packaged_task.hpp>
 
@@ -26,8 +26,8 @@ namespace sensateiot::mqtt
 		std::unique_lock lock(this->m_lock);
 		std::string uri = this->m_conf.GetMqtt().GetPrivateBroker().GetBroker().GetUri();
 
-		//for(auto idx = 0U; idx < std::thread::hardware_concurrency(); idx++) {
 		for(auto idx = 0U; idx < 1; idx++) {
+		//for(auto idx = 0U; idx < std::thread::hardware_concurrency(); idx++) {
 			MeasurementHandler handler(client, this->m_cache, conf);
 			this->m_handlers.emplace_back(std::move(handler));
 		}
@@ -39,7 +39,7 @@ namespace sensateiot::mqtt
 		std::vector<models::ObjectId> ids;
 
 		std::deque<boost::fibers::packaged_task<ProcessingStats()>> queue;
-		std::vector<boost::fibers::future<ProcessingStats>> results(queue.size());
+		std::vector<boost::fibers::future<ProcessingStats>> results;
 
 		std::shared_lock lock(this->m_lock);
 
@@ -89,7 +89,7 @@ namespace sensateiot::mqtt
 			log << "Unable to process messages: " << error.what() << util::Log::NewLine;
 		}
 
-		if(authorized == 0ULL) {
+		if(authorized != 0ULL) {
 			log << "Authorized " << std::to_string(authorized) << " messages" << util::Log::NewLine;
 		}
 

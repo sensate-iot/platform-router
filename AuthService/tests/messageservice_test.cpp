@@ -29,8 +29,8 @@
 
 //static constexpr std::string_view json(R"({"longitude":4.774186840897145,"latitude":51.59384817617493,"createdById":"5c7c3bbd80e8ae3154d04912","createdBySecret":"$76d0d71b0abb9681a5984de91d07b7f434424492933d3069efa2a18e325bd911==","data":{"x":{"value":3.7348298850142325,"unit":"m/s2"},"y":{"value":95.1696675190223,"unit":"m/s2"},"z":{"value":15.24488164994629,"unit":"m/s2"}}})");
 static constexpr std::string_view json(R"({"longitude":4.774186840897145,"latitude":51.59384817617493,"createdById":"5c7c3bbd80e8ae3154d04912","createdBySecret":"$76d0d71b0abb9681a5984de91d07b7f434424492933d3069efa2a18e325bd911==","data":{"x":{"value":3.7348298850142325,"unit":"m/s2"},"y":{"value":95.1696675190223,"unit":"m/s2"},"z":{"value":15.24488164994629,"unit":"m/s2"}}})");
-static constexpr std::string_view json_noauth(R"({"longitude":4.774186840897145,"latitude":51.59384817617493,"createdById":"5c7c3bbd80e8ae3154d04912","createdBySecret":"$86d0d71b0abb9681a5984de91d07b7f434424492933d3069efa2a18e325bd911==","data":{"x":{"value":3.7348298850142325,"unit":"m/s2"},"y":{"value":95.1696675190223,"unit":"m/s2"},"z":{"value":15.24488164994629,"unit":"m/s2"}}})");
-static constexpr std::string_view json_notfound(R"({"longitude":4.774186840897145,"latitude":51.59384817617493,"createdById":"6c7c3bbd80e8ae3154d04912","createdBySecret":"$76d0d71b0abb9681a5984de91d07b7f434424492933d3069efa2a18e325bd911==","data":{"x":{"value":3.7348298850142325,"unit":"m/s2"},"y":{"value":95.1696675190223,"unit":"m/s2"},"z":{"value":15.24488164994629,"unit":"m/s2"}}})");
+//static constexpr std::string_view json_noauth(R"({"longitude":4.774186840897145,"latitude":51.59384817617493,"createdById":"5c7c3bbd80e8ae3154d04912","createdBySecret":"$86d0d71b0abb9681a5984de91d07b7f434424492933d3069efa2a18e325bd911==","data":{"x":{"value":3.7348298850142325,"unit":"m/s2"},"y":{"value":95.1696675190223,"unit":"m/s2"},"z":{"value":15.24488164994629,"unit":"m/s2"}}})");
+//static constexpr std::string_view json_notfound(R"({"longitude":4.774186840897145,"latitude":51.59384817617493,"createdById":"6c7c3bbd80e8ae3154d04912","createdBySecret":"$76d0d71b0abb9681a5984de91d07b7f434424492933d3069efa2a18e325bd911==","data":{"x":{"value":3.7348298850142325,"unit":"m/s2"},"y":{"value":95.1696675190223,"unit":"m/s2"},"z":{"value":15.24488164994629,"unit":"m/s2"}}})");
 
 static std::vector<std::pair<std::string, std::string>> sensors;
 
@@ -62,36 +62,20 @@ static void generate_data(sensateiot::test::SensorRepository& sensors, sensateio
 	}
 }
 
-static void load_sensors(const std::string& path)
-{
-	std::ifstream file(path);
-	std::stringstream sstream;
-	std::string json;
-
-	while( std::getline(file, json) ) {
-		sstream << json;
-	}
-
-	sstream << std::endl;
-	json = sstream.str();
-
-	std::cout << json << std::endl;
-}
-
-static void test_measurement_processing(std::string path)
+static void test_measurement_processing()
 {
 	using namespace sensateiot;
 	config::Config config;
 	boost::uuids::random_generator gen;
 
-	load_sensors(path);
-
 	config.SetWorkers(3);
 	config.SetInterval(1000);
+	config.SetInternalBatchSize(10000);
 
 	auto& mqtt = config.GetMqtt().GetPrivateBroker();
 	mqtt.GetBroker().SetHostName("tcp://127.0.0.1");
 	mqtt.GetBroker().SetPortNumber(1883);
+	mqtt.SetBulkMeasurementTopic("internal/test/measurements");
 
 	test::TestMqttClient client;
 	client.Connect(config.GetMqtt());
@@ -229,7 +213,7 @@ int main(int argc, char** argv)
 {
 	mongoc_init();
 	test_datacache();
-	test_measurement_processing(argv[1]);
+	test_measurement_processing();
 	mongoc_cleanup();
 
 	google::protobuf::ShutdownProtobufLibrary();

@@ -7,7 +7,7 @@
 
 #include <sensateiot/application.h>
 #include <sensateiot/mqtt/mqttclient.h>
-#include <sensateiot/mqtt/messageservice.h>
+#include <sensateiot/services/messageservice.h>
 #include <sensateiot/util/mongodbclientpool.h>
 
 #include <sensateiot/services/userrepository.h>
@@ -20,6 +20,8 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+
+#include <google/protobuf/any.h>
 
 template<typename T>
 std::string ToHex(const T &value, size_t padding = 1)
@@ -106,6 +108,7 @@ namespace sensateiot
 		} catch(json::exception &ex) {
 			std::cerr << "Unable to parse configuration file: " <<
 			          ex.what() << std::endl;
+			throw;
 		}
 	}
 
@@ -168,17 +171,17 @@ namespace sensateiot
 
 void CreateApplication(const char *path)
 {
-	auto &app = sensateiot::Application::GetApplication();
-
 	try {
+		auto &app = sensateiot::Application::GetApplication();
 		app.SetConfig(path);
 		app.Run();
 		sensateiot::util::MongoDBClientPool::Destroy();
+		google::protobuf::ShutdownProtobufLibrary();
 	} catch(std::runtime_error &ex) {
 		std::cerr << "Unable to run application: " << ex.what();
-		throw ex;
+		throw;
 	} catch(std::exception &ex) {
 		std::cerr << "Unable to run application: " << ex.what();
-		throw ex;
+		throw;
 	}
 }

@@ -12,7 +12,7 @@
 
 #include <boost/uuid/uuid.hpp>
 
-#include <sensateiot/mqtt/measurementhandler.h>
+#include <sensateiot/handlers/measurementhandler.h>
 #include <sensateiot/mqtt/imqttclient.h>
 
 #include <sensateiot/data/datacache.h>

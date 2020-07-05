@@ -24,7 +24,7 @@
 #include <sensateiot/mqtt/mqttinternalcallback.h>
 #include <sensateiot/data/datacache.h>
 
-#include <sensateiot/mqtt/messageservice.h>
+#include <sensateiot/services/messageservice.h>
 #include <sensateiot/util/mongodbclientpool.h>
 #include <sensateiot/services/userrepository.h>
 #include <sensateiot/services/apikeyrepository.h>
@@ -131,8 +131,6 @@ static void generate_measurements(std::string path, int max)
 
 		measurements.emplace_back(std::move(measurement));
 	}
-
-	std::cout << "Generated " << measurements.size() << " measurements!" << std::endl;
 }
 
 static void ParseConfig(sensateiot::config::Config& config, const std::string& path)

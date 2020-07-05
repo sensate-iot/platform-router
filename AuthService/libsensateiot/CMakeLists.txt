@@ -30,12 +30,14 @@ SET(SOURCES
 	services/apikeyrepository.cpp
 	services/sensorrepository.cpp
 	services/abstractsensorrepository.cpp
+	services/messageservice.cpp
 
 	data/datacache.cpp
 	data/measurementvalidator.cpp
 
-	mqtt/messageservice.cpp
-	mqtt/measurementhandler.cpp
+	handlers/measurementhandler.cpp
+	handlers/abstracthandler.cpp
+
 	mqtt/mqttcallback.cpp
 	mqtt/mqttclient.cpp
 	mqtt/mqttinternalcallback.cpp
@@ -73,10 +75,11 @@ set(LIB_HEADERS
 	sensateiot/models/rawmeasurement.h
 	sensateiot/models/sensor.h
 	sensateiot/models/user.h
-
 	sensateiot/mqtt/imqttclient.h
-	sensateiot/mqtt/measurementhandler.h
-	sensateiot/mqtt/messageservice.h
+
+	sensateiot/handlers/abstracthandler.h
+	sensateiot/handlers/measurementhandler.h
+
 	sensateiot/mqtt/mqttcallback.h
 	sensateiot/mqtt/mqttclient.h
 	sensateiot/mqtt/mqttinternalcallback.h
@@ -86,6 +89,7 @@ set(LIB_HEADERS
 	sensateiot/services/abstractuserrepository.h
 	sensateiot/services/apikeyrepository.h
 	sensateiot/services/sensorrepository.h
+	sensateiot/services/messageservice.h
 	sensateiot/services/userrepository.h
 
 	sensateiot/stl/clist.h

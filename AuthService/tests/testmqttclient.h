@@ -8,6 +8,7 @@
 #pragma once
 
 #include <sensateiot/mqtt/imqttclient.h>
+#include <sensateiot/util/log.h>
 
 #include <string>
 #include <iostream>
@@ -23,7 +24,11 @@ namespace sensateiot::test
 		
 		void Publish(const std::string& topic, const std::string& msg) override
 		{
-			std::cout << "Publish on topic: " << topic << " || Message: " << msg << std::endl;
+			auto& log = util::Log::GetLog();
+			std::stringstream value;
+
+			value << "Publish on topic: " << topic;
+			log << value.str() << util::Log::NewLine;
 		}
 	};
 }
