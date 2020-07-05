@@ -12,7 +12,7 @@
 
 #include <boost/uuid/uuid.hpp>
 
-#include <sensateiot/handlers/measurementhandler.h>
+#include <sensateiot/consumers/measurementconsumer.h>
 #include <sensateiot/mqtt/imqttclient.h>
 
 #include <sensateiot/data/datacache.h>
@@ -50,7 +50,7 @@ namespace sensateiot::mqtt
 		mutable std::shared_mutex m_lock;
 		config::Config m_conf;
 		std::atomic_uint8_t m_index;
-		std::vector<MeasurementHandler> m_handlers;
+		std::vector<consumers::MeasurementConsumer> m_handlers;
 
 		data::DataCache m_cache;
 		data::MeasurementValidator m_validator;
@@ -60,7 +60,7 @@ namespace sensateiot::mqtt
 		stl::ReferenceWrapper<services::AbstractUserRepository> m_userRepo;
 		stl::ReferenceWrapper<services::AbstractSensorRepository> m_sensorRepo;
 
-		std::vector<models::ObjectId> RawProcess(bool leftOvers = false);
+		std::vector<models::ObjectId> RawProcess(bool postProcess = false);
 
 		static constexpr int Increment = 1;
 

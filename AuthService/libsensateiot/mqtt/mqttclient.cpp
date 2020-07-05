@@ -17,6 +17,21 @@ namespace sensateiot::mqtt
 		try {
 			auto& log = util::Log::GetLog();
 			log << "Connecting to MQTT broker: " << this->m_client.get_server_uri() << util::Log::NewLine;
+
+			auto token = this->m_client.connect(this->m_opts);
+			token->wait();
+		} catch(const ::mqtt::exception& ex) {
+			std::cerr << "Unable to connect MQTT client: " <<
+			          ex.what() << std::endl;
+		}
+	}
+	
+	void BaseMqttClient::Connect(const config::Mqtt &config, const ns_base::mqtt::connect_options& opts)
+	{
+		try {
+			auto& log = util::Log::GetLog();
+			log << "Connecting to MQTT broker: " << this->m_client.get_server_uri() << util::Log::NewLine;
+
 			auto token = this->m_client.connect();
 			token->wait();
 		} catch(const ::mqtt::exception& ex) {
@@ -62,6 +77,10 @@ namespace sensateiot::mqtt
 	void MqttClient::Connect(const config::Mqtt &config)
 	{
 		this->SetCallback(this->m_cb);
+
+		this->m_opts.set_user_name(config.GetPublicBroker().GetBroker().GetUsername());
+		this->m_opts.set_password(config.GetPublicBroker().GetBroker().GetPassword());
+
 		this->m_cb.set_config(config);
 		BaseMqttClient::Connect(config);
 	}
@@ -76,6 +95,9 @@ namespace sensateiot::mqtt
 	void InternalMqttClient::Connect(const config::Mqtt &config)
 	{
 		this->SetCallback(this->m_cb);
+
+		this->m_opts.set_user_name(config.GetPrivateBroker().GetBroker().GetUsername());
+		this->m_opts.set_password(config.GetPrivateBroker().GetBroker().GetPassword());
 		BaseMqttClient::Connect(config);
 	}
 }

@@ -35,8 +35,8 @@ SET(SOURCES
 	data/datacache.cpp
 	data/measurementvalidator.cpp
 
-	handlers/measurementhandler.cpp
-	handlers/abstracthandler.cpp
+	consumers/measurementconsumer.cpp
+	consumers/abstractconsumer.cpp
 
 	mqtt/mqttcallback.cpp
 	mqtt/mqttclient.cpp
@@ -77,8 +77,8 @@ set(LIB_HEADERS
 	sensateiot/models/user.h
 	sensateiot/mqtt/imqttclient.h
 
-	sensateiot/handlers/abstracthandler.h
-	sensateiot/handlers/measurementhandler.h
+	sensateiot/consumers/abstractconsumer.h
+	sensateiot/consumers/measurementconsumer.h
 
 	sensateiot/mqtt/mqttcallback.h
 	sensateiot/mqtt/mqttclient.h

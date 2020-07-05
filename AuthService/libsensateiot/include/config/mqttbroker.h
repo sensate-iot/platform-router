@@ -50,6 +50,7 @@ namespace sensateiot::config
 	class DLL_EXPORT PublicBroker {
 	public:
 		MqttBroker& GetBroker() ;
+		const MqttBroker& GetBroker() const;
 
 		[[nodiscard]]
 		const std::string& GetMeasurementTopic() const;
@@ -72,7 +73,8 @@ namespace sensateiot::config
 
 	class DLL_EXPORT PrivateBroker {
 	public:
-		MqttBroker& GetBroker() ;
+		const MqttBroker& GetBroker() const;
+		MqttBroker& GetBroker();
 
 		[[nodiscard]]
 		const std::string& GetMeasurementTopic() const;

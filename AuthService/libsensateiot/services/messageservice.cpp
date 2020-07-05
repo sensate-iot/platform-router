@@ -28,12 +28,12 @@ namespace sensateiot::mqtt
 
 		for(auto idx = 0U; idx < 1; idx++) {
 		//for(auto idx = 0U; idx < std::thread::hardware_concurrency(); idx++) {
-			MeasurementHandler handler(client, this->m_cache, conf);
+			consumers::MeasurementConsumer handler(client, this->m_cache, conf);
 			this->m_handlers.emplace_back(std::move(handler));
 		}
 	}
 	
-	std::vector<models::ObjectId> MessageService::RawProcess(bool leftOvers)
+	std::vector<models::ObjectId> MessageService::RawProcess(bool postProcess)
 	{
 		auto &log = util::Log::GetLog();
 		std::vector<models::ObjectId> ids;
@@ -44,16 +44,18 @@ namespace sensateiot::mqtt
 		std::shared_lock lock(this->m_lock);
 
 		for(auto &handler : this->m_handlers) {
-			boost::fibers::packaged_task<ProcessingStats()> tsk(
-				[&h = handler, &l = this->m_lock, lo = leftOvers]{
-					std::shared_lock lock(l);
+			auto processor = [&h = handler, &l = this->m_lock, pp = postProcess]{
 
-					if(lo) {
-						return std::make_pair(h.ProcessLeftOvers(), std::vector<models::ObjectId>());
-					}
+				std::shared_lock lock(l);
 
-					return h.Process();
-			});
+				if(pp) {
+					return std::make_pair(h.PostProcess(), std::vector<models::ObjectId>());
+				}
+
+				return h.Process();
+			};
+			
+			boost::fibers::packaged_task<ProcessingStats()> tsk(std::move(processor));
 
 			results.emplace_back(tsk.get_future());
 			queue.emplace_back(std::move(tsk));
@@ -72,15 +74,20 @@ namespace sensateiot::mqtt
 		std::size_t authorized = 0ULL;
 
 		try {
-
 			for(auto&& future : results) {
 				if(!future.valid()) {
 					continue;
 				}
 
 				auto tmp = future.get();
-				ids.resize(ids.size() + tmp.second.size());
-				std::move(std::begin(tmp.second), std::end(tmp.second), std::back_inserter(ids));
+
+				if(ids.empty()) {
+					ids = std::move(tmp.second);
+				} else {
+					ids.resize(ids.size() + tmp.second.size());
+					std::move(std::begin(tmp.second), std::end(tmp.second), std::back_inserter(ids));
+				}
+
 				authorized += tmp.first;
 			}
 		} catch(boost::fibers::future_error& error) {
@@ -137,7 +144,7 @@ namespace sensateiot::mqtt
 		++this->m_count;
 
 		auto &repo = this->m_handlers[current];
-		repo.PushMeasurement(std::move(pair));
+		repo.PushMessage(std::move(pair));
 	}
 
 	void MessageService::Load(std::vector<models::ObjectId> &objIds)
@@ -151,6 +158,10 @@ namespace sensateiot::mqtt
 
 		auto sensors = this->m_sensorRepo->GetRange(objIds, 0, 0);
 		boost::unordered_set<boost::uuids::uuid> uuids;
+
+		if(sensors.empty()) {
+			return;
+		}
 
 		for(auto &sensor : sensors) {
 			uuids.insert(sensor.GetOwner());

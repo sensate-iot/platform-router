@@ -7,30 +7,30 @@
 
 #include <iostream>
 
-#include <sensateiot/mqtt/measurementhandler.h>
+#include <sensateiot/consumers/measurementconsumer.h>
 #include <sensateiot/util/log.h>
 #include <sensateiot/util/sha256.h>
 #include <sensateiot/util/protobuf.h>
 
-namespace sensateiot::mqtt
+namespace sensateiot::consumers
 {
-	MeasurementHandler::MeasurementHandler(IMqttClient &client, data::DataCache &cache, const config::Config& conf) :
+	MeasurementConsumer::MeasurementConsumer(mqtt::IMqttClient &client, data::DataCache &cache, config::Config conf) :
 		m_internal(client),
 		m_cache(cache),
 		m_regex(SearchRegex.data()),
-		m_config(conf)
+		m_config(std::move(conf))
 	{
 		this->m_measurements.reserve(100000);
 	}
 
-	MeasurementHandler::~MeasurementHandler()
+	MeasurementConsumer::~MeasurementConsumer()
 	{
 		this->m_lock.lock();
 		this->m_measurements.clear();
 		this->m_lock.unlock();
 	}
 
-	MeasurementHandler::MeasurementHandler(MeasurementHandler &&rhs) noexcept :
+	MeasurementConsumer::MeasurementConsumer(MeasurementConsumer &&rhs) noexcept :
 		m_regex(SearchRegex.data()), m_config(std::move(rhs.m_config))
 	{
 		std::scoped_lock l(this->m_lock, rhs.m_lock);
@@ -41,7 +41,7 @@ namespace sensateiot::mqtt
 		this->m_leftOver = std::move(rhs.m_leftOver);
 	}
 
-	MeasurementHandler &MeasurementHandler::operator=(MeasurementHandler &&rhs) noexcept
+	MeasurementConsumer &MeasurementConsumer::operator=(MeasurementConsumer &&rhs) noexcept
 	{
 		std::scoped_lock l(this->m_lock, rhs.m_lock);
 
@@ -54,7 +54,7 @@ namespace sensateiot::mqtt
 		return *this;
 	}
 
-	bool MeasurementHandler::ValidateMeasurement(const models::Sensor& sensor, MeasurementPair & pair) const
+	bool MeasurementConsumer::ValidateMeasurement(const models::Sensor& sensor, MessagePair & pair) const
 	{
 		auto result = RE2::Replace(&pair.first, this->m_regex, sensor.GetSecret());
 
@@ -68,7 +68,7 @@ namespace sensateiot::mqtt
 		return pair.second.GetKey() == sensor.GetSecret();
 	}
 
-	void MeasurementHandler::PublishAuthorizedMessages(const std::vector<models::RawMeasurement>& authorized) 
+	void MeasurementConsumer::PublishAuthorizedMessages(const std::vector<models::RawMeasurement>& authorized) 
 	{
 		for(std::size_t idx = 0UL; idx < authorized.size(); idx += this->m_config.GetInternalBatchSize()) {
 			auto begin = authorized.begin() + idx;
@@ -81,15 +81,15 @@ namespace sensateiot::mqtt
 		}
 	}
 
-	void MeasurementHandler::PushMeasurement(MeasurementPair measurement)
+	void MeasurementConsumer::PushMessage(MessagePair measurement)
 	{
 		std::scoped_lock l(this->m_lock);
 		this->m_measurements.emplace_back(std::move(measurement));
 	}
 
-	std::size_t MeasurementHandler::ProcessLeftOvers()
+	std::size_t MeasurementConsumer::PostProcess()
 	{
-		std::vector<MeasurementPair> data;
+		std::vector<MessagePair> data;
 		SensorLookupType sensor;
 
 		this->m_lock.lock();
@@ -137,10 +137,10 @@ namespace sensateiot::mqtt
 		return authorized.size();
 	}
 
-	std::pair<std::size_t, std::vector<models::ObjectId>> MeasurementHandler::Process()
+	MeasurementConsumer::ProcessingStats MeasurementConsumer::Process()
 	{
-		std::vector<MeasurementPair> data;
-		std::vector<MeasurementPair> leftOver;
+		std::vector<MessagePair> data;
+		std::vector<MessagePair> leftOver;
 		std::vector<models::ObjectId> notFound;
 		SensorLookupType sensor;
 		auto& log = util::Log::GetLog();
@@ -151,7 +151,7 @@ namespace sensateiot::mqtt
 		this->m_measurements.clear();
 		this->m_lock.unlock();
 
-		std::sort(std::begin(data), std::end(data), [](const MeasurementPair& x, const MeasurementPair& y)
+		std::sort(std::begin(data), std::end(data), [](const MessagePair& x, const MessagePair& y)
 		{
 			return x.second.GetObjectId().compare(y.second.GetObjectId()) < 0;
 		});
@@ -168,7 +168,7 @@ namespace sensateiot::mqtt
 				if(!this->m_cache->IsBlackListed(pair.second.GetObjectId())) {
 					/* Add to not found list & continue */
 					notFound.push_back(pair.second.GetObjectId());
-					leftOver.emplace_back(std::forward<MeasurementPair>(pair));
+					leftOver.emplace_back(std::forward<MessagePair>(pair));
 				}
 
 				continue;
