@@ -34,6 +34,7 @@ SET(SOURCES
 
 	data/datacache.cpp
 	data/measurementvalidator.cpp
+	data/bulkmeasurementvalidator.cpp
 
 	consumers/measurementconsumer.cpp
 	consumers/abstractconsumer.cpp
@@ -61,6 +62,7 @@ set(LIB_HEADERS
 	sensateiot/compiler/compiler.h
 
 	sensateiot/data/datacache.h
+	sensateiot/data/bulkmeasurementvalidator.h
 	sensateiot/data/measurementvalidator.h
 
 	sensateiot/detail/redblacktree.h
