@@ -30,13 +30,17 @@ namespace sensateiot::util
 		stl::SmallVector<std::uint8_t, Sha256Size> otherHex;
 		std::uint8_t values[Sha256Size];
 
-		boost::algorithm::unhex(other.begin(), other.end(), std::back_inserter(otherHex));
-		auto result = sha256(data);
-		SHA256_CTX ctx;
+		try {
+			boost::algorithm::unhex(other.begin(), other.end(), std::back_inserter(otherHex));
+			auto result = sha256(data);
+			SHA256_CTX ctx;
 
-		sha256_init(&ctx);
-		sha256_update(&ctx, reinterpret_cast<const uint8_t *>(data.c_str()), data.length());
-		sha256_final(&ctx, values);
+			sha256_init(&ctx);
+			sha256_update(&ctx, reinterpret_cast<const uint8_t *>(data.c_str()), data.length());
+			sha256_final(&ctx, values);
+		} catch(boost::exception&) {
+			return false;
+		}
 
 		return memcmp(otherHex.data(), values, Sha256Size) == 0;
 	}

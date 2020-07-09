@@ -25,12 +25,12 @@ namespace sensateiot::detail
 
 			if (json.HasMember(models::RawMeasurement::Longitude.data()) &&
 				json.HasMember(models::RawMeasurement::Latitude.data())) {
-				raw.SetCoordinates(json[models::RawMeasurement::Longitude].GetDouble(),
-					json[models::RawMeasurement::Latitude].GetDouble());
+				raw.SetCoordinates(json[models::RawMeasurement::Longitude.data()].GetDouble(),
+					json[models::RawMeasurement::Latitude.data()].GetDouble());
 			}
 
 			if (json.HasMember(models::RawMeasurement::Timestamp.data())) {
-				raw.SetCreatedTimestamp(json[models::RawMeasurement::Timestamp].GetString());
+				raw.SetCreatedTimestamp(json[models::RawMeasurement::Timestamp.data()].GetString());
 			}
 
 			auto end = json["data"].MemberEnd();
@@ -39,18 +39,18 @@ namespace sensateiot::detail
 				auto& value = it->value;
 
 				entry.m_key = it->name.GetString();
-				entry.m_value = value[models::RawMeasurement::DataValue].GetDouble();
+				entry.m_value = value[models::RawMeasurement::DataValue.data()].GetDouble();
 
 				if (value.HasMember(models::RawMeasurement::DataUnit.data())) {
-					entry.m_unit = value[models::RawMeasurement::DataUnit].GetString();
+					entry.m_unit = value[models::RawMeasurement::DataUnit.data()].GetString();
 				}
 
 				if (value.HasMember(models::RawMeasurement::DataAccuracy.data())) {
-					entry.m_accuracy = value[models::RawMeasurement::DataAccuracy].GetDouble();
+					entry.m_accuracy = value[models::RawMeasurement::DataAccuracy.data()].GetDouble();
 				}
 
 				if (value.HasMember(models::RawMeasurement::DataPrecision.data())) {
-					entry.m_precision = value[models::RawMeasurement::DataPrecision].GetDouble();
+					entry.m_precision = value[models::RawMeasurement::DataPrecision.data()].GetDouble();
 				}
 
 				entries.emplace_back(std::move(entry));

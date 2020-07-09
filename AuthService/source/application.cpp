@@ -57,7 +57,7 @@ namespace sensateiot
 
 		// Internal client
 		mqtt::MqttInternalCallback icb;
-		auto ihost = this->m_config.GetMqtt().GetPublicBroker().GetBroker().GetUri();
+		auto ihost = this->m_config.GetMqtt().GetPrivateBroker().GetBroker().GetUri();
 		mqtt::InternalMqttClient iclient(ihost, "3lasdfjlas", std::move(icb));
 		iclient.Connect(this->m_config.GetMqtt());
 
@@ -179,9 +179,7 @@ void CreateApplication(const char *path)
 		google::protobuf::ShutdownProtobufLibrary();
 	} catch(std::runtime_error &ex) {
 		std::cerr << "Unable to run application: " << ex.what();
-		throw;
 	} catch(std::exception &ex) {
 		std::cerr << "Unable to run application: " << ex.what();
-		throw;
 	}
 }
