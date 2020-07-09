@@ -49,21 +49,27 @@ function generateMeasurement(args) {
 		data: {
 			x: {
 				value: Math.random() * 10,
-				unit: "m/s2"
+				unit: "m/s2",
+				precision: 0.01,
+				accuracy:  0.5
 			},
 			y: {
 				value: Math.random() * 100,
-				unit: "m/s2"
+				unit: "m/s2",
+				precision: 0.01,
+				accuracy:  0.5
 			},
 			z: {
 				value: Math.random() * 20,
-				unit: "m/s2"
+				unit: "m/s2",
+				precision: 0.01,
+				accuracy:  0.5
 			}
 		}
 	}
 
 	const hash = crypto.createHash('sha256').update(JSON.stringify(measurement));
-	measurement.CreatedBySecret = `$${hash.digest('hex')}==`;
+	measurement.createdBySecret = `$${hash.digest('hex')}==`;
 
 	return measurement;
 }
