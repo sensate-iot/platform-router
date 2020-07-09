@@ -60,7 +60,7 @@ namespace sensateiot::mqtt
 		stl::ReferenceWrapper<services::AbstractUserRepository> m_userRepo;
 		stl::ReferenceWrapper<services::AbstractSensorRepository> m_sensorRepo;
 
-		std::vector<models::ObjectId> RawProcess(bool postProcess = false);
+		std::vector<models::ObjectId> Process(bool postProcess);
 
 		static constexpr int Increment = 1;
 

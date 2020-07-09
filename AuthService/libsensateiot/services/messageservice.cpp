@@ -32,7 +32,7 @@ namespace sensateiot::mqtt
 		}
 	}
 	
-	std::vector<models::ObjectId> MessageService::RawProcess(bool postProcess)
+	std::vector<models::ObjectId> MessageService::Process(bool postProcess)
 	{
 		auto &log = util::Log::GetLog();
 		std::vector<models::ObjectId> ids;
@@ -109,13 +109,13 @@ namespace sensateiot::mqtt
 		
 		log << "Processing " << std::to_string(count) << " measurements!" << util::Log::NewLine;
 		auto start = boost::chrono::system_clock::now();
-		auto ids = this->RawProcess();
+		auto ids = this->Process(false);
 
 		if(!ids.empty()) {
 			this->Load(ids);
 		}
 
-		this->RawProcess(true);
+		this->Process(true);
 
 		auto diff = boost::chrono::system_clock::now() - start;
 		using Millis = boost::chrono::milliseconds;
