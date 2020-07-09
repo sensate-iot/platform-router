@@ -167,9 +167,6 @@ static void test_messageservice(std::string path)
 	util::Log::StartLogging(config.GetLogging());
 	util::MongoDBClientPool::Init(config.GetDatabase().GetMongoDB());
 	
-	//test::TestMqttClient client;
-	//client.Connect(config.GetMqtt());
-
 	sensateiot::mqtt::MqttInternalCallback icb;
 	auto ihost = config.GetMqtt().GetPublicBroker().GetBroker().GetUri();
 	sensateiot::mqtt::InternalMqttClient iclient(ihost, "3lasdfjlas", std::move(icb));

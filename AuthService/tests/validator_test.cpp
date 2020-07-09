@@ -18,9 +18,7 @@
 #include <iostream>
 #include <fstream>
 
-//static constexpr std::string_view json("{\"longitude\":4.774186840897145,\"latitude\":51.59384817617493,\"createdById\":\"5c7c3bbd80e8ae3154d04912\",\"createdBySecret\":\"$5e7a36d90554c9b805345533de22eafbb55b081c69fed55c8311f46b0e45527b==\",\"data\":{\"x\":{\"value\":3.7348298850142325,\"unit\":\"m/s2\"},\"y\":{\"value\":95.1696675190223,\"unit\":\"m/s2\"},\"z\":{\"value\":15.24488164994629,\"unit\":\"m/s2\"}}}");
 static constexpr std::string_view json(R"({"longitude":4.774186840897145,"latitude":51.59384817617493,"createdById":"5c7c3bbd80e8ae3154d04912","createdBySecret":"$76d0d71b0abb9681a5984de91d07b7f434424492933d3069efa2a18e325bd911==","data":{"x":{"value":3.7348298850142325,"unit":"m/s2"},"y":{"value":95.1696675190223,"unit":"m/s2"},"z":{"value":15.24488164994629,"unit":"m/s2"}}})");
-//static constexpr auto search_regex = ctll::fixed_string{ "\\$[a-f0-9]{64}==" };
 static const RE2 search_regex("\\$[a-f0-9]{64}==");
 
 static void validate_bulk()
