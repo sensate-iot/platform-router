@@ -26,8 +26,7 @@ namespace sensateiot::mqtt
 		std::unique_lock lock(this->m_lock);
 		std::string uri = this->m_conf.GetMqtt().GetPrivateBroker().GetBroker().GetUri();
 
-		for(auto idx = 0U; idx < 1; idx++) {
-		//for(auto idx = 0U; idx < std::thread::hardware_concurrency(); idx++) {
+		for(auto idx = 0U; idx < std::thread::hardware_concurrency(); idx++) {
 			consumers::MeasurementConsumer handler(client, this->m_cache, conf);
 			this->m_handlers.emplace_back(std::move(handler));
 		}
