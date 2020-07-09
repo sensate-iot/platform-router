@@ -25,12 +25,12 @@ namespace sensateiot::detail
 
 			if (json.HasMember(models::RawMeasurement::Longitude.data()) &&
 				json.HasMember(models::RawMeasurement::Latitude.data())) {
-				raw.SetCoordinates(json[models::RawMeasurement::Longitude.data()].GetDouble(),
-					json[models::RawMeasurement::Latitude.data()].GetDouble());
+				raw.SetCoordinates(json[models::RawMeasurement::Longitude].GetDouble(),
+					json[models::RawMeasurement::Latitude].GetDouble());
 			}
 
 			if (json.HasMember(models::RawMeasurement::Timestamp.data())) {
-				raw.SetCreatedTimestamp(json[models::RawMeasurement::Timestamp.data()].GetString());
+				raw.SetCreatedTimestamp(json[models::RawMeasurement::Timestamp].GetString());
 			}
 
 			auto end = json["data"].MemberEnd();
@@ -39,18 +39,18 @@ namespace sensateiot::detail
 				auto& value = it->value;
 
 				entry.m_key = it->name.GetString();
-				entry.m_value = value[models::RawMeasurement::DataValue.data()].GetDouble();
+				entry.m_value = value[models::RawMeasurement::DataValue].GetDouble();
 
 				if (value.HasMember(models::RawMeasurement::DataUnit.data())) {
-					entry.m_unit = value[models::RawMeasurement::DataUnit.data()].GetString();
+					entry.m_unit = value[models::RawMeasurement::DataUnit].GetString();
 				}
 
 				if (value.HasMember(models::RawMeasurement::DataAccuracy.data())) {
-					entry.m_accuracy = value[models::RawMeasurement::DataAccuracy.data()].GetDouble();
+					entry.m_accuracy = value[models::RawMeasurement::DataAccuracy].GetDouble();
 				}
 
 				if (value.HasMember(models::RawMeasurement::DataPrecision.data())) {
-					entry.m_precision = value[models::RawMeasurement::DataPrecision.data()].GetDouble();
+					entry.m_precision = value[models::RawMeasurement::DataPrecision].GetDouble();
 				}
 
 				entries.emplace_back(std::move(entry));
@@ -59,7 +59,7 @@ namespace sensateiot::detail
 			raw.SetData(std::move(entries));
 			return std::make_pair(true, std::move(raw));
 		}
-		catch (std::exception& ex) {
+		catch (std::exception&) {
 			return std::make_pair(false, models::RawMeasurement());
 		}
 	}

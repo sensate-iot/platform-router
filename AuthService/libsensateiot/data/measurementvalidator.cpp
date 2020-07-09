@@ -21,7 +21,7 @@ namespace sensateiot::data
 			json.Parse(str.c_str());
 
 			return detail::ParseSingleMeasurement(json);
-		} catch(std::exception &ex) {
+		} catch(std::exception &) {
 			return std::make_pair(false, models::RawMeasurement());
 		}
 	}
