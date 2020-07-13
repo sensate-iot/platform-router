@@ -27,7 +27,7 @@ static void validate_bulk()
 	sensateiot::data::BulkMeasurementValidator bmv;
 
 	sstream << '[';
-	for (auto idx = 0UL; idx < 9999; idx++) {
+	for (auto idx = 0UL; idx < 99; idx++) {
 		sstream << json << ',';
 	}
 
@@ -40,23 +40,14 @@ static void validate_bulk()
 	std::cout << "Parsing measurements..." << std::endl;
 	std::string str = sstream.str();
 
-
-	std::ofstream f;
-	f.open("data.json");
-	f << str;
-	f.close();
-
-
 	ClockType::time_point start = ClockType::now();
-	using Millis = std::chrono::milliseconds;
-;
 
 	auto result = bmv(str);
 	ClockType::time_point end = ClockType::now();
 
 	std::cout << "Parsed " << result.value().size() << " measurements." << std::endl;
 	auto diff = end - start;
-	std::cout << "Parsing took: " << std::chrono::duration_cast<Millis>(diff).count() << "ms." << std::endl;
+	std::cout << "Parsing took: " << std::chrono::duration_cast<std::chrono::microseconds>(diff).count() << "us." << std::endl;
 }
 
 static void validate_indiv()
@@ -68,9 +59,8 @@ static void validate_indiv()
 
 	std::cout << "Parsing measurements..." << std::endl;
 	ClockType::time_point start = ClockType::now();
-	using Millis = std::chrono::milliseconds;
 
-	for (auto idx = 0UL; idx < 10000; idx++) {
+	for (auto idx = 0UL; idx < 100; idx++) {
 		auto result = validator(std::string(json));
 
 		if (!result.first) {
@@ -83,7 +73,7 @@ static void validate_indiv()
 	ClockType::time_point end = ClockType::now();
 	std::cout << "Parsed " << data.size() << " measurements." << std::endl;
 	auto diff = end - start;
-	std::cout << "Parsing took: " << std::chrono::duration_cast<Millis>(diff).count() << "ms." << std::endl;
+	std::cout << "Parsing took: " << std::chrono::duration_cast<std::chrono::microseconds>(diff).count() << "us." << std::endl;
 }
 
 static void authorize_message()

@@ -19,8 +19,6 @@ namespace sensateiot::data
 	std::optional<std::vector<std::pair<std::string, models::RawMeasurement>>> BulkMeasurementValidator::operator()(const std::string& str) const
 	{
 		std::vector<std::pair<std::string, models::RawMeasurement>> measurements;
-		rapidjson::StringBuffer buf;
-		rapidjson::Writer<rapidjson::StringBuffer> writer(buf);
 
 		try {
 			rapidjson::Document doc;
@@ -34,6 +32,8 @@ namespace sensateiot::data
 				}
 
 
+				rapidjson::StringBuffer buf;
+				rapidjson::Writer<rapidjson::StringBuffer> writer(buf);
 				buf.Clear();
 				iter->Accept(writer);
 
