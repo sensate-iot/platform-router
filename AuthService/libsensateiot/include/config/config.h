@@ -35,6 +35,14 @@ namespace sensateiot::config
 		std::size_t GetInternalBatchSize() const;
 		void SetInternalBatchSize(std::size_t size);
 
+		[[nodiscard]]
+		std::uint16_t GetPort() const;
+		void SetPort(std::uint16_t port);
+
+		[[nodiscard]]
+		const std::string& GetBindAddress() const;
+		void SetBindAddress(const std::string& addr);
+
 		Logging& GetLogging();
 
 	private:
@@ -44,5 +52,7 @@ namespace sensateiot::config
 		int m_workers{};
 		int m_interval{};
 		std::size_t m_internalBatchSize{};
+		std::string m_bindAddr;
+		std::uint16_t m_port;
 	};
 }

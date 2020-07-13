@@ -24,6 +24,12 @@ SET(SOURCES
 	util/protobuf.cpp
 	util/base64.cpp
 
+	httpd/httpserver.cpp
+	httpd/httpsession.cpp
+	httpd/httplistener.cpp
+	httpd/httpresponse.cpp
+	httpd/httprequest.cpp
+
 	services/userrepository.cpp
 	services/abstractuserrepository.cpp
 	services/abstractapikeyrepository.cpp
@@ -71,6 +77,12 @@ set(LIB_HEADERS
 	sensateiot/detail/redblacktreeiterator.hpp
 	sensateiot/detail/redblacktreenode.h
 	sensateiot/detail/redblacktreenode.hpp
+
+	sensateiot/httpd/httpserver.h
+	sensateiot/httpd/httplistener.h
+	sensateiot/httpd/httpsession.h
+	sensateiot/httpd/httpresponse.h
+	sensateiot/httpd/httprequest.h
 
 	sensateiot/models/apikey.h
 	sensateiot/models/objectid.h

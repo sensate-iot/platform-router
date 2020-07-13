@@ -50,6 +50,26 @@ namespace sensateiot::config
 		this->m_internalBatchSize = size;
 	}
 
+	std::uint16_t Config::GetPort() const
+	{
+		return this->m_port;
+	}
+
+	void Config::SetPort(std::uint16_t port)
+	{
+		this->m_port = port;
+	}
+
+	const std::string& Config::GetBindAddress() const
+	{
+		return this->m_bindAddr;
+	}
+
+	void Config::SetBindAddress(const std::string& addr)
+	{
+		this->m_bindAddr = addr;
+	}
+
 	Logging &Config::GetLogging()
 	{
 		return this->m_logging;
