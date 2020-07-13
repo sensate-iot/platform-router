@@ -36,8 +36,8 @@ namespace sensateiot::config
 		void SetInternalBatchSize(std::size_t size);
 
 		[[nodiscard]]
-		std::uint16_t GetPort() const;
-		void SetPort(std::uint16_t port);
+		std::uint16_t GetHttpPort() const;
+		void SetHttpPort(std::uint16_t port);
 
 		[[nodiscard]]
 		const std::string& GetBindAddress() const;

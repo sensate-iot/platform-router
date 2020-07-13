@@ -5,19 +5,16 @@
  * @email  michel@michelmegens.net
  */
 
-#ifdef WIN32
-#define _WIN32_WINNT 0x0601
-#endif
-
-#include <boost/beast/core.hpp>
-#include <boost/beast/http.hpp>
-#include <boost/beast/version.hpp>
-#include <boost/asio.hpp>
 
 #include <sensateiot/httpd/httpsession.h>
 #include <sensateiot/httpd/httplistener.h>
 #include <sensateiot/httpd/httpserver.h>
 #include <sensateiot/util/log.h>
+
+#include <boost/beast/core.hpp>
+#include <boost/beast/http.hpp>
+#include <boost/beast/version.hpp>
+#include <boost/asio.hpp>
 
 #include <forward_list>
 
@@ -33,7 +30,7 @@ namespace sensateiot::httpd
 	void HttpServer::Run()
 	{
 		const auto addr = net::ip::make_address(this->m_config.GetBindAddress());
-		const auto port = this->m_config.GetPort();
+		const auto port = this->m_config.GetHttpPort();
 		const auto threads = 4;
 
 		net::io_context ctx{threads};
