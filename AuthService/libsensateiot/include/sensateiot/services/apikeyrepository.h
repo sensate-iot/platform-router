@@ -32,8 +32,5 @@ namespace sensateiot::services
 		std::vector<std::string> GetKeysFor(const std::vector<models::Sensor>& sensors) override;
 		std::vector<std::string> GetKeys(const std::vector<std::string>& ids) override;
 		std::vector<std::string> GetKeysByOwners(const boost::unordered_set<boost::uuids::uuid>& ids) override;
-
-	private:
-		pqxx::connection m_connection;
 	};
 }

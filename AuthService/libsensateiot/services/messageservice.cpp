@@ -176,12 +176,17 @@ namespace sensateiot::mqtt
 			return this->m_keyRepo->GetKeysFor(sensors);
 		});
 
-		auto users = user_f.get();
-		auto keys = key_f.get();
+		try {
+			auto users = user_f.get();
+			auto keys = key_f.get();
 
-		this->m_cache.AppendBlackList(objIds);
-		this->m_cache.Append(sensors);
-		this->m_cache.Append(users);
-		this->m_cache.Append(keys);
+			this->m_cache.Append(sensors);
+			this->m_cache.Append(users);
+			this->m_cache.Append(keys);
+			this->m_cache.AppendBlackList(objIds);
+		} catch (std::exception& ex) {
+			auto& log = util::Log::GetLog();
+			log << "PostgreSQL error while fetching users/keys: " << ex.what() << util::Log::NewLine;
+		}
 	}
 }

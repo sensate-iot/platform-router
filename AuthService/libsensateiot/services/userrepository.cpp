@@ -16,8 +16,7 @@
 
 namespace sensateiot::services
 {
-	UserRepository::UserRepository(const config::PostgreSQL& pgsql) :
-		AbstractUserRepository(pgsql), m_connection(pgsql.GetConnectionString())
+	UserRepository::UserRepository(const config::PostgreSQL& pgsql) : AbstractUserRepository(pgsql)
 	{
 		auto& log = util::Log::GetLog();
 
@@ -38,6 +37,7 @@ namespace sensateiot::services
 		             "         INNER JOIN \"Roles\" ON \"UserRoles\".\"RoleId\" = \"Roles\".\"Id\"\n"
 		             "GROUP BY \"Users\".\"Id\", \"BillingLockout\", \"Roles\".\"NormalizedName\" = 'BANNED'");
 
+		this->Reconnect();
 		pqxx::nontransaction q(this->m_connection);
 		pqxx::result res(q.exec(query));
 		std::vector<models::User> users;
@@ -71,7 +71,6 @@ namespace sensateiot::services
 		rv += ")";
 
 		std::string::size_type pos = 0u;
-
 		std::string query("SELECT \"Users\".\"Id\",\n"
 		             "       \"BillingLockout\",\n"
 		             "       \"Roles\".\"NormalizedName\" = 'BANNED' as \"Banned\"\n"
@@ -84,6 +83,7 @@ namespace sensateiot::services
 		pos = query.find('%', pos);
 		query.replace(pos, sizeof(char), rv);
 
+		this->Reconnect();
 		pqxx::nontransaction q(this->m_connection);
 		pqxx::result res(q.exec(query));
 		std::vector<models::User> users;

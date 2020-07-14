@@ -41,6 +41,7 @@ SET(SOURCES
 	services/sensorrepository.cpp
 	services/abstractsensorrepository.cpp
 	services/messageservice.cpp
+	services/abstractpostgresqlrepository.cpp
 
 	data/datacache.cpp
 	data/measurementvalidator.cpp
@@ -113,6 +114,7 @@ set(LIB_HEADERS
 	sensateiot/services/sensorrepository.h
 	sensateiot/services/messageservice.h
 	sensateiot/services/userrepository.h
+	sensateiot/services/abstractpostgresqlrepository.h
 
 	sensateiot/stl/clist.h
 	sensateiot/stl/map.h

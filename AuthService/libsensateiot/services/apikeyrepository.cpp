@@ -19,8 +19,7 @@
 
 namespace sensateiot::services
 {
-	ApiKeyRepository::ApiKeyRepository(const config::PostgreSQL &pgsql) :
-			AbstractApiKeyRepository(pgsql), m_connection(pgsql.GetConnectionString())
+	ApiKeyRepository::ApiKeyRepository(const config::PostgreSQL &pgsql) : AbstractApiKeyRepository(pgsql)
 	{
 		auto &log = util::Log::GetLog();
 
@@ -37,6 +36,7 @@ namespace sensateiot::services
 		                  "FROM \"ApiKeys\"\n"
 		                  "WHERE \"Type\" = 0 AND \"Revoked\" = FALSE");
 
+		this->Reconnect();
 		pqxx::nontransaction q(this->m_connection);
 		pqxx::result res(q.exec(query));
 		std::vector<std::string> keys;
@@ -73,6 +73,7 @@ namespace sensateiot::services
 		pos = query.find('?', pos);
 		query.replace(pos, sizeof(char), sstream.str());
 
+		this->Reconnect();
 		pqxx::nontransaction q(this->m_connection);
 		pqxx::result res(q.exec(query));
 		std::vector<std::string> keys;
@@ -108,6 +109,7 @@ namespace sensateiot::services
 		pos = query.find('?', pos);
 		query.replace(pos, sizeof(char), rv);
 
+		this->Reconnect();
 		pqxx::nontransaction q(this->m_connection);
 		pqxx::result res(q.exec(query));
 		std::vector<std::string> keys;
@@ -144,6 +146,7 @@ namespace sensateiot::services
 		pos = query.find('?', pos);
 		query.replace(pos, sizeof(char), rv);
 
+		this->Reconnect();
 		pqxx::nontransaction q(this->m_connection);
 		pqxx::result res(q.exec(query));
 		std::vector<std::string> keys;
