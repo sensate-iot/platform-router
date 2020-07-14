@@ -12,13 +12,13 @@
 #include <deque>
 #include <vector>
 
-namespace sensateiot::mqtt
+namespace sensateiot::services
 {
 	MessageService::MessageService(
-			IMqttClient &client,
-			services::AbstractUserRepository &users,
-			services::AbstractApiKeyRepository &keys,
-			services::AbstractSensorRepository &sensors,
+			mqtt::IMqttClient &client,
+			AbstractUserRepository &users,
+			AbstractApiKeyRepository &keys,
+			AbstractSensorRepository &sensors,
 			const config::Config &conf
 	) : m_conf(conf), m_index(0), m_count(0),
 	    m_keyRepo(keys), m_userRepo(users), m_sensorRepo(sensors)

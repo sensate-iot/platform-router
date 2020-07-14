@@ -176,7 +176,7 @@ static void test_messageservice(std::string path)
 	services::ApiKeyRepository keys(config.GetDatabase().GetPostgreSQL());
 	services::SensorRepository sensors(config.GetDatabase().GetMongoDB());
 
-	sensateiot::mqtt::MessageService service(iclient, users, keys, sensors, config);
+	sensateiot::services::MessageService service(iclient, users, keys, sensors, config);
 
 	auto& log = util::Log::GetLog();
 	auto start = boost::chrono::system_clock::now();

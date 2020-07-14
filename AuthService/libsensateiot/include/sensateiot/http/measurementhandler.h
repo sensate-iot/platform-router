@@ -20,11 +20,11 @@ namespace sensateiot::http
 	class MeasurementHandler : public AbstractHandler {
 	public:
 		explicit MeasurementHandler() = default;
-		explicit MeasurementHandler(mqtt::MessageService& service);
+		explicit MeasurementHandler(services::MessageService& service);
 
 		httpd::HttpResponse HandleRequest(const httpd::HttpRequest& request) override;
 
 	private:
-		stl::ReferenceWrapper<mqtt::MessageService> m_service;
+		stl::ReferenceWrapper<services::MessageService> m_service;
 	};
 }

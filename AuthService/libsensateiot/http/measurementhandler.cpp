@@ -16,7 +16,7 @@
 
 namespace sensateiot::http
 {
-	MeasurementHandler::MeasurementHandler(mqtt::MessageService& service) : m_service(service)
+	MeasurementHandler::MeasurementHandler(services::MessageService& service) : m_service(service)
 	{
 	}
 

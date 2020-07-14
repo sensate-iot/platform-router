@@ -67,7 +67,7 @@ namespace sensateiot
 		services::UserRepository users(this->m_config.GetDatabase().GetPostgreSQL());
 		services::ApiKeyRepository keys(this->m_config.GetDatabase().GetPostgreSQL());
 		services::SensorRepository sensors(this->m_config.GetDatabase().GetMongoDB());
-		mqtt::MessageService service(iclient, users, keys, sensors, this->m_config);
+		services::MessageService service(iclient, users, keys, sensors, this->m_config);
 
 		mqtt::MqttCallback cb(service);
 		mqtt::MqttClient client(hostname, "a23fa-badf", std::move(cb));

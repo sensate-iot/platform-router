@@ -83,7 +83,7 @@ static void test_measurement_processing()
 	test::UserRepository users(config.GetDatabase().GetPostgreSQL());
 	test::ApiKeyRepository keys(config.GetDatabase().GetPostgreSQL());
 	test::SensorRepository sensors(config.GetDatabase().GetMongoDB());
-	sensateiot::mqtt::MessageService service(client, users, keys, sensors, config);
+	sensateiot::services::MessageService service(client, users, keys, sensors, config);
 
 	generate_data(sensors, users, keys);
 	models::Sensor s;

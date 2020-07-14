@@ -5,11 +5,8 @@
  * @email  michel@michelmegens.net
  */
 
-#ifdef WIN32
-#define _WIN32_WINNT 0x0601
-#endif
-
 #include <config/config.h>
+
 #include <sensateiot/httpd/httpserver.h>
 #include <sensateiot/http/statushandler.h>
 #include <sensateiot/util/log.h>
@@ -23,7 +20,7 @@ int main(int argc, char** argv)
 	http::StatusHandler status;
 
 	config.SetBindAddress("127.0.0.1");
-	config.SetPort(8080);
+	config.SetHttpPort(8080);
 	config.GetLogging().SetPath("auth-service_%N.log");
 
 	util::Log::StartLogging(config.GetLogging());
@@ -33,7 +30,7 @@ int main(int argc, char** argv)
 	httpd::HttpServer server(config);
 
 	server.AddHandler("/v1/status", [&s = status](const auto& request) {
-		return s.Handle(request);
+		return s.HandleRequest(request);
 	});
 
 	server.AddHandler("/index.json", [](const httpd::HttpRequest& request)

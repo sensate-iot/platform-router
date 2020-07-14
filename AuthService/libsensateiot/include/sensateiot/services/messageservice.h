@@ -31,16 +31,16 @@
 #include <atomic>
 #include <shared_mutex>
 
-namespace sensateiot::mqtt
+namespace sensateiot::services
 {
 	class MessageService {
 		typedef std::pair<std::size_t, std::vector<models::ObjectId>> ProcessingStats;
 
 	public:
-		explicit MessageService(IMqttClient& client,
-		                        services::AbstractUserRepository& users,
-		                        services::AbstractApiKeyRepository& keys,
-		                        services::AbstractSensorRepository& sensors,
+		explicit MessageService(mqtt::IMqttClient& client,
+		                        AbstractUserRepository& users,
+		                        AbstractApiKeyRepository& keys,
+		                        AbstractSensorRepository& sensors,
 		                        const config::Config& conf);
 
 		std::time_t Process();
@@ -56,9 +56,9 @@ namespace sensateiot::mqtt
 		data::MeasurementValidator m_validator;
 		std::atomic_uint m_count;
 
-		stl::ReferenceWrapper<services::AbstractApiKeyRepository> m_keyRepo;
-		stl::ReferenceWrapper<services::AbstractUserRepository> m_userRepo;
-		stl::ReferenceWrapper<services::AbstractSensorRepository> m_sensorRepo;
+		stl::ReferenceWrapper<AbstractApiKeyRepository> m_keyRepo;
+		stl::ReferenceWrapper<AbstractUserRepository> m_userRepo;
+		stl::ReferenceWrapper<AbstractSensorRepository> m_sensorRepo;
 
 		std::vector<models::ObjectId> Process(bool postProcess);
 

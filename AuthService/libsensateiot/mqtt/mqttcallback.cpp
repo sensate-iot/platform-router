@@ -12,7 +12,7 @@
 
 namespace sensateiot::mqtt
 {
-	MqttCallback::MqttCallback(MessageService& service) : m_messageService(service)
+	MqttCallback::MqttCallback(services::MessageService& service) : m_messageService(service)
 	{
 	}
 
