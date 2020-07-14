@@ -76,5 +76,5 @@ namespace sensateiot::util
 	}
 
 	std::mutex MongoDBClientPool::Lock;
-	config::MongoDB MongoDBClientPool::Config;
+	config::MongoDB MongoDBClientPool::Config{};
 }

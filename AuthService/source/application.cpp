@@ -9,6 +9,9 @@
 #include <sensateiot/mqtt/mqttclient.h>
 #include <sensateiot/services/messageservice.h>
 #include <sensateiot/util/mongodbclientpool.h>
+#include <sensateiot/httpd/httpserver.h>
+#include <sensateiot/http/statushandler.h>
+#include <sensateiot/http/measurementhandler.h>
 
 #include <sensateiot/services/userrepository.h>
 #include <sensateiot/services/apikeyrepository.h>
@@ -69,20 +72,33 @@ namespace sensateiot
 		mqtt::MqttCallback cb(service);
 		mqtt::MqttClient client(hostname, "a23fa-badf", std::move(cb));
 		client.Connect(this->m_config.GetMqtt());
-		//auto& pool = util::MongoDBClientPool::GetClientPool();
+		std::atomic_bool done = false;
 
-		for(;;) {
-			auto time = service.Process();
-			time_t interval = this->m_config.GetInterval();
+		std::thread runner([&]() {
+			while(!done) {
+				auto time = service.Process();
+				time_t interval = this->m_config.GetInterval();
 
-			if(time > interval) {
-				interval = 10;
-			} else {
-				interval = interval - time;
+				if(time > interval) {
+					interval = 10;
+				} else {
+					interval = interval - time;
+				}
+
+				std::this_thread::sleep_for(std::chrono::milliseconds(interval));
 			}
+		});
 
-			std::this_thread::sleep_for(std::chrono::milliseconds(interval));
-		}
+		httpd::HttpServer server(this->m_config);
+		http::StatusHandler status;
+		http::MeasurementHandler measurementHandler(service);
+
+		server.AddHandler("/v1/status", status);
+		server.AddHandler("/v1/processor/measurements", measurementHandler);
+		server.Run();
+
+		done = true;
+		runner.join();
 	}
 
 	void Application::ParseConfig()
@@ -102,6 +118,8 @@ namespace sensateiot
 			auto j = json::parse(content);
 
 			this->m_config.SetInternalBatchSize(j["InternalBatchSize"]);
+			this->m_config.SetBindAddress(j["BindAddress"]);
+			this->m_config.SetHttpPort(j["Port"].get<std::uint16_t>());
 			this->ParseMqtt(j);
 			this->ParseDatabase(j);
 			this->ParseLogging(j);
