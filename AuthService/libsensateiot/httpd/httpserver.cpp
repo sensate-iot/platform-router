@@ -9,6 +9,7 @@
 #include <sensateiot/httpd/httpsession.h>
 #include <sensateiot/httpd/httplistener.h>
 #include <sensateiot/httpd/httpserver.h>
+#include <sensateiot/httpd/httprequest.h>
 #include <sensateiot/util/log.h>
 
 #include <boost/beast/core.hpp>
@@ -61,6 +62,13 @@ namespace sensateiot::httpd
 	void HttpServer::AddHandler(const std::string& route, const HttpRequestHandler& handler)
 	{
 		this->m_handlers.Insert(route, handler);
+	}
+
+	void HttpServer::AddHandler(const std::string& route, http::AbstractHandler& handler)
+	{
+		this->AddHandler(route, [&h = handler](const httpd::HttpRequest& req) {
+			return h.HandleRequest(req);
+		});
 	}
 
 	void HttpServer::Stop()

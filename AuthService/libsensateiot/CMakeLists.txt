@@ -30,6 +30,10 @@ SET(SOURCES
 	httpd/httpresponse.cpp
 	httpd/httprequest.cpp
 
+	http/statushandler.cpp
+	http/measurementhandler.cpp
+	http/abstracthandler.cpp
+
 	services/userrepository.cpp
 	services/abstractuserrepository.cpp
 	services/abstractapikeyrepository.cpp
@@ -83,6 +87,10 @@ set(LIB_HEADERS
 	sensateiot/httpd/httpsession.h
 	sensateiot/httpd/httpresponse.h
 	sensateiot/httpd/httprequest.h
+
+	sensateiot/http/statushandler.h
+	sensateiot/http/measurementhandler.h
+	sensateiot/http/abstracthandler.h
 
 	sensateiot/models/apikey.h
 	sensateiot/models/objectid.h
@@ -166,7 +174,6 @@ prepend_path(GENERIC_HEADERS ${INCLUDE_DIR})
 add_library(sensateiot SHARED ${SOURCES} ${GENERIC_HEADERS} ${PROTO_OUTPUT})
 #add_dependencies(sensateiot proto-dep)
 target_link_libraries(sensateiot ${CONAN_LIBS})
-MESSAGE( STATUS ${PROJECT_BINARY_DIR}/libsensateiot/proto)
 target_include_directories(sensateiot PRIVATE ${PROJECT_BINARY_DIR}/libsensateiot)
 
 if (MSVC)

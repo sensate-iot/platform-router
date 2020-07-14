@@ -14,6 +14,7 @@
 #include <sensateiot/httpd/httpsession.h>
 #include <sensateiot/httpd/httprequest.h>
 #include <sensateiot/httpd/httplistener.h>
+#include <sensateiot/http/abstracthandler.h>
 
 #include <config/config.h>
 #include <atomic>
@@ -33,12 +34,13 @@ namespace sensateiot::httpd
 		bool Running() const;
 
 		void AddHandler(const std::string& route, const HttpRequestHandler& handler);
+		void AddHandler(const std::string& route, http::AbstractHandler& handler);
 		
-		template <typename Func>
+		/*template <typename Func>
 		void AddHandler(const std::string& route, Func&& handler)
 		{
 			this->m_handlers.Emplace(route, std::forward<Func>(handler));
-		}
+		}*/
 
 	private:
 		config::Config m_config{};
