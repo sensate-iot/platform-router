@@ -26,5 +26,8 @@ namespace sensateiot::http
 
 	private:
 		stl::ReferenceWrapper<services::MessageService> m_service;
+
+		httpd::HttpResponse HandleInvalidMethod();
+		httpd::HttpResponse HandleUnprocessable();
 	};
 }
