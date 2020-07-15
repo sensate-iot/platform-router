@@ -27,18 +27,6 @@ namespace sensateiot::httpd
 	void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req,
 		Send&& send, const HttpSession::HandlerMap& handlers)
 	{
-		auto const bad_request =
-			[&req](beast::string_view why)
-		{
-			http::response<http::string_body> res{ http::status::bad_request, req.version() };
-			res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-			res.set(http::field::content_type, "text/html");
-			res.keep_alive(req.keep_alive());
-			res.body() = std::string(why);
-			res.prepare_payload();
-			return res;
-		};
-
 		auto const not_found =
 			[&req](beast::string_view target)
 		{
@@ -70,6 +58,7 @@ namespace sensateiot::httpd
 			request.SetMethod(req.method());
 			request.SetTarget(req.target());
 			request.SetBody(req.body());
+			request.SetKeepAlive(req.keep_alive());
 
 			handlers.Process(target, [&](const HttpSession::HttpRequestHandler& handler) {
 				auto resp = handler(request);
@@ -80,13 +69,17 @@ namespace sensateiot::httpd
 				res.set(http::field::server, resp.Server());
 				res.body().assign(resp.Data());
 				res.content_length(resp.Data().length());
-				res.keep_alive(req.keep_alive());
+				res.keep_alive(resp.GetKeepAlive());
 				res.prepare_payload();
 
 				send(std::move(res));
 			});
 		} catch(std::out_of_range&) {
 			send(not_found(req.target()));
+		} catch (std::exception& ex) {
+			auto& log = util::Log::GetLog();
+			log << "Unable to server HTTP request: " << req.target().data() << " || " << ex.what() << util::Log::NewLine;
+			send(server_error("unable to complete request!"));
 		}
 	}
 

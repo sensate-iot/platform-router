@@ -39,4 +39,14 @@ namespace sensateiot::httpd
 	{
 		this->m_method = method;
 	}
+
+	bool HttpRequest::GetKeepAlive() const
+	{
+		return this->m_keepAlive;
+	}
+
+	void HttpRequest::SetKeepAlive(bool keepalive)
+	{
+		this->m_keepAlive = keepalive;
+	}
 }

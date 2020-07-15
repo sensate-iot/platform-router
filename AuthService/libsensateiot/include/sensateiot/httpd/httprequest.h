@@ -34,9 +34,14 @@ namespace sensateiot::httpd
 		boost::beast::http::verb GetMethod() const;
 		void SetMethod(boost::beast::http::verb method);
 
+		[[nodiscard]]
+		bool GetKeepAlive() const;
+		void SetKeepAlive(bool keepalive);
+
 	private:
 		boost::string_view m_target;
 		boost::string_view m_body;
 		boost::beast::http::verb m_method {boost::beast::http::verb::get};
+		bool m_keepAlive;
 	};
 }
