@@ -5,7 +5,7 @@
  * @email michel@michelmegens.net
  */
 
-#include <sensateiot/mqtt/mqttcallback.h>
+#include <sensateiot/util/log.h>
 #include <sensateiot/mqtt/mqttclient.h>
 
 #include <iostream>
@@ -67,24 +67,6 @@ namespace sensateiot::mqtt
 	{
 		this->m_client.set_callback(cb);
 	}
-
-	MqttClient::MqttClient(const std::string &host, const std::string &id, MqttCallback cb) :
-		BaseMqttClient(host, id), m_cb(std::move(cb))
-	{
-		this->m_cb.set_client(this->m_client, this->m_opts);
-	}
-
-	void MqttClient::Connect(const config::Mqtt &config)
-	{
-		this->SetCallback(this->m_cb);
-
-		this->m_opts.set_user_name(config.GetPublicBroker().GetBroker().GetUsername());
-		this->m_opts.set_password(config.GetPublicBroker().GetBroker().GetPassword());
-
-		this->m_cb.set_config(config);
-		BaseMqttClient::Connect(config);
-	}
-
 
 	InternalMqttClient::InternalMqttClient(const std::string& host, const std::string& id, MqttInternalCallback cb) :
 		BaseMqttClient(host, id), m_cb(std::move(cb))

@@ -12,6 +12,10 @@
 #include <deque>
 #include <vector>
 
+#ifdef WIN32
+#undef max
+#endif
+
 namespace sensateiot::services
 {
 	MessageService::MessageService(
@@ -28,7 +32,7 @@ namespace sensateiot::services
 
 		for(auto idx = 0U; idx < std::thread::hardware_concurrency(); idx++) {
 			consumers::MeasurementConsumer handler(client, this->m_cache, conf);
-			this->m_handlers.emplace_back(std::move(handler));
+			this->m_measurementHandlers.emplace_back(std::move(handler));
 		}
 	}
 	
@@ -42,8 +46,12 @@ namespace sensateiot::services
 
 		std::shared_lock lock(this->m_lock);
 
-		for(auto &handler : this->m_handlers) {
-			auto processor = [&h = handler, &l = this->m_lock, pp = postProcess]{
+		for(auto idx = 0U; idx < this->m_measurementHandlers.size(); idx++) {
+			auto processor = [
+				&h = this->m_measurementHandlers[idx],
+				&l = this->m_lock,
+				pp = postProcess
+			]() {
 
 				std::shared_lock lock(l);
 
@@ -139,22 +147,26 @@ namespace sensateiot::services
 		std::shared_lock lock(this->m_lock);
 		std::size_t current = this->m_index.fetch_add(1);
 
-		current %= this->m_handlers.size();
+		current %= this->m_measurementHandlers.size();
 		++this->m_count;
 
-		auto &repo = this->m_handlers[current];
+		auto &repo = this->m_measurementHandlers[current];
 		repo.PushMessage(std::move(pair));
 	}
 
 	void MessageService::AddMeasurements(std::vector<std::pair<std::string, models::RawMeasurement>> measurements)
 	{
+		if(measurements.size() > std::numeric_limits<unsigned int>::max()) {
+			return;
+		}
+		
 		std::shared_lock lock(this->m_lock);
 		std::size_t current = this->m_index.fetch_add(1);
 
-		current %= this->m_handlers.size();
-		this->m_count += measurements.size();
+		current %= this->m_measurementHandlers.size();
+		this->m_count += static_cast<unsigned int>(measurements.size());
 
-		auto &repo = this->m_handlers[current];
+		auto &repo = this->m_measurementHandlers[current];
 		repo.PushMessages(std::move(measurements));
 	}
 

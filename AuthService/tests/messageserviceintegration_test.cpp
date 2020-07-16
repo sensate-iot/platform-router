@@ -18,6 +18,8 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/random_generator.hpp>
 
+#include <config/config.h>
+
 #include <sensateiot/mqtt/mqttclient.h>
 #include <sensateiot/mqtt/imqttclient.h>
 #include <sensateiot/mqtt/mqttclient.h>
@@ -33,7 +35,6 @@
 #include "testmqttclient.h"
 
 static constexpr std::string_view format(R"({"longitude":4.774186840897145,"latitude":51.59384817617493,"createdById":"%ID%","createdBySecret":"%S%","data":{"x":{"value":3.7348298850142325,"unit":"m/s2"},"y":{"value":95.1696675190223,"unit":"m/s2"},"z":{"value":15.24488164994629,"unit":"m/s2"}}})");
-
 static std::vector<std::string> measurements;
 
 namespace sensateiot::test
@@ -73,23 +74,6 @@ static void ParseMqtt(sensateiot::config::Config& config, nlohmann::json &j)
 			.SetMeasurementTopic(j["Mqtt"]["InternalBroker"]["InternalMeasurementTopic"]);
 	config.GetMqtt().GetPrivateBroker()
 			.SetMessageTopic(j["Mqtt"]["InternalBroker"]["InternalMessageTopic"]);
-
-	config.GetMqtt().GetPublicBroker()
-			.GetBroker().SetHostName(j["Mqtt"]["PublicBroker"]["Host"]);
-	config.GetMqtt().GetPublicBroker()
-			.GetBroker().SetPortNumber(j["Mqtt"]["PublicBroker"]["Port"]);
-	config.GetMqtt().GetPublicBroker()
-			.GetBroker().SetUsername(j["Mqtt"]["PublicBroker"]["Username"]);
-	config.GetMqtt().GetPublicBroker()
-			.GetBroker().SetPassword(j["Mqtt"]["PublicBroker"]["Password"]);
-	config.GetMqtt().GetPublicBroker()
-			.GetBroker().SetSsl(j["Mqtt"]["PublicBroker"]["Ssl"] == "true");
-	config.GetMqtt().GetPublicBroker()
-			.SetBulkMeasurementTopic(j["Mqtt"]["PublicBroker"]["BulkMeasurementTopic"]);
-	config.GetMqtt().GetPublicBroker()
-			.SetMeasurementTopic(j["Mqtt"]["PublicBroker"]["MeasurementTopic"]);
-	config.GetMqtt().GetPublicBroker()
-			.SetMessageTopic(j["Mqtt"]["PublicBroker"]["MessageTopic"]);
 }
 
 static void ParseDatabase(sensateiot::config::Config& config, nlohmann::json &json)
@@ -168,7 +152,7 @@ static void test_messageservice(std::string path)
 	util::MongoDBClientPool::Init(config.GetDatabase().GetMongoDB());
 	
 	sensateiot::mqtt::MqttInternalCallback icb;
-	auto ihost = config.GetMqtt().GetPublicBroker().GetBroker().GetUri();
+	auto ihost = config.GetMqtt().GetPrivateBroker().GetBroker().GetUri();
 	sensateiot::mqtt::InternalMqttClient iclient(ihost, "3lasdfjlas", std::move(icb));
 	iclient.Connect(config.GetMqtt());
 	

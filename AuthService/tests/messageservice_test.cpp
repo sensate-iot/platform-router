@@ -18,20 +18,19 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/random_generator.hpp>
 
+#include <config/config.h>
+
 #include <sensateiot/mqtt/imqttclient.h>
 #include <sensateiot/mqtt/mqttclient.h>
 #include <sensateiot/data/datacache.h>
+#include <sensateiot/services/messageservice.h>
 
 #include "testmqttclient.h"
 #include "testapikeyrepository.h"
 #include "testuserrepository.h"
 #include "testsensorrepository.h"
 
-//static constexpr std::string_view json(R"({"longitude":4.774186840897145,"latitude":51.59384817617493,"createdById":"5c7c3bbd80e8ae3154d04912","createdBySecret":"$76d0d71b0abb9681a5984de91d07b7f434424492933d3069efa2a18e325bd911==","data":{"x":{"value":3.7348298850142325,"unit":"m/s2"},"y":{"value":95.1696675190223,"unit":"m/s2"},"z":{"value":15.24488164994629,"unit":"m/s2"}}})");
 static constexpr std::string_view json(R"({"longitude":4.774186840897145,"latitude":51.59384817617493,"createdById":"5c7c3bbd80e8ae3154d04912","createdBySecret":"$76d0d71b0abb9681a5984de91d07b7f434424492933d3069efa2a18e325bd911==","data":{"x":{"value":3.7348298850142325,"unit":"m/s2"},"y":{"value":95.1696675190223,"unit":"m/s2"},"z":{"value":15.24488164994629,"unit":"m/s2"}}})");
-//static constexpr std::string_view json_noauth(R"({"longitude":4.774186840897145,"latitude":51.59384817617493,"createdById":"5c7c3bbd80e8ae3154d04912","createdBySecret":"$86d0d71b0abb9681a5984de91d07b7f434424492933d3069efa2a18e325bd911==","data":{"x":{"value":3.7348298850142325,"unit":"m/s2"},"y":{"value":95.1696675190223,"unit":"m/s2"},"z":{"value":15.24488164994629,"unit":"m/s2"}}})");
-//static constexpr std::string_view json_notfound(R"({"longitude":4.774186840897145,"latitude":51.59384817617493,"createdById":"6c7c3bbd80e8ae3154d04912","createdBySecret":"$76d0d71b0abb9681a5984de91d07b7f434424492933d3069efa2a18e325bd911==","data":{"x":{"value":3.7348298850142325,"unit":"m/s2"},"y":{"value":95.1696675190223,"unit":"m/s2"},"z":{"value":15.24488164994629,"unit":"m/s2"}}})");
-
 static std::vector<std::pair<std::string, std::string>> sensors;
 
 static void generate_data(sensateiot::test::SensorRepository& sensors, sensateiot::test::UserRepository& users, sensateiot::test::ApiKeyRepository& keys)
@@ -83,7 +82,7 @@ static void test_measurement_processing()
 	test::UserRepository users(config.GetDatabase().GetPostgreSQL());
 	test::ApiKeyRepository keys(config.GetDatabase().GetPostgreSQL());
 	test::SensorRepository sensors(config.GetDatabase().GetMongoDB());
-	sensateiot::services::MessageService service(client, users, keys, sensors, config);
+	services::MessageService service(client, users, keys, sensors, config);
 
 	generate_data(sensors, users, keys);
 	models::Sensor s;

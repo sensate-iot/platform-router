@@ -51,7 +51,7 @@ namespace sensateiot::services
 		mutable std::shared_mutex m_lock;
 		config::Config m_conf;
 		std::atomic_uint8_t m_index;
-		std::vector<consumers::MeasurementConsumer> m_handlers;
+		std::vector<consumers::MeasurementConsumer> m_measurementHandlers;
 
 		data::DataCache m_cache;
 		data::MeasurementValidator m_validator;

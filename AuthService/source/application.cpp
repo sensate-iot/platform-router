@@ -49,13 +49,14 @@ namespace sensateiot
 
 	void Application::Run()
 	{
+		std::atomic_bool done = false;
+		auto &log = util::Log::GetLog();
+		
 		this->ParseConfig();
 		util::Log::StartLogging(this->m_config.GetLogging());
 
-		auto &log = util::Log::GetLog();
 		log << "Starting Sensate IoT AuthService..." << util::Log::NewLine;
 
-		auto hostname = this->m_config.GetMqtt().GetPublicBroker().GetBroker().GetUri();
 		util::MongoDBClientPool::Init(this->m_config.GetDatabase().GetMongoDB());
 
 		// Internal client
@@ -68,11 +69,6 @@ namespace sensateiot
 		services::ApiKeyRepository keys(this->m_config.GetDatabase().GetPostgreSQL());
 		services::SensorRepository sensors(this->m_config.GetDatabase().GetMongoDB());
 		services::MessageService service(iclient, users, keys, sensors, this->m_config);
-
-		mqtt::MqttCallback cb(service);
-		mqtt::MqttClient client(hostname, "a23fa-badf", std::move(cb));
-		client.Connect(this->m_config.GetMqtt());
-		std::atomic_bool done = false;
 
 		std::thread runner([&]() {
 			while(!done) {
@@ -151,23 +147,6 @@ namespace sensateiot
 				.SetMeasurementTopic(j["Mqtt"]["InternalBroker"]["InternalMeasurementTopic"]);
 		this->m_config.GetMqtt().GetPrivateBroker()
 				.SetMessageTopic(j["Mqtt"]["InternalBroker"]["InternalMessageTopic"]);
-
-		this->m_config.GetMqtt().GetPublicBroker()
-				.GetBroker().SetHostName(j["Mqtt"]["PublicBroker"]["Host"]);
-		this->m_config.GetMqtt().GetPublicBroker()
-				.GetBroker().SetPortNumber(j["Mqtt"]["PublicBroker"]["Port"]);
-		this->m_config.GetMqtt().GetPublicBroker()
-				.GetBroker().SetUsername(j["Mqtt"]["PublicBroker"]["Username"]);
-		this->m_config.GetMqtt().GetPublicBroker()
-				.GetBroker().SetPassword(j["Mqtt"]["PublicBroker"]["Password"]);
-		this->m_config.GetMqtt().GetPublicBroker()
-				.GetBroker().SetSsl(j["Mqtt"]["PublicBroker"]["Ssl"] == "true");
-		this->m_config.GetMqtt().GetPublicBroker()
-				.SetBulkMeasurementTopic(j["Mqtt"]["PublicBroker"]["BulkMeasurementTopic"]);
-		this->m_config.GetMqtt().GetPublicBroker()
-				.SetMeasurementTopic(j["Mqtt"]["PublicBroker"]["MeasurementTopic"]);
-		this->m_config.GetMqtt().GetPublicBroker()
-				.SetMessageTopic(j["Mqtt"]["PublicBroker"]["MessageTopic"]);
 	}
 
 	void Application::ParseDatabase(nlohmann::json &json)

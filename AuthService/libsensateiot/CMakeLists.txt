@@ -50,7 +50,6 @@ SET(SOURCES
 	consumers/measurementconsumer.cpp
 	consumers/abstractconsumer.cpp
 
-	mqtt/mqttcallback.cpp
 	mqtt/mqttclient.cpp
 	mqtt/mqttinternalcallback.cpp
 )
@@ -103,7 +102,6 @@ set(LIB_HEADERS
 	sensateiot/consumers/abstractconsumer.h
 	sensateiot/consumers/measurementconsumer.h
 
-	sensateiot/mqtt/mqttcallback.h
 	sensateiot/mqtt/mqttclient.h
 	sensateiot/mqtt/mqttinternalcallback.h
 

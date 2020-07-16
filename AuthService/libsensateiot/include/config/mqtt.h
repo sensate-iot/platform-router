@@ -16,13 +16,9 @@ namespace sensateiot::config
 	class DLL_EXPORT Mqtt {
 	public:
 		PrivateBroker& GetPrivateBroker();
-		PublicBroker& GetPublicBroker();
-		
 		const PrivateBroker& GetPrivateBroker() const;
-		const PublicBroker& GetPublicBroker() const;
 
 	private:
 		PrivateBroker m_private{};
-		PublicBroker m_public{};
 	};
 }

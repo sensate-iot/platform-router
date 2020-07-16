@@ -13,7 +13,6 @@
 #include <mqtt/client.h>
 #include <mqtt/async_client.h>
 
-#include <sensateiot/mqtt/mqttcallback.h>
 #include <sensateiot/mqtt/mqttinternalcallback.h>
 #include <sensateiot/mqtt/imqttclient.h>
 
@@ -39,15 +38,6 @@ namespace sensateiot::mqtt
 
 		ns_base::mqtt::async_client m_client;
 		ns_base::mqtt::connect_options m_opts;
-	};
-
-	class DLL_EXPORT MqttClient : public BaseMqttClient {
-	public:
-		explicit MqttClient(const std::string& host, const std::string& id, MqttCallback cb);
-		void Connect(const config::Mqtt &config) override;
-
-	private:
-		MqttCallback m_cb;
 	};
 
 	class DLL_EXPORT InternalMqttClient : public BaseMqttClient {

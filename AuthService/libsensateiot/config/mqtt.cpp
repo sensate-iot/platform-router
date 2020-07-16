@@ -9,19 +9,9 @@
 
 namespace sensateiot::config
 {
-	PublicBroker &Mqtt::GetPublicBroker()
-	{
-		return this->m_public;
-	}
-
 	const PrivateBroker& Mqtt::GetPrivateBroker() const
 	{
 		return this->m_private;
-	}
-
-	const PublicBroker& Mqtt::GetPublicBroker() const
-	{
-		return this->m_public;
 	}
 
 	PrivateBroker &Mqtt::GetPrivateBroker()
