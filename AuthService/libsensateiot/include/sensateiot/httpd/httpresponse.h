@@ -18,7 +18,7 @@ namespace sensateiot::httpd
 {
 	class HttpResponse {
 	public:
-		explicit HttpResponse() = default;
+		explicit HttpResponse();
 
 		std::string& Data();
 		std::string& ContentType();

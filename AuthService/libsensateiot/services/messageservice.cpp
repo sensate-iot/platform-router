@@ -146,6 +146,18 @@ namespace sensateiot::services
 		repo.PushMessage(std::move(pair));
 	}
 
+	void MessageService::AddMeasurements(std::vector<std::pair<std::string, models::RawMeasurement>> measurements)
+	{
+		std::shared_lock lock(this->m_lock);
+		std::size_t current = this->m_index.fetch_add(1);
+
+		current %= this->m_handlers.size();
+		this->m_count += measurements.size();
+
+		auto &repo = this->m_handlers[current];
+		repo.PushMessages(std::move(measurements));
+	}
+
 	void MessageService::Load(std::vector<models::ObjectId> &objIds)
 	{
 		std::sort(objIds.begin(), objIds.end(), [](const auto &a, const auto &b) {

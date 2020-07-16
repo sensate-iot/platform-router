@@ -22,18 +22,21 @@ namespace sensateiot::http
 
 	httpd::HttpResponse MeasurementHandler::HandleRequest(const httpd::HttpRequest& request)
 	{
-		httpd::HttpResponse response;
-
-		if (!(request.GetMethod() == boost::beast::http::verb::get ||
+		if (!(request.GetMethod() == boost::beast::http::verb::post ||
 			request.GetMethod() == boost::beast::http::verb::options)) {
 			return this->HandleInvalidMethod();
 		}
 
-		return this->HandleUnprocessable();
+		auto result = this->m_validator({ request.GetBody().begin(), request.GetBody().end() });
 
-		response.Data().clear();
-		response.Server().assign("Sensate IoT/AuthService");
-		response.ContentType().assign("application/json");
+		if(!result.has_value()) {
+			return this->HandleUnprocessable();
+		}
+
+		this->m_service->AddMeasurements(std::move(*result));
+
+		httpd::HttpResponse response;
+		response.Data().assign(AcceptedMessage);
 		response.SetStatus(boost::beast::http::status::accepted);
 		response.SetKeepAlive(request.GetKeepAlive());
 
@@ -45,8 +48,6 @@ namespace sensateiot::http
 		httpd::HttpResponse response;
 
 		response.Data().assign(R"({"message": "No route has been defined."})");
-		response.Server().assign("Sensate IoT/AuthService");
-		response.ContentType().assign("application/json");
 		response.SetStatus(boost::beast::http::status::method_not_allowed);
 		response.SetKeepAlive(false);
 
@@ -58,8 +59,6 @@ namespace sensateiot::http
 		httpd::HttpResponse response;
 
 		response.Data().assign(R"({"message": "Unable to process request."})");
-		response.Server().assign("Sensate IoT/AuthService");
-		response.ContentType().assign("application/json");
 		response.SetStatus(boost::beast::http::status::unprocessable_entity);
 		response.SetKeepAlive(false);
 

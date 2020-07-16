@@ -9,6 +9,11 @@
 
 namespace sensateiot::httpd
 {
+	HttpResponse::HttpResponse() :
+		m_contentType("application/json"), m_server("Sensate IoT/AuthService")
+	{
+	}
+
 	std::string& HttpResponse::Data()
 	{
 		return this->m_data;

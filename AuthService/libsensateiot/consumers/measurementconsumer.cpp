@@ -87,6 +87,14 @@ namespace sensateiot::consumers
 		this->m_measurements.emplace_back(std::move(measurement));
 	}
 
+	void MeasurementConsumer::PushMessages(std::vector<MessagePair>&& measurements)
+	{
+		std::scoped_lock lock(this->m_lock);
+
+		std::move(measurements.begin(), measurements.end(), std::back_inserter(this->m_measurements));
+		measurements.clear();
+	}
+
 	std::size_t MeasurementConsumer::PostProcess()
 	{
 		std::vector<MessagePair> data;

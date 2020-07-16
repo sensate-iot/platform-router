@@ -31,6 +31,7 @@ namespace sensateiot::consumers
 		virtual ~MeasurementConsumer();
 
 		void PushMessage(MessagePair measurement) override;
+		void PushMessages(std::vector<MessagePair>&& measurements) override;
 		ProcessingStats Process() override;
 		std::size_t PostProcess() override;
 

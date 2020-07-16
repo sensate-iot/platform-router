@@ -25,6 +25,7 @@ namespace sensateiot::consumers
 		virtual ~AbstractConsumer() = default;
 		
 		virtual void PushMessage(MessagePair data) = 0;
+		virtual void PushMessages(std::vector<MessagePair>&& measurements) = 0;
 		virtual std::size_t PostProcess() = 0;
 		virtual ProcessingStats Process() = 0;
 

@@ -24,13 +24,16 @@ namespace sensateiot::data
 			rapidjson::Document doc;
 			doc.Parse(str.c_str());
 
+			if(!doc.IsArray()) {
+				return std::optional<std::vector<std::pair<std::string, models::RawMeasurement>>>();
+			}
+
 			for(auto iter = doc.Begin(); iter != doc.End(); ++iter) {
 				auto measurement = detail::ParseSingleMeasurement(iter->GetObject());
 
 				if (!measurement.first) {
 					continue;
 				}
-
 
 				rapidjson::StringBuffer buf;
 				rapidjson::Writer<rapidjson::StringBuffer> writer(buf);
