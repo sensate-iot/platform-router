@@ -31,8 +31,11 @@ namespace sensateiot::services
 		std::string uri = this->m_conf.GetMqtt().GetPrivateBroker().GetBroker().GetUri();
 
 		for(auto idx = 0U; idx < std::thread::hardware_concurrency(); idx++) {
-			consumers::MeasurementConsumer handler(client, this->m_cache, conf);
-			this->m_measurementHandlers.emplace_back(std::move(handler));
+			consumers::MeasurementConsumer measurementHandler(client, this->m_cache, conf);
+			consumers::MessageConsumer messageHandler(client, this->m_cache, conf);
+
+			this->m_measurementHandlers.emplace_back(std::move(measurementHandler));
+			this->m_messageHandlers.emplace_back(std::move(messageHandler));
 		}
 	}
 	
@@ -48,7 +51,8 @@ namespace sensateiot::services
 
 		for(auto idx = 0U; idx < this->m_measurementHandlers.size(); idx++) {
 			auto processor = [
-				&h = this->m_measurementHandlers[idx],
+				&measurementHandler = this->m_measurementHandlers[idx],
+				&messageHandler = this->m_messageHandlers[idx],
 				&l = this->m_lock,
 				pp = postProcess
 			]() {
@@ -56,10 +60,22 @@ namespace sensateiot::services
 				std::shared_lock lock(l);
 
 				if(pp) {
-					return std::make_pair(h.PostProcess(), std::vector<models::ObjectId>());
+					auto messageResult = messageHandler.PostProcess();
+					return std::make_pair(measurementHandler.PostProcess() + messageResult, std::vector<models::ObjectId>());
 				}
 
-				return h.Process();
+				auto messageResult = messageHandler.Process();
+				auto measurementResult = measurementHandler.Process();
+
+				measurementResult.first += messageResult.first;
+				measurementResult.second.reserve(measurementResult.second.size() + messageResult.second.size());
+				std::move(
+					std::begin(messageResult.second),
+					std::end(messageResult.second),
+					std::back_inserter(measurementResult.second)
+				);
+
+				return measurementResult;
 			};
 			
 			boost::fibers::packaged_task<ProcessingStats()> tsk(std::move(processor));
@@ -124,6 +140,7 @@ namespace sensateiot::services
 		}
 
 		this->Process(true);
+		this->m_cache.CleanupFor(CleanupTimeout);
 
 		auto diff = boost::chrono::system_clock::now() - start;
 		using Millis = boost::chrono::milliseconds;

@@ -9,6 +9,7 @@ SET(SOURCES
 	models/user.cpp
 	models/sensor.cpp
 	models/rawmeasurement.cpp
+	models/message.cpp
 
 	config/config.cpp
 	config/database.cpp
@@ -48,7 +49,7 @@ SET(SOURCES
 	data/bulkmeasurementvalidator.cpp
 
 	consumers/measurementconsumer.cpp
-	consumers/abstractconsumer.cpp
+	consumers/messageconsumer.cpp
 
 	mqtt/mqttclient.cpp
 	mqtt/mqttinternalcallback.cpp
@@ -97,11 +98,13 @@ set(LIB_HEADERS
 	sensateiot/models/rawmeasurement.h
 	sensateiot/models/sensor.h
 	sensateiot/models/user.h
-	sensateiot/mqtt/imqttclient.h
+	sensateiot/models/message.h
 
 	sensateiot/consumers/abstractconsumer.h
 	sensateiot/consumers/measurementconsumer.h
+	sensateiot/consumers/messageconsumer.h
 
+	sensateiot/mqtt/imqttclient.h
 	sensateiot/mqtt/mqttclient.h
 	sensateiot/mqtt/mqttinternalcallback.h
 

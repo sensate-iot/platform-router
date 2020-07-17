@@ -11,8 +11,10 @@
 #include <config/config.h>
 
 #include <boost/uuid/uuid.hpp>
+#include <boost/chrono.hpp>
 
 #include <sensateiot/consumers/measurementconsumer.h>
+#include <sensateiot/consumers/messageconsumer.h>
 #include <sensateiot/mqtt/imqttclient.h>
 
 #include <sensateiot/data/datacache.h>
@@ -52,6 +54,7 @@ namespace sensateiot::services
 		config::Config m_conf;
 		std::atomic_uint8_t m_index;
 		std::vector<consumers::MeasurementConsumer> m_measurementHandlers;
+		std::vector<consumers::MessageConsumer> m_messageHandlers;
 
 		data::DataCache m_cache;
 		data::MeasurementValidator m_validator;
@@ -64,6 +67,7 @@ namespace sensateiot::services
 		std::vector<models::ObjectId> Process(bool postProcess);
 
 		static constexpr int Increment = 1;
+		static constexpr auto CleanupTimeout = boost::chrono::milliseconds(25);
 
 		void Load(std::vector<models::ObjectId>& objIds);
 	};

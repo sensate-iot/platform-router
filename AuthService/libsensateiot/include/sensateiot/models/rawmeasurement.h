@@ -57,6 +57,5 @@ namespace sensateiot::models
 
 		std::vector<DataEntry> m_data;
 		std::pair<double, double> m_coords;
-
 	};
 }
