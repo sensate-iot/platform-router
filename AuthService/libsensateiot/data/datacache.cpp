@@ -98,10 +98,21 @@ namespace sensateiot::data
 
 	void DataCache::CleanupFor(boost::chrono::milliseconds millis)
 	{
-		this->m_users.Cleanup(millis);
-		this->m_keys.Cleanup(millis);
-		this->m_sensors.Cleanup(millis);
-		this->m_blackList.Cleanup(millis);
+		if(this->m_users.Size() > 0) {
+			this->m_users.Cleanup(millis);
+		}
+
+		if(this->m_keys.Size() > 0) {
+			this->m_keys.Cleanup(millis);
+		}
+
+		if(this->m_sensors.Size() > 0) {
+			this->m_sensors.Cleanup(millis);
+		}
+
+		if(this->m_blackList.Size() > 0) {
+			this->m_blackList.Cleanup(millis);
+		}
 	}
 
 	void DataCache::Clear()
