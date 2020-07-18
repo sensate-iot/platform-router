@@ -42,7 +42,8 @@ namespace sensateiot::mqtt
 
 	void BaseMqttClient::Publish(const std::string& topic, const std::string& msg)
 	{
-		this->m_client.publish(topic, msg);
+		auto result = this->m_client.publish(topic, msg);
+		result->wait();
 	}
 
 	BaseMqttClient::BaseMqttClient(const std::string &host, const std::string &id) :
