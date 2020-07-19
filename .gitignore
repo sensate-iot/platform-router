@@ -3,6 +3,7 @@ obj/
 tools/
 .vscode/
 .vs/
+node_modules/
 Properties/
 SensateService/Properties/
 SensateService/SensateService.csproj.user
