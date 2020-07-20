@@ -23,15 +23,14 @@ namespace sensateiot::util
 	{
 		namespace bio = boost::iostreams;
 
-		std::stringstream compressed;
 		std::stringstream origin(data);
+		std::vector<std::uint8_t> binary;
 
 		bio::filtering_streambuf<bio::input> out;
 		out.push(bio::gzip_compressor(bio::gzip_params(bio::gzip::best_compression)));
 		out.push(origin);
-		bio::copy(out, compressed);
 
-		return "";
-		//return Encode64(compressed.str());
+		binary.assign(std::istreambuf_iterator<char>{&out}, {});
+		return Encode64(binary);
 	}
 }

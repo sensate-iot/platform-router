@@ -11,6 +11,9 @@
 #include <sensateiot/util/log.h>
 #include <sensateiot/util/sha256.h>
 #include <sensateiot/util/protobuf.h>
+#include <sensateiot/util/gzip.h>
+
+#include <mqtt/async_client.h>
 
 namespace sensateiot::consumers
 {
@@ -70,14 +73,25 @@ namespace sensateiot::consumers
 
 	void MeasurementConsumer::PublishAuthorizedMessages(const std::vector<models::RawMeasurement>& authorized) 
 	{
+		std::vector<ns_base::mqtt::delivery_token_ptr> tokens;
+
 		for(std::size_t idx = 0UL; idx < authorized.size(); idx += this->m_config.GetInternalBatchSize()) {
 			auto begin = authorized.begin() + idx;
 			auto endIdx = (idx + this->m_config.GetInternalBatchSize() <= authorized.size()) ?
 				idx + this->m_config.GetInternalBatchSize() : authorized.size();
 			auto end = authorized.begin() + endIdx;
 
-			auto json = util::to_protobuf(begin, end);
-			this->m_internal->Publish(this->m_config.GetMqtt().GetPrivateBroker().GetBulkMeasurementTopic(), json);
+			auto json = util::Compress(util::to_protobuf(begin, end));
+			auto token = this->m_internal->Publish(this->m_config.GetMqtt().GetPrivateBroker().GetBulkMeasurementTopic(), json);
+			tokens.push_back(token);
+		}
+
+		for (auto&& token : tokens) {
+			if (token->is_complete()) {
+				continue;
+			}
+
+			token->wait();
 		}
 	}
 
@@ -154,7 +168,7 @@ namespace sensateiot::consumers
 		auto& log = util::Log::GetLog();
 
 		this->m_lock.lock();
-		data.reserve(this->m_measurements.size());
+		data.reserve(std::max<std::size_t>(this->m_measurements.size(), 100000UL));
 		std::swap(this->m_measurements, data);
 		this->m_measurements.clear();
 		this->m_lock.unlock();

@@ -31,7 +31,7 @@ namespace sensateiot::mqtt
 
 		void Connect(const config::Mqtt &config, const ns_base::mqtt::connect_options& opts);
 		void Connect(const config::Mqtt &config) override;
-		void Publish(const std::string& topic, const std::string& msg) override;
+		ns_base::mqtt::delivery_token_ptr Publish(const std::string& topic, const std::string& msg) override;
 
 	protected:
 		void SetCallback(::mqtt::callback& cb);

@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <cstdlib>
 #include <limits>
+#include <cstring>
 
 #include <openssl/evp.h>
 
@@ -25,6 +26,7 @@ namespace sensateiot::util {
 		std::size_t length = 4 * ((input.size() + 2) / 3);;
 		auto* str = new unsigned char[length + 1];
 
+		memset(str, 0, length + 1);
 		if(input.size() > std::numeric_limits<int>::max()) {
 			throw std::range_error("Unable to Encode64: input too big!");
 		}

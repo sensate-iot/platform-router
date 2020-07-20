@@ -7,7 +7,10 @@
 
 #pragma once
 
+#include <sensateiot.h>
 #include <config/mqtt.h>
+#include <mqtt/async_client.h>
+
 #include <string>
 
 namespace sensateiot::mqtt
@@ -16,6 +19,6 @@ namespace sensateiot::mqtt
 	public:
 		virtual ~IMqttClient() = default;
 		virtual void Connect(const config::Mqtt&) = 0;
-		virtual void Publish(const std::string& topic, const std::string& msg) = 0;
+		virtual ns_base::mqtt::delivery_token_ptr Publish(const std::string& topic, const std::string& msg) = 0;
 	};
 }

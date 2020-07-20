@@ -40,10 +40,10 @@ namespace sensateiot::mqtt
 		}
 	}
 
-	void BaseMqttClient::Publish(const std::string& topic, const std::string& msg)
+	ns_base::mqtt::delivery_token_ptr BaseMqttClient::Publish(const std::string& topic, const std::string& msg)
 	{
-		auto result = this->m_client.publish(topic, msg);
-		result->wait();
+		return this->m_client.publish(topic, msg);
+		//result->wait();
 	}
 
 	BaseMqttClient::BaseMqttClient(const std::string &host, const std::string &id) :

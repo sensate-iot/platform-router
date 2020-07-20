@@ -30,7 +30,8 @@ namespace sensateiot::services
 		std::unique_lock lock(this->m_lock);
 		std::string uri = this->m_conf.GetMqtt().GetPrivateBroker().GetBroker().GetUri();
 
-		for(auto idx = 0U; idx < std::thread::hardware_concurrency(); idx++) {
+		//for(auto idx = 0U; idx < std::thread::hardware_concurrency(); idx++) {
+		for(auto idx = 0U; idx < this->m_conf.GetWorkers(); idx++) {
 			consumers::MeasurementConsumer measurementHandler(client, this->m_cache, conf);
 			consumers::MessageConsumer messageHandler(client, this->m_cache, conf);
 
@@ -185,6 +186,45 @@ namespace sensateiot::services
 
 		auto &repo = this->m_measurementHandlers[current];
 		repo.PushMessages(std::move(measurements));
+	}
+
+	void MessageService::LoadAll()
+	{
+		auto sensor_f = std::async(std::launch::async, [this]()
+		{
+			return this->m_sensorRepo->GetAllSensors(0, 0);
+		});
+
+		auto user_f = std::async(std::launch::async, [this]()
+		{
+			return this->m_userRepo->GetAllUsers();
+		});
+
+		auto key_f = std::async(std::launch::async, [this]()
+		{
+			return this->m_keyRepo->GetAllSensorKeys();
+		});
+
+		auto sensors = sensor_f.get();
+		auto keys = key_f.get();
+		auto users = user_f.get();
+
+		auto append_f = std::async(std::launch::async, [&]()
+		{
+			this->m_cache.Append(sensors);
+			this->m_cache.Append(users);
+			this->m_cache.Append(keys);
+		});
+
+		std::vector<models::ObjectId> objs;
+		objs.reserve(sensors.size());
+
+		for (auto& sensor : sensors) {
+			objs.push_back(sensor.GetId());
+		}
+
+		this->m_cache.AppendBlackList(objs);
+		append_f.wait();
 	}
 
 	void MessageService::Load(std::vector<models::ObjectId> &objIds)

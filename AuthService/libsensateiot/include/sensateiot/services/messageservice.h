@@ -48,6 +48,7 @@ namespace sensateiot::services
 		std::time_t Process();
 		void AddMeasurement(std::string msg);
 		void AddMeasurements(std::vector<std::pair<std::string, models::RawMeasurement>> measurements);
+		void LoadAll();
 
 	private:
 		mutable std::shared_mutex m_lock;

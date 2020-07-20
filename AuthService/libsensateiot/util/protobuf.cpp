@@ -60,13 +60,18 @@ namespace sensateiot::util
 			}
 		}
 
-		std::vector<std::uint8_t> bytes(data.ByteSizeLong());
+		std::vector<std::uint8_t> bytes( data.ByteSizeLong());
 
 		if (bytes.size() > std::numeric_limits<int>::max()) {
 			throw std::out_of_range("Serialization length to large!");
 		}
 
-		data.SerializeToArray(bytes.data(), static_cast<int>(bytes.size()));
-		return Encode64(bytes);
+		return data.SerializeAsString();
+		/*data.SerializeToArray(bytes.data(), static_cast<int>(bytes.size()));
+		auto encoded = Encode64(bytes);
+
+		std::cout << "Byte size: " << data.ByteSizeLong() << std::endl;
+		std::cout << "Encoded size: " << encoded.size() << std::endl;
+		return encoded;*/
 	}
 }
