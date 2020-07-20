@@ -17,12 +17,12 @@
 namespace sensateiot::util
 {
 	template <>
-	std::string to_protobuf<std::vector<models::RawMeasurement>>(const std::vector<models::RawMeasurement>& value)
+	std::vector<char> to_protobuf<std::vector<models::RawMeasurement>>(const std::vector<models::RawMeasurement>& value)
 	{
 		return to_protobuf(value.begin(), value.end());
 	}
 
-	std::string to_protobuf(
+	std::vector<char> to_protobuf(
 		std::vector<models::RawMeasurement>::const_iterator begin,
 		std::vector<models::RawMeasurement>::const_iterator end)
 	{
@@ -60,18 +60,13 @@ namespace sensateiot::util
 			}
 		}
 
-		std::vector<std::uint8_t> bytes( data.ByteSizeLong());
+		std::vector<char> bytes( data.ByteSizeLong());
 
 		if (bytes.size() > std::numeric_limits<int>::max()) {
 			throw std::out_of_range("Serialization length to large!");
 		}
 
-		return data.SerializeAsString();
-		/*data.SerializeToArray(bytes.data(), static_cast<int>(bytes.size()));
-		auto encoded = Encode64(bytes);
-
-		std::cout << "Byte size: " << data.ByteSizeLong() << std::endl;
-		std::cout << "Encoded size: " << encoded.size() << std::endl;
-		return encoded;*/
+		data.SerializeToArray(bytes.data(), static_cast<int>(bytes.size()));
+		return bytes;
 	}
 }

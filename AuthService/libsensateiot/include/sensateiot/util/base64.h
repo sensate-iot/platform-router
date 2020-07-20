@@ -12,5 +12,5 @@
 
 namespace sensateiot::util
 {
-	extern DLL_EXPORT std::string Encode64(const std::vector<std::uint8_t>& input);
+	extern DLL_EXPORT std::string Encode64(const std::vector<char>& input);
 }

@@ -17,11 +17,7 @@
 #include <sensateiot/util/base64.h>
 
 namespace sensateiot::util {
-
-	static constexpr char kEncodeLookup[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-	static constexpr char kPadCharacter = '=';
-
-	std::string Encode64(const std::vector<std::uint8_t>& input)
+	std::string Encode64(const std::vector<char>& input)
 	{
 		std::size_t length = 4 * ((input.size() + 2) / 3);;
 		auto* str = new unsigned char[length + 1];
@@ -31,7 +27,7 @@ namespace sensateiot::util {
 			throw std::range_error("Unable to Encode64: input too big!");
 		}
 
-		EVP_EncodeBlock(str, input.data(), static_cast<int>(input.size()));
+		EVP_EncodeBlock(str, reinterpret_cast<const std::uint8_t*>(input.data()), static_cast<int>(input.size()));
 
 		auto result = std::string((char*)str);
 		delete[] str;
