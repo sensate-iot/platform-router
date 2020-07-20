@@ -75,23 +75,28 @@ namespace sensateiot::consumers
 	{
 		std::vector<ns_base::mqtt::delivery_token_ptr> tokens;
 
-		for(std::size_t idx = 0UL; idx < authorized.size(); idx += this->m_config.GetInternalBatchSize()) {
-			auto begin = authorized.begin() + idx;
-			auto endIdx = (idx + this->m_config.GetInternalBatchSize() <= authorized.size()) ?
-				idx + this->m_config.GetInternalBatchSize() : authorized.size();
-			auto end = authorized.begin() + endIdx;
+		try {
+			for(std::size_t idx = 0UL; idx < authorized.size(); idx += this->m_config.GetInternalBatchSize()) {
+				auto begin = authorized.begin() + idx;
+				auto endIdx = (idx + this->m_config.GetInternalBatchSize() <= authorized.size()) ?
+					idx + this->m_config.GetInternalBatchSize() : authorized.size();
+				auto end = authorized.begin() + endIdx;
 
-			auto json = util::Compress(util::to_protobuf(begin, end));
-			auto token = this->m_internal->Publish(this->m_config.GetMqtt().GetPrivateBroker().GetBulkMeasurementTopic(), json);
-			tokens.push_back(token);
-		}
-
-		for (auto&& token : tokens) {
-			if (token->is_complete()) {
-				continue;
+				auto data = util::Compress(util::to_protobuf(begin, end));
+				auto token = this->m_internal->Publish(this->m_config.GetMqtt().GetPrivateBroker().GetBulkMeasurementTopic(), data);
+				tokens.push_back(token);
 			}
 
-			token->wait();
+			for(auto&& token : tokens) {
+				if(token->is_complete()) {
+					continue;
+				}
+
+				token->wait();
+			}
+		} catch(ns_base::mqtt::exception& ex) {
+			auto& log = util::Log::GetLog();
+			log << "Unable to publish mesages: " << ex.get_error_str() << util::Log::NewLine;
 		}
 	}
 

@@ -30,7 +30,6 @@ namespace sensateiot::services
 		std::unique_lock lock(this->m_lock);
 		std::string uri = this->m_conf.GetMqtt().GetPrivateBroker().GetBroker().GetUri();
 
-		//for(auto idx = 0U; idx < std::thread::hardware_concurrency(); idx++) {
 		for(auto idx = 0U; idx < this->m_conf.GetWorkers(); idx++) {
 			consumers::MeasurementConsumer measurementHandler(client, this->m_cache, conf);
 			consumers::MessageConsumer messageHandler(client, this->m_cache, conf);
@@ -58,25 +57,30 @@ namespace sensateiot::services
 				pp = postProcess
 			]() {
 
-				std::shared_lock lock(l);
+				try {
 
-				if(pp) {
-					auto messageResult = messageHandler.PostProcess();
-					return std::make_pair(measurementHandler.PostProcess() + messageResult, std::vector<models::ObjectId>());
+					std::shared_lock lock(l);
+
+					if(pp) {
+						auto messageResult = messageHandler.PostProcess();
+						return std::make_pair(measurementHandler.PostProcess() + messageResult, std::vector<models::ObjectId>());
+					}
+
+					auto messageResult = messageHandler.Process();
+					auto measurementResult = measurementHandler.Process();
+
+					measurementResult.first += messageResult.first;
+					measurementResult.second.reserve(measurementResult.second.size() + messageResult.second.size());
+					std::move(
+						std::begin(messageResult.second),
+						std::end(messageResult.second),
+						std::back_inserter(measurementResult.second)
+					);
+
+					return measurementResult;
+				} catch(std::exception&) {
+					return std::pair(std::size_t{}, std::vector < models::ObjectId>{});
 				}
-
-				auto messageResult = messageHandler.Process();
-				auto measurementResult = measurementHandler.Process();
-
-				measurementResult.first += messageResult.first;
-				measurementResult.second.reserve(measurementResult.second.size() + messageResult.second.size());
-				std::move(
-					std::begin(messageResult.second),
-					std::end(messageResult.second),
-					std::back_inserter(measurementResult.second)
-				);
-
-				return measurementResult;
 			};
 			
 			boost::fibers::packaged_task<ProcessingStats()> tsk(std::move(processor));
