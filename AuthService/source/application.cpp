@@ -70,18 +70,18 @@ namespace sensateiot
 		services::SensorRepository sensors(this->m_config.GetDatabase().GetMongoDB());
 		services::MessageService service(iclient, users, keys, sensors, this->m_config);
 
+		service.LoadAll();
+		log << "AuthService started!" << util::Log::NewLine;
+
 		std::thread runner([&]() {
 			while(!done) {
 				auto time = service.Process();
 				time_t interval = this->m_config.GetInterval();
 
-				if(time > interval) {
-					interval = 10;
-				} else {
-					interval = interval - time;
+				if(time < interval) {
+					std::this_thread::sleep_for(std::chrono::milliseconds(interval - time));
 				}
 
-				std::this_thread::sleep_for(std::chrono::milliseconds(interval));
 			}
 		});
 
