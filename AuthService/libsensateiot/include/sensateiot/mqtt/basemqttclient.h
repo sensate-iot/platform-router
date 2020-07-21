@@ -39,13 +39,4 @@ namespace sensateiot::mqtt
 		ns_base::mqtt::async_client m_client;
 		ns_base::mqtt::connect_options m_opts;
 	};
-
-	class DLL_EXPORT InternalMqttClient : public BaseMqttClient {
-	public:
-		explicit InternalMqttClient(const std::string& host, const std::string& id, MqttInternalCallback cb);
-		void Connect(const config::Mqtt &config) override;
-
-	private:
-		MqttInternalCallback m_cb;
-	};
 }

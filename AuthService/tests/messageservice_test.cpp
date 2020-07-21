@@ -21,7 +21,7 @@
 #include <config/config.h>
 
 #include <sensateiot/mqtt/imqttclient.h>
-#include <sensateiot/mqtt/mqttclient.h>
+#include <sensateiot/mqtt/basemqttclient.h>
 #include <sensateiot/data/datacache.h>
 #include <sensateiot/services/messageservice.h>
 

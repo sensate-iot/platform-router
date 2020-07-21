@@ -6,12 +6,15 @@
  */
 
 #include <sensateiot/application.h>
-#include <sensateiot/mqtt/mqttclient.h>
 #include <sensateiot/services/messageservice.h>
 #include <sensateiot/util/mongodbclientpool.h>
+
 #include <sensateiot/httpd/httpserver.h>
 #include <sensateiot/http/statushandler.h>
 #include <sensateiot/http/measurementhandler.h>
+
+#include <sensateiot/mqtt/basemqttclient.h>
+#include <sensateiot/mqtt/internalmqttclient.h>
 
 #include <sensateiot/services/userrepository.h>
 #include <sensateiot/services/apikeyrepository.h>
@@ -50,10 +53,10 @@ namespace sensateiot
 	void Application::Run()
 	{
 		std::atomic_bool done = false;
-		auto &log = util::Log::GetLog();
 		
 		this->ParseConfig();
 		util::Log::StartLogging(this->m_config.GetLogging());
+		auto &log = util::Log::GetLog();
 
 		log << "Starting Sensate IoT AuthService..." << util::Log::NewLine;
 
