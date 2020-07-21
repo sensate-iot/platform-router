@@ -30,8 +30,5 @@ namespace sensateiot::http
 		data::BulkMeasurementValidator m_validator;
 
 		static constexpr auto AcceptedMessage = std::string_view(R"({"message":"Measurements queued.","count":%llu})");
-
-		httpd::HttpResponse HandleInvalidMethod();
-		httpd::HttpResponse HandleUnprocessable();
 	};
 }

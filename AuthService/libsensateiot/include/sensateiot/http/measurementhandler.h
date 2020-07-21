@@ -1,4 +1,3 @@
-
 /*
  * HTTP measurement handler.
  *
@@ -19,10 +18,11 @@
 
 namespace sensateiot::http
 {
-	class BulkMeasurementHandler : public AbstractHandler {
+	class MeasurementHandler : public AbstractHandler {
 	public:
-		explicit BulkMeasurementHandler() = default;
-		explicit BulkMeasurementHandler(services::MessageService& service);
+		explicit MeasurementHandler() = default;
+		explicit MeasurementHandler(services::MessageService& service);
+		~MeasurementHandler() override = default;
 
 		httpd::HttpResponse HandleRequest(const httpd::HttpRequest& request) override;
 
@@ -31,8 +31,5 @@ namespace sensateiot::http
 		data::MeasurementValidator m_validator;
 
 		static constexpr auto AcceptedMessage = std::string_view(R"({"message":"Measurement queued."})");
-
-		httpd::HttpResponse HandleInvalidMethod();
-		httpd::HttpResponse HandleUnprocessable();
 	};
 }

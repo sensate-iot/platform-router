@@ -45,26 +45,4 @@ namespace sensateiot::http
 
 		return response;
 	}
-
-	httpd::HttpResponse BulkMeasurementHandler::HandleInvalidMethod()
-	{
-		httpd::HttpResponse response;
-
-		response.Data().assign(R"({"message": "No route has been defined."})");
-		response.SetStatus(boost::beast::http::status::method_not_allowed);
-		response.SetKeepAlive(false);
-
-		return response;
-	}
-
-	httpd::HttpResponse BulkMeasurementHandler::HandleUnprocessable()
-	{
-		httpd::HttpResponse response;
-
-		response.Data().assign(R"({"message": "Unable to process request."})");
-		response.SetStatus(boost::beast::http::status::unprocessable_entity);
-		response.SetKeepAlive(false);
-
-		return response;
-	}
 }

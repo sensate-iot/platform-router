@@ -16,5 +16,9 @@ namespace sensateiot::http
 	public:
 		virtual ~AbstractHandler() = default;
 		virtual httpd::HttpResponse HandleRequest(const httpd::HttpRequest& request);
+
+	protected:
+		virtual httpd::HttpResponse HandleInvalidMethod();
+		virtual httpd::HttpResponse HandleUnprocessable();
 	};
 }
