@@ -40,25 +40,25 @@ function generateMeasurement(sensors) {
 	const location = generateLocationAround(51.59137, 4.7786, 1200);
 
 	const measurement = {
-		longitude: location[1].toFixed(5),
-		latitude: location[0].toFixed(5),
+		longitude: +location[1].toFixed(5),
+		latitude: +location[0].toFixed(5),
 		createdById: sensors[idx].sensorId,
 		createdBySecret: sensors[idx].sensorSecret,
 		data: {
 			x: {
-				value: (Math.random() * 10).toFixed(5),
+				value: +(Math.random() * 10).toFixed(5),
 				unit: "m/s2",
 				precision: 0.01,
 				accuracy:  0.5
 			},
 			y: {
-				value: (Math.random() * 100).toFixed(5),
+				value: +(Math.random() * 100).toFixed(5),
 				unit: "m/s2",
 				precision: 0.01,
 				accuracy:  0.5
 			},
 			z: {
-				value: (Math.random() * 200).toFixed(5),
+				value: +(Math.random() * 200).toFixed(5),
 				unit: "m/s2",
 				precision: 0.01,
 				accuracy:  0.5
