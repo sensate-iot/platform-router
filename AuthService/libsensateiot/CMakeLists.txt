@@ -37,8 +37,6 @@ SET(SOURCES
 	http/abstracthandler.cpp
 
 	services/userrepository.cpp
-	services/abstractuserrepository.cpp
-	services/abstractapikeyrepository.cpp
 	services/apikeyrepository.cpp
 	services/sensorrepository.cpp
 	services/abstractsensorrepository.cpp

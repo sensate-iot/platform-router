@@ -10,10 +10,11 @@
 #include <pqxx/pqxx>
 
 #include <sensateiot/services/abstractuserrepository.h>
+#include <sensateiot/services/abstractpostgresqlrepository.h>
 
 namespace sensateiot::services
 {
-	class DLL_EXPORT UserRepository : public AbstractUserRepository {
+	class DLL_EXPORT UserRepository : public AbstractUserRepository, public AbstractPostgresqlRepository {
 	public:
 		explicit UserRepository(const config::PostgreSQL& pgsql);
 		~UserRepository() override = default;

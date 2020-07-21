@@ -88,6 +88,10 @@ namespace sensateiot::consumers
 			}
 
 			for(auto&& token : tokens) {
+				if (!token) {
+					continue;
+				}
+
 				if(token->is_complete()) {
 					continue;
 				}
@@ -96,7 +100,7 @@ namespace sensateiot::consumers
 			}
 		} catch(ns_base::mqtt::exception& ex) {
 			auto& log = util::Log::GetLog();
-			log << "Unable to publish mesages: " << ex.get_error_str() << util::Log::NewLine;
+			log << "Unable to publish messages: " << ex.get_error_str() << util::Log::NewLine;
 		}
 	}
 
@@ -218,13 +222,6 @@ namespace sensateiot::consumers
 
 		if(!authorized.empty()) {
 			this->PublishAuthorizedMessages(authorized);
-		}
-
-		if(!leftOver.empty()) {
-			std::stringstream stream;
-
-			stream << "Unable to process " << leftOver.size() << " measurements.";
-			log << stream.str() << util::Log::NewLine;
 		}
 
 		std::scoped_lock l(this->m_lock);

@@ -20,11 +20,10 @@
 
 namespace sensateiot::services
 {
-	class DLL_EXPORT AbstractUserRepository : public AbstractPostgresqlRepository {
+	class DLL_EXPORT AbstractUserRepository {
 	public:
 		explicit AbstractUserRepository() = default;
-		explicit AbstractUserRepository(config::PostgreSQL pgsql);
-		~AbstractUserRepository() override = default;
+		virtual ~AbstractUserRepository() = default;
 
 		virtual std::vector<models::User> GetAllUsers() = 0;
 		virtual std::vector<models::User> GetRange(const boost::unordered_set<boost::uuids::uuid> &ids) = 0;

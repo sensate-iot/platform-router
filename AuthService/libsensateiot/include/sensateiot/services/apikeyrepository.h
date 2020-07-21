@@ -14,6 +14,7 @@
 #include <sensateiot/models/sensor.h>
 
 #include <sensateiot/services/abstractapikeyrepository.h>
+#include <sensateiot/services/abstractpostgresqlrepository.h>
 
 #include <string>
 #include <vector>
@@ -22,7 +23,7 @@
 
 namespace sensateiot::services
 {
-	class DLL_EXPORT ApiKeyRepository : public AbstractApiKeyRepository {
+	class DLL_EXPORT ApiKeyRepository : public AbstractApiKeyRepository, public AbstractPostgresqlRepository {
 	public:
 		explicit ApiKeyRepository() = default;
 		explicit ApiKeyRepository(const config::PostgreSQL& pgsql);

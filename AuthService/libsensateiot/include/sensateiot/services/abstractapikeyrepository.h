@@ -22,15 +22,15 @@
 
 namespace sensateiot::services
 {
-	class AbstractApiKeyRepository : public AbstractPostgresqlRepository {
+	class AbstractApiKeyRepository {
 	public:
 		explicit AbstractApiKeyRepository() = default;
 		explicit AbstractApiKeyRepository(config::PostgreSQL pgsql);
-		~AbstractApiKeyRepository() override = default;
+		virtual ~AbstractApiKeyRepository() = default;
 
 		virtual std::vector<std::string> GetAllSensorKeys() = 0;
+		virtual std::vector<std::string> GetKeysByOwners(const boost::unordered_set<boost::uuids::uuid>& ids) = 0;
 		virtual std::vector<std::string> GetKeys(const std::vector<std::string>& ids) = 0;
 		virtual std::vector<std::string> GetKeysFor(const std::vector<models::Sensor>& sensors) = 0;
-		virtual std::vector<std::string> GetKeysByOwners(const boost::unordered_set<boost::uuids::uuid>& ids) = 0;
 	};
 }
