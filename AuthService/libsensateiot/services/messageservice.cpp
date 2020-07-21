@@ -125,7 +125,7 @@ namespace sensateiot::services
 		}
 
 		if(authorized != 0ULL) {
-			log << "Authorized " << std::to_string(authorized) << " messages" << util::Log::NewLine;
+			log << "Authorized " << std::to_string(authorized) << " messages." << util::Log::NewLine;
 		}
 
 		return ids;
@@ -135,7 +135,12 @@ namespace sensateiot::services
 	{
 		auto &log = util::Log::GetLog();
 		auto count = this->m_count.exchange(0ULL);
-		
+	
+		if (count <= 0) {
+			this->m_cache.CleanupFor(CleanupTimeout);
+			return {};
+		}
+
 		log << "Processing " << std::to_string(count) << " measurements!" << util::Log::NewLine;
 		auto start = boost::chrono::system_clock::now();
 		auto ids = this->Process(false);

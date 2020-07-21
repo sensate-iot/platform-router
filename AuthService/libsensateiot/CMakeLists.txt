@@ -33,6 +33,7 @@ SET(SOURCES
 	httpd/httprequest.cpp
 
 	http/statushandler.cpp
+	http/bulkmeasurementhandler.cpp
 	http/measurementhandler.cpp
 	http/abstracthandler.cpp
 
@@ -91,6 +92,7 @@ set(LIB_HEADERS
 
 	sensateiot/http/statushandler.h
 	sensateiot/http/measurementhandler.h
+	sensateiot/http/bulkmeasurementhandler.h
 	sensateiot/http/abstracthandler.h
 
 	sensateiot/models/apikey.h

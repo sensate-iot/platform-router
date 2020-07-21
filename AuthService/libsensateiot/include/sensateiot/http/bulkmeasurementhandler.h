@@ -1,4 +1,3 @@
-
 /*
  * HTTP measurement handler.
  *
@@ -13,7 +12,7 @@
 #include <sensateiot/http/abstracthandler.h>
 #include <sensateiot/services/messageservice.h>
 #include <sensateiot/stl/referencewrapper.h>
-#include <sensateiot/data/measurementvalidator.h>
+#include <sensateiot/data/bulkmeasurementvalidator.h>
 
 #include <string>
 
@@ -28,9 +27,9 @@ namespace sensateiot::http
 
 	private:
 		stl::ReferenceWrapper<services::MessageService> m_service;
-		data::MeasurementValidator m_validator;
+		data::BulkMeasurementValidator m_validator;
 
-		static constexpr auto AcceptedMessage = std::string_view(R"({"message":"Measurement queued."})");
+		static constexpr auto AcceptedMessage = std::string_view(R"({"message":"Measurements queued.","count":%llu})");
 
 		httpd::HttpResponse HandleInvalidMethod();
 		httpd::HttpResponse HandleUnprocessable();
