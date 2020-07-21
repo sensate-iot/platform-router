@@ -70,6 +70,16 @@ namespace sensateiot::config
 		this->m_bindAddr = addr;
 	}
 
+	bool Config::GetHotLoad() const
+	{
+		return this->m_hotLoad;
+	}
+
+	void Config::SetHotLoad(bool load)
+	{
+		this->m_hotLoad = load;
+	}
+
 	Logging &Config::GetLogging()
 	{
 		return this->m_logging;

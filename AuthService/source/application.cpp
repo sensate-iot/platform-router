@@ -11,7 +11,7 @@
 
 #include <sensateiot/httpd/httpserver.h>
 #include <sensateiot/http/statushandler.h>
-#include <sensateiot/http/measurementhandler.h>
+#include <sensateiot/http/bulkmeasurementhandler.h>
 
 #include <sensateiot/mqtt/basemqttclient.h>
 #include <sensateiot/mqtt/internalmqttclient.h>
@@ -73,7 +73,10 @@ namespace sensateiot
 		services::SensorRepository sensors(this->m_config.GetDatabase().GetMongoDB());
 		services::MessageService service(iclient, users, keys, sensors, this->m_config);
 
-		service.LoadAll();
+		if (this->m_config.GetHotLoad()) {
+			service.LoadAll();
+		}
+
 		log << "AuthService started!" << util::Log::NewLine;
 
 		std::thread runner([&]() {
@@ -84,13 +87,12 @@ namespace sensateiot
 				if(time < interval) {
 					std::this_thread::sleep_for(std::chrono::milliseconds(interval - time));
 				}
-
 			}
 		});
 
 		httpd::HttpServer server(this->m_config);
 		http::StatusHandler status;
-		http::MeasurementHandler measurementHandler(service);
+		http::BulkMeasurementHandler measurementHandler(service);
 
 		server.AddHandler("/v1/status", status);
 		server.AddHandler("/v1/processor/measurements", measurementHandler);
@@ -119,6 +121,14 @@ namespace sensateiot
 			this->m_config.SetInternalBatchSize(j["InternalBatchSize"]);
 			this->m_config.SetBindAddress(j["BindAddress"]);
 			this->m_config.SetHttpPort(j["Port"].get<std::uint16_t>());
+
+			if (j.contains("HotLoad") && j["HotLoad"].is_boolean()) {
+				this->m_config.SetHotLoad(j["HotLoad"]);
+			}
+			else {
+				this->m_config.SetHotLoad(false);
+			}
+
 			this->ParseMqtt(j);
 			this->ParseDatabase(j);
 			this->ParseLogging(j);
