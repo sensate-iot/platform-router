@@ -6,8 +6,6 @@
  * @email  michel@michelmegens.net
  */
 
-#pragma once
-
 #include <sensateiot/consumers/messageconsumer.h>
 
 #include <re2/re2.h>

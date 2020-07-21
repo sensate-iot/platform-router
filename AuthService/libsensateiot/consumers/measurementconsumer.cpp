@@ -174,7 +174,6 @@ namespace sensateiot::consumers
 		std::vector<MessagePair> leftOver;
 		std::vector<models::ObjectId> notFound;
 		SensorLookupType sensor;
-		auto& log = util::Log::GetLog();
 
 		this->m_lock.lock();
 		data.reserve(std::max<std::size_t>(this->m_measurements.size(), 100000UL));

@@ -5,8 +5,6 @@
  * @email  michel@michelmegens.net
  */
 
-#pragma once
-
 #include <sensateiot.h>
 #include <sensateiot/models/objectid.h>
 #include <sensateiot/models/message.h>

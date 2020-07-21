@@ -136,12 +136,12 @@ set(LIB_HEADERS
 )
 
 SET(PROTO_FILES
-	${PROJECT_SOURCE_DIR}/libsensateiot/proto/datapoint.proto
+	${PROJECT_SOURCE_DIR}/libsensateiot/proto/measurement.proto
 )
 
 SET(PROTO_OUTPUT
-	${CMAKE_BINARY_DIR}/libsensateiot/proto/datapoint.pb.cc
-	${CMAKE_BINARY_DIR}/libsensateiot/proto/datapoint.pb.h
+	${CMAKE_BINARY_DIR}/libsensateiot/proto/measurement.pb.cc
+	${CMAKE_BINARY_DIR}/libsensateiot/proto/measurement.pb.h
 )
 add_custom_command(
 	OUTPUT ${PROTO_OUTPUT}

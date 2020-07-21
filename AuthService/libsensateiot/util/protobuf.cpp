@@ -9,7 +9,7 @@
 #include <sensateiot/util/base64.h>
 #include <sensateiot/util/time.h>
 
-#include <proto/datapoint.pb.h>
+#include <proto/measurement.pb.h>
 
 #include <string>
 #include <limits>

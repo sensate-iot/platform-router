@@ -30,7 +30,7 @@ namespace sensateiot::services
 		std::unique_lock lock(this->m_lock);
 		std::string uri = this->m_conf.GetMqtt().GetPrivateBroker().GetBroker().GetUri();
 
-		for(auto idx = 0U; idx < this->m_conf.GetWorkers(); idx++) {
+		for(auto idx = 0; idx < this->m_conf.GetWorkers(); idx++) {
 			consumers::MeasurementConsumer measurementHandler(client, this->m_cache, conf);
 			consumers::MessageConsumer messageHandler(client, this->m_cache, conf);
 
