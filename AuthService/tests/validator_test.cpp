@@ -83,6 +83,7 @@ static void authorize_message()
 	assert(search_regex.ok());
 
 	auto result = RE2::Replace(&message, search_regex, "Hello, World!");
+	(void)result;
 	assert(result);
 
 	auto compare = sensateiot::util::sha256_compare(message, "76d0d71b0abb9681a5984de91d07b7f434424492933d3069efa2a18e325bd911");

@@ -9,12 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef WIN32
 #include <sensateiot/getopt.h>
-#else
-#include <unistd.h>
-#endif
-
 #include <sensateiot/application.h>
 
 static void help()
@@ -29,7 +24,7 @@ int main(int argc, char* argv[])
 
 	path = NULL;
 
-	while((opt = getopt(argc, argv, "c:h")) != -1) {
+	while((opt = sensateiot_getopt(argc, argv, "c:h")) != -1) {
 		switch(opt) {
 		case 'c':
 			len = strlen(optarg);

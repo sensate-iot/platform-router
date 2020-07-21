@@ -31,7 +31,7 @@ static void __getopt_msg(const char *a, const char *b, const char *c, size_t l)
 #endif
 }
 
-int getopt(int argc, char *const argv[], const char *optstring)
+int sensateiot_getopt(int argc, char *const argv[], const char *optstring)
 {
 	int i, c, d;
 	int k, l;
@@ -195,7 +195,8 @@ __getopt_long_core(int argc, char *const *argv, const char *optstring, const str
 			return '?';
 		}
 	}
-	return getopt(argc, argv, optstring);
+
+	return sensateiot_getopt(argc, argv, optstring);
 }
 
 static int
@@ -232,12 +233,12 @@ __getopt_long(int argc, char *const *argv, const char *optstring, const struct o
 	return ret;
 }
 
-int getopt_long(int argc, char *const *argv, const char *optstring, const struct option *longopts, int *idx)
+int sensateiot_getopt_long(int argc, char *const *argv, const char *optstring, const struct option *longopts, int *idx)
 {
 	return __getopt_long(argc, argv, optstring, longopts, idx, 0);
 }
 
-int getopt_long_only(int argc, char *const *argv, const char *optstring, const struct option *longopts, int *idx)
+int sensateiot_getopt_long_only(int argc, char *const *argv, const char *optstring, const struct option *longopts, int *idx)
 {
 	return __getopt_long(argc, argv, optstring, longopts, idx, 1);
 }

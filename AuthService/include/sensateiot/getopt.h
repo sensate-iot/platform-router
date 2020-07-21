@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-extern int getopt(int, char * const [], const char *);
+extern int sensateiot_getopt(int, char * const [], const char *);
 extern char *optarg;
 extern int optind, opterr, optopt, optreset;
 
@@ -39,8 +39,8 @@ struct option {
 	int val;
 };
 
-extern int getopt_long(int, char *const *, const char *, const struct option *, int *);
-extern int getopt_long_only(int, char *const *, const char *, const struct option *, int *);
+extern int sensateiot_getopt_long(int, char *const *, const char *, const struct option *, int *);
+extern int sensateiot_getopt_long_only(int, char *const *, const char *, const struct option *, int *);
 
 #define no_argument        0
 #define required_argument  1
