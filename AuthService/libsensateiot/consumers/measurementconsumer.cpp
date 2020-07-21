@@ -71,7 +71,7 @@ namespace sensateiot::consumers
 		return pair.second.GetKey() == sensor.GetSecret();
 	}
 
-	void MeasurementConsumer::PublishAuthorizedMessages(const std::vector<models::RawMeasurement>& authorized) 
+	void MeasurementConsumer::PublishAuthorizedMessages(const std::vector<models::Measurement>& authorized) 
 	{
 		std::vector<ns_base::mqtt::delivery_token_ptr> tokens;
 
@@ -134,7 +134,7 @@ namespace sensateiot::consumers
 		this->m_leftOver.clear();
 		this->m_lock.unlock();
 
-		std::vector<models::RawMeasurement> authorized;
+		std::vector<models::Measurement> authorized;
 		authorized.reserve(data.size());
 
 		std::sort(std::begin(data), std::end(data), [](const auto& x, const auto& y)
@@ -186,7 +186,7 @@ namespace sensateiot::consumers
 			return x.second.GetObjectId().compare(y.second.GetObjectId()) < 0;
 		});
 		
-		std::vector<models::RawMeasurement> authorized;
+		std::vector<models::Measurement> authorized;
 		authorized.reserve(data.size());
 
 		for(auto&& pair : data) {

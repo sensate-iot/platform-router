@@ -13,7 +13,7 @@
 #include <sensateiot/stl/referencewrapper.h>
 #include <sensateiot/data/datacache.h>
 #include <sensateiot/models/objectid.h>
-#include <sensateiot/models/rawmeasurement.h>
+#include <sensateiot/models/measurement.h>
 #include <sensateiot/consumers/abstractconsumer.h>
 
 #include <re2/re2.h>
@@ -25,7 +25,7 @@
 
 namespace sensateiot::consumers
 {
-	class MeasurementConsumer : public AbstractConsumer<models::RawMeasurement> {
+	class MeasurementConsumer : public AbstractConsumer<models::Measurement> {
 	public:
 		explicit MeasurementConsumer(mqtt::IMqttClient& client, data::DataCache& cache, config::Config conf);
 		virtual ~MeasurementConsumer();
@@ -50,6 +50,6 @@ namespace sensateiot::consumers
 		typedef data::DataCache::SensorLookupType SensorLookupType;
 
 		bool ValidateMeasurement(const models::Sensor& sensor, MessagePair& pair) const;
-		void PublishAuthorizedMessages(const std::vector<models::RawMeasurement>& authorized);
+		void PublishAuthorizedMessages(const std::vector<models::Measurement>& authorized);
 	};
 }

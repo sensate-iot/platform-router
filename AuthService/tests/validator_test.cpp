@@ -53,7 +53,7 @@ static void validate_bulk()
 static void validate_indiv()
 {
 	sensateiot::data::MeasurementValidator validator;
-	std::vector<sensateiot::models::RawMeasurement> data;
+	std::vector<sensateiot::models::Measurement> data;
 
 	using ClockType = std::chrono::high_resolution_clock;
 

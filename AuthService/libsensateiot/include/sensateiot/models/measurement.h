@@ -16,7 +16,7 @@
 
 namespace sensateiot::models
 {
-	struct RawMeasurement {
+	struct Measurement {
 		struct DataEntry {
 			std::string m_unit;
 			double m_value;

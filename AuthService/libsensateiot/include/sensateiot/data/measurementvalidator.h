@@ -11,11 +11,11 @@
 #include <vector>
 #include <utility>
 
-#include <sensateiot/models/rawmeasurement.h>
+#include <sensateiot/models/measurement.h>
 
 namespace sensateiot::data
 {
 	struct MeasurementValidator {
-		std::pair<bool, models::RawMeasurement> operator()(const std::string& str) const;
+		std::pair<bool, models::Measurement> operator()(const std::string& str) const;
 	};
 }

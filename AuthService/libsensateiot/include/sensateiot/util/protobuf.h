@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <sensateiot/models/rawmeasurement.h>
+#include <sensateiot/models/measurement.h>
 
 #include <string>
 
@@ -21,10 +21,10 @@ namespace sensateiot::util
 	
 
 	template <>
-	std::vector<char> to_protobuf<std::vector<models::RawMeasurement>>(const std::vector<models::RawMeasurement>& value);
+	std::vector<char> to_protobuf<std::vector<models::Measurement>>(const std::vector<models::Measurement>& value);
 
 	std::vector<char> to_protobuf(
-		std::vector<models::RawMeasurement>::const_iterator begin,
-		std::vector<models::RawMeasurement>::const_iterator end
+		std::vector<models::Measurement>::const_iterator begin,
+		std::vector<models::Measurement>::const_iterator end
 	);
 }

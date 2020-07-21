@@ -176,7 +176,7 @@ namespace sensateiot::services
 		repo.PushMessage(std::move(pair));
 	}
 
-	void MessageService::AddMeasurements(std::vector<std::pair<std::string, models::RawMeasurement>> measurements)
+	void MessageService::AddMeasurements(std::vector<std::pair<std::string, models::Measurement>> measurements)
 	{
 		if(measurements.size() > std::numeric_limits<unsigned int>::max()) {
 			return;

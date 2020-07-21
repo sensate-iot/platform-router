@@ -14,7 +14,7 @@
 
 namespace sensateiot::data
 {
-	std::pair<bool, models::RawMeasurement> MeasurementValidator::operator()(const std::string &str) const
+	std::pair<bool, models::Measurement> MeasurementValidator::operator()(const std::string &str) const
 	{
 		try {
 			rapidjson::Document json;
@@ -22,7 +22,7 @@ namespace sensateiot::data
 
 			return detail::ParseSingleMeasurement(json);
 		} catch(std::exception &) {
-			return std::make_pair(false, models::RawMeasurement());
+			return std::make_pair(false, models::Measurement());
 		}
 	}
 }

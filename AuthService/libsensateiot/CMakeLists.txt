@@ -8,7 +8,7 @@ SET(SOURCES
 	models/apikey.cpp
 	models/user.cpp
 	models/sensor.cpp
-	models/rawmeasurement.cpp
+	models/measurement.cpp
 	models/message.cpp
 
 	config/config.cpp
@@ -95,7 +95,7 @@ set(LIB_HEADERS
 
 	sensateiot/models/apikey.h
 	sensateiot/models/objectid.h
-	sensateiot/models/rawmeasurement.h
+	sensateiot/models/measurement.h
 	sensateiot/models/sensor.h
 	sensateiot/models/user.h
 	sensateiot/models/message.h

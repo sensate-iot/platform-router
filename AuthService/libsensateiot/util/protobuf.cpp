@@ -17,14 +17,14 @@
 namespace sensateiot::util
 {
 	template <>
-	std::vector<char> to_protobuf<std::vector<models::RawMeasurement>>(const std::vector<models::RawMeasurement>& value)
+	std::vector<char> to_protobuf<std::vector<models::Measurement>>(const std::vector<models::Measurement>& value)
 	{
 		return to_protobuf(value.begin(), value.end());
 	}
 
 	std::vector<char> to_protobuf(
-		std::vector<models::RawMeasurement>::const_iterator begin,
-		std::vector<models::RawMeasurement>::const_iterator end)
+		std::vector<models::Measurement>::const_iterator begin,
+		std::vector<models::Measurement>::const_iterator end)
 	{
 		MeasurementData data;
 		auto now = util::GetIsoTimestamp();

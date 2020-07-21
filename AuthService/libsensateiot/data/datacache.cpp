@@ -6,7 +6,7 @@
  */
 
 #include <sensateiot/data/datacache.h>
-#include <sensateiot/models/rawmeasurement.h>
+#include <sensateiot/models/measurement.h>
 
 namespace sensateiot::data
 {
@@ -73,7 +73,7 @@ namespace sensateiot::data
 		return this->m_blackList.Contains(objId);
 	}
 
-	DataCache::SensorStatus DataCache::CanProcess(const models::RawMeasurement& raw) const
+	DataCache::SensorStatus DataCache::CanProcess(const models::Measurement& raw) const
 	{
 		SensorStatus rv = SensorStatus::Unknown;
 		auto now = boost::chrono::high_resolution_clock::now();

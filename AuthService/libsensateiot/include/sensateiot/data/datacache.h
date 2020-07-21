@@ -9,7 +9,7 @@
 
 #include <sensateiot/models/sensor.h>
 #include <sensateiot/models/user.h>
-#include <sensateiot/models/rawmeasurement.h>
+#include <sensateiot/models/measurement.h>
 
 #include <sensateiot/stl/map.h>
 
@@ -52,7 +52,7 @@ namespace sensateiot::data
 		/* Found, sensor data */
 		std::pair<bool, std::optional<models::Sensor>> GetSensor(const models::ObjectId& id) const;
 		bool IsBlackListed(const models::ObjectId& objId) const;
-		SensorStatus CanProcess(const models::RawMeasurement& raw) const;
+		SensorStatus CanProcess(const models::Measurement& raw) const;
 
 	private:
 		stl::Map<models::ObjectId, models::Sensor> m_sensors;

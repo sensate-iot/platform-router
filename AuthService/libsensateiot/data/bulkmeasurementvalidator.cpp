@@ -16,16 +16,16 @@
 
 namespace sensateiot::data
 {
-	std::optional<std::vector<std::pair<std::string, models::RawMeasurement>>> BulkMeasurementValidator::operator()(const std::string& str) const
+	std::optional<std::vector<std::pair<std::string, models::Measurement>>> BulkMeasurementValidator::operator()(const std::string& str) const
 	{
-		std::vector<std::pair<std::string, models::RawMeasurement>> measurements;
+		std::vector<std::pair<std::string, models::Measurement>> measurements;
 
 		try {
 			rapidjson::Document doc;
 			doc.Parse(str.c_str());
 
 			if(!doc.IsArray()) {
-				return std::optional<std::vector<std::pair<std::string, models::RawMeasurement>>>();
+				return std::optional<std::vector<std::pair<std::string, models::Measurement>>>();
 			}
 
 			for(auto iter = doc.Begin(); iter != doc.End(); ++iter) {
@@ -46,7 +46,7 @@ namespace sensateiot::data
 
 			return std::optional(std::move(measurements));
 		} catch (std::exception&) {
-			return std::optional<std::vector<std::pair<std::string, models::RawMeasurement>>>();
+			return std::optional<std::vector<std::pair<std::string, models::Measurement>>>();
 		}
 	}
 }

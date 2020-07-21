@@ -47,7 +47,7 @@ namespace sensateiot::services
 
 		std::time_t Process();
 		void AddMeasurement(std::string msg);
-		void AddMeasurements(std::vector<std::pair<std::string, models::RawMeasurement>> measurements);
+		void AddMeasurements(std::vector<std::pair<std::string, models::Measurement>> measurements);
 		void LoadAll();
 
 	private:
