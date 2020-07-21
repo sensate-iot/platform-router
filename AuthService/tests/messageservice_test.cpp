@@ -105,44 +105,7 @@ static void test_measurement_processing()
 	for(auto idx = 0U; idx < 10; idx++) {
 		service.AddMeasurement(std::string(json));
 	}
-	/*service.AddMeasurement(std::string(json));
-	service.AddMeasurement(std::string(json));
-	service.AddMeasurement(std::string(json));
-	service.AddMeasurement(std::string(json));
-	service.AddMeasurement(std::string(json));
-	service.AddMeasurement(std::string(json));
-	service.AddMeasurement(std::string(json));
-	service.AddMeasurement(std::string(json));
-	service.AddMeasurement(std::string(json));
-	service.AddMeasurement(std::string(json));*/
 
-	/*service.AddMeasurement(std::string(json_noauth));
-	service.AddMeasurement(std::string(json_noauth));
-	service.AddMeasurement(std::string(json_noauth));
-	service.AddMeasurement(std::string(json_noauth));
-	service.AddMeasurement(std::string(json_noauth));
-	service.AddMeasurement(std::string(json_noauth));
-	service.AddMeasurement(std::string(json_noauth));
-	service.AddMeasurement(std::string(json_noauth));
-	service.AddMeasurement(std::string(json_noauth));
-	service.AddMeasurement(std::string(json_noauth));
-	service.AddMeasurement(std::string(json_noauth));
-	
-	service.AddMeasurement(std::string(json_notfound));
-	service.AddMeasurement(std::string(json_notfound));
-	service.AddMeasurement(std::string(json_notfound));
-	service.AddMeasurement(std::string(json_notfound));
-	service.AddMeasurement(std::string(json_notfound));
-	service.AddMeasurement(std::string(json_notfound));
-	service.AddMeasurement(std::string(json_notfound));
-	service.AddMeasurement(std::string(json_notfound));
-	service.AddMeasurement(std::string(json_notfound));
-	service.AddMeasurement(std::string(json_notfound));
-	service.AddMeasurement(std::string(json_notfound));
-	service.AddMeasurement(std::string(json_notfound));
-	service.AddMeasurement(std::string(json_notfound));*/
-
-	service.Process();
 	service.Process();
 
 	auto& log = util::Log::GetLog();

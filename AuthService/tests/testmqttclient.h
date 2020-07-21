@@ -22,13 +22,15 @@ namespace sensateiot::test
 		{
 		}
 		
-		void Publish(const std::string& topic, const std::string& msg) override
+		ns_base::mqtt::delivery_token_ptr Publish(const std::string& topic, const std::string& msg) override
 		{
 			auto& log = util::Log::GetLog();
 			std::stringstream value;
 
 			value << "Publish on topic: " << topic;
 			log << value.str() << util::Log::NewLine;
+
+			return {};
 		}
 	};
 }
