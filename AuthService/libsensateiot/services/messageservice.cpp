@@ -169,8 +169,11 @@ namespace sensateiot::services
 			return;
 		}
 
-		auto pair = std::make_pair(std::move(msg), std::move(measurement.second));
+		this->AddMeasurement(std::make_pair(std::move(msg), std::move(measurement.second)));
+	}
 
+	void MessageService::AddMeasurement(std::pair<std::string, models::Measurement> measurement)
+	{
 		std::shared_lock lock(this->m_lock);
 		std::size_t current = this->m_index.fetch_add(1);
 
@@ -178,7 +181,7 @@ namespace sensateiot::services
 		++this->m_count;
 
 		auto &repo = this->m_measurementHandlers[current];
-		repo.PushMessage(std::move(pair));
+		repo.PushMessage(std::move(measurement));
 	}
 
 	void MessageService::AddMeasurements(std::vector<std::pair<std::string, models::Measurement>> measurements)
