@@ -33,6 +33,16 @@ namespace sensateiot::models
 		return this->m_data;
 	}
 
+	void Message::SetCreatedAt(const std::string& date)
+	{
+		this->m_createdAt = date;
+	}
+
+	const std::string& Message::GetCreatedAt() const
+	{
+		return this->m_createdAt;
+	}
+
 	void Message::SetObjectId(const ObjectId& id)
 	{
 		this->m_sensorId = id;

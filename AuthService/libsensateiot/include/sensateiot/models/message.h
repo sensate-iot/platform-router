@@ -21,6 +21,9 @@ namespace sensateiot::models
 		
 		void SetData(const std::string& data);
 		[[nodiscard]] const std::string& GetData() const;
+
+		void SetCreatedAt(const std::string& date);
+		[[nodiscard]] const std::string& GetCreatedAt() const;
 		
 		void SetObjectId(const ObjectId& id);
 		[[nodiscard]] const ObjectId& GetObjectId() const;
@@ -28,6 +31,7 @@ namespace sensateiot::models
 	private:
 		std::string m_secret;
 		std::string m_data;
+		std::string m_createdAt;
 		ObjectId m_sensorId;
 	};
 }
