@@ -46,13 +46,13 @@ function generateMeasurement(sensors) {
 		createdBySecret: sensors[idx].sensorSecret,
 		data: {
 			x: {
-				value: +(Math.random() * 10).toFixed(5),
+				value: +((Math.random() * 10).toFixed(5)),
 				unit: "m/s2",
 				precision: 0.01,
 				accuracy:  0.5
 			},
 			y: {
-				value: +(Math.random() * 100).toFixed(5),
+				value: +((Math.random() * 100).toFixed(5)),
 				unit: "m/s2",
 				precision: 0.01,
 				accuracy:  0.5
