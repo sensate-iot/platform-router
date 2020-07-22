@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package sensateiot;
+option csharp_namespace = "SensateService.Protobuf";
 
 message DataPoint {
 	double value = 1;

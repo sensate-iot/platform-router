@@ -35,6 +35,7 @@ SET(SOURCES
 	http/statushandler.cpp
 	http/bulkmeasurementhandler.cpp
 	http/measurementhandler.cpp
+	http/messagehandler.cpp
 	http/abstracthandler.cpp
 
 	services/userrepository.cpp
@@ -76,6 +77,7 @@ set(LIB_HEADERS
 	sensateiot/data/datacache.h
 	sensateiot/data/bulkmeasurementvalidator.h
 	sensateiot/data/measurementvalidator.h
+	sensateiot/data/messagevalidator.h
 
 	sensateiot/detail/redblacktree.h
 	sensateiot/detail/redblacktree.hpp
@@ -91,6 +93,7 @@ set(LIB_HEADERS
 	sensateiot/httpd/httprequest.h
 
 	sensateiot/http/statushandler.h
+	sensateiot/http/messagehandler.h
 	sensateiot/http/measurementhandler.h
 	sensateiot/http/bulkmeasurementhandler.h
 	sensateiot/http/abstracthandler.h
@@ -139,11 +142,14 @@ set(LIB_HEADERS
 
 SET(PROTO_FILES
 	${PROJECT_SOURCE_DIR}/libsensateiot/proto/measurement.proto
+	${PROJECT_SOURCE_DIR}/libsensateiot/proto/message.proto
 )
 
 SET(PROTO_OUTPUT
 	${CMAKE_BINARY_DIR}/libsensateiot/proto/measurement.pb.cc
 	${CMAKE_BINARY_DIR}/libsensateiot/proto/measurement.pb.h
+	${CMAKE_BINARY_DIR}/libsensateiot/proto/message.pb.cc
+	${CMAKE_BINARY_DIR}/libsensateiot/proto/message.pb.h
 )
 add_custom_command(
 	OUTPUT ${PROTO_OUTPUT}
@@ -176,10 +182,7 @@ SET(GENERIC_HEADERS
 SET(INCLUDE_DIR ${PROJECT_SOURCE_DIR})
 prepend_path(GENERIC_HEADERS ${INCLUDE_DIR})
 
-#add_custom_target(proto-dep DEPENDS ${PROTO_SRCS} ${PROTO_HDRS})
-
 add_library(sensateiot SHARED ${SOURCES} ${GENERIC_HEADERS} ${PROTO_OUTPUT})
-#add_dependencies(sensateiot proto-dep)
 target_link_libraries(sensateiot ${CONAN_LIBS})
 target_include_directories(sensateiot PRIVATE ${PROJECT_BINARY_DIR}/libsensateiot)
 
