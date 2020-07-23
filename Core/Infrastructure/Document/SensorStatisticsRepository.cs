@@ -144,6 +144,23 @@ namespace SensateService.Infrastructure.Document
 			return await result.ToListAsync().AwaitBackground();
 		}
 
+		public async Task<IEnumerable<SensorStatisticsEntry>> GetAfterAsync(IEnumerable<Sensor> sensors, DateTime dt)
+		{
+			FilterDefinition<SensorStatisticsEntry> filter;
+			var filterBuilder = Builders<SensorStatisticsEntry>.Filter;
+			var date = dt.ThisHour();
+			var ids = sensors.Select(x => x.InternalId);
+
+			filter = filterBuilder.In(x => x.SensorId, ids) & filterBuilder.Gte(x => x.Date, date);
+			var result = await this._stats.FindAsync(filter).AwaitBackground();
+
+			if(result == null) {
+				return null;
+			}
+
+			return await result.ToListAsync().AwaitBackground();
+		}
+
 		public async Task<IEnumerable<SensorStatisticsEntry>> GetAfterAsync(Sensor sensor, DateTime dt)
 		{
 			FilterDefinition<SensorStatisticsEntry> filter;

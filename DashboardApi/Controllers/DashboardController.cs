@@ -118,25 +118,12 @@ namespace SensateService.DashboardApi.Controllers
 		{
 			var raw = await this._sensors.GetAsync(user).AwaitBackground();
 			var sensors = raw.ToList();
-			List<SensorStatisticsEntry> rv;
 
 			if(sensors.Count <= 0) {
 				return null;
 			}
 
-			var tasks = new Task<IEnumerable<SensorStatisticsEntry>>[sensors.Count];
-			for(var i = 0; i < sensors.Count; i++) {
-				tasks[i] = this._stats.GetAfterAsync(sensors[i], date);
-			}
-
-			var results = await Task.WhenAll(tasks).AwaitBackground();
-			rv = new List<SensorStatisticsEntry>();
-
-			foreach(var entry in results) {
-				rv.AddRange(entry);
-			}
-
-			return rv;
+			return await this._stats.GetAfterAsync(sensors, date).AwaitBackground();
 		}
 
 		private async Task<Graph<DateTime, long>> GetApiCallsPerDayAsync()
