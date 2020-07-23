@@ -47,6 +47,7 @@ SET(SOURCES
 
 	data/datacache.cpp
 	data/measurementvalidator.cpp
+	data/messagevalidator.cpp
 	data/bulkmeasurementvalidator.cpp
 
 	consumers/measurementconsumer.cpp

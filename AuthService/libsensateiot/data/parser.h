@@ -1,9 +1,8 @@
 
 #pragma once
 
-#include <rapidjson/document.h>
-#include <rapidjson/rapidjson.h>
 #include <sensateiot/models/measurement.h>
+#include <sensateiot/models/message.h>
 
 #include <string>
 #include <vector>
@@ -18,6 +17,18 @@ namespace sensateiot::detail
 			json.HasMember(models::Measurement::Latitude.data()) &&
 			json[models::Measurement::Longitude.data()].IsDouble() &&
 			json[models::Measurement::Latitude.data()].IsDouble();
+	}
+
+	template <typename T>
+	std::pair<bool, models::Message> ParseSingleMessage(const T& json)
+	{
+		try {
+			models::Message msg;
+
+			return std::make_pair(true, std::Move(msg));
+		} catch(std::exception&) {
+			return {};
+		}
 	}
 
 	template <typename T>

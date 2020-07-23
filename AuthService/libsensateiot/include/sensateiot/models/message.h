@@ -11,6 +11,7 @@
 #include <sensateiot/models/objectid.h>
 
 #include <string>
+#include <string_view>
 
 namespace sensateiot::models
 {
@@ -33,5 +34,10 @@ namespace sensateiot::models
 		std::string m_data;
 		std::string m_createdAt;
 		ObjectId m_sensorId;
+
+		static constexpr auto Secret = std::string_view("createdBySecret");
+		static constexpr auto Data = std::string_view("data");
+		static constexpr auto CreatedAt = std::string_view("createdAt");
+		static constexpr auto SensorId = std::string_view("createdById");
 	};
 }
