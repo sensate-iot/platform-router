@@ -36,6 +36,7 @@ SET(SOURCES
 	http/bulkmeasurementhandler.cpp
 	http/measurementhandler.cpp
 	http/messagehandler.cpp
+	http/bulkmessagehandler.cpp
 	http/abstracthandler.cpp
 
 	services/userrepository.cpp
@@ -48,6 +49,7 @@ SET(SOURCES
 	data/datacache.cpp
 	data/measurementvalidator.cpp
 	data/messagevalidator.cpp
+	data/bulkmessagevalidator.cpp
 	data/bulkmeasurementvalidator.cpp
 
 	consumers/measurementconsumer.cpp
@@ -79,6 +81,7 @@ set(LIB_HEADERS
 	sensateiot/data/bulkmeasurementvalidator.h
 	sensateiot/data/measurementvalidator.h
 	sensateiot/data/messagevalidator.h
+	sensateiot/data/bulkmessagevalidator.h
 
 	sensateiot/detail/redblacktree.h
 	sensateiot/detail/redblacktree.hpp
@@ -95,6 +98,7 @@ set(LIB_HEADERS
 
 	sensateiot/http/statushandler.h
 	sensateiot/http/messagehandler.h
+	sensateiot/http/bulkmessagehandler.h
 	sensateiot/http/measurementhandler.h
 	sensateiot/http/bulkmeasurementhandler.h
 	sensateiot/http/abstracthandler.h
