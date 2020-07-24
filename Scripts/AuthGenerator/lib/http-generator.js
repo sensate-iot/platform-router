@@ -42,8 +42,8 @@ function generateMeasurement(sensors) {
 	const measurement = {
 		longitude: +location[1].toFixed(5),
 		latitude: +location[0].toFixed(5),
-		createdById: sensors[idx].sensorId,
-		createdBySecret: sensors[idx].sensorSecret,
+		sensorId: sensors[idx].sensorId,
+		secret: sensors[idx].sensorSecret,
 		data: {
 			x: {
 				value: +((Math.random() * 10).toFixed(5)),
@@ -67,7 +67,9 @@ function generateMeasurement(sensors) {
 	}
 
 	const hash = crypto.createHash('sha256').update(JSON.stringify(measurement));
-	measurement.createdBySecret = `$${hash.digest('hex')}==`;
+	measurement.secret = `$${hash.digest('hex')}==`;
+
+	console.log(JSON.stringify(measurement));
 
 	return measurement;
 }
