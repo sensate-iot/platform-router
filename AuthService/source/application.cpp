@@ -13,6 +13,7 @@
 #include <sensateiot/http/statushandler.h>
 #include <sensateiot/http/bulkmeasurementhandler.h>
 #include <sensateiot/http/measurementhandler.h>
+#include <sensateiot/http/messagehandler.h>
 
 #include <sensateiot/mqtt/basemqttclient.h>
 #include <sensateiot/mqtt/internalmqttclient.h>
@@ -95,8 +96,10 @@ namespace sensateiot
 		http::StatusHandler status;
 		http::BulkMeasurementHandler bulkMeasurementHandler(service);
 		http::MeasurementHandler measurementHandler(service);
+		http::MessageHandler messageHandler(service);
 
 		server.AddHandler("/v1/status", status);
+		server.AddHandler("/v1/processor/message", messageHandler);
 		server.AddHandler("/v1/processor/measurements", bulkMeasurementHandler);
 		server.AddHandler("/v1/processor/measurement", measurementHandler);
 		server.Run();
