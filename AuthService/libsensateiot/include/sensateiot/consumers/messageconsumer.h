@@ -29,14 +29,14 @@ namespace sensateiot::consumers
 	public:
 		explicit MessageConsumer(mqtt::IMqttClient& client, data::DataCache& cache, config::Config conf);
 		
-		void PushMessage(MessagePair measurement) override;
-		void PushMessages(std::vector<MessagePair>&& measurements) override;
 		ProcessingStats Process() override;
 		std::size_t PostProcess() override;
 
 	private:
-		stl::ReferenceWrapper<mqtt::IMqttClient> m_internal;
-		stl::ReferenceWrapper<data::DataCache> m_cache;
-		config::Config m_config;
+		typedef data::DataCache::SensorLookupType SensorLookupType;
+		std::vector<MessagePair> m_leftOver;
+
+		/* Methods */
+		bool ValidateMeasurement(const models::Sensor& sensor, MessagePair& pair) const;
 	};
 }

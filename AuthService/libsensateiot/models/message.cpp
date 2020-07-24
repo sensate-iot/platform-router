@@ -52,4 +52,14 @@ namespace sensateiot::models
 	{
 		return this->m_sensorId;
 	}
+
+	void Message::SetLocation(std::pair<double, double> location)
+	{
+		this->m_coords = std::move(location);
+	}
+
+	const std::optional<std::pair<double, double>>& Message::GetLocation() const
+	{
+		return this->m_coords;
+	}
 }

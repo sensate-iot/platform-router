@@ -14,11 +14,6 @@ namespace sensateiot::models
 		this->m_id = id;
 	}
 
-	const ObjectId &Measurement::SetObjectId()
-	{
-		return this->m_id;
-	}
-
 	const ObjectId &Measurement::GetObjectId() const
 	{
 		return this->m_id;

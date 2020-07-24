@@ -10,6 +10,8 @@
 #include <sensateiot.h>
 #include <sensateiot/models/objectid.h>
 
+#include <utility>
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -28,16 +30,23 @@ namespace sensateiot::models
 		
 		void SetObjectId(const ObjectId& id);
 		[[nodiscard]] const ObjectId& GetObjectId() const;
+		
+		void SetLocation(std::pair<double,double> location);
+		[[nodiscard]] const std::optional<std::pair<double,double>>& GetLocation() const;
 
 	private:
 		std::string m_secret;
 		std::string m_data;
 		std::string m_createdAt;
 		ObjectId m_sensorId;
+		std::optional<std::pair<double, double>> m_coords;
 
-		static constexpr auto Secret = std::string_view("createdBySecret");
+	public:
+		static constexpr auto Secret = std::string_view("secret");
 		static constexpr auto Data = std::string_view("data");
-		static constexpr auto CreatedAt = std::string_view("createdAt");
-		static constexpr auto SensorId = std::string_view("createdById");
+		static constexpr auto Timestamp = std::string_view("createdAt");
+		static constexpr auto SensorId = std::string_view("sensorId");
+		static constexpr auto Longitude = std::string_view("longitude");
+		static constexpr auto Latitude = std::string_view("latitude");
 	};
 }

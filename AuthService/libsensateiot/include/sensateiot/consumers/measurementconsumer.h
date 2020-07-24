@@ -16,8 +16,6 @@
 #include <sensateiot/models/measurement.h>
 #include <sensateiot/consumers/abstractconsumer.h>
 
-#include <re2/re2.h>
-
 #include <string>
 #include <string_view>
 #include <vector>
@@ -28,28 +26,17 @@ namespace sensateiot::consumers
 	class MeasurementConsumer : public AbstractConsumer<models::Measurement> {
 	public:
 		explicit MeasurementConsumer(mqtt::IMqttClient& client, data::DataCache& cache, config::Config conf);
+		MeasurementConsumer(MeasurementConsumer&& rhs) noexcept ;
+		MeasurementConsumer& operator=(MeasurementConsumer&& rhs) noexcept;
 		virtual ~MeasurementConsumer();
 
-		void PushMessage(MessagePair measurement) override;
-		void PushMessages(std::vector<MessagePair>&& measurements) override;
 		ProcessingStats Process() override;
 		std::size_t PostProcess() override;
 
-		MeasurementConsumer(MeasurementConsumer&& rhs) noexcept ;
-		MeasurementConsumer& operator=(MeasurementConsumer&& rhs) noexcept;
-
 	private:
-		stl::ReferenceWrapper<mqtt::IMqttClient> m_internal;
-		stl::ReferenceWrapper<data::DataCache> m_cache;
-		std::vector<MessagePair> m_measurements;
-		std::vector<MessagePair> m_leftOver;
-		std::mutex m_lock;
-		RE2 m_regex;
-		config::Config m_config;
-
 		typedef data::DataCache::SensorLookupType SensorLookupType;
+		std::vector<MessagePair> m_leftOver;
 
 		bool ValidateMeasurement(const models::Sensor& sensor, MessagePair& pair) const;
-		void PublishAuthorizedMessages(const std::vector<models::Measurement>& authorized);
 	};
 }

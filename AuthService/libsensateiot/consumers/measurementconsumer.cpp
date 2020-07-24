@@ -10,37 +10,27 @@
 #include <sensateiot/consumers/measurementconsumer.h>
 #include <sensateiot/util/log.h>
 #include <sensateiot/util/sha256.h>
-#include <sensateiot/util/protobuf.h>
-#include <sensateiot/util/gzip.h>
 
 #include <mqtt/async_client.h>
 
 namespace sensateiot::consumers
 {
 	MeasurementConsumer::MeasurementConsumer(mqtt::IMqttClient &client, data::DataCache &cache, config::Config conf) :
-		m_internal(client),
-		m_cache(cache),
-		m_regex(SearchRegex.data()),
-		m_config(std::move(conf))
+		AbstractConsumer(client, cache, std::move(conf))
 	{
-		this->m_measurements.reserve(100000);
 	}
 
 	MeasurementConsumer::~MeasurementConsumer()
 	{
 		this->m_lock.lock();
-		this->m_measurements.clear();
+		this->m_messages.clear();
 		this->m_lock.unlock();
 	}
 
 	MeasurementConsumer::MeasurementConsumer(MeasurementConsumer &&rhs) noexcept :
-		m_regex(SearchRegex.data()), m_config(std::move(rhs.m_config))
+		AbstractConsumer(std::forward<AbstractConsumer>(rhs))
 	{
 		std::scoped_lock l(this->m_lock, rhs.m_lock);
-
-		this->m_internal = std::move(rhs.m_internal);
-		this->m_measurements = std::move(rhs.m_measurements);
-		this->m_cache = std::move(rhs.m_cache);
 		this->m_leftOver = std::move(rhs.m_leftOver);
 	}
 
@@ -48,11 +38,8 @@ namespace sensateiot::consumers
 	{
 		std::scoped_lock l(this->m_lock, rhs.m_lock);
 
-		this->m_internal = std::move(rhs.m_internal);
-		this->m_measurements = std::move(rhs.m_measurements);
-		this->m_cache = std::move(rhs.m_cache);
-		this->m_config = std::move(rhs.m_config);
 		this->m_leftOver = std::move(rhs.m_leftOver);
+		this->Move(rhs);
 
 		return *this;
 	}
@@ -69,53 +56,6 @@ namespace sensateiot::consumers
 
 		/* This is not a SHA256 secured message. Authorize manually. */
 		return pair.second.GetKey() == sensor.GetSecret();
-	}
-
-	void MeasurementConsumer::PublishAuthorizedMessages(const std::vector<models::Measurement>& authorized) 
-	{
-		std::vector<ns_base::mqtt::delivery_token_ptr> tokens;
-
-		try {
-			for(std::size_t idx = 0UL; idx < authorized.size(); idx += this->m_config.GetInternalBatchSize()) {
-				auto begin = authorized.begin() + idx;
-				auto endIdx = (idx + this->m_config.GetInternalBatchSize() <= authorized.size()) ?
-					idx + this->m_config.GetInternalBatchSize() : authorized.size();
-				auto end = authorized.begin() + endIdx;
-
-				auto data = util::Compress(util::to_protobuf(begin, end));
-				auto token = this->m_internal->Publish(this->m_config.GetMqtt().GetPrivateBroker().GetBulkMeasurementTopic(), data);
-				tokens.push_back(token);
-			}
-
-			for(auto&& token : tokens) {
-				if (!token) {
-					continue;
-				}
-
-				if(token->is_complete()) {
-					continue;
-				}
-
-				token->wait();
-			}
-		} catch(ns_base::mqtt::exception& ex) {
-			auto& log = util::Log::GetLog();
-			log << "Unable to publish messages: " << ex.get_error_str() << util::Log::NewLine;
-		}
-	}
-
-	void MeasurementConsumer::PushMessage(MessagePair measurement)
-	{
-		std::scoped_lock l(this->m_lock);
-		this->m_measurements.emplace_back(std::move(measurement));
-	}
-
-	void MeasurementConsumer::PushMessages(std::vector<MessagePair>&& measurements)
-	{
-		std::scoped_lock lock(this->m_lock);
-
-		std::move(measurements.begin(), measurements.end(), std::back_inserter(this->m_measurements));
-		measurements.clear();
 	}
 
 	std::size_t MeasurementConsumer::PostProcess()
@@ -164,7 +104,7 @@ namespace sensateiot::consumers
 			return {};
 		}
 
-		this->PublishAuthorizedMessages(authorized);
+		this->PublishAuthorizedMessages(authorized, this->m_config.GetMqtt().GetPrivateBroker().GetBulkMeasurementTopic());
 		return authorized.size();
 	}
 
@@ -176,9 +116,9 @@ namespace sensateiot::consumers
 		SensorLookupType sensor;
 
 		this->m_lock.lock();
-		data.reserve(std::max<std::size_t>(this->m_measurements.size(), 100000UL));
-		std::swap(this->m_measurements, data);
-		this->m_measurements.clear();
+		data.reserve(std::max<std::size_t>(this->m_messages.size(), MessageArraySize));
+		std::swap(this->m_messages, data);
+		this->m_messages.clear();
 		this->m_lock.unlock();
 
 		std::sort(std::begin(data), std::end(data), [](const MessagePair& x, const MessagePair& y)
@@ -220,7 +160,7 @@ namespace sensateiot::consumers
 		data.clear();
 
 		if(!authorized.empty()) {
-			this->PublishAuthorizedMessages(authorized);
+			this->PublishAuthorizedMessages(authorized, this->m_config.GetMqtt().GetPrivateBroker().GetBulkMeasurementTopic());
 		}
 
 		std::scoped_lock l(this->m_lock);
