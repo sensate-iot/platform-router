@@ -24,7 +24,7 @@ namespace sensateiot::services
 			AbstractApiKeyRepository &keys,
 			AbstractSensorRepository &sensors,
 			const config::Config &conf
-	) : m_conf(conf), m_index(0), m_count(0),
+	) : m_conf(conf), m_measurementIndex(0), m_messageIndex(0), m_count(0),
 	    m_keyRepo(keys), m_userRepo(users), m_sensorRepo(sensors)
 	{
 		std::unique_lock lock(this->m_lock);
@@ -78,7 +78,8 @@ namespace sensateiot::services
 					);
 
 					return measurementResult;
-				} catch(std::exception&) {
+				} catch(std::exception& ex) {
+					util::Log::GetLog() << "Unable to publish messages: " << ex.what() << util::Log::NewLine;
 					return std::pair(std::size_t{}, std::vector < models::ObjectId>{});
 				}
 			};
@@ -141,7 +142,7 @@ namespace sensateiot::services
 			return {};
 		}
 
-		log << "Processing " << std::to_string(count) << " measurements!" << util::Log::NewLine;
+		log << "Processing " << std::to_string(count) << " messages!" << util::Log::NewLine;
 		auto start = boost::chrono::system_clock::now();
 		auto ids = this->Process(false);
 
@@ -175,13 +176,25 @@ namespace sensateiot::services
 	void MessageService::AddMeasurement(std::pair<std::string, models::Measurement> measurement)
 	{
 		std::shared_lock lock(this->m_lock);
-		std::size_t current = this->m_index.fetch_add(1);
+		std::size_t current = this->m_measurementIndex.fetch_add(1);
 
 		current %= this->m_measurementHandlers.size();
 		++this->m_count;
 
 		auto &repo = this->m_measurementHandlers[current];
 		repo.PushMessage(std::move(measurement));
+	}
+
+	void MessageService::AddMessage(std::pair<std::string, models::Message> message)
+	{
+		std::shared_lock lock(this->m_lock);
+		std::size_t current = this->m_messageIndex.fetch_add(1);
+
+		current %= this->m_messageHandlers.size();
+		++this->m_count;
+
+		auto &repo = this->m_messageHandlers[current];
+		repo.PushMessage(std::move(message));
 	}
 
 	void MessageService::AddMeasurements(std::vector<std::pair<std::string, models::Measurement>> measurements)
@@ -191,13 +204,29 @@ namespace sensateiot::services
 		}
 		
 		std::shared_lock lock(this->m_lock);
-		std::size_t current = this->m_index.fetch_add(1);
+		std::size_t current = this->m_measurementIndex.fetch_add(1);
 
 		current %= this->m_measurementHandlers.size();
 		this->m_count += static_cast<unsigned int>(measurements.size());
 
 		auto &repo = this->m_measurementHandlers[current];
 		repo.PushMessages(std::move(measurements));
+	}
+
+	void MessageService::AddMessages(std::vector<std::pair<std::string, models::Message>> messages)
+	{
+		if(messages.size() > std::numeric_limits<unsigned int>::max()) {
+			return;
+		}
+		
+		std::shared_lock lock(this->m_lock);
+		std::size_t current = this->m_messageIndex.fetch_add(1);
+
+		current %= this->m_messageHandlers.size();
+		this->m_count += static_cast<unsigned int>(messages.size());
+
+		auto &repo = this->m_messageHandlers[current];
+		repo.PushMessages(std::move(messages));
 	}
 
 	void MessageService::LoadAll()

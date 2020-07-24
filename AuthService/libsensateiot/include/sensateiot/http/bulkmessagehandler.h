@@ -1,5 +1,5 @@
 /*
- * HTTP message handler.
+ * HTTP bulk message handler.
  *
  * @author Michel Megens
  * @email  michel@michelmegens.net
@@ -12,24 +12,23 @@
 #include <sensateiot/http/abstracthandler.h>
 #include <sensateiot/services/messageservice.h>
 #include <sensateiot/stl/referencewrapper.h>
-#include <sensateiot/data/messagevalidator.h>
+#include <sensateiot/data/bulkmessagevalidator.h>
 
 #include <string>
 
 namespace sensateiot::http
 {
-	class MessageHandler : public AbstractHandler {
+	class BulkMessageHandler : public AbstractHandler {
 	public:
-		explicit MessageHandler() = default;
-		explicit MessageHandler(services::MessageService& service);
-		~MessageHandler() override = default;
+		explicit BulkMessageHandler() = default;
+		explicit BulkMessageHandler(services::MessageService& service);
 
 		httpd::HttpResponse HandleRequest(const httpd::HttpRequest& request) override;
 
 	private:
 		stl::ReferenceWrapper<services::MessageService> m_service;
-		data::MessageValidator m_validator;
+		data::BulkMessageValidator m_validator;
 
-		static constexpr auto AcceptedMessage = std::string_view(R"({"message":"Message queued."})");
+		static constexpr auto AcceptedMessage = std::string_view(R"({"message":"Messages queued.","count":%llu})");
 	};
 }

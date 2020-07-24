@@ -28,6 +28,8 @@
 #include <sensateiot/models/user.h>
 #include <sensateiot/models/apikey.h>
 #include <sensateiot/models/objectid.h>
+#include <sensateiot/models/measurement.h>
+#include <sensateiot/models/message.h>
 
 #include <string>
 #include <atomic>
@@ -48,13 +50,16 @@ namespace sensateiot::services
 		std::time_t Process();
 		void AddMeasurement(std::string msg);
 		void AddMeasurement(std::pair<std::string, models::Measurement> measurement);
+		void AddMessage(std::pair<std::string, models::Message> messages);
 		void AddMeasurements(std::vector<std::pair<std::string, models::Measurement>> measurements);
+		void AddMessages(std::vector<std::pair<std::string, models::Message>> messages);
 		void LoadAll();
 
 	private:
 		mutable std::shared_mutex m_lock;
 		config::Config m_conf;
-		std::atomic_uint8_t m_index;
+		std::atomic_uint8_t m_measurementIndex;
+		std::atomic_uint8_t m_messageIndex;
 		std::vector<consumers::MeasurementConsumer> m_measurementHandlers;
 		std::vector<consumers::MessageConsumer> m_messageHandlers;
 
