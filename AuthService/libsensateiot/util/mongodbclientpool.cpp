@@ -16,17 +16,6 @@ namespace sensateiot::util
 		mongoc_init();
 		this->m_uri = mongoc_uri_new(config.GetConnectionString().c_str());
 		this->m_pool = mongoc_client_pool_new(this->m_uri);
-
-//		auto* client = mongoc_client_new_from_uri(this->m_uri);
-//		mongoc_client_destroy(client);
-
-//		auto testClient = this->m_pool.acquire();
-//
-//		auto& lg = util::Log::GetLog();
-//
-//		if(testClient) {
-//			lg << "MongoDB connected!" << Log::NewLine;
-//		}
 	}
 
 	void MongoDBClientPool::Init(config::MongoDB config)
