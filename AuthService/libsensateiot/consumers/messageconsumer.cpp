@@ -32,7 +32,7 @@ namespace sensateiot::consumers
 		SensorLookupType sensor;
 
 		this->m_lock.lock();
-		data.reserve(std::max<std::size_t>(this->m_messages.size(), MessageArraySize));
+		data.reserve(MessageArraySize);
 		std::swap(this->m_messages, data);
 		this->m_messages.clear();
 		this->m_lock.unlock();

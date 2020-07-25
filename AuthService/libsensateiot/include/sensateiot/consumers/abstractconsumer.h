@@ -30,6 +30,7 @@ namespace sensateiot::consumers
 		explicit AbstractConsumer(mqtt::IMqttClient& client, data::DataCache& cache, config::Config conf) :
 			m_internal(client), m_cache(cache), m_config(std::move(conf)), m_regex(SearchRegex.data())
 		{
+			std::scoped_lock l(this->m_lock);
 			this->m_messages.reserve(MessageArraySize);
 		}
 
