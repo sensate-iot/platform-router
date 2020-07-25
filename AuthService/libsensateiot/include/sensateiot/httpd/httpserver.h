@@ -17,6 +17,8 @@
 #include <sensateiot/http/abstracthandler.h>
 
 #include <config/config.h>
+
+#include <limits>
 #include <atomic>
 
 namespace sensateiot::httpd
@@ -26,7 +28,7 @@ namespace sensateiot::httpd
 		typedef HttpListener::HttpRequestHandler HttpRequestHandler;
 		typedef HttpListener::HandlerMap HandlerMap;
 
-		HttpServer() = default;
+		explicit HttpServer();
 		explicit HttpServer(const config::Config& config);
 
 		void Run();
@@ -46,5 +48,7 @@ namespace sensateiot::httpd
 		config::Config m_config{};
 		std::atomic_bool m_running;
 		HandlerMap m_handlers;
+
+		static constexpr auto HandlerTimeout = std::numeric_limits<long>::max();
 	};
 }
