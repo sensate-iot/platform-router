@@ -133,6 +133,16 @@ namespace sensateiot::config
 		this->m_internalBulkMeasurementTopic = topic;
 	}
 
+	const std::string& PrivateBroker::GetClientId() const
+	{
+		return this->m_clientId;
+	}
+
+	void PrivateBroker::SetClientId(const std::string& id)
+	{
+		this->m_clientId = id;
+	}
+
 	const MqttBroker& PrivateBroker::GetBroker() const
 	{
 		return this->m_broker;

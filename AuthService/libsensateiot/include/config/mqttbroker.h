@@ -88,10 +88,15 @@ namespace sensateiot::config
 		const std::string& GetBulkMeasurementTopic() const;
 		void SetBulkMeasurementTopic(const std::string& topic);
 
+		[[nodiscard]]
+		const std::string& GetClientId() const;
+		void SetClientId(const std::string& id);
+
 	private:
 		MqttBroker m_broker{};
 		std::string m_internalMeasurementTopic;
 		std::string m_internalBulkMeasurementTopic;
 		std::string m_internalMessageTopic;
+		std::string m_clientId;
 	};
 }

@@ -67,7 +67,11 @@ namespace sensateiot
 		// Internal client
 		mqtt::MqttInternalCallback icb;
 		auto ihost = this->m_config.GetMqtt().GetPrivateBroker().GetBroker().GetUri();
-		mqtt::InternalMqttClient iclient(ihost, "3lasdfjlas", std::move(icb));
+		mqtt::InternalMqttClient iclient(
+			ihost,
+			this->m_config.GetMqtt().GetPrivateBroker().GetClientId(),
+			std::move(icb)
+		);
 		iclient.Connect(this->m_config.GetMqtt());
 
 		services::UserRepository users(this->m_config.GetDatabase().GetPostgreSQL());
@@ -166,6 +170,8 @@ namespace sensateiot
 				.SetMeasurementTopic(j["Mqtt"]["InternalBroker"]["InternalMeasurementTopic"]);
 		this->m_config.GetMqtt().GetPrivateBroker()
 				.SetMessageTopic(j["Mqtt"]["InternalBroker"]["InternalMessageTopic"]);
+		this->m_config.GetMqtt().GetPrivateBroker()
+				.SetClientId(j["Mqtt"]["InternalBroker"]["ClientId"]);
 	}
 
 	void Application::ParseDatabase(nlohmann::json &json)
