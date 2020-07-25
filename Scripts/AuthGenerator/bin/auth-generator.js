@@ -11,6 +11,7 @@ function main() {
 	.option('-i --interval <num>', 'interval to generate measurements', 1000)
 	.option('-d, --datapoints <num>', 'number of datapoints to generate for each measurement', 3)
 	.option('-c, --count <num>', 'number of measurements to generate', 0)
+	.option('-H, --host <host>', 'address of the authorization server', 'localhost:8080')
 	.option('-s, --sensors <sensorPath>', 'sensor secrets & ID\'s', undefined);
 
 	program.parse(process.argv);
@@ -26,7 +27,8 @@ function main() {
 		wrk: program.wrk,
 		interval: +program.interval,
 		count: +program.count,
-		datapoints: +program.datapoints
+		datapoints: +program.datapoints,
+		host: program.host
 	}
 
 	if(args.wrk) {

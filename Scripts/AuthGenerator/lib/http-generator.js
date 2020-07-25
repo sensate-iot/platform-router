@@ -10,7 +10,8 @@ const crypto = require('crypto');
 const unirest = require('unirest');
 
 function getRandNumber(min, max) {
-	return Math.floor(Math.random() * ( max - min)) + min;
+	return 1;
+	//return Math.floor(Math.random() * ( max - min)) + min;
 }
 
 function generateLocationAround(lat, lng, radius) {
@@ -40,8 +41,8 @@ function generateMeasurement(sensors) {
 	const location = generateLocationAround(51.59137, 4.7786, 1200);
 
 	const measurement = {
-		longitude: +location[1].toFixed(5),
-		latitude: +location[0].toFixed(5),
+		longitude: +(location[1].toFixed(5)),
+		latitude: +(location[0].toFixed(5)),
 		sensorId: sensors[idx].sensorId,
 		secret: sensors[idx].sensorSecret,
 		data: {
@@ -58,7 +59,7 @@ function generateMeasurement(sensors) {
 				accuracy:  0.5
 			},
 			z: {
-				value: +(Math.random() * 200).toFixed(5),
+				value: +((Math.random() * 200).toFixed(5)),
 				unit: "m/s2",
 				precision: 0.01,
 				accuracy:  0.5
@@ -69,17 +70,15 @@ function generateMeasurement(sensors) {
 	const hash = crypto.createHash('sha256').update(JSON.stringify(measurement));
 	measurement.secret = `$${hash.digest('hex')}==`;
 
-	console.log(JSON.stringify(measurement));
-
 	return measurement;
 }
 
-function send(content) {
-	var req = unirest("POST", "http://localhost:8080/v1/processor/measurements");
+function send(host, content) {
+	var req = unirest("POST", `http://${host}/v1/processor/measurements`);
 
 	req.headers({
 		"Cache-Control": "no-cache",
-		"Accept": "*/*",
+		"Accept": "application/json",
 		"Connection": "keep-alive",
 		"Content-Type": "application/json"
 	});
@@ -87,13 +86,7 @@ function send(content) {
 	req.type("json");
 	req.send(JSON.stringify(content));
 
-	req.end(function (res) {
-		if (res.error) {
-			throw new Error(res.error);
-		}
-
-		//console.log(res.body);
-	});
+	req.end(function (res) { });
 }
 
 function generateSend(args, sensors) {
@@ -103,7 +96,7 @@ function generateSend(args, sensors) {
 		measurements.push((generateMeasurement(sensors)));
 	}
 
-	send(measurements);
+	send(args.host, measurements);
 }
 
 function generate(args) {
