@@ -28,6 +28,9 @@ namespace sensateiot::consumers
 	class MessageConsumer : public AbstractConsumer<models::Message> {
 	public:
 		explicit MessageConsumer(mqtt::IMqttClient& client, data::DataCache& cache, config::Config conf);
+		MessageConsumer(MessageConsumer&& rhs) noexcept ;
+		MessageConsumer& operator=(MessageConsumer&& rhs) noexcept;
+		virtual ~MessageConsumer();
 		
 		ProcessingStats Process() override;
 		std::size_t PostProcess() override;
@@ -37,6 +40,6 @@ namespace sensateiot::consumers
 		std::vector<MessagePair> m_leftOver;
 
 		/* Methods */
-		bool ValidateMeasurement(const models::Sensor& sensor, MessagePair& pair) const;
+		bool ValidateMessage(const models::Sensor& sensor, MessagePair& pair) const;
 	};
 }

@@ -22,9 +22,8 @@ namespace sensateiot::consumers
 
 	MeasurementConsumer::~MeasurementConsumer()
 	{
-		this->m_lock.lock();
-		this->m_messages.clear();
-		this->m_lock.unlock();
+		std::scoped_lock l(this->m_lock);
+		this->m_leftOver.clear();
 	}
 
 	MeasurementConsumer::MeasurementConsumer(MeasurementConsumer &&rhs) noexcept :

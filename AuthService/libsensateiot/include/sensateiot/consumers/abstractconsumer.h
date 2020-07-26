@@ -40,7 +40,11 @@ namespace sensateiot::consumers
 		{
 		}
 		
-		virtual ~AbstractConsumer() = default;
+		virtual ~AbstractConsumer()
+		{
+			std::scoped_lock l(this->m_lock);
+			this->m_messages.clear();
+		}
 		
 		virtual void PushMessage(MessagePair data)
 		{

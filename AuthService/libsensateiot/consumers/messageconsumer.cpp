@@ -24,6 +24,26 @@ namespace sensateiot::consumers
 	{
 	}
 
+	MessageConsumer::MessageConsumer(MessageConsumer&& rhs) noexcept :
+		AbstractConsumer(std::forward<AbstractConsumer>(rhs)), m_leftOver(std::move(rhs.m_leftOver))
+	{
+	}
+
+	MessageConsumer& MessageConsumer::operator=(MessageConsumer&& rhs) noexcept
+	{
+		std::scoped_lock l(this->m_lock, rhs.m_lock);
+		this->m_leftOver = std::move(rhs.m_leftOver);
+		this->Move(rhs);
+
+		return *this;
+	}
+
+	MessageConsumer::~MessageConsumer()
+	{
+		std::scoped_lock l(this->m_lock);
+		this->m_leftOver.clear();
+	}
+
 	AbstractConsumer<models::Message>::ProcessingStats MessageConsumer::Process()
 	{
 		std::vector<MessagePair> data;
@@ -66,7 +86,7 @@ namespace sensateiot::consumers
 			}
 
 			/* Valid sensor, validate the measurement */
-			if(!this->ValidateMeasurement(sensor.second.value(), pair)) {
+			if(!this->ValidateMessage(sensor.second.value(), pair)) {
 				continue;
 			}
 
@@ -119,7 +139,7 @@ namespace sensateiot::consumers
 			}
 
 			/* Valid sensor. Validate the measurement. */
-			if(!this->ValidateMeasurement(sensor.second.value(), pair)) {
+			if(!this->ValidateMessage(sensor.second.value(), pair)) {
 				continue;
 			}
 
@@ -135,7 +155,7 @@ namespace sensateiot::consumers
 		return authorized.size();
 	}
 
-	bool MessageConsumer::ValidateMeasurement(const models::Sensor& sensor, MessagePair& pair) const
+	bool MessageConsumer::ValidateMessage(const models::Sensor& sensor, MessagePair& pair) const
 	{
 		auto result = RE2::Replace(&pair.first, this->m_regex, sensor.GetSecret());
 
