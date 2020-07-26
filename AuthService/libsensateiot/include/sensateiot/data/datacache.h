@@ -49,6 +49,10 @@ namespace sensateiot::data
 		void Clear();
 		void Cleanup();
 
+		void FlushUser(const boost::uuids::uuid& id);
+		void FlushSensor(const models::ObjectId& id);
+		void FlushKey(const std::string& key);
+
 		/* Found, sensor data */
 		std::pair<bool, std::optional<models::Sensor>> GetSensor(const models::ObjectId& id) const;
 		bool IsBlackListed(const models::ObjectId& objId) const;

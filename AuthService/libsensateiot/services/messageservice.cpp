@@ -6,6 +6,9 @@
  */
 
 #include <sensateiot/services/messageservice.h>
+
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/fiber/future/future.hpp>
 #include <boost/fiber/future/packaged_task.hpp>
 
@@ -266,6 +269,23 @@ namespace sensateiot::services
 
 		this->m_cache.AppendBlackList(objs);
 		append_f.wait();
+	}
+
+	void MessageService::FlushUser(const std::string& id)
+	{
+		auto userId = boost::lexical_cast<boost::uuids::uuid>(id);
+		this->m_cache.FlushUser(userId);
+	}
+
+	void MessageService::FlushSensor(const std::string& id)
+	{
+		models::ObjectId sensorId(id);
+		this->m_cache.FlushSensor(sensorId);
+	}
+
+	void MessageService::FlushKey(const std::string& key)
+	{
+		this->m_cache.FlushKey(key);
 	}
 
 	void MessageService::Load(std::vector<models::ObjectId> &objIds)

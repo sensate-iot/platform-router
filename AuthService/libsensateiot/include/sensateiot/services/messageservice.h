@@ -55,6 +55,10 @@ namespace sensateiot::services
 		void AddMessages(std::vector<std::pair<std::string, models::Message>> messages);
 		void LoadAll();
 
+		void FlushUser(const std::string& id);
+		void FlushSensor(const std::string& id);
+		void FlushKey(const std::string& key);
+
 	private:
 		mutable std::shared_mutex m_lock;
 		config::Config m_conf;

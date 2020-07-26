@@ -130,4 +130,30 @@ namespace sensateiot::data
 		this->m_sensors.Cleanup();
 		this->m_blackList.Cleanup();
 	}
+
+	void DataCache::FlushUser(const boost::uuids::uuid& id)
+	{
+		this->m_users.Erase(id);
+	}
+
+	void DataCache::FlushSensor(const models::ObjectId& id)
+	{
+		try {
+			this->m_sensors.Process(id, [this](const models::Sensor& sensor) {
+				const auto& secret = sensor.GetSecret();
+				this->FlushKey(secret);
+			});
+
+			this->m_blackList.Erase(id);
+			this->m_sensors.Erase(id);
+		} catch(std::out_of_range&) {
+			this->m_blackList.Erase(id);
+			this->m_sensors.Erase(id);
+		}
+	}
+
+	void DataCache::FlushKey(const std::string& key)
+	{
+		this->m_keys.Erase(key);
+	}
 }
