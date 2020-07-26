@@ -20,6 +20,10 @@ namespace sensateiot::data
 			rapidjson::Document json;
 			json.Parse(str.c_str());
 
+			if(!json.IsObject()) {
+				return {};
+			}
+
 			return detail::ParseSingleMeasurement(json);
 		} catch(std::exception &) {
 			return std::make_pair(false, models::Measurement());

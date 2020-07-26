@@ -26,6 +26,10 @@ namespace sensateiot::data
 			rapidjson::Document json;
 			json.Parse(str.c_str());
 
+			if(!json.IsObject()) {
+				return {};
+			}
+
 			return detail::ParseSingleMessage(json);
 		} catch(std::exception &) {
 			return {};

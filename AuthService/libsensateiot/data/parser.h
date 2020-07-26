@@ -69,7 +69,6 @@ namespace sensateiot::detail
 	{
 		try {
 			std::vector<models::Measurement::DataEntry> entries;
-
 			models::Measurement raw;
 
 			if(json.HasMember(models::Measurement::CreatedBy.data()) && json[models::Measurement::CreatedBy.data()].IsString()) {
