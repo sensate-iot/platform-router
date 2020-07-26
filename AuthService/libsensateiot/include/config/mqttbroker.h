@@ -73,16 +73,13 @@ namespace sensateiot::config
 
 	class DLL_EXPORT PrivateBroker {
 	public:
+		[[nodiscard]]
 		const MqttBroker& GetBroker() const;
 		MqttBroker& GetBroker();
 
 		[[nodiscard]]
-		const std::string& GetMeasurementTopic() const;
-		void SetMeasurementTopic(const std::string& topic);
-
-		[[nodiscard]]
-		const std::string& GetMessageTopic() const;
-		void SetMessageTopic(const std::string& topic);
+		const std::string& GetBulkMessageTopic() const;
+		void SetBulkMessageTopic(const std::string& topic);
 
 		[[nodiscard]]
 		const std::string& GetBulkMeasurementTopic() const;
@@ -94,9 +91,8 @@ namespace sensateiot::config
 
 	private:
 		MqttBroker m_broker{};
-		std::string m_internalMeasurementTopic;
 		std::string m_internalBulkMeasurementTopic;
-		std::string m_internalMessageTopic;
+		std::string m_internalBulkMessageTopic;
 		std::string m_clientId;
 	};
 }

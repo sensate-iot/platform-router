@@ -113,16 +113,6 @@ namespace sensateiot::config
 
 	// Private broker
 
-	const std::string &PrivateBroker::GetMeasurementTopic() const
-	{
-		return this->m_internalMeasurementTopic;
-	}
-
-	void PrivateBroker::SetMeasurementTopic(const std::string &topic)
-	{
-		this->m_internalMeasurementTopic = topic;
-	}
-
 	const std::string &PrivateBroker::GetBulkMeasurementTopic() const
 	{
 		return this->m_internalBulkMeasurementTopic;
@@ -153,13 +143,13 @@ namespace sensateiot::config
 		return this->m_broker;
 	}
 
-	const std::string &PrivateBroker::GetMessageTopic() const
+	const std::string &PrivateBroker::GetBulkMessageTopic() const
 	{
-		return this->m_internalMessageTopic;
+		return this->m_internalBulkMessageTopic;
 	}
 
-	void PrivateBroker::SetMessageTopic(const std::string &topic)
+	void PrivateBroker::SetBulkMessageTopic(const std::string &topic)
 	{
-		this->m_internalMessageTopic = topic;
+		this->m_internalBulkMessageTopic = topic;
 	}
 }

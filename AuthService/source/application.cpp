@@ -167,9 +167,7 @@ namespace sensateiot
 		this->m_config.GetMqtt().GetPrivateBroker()
 				.SetBulkMeasurementTopic(j["Mqtt"]["InternalBroker"]["InternalBulkMeasurementTopic"]);
 		this->m_config.GetMqtt().GetPrivateBroker()
-				.SetMeasurementTopic(j["Mqtt"]["InternalBroker"]["InternalMeasurementTopic"]);
-		this->m_config.GetMqtt().GetPrivateBroker()
-				.SetMessageTopic(j["Mqtt"]["InternalBroker"]["InternalMessageTopic"]);
+				.SetBulkMessageTopic(j["Mqtt"]["InternalBroker"]["InternalBulkMessageTopic"]);
 		this->m_config.GetMqtt().GetPrivateBroker()
 				.SetClientId(j["Mqtt"]["InternalBroker"]["ClientId"]);
 	}

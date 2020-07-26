@@ -71,9 +71,7 @@ static void ParseMqtt(sensateiot::config::Config& config, nlohmann::json &j)
 	config.GetMqtt().GetPrivateBroker()
 			.SetBulkMeasurementTopic(j["Mqtt"]["InternalBroker"]["InternalBulkMeasurementTopic"]);
 	config.GetMqtt().GetPrivateBroker()
-			.SetMeasurementTopic(j["Mqtt"]["InternalBroker"]["InternalMeasurementTopic"]);
-	config.GetMqtt().GetPrivateBroker()
-			.SetMessageTopic(j["Mqtt"]["InternalBroker"]["InternalMessageTopic"]);
+			.SetBulkMessageTopic(j["Mqtt"]["InternalBroker"]["InternalBulkMessageTopic"]);
 }
 
 static void ParseDatabase(sensateiot::config::Config& config, nlohmann::json &json)

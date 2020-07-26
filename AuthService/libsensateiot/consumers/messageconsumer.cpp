@@ -151,7 +151,7 @@ namespace sensateiot::consumers
 			return {};
 		}
 
-		this->PublishAuthorizedMessages(authorized, this->m_config.GetMqtt().GetPrivateBroker().GetBulkMeasurementTopic());
+		this->PublishAuthorizedMessages(authorized, this->m_config.GetMqtt().GetPrivateBroker().GetBulkMessageTopic());
 		return authorized.size();
 	}
 
