@@ -28,7 +28,7 @@ namespace sensateiot::httpd
 		typedef HttpListener::HttpRequestHandler HttpRequestHandler;
 		typedef HttpListener::HandlerMap HandlerMap;
 
-		explicit HttpServer();
+		explicit HttpServer() = default;
 		explicit HttpServer(const config::Config& config);
 
 		void Run();
@@ -38,12 +38,6 @@ namespace sensateiot::httpd
 		void AddHandler(const std::string& route, const HttpRequestHandler& handler);
 		void AddHandler(const std::string& route, http::AbstractHandler& handler);
 		
-		/*template <typename Func>
-		void AddHandler(const std::string& route, Func&& handler)
-		{
-			this->m_handlers.Emplace(route, std::forward<Func>(handler));
-		}*/
-
 	private:
 		config::Config m_config{};
 		std::atomic_bool m_running;

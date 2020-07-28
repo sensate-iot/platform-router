@@ -16,9 +16,9 @@
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 
-#include <sensateiot/stl/map.h>
 #include <sensateiot/httpd/httpresponse.h>
 #include <sensateiot/httpd/httprequest.h>
+#include <sensateiot/stl/dictionary.h>
 
 #include <chrono>
 #include <string>
@@ -92,7 +92,7 @@ namespace sensateiot::httpd
 
 	public:
 		typedef std::function<HttpResponse(const HttpRequest&)> HttpRequestHandler;
-		typedef stl::Map<std::string, HttpRequestHandler> HandlerMap;
+		typedef stl::Dictionary<std::string, HttpRequestHandler> HandlerMap;
 		
 		explicit HttpSession(tcp::socket&& socket, HandlerMap& handlers);
 		void Run();
@@ -109,6 +109,6 @@ namespace sensateiot::httpd
 		boost::beast::flat_buffer buffer_;
 		ResponseQueue queue_;
 		boost::optional<boost::beast::http::request_parser<boost::beast::http::string_body>> parser_;
-		stl::Map<std::string, HttpRequestHandler>& m_handlers;
+		HandlerMap& m_handlers;
 	};
 }

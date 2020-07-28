@@ -24,11 +24,7 @@ namespace net = boost::asio;
 
 namespace sensateiot::httpd
 {
-	HttpServer::HttpServer() : m_handlers(HandlerTimeout)
-	{
-	}
-
-	HttpServer::HttpServer(const config::Config& config) : m_config(config), m_handlers(HandlerTimeout)
+	HttpServer::HttpServer(const config::Config& config) : m_config(config)
 	{
 	}
 
