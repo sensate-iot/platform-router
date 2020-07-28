@@ -7,6 +7,7 @@
 
 #include <sensateiot/application.h>
 #include <sensateiot/services/messageservice.h>
+#include <sensateiot/consumers/commandconsumer.h>
 #include <sensateiot/util/mongodbclientpool.h>
 
 #include <sensateiot/httpd/httpserver.h>
@@ -21,6 +22,10 @@
 #include <sensateiot/services/userrepository.h>
 #include <sensateiot/services/apikeyrepository.h>
 #include <sensateiot/services/sensorrepository.h>
+
+#include <sensateiot/commands/flushsensorcommandhandler.h>
+#include <sensateiot/commands/flushkeycommandhandler.h>
+#include <sensateiot/commands/flushusercommandhandler.h>
 
 #include <json.hpp>
 
@@ -64,8 +69,10 @@ namespace sensateiot
 
 		util::MongoDBClientPool::Init(this->m_config.GetDatabase().GetMongoDB());
 
+		consumers::CommandConsumer commands;
+
 		// Internal client
-		mqtt::MqttInternalCallback icb;
+		mqtt::MqttInternalCallback icb(this->m_config, commands);
 		auto ihost = this->m_config.GetMqtt().GetPrivateBroker().GetBroker().GetUri();
 		mqtt::InternalMqttClient iclient(
 			ihost,
@@ -77,7 +84,15 @@ namespace sensateiot
 		services::UserRepository users(this->m_config.GetDatabase().GetPostgreSQL());
 		services::ApiKeyRepository keys(this->m_config.GetDatabase().GetPostgreSQL());
 		services::SensorRepository sensors(this->m_config.GetDatabase().GetMongoDB());
-		services::MessageService service(iclient, users, keys, sensors, this->m_config);
+		services::MessageService service(iclient, commands, users, keys, sensors, this->m_config);
+
+		commands::FlushSensorCommandHandler sensorHandler(service);
+		commands::FlushKeyCommandHandler keyHandler(service);
+		commands::FlushUserCommandHandler userHandler(service);
+
+		commands.AddHandler(FlushSensorCmd.data(), sensorHandler);
+		commands.AddHandler(FlushKeyCmd.data(), keyHandler);
+		commands.AddHandler(FlushUserCmd.data(), userHandler);
 
 		if (this->m_config.GetHotLoad()) {
 			service.LoadAll();
@@ -170,6 +185,8 @@ namespace sensateiot
 				.SetBulkMessageTopic(j["Mqtt"]["InternalBroker"]["InternalBulkMessageTopic"]);
 		this->m_config.GetMqtt().GetPrivateBroker()
 				.SetClientId(j["Mqtt"]["InternalBroker"]["ClientId"]);
+		this->m_config.GetMqtt().GetPrivateBroker()
+				.SetCommandTopic(j["Mqtt"]["InternalBroker"]["InternalCommandTopic"]);
 	}
 
 	void Application::ParseDatabase(nlohmann::json &json)

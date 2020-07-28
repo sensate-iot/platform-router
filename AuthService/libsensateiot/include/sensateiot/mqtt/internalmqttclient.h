@@ -22,5 +22,6 @@ namespace sensateiot::mqtt
 
 	private:
 		MqttInternalCallback m_cb;
+		stl::ReferenceWrapper<consumers::CommandConsumer> m_commands;
 	};
 }

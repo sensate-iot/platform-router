@@ -24,6 +24,7 @@
 #include <sensateiot/mqtt/basemqttclient.h>
 #include <sensateiot/data/datacache.h>
 #include <sensateiot/services/messageservice.h>
+#include <sensateiot/consumers/commandconsumer.h>
 
 #include "testmqttclient.h"
 #include "testapikeyrepository.h"
@@ -77,12 +78,13 @@ static void test_measurement_processing()
 	mqtt.SetBulkMeasurementTopic("internal/test/measurements");
 
 	test::TestMqttClient client;
+	consumers::CommandConsumer commands;
 	client.Connect(config.GetMqtt());
 
 	test::UserRepository users(config.GetDatabase().GetPostgreSQL());
 	test::ApiKeyRepository keys(config.GetDatabase().GetPostgreSQL());
 	test::SensorRepository sensors(config.GetDatabase().GetMongoDB());
-	services::MessageService service(client, users, keys, sensors, config);
+	services::MessageService service(client, commands, users, keys, sensors, config);
 
 	generate_data(sensors, users, keys);
 	models::Sensor s;

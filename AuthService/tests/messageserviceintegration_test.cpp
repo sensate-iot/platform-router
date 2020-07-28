@@ -27,6 +27,7 @@
 #include <sensateiot/data/datacache.h>
 
 #include <sensateiot/services/messageservice.h>
+#include <sensateiot/consumers/commandconsumer.h>
 #include <sensateiot/util/mongodbclientpool.h>
 #include <sensateiot/services/userrepository.h>
 #include <sensateiot/services/apikeyrepository.h>
@@ -148,8 +149,10 @@ static void test_messageservice(std::string path)
 	ParseConfig(config, path);
 	util::Log::StartLogging(config.GetLogging());
 	util::MongoDBClientPool::Init(config.GetDatabase().GetMongoDB());
+	consumers::CommandConsumer cmds;
 	
-	sensateiot::mqtt::MqttInternalCallback icb;
+	consumers::CommandConsumer commands;
+	sensateiot::mqtt::MqttInternalCallback icb(config, cmds);
 	auto ihost = config.GetMqtt().GetPrivateBroker().GetBroker().GetUri();
 	sensateiot::mqtt::InternalMqttClient iclient(ihost, "3lasdfjlas", std::move(icb));
 	iclient.Connect(config.GetMqtt());
@@ -158,7 +161,7 @@ static void test_messageservice(std::string path)
 	services::ApiKeyRepository keys(config.GetDatabase().GetPostgreSQL());
 	services::SensorRepository sensors(config.GetDatabase().GetMongoDB());
 
-	sensateiot::services::MessageService service(iclient, users, keys, sensors, config);
+	sensateiot::services::MessageService service(iclient, commands, users, keys, sensors, config);
 
 	auto& log = util::Log::GetLog();
 	auto start = boost::chrono::system_clock::now();
