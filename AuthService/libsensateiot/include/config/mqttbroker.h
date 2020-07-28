@@ -47,30 +47,6 @@ namespace sensateiot::config
 		bool m_ssl{};
 	};
 
-	class DLL_EXPORT PublicBroker {
-	public:
-		MqttBroker& GetBroker() ;
-		const MqttBroker& GetBroker() const;
-
-		[[nodiscard]]
-		const std::string& GetMeasurementTopic() const;
-		void SetMeasurementTopic(const std::string& topic);
-
-		[[nodiscard]]
-		const std::string& GetMessageTopic() const;
-		void SetMessageTopic(const std::string& topic);
-
-		[[nodiscard]]
-		const std::string& GetBulkMeasurementTopic() const;
-		void SetBulkMeasurementTopic(const std::string& topic);
-
-	private:
-		MqttBroker m_broker{};
-		std::string m_measurementTopic;
-		std::string m_bulkMeasurementTopic;
-		std::string m_messageTopic;
-	};
-
 	class DLL_EXPORT PrivateBroker {
 	public:
 		[[nodiscard]]
@@ -86,6 +62,10 @@ namespace sensateiot::config
 		void SetBulkMeasurementTopic(const std::string& topic);
 
 		[[nodiscard]]
+		const std::string& GetCommandTopic() const;
+		void SetCommandTopic(const std::string& topic);
+
+		[[nodiscard]]
 		const std::string& GetClientId() const;
 		void SetClientId(const std::string& id);
 
@@ -94,5 +74,6 @@ namespace sensateiot::config
 		std::string m_internalBulkMeasurementTopic;
 		std::string m_internalBulkMessageTopic;
 		std::string m_clientId;
+		std::string m_commandTopic;
 	};
 }

@@ -69,48 +69,6 @@ namespace sensateiot::config
 		return rv;
 	}
 
-	// Public broker
-
-	const std::string &PublicBroker::GetMeasurementTopic() const
-	{
-		return this->m_measurementTopic;
-	}
-
-	void PublicBroker::SetMeasurementTopic(const std::string &topic)
-	{
-		this->m_measurementTopic = topic;
-	}
-
-	const std::string &PublicBroker::GetBulkMeasurementTopic() const
-	{
-		return this->m_bulkMeasurementTopic;
-	}
-
-	void PublicBroker::SetBulkMeasurementTopic(const std::string &topic)
-	{
-		this->m_bulkMeasurementTopic = topic;
-	}
-
-	MqttBroker &PublicBroker::GetBroker()
-	{
-		return this->m_broker;
-	}
-
-	const MqttBroker& PublicBroker::GetBroker() const
-	{
-		return this->m_broker;
-	}
-
-	const std::string &PublicBroker::GetMessageTopic() const
-	{
-		return this->m_messageTopic;
-	}
-
-	void PublicBroker::SetMessageTopic(const std::string &topic)
-	{
-		this->m_messageTopic = topic;
-	}
-
 	// Private broker
 
 	const std::string &PrivateBroker::GetBulkMeasurementTopic() const
@@ -121,6 +79,16 @@ namespace sensateiot::config
 	void PrivateBroker::SetBulkMeasurementTopic(const std::string &topic)
 	{
 		this->m_internalBulkMeasurementTopic = topic;
+	}
+
+	const std::string& PrivateBroker::GetCommandTopic() const
+	{
+		return this->m_commandTopic;
+	}
+
+	void PrivateBroker::SetCommandTopic(const std::string& topic)
+	{
+		this->m_commandTopic = topic;
 	}
 
 	const std::string& PrivateBroker::GetClientId() const
