@@ -54,10 +54,16 @@ SET(SOURCES
 
 	consumers/measurementconsumer.cpp
 	consumers/messageconsumer.cpp
+	consumers/commandconsumer.cpp
 
 	mqtt/basemqttclient.cpp
 	mqtt/internalmqttclient.cpp
 	mqtt/mqttinternalcallback.cpp
+
+	commands/command.cpp
+	commands/flushusercommandhandler.cpp
+	commands/flushsensorcommandhandler.cpp
+	commands/flushkeycommandhandler.cpp
 )
 
 SET(APP_HEADERS
@@ -113,6 +119,7 @@ set(LIB_HEADERS
 	sensateiot/consumers/abstractconsumer.h
 	sensateiot/consumers/measurementconsumer.h
 	sensateiot/consumers/messageconsumer.h
+	sensateiot/consumers/commandconsumer.h
 
 	sensateiot/mqtt/imqttclient.h
 	sensateiot/mqtt/basemqttclient.h
@@ -130,6 +137,7 @@ set(LIB_HEADERS
 
 	sensateiot/stl/clist.h
 	sensateiot/stl/map.h
+	sensateiot/stl/dictionary.h
 	sensateiot/stl/referencewrapper.h
 	sensateiot/stl/smallvector.h
 
@@ -141,6 +149,12 @@ set(LIB_HEADERS
 	sensateiot/util/gzip.h
 	sensateiot/util/base64.h
 	sensateiot/util/time.h
+
+	sensateiot/commands/abstractcommandhandler.h
+	sensateiot/commands/command.h
+	sensateiot/commands/flushusercommandhandler.h
+	sensateiot/commands/flushsensorcommandhandler.h
+	sensateiot/commands/flushkeycommandhandler.h
 
 	sensateiot.h
 )

@@ -35,6 +35,11 @@
 #include <atomic>
 #include <shared_mutex>
 
+namespace sensateiot::consumers
+{
+	class CommandConsumer;
+}
+
 namespace sensateiot::services
 {
 	class MessageService {
@@ -42,6 +47,7 @@ namespace sensateiot::services
 
 	public:
 		explicit MessageService(mqtt::IMqttClient& client,
+								consumers::CommandConsumer& commands,
 		                        AbstractUserRepository& users,
 		                        AbstractApiKeyRepository& keys,
 		                        AbstractSensorRepository& sensors,
@@ -74,6 +80,7 @@ namespace sensateiot::services
 		stl::ReferenceWrapper<AbstractApiKeyRepository> m_keyRepo;
 		stl::ReferenceWrapper<AbstractUserRepository> m_userRepo;
 		stl::ReferenceWrapper<AbstractSensorRepository> m_sensorRepo;
+		stl::ReferenceWrapper<consumers::CommandConsumer> m_commands;
 
 		std::vector<models::ObjectId> Process(bool postProcess);
 

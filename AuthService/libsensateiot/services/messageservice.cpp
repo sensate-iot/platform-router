@@ -6,6 +6,7 @@
  */
 
 #include <sensateiot/services/messageservice.h>
+#include <sensateiot/consumers/commandconsumer.h>
 
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/lexical_cast.hpp>
@@ -23,12 +24,13 @@ namespace sensateiot::services
 {
 	MessageService::MessageService(
 			mqtt::IMqttClient &client,
+			consumers::CommandConsumer& commands,
 			AbstractUserRepository &users,
 			AbstractApiKeyRepository &keys,
 			AbstractSensorRepository &sensors,
 			const config::Config &conf
 	) : m_conf(conf), m_measurementIndex(0), m_messageIndex(0), m_count(0),
-	    m_keyRepo(keys), m_userRepo(users), m_sensorRepo(sensors)
+	    m_keyRepo(keys), m_userRepo(users), m_sensorRepo(sensors), m_commands(commands)
 	{
 		std::unique_lock lock(this->m_lock);
 		std::string uri = this->m_conf.GetMqtt().GetPrivateBroker().GetBroker().GetUri();
@@ -142,6 +144,7 @@ namespace sensateiot::services
 	
 		if (count <= 0) {
 			this->m_cache.CleanupFor(CleanupTimeout);
+			this->m_commands->Execute();
 			return {};
 		}
 
@@ -155,6 +158,7 @@ namespace sensateiot::services
 
 		this->Process(true);
 		this->m_cache.CleanupFor(CleanupTimeout);
+		this->m_commands->Execute();
 
 		auto diff = boost::chrono::system_clock::now() - start;
 		using Millis = boost::chrono::milliseconds;
