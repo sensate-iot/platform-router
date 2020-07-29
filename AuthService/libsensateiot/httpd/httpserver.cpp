@@ -71,10 +71,6 @@ namespace sensateiot::httpd
 		});
 	}
 
-	void HttpServer::Stop()
-	{
-	}
-
 	bool HttpServer::Running() const
 	{
 		return this->m_running.load();

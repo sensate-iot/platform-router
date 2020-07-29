@@ -32,7 +32,6 @@ namespace sensateiot::httpd
 		explicit HttpServer(const config::Config& config);
 
 		void Run();
-		void Stop();
 		bool Running() const;
 
 		void AddHandler(const std::string& route, const HttpRequestHandler& handler);
