@@ -32,9 +32,9 @@ namespace sensateiot::httpd
 		{
 			http::response<http::string_body> res{ http::status::not_found, req.version() };
 			res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-			res.set(http::field::content_type, "text/html");
+			res.set(http::field::content_type, "application/json");
 			res.keep_alive(req.keep_alive());
-			res.body() = "The resource '" + std::string(target) + "' was not found.";
+			res.body() = R"({"message": "Resource not found!})";
 			res.prepare_payload();
 			return res;
 		};
@@ -44,9 +44,9 @@ namespace sensateiot::httpd
 		{
 			http::response<http::string_body> res{ http::status::internal_server_error, req.version() };
 			res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-			res.set(http::field::content_type, "text/html");
+			res.set(http::field::content_type, "application/json");
 			res.keep_alive(req.keep_alive());
-			res.body() = "An error occurred: '" + std::string(what) + "'";
+			res.body() = R"({"message": "Service unavailable!})";
 			res.prepare_payload();
 			return res;
 		};
