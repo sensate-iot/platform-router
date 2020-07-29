@@ -6,7 +6,8 @@
  */
 
 #include <sensateiot/application.h>
-#include <sensateiot/services/messageservice.h>
+#include <sensateiot/configparser.h>
+
 #include <sensateiot/consumers/commandconsumer.h>
 #include <sensateiot/util/mongodbclientpool.h>
 
@@ -20,6 +21,7 @@
 #include <sensateiot/mqtt/internalmqttclient.h>
 
 #include <sensateiot/services/userrepository.h>
+#include <sensateiot/services/messageservice.h>
 #include <sensateiot/services/apikeyrepository.h>
 #include <sensateiot/services/sensorrepository.h>
 
@@ -28,22 +30,7 @@
 #include <sensateiot/commands/flushusercommandhandler.h>
 
 #include <json.hpp>
-
-#include <unordered_set>
-#include <fstream>
-#include <iostream>
-#include <string>
-
 #include <google/protobuf/any.h>
-
-template<typename T>
-std::string ToHex(const T &value, size_t padding = 1)
-{
-	std::stringstream ss;
-
-	ss << std::hex << value;
-	return ss.str();
-}
 
 namespace sensateiot
 {
@@ -66,8 +53,8 @@ namespace sensateiot
 	void Application::Run()
 	{
 		std::atomic_bool done = false;
-		
-		this->ParseConfig();
+	
+		this->m_config = parser::Parse(this->m_configPath);
 		util::Log::StartLogging(this->m_config.GetLogging());
 		auto &log = util::Log::GetLog();
 
@@ -131,84 +118,6 @@ namespace sensateiot
 
 		done = true;
 		runner.join();
-	}
-
-	void Application::ParseConfig()
-	{
-		using namespace nlohmann;
-		std::ifstream file(this->m_configPath);
-
-		if(!file.good()) {
-			throw std::runtime_error("Config file not found!");
-		}
-
-		std::string content(
-				(std::istreambuf_iterator<char>(file)),
-				std::istreambuf_iterator<char>());
-
-		try {
-			auto j = json::parse(content);
-
-			this->m_config.SetInternalBatchSize(j["InternalBatchSize"]);
-			this->m_config.SetBindAddress(j["BindAddress"]);
-			this->m_config.SetHttpPort(j["Port"].get<std::uint16_t>());
-
-			if (j.contains("HotLoad") && j["HotLoad"].is_boolean()) {
-				this->m_config.SetHotLoad(j["HotLoad"]);
-			}
-			else {
-				this->m_config.SetHotLoad(false);
-			}
-
-			this->ParseMqtt(j);
-			this->ParseDatabase(j);
-			this->ParseLogging(j);
-		} catch(json::exception &ex) {
-			std::cerr << "Unable to parse configuration file: " <<
-			          ex.what() << std::endl;
-			throw;
-		}
-	}
-
-	void Application::ParseMqtt(nlohmann::json &j)
-	{
-		this->m_config.SetInterval(j["Interval"]);
-		this->m_config.SetWorkers(j["Workers"]);
-
-		this->m_config.GetMqtt().GetPrivateBroker()
-				.GetBroker().SetHostName(j["Mqtt"]["InternalBroker"]["Host"]);
-		this->m_config.GetMqtt().GetPrivateBroker()
-				.GetBroker().SetPortNumber(j["Mqtt"]["InternalBroker"]["Port"]);
-		this->m_config.GetMqtt().GetPrivateBroker()
-				.GetBroker().SetUsername(j["Mqtt"]["InternalBroker"]["Username"]);
-		this->m_config.GetMqtt().GetPrivateBroker()
-				.GetBroker().SetPassword(j["Mqtt"]["InternalBroker"]["Password"]);
-		this->m_config.GetMqtt().GetPrivateBroker()
-				.GetBroker().SetSsl(j["Mqtt"]["InternalBroker"]["Ssl"] == "true");
-		this->m_config.GetMqtt().GetPrivateBroker()
-				.SetBulkMeasurementTopic(j["Mqtt"]["InternalBroker"]["InternalBulkMeasurementTopic"]);
-		this->m_config.GetMqtt().GetPrivateBroker()
-				.SetBulkMessageTopic(j["Mqtt"]["InternalBroker"]["InternalBulkMessageTopic"]);
-		this->m_config.GetMqtt().GetPrivateBroker()
-				.SetClientId(j["Mqtt"]["InternalBroker"]["ClientId"]);
-		this->m_config.GetMqtt().GetPrivateBroker()
-				.SetCommandTopic(j["Mqtt"]["InternalBroker"]["InternalCommandTopic"]);
-	}
-
-	void Application::ParseDatabase(nlohmann::json &json)
-	{
-		this->m_config.GetDatabase().GetPostgreSQL()
-				.SetConnectionString(json["Database"]["PgSQL"]["ConnectionString"]);
-		this->m_config.GetDatabase().GetMongoDB()
-				.SetDatabaseName(json["Database"]["MongoDB"]["DatabaseName"]);
-		this->m_config.GetDatabase().GetMongoDB()
-				.SetConnectionString(json["Database"]["MongoDB"]["ConnectionString"]);
-	}
-
-	void Application::ParseLogging(nlohmann::json &json)
-	{
-		this->m_config.GetLogging().SetLevel(json["Logging"]["Level"]);
-		this->m_config.GetLogging().SetPath(json["Logging"]["File"]);
 	}
 }
 

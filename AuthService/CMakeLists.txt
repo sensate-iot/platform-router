@@ -12,6 +12,13 @@ SET(AUTHSERVICE_SOURCES
 	${PROJECT_SOURCE_DIR}/source/main.c
 	${PROJECT_SOURCE_DIR}/source/application.cpp
 	${PROJECT_SOURCE_DIR}/source/getopt.c
+	${PROJECT_SOURCE_DIR}/source/configparser.cpp
+)
+
+SET(AUTHSERVICE_HEADERS
+	${PROJECT_SOURCE_DIR}/include/sensateiot/application.h
+	${PROJECT_SOURCE_DIR}/include/sensateiot/configparser.h
+	${PROJECT_SOURCE_DIR}/include/sensateiot/getopt.h
 )
 
 if(MSVC)
@@ -52,7 +59,7 @@ include_directories(
 
 add_subdirectory(libsensateiot)
 
-ADD_EXECUTABLE(auth-service ${AUTHSERVICE_SOURCES})
+ADD_EXECUTABLE(auth-service ${AUTHSERVICE_SOURCES} ${AUTHSERVICE_HEADERS})
 TARGET_LINK_LIBRARIES(auth-service sensateiot ${CONAN_LIBS})
 
 if (MSVC)

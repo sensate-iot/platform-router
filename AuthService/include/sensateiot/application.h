@@ -40,11 +40,6 @@ namespace sensateiot
 
 		explicit Application() = default;
 
-		void ParseConfig();
-		void ParseMqtt(nlohmann::json& json);
-		void ParseDatabase(nlohmann::json&  json);
-		void ParseLogging(nlohmann::json& json);
-
 		static constexpr auto FlushKeyCmd = std::string_view("flush_key");
 		static constexpr auto FlushSensorCmd = std::string_view("flush_sensor");
 		static constexpr auto FlushUserCmd = std::string_view("flush_user");
