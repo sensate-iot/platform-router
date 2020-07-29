@@ -66,11 +66,6 @@ SET(SOURCES
 	commands/flushkeycommandhandler.cpp
 )
 
-SET(APP_HEADERS
-	include/sensateiot/application.h
-	include/sensateiot/getopt.h
-)
-
 set(LIB_HEADERS
 	auth.h
 
@@ -187,16 +182,11 @@ FUNCTION( prepend_path SOURCE_FILES INC_PATH )
 	SET( ${SOURCE_FILES} ${MODIFIED} PARENT_SCOPE )
 ENDFUNCTION()
 
-SET(GENERIC_HEADERS 
-	${LIB_HEADERS}
-)
+SET(GENERIC_HEADERS  ${LIB_HEADERS})
+SET(${SOURCES}       ${SOURCES})
+SET(${LIB_HEADERS}   ${LIB_HEADERS})
 
 prepend_path(GENERIC_HEADERS "libsensateiot/include" )
-
-SET(GENERIC_HEADERS 
-	${GENERIC_HEADERS}
-	${APP_HEADERS}
-)
 
 SET(INCLUDE_DIR ${PROJECT_SOURCE_DIR})
 prepend_path(GENERIC_HEADERS ${INCLUDE_DIR})
@@ -218,8 +208,6 @@ install(TARGETS sensateiot
 	ARCHIVE DESTINATION lib ${CMAKE_INSTALL_LIBDIR} # should add lib
 )
 
-SET(${SOURCES} ${SOURCES})
-SET(${LIB_HEADERS} ${LIB_HEADERS})
 
 message(STATUS "Generating MSVS filters.")
 foreach(source IN LISTS ${SOURCES})
