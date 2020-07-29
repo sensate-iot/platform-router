@@ -22,6 +22,8 @@ namespace sensateiot
 {
 	class Application {
 	public:
+		~Application();
+		
 		static Application &GetApplication()
 		{
 			static Application app;

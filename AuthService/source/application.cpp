@@ -52,6 +52,12 @@ namespace sensateiot
 		return this->m_config;
 	}
 
+	Application::~Application()
+	{
+		util::MongoDBClientPool::Destroy();
+		google::protobuf::ShutdownProtobufLibrary();
+	}
+
 	void Application::SetConfig(std::string path)
 	{
 		this->m_configPath = std::move(path);
@@ -212,8 +218,6 @@ void CreateApplication(const char *path)
 		auto &app = sensateiot::Application::GetApplication();
 		app.SetConfig(path);
 		app.Run();
-		sensateiot::util::MongoDBClientPool::Destroy();
-		google::protobuf::ShutdownProtobufLibrary();
 	} catch(std::runtime_error &ex) {
 		std::cerr << "Unable to run application: " << ex.what();
 	} catch(std::exception &ex) {
