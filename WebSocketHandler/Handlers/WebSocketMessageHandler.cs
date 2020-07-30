@@ -93,10 +93,13 @@ namespace SensateService.WebSocketHandler.Handlers
 					CreatedAt = raw.CreatedAt ?? DateTime.UtcNow,
 					UpdatedAt = raw.CreatedAt ?? DateTime.UtcNow
 				};
-				var json = JsonConvert.SerializeObject(msg);
+
+				var msgArray = new Message[1];
+				msgArray[0] = msg;
+				var json = JsonConvert.SerializeObject(msgArray);
 
 				asyncio[0] = messagedb.CreateAsync(msg);
-				asyncio[1] = this.m_client.PublishOnAsync(this.m_options.InternalMessageTopic, json, false);
+				asyncio[1] = this.m_client.PublishOnAsync(this.m_options.InternalBulkMessageTopic, json, false);
 				await Task.WhenAll(asyncio).AwaitBackground();
 
 				this.m_logger.LogInformation("Message stored!");

@@ -10,14 +10,16 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
 
+using MongoDB.Bson;
 using MongoDB.Driver.GeoJsonObjectModel;
+
 using SensateService.Enums;
 using SensateService.Models;
 using SensateService.Models.Generic;
 
 namespace SensateService.Infrastructure.Repositories
 {
-	using MeasurementMap = IDictionary<Sensor, List<Measurement>>;
+	using MeasurementMap = IDictionary<ObjectId, List<Measurement>>;
 
 	public interface IMeasurementRepository
 	{
@@ -42,7 +44,7 @@ namespace SensateService.Infrastructure.Repositories
 
 		Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index, CancellationToken ct = default);
 
-		Task StoreAsync(MeasurementMap measurements, CancellationToken ct = default(CancellationToken));
-		Task StoreAsync(Sensor sensor, Measurement measurement, CancellationToken ct = default(CancellationToken));
+		Task StoreAsync(MeasurementMap measurements, CancellationToken ct = default);
+		Task StoreAsync(Sensor sensor, Measurement measurement, CancellationToken ct = default);
 	}
 }

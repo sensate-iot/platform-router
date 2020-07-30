@@ -68,9 +68,11 @@
       "Ssl": "false",
       "Port": 1883,
       "Host": "",
-      "InternalMeasurementTopic": "sensate/internal/measurements",
+      "AuthorizedBulkMeasurementTopic": "$share/auth-service/sensate-auth/internal/measurements/bulk",
+      "AuthorizedBulkMessageTopic": "$share/auth-service/sensate-auth/internal/messages/bulk",
       "InternalBulkMeasurementTopic": "sensate/internal/measurements/bulk",
-      "InternalMessageTopic": "sensate/internal/messages"
+      "InternalBulkMessageTopic": "sensate/internal/messages/bulk",
+      "InternalBlobTopic": "sensate/internal/blobs"
     } 
   }
 }

@@ -7,7 +7,6 @@
 
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,7 +14,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using SensateService.Enums;
@@ -24,7 +22,6 @@ using SensateService.Helpers;
 using SensateService.Infrastructure.Events;
 using SensateService.Infrastructure.Storage;
 using SensateService.Models.Generic;
-using SensateService.Models.Json.In;
 using SensateService.Services;
 using SensateService.Services.Settings;
 

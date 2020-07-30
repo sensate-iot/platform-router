@@ -85,11 +85,12 @@ namespace SensateService.DataApi.Controllers
 			}
 
 			try {
-				await Task.WhenAll(
-					this.m_messages.CreateAsync(msg),
-					this.m_publisher.PublishOnAsync(this.m_options.InternalMessageTopic,
-													JsonConvert.SerializeObject(msg), false)
-				).AwaitBackground();
+				//TODO: use authorization service
+				//await Task.WhenAll(
+				//	this.m_messages.CreateAsync(msg),
+					//this.m_publisher.PublishOnAsync(this.m_options.InternalMessageTopic,
+													//JsonConvert.SerializeObject(msg), false)
+				//).AwaitBackground();
 			} catch(Exception ex) {
 				this.m_logger.LogInformation("Unable to store message: " + ex.Message);
 				this.m_logger.LogDebug(ex.StackTrace);

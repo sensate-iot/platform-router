@@ -15,6 +15,5 @@ namespace SensateService.Infrastructure.Storage
 	public interface IMeasurementCache
 	{
 		Task StoreAsync(string obj, RequestMethod methodd);
-		Task StoreRangeAsync(IEnumerable<string> measurements, RequestMethod method);
 	}
 }

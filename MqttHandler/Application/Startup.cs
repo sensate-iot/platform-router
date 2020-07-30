@@ -83,7 +83,7 @@ namespace SensateService.MqttHandler.Application
 				options.Username = publicmqtt.Username;
 				options.Password = publicmqtt.Password;
 				options.Id = Guid.NewGuid().ToString();
-				options.TopicShare = "$share/sensate/";
+				options.TopicShare = "$share/auth-service/";
 			});
 
 			services.AddInternalMqttService(options => {
@@ -94,14 +94,15 @@ namespace SensateService.MqttHandler.Application
 				options.Password = privatemqtt.Password;
 				options.Id = Guid.NewGuid().ToString();
 				options.InternalBulkMeasurementTopic = privatemqtt.InternalBulkMeasurementTopic;
-				options.InternalMeasurementTopic = privatemqtt.InternalMeasurementTopic;
-				options.InternalMessageTopic = privatemqtt.InternalMessageTopic;
+				options.AuthorizedBulkMeasurementTopic = privatemqtt.AuthorizedBulkMeasurementTopic;
+				options.AuthorizedBulkMessageTopic = privatemqtt.AuthorizedBulkMessageTopic;
+				options.InternalBulkMessageTopic = privatemqtt.InternalBulkMessageTopic;
 			});
 
 			services.AddSingleton<IHostedService, MqttPublishHandler>();
 
 			services.AddLogging(builder => {
-				builder.AddConfiguration(Configuration.GetSection("Logging"));
+				builder.AddConfiguration(this.Configuration.GetSection("Logging"));
 
 				if(IsDevelopment()) {
 					builder.AddDebug();
@@ -114,16 +115,12 @@ namespace SensateService.MqttHandler.Application
 		public void Configure(IServiceProvider provider)
 		{
 			var mqtt = new MqttConfig();
-			var cache = new CacheConfig();
 
 			this.Configuration.GetSection("Mqtt").Bind(mqtt);
-			this.Configuration.GetSection("Cache").Bind(cache);
-			var @public = mqtt.PublicBroker;
+			var @private = mqtt.InternalBroker;
 
-			provider.MapMqttTopic<MqttRealTimeMeasurementHandler>(@public.RealTimeShareTopic);
-			provider.MapMqttTopic<MqttMeasurementHandler>(@public.ShareTopic);
-			provider.MapMqttTopic<MqttBulkMeasurementHandler>(@public.BulkShareTopic);
-			provider.MapMqttTopic<MqttMessageHandler>(@public.MessageTopic);
+			provider.MapMqttTopic<MqttBulkMeasurementHandler>(@private.AuthorizedBulkMeasurementTopic);
+			provider.MapMqttTopic<MqttBulkMessageHandler>(@private.AuthorizedBulkMessageTopic);
 		}
 	}
 }

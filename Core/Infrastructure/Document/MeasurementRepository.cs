@@ -296,7 +296,7 @@ namespace SensateService.Infrastructure.Document
 			return update;
 		}
 
-		public async Task StoreAsync(IDictionary<Sensor, List<Measurement>> measurements, CancellationToken ct)
+		public async Task StoreAsync(IDictionary<ObjectId, List<Measurement>> measurements, CancellationToken ct)
 		{
 			var updates = new List<UpdateOneModel<MeasurementBucket>>();
 			var total = 0L;
@@ -305,13 +305,13 @@ namespace SensateService.Infrastructure.Document
 				var fbuilder = Builders<MeasurementBucket>.Filter;
 
 				var filter = fbuilder.Eq(x => x.Timestamp, DateTime.Now.ThisHour()) &
-							 fbuilder.Eq(x => x.SensorId, kvpair.Key.InternalId) &
+							 fbuilder.Eq(x => x.SensorId, kvpair.Key) &
 							 fbuilder.Lt(x => x.Count, MeasurementBucketSize);
 
 				for(var idx = 0; idx < kvpair.Value.Count;) {
 					var sublist = kvpair.Value.GetRange(idx,
 														Math.Min(MeasurementBucketSize, kvpair.Value.Count - idx));
-					var update = CreateBucketUpdate(kvpair.Key.InternalId, sublist);
+					var update = CreateBucketUpdate(kvpair.Key, sublist);
 
 					var upsert = new UpdateOneModel<MeasurementBucket>(filter, update) {
 						IsUpsert = true
@@ -338,12 +338,12 @@ namespace SensateService.Infrastructure.Document
 		}
 
 		public async Task StoreAsync(Sensor sensor, Measurement measurement,
-									 CancellationToken ct = default(CancellationToken))
+									 CancellationToken ct = default)
 		{
-			var dict = new Dictionary<Sensor, List<Measurement>>();
+			var dict = new Dictionary<ObjectId, List<Measurement>>();
 			var measurements = new List<Measurement> { measurement };
 
-			dict[sensor] = measurements;
+			dict[sensor.InternalId] = measurements;
 			await this.StoreAsync(dict, ct).AwaitBackground();
 		}
 

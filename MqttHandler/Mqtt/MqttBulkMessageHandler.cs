@@ -25,20 +25,20 @@ using SensateService.Services.Settings;
 
 namespace SensateService.MqttHandler.Mqtt
 {
-	public class MqttMessageHandler : Middleware.MqttHandler
+	public class MqttBulkMessageHandler : Middleware.MqttHandler
 	{
 		private readonly InternalMqttServiceOptions m_options;
 		private readonly IUserRepository m_users;
 		private readonly IMessageRepository m_messages;
 		private readonly ISensorRepository m_sensors;
 		private readonly IMqttPublishService m_client;
-		private readonly ILogger<MqttMessageHandler> m_logger;
+		private readonly ILogger<MqttBulkMessageHandler> m_logger;
 
 		private const int SecretSubStringOffset = 3;
 		private const int SecretSubStringStart = 1;
 
-		public MqttMessageHandler(IMessageRepository messages, ISensorRepository sensors, IUserRepository users,
-			IOptions<InternalMqttServiceOptions> options, IMqttPublishService client, ILogger<MqttMessageHandler> logger)
+		public MqttBulkMessageHandler(IMessageRepository messages, ISensorRepository sensors, IUserRepository users,
+			IOptions<InternalMqttServiceOptions> options, IMqttPublishService client, ILogger<MqttBulkMessageHandler> logger)
 		{
 			this.m_messages = messages;
 			this.m_users = users;
@@ -110,7 +110,7 @@ namespace SensateService.MqttHandler.Mqtt
 				var json = JsonConvert.SerializeObject(msg);
 
 				asyncio[0] = this.m_messages.CreateAsync(msg);
-				asyncio[1] = this.m_client.PublishOnAsync(this.m_options.InternalMessageTopic, json, false);
+				asyncio[1] = this.m_client.PublishOnAsync(this.m_options.InternalBulkMessageTopic, json, false);
 				await Task.WhenAll(asyncio).AwaitBackground();
 			} catch(Exception ex) {
 				this.m_logger.LogInformation($"Unable to store message: {ex.Message}");

@@ -142,7 +142,7 @@ namespace SensateService.TriggerHandler.Application
 			});
 
 			services.AddLogging(builder => {
-				builder.AddConfiguration(Configuration.GetSection("Logging"));
+				builder.AddConfiguration(this.Configuration.GetSection("Logging"));
 				if(IsDevelopment()) {
 					builder.AddDebug();
 				}
@@ -169,8 +169,7 @@ namespace SensateService.TriggerHandler.Application
 			var @private = mqtt.InternalBroker;
 
 			provider.MapInternalMqttTopic<MqttBulkNumberTriggerHandler>(@private.InternalBulkMeasurementTopic);
-			provider.MapInternalMqttTopic<MqttNumberTriggerHandler>(@private.InternalMeasurementTopic);
-			provider.MapInternalMqttTopic<MqttFormalLanguageTriggerHandler>(@private.InternalMessageTopic);
+			provider.MapInternalMqttTopic<MqttFormalLanguageTriggerHandler>(@private.InternalBulkMessageTopic);
 		}
 	}
 }

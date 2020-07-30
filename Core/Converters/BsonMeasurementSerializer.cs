@@ -51,7 +51,7 @@ namespace SensateService.Converters
 					writer.WriteString("Unit", dp.Value.Unit);
 
 				if(dp.Value.Precision != null) {
-					writer.WriteDecimal128("Precision", dp.Value.Precision.Value.ToDecimal128());
+					writer.WriteDouble("Precision", dp.Value.Precision.Value);
 				}
 
 				if(dp.Value.Accuracy != null) {
@@ -104,7 +104,7 @@ namespace SensateService.Converters
 					dataPoint.Precision = null;
 				}
 
-				dataPoint.Precision = reader.ReadDecimal128().ToDecimal();
+				dataPoint.Precision = reader.ReadDouble();
 				break;
 
 			case "Accuracy":

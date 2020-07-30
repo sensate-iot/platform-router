@@ -79,8 +79,7 @@ namespace SensateService.DataApi.Application
 				options.Password = privatemqtt.Password;
 				options.Id = Guid.NewGuid().ToString();
 				options.InternalBulkMeasurementTopic = privatemqtt.InternalBulkMeasurementTopic;
-				options.InternalMeasurementTopic = privatemqtt.InternalMeasurementTopic;
-				options.InternalMessageTopic = privatemqtt.InternalMessageTopic;
+				options.InternalBulkMessageTopic = privatemqtt.InternalBulkMessageTopic;
 			});
 
 			services.AddHostedService<MqttPublishHandler>();

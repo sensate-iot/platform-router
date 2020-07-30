@@ -34,9 +34,10 @@ namespace SensateService.Config
 		public string Host { get; set; }
 		public bool Ssl { get; set; }
 		public short Port { get; set; }
-		public string InternalMeasurementTopic { get; set; }
 		public string InternalBulkMeasurementTopic { get; set; }
-		public string InternalMessageTopic { get; set; }
+		public string InternalBulkMessageTopic { get; set; }
+		public string AuthorizedBulkMessageTopic { get; set; }
+		public string AuthorizedBulkMeasurementTopic { get; set; }
 		public string InternalBlobTopic { get; set; }
 	}
 }

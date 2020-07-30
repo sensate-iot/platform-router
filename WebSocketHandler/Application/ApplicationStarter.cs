@@ -78,14 +78,12 @@ namespace SensateService.WebSocketHandler.Application
 				options.Password = mqtt.InternalBroker.Password;
 				options.Id = Guid.NewGuid().ToString();
 				options.InternalBulkMeasurementTopic = mqtt.InternalBroker.InternalBulkMeasurementTopic;
-				options.InternalMeasurementTopic = mqtt.InternalBroker.InternalMeasurementTopic;
-				options.InternalMessageTopic = mqtt.InternalBroker.InternalMessageTopic;
+				options.InternalBulkMessageTopic = mqtt.InternalBroker.InternalBulkMessageTopic;
 			});
 
 			services.AddSingleton<IHostedService, MqttPublishHandler>();
 
 			services.AddWebSocketHandler<WebSocketMessageHandler>();
-			services.AddWebSocketHandler<RealTimeWebSocketMeasurementHandler>();
 			services.AddWebSocketHandler<WebSocketMeasurementHandler>();
 			services.AddControllers().AddNewtonsoftJson();
 
@@ -98,7 +96,7 @@ namespace SensateService.WebSocketHandler.Application
 			});
 		}
 
-		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory logging, IServiceProvider sp)
+		public void Configure(IApplicationBuilder app, IServiceProvider sp)
 		{
 			var cache = new CacheConfig();
 
@@ -109,7 +107,6 @@ namespace SensateService.WebSocketHandler.Application
 			this.Configuration.GetSection("Cache").Bind(cache);
 
 			app.MapWebSocketService("/ingress/v1/message", sp.GetService<WebSocketMessageHandler>());
-			app.MapWebSocketService("/ingress/v1/measurement/rt", sp.GetService<RealTimeWebSocketMeasurementHandler>());
 			app.MapWebSocketService("/ingress/v1/measurement", sp.GetService<WebSocketMeasurementHandler>());
 
 			app.UseAuthentication();

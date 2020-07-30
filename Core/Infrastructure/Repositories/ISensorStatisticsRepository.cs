@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-
+using MongoDB.Bson;
 using SensateService.Enums;
 using SensateService.Models;
 
@@ -18,9 +18,9 @@ namespace SensateService.Infrastructure.Repositories
 {
 	public interface ISensorStatisticsRepository
 	{
-		Task IncrementAsync(Sensor sensor, RequestMethod method);
+		Task IncrementAsync(ObjectId sensorId, RequestMethod method);
 		Task<SensorStatisticsEntry> CreateForAsync(Sensor sensor);
-		Task IncrementManyAsync(Sensor sensor, RequestMethod method, int num, CancellationToken token = default(CancellationToken));
+		Task IncrementManyAsync(ObjectId sensorId, RequestMethod method, int num, CancellationToken token = default);
 
 		Task<SensorStatisticsEntry> GetByDateAsync(Sensor sensor, DateTime date);
 		Task<IEnumerable<SensorStatisticsEntry>> GetBeforeAsync(Sensor sensor, DateTime date);
