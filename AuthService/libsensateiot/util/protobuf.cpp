@@ -76,6 +76,7 @@ namespace sensateiot::util
 
 				datapoint->set_value(dp.m_value);
 				datapoint->set_unit(dp.m_unit);
+				datapoint->set_key(dp.m_key);
 
 				if(dp.m_accuracy.has_value()) {
 					datapoint->set_accuracy(dp.m_accuracy.value());

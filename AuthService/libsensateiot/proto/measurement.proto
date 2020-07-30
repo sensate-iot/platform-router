@@ -8,6 +8,7 @@ message DataPoint {
 	string unit = 2;
 	double accuracy = 3;
 	double precision = 4;
+	string key = 5;
 }
 
 message Measurement {
