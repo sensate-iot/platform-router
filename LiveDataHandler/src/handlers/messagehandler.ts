@@ -18,12 +18,11 @@ export class MessageHandler implements IMessageHandler {
         const measurement: MeasurementInfo = JSON.parse(msg, toCamelCase);
         const bulk = new BulkMeasurementInfo();
 
-
         if (measurement == null) {
             return;
         }
 
-        bulk.createdBy = measurement.createdBy;
+        bulk.sensorId = measurement.sensorId;
         bulk.measurements = [measurement.measurement];
 
         this.wss.process(bulk);

@@ -162,7 +162,7 @@ export class WebSocketClient {
             return;
         }
 
-        const sensor = this.sensors.get(measurements.createdBy.toString());
+        const sensor = this.sensors.get(measurements.sensorId.toString());
 
         if (sensor === null) {
             return;

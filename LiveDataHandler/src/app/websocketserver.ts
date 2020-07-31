@@ -37,7 +37,7 @@ export class WebSocketServer {
 
     public process(measurements: BulkMeasurementInfo) {
         this.clients.forEach(client => {
-            if (!client.isServicing(measurements.createdBy.toString())) {
+            if (!client.isServicing(measurements.sensorId.toString())) {
                 return;
             }
 

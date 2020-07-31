@@ -24,7 +24,7 @@ export class BulkMessageHandler implements IMessageHandler {
         }
 
         measurements.forEach(m => {
-            if (!this.wss.hasOpenSocketFor(m.createdBy.toString()))
+            if (!this.wss.hasOpenSocketFor(m.sensorId.toString()))
                 return;
 
             this.wss.process(m);
@@ -50,4 +50,3 @@ export class BulkMessageHandler implements IMessageHandler {
         return this.topic;
     }
 }
-

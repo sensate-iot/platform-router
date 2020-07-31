@@ -28,10 +28,10 @@ export interface Measurement {
 
 export class BulkMeasurementInfo {
     public measurements: [Measurement];
-    public createdBy: Types.ObjectId;
+    public sensorId: Types.ObjectId;
 }
 
 export class MeasurementInfo {
     public measurement: Measurement;
-    public createdBy: Types.ObjectId;
+    public sensorId: Types.ObjectId;
 }
