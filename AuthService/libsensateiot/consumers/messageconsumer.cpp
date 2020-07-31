@@ -96,7 +96,7 @@ namespace sensateiot::consumers
 		data.clear();
 
 		if(!authorized.empty()) {
-			this->PublishAuthorizedMessages(authorized, this->m_config.GetMqtt().GetPrivateBroker().GetBulkMeasurementTopic());
+			this->PublishAuthorizedMessages(authorized, this->m_config.GetMqtt().GetPrivateBroker().GetBulkMessageTopic());
 		}
 
 		std::scoped_lock l(this->m_lock);
