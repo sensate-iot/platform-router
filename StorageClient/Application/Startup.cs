@@ -84,7 +84,7 @@ namespace SensateService.MqttHandler.Application
 				options.Username = publicmqtt.Username;
 				options.Password = publicmqtt.Password;
 				options.Id = Guid.NewGuid().ToString();
-				options.TopicShare = "$share/auth-service/";
+				options.TopicShare = "$share/sensate-storage/";
 			});
 
 			services.AddInternalMqttService(options => {
