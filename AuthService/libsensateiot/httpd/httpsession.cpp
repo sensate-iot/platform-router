@@ -34,7 +34,7 @@ namespace sensateiot::httpd
 			res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
 			res.set(http::field::content_type, "application/json");
 			res.keep_alive(req.keep_alive());
-			res.body() = R"({"message": "Resource not found!})";
+			res.body() = R"({"message":"Resource not found!"})";
 			res.prepare_payload();
 			return res;
 		};
@@ -46,7 +46,7 @@ namespace sensateiot::httpd
 			res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
 			res.set(http::field::content_type, "application/json");
 			res.keep_alive(req.keep_alive());
-			res.body() = R"({"message": "Service unavailable!})";
+			res.body() = R"({"message":"Service unavailable!"})";
 			res.prepare_payload();
 			return res;
 		};
