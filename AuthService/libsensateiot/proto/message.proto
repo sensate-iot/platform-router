@@ -5,7 +5,7 @@ option csharp_namespace = "SensateService.Protobuf";
 
 message TextMessage {
 	string data = 1;
-	string created_at = 2;
+	string timestamp = 2;
 	double longitude = 3;
 	double latitude = 4;
 	string sensor_id = 5;

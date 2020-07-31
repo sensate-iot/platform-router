@@ -46,7 +46,7 @@ namespace sensateiot::util
 			}
 
 			message->set_data(entry.GetData());
-			message->set_created_at(entry.GetCreatedAt());
+			message->set_timestamp(entry.GetCreatedAt());
 			message->set_sensor_id(entry.GetObjectId().ToString());
 		}
 
