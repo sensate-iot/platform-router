@@ -15,7 +15,7 @@ namespace sensateiot::models
 {
 	namespace detail
 	{
-		enum DLL_EXPORT ApiKeyType {
+		enum class ApiKeyType {
 			SensorKey,
 			SystemKey,
 			ApiKey
@@ -24,6 +24,7 @@ namespace sensateiot::models
 
 	class DLL_EXPORT ApiKey {
 	public:
+		explicit ApiKey() = default;
 		typedef detail::ApiKeyType Type;
 
 		void SetKey(const std::string& value);
@@ -46,7 +47,7 @@ namespace sensateiot::models
 	private:
 		std::string m_key;
 		std::string m_userId;
-		Type m_type;
-		bool m_revoked;
+		Type m_type { detail::ApiKeyType::SystemKey };
+		bool m_revoked {};
 	};
 }

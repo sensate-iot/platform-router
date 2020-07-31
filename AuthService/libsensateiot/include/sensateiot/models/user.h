@@ -41,7 +41,7 @@ namespace sensateiot::models
 		bool GetBanned() const;
 
 	private:
-		IdType m_id;
+		IdType m_id{};
 		bool m_lockout{};
 		bool m_banned{};
 	};

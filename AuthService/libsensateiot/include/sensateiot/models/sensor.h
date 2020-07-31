@@ -17,6 +17,8 @@ namespace sensateiot::models
 {
 	class DLL_EXPORT Sensor {
 	public:
+		explicit Sensor() = default;
+
 		void SetId(const ObjectId& id);
 		void SetId(const std::string& id);
 		void SetSecret(std::string secret);
