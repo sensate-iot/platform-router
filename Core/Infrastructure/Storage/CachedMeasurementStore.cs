@@ -101,7 +101,7 @@ namespace SensateService.Infrastructure.Storage
 
 		public async Task<long> ProcessMeasurementsAsync()
 		{
-			long count = 0;
+			long count;
 
 			this.m_lock.Lock();
 			if(this.m_data.Count <= 0L) {
@@ -121,7 +121,7 @@ namespace SensateService.Infrastructure.Storage
 				IList<MeasurementQueue> livedata;
 				IList<StatisticsUpdate> statsdata;
 				var asyncio = new Task[3];
-				var measurements = DeflateMeasurements(raw_q);
+				var measurements = DeflateMeasurements(raw_q).ToList();
 				var measurementsDict = measurements.ToDictionary(x => x.SensorId, x => x.Measurements);
 
 				statsdata = measurementsDict.Select(e => new StatisticsUpdate(RequestMethod.MqttTcp, e.Value.Count, e.Key)).ToList();
@@ -131,6 +131,7 @@ namespace SensateService.Infrastructure.Storage
 				livedata = measurementsDict.Select(x => new MeasurementQueue { SensorId =  x.Key, Measurements = x.Value}).ToList();
 				asyncio[2] = this.InvokeEventHandlersAsync(livedata, cts.Token);
 
+				count = measurements.Sum(x => x.Measurements.Count);
 				await Task.WhenAll(asyncio).AwaitBackground();
 			} catch(DatabaseException e) {
 				cts.Cancel(false);
