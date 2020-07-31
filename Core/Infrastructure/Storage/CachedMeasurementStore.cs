@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,7 +20,6 @@ using Microsoft.Extensions.Logging;
 
 using MongoDB.Bson;
 using MongoDB.Driver.GeoJsonObjectModel;
-using Newtonsoft.Json;
 
 using SensateService.Enums;
 using SensateService.Protobuf;
@@ -34,7 +32,7 @@ using Measurement = SensateService.Models.Measurement;
 
 namespace SensateService.Infrastructure.Storage
 {
-	public class CachedMeasurementStore : ICachedMeasurementStore, IMeasurementCache
+	public class CachedMeasurementStore : ICachedMeasurementStore
 	{
 		public static event OnMeasurementsReceived MeasurementsReceived;
 
@@ -57,7 +55,7 @@ namespace SensateService.Infrastructure.Storage
 			this.m_lock.Unlock();
 		}
 
-		public Task StoreAsync(string obj, RequestMethod method)
+		public Task StoreAsync(string obj)
 		{
 			this.m_lock.Lock();
 			this.m_data.Add(obj);
@@ -81,7 +79,7 @@ namespace SensateService.Infrastructure.Storage
 		private async Task InvokeEventHandlersAsync(IList<MeasurementQueue> measurements, CancellationToken token)
 		{
 			Delegate[] delegates;
-			MeasurementsReceivedEventArgs args;
+			DataReceivedEventArgs args;
 
 			if(MeasurementsReceived == null)
 				return;
@@ -92,9 +90,9 @@ namespace SensateService.Infrastructure.Storage
 				return;
 			}
 
-			var task = Task.Run(() => Compress(measurements), token);
+			var task = Task.Run(measurements.Compress, token);
 
-			args = new MeasurementsReceivedEventArgs(token) {
+			args = new DataReceivedEventArgs(token) {
 				Compressed = await task.AwaitBackground()
 			};
 
@@ -187,35 +185,6 @@ namespace SensateService.Infrastructure.Storage
 					};
 
 				rv.AddRange(measurements);
-			}
-
-			return rv;
-		}
-
-		private static string Compress(IList<MeasurementQueue> measurements)
-		{
-			string rv;
-			MemoryStream msi, mso;
-			GZipStream gzip;
-
-			msi = null;
-			mso = null;
-
-			try {
-				var data = JsonConvert.SerializeObject(measurements);
-				var bytes = Encoding.UTF8.GetBytes(data);
-
-				msi = new MemoryStream(bytes);
-				mso = new MemoryStream();
-				gzip = new GZipStream(mso, CompressionMode.Compress);
-
-				msi.CopyTo(gzip);
-				gzip.Dispose();
-
-				rv = Convert.ToBase64String(mso.ToArray());
-			} finally {
-				mso?.Dispose();
-				msi?.Dispose();
 			}
 
 			return rv;

@@ -24,13 +24,15 @@ namespace SensateService.MqttHandler.Mqtt
 	public class MqttPublishHandler : IHostedService
 	{
 		private readonly IServiceProvider _provider;
+		private readonly InternalMqttServiceOptions m_opts;
 
-		public MqttPublishHandler(IServiceProvider provider)
+		public MqttPublishHandler(IServiceProvider provider, IOptions<InternalMqttServiceOptions> opts)
 		{
 			this._provider = provider;
+			this.m_opts = opts.Value;
 		}
 
-		private async Task MeasurementsStored_Handler(object sender, MeasurementsReceivedEventArgs e)
+		private async Task MeasurementsStored_Handler(object sender, DataReceivedEventArgs e)
 		{
 			string data;
 
@@ -39,18 +41,31 @@ namespace SensateService.MqttHandler.Mqtt
 
 			data = e.Compressed;
 			//await client.PublishOnAsync(this._options.InternalBulkMeasurementTopic, data, false).AwaitBackground();
-			await client.PublishOnAsync("sensate/measurements", data, false).AwaitBackground();
+			await client.PublishOnAsync(this.m_opts.InternalBulkMeasurementTopic, data, false).AwaitBackground();
+		}
+
+		private async Task MessagesStored_Handler(object sender, DataReceivedEventArgs e)
+		{
+			string data;
+
+			using var scope = this._provider.CreateScope();
+			var client = scope.ServiceProvider.GetRequiredService<IMqttPublishService>();
+
+			data = e.Compressed;
+			await client.PublishOnAsync(this.m_opts.InternalBulkMessageTopic, data, false).AwaitBackground();
 		}
 
 		public Task StartAsync(CancellationToken cancellationToken)
 		{
 			CachedMeasurementStore.MeasurementsReceived += this.MeasurementsStored_Handler;
+			CachedCachedMessageStore.MessagesReceived += this.MessagesStored_Handler;
 			return Task.CompletedTask;
 		}
 
 		public Task StopAsync(CancellationToken cancellationToken)
 		{
 			CachedMeasurementStore.MeasurementsReceived -= this.MeasurementsStored_Handler;
+			CachedCachedMessageStore.MessagesReceived -= this.MessagesStored_Handler;
 			return Task.CompletedTask;
 		}
 	}

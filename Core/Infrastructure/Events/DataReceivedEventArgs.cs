@@ -5,18 +5,16 @@
  * @email  michel.megens@sonatolabs.com
  */
 
-using System.Collections.Generic;
 using System.Threading;
-using SensateService.Models;
 
 namespace SensateService.Infrastructure.Events
 {
-	public class MeasurementsReceivedEventArgs
+	public class DataReceivedEventArgs
 	{
 		public string Compressed { get; set; }
 		public CancellationToken Token { get; }
 
-		public MeasurementsReceivedEventArgs(CancellationToken token)
+		public DataReceivedEventArgs(CancellationToken token)
 		{
 			this.Token = token;
 		}

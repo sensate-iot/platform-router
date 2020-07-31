@@ -1,5 +1,5 @@
 ﻿/*
- * Measurement cache interface definition.
+ * Message store interface definition.
  *
  * @author Michel Megens
  * @email  michel@michelmegens.net
@@ -9,8 +9,9 @@ using System.Threading.Tasks;
 
 namespace SensateService.Infrastructure.Storage
 {
-	public interface IMeasurementCache
+	public interface ICachedMessageStore : IMessageCache
 	{
-		Task StoreAsync(string obj);
+		Task<long> ProcessMessagesAsync();
+		void Destroy();
 	}
 }

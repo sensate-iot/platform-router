@@ -61,8 +61,7 @@ namespace SensateService.DataApi.Controllers
 		public async Task<IActionResult> Create([FromBody] RawMessage raw)
 		{
 			var msg = new Message {
-				UpdatedAt = DateTime.Now,
-				CreatedAt = raw.CreatedAt ?? DateTime.Now,
+				Timestamp = raw.CreatedAt ?? DateTime.Now,
 				Data = raw.Data
 			};
 
@@ -74,7 +73,7 @@ namespace SensateService.DataApi.Controllers
 			}
 
 			msg.SensorId = tmp;
-			msg.InternalId = ObjectId.GenerateNewId(msg.CreatedAt);
+			msg.InternalId = ObjectId.GenerateNewId(msg.Timestamp);
 			var auth = await this.AuthenticateUserForSensor(raw.SensorId, true).AwaitBackground();
 
 			if(!auth) {

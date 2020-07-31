@@ -7,9 +7,12 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver.GeoJsonObjectModel;
 using Newtonsoft.Json;
+
 using SensateService.Converters;
 
 namespace SensateService.Models
@@ -19,11 +22,11 @@ namespace SensateService.Models
 		[BsonId, BsonRequired, JsonConverter(typeof(ObjectIdJsonConverter))]
 		public ObjectId InternalId { get; set; }
 		[BsonRequired]
-		public DateTime CreatedAt { get; set; }
-		[BsonRequired, JsonIgnore]
-		public DateTime UpdatedAt { get; set; }
+		public DateTime Timestamp { get; set; }
 		[BsonRequired, JsonConverter(typeof(ObjectIdJsonConverter))]
 		public ObjectId SensorId { get; set; }
+		[JsonConverter(typeof(GeoJsonPointJsonConverter))]
+		public GeoJsonPoint<GeoJson2DGeographicCoordinates> Location { get; set; }
 		[BsonRequired, StringLength(1024, MinimumLength = 1)]
 		public string Data { get; set; }
 	}

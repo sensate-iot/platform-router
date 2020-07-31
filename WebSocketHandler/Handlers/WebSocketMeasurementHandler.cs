@@ -24,6 +24,7 @@ using SensateService.Infrastructure.Storage;
 using SensateService.Models.Generic;
 using SensateService.Services;
 using SensateService.Services.Settings;
+using DataReceivedEventArgs = SensateService.Infrastructure.Events.DataReceivedEventArgs;
 
 namespace SensateService.WebSocketHandler.Handlers
 {
@@ -64,7 +65,7 @@ namespace SensateService.WebSocketHandler.Handlers
 			}
 		}
 
-		private async Task MeasurementsStored_Handler(object sender, MeasurementsReceivedEventArgs e)
+		private async Task MeasurementsStored_Handler(object sender, DataReceivedEventArgs e)
 		{
 			await this.client.PublishOnAsync(this.mqttopts.InternalBulkMeasurementTopic, e.Compressed, false).AwaitBackground();
 		}

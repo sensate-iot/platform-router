@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SensateService.Infrastructure.Storage
 {
-	public interface ICachedMeasurementStore 
+	public interface ICachedMeasurementStore : IMeasurementCache
 	{
 		Task<long> ProcessMeasurementsAsync();
 		void Destroy();

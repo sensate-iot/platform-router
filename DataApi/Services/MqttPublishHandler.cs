@@ -30,7 +30,7 @@ namespace SensateService.DataApi.Services
 			this._provider = provider;
 		}
 
-		private async Task MeasurementsStored_Handler(object sender, MeasurementsReceivedEventArgs e)
+		private async Task MeasurementsStored_Handler(object sender, DataReceivedEventArgs e)
 		{
 			string data;
 

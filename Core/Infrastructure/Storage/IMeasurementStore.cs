@@ -7,12 +7,10 @@
 
 using System.Threading.Tasks;
 
-using SensateService.Enums;
-
 namespace SensateService.Infrastructure.Storage
 {
 	public interface IMeasurementStore
 	{
-		Task StoreAsync(string obj, RequestMethod method);
+		Task StoreAsync(string obj);
 	}
 }

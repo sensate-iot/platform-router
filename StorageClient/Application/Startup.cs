@@ -74,6 +74,7 @@ namespace SensateService.MqttHandler.Application
 			services.AddDocumentRepositories(cache.Enabled);
 			services.AddSqlRepositories(cache.Enabled);
 			services.AddMeasurementStorage(cache);
+			services.AddMessageStorage();
 			services.AddHashAlgorihms();
 
 			services.AddMqttService(options => {

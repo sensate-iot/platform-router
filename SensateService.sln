@@ -6,7 +6,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthApi", "AuthApi\AuthApi.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{C9A2C1FE-9179-45B9-ABDE-3336DD80A60B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MqttHandler", "MqttHandler\MqttHandler.csproj", "{8D55A3E7-8E0E-4ABB-ADEA-FFD157E9D095}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StorageClient", "StorageClient\StorageClient.csproj", "{8D55A3E7-8E0E-4ABB-ADEA-FFD157E9D095}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlSetup", "SqlSetup\SqlSetup.csproj", "{AE713298-9C5F-483D-B4BE-D335BA63B0A2}"
 EndProject

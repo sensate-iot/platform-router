@@ -20,26 +20,29 @@ using SensateService.Services.Settings;
 
 namespace SensateService.Services.Processing
 {
-	public class MeasurementCacheService : TimedBackgroundService
+	public class CacheService : TimedBackgroundService
 	{
 		public const int IntervalInMillis = 2000;
 		private const int StartDelay = 200;
 
-		private readonly ILogger<MeasurementCacheService> _logger;
+		private readonly ILogger<CacheService> _logger;
 		private readonly CacheConfig _config;
 
-		private readonly ICachedMeasurementStore _store;
+		private readonly ICachedMeasurementStore _measurementStore;
+		private readonly ICachedMessageStore _messageStore;
 		private long _totalCount;
 
-		public MeasurementCacheService(CacheConfig config, ILogger<MeasurementCacheService> logger, ICachedMeasurementStore store)
+		public CacheService(CacheConfig config, ILogger<CacheService> logger, ICachedMeasurementStore measurements, ICachedMessageStore msgs)
 		{
 			this._logger = logger;
 			this._config = config;
 
-			if(config.Interval <= 0)
+			if(config.Interval <= 0) {
 				this._config.Interval = IntervalInMillis;
+			}
 
-			this._store = store;
+			this._messageStore = msgs;
+			this._measurementStore = measurements;
 			this._totalCount = 0L;
 		}
 
@@ -54,7 +57,8 @@ namespace SensateService.Services.Processing
 			count = 0L;
 
 			try {
-				count = await this._store.ProcessMeasurementsAsync().AwaitBackground();
+				count = await this._measurementStore.ProcessMeasurementsAsync().AwaitBackground();
+				await this._messageStore.ProcessMessagesAsync().AwaitBackground();
 			} catch(CachingException ex) {
 				this._logger.LogInformation($"Measurement cache failed: {ex.InnerException?.Message}");
 			}
@@ -81,7 +85,7 @@ namespace SensateService.Services.Processing
 		{
 			await base.StopAsync(cancellationToken).AwaitBackground();
 
-			this._store.Destroy();
+			this._measurementStore.Destroy();
 			this._logger.LogInformation("Stopping measurement cache service!");
 		}
 	}

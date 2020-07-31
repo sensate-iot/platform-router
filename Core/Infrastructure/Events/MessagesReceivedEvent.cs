@@ -1,14 +1,13 @@
 ﻿/*
- * Bulk measurement processing event.
+ * Bulk message processing event.
  *
  * @author Michel Megens
  * @email  michel.megens@sonatolabs.com
  */
 
-
 using System.Threading.Tasks;
 
 namespace SensateService.Infrastructure.Events
 {
-	public delegate Task OnMeasurementsReceived(object sender, DataReceivedEventArgs args);
+	public delegate Task OnMessagesReceived(object sender, DataReceivedEventArgs args);
 }

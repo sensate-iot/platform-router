@@ -19,12 +19,22 @@ namespace SensateService.Init
 		public static IServiceCollection AddMeasurementStorage(this IServiceCollection services, CacheConfig config)
 		{
 			services.AddSingleton(config);
-			services.AddSingleton<IHostedService, MeasurementCacheService>();
+			services.AddSingleton<IHostedService, CacheService>();
 
-			services.AddScoped<IMeasurementStore, MeasurementStore>();
 			services.AddSingleton<ICachedMeasurementStore, CachedMeasurementStore>();
 			services.AddSingleton<IMeasurementCache>(x => {
 				var obj = x.GetRequiredService<ICachedMeasurementStore>();
+				return obj;
+			});
+
+			return services;
+		}
+
+		public static IServiceCollection AddMessageStorage(this IServiceCollection services)
+		{
+			services.AddSingleton<ICachedMessageStore, CachedCachedMessageStore>();
+			services.AddSingleton<IMessageCache>(x => {
+				var obj = x.GetRequiredService<ICachedMessageStore>();
 				return obj;
 			});
 

@@ -6,15 +6,10 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Storage;
 
@@ -23,9 +18,9 @@ namespace SensateService.MqttHandler.Mqtt
 	public class MqttBulkMeasurementHandler : Middleware.MqttHandler
 	{
 		private readonly IMeasurementCache store;
-		private readonly ILogger<MqttMeasurementHandler> logger;
+		private readonly ILogger<MqttBulkMeasurementHandler> logger;
 
-		public MqttBulkMeasurementHandler(IMeasurementCache store, ILogger<MqttMeasurementHandler> logger)
+		public MqttBulkMeasurementHandler(IMeasurementCache store, ILogger<MqttBulkMeasurementHandler> logger)
 		{
 			this.store = store;
 			this.logger = logger;
@@ -39,7 +34,7 @@ namespace SensateService.MqttHandler.Mqtt
 		public override async Task OnMessageAsync(string topic, string message)
 		{
 			try {
-				await this.store.StoreAsync(message, RequestMethod.MqttTcp).AwaitBackground();
+				await this.store.StoreAsync(message).AwaitBackground();
 			} catch(Exception ex) {
 				this.logger.LogInformation($"Error: {ex.Message}");
 				this.logger.LogInformation($"Received a buggy MQTT message: {message}");

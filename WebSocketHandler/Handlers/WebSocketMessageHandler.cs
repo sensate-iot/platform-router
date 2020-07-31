@@ -90,8 +90,7 @@ namespace SensateService.WebSocketHandler.Handlers
 				var msg = new Message {
 					Data = raw.Data,
 					SensorId = id,
-					CreatedAt = raw.CreatedAt ?? DateTime.UtcNow,
-					UpdatedAt = raw.CreatedAt ?? DateTime.UtcNow
+					Timestamp = raw.CreatedAt ?? DateTime.UtcNow,
 				};
 
 				var msgArray = new Message[1];
