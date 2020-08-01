@@ -27,6 +27,10 @@
     <None Update="Dockerfile">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="..\COPYING">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -35,8 +39,12 @@
     <ServerGarbageCollection>true</ServerGarbageCollection>
 	
     <SignAssembly>false</SignAssembly>
-    <RootNamespace>SensateService.MqttHandler</RootNamespace>
+    <RootNamespace>SensateService.StorageClient</RootNamespace>
     <Version>0.5.1</Version>
+    <Authors>Sensate IoT</Authors>
+    <Company>Sensate IoT</Company>
+    <Product>Sensate</Product>
+    <PackageLicenseFile>COPYING</PackageLicenseFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>TRACE;DEBUG</DefineConstants>

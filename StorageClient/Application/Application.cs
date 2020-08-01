@@ -7,10 +7,9 @@
 
 using System;
 using System.Threading;
-
 using Microsoft.Extensions.Hosting;
 
-namespace SensateService.MqttHandler.Application
+namespace SensateService.StorageClient.Application
 {
 	public class Application
 	{

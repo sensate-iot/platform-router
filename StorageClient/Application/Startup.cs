@@ -6,21 +6,19 @@
  */
 
 using System;
-
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-
 using SensateService.Config;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
 using SensateService.Models;
-using SensateService.MqttHandler.Mqtt;
+using SensateService.StorageClient.Mqtt;
 
-namespace SensateService.MqttHandler.Application
+namespace SensateService.StorageClient.Application
 {
 	public class Startup
 	{

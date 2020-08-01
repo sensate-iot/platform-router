@@ -7,16 +7,14 @@
 
 using System;
 using System.Threading.Tasks;
-
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-
 using SensateService.Helpers;
 using SensateService.Infrastructure.Storage;
 using SensateService.Services;
 using SensateService.Services.Settings;
 
-namespace SensateService.MqttHandler.Mqtt
+namespace SensateService.StorageClient.Mqtt
 {
 	public class MqttBulkMessageHandler : Middleware.MqttHandler
 	{

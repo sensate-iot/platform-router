@@ -7,10 +7,9 @@
 
 using MongoDB.Bson;
 using Newtonsoft.Json;
-
 using SensateService.Converters;
 
-namespace SensateService.MqttHandler.Models
+namespace SensateService.StorageClient.Models
 {
 	public class RawMessage
 	{

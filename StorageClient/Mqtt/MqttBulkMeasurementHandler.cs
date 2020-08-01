@@ -7,13 +7,11 @@
 
 using System;
 using System.Threading.Tasks;
-
 using Microsoft.Extensions.Logging;
-
 using SensateService.Helpers;
 using SensateService.Infrastructure.Storage;
 
-namespace SensateService.MqttHandler.Mqtt
+namespace SensateService.StorageClient.Mqtt
 {
 	public class MqttBulkMeasurementHandler : Middleware.MqttHandler
 	{
