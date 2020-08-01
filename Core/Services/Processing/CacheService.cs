@@ -7,6 +7,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -57,21 +58,25 @@ namespace SensateService.Services.Processing
 			count = 0L;
 
 			try {
-				count = await this._measurementStore.ProcessMeasurementsAsync().AwaitBackground();
-				await this._messageStore.ProcessMessagesAsync().AwaitBackground();
+				var io = new Task<long>[2];
+				io[0] = this._measurementStore.ProcessMeasurementsAsync();
+				io[1] = this._messageStore.ProcessMessagesAsync();
+
+				var counts = await Task.WhenAll(io).AwaitBackground();
+				count = counts.Sum();
 			} catch(CachingException ex) {
-				this._logger.LogInformation($"Measurement cache failed: {ex.InnerException?.Message}");
+				this._logger.LogInformation($"Storage cache failed: {ex.InnerException?.Message}");
 			}
 
 			sw.Stop();
 
-			totaltime = base.MillisecondsElapsed();
+			totaltime = this.MillisecondsElapsed();
 			this._totalCount += count;
 
 			if(count > 0) {
-				this._logger.LogInformation($"Number of measurements processed: {count}.{Environment.NewLine}" +
+				this._logger.LogInformation($"Number of messages processed: {count}.{Environment.NewLine}" +
 											$"Processing took {sw.ElapsedMilliseconds}ms.{Environment.NewLine}" +
-											$"Average measurements per second: {this._totalCount / (totaltime / 1000)}.");
+											$"Average messages per second: {this._totalCount / (totaltime / 1000)}.");
 			}
 		}
 

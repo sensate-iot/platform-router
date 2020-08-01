@@ -99,7 +99,7 @@ namespace SensateService.Infrastructure.Storage
 
 		public async Task<long> ProcessMessagesAsync()
 		{
-			long count = 0;
+			long count;
 
 			this.m_lock.Lock();
 			if(this.m_data.Count <= 0L) {
@@ -129,6 +129,7 @@ namespace SensateService.Infrastructure.Storage
 				asyncio[1] = messagesdb.CreateRangeAsync(messages, cts.Token);
 				asyncio[2] = this.InvokeEventHandlersAsync(messages, cts.Token);
 
+				count = messages.Count;
 				await Task.WhenAll(asyncio).AwaitBackground();
 			} catch(DatabaseException e) {
 				cts.Cancel(false);
