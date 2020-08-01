@@ -27,23 +27,17 @@ namespace SensateService.TriggerHandler.Mqtt
 {
 	public class MqttBulkFormalLanguageTriggerHandler : MqttHandler
 	{
-		private readonly ILogger<MqttFormalLanguageTriggerHandler> m_logger;
-		private readonly ISensorRepository m_sensors;
-		private readonly IUserRepository m_users;
+		private readonly ILogger<MqttBulkFormalLanguageTriggerHandler> m_logger;
 		private readonly ITriggerRepository m_triggers;
 		private readonly ITriggerTextMatchingService m_matcher;
 
 		public MqttBulkFormalLanguageTriggerHandler(
-			ILogger<MqttFormalLanguageTriggerHandler> logger,
-			ISensorRepository sensors,
-			IUserRepository users,
+			ILogger<MqttBulkFormalLanguageTriggerHandler> logger,
 			ITriggerRepository triggers,
 			ITriggerTextMatchingService matcher
 		)
 		{
 			this.m_logger = logger;
-			this.m_users = users;
-			this.m_sensors = sensors;
 			this.m_triggers = triggers;
 			this.m_matcher = matcher;
 		}
