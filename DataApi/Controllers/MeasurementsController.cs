@@ -77,7 +77,7 @@ namespace SensateService.DataApi.Controllers
 			status.ErrorCode = ReplyCode.Ok;
 			status.Message = "Measurement queued!";
 
-			await this.m_cache.StoreAsync(raw, RequestMethod.HttpPost);
+			await this.m_cache.StoreAsync(raw);
 			return this.Accepted(status);
 		}
 

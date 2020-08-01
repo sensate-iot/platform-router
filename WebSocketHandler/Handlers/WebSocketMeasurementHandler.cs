@@ -51,7 +51,7 @@ namespace SensateService.WebSocketHandler.Handlers
 				var store = scope.ServiceProvider.GetRequiredService<IMeasurementCache>();
 				msg = Encoding.UTF8.GetString(buffer, 0, result.Count);
 
-				await store.StoreAsync(msg, RequestMethod.WebSocket).AwaitBackground();
+				await store.StoreAsync(msg).AwaitBackground();
 			} catch(InvalidRequestException ex) {
 				Debug.WriteLine($"Unable to store measurement: {ex.Message}");
 				dynamic jobj = new JObject();
