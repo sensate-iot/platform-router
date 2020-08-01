@@ -1,4 +1,3 @@
-
 /*
  * MQTT message handler.
  *
@@ -10,6 +9,7 @@
 #include <sensateiot/util/sha256.h>
 #include <sensateiot/util/protobuf.h>
 
+#include <boost/chrono/chrono.hpp>
 #include <re2/re2.h>
 
 #include <string>
@@ -64,10 +64,11 @@ namespace sensateiot::consumers
 		
 		std::vector<models::Message> authorized;
 		authorized.reserve(data.size());
+		auto now = boost::chrono::high_resolution_clock::now();
 
 		for(auto&& pair : data) {
 			if(!sensor.second.has_value() || sensor.second->GetId() != pair.second.GetObjectId()) {
-				sensor = this->m_cache->GetSensor(pair.second.GetObjectId());
+				sensor = this->m_cache->GetSensor(pair.second.GetObjectId(), now);
 			}
 
 			if(!sensor.first) {
@@ -123,6 +124,7 @@ namespace sensateiot::consumers
 
 		std::vector<models::Message> authorized;
 		authorized.reserve(data.size());
+		auto now = boost::chrono::high_resolution_clock::now();
 
 		std::sort(std::begin(data), std::end(data), [](const auto& x, const auto& y)
 		{
@@ -131,7 +133,7 @@ namespace sensateiot::consumers
 
 		for(auto&& pair : data) {
 			if(!sensor.second.has_value() || sensor.second->GetId() != pair.second.GetObjectId()) {
-				sensor = this->m_cache->GetSensor(pair.second.GetObjectId());
+				sensor = this->m_cache->GetSensor(pair.second.GetObjectId(), now);
 			}
 
 			if(!sensor.first || !sensor.second.has_value()) {

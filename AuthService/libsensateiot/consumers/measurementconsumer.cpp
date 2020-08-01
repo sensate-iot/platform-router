@@ -81,9 +81,11 @@ namespace sensateiot::consumers
 			return x.second.GetObjectId().compare(y.second.GetObjectId()) < 0;
 		});
 
+		auto now = boost::chrono::high_resolution_clock::now();
+
 		for(auto&& pair : data) {
 			if(!sensor.second.has_value() || sensor.second->GetId() != pair.second.GetObjectId()) {
-				sensor = this->m_cache->GetSensor(pair.second.GetObjectId());
+				sensor = this->m_cache->GetSensor(pair.second.GetObjectId(), now);
 			}
 
 			if(!sensor.first || !sensor.second.has_value()) {
@@ -127,10 +129,11 @@ namespace sensateiot::consumers
 		
 		std::vector<models::Measurement> authorized;
 		authorized.reserve(data.size());
+		auto now = boost::chrono::high_resolution_clock::now();
 
 		for(auto&& pair : data) {
 			if(!sensor.second.has_value() || sensor.second->GetId() != pair.second.GetObjectId()) {
-				sensor = this->m_cache->GetSensor(pair.second.GetObjectId());
+				sensor = this->m_cache->GetSensor(pair.second.GetObjectId(), now);
 			}
 
 			if(!sensor.first) {

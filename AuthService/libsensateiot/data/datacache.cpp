@@ -47,13 +47,12 @@ namespace sensateiot::data
 		}
 	}
 
-	std::pair<bool, std::optional<models::Sensor>> DataCache::GetSensor(const models::ObjectId& id) const
+	std::pair<bool, std::optional<models::Sensor>> DataCache::GetSensor(const models::ObjectId& id, TimePoint tp) const
 	{
 		try {
-			auto now = boost::chrono::high_resolution_clock::now();
-			auto sensor = this->m_sensors.At(id, now);
-			auto user = this->m_users.At(sensor.GetOwner(), now);
-			auto validated = this->m_keys.Has(sensor.GetSecret(), now);
+			auto sensor = this->m_sensors.At(id, tp);
+			auto user = this->m_users.At(sensor.GetOwner(), tp);
+			auto validated = this->m_keys.Has(sensor.GetSecret(), tp);
 
 			validated = validated && !user.GetBanned() && !user.GetLockout();
 
