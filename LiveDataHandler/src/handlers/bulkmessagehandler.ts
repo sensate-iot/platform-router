@@ -11,7 +11,7 @@ import { BulkMeasurementInfo } from "../models/measurement";
 import { toCamelCase } from "../app/util";
 import * as gzip from "zlib";
 
-export class BulkMessageHandler implements IMessageHandler {
+export class BulkMeasurementHandler implements IMessageHandler {
     public constructor(private readonly wss: WebSocketServer, private readonly topic: string) {
     }
 

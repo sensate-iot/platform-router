@@ -17,8 +17,8 @@ import { connect } from "./postgresql";
 import express from "express";
 import cors from "cors";
 import "./jsonmodule";
-import { MessageHandler } from "../handlers/messagehandler";
-import { BulkMessageHandler } from "../handlers/bulkmessagehandler";
+import { MeasurementHandler } from "../handlers/messagehandler";
+import { BulkMeasurementHandler } from "../handlers/bulkmessagehandler";
 
 class Application {
     private readonly client: MqttClient;
@@ -41,8 +41,8 @@ class Application {
     public run() {
         mongodb.connect(this.config.mongoDB.connectionString);
 
-        this.client.addHandler(new MessageHandler(this.wss, this.config.mqtt.internalMeasurementTopic));
-        this.client.addHandler(new BulkMessageHandler(this.wss, this.config.mqtt.internalBulkMeasurementTopic));
+        this.client.addHandler(new MeasurementHandler(this.wss, this.config.mqtt.internalMeasurementTopic));
+        this.client.addHandler(new BulkMeasurementHandler(this.wss, this.config.mqtt.internalBulkMeasurementTopic));
 
         this.client.connect(this.config.mqtt.username, this.config.mqtt.password).then(() => {
             console.log("Connected to MQTT!");

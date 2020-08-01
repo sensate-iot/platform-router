@@ -47,7 +47,7 @@ export class WebSocketClient {
         const log: AuditLog = {
             timestamp: new Date(),
             authorId: this.userId,
-            route: "/measurements/live",
+            route: "/live/v1/measurements",
             method: RequestMethod.WebSocket,
             ipAddress: this.remote 
         };

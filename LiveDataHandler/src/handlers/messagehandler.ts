@@ -10,7 +10,7 @@ import { WebSocketServer } from "../app/websocketserver";
 import { MeasurementInfo, BulkMeasurementInfo } from "../models/measurement";
 import { toCamelCase } from "../app/util";
 
-export class MessageHandler implements IMessageHandler {
+export class MeasurementHandler implements IMessageHandler {
     public constructor(private readonly wss: WebSocketServer, private readonly topic: string) {
     }
 
