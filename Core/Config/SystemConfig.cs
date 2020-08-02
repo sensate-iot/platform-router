@@ -10,6 +10,7 @@ namespace SensateService.Config
 	public class SystemConfig
 	{
 		public int ProxyLevel { get; set; }
-		public string InstanceName { get; set; }
+		public string MeasurementAuthProxyUrl { get; set; }
+		public string MessageAuthProxyUrl { get; set; }
 	}
 }
