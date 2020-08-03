@@ -15,12 +15,12 @@ using SensateService.Infrastructure.Authorization;
 
 namespace SensateService.MqttHandler.Mqtt
 {
-	public class MqttBulkMeasurementHandler : Middleware.MqttHandler
+	public class MqttBulkMessageHandler : Middleware.MqttHandler
 	{
-		private readonly IMeasurementAuthorizationProxyCache m_proxy;
-		private readonly ILogger<MqttBulkMeasurementHandler> logger;
+		private readonly IMessageAuthorizationProxyCache m_proxy;
+		private readonly ILogger<MqttBulkMessageHandler> logger;
 
-		public MqttBulkMeasurementHandler(IMeasurementAuthorizationProxyCache store, ILogger<MqttBulkMeasurementHandler> logger)
+		public MqttBulkMessageHandler(IMessageAuthorizationProxyCache store, ILogger<MqttBulkMessageHandler> logger)
 		{
 			this.m_proxy = store;
 			this.logger = logger;

@@ -43,10 +43,7 @@ namespace SensateService.WebSocketHandler.Application
 				.UseConfiguration(conf)
 				.UseContentRoot(Directory.GetCurrentDirectory())
 				.ConfigureAppConfiguration((hostingContext, config) => {
-					if(hostingContext.HostingEnvironment.IsProduction())
-						config.AddJsonFile(GetAppSettings(), optional: false, reloadOnChange: true);
-					else
-						config.AddUserSecrets<ApplicationStarter>();
+					config.AddJsonFile(GetAppSettings(), optional: false, reloadOnChange: true);
 					config.AddEnvironmentVariables();
 				})
 				.ConfigureLogging((hostingContext, logging) => {

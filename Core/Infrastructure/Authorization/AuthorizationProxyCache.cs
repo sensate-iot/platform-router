@@ -35,7 +35,7 @@ namespace SensateService.Infrastructure.Authorization
 
 			client.DefaultRequestHeaders.Accept.Clear();
 			client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-			client.DefaultRequestHeaders.Add("User-Agent", "Sensate IoT Trigger Reporter");
+			client.DefaultRequestHeaders.Add("User-Agent", "Sensate IoT Auth Proxy");
 			this.m_client = client;
 		}
 
@@ -68,6 +68,10 @@ namespace SensateService.Infrastructure.Authorization
 			data = this.m_objects;
 			this.m_objects = new List<JToken>(ListCapacity);
 			this.m_lock.Unlock();
+
+			if(data.Count <= 0) {
+				return 0L;
+			}
 
 			partitions = data.Partition(PartitionSize).ToList();
 			var count = 0L;

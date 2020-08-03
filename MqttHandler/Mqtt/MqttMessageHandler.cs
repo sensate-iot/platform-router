@@ -1,5 +1,5 @@
 ﻿/*
- * Bulk measurement handler.
+ * MQTT measurement handler.
  *
  * @author Michel Megens
  * @email  michel@michelmegens.net
@@ -15,12 +15,12 @@ using SensateService.Infrastructure.Authorization;
 
 namespace SensateService.MqttHandler.Mqtt
 {
-	public class MqttBulkMeasurementHandler : Middleware.MqttHandler
+	public class MqttMessageHandler : Middleware.MqttHandler
 	{
-		private readonly IMeasurementAuthorizationProxyCache m_proxy;
-		private readonly ILogger<MqttBulkMeasurementHandler> logger;
+		private readonly IMessageAuthorizationProxyCache m_proxy;
+		private readonly ILogger<MqttMessageHandler> logger;
 
-		public MqttBulkMeasurementHandler(IMeasurementAuthorizationProxyCache store, ILogger<MqttBulkMeasurementHandler> logger)
+		public MqttMessageHandler(IMessageAuthorizationProxyCache store, ILogger<MqttMessageHandler> logger)
 		{
 			this.m_proxy = store;
 			this.logger = logger;
@@ -34,7 +34,7 @@ namespace SensateService.MqttHandler.Mqtt
 		public override Task OnMessageAsync(string topic, string message)
 		{
 			try {
-				this.m_proxy.AddMessages(message);
+				this.m_proxy.AddMessage(message);
 			} catch(Exception ex) {
 				this.logger.LogInformation($"Error: {ex.Message}");
 				this.logger.LogInformation($"Received a buggy MQTT message: {message}");
@@ -44,3 +44,4 @@ namespace SensateService.MqttHandler.Mqtt
 		}
 	}
 }
+
