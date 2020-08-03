@@ -16,6 +16,7 @@
 #include <google/protobuf/any.h>
 
 #include <boost/uuid/uuid.hpp>
+#include <boost/chrono/chrono.hpp>
 #include <boost/uuid/random_generator.hpp>
 
 #include <config/config.h>
@@ -164,11 +165,12 @@ static void test_datacache()
 	bson_oid_init(&oid, nullptr);
 	models::ObjectId id(oid.bytes);
 
-	auto sensor = cache.GetSensor(id);
+	auto now = boost::chrono::high_resolution_clock::now();
+	auto sensor = cache.GetSensor(id, now);
 	assert(!std::get<0>(sensor));
 	assert(!sensor.second.has_value());
 
-	sensor = cache.GetSensor(testId);
+	sensor = cache.GetSensor(testId, now);
 	assert(std::get<0>(sensor));
 	assert(sensor.second.has_value());
 }

@@ -131,7 +131,7 @@ namespace sensateiot::services
 		}
 
 		if(authorized != 0ULL) {
-			log << "Authorized " << std::to_string(authorized) << " messages." << util::Log::NewLine;
+			log << "Authorized " << authorized << " messages." << util::Log::NewLine;
 		}
 
 		return ids;
@@ -148,7 +148,7 @@ namespace sensateiot::services
 			return {};
 		}
 
-		log << "Processing " << std::to_string(count) << " messages!" << util::Log::NewLine;
+		log << "Processing " << count << " messages!" << util::Log::NewLine;
 		auto start = boost::chrono::system_clock::now();
 		auto ids = this->Process(false);
 
@@ -164,7 +164,7 @@ namespace sensateiot::services
 		using Millis = boost::chrono::milliseconds;
 		auto duration = boost::chrono::duration_cast<Millis>(diff);
 
-		log << "Processing took: " << std::to_string(duration.count()) << "ms." << util::Log::NewLine;
+		log << "Processing took: " << duration.count() << "ms." << util::Log::NewLine;
 
 		return duration.count();
 	}

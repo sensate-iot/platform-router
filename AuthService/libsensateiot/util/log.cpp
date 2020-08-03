@@ -61,6 +61,14 @@ namespace sensateiot::util
 		return *this;
 	}
 
+	Log& Log::operator<<(const char* input)
+	{
+		std::scoped_lock l(this->m_lock);
+
+		this->m_buffer += input;
+		return *this;
+	}
+
 	Log& Log::operator<<(NewLineType nl)
 	{
 		UNUSED(nl);
@@ -86,5 +94,12 @@ namespace sensateiot::util
 	{
 		static Log log;
 		return log;
+	}
+
+	Log& Log::operator<<(bool input)
+	{
+		const auto* value = input ? "true" : "false";
+		*this << value;
+		return *this;
 	}
 }
