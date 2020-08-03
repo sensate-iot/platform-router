@@ -76,8 +76,10 @@ namespace SensateService.MqttHandler.Application
 			this.Configuration.GetSection("Mqtt").Bind(mqtt);
 			var @public = mqtt.PublicBroker;
 
-			provider.MapMqttTopic<MqttMeasurementHandler>(@public.ShareTopic);
-			provider.MapMqttTopic<MqttBulkMeasurementHandler>(@public.BulkShareTopic);
+			provider.MapMqttTopic<MqttMeasurementHandler>(@public.MeasurementTopic);
+			provider.MapMqttTopic<MqttBulkMeasurementHandler>(@public.BulkMeasurementTopic);
+			provider.MapMqttTopic<MqttBulkMessageHandler>(@public.BulkMessageTopic);
+			provider.MapMqttTopic<MqttMessageHandler>(@public.MessageTopic);
 		}
 	}
 }

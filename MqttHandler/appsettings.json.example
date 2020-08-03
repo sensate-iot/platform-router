@@ -51,17 +51,16 @@
   },
 
   "Mqtt": {
-    "InternalBroker": {
+    "PublicBroker": {
       "Username": "",
       "Password": "",
       "Ssl": "false",
       "Port": 1883,
-      "Host": "",
-      "AuthorizedBulkMeasurementTopic": "$share/sensate-storage/sensate-auth/internal/measurements/bulk",
-      "AuthorizedBulkMessageTopic": "$share/sensate-storage/sensate-auth/internal/messages/bulk",
-      "InternalBulkMeasurementTopic": "sensate/internal/measurements/bulk",
-      "InternalBulkMessageTopic": "sensate/internal/messages/bulk",
-      "InternalBlobTopic": "sensate/internal/blobs"
-    } 
+      "Host": "127.0.0.1",
+      "MeasurementTopic": "$share/sensate/sensate/measurements",
+      "BulkMeasurementTopic": "$share/sensate/sensate/measurements/bulk",
+      "MessageTopic":  "$share/sensate/sensate/messages",
+      "BulkMessageTopic":  "$share/sensate/sensate/messages/bulk"
+    }
   }
 }
