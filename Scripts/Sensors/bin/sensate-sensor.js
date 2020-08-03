@@ -25,6 +25,7 @@ function main() {
 		.option('-b --bulk <max>', 'min amount', undefined)
 		.option('-a, --allsensors', 'send measurements from multiple sensors', false)
 		.option('-I, --interval <interval>', 'set the update interval', '1000')
+		.option('-S, --sensors <path>', 'sensor data path', undefined)
 		.option('-c, --config <config>', 'set configuration file', undefined);
 
 	program.parse(process.argv);
@@ -46,7 +47,8 @@ function main() {
 		raw_config: program.config,
 		config: settings.parse(program.config),
 		allsensors: program.allsensors,
-		messages: program.messages
+		messages: program.messages,
+		sensorPath: `${process.cwd()}/${program.sensors}`
 	}
 
 	if(args.config != undefined) {
