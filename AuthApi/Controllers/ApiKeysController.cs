@@ -140,7 +140,7 @@ namespace SensateService.AuthApi.Controllers
 			filter ??= new ApiKeyFilter() {
 				Limit = 0,
 				Skip = 0,
-				IncludeRevoked = false 
+				IncludeRevoked = false
 			};
 
 			filter.Limit ??= 0;

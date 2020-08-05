@@ -55,7 +55,7 @@ namespace SensateService.Infrastructure.Sql
 			if(withKeys) {
 				profiles = profiles.Include(u => u.ApiKeys).ThenInclude(key => key.User);
 			}
-			
+
 			profiles = profiles.Include(u => u.UserRoles).ThenInclude(ur => ur.Role);
 			return await profiles.ToListAsync().AwaitBackground();
 
