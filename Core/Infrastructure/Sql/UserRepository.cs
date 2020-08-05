@@ -48,16 +48,17 @@ namespace SensateService.Infrastructure.Sql
 			return await this._manager.FindByEmailAsync(email).AwaitBackground();
 		}
 
-		public Task<IEnumerable<SensateUser>> GetRangeAsync(IEnumerable<string> ids)
+		public async Task<IEnumerable<SensateUser>> GetRangeAsync(IEnumerable<string> ids, bool withKeys)
 		{
-			var worker = Task.Run(() => {
-				var profiles = this.Data.Where(u => ids.Contains(u.Id))
-					.Include(u => u.ApiKeys).ThenInclude(key => key.User)
-					.Include(u => u.UserRoles).ThenInclude(ur => ur.Role);
-				return profiles.ToList().AsEnumerable();
-			});
+			var profiles = this.Data.Where(u => ids.Contains(u.Id));
 
-			return worker;
+			if(withKeys) {
+				profiles = profiles.Include(u => u.ApiKeys).ThenInclude(key => key.User);
+			}
+			
+			profiles = profiles.Include(u => u.UserRoles).ThenInclude(ur => ur.Role);
+			return await profiles.ToListAsync().AwaitBackground();
+
 		}
 
 		public virtual async Task<IEnumerable<SensateUser>> GetAllAsync(int skip = 0, int limit = 0, CancellationToken ct = default)
