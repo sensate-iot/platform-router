@@ -85,9 +85,9 @@ namespace SensateService.Infrastructure.Sql
 			return obj;
 		}
 
-		public override async Task<SensateUser> GetAsync(string key)
+		public override async Task<SensateUser> GetAsync(string key, bool withKeys)
 		{
-			var obj = await this.LookupAsync(key, default(CancellationToken)).ConfigureAwait(false);
+			var obj = await this.LookupAsync($"{key}:{withKeys}", default).ConfigureAwait(false);
 
 			if(obj != null) {
 				var entries = this._sqlContext.ChangeTracker.Entries<SensateUser>().ToList();
@@ -103,13 +103,18 @@ namespace SensateService.Infrastructure.Sql
 				return obj;
 			}
 
-			obj = await base.GetAsync(key).AwaitBackground();
+			obj = await base.GetAsync(key, withKeys).AwaitBackground();
 
 			if(obj == null) {
 				return null;
 			}
 
 			await this.SetCacheAsync(obj, default).ConfigureAwait(false);
+			await this._cache.SetAsync(
+				$"{obj.Id}:{withKeys}", JsonConvert.SerializeObject(obj),
+				CacheTimeout.TimeoutShort.ToInt(),
+				false
+				);
 			return obj;
 		}
 

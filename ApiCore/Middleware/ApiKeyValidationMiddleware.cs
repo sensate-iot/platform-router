@@ -87,14 +87,14 @@ namespace SensateService.ApiCore.Middleware
 				var users = scope.ServiceProvider.GetRequiredService<IUserRepository>();
 				var token = await repo.GetAsync(key, CancellationToken.None).AwaitBackground();
 
-				await repo.IncrementRequestCountAsync(token).AwaitBackground();
-
 				if(token == null) {
 					await this.RespondErrorAsync(ctx, ReplyCode.BadInput, "API key not found!", 401).AwaitBackground();
 					return;
 				}
 
-				token.User = await users.GetAsync(token.UserId).AwaitBackground();
+				await repo.IncrementRequestCountAsync(token).AwaitBackground();
+
+				token.User = await users.GetAsync(token.UserId, false).AwaitBackground();
 				var banned = await roles.GetByNameAsync(SensateRole.Banned).AwaitBackground();
 
 				if(IsBanned(token.User, banned)) {

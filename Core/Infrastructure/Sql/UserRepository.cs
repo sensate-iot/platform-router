@@ -89,11 +89,15 @@ namespace SensateService.Infrastructure.Sql
 			return this.GetById(key);
 		}
 
-		public virtual Task<SensateUser> GetAsync(string key)
+		public virtual Task<SensateUser> GetAsync(string key, bool withKeys)
 		{
-			return this.Data.Where(u => u.Id == key)
-				.Include(u => u.ApiKeys).ThenInclude(k => k.User)
-				.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).FirstOrDefaultAsync();
+			var query = this.Data.Where(u => u.Id == key);
+
+			if(withKeys) {
+				query = query.Include(u => u.ApiKeys).ThenInclude(k => k.User);
+			}
+
+			return query.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).FirstOrDefaultAsync();
 		}
 
 		public async Task<int> CountFindAsync(string email, CancellationToken ct = default)
