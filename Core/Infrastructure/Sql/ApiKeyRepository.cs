@@ -130,7 +130,7 @@ namespace SensateService.Infrastructure.Sql
 				q = q.Take(limit);
 			}
 
-			q = q.Include(key => key.User).ThenInclude(u => u.ApiKeys);
+			q = q.Include(key => key.User);
 
 			rv.Values = await q.ToListAsync().AwaitBackground();
 
