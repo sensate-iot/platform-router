@@ -137,26 +137,19 @@ namespace SensateService.AuthApi.Controllers
 		{
 			PaginationResult<SensateApiKey> keys;
 
-			if(filter == null) {
-				filter = new ApiKeyFilter() {
-					Limit = 0,
-					Skip = 0,
-					IncludeRevoked = true
-				};
-			}
+			filter ??= new ApiKeyFilter() {
+				Limit = 0,
+				Skip = 0,
+				IncludeRevoked = false 
+			};
 
-			if(filter.Limit == null) {
-				filter.Limit = 0;
-			}
+			filter.Limit ??= 0;
 
-			if(filter.Skip == null) {
-				filter.Skip = 0;
-			}
+			filter.Skip ??= 0;
 
 			if(filter.Types == null || filter.Types.Count <= 0) {
 				filter.Types = new List<ApiKeyType> {
 					ApiKeyType.ApiKey,
-					ApiKeyType.SensorKey,
 					ApiKeyType.SystemKey
 				};
 			}
