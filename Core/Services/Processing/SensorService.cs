@@ -34,7 +34,6 @@ namespace SensateService.Services.Processing
 			ITriggerRepository triggers,
 			IControlMessageRepository control,
 			IMessageRepository messages,
-			ISensorStatisticsRepository stats,
 			IApiKeyRepository keys,
 			IBlobRepository blobs
 			)
