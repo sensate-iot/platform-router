@@ -46,8 +46,9 @@ namespace SensateService.DataApi.Controllers
 									  ISensorService sensorService,
 									  ISensorLinkRepository links,
 									  ISensorRepository sensors,
+									  IApiKeyRepository keys,
 									  ILogger<MeasurementsController> logger,
-									  IHttpContextAccessor ctx) : base(ctx, sensors, links)
+									  IHttpContextAccessor ctx) : base(ctx, sensors, links, keys)
 		{
 			this.m_cache = cache;
 			this.m_measurements = measurements;
@@ -198,7 +199,7 @@ namespace SensateService.DataApi.Controllers
 
 			var linked = await this.IsLinkedSensor(sensorId).AwaitBackground();
 
-			if(!this.AuthenticateUserForSensor(sensor, false) && !linked) {
+			if(! await this.AuthenticateUserForSensor(sensor, false).AwaitBackground() && !linked) {
 				return this.Unauthorized();
 			}
 
@@ -234,7 +235,7 @@ namespace SensateService.DataApi.Controllers
 					return this.NotFound();
 				}
 
-				if(!this.AuthenticateUserForSensor(sensor, false)) {
+				if(! await this.AuthenticateUserForSensor(sensor, false).AwaitBackground()) {
 					return this.Unauthorized();
 				}
 

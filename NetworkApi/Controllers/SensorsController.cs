@@ -35,7 +35,6 @@ namespace SensateService.NetworkApi.Controllers
 	public class SensorsController : AbstractDataController
 	{
 		private readonly ILogger<SensorsController> m_logger;
-		private readonly IApiKeyRepository m_apiKeys;
 		private readonly IUserRepository m_users;
 		private readonly ISensorService m_sensorService;
 
@@ -45,10 +44,9 @@ namespace SensateService.NetworkApi.Controllers
 								 IUserRepository users,
 								 ISensorLinkRepository links,
 								 ISensorService sensorService,
-								 IApiKeyRepository keys) : base(ctx, sensors, links)
+								 IApiKeyRepository keys) : base(ctx, sensors, links, keys)
 		{
 			this.m_logger = logger;
-			this.m_apiKeys = keys;
 			this.m_users = users;
 			this.m_sensorService = sensorService;
 		}
@@ -104,7 +102,7 @@ namespace SensateService.NetworkApi.Controllers
 			sensor.Owner = this.CurrentUser.Id;
 
 			try {
-				await this.m_apiKeys.CreateSensorKey(new SensateApiKey(), sensor).AwaitBackground();
+				await this.m_keys.CreateSensorKey(new SensateApiKey(), sensor).AwaitBackground();
 				await this.m_sensors.CreateAsync(sensor).AwaitBackground();
 			} catch(Exception ex) {
 				this.m_logger.LogInformation($"Unable to create sensor: {ex.Message}");
@@ -225,7 +223,7 @@ namespace SensateService.NetworkApi.Controllers
 				var sensor = await this.m_sensors.GetAsync(link.SensorId).AwaitBackground();
 				var user = await this.m_users.GetByEmailAsync(link.UserId).AwaitBackground();
 
-				if(!this.AuthenticateUserForSensor(sensor, false)) {
+				if(! await this.AuthenticateUserForSensor(sensor, false).AwaitBackground()) {
 					return this.Forbid();
 				}
 
@@ -285,7 +283,7 @@ namespace SensateService.NetworkApi.Controllers
 			try {
 				sensor = await this.m_sensors.GetAsync(id).AwaitBackground();
 
-				if(!this.AuthenticateUserForSensor(sensor, false)) {
+				if(! await this.AuthenticateUserForSensor(sensor, false).AwaitBackground() ) {
 					return this.Forbid();
 				}
 
@@ -338,7 +336,7 @@ namespace SensateService.NetworkApi.Controllers
 			try {
 				sensor = await this.m_sensors.GetAsync(id).AwaitBackground();
 
-				if(!this.AuthenticateUserForSensor(sensor, false)) {
+				if(! await this.AuthenticateUserForSensor(sensor, false).AwaitBackground()) {
 					return this.Forbid();
 				}
 
@@ -346,8 +344,8 @@ namespace SensateService.NetworkApi.Controllers
 					return this.NotFound();
 				}
 
-				var key = await this.m_apiKeys.GetByKeyAsync(update.Secret).AwaitBackground();
-				var old = await this.m_apiKeys.GetByKeyAsync(sensor.Secret).AwaitBackground();
+				var key = await this.m_keys.GetByKeyAsync(update.Secret).AwaitBackground();
+				var old = await this.m_keys.GetByKeyAsync(sensor.Secret).AwaitBackground();
 
 				if(key != null) {
 					return this.BadRequest(new Status {
@@ -356,7 +354,7 @@ namespace SensateService.NetworkApi.Controllers
 					});
 				}
 
-				sensor.Secret = string.IsNullOrEmpty(update.Secret) ? this.m_apiKeys.GenerateApiKey() : update.Secret;
+				sensor.Secret = string.IsNullOrEmpty(update.Secret) ? this.m_keys.GenerateApiKey() : update.Secret;
 
 				if(!string.IsNullOrEmpty(update.Name)) {
 					sensor.Name = update.Name;
@@ -367,7 +365,7 @@ namespace SensateService.NetworkApi.Controllers
 				}
 
 				await Task.WhenAll(
-					this.m_apiKeys.RefreshAsync(old, sensor.Secret),
+					this.m_keys.RefreshAsync(old, sensor.Secret),
 					this.m_sensors.UpdateSecretAsync(sensor, old)
 					).AwaitBackground();
 				await this.m_sensors.UpdateAsync(sensor).AwaitBackground();
@@ -398,7 +396,7 @@ namespace SensateService.NetworkApi.Controllers
 					return this.NotFound();
 				}
 
-				if(!this.AuthenticateUserForSensor(sensor, false)) {
+				if(! await this.AuthenticateUserForSensor(sensor, false).AwaitBackground()) {
 					return this.Forbid();
 				}
 
@@ -431,7 +429,7 @@ namespace SensateService.NetworkApi.Controllers
 
 			var linked = await this.IsLinkedSensor(id).AwaitBackground();
 
-			if(!this.AuthenticateUserForSensor(sensor, false) && !linked) {
+			if(! await this.AuthenticateUserForSensor(sensor, false).AwaitBackground() && !linked) {
 				return this.Forbid();
 			}
 

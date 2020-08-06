@@ -50,8 +50,9 @@ namespace SensateService.DataApi.Controllers
 									IControlMessageRepository control,
 									IMessageRepository messages,
 									IBlobRepository blobs,
+									IApiKeyRepository keys,
 									ILogger<StatisticsController> loger,
-									IHttpContextAccessor ctx) : base(ctx, sensors, links)
+									IHttpContextAccessor ctx) : base(ctx, sensors, links, keys)
 		{
 			this._stats = stats;
 			this._sensors = sensors;
@@ -259,7 +260,7 @@ namespace SensateService.DataApi.Controllers
 						return this.NotFound();
 					}
 
-					if(!this.AuthenticateUserForSensor(s, false)) {
+					if(! await this.AuthenticateUserForSensor(s, false).AwaitBackground()) {
 						return this.Forbid();
 					}
 

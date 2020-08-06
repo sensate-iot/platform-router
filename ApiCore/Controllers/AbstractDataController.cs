@@ -21,11 +21,16 @@ namespace SensateService.ApiCore.Controllers
 	{
 		protected readonly ISensorRepository m_sensors;
 		protected readonly ISensorLinkRepository m_links;
+		protected readonly IApiKeyRepository m_keys;
 
-		public AbstractDataController(IHttpContextAccessor ctx, ISensorRepository sensors, ISensorLinkRepository links) : base(ctx)
+		public AbstractDataController(IHttpContextAccessor ctx,
+			ISensorRepository sensors,
+			ISensorLinkRepository links,
+			IApiKeyRepository keys) : base(ctx)
 		{
 			this.m_sensors = sensors;
 			this.m_links = links;
+			this.m_keys = keys;
 		}
 
 		protected async Task<bool> AuthenticateUserForSensor(string sensorId, bool strict = false)
@@ -36,7 +41,7 @@ namespace SensateService.ApiCore.Controllers
 				return false;
 			}
 
-			return this.AuthenticateUserForSensor(sensor, strict);
+			return await this.AuthenticateUserForSensor(sensor, strict);
 		}
 
 		protected async Task<bool> IsLinkedSensor(string id)
@@ -45,9 +50,10 @@ namespace SensateService.ApiCore.Controllers
 			return links.Any(link => link.SensorId == id);
 		}
 
-		protected bool AuthenticateUserForSensor(Sensor sensor, bool strict)
+		protected async Task<bool> AuthenticateUserForSensor(Sensor sensor, bool strict)
 		{
-			var auth = sensor.Owner == this.CurrentUser.Id && this.CurrentUser.ApiKeys.Any(key => key.ApiKey == sensor.Secret);
+			var sensorKey = await this.m_keys.GetByKeyAsync(sensor.Secret).AwaitBackground();
+			var auth = sensor.Owner == this.CurrentUser.Id && sensorKey != null;
 
 			if(this.ApiKey == null) {
 				return false;

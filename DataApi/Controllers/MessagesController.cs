@@ -45,7 +45,8 @@ namespace SensateService.DataApi.Controllers
 								  IMessageRepository messages,
 								  ISensorLinkRepository links,
 								  IMqttPublishService publisher,
-								  ISensorRepository sensors) : base(ctx, sensors, links)
+								  IApiKeyRepository keys,
+								  ISensorRepository sensors) : base(ctx, sensors, links, keys)
 		{
 			this.m_messages = messages;
 			this.m_logger = logger;

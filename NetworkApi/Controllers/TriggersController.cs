@@ -34,8 +34,8 @@ namespace SensateService.NetworkApi.Controllers
 		private readonly ILogger<TriggersController> m_logger;
 
 		public TriggersController(IHttpContextAccessor ctx, ITriggerRepository triggers,
-			ISensorLinkRepository links,
-			ISensorRepository sensors, ILogger<TriggersController> logger) : base(ctx, sensors, links)
+			ISensorLinkRepository links, IApiKeyRepository keys,
+			ISensorRepository sensors, ILogger<TriggersController> logger) : base(ctx, sensors, links, keys)
 		{
 			this.m_logger = logger;
 			this.m_triggers = triggers;
@@ -155,7 +155,7 @@ namespace SensateService.NetworkApi.Controllers
 					return false;
 				}
 
-				auth = this.AuthenticateUserForSensor(actuator, false);
+				auth = await this.AuthenticateUserForSensor(actuator, false).AwaitBackground();
 			} else {
 				auth = Uri.TryCreate(action.Target, UriKind.Absolute, out var result) &&
 					   result.Scheme == Uri.UriSchemeHttp || result.Scheme == Uri.UriSchemeHttps;
