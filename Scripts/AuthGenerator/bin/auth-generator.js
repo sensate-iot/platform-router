@@ -1,16 +1,21 @@
 #!/usr/bin/env node
 
+/*
+ * Authorization test tool.
+ *
+ * @author Michel Megens
+ * @email  michel@michelmegens.net
+ */
+
 'use strict';
 
 const program = require('commander');
-const wrk = require('../lib/http-generator');
+const http = require('../lib/http-generator');
 
 function main() {
 	program.version('0.0.1', '-v, --version')
-	.option('-W, --wrk', 'generate WRK configuration', false)
 	.option('-i --interval <num>', 'interval to generate measurements', 1000)
-	.option('-d, --datapoints <num>', 'number of datapoints to generate for each measurement', 3)
-	.option('-c, --count <num>', 'number of measurements to generate', 0)
+	.option('-C, --count <num>', 'number of measurements to generate', 0)
 	.option('-H, --host <host>', 'address of the authorization server', 'localhost:8080')
 	.option('-s, --sensors <sensorPath>', 'sensor secrets & ID\'s', undefined);
 
@@ -31,9 +36,7 @@ function main() {
 		host: program.host
 	}
 
-	if(args.wrk) {
-		wrk.generate(args);
-	}
+    http.generate(args);
 }
 
 main();

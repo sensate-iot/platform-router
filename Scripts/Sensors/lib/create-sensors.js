@@ -9,12 +9,11 @@
 
 const axios = require('axios');
 
-async function generateSensor(idx) {
+async function generateSensor(idx, key) {
 	const name = `Test Sensor ${idx + 1}`;
 	const description = `Automagically generated testing sensor #${idx + 1}`;
 
-	return axios.post('https://api.staging.sensateiot.com/network/v1/sensors?key=fpaAFwvMQA3IeL_RT8uWSMSnrEOFIX0d', {
-	//return axios.post('http://localhost:5003/network/v1/sensors?key=KTF0dTwb13mde1TTnXwBrKa4LzTKoM9m', {
+	return axios.post(`https://api.staging.sensateiot.com/network/v1/sensors?key=${key}`, {
 		name: name,
 		description: description
 	}).then(value => {
@@ -30,16 +29,16 @@ async function generateSensor(idx) {
 	});
 }
 
-async function generateSensors(count) {
+async function generateSensors(count, key) {
 	const sensors = new Array;
 
 	console.log("Generating sensors");
 	for(let idx = 0; idx < count; idx++) {
-		const sensor = await generateSensor(idx);
+		const sensor = await generateSensor(idx, key);
 		sensors.push(sensor);
 
-		if(idx % 10 === 0) {
-			console.log("Generated 10 sensors");
+		if(idx % 100 === 0) {
+			console.log("Generated 100 sensors");
 		}
 	}
 

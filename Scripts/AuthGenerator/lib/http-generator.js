@@ -1,5 +1,5 @@
 /*
- * Generate WRK test data.
+ * Generate HTTP test data.
  *
  * @author Michel Megens
  * @email  michel@michelmegens.net
@@ -10,7 +10,6 @@ const crypto = require('crypto');
 const unirest = require('unirest');
 
 function getRandNumber(min, max) {
-	//return 1;
 	return Math.floor(Math.random() * ( max - min)) + min;
 }
 

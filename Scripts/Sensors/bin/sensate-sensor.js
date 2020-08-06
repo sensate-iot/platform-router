@@ -8,9 +8,7 @@ const generate = require('../lib/create-sensors');
 const websocket = require('../lib/websocket');
 const settings = require('../lib/settings-parser');
 
-main();
-
-function main() {
+async function main() {
 	program.version('0.1.0', '-v, --version')
 		.option('-g, --generate', 'generate Sensate IoT sensors', false)
 		.option('-m, --mqtt', 'run the MQTT client')
@@ -25,7 +23,9 @@ function main() {
 		.option('-b --bulk <max>', 'min amount', undefined)
 		.option('-a, --allsensors', 'send measurements from multiple sensors', false)
 		.option('-I, --interval <interval>', 'set the update interval', '1000')
-		.option('-S, --sensors <path>', 'sensor data path', undefined)
+        .option('-S, --sensors <path>', 'sensor data path', undefined)
+        .option('-k, --key <key>', 'sensor generation API key', undefined)
+        .option('-C, --count <key>', 'number of sensors to generate', 10)
 		.option('-c, --config <config>', 'set configuration file', undefined);
 
 	program.parse(process.argv);
@@ -61,10 +61,19 @@ function main() {
 	}
 
 	if(program.generate) {
-		generate.generateSensors(25000).then(() => {});
+        if (program.key == null) {
+            console.log("Please supply a key using -k <key>");
+            program.help();
+        }
+
+		await generate.generateSensors(+program.count, program.key);
 	} else if(program.mqtt) {
 		mqtt.run(args);
 	} else {
 		websocket.run(args);
 	}
 }
+
+main().catch(error => {
+    console.log("Unable run sensate-sensor");
+});
