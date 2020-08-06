@@ -24,14 +24,14 @@ namespace SensateService.Services.Processing
 		public const int Interval = 1000;
 		private const int StartDelay = 200;
 
-		private readonly ILogger<CacheService> _logger;
+		private readonly ILogger<AuthProxyService> _logger;
 		private readonly IMeasurementAuthorizationProxyCache m_measurementProxy;
 		private readonly IMessageAuthorizationProxyCache m_messageProxy;
 		private readonly SystemConfig m_config;
 
 		private long _totalCount;
 
-		public AuthProxyService(ILogger<CacheService> logger,
+		public AuthProxyService(ILogger<AuthProxyService> logger,
 		                        IMeasurementAuthorizationProxyCache measurements,
 		                        IMessageAuthorizationProxyCache messages,
 								SystemConfig config
