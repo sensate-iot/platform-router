@@ -49,8 +49,13 @@ static void set_test()
 
 	id_set.Emplace(gen());
 
-	assert(t.Has(4));
-	assert(!t.Has(5));
+	if (!t.Has(4)) {
+		throw std::exception();
+	}
+
+	if (t.Has(5)) {
+		throw std::exception();
+	}
 
 	t2 = t;
 	t = std::move(t2);
@@ -74,7 +79,7 @@ static void timeout_test()
 	auto v3 = t.Find(std::to_string(3));
 
 	if(v1 != 1000 || v2 != 2000 || *v3 != 3000) {
-		throw;
+		throw std::exception();
 	}
 
 	using namespace std::chrono_literals;
@@ -84,7 +89,7 @@ static void timeout_test()
 	t["4"] = 5000;
 
 	if(t["4"] != 5000) {
-		throw;
+		throw std::exception();
 	}
 
 	try {
@@ -103,7 +108,9 @@ static void timeout_test()
 	t["10"] = 10;
 	t.Cleanup(boost::chrono::milliseconds(50));
 
-	assert(t.Contains("10"));
+	if (!t.Contains("10")) {
+		throw std::exception();
+	}
 }
 
 static void concurrent_test()
@@ -177,7 +184,6 @@ static void concurrent_test()
 		for(auto idx = StartInsert; idx < MapSize*4; idx++) {
 			auto iter = t.Find(std::to_string(idx));
 			t.Erase(iter);
-//			t.Erase(std::to_string(idx));
 		}
 	});
 
@@ -187,7 +193,7 @@ static void concurrent_test()
 	t4.join();
 
 	if(!t.Validate()) {
-		throw;
+		throw std::exception();
 	}
 }
 
@@ -197,6 +203,9 @@ static void iteration_test()
 	using TreeType = Map<std::string, int>;
 	TreeType t1;
 	TreeType t2;
+
+	constexpr auto expected_1 = " 13 29 9 14 32 11 28 25 8 10 21 17 16 0 2 18 27 1 23 30 33 15 4 24 34 31 6 20 3 7 26 12 19 5 22";
+	constexpr auto expected_2 = " 32 11 28 25 8 10 21 17 16 0 2 18 27 1 23 30 33 15 4 24 34 31 6 20 3 7 26 12 19 5 22";
 
 	auto& log = sensateiot::util::Log::GetLog();
 
@@ -211,10 +220,20 @@ static void iteration_test()
 	t1.Merge(std::move(t2));
 
 	log << "Tree entries:";
+	std::stringstream sstream;
+
 	for(auto iter = t1.Begin(); iter != t1.End(); ++iter) {
-		log << " " << std::to_string(*iter);
+		log << " " << *iter;
+		sstream << " " << *iter;
 	}
+
 	log << sensateiot::util::Log::NewLine;
+
+	if (sstream.str() != expected_1) {
+		throw std::exception();
+	}
+
+	sstream.str(std::string());
 
 	auto begin = t1.Begin();
 	auto end = t1.Begin();
@@ -226,23 +245,28 @@ static void iteration_test()
 	t1.Erase(begin, end);
 
 	log << "Tree entries:";
+
 	for(auto iter = t1.Begin(); iter != t1.End(); ++iter) {
-		log << " " << std::to_string(*iter);
+		log << " " << *iter;
+		sstream << " " << *iter;
 	}
 	log << sensateiot::util::Log::NewLine;
 
+	if (sstream.str() != expected_2) {
+		throw std::exception();
+	}
+
 	assert(t1 == t1);
+	if (!t1.Validate()) {
+		throw std::exception();
+	}
 }
 
 static void test_insert()
 {
 	using namespace sensateiot::detail;
-//	using TreeType = sensateiot::stl::Map<std::string, sensateiot::models::Sensor>;
 	using TreeType = sensateiot::stl::Map<sensateiot::models::ObjectId, sensateiot::models::Sensor>;
-//	using TreeType = sensateiot::stl::Map<sensateiot::models::ObjectId::ObjectIdType, sensateiot::models::Sensor>;
 	TreeType t;
-
-//	std::vector<std::string> keys;
 
 	auto& log = sensateiot::util::Log::GetLog();
 
@@ -255,9 +279,7 @@ static void test_insert()
 
 	for(auto idx = 0UL; idx < MapSize; idx++) {
 		sensateiot::models::Sensor s;
-//		auto id = std::to_string(idx);
 		auto id = sensorIds[idx];
-//		keys.push_back(id);
 
 		s.SetId(sensorIds[idx]);
 		s.SetOwner(sensorOwnerIds[idx]);
@@ -275,8 +297,9 @@ static void test_insert()
 	log << "Insertion took: " << std::to_string(std::chrono::duration_cast<Nanos>(diff).count() / MapSize)
 	    << "ns per entry." << sensateiot::util::Log::NewLine;
 
-
-	t.Validate();
+	if(!t.Validate()) {
+		throw std::exception();
+	}
 
 	log << "Start lookup-map test!" << sensateiot::util::Log::NewLine;
 
@@ -286,16 +309,13 @@ static void test_insert()
 
 		for(auto idx = 0UL; idx < LookupSize; idx++) {
 			sensateiot::models::ObjectId id(sensorStringIds[idx]);
-//			auto sensor = t.At(sensorIds[idx], now);
 			auto sensor = t.At(id, now);
-//			auto sensor = t.Find(keys.at(idx), now);
 			(void)sensor.GetId();
 		}
 	};
 
 	start = ClockType::now();
 
-//	l();
 	auto thread1 = std::thread(l);
 	auto thread2 = std::thread(l);
 	auto thread3 = std::thread(l);
@@ -332,7 +352,9 @@ static void test_insert()
 
 	log << "Post-delete size: " << std::to_string(t.Size()) << sensateiot::util::Log::NewLine;
 
-	t.Validate();
+	if(!t.Validate()) {
+		throw std::exception();
+	}
 }
 
 int main(int argc, char** argv)
@@ -346,7 +368,7 @@ int main(int argc, char** argv)
 		sensorIds.reserve(MapSize);
 		sensorStringIds.reserve(MapSize);
 
-		for(auto idx = 0; idx < MapSize; idx++) {
+		for (auto idx = 0; idx < MapSize; idx++) {
 			bson_oid_t oid;
 			char oidStr[25];
 
@@ -355,6 +377,10 @@ int main(int argc, char** argv)
 			std::string str(oidStr);
 
 			sensateiot::models::ObjectId id(oid.bytes);
+
+			sensorOwnerIds.push_back(gen());
+			sensorIds.push_back(id);
+			sensorStringIds.emplace_back(std::move(str));
 		}
 
 		test_insert();

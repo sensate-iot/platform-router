@@ -32,7 +32,7 @@
 #include "testuserrepository.h"
 #include "testsensorrepository.h"
 
-static constexpr std::string_view json(R"({"longitude":4.774186840897145,"latitude":51.59384817617493,"createdById":"5c7c3bbd80e8ae3154d04912","createdBySecret":"$76d0d71b0abb9681a5984de91d07b7f434424492933d3069efa2a18e325bd911==","data":{"x":{"value":3.7348298850142325,"unit":"m/s2"},"y":{"value":95.1696675190223,"unit":"m/s2"},"z":{"value":15.24488164994629,"unit":"m/s2"}}})");
+static constexpr std::string_view json(R"({"longitude":4.774186840897145,"latitude":51.59384817617493,"sensorId":"5c7c3bbd80e8ae3154d04912","secret":"$4ed836205f02c2d353f5620e762045003a2c512cffc0495f7671002c343183d1==","data":{"x":{"value":3.7348298850142325,"unit":"m/s2"},"y":{"value":95.1696675190223,"unit":"m/s2"},"z":{"value":15.24488164994629,"unit":"m/s2"}}})");
 static std::vector<std::pair<std::string, std::string>> sensors;
 
 static void generate_data(sensateiot::test::SensorRepository& sensors, sensateiot::test::UserRepository& users, sensateiot::test::ApiKeyRepository& keys)
