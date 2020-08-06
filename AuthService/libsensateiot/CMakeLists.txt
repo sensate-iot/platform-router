@@ -165,6 +165,7 @@ SET(PROTO_OUTPUT
 	${CMAKE_BINARY_DIR}/libsensateiot/proto/message.pb.cc
 	${CMAKE_BINARY_DIR}/libsensateiot/proto/message.pb.h
 )
+
 add_custom_command(
 	OUTPUT ${PROTO_OUTPUT}
 	COMMAND ${CONAN_BIN_DIRS_PROTOBUF}/protoc --cpp_out=${CMAKE_BINARY_DIR}/libsensateiot
@@ -175,20 +176,12 @@ add_custom_command(
 	VERBATIM
 )
 
-FUNCTION( prepend_path SOURCE_FILES INC_PATH )
-	FOREACH( SOURCE_FILE ${${SOURCE_FILES}} )
-		SET( MODIFIED ${MODIFIED} ${INC_PATH}/${SOURCE_FILE} )
-	ENDFOREACH()
-	SET( ${SOURCE_FILES} ${MODIFIED} PARENT_SCOPE )
-ENDFUNCTION()
-
 SET(GENERIC_HEADERS  ${LIB_HEADERS})
 SET(${SOURCES}       ${SOURCES})
 SET(${LIB_HEADERS}   ${LIB_HEADERS})
+SET(INCLUDE_DIR ${PROJECT_SOURCE_DIR})
 
 prepend_path(GENERIC_HEADERS "libsensateiot/include" )
-
-SET(INCLUDE_DIR ${PROJECT_SOURCE_DIR})
 prepend_path(GENERIC_HEADERS ${INCLUDE_DIR})
 
 add_library(sensateiot SHARED ${SOURCES} ${GENERIC_HEADERS} ${PROTO_OUTPUT})
@@ -208,6 +201,29 @@ install(TARGETS sensateiot
 	ARCHIVE DESTINATION lib ${CMAKE_INSTALL_LIBDIR} # should add lib
 )
 
+option(CONFIG_PCH "Enable Precompiled Headers" OFF)
+if(CONFIG_PCH)
+  # This sets a global PCH parameter, each project will build its own PCH, which is a good idea if any #define's change
+  #
+  # consider breaking this out per project as necessary
+  target_precompile_headers(
+    project_options
+    INTERFACE
+    <vector>
+    <string>
+    <map>
+    <utility>
+	
+	<boost/log/core.hpp>
+	<boost/log/trivial.hpp>
+	<boost/log/sources/severity_logger.hpp>
+	<boost/log/expressions.hpp>
+	<boost/log/sinks/text_file_backend.hpp>
+	<boost/log/utility/setup/file.hpp>
+	<boost/log/utility/setup/console.hpp>
+	<boost/log/utility/setup/common_attributes.hpp>
+	)
+endif()
 
 message(STATUS "Generating MSVS filters.")
 foreach(source IN LISTS ${SOURCES})
