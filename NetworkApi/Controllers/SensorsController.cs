@@ -223,7 +223,7 @@ namespace SensateService.NetworkApi.Controllers
 				var sensor = await this.m_sensors.GetAsync(link.SensorId).AwaitBackground();
 				var user = await this.m_users.GetByEmailAsync(link.UserId).AwaitBackground();
 
-				if(! await this.AuthenticateUserForSensor(sensor, false).AwaitBackground()) {
+				if(!await this.AuthenticateUserForSensor(sensor, false).AwaitBackground()) {
 					return this.Forbid();
 				}
 
@@ -283,7 +283,7 @@ namespace SensateService.NetworkApi.Controllers
 			try {
 				sensor = await this.m_sensors.GetAsync(id).AwaitBackground();
 
-				if(! await this.AuthenticateUserForSensor(sensor, false).AwaitBackground() ) {
+				if(!await this.AuthenticateUserForSensor(sensor, false).AwaitBackground()) {
 					return this.Forbid();
 				}
 
@@ -336,7 +336,7 @@ namespace SensateService.NetworkApi.Controllers
 			try {
 				sensor = await this.m_sensors.GetAsync(id).AwaitBackground();
 
-				if(! await this.AuthenticateUserForSensor(sensor, false).AwaitBackground()) {
+				if(!await this.AuthenticateUserForSensor(sensor, false).AwaitBackground()) {
 					return this.Forbid();
 				}
 
@@ -396,7 +396,7 @@ namespace SensateService.NetworkApi.Controllers
 					return this.NotFound();
 				}
 
-				if(! await this.AuthenticateUserForSensor(sensor, false).AwaitBackground()) {
+				if(!await this.AuthenticateUserForSensor(sensor, false).AwaitBackground()) {
 					return this.Forbid();
 				}
 
@@ -429,7 +429,7 @@ namespace SensateService.NetworkApi.Controllers
 
 			var linked = await this.IsLinkedSensor(id).AwaitBackground();
 
-			if(! await this.AuthenticateUserForSensor(sensor, false).AwaitBackground() && !linked) {
+			if(!await this.AuthenticateUserForSensor(sensor, false).AwaitBackground() && !linked) {
 				return this.Forbid();
 			}
 

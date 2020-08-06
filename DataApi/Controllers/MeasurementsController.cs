@@ -199,7 +199,7 @@ namespace SensateService.DataApi.Controllers
 
 			var linked = await this.IsLinkedSensor(sensorId).AwaitBackground();
 
-			if(! await this.AuthenticateUserForSensor(sensor, false).AwaitBackground() && !linked) {
+			if(!await this.AuthenticateUserForSensor(sensor, false).AwaitBackground() && !linked) {
 				return this.Unauthorized();
 			}
 
@@ -235,7 +235,7 @@ namespace SensateService.DataApi.Controllers
 					return this.NotFound();
 				}
 
-				if(! await this.AuthenticateUserForSensor(sensor, false).AwaitBackground()) {
+				if(!await this.AuthenticateUserForSensor(sensor, false).AwaitBackground()) {
 					return this.Unauthorized();
 				}
 

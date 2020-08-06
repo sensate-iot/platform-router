@@ -260,7 +260,7 @@ namespace SensateService.DataApi.Controllers
 						return this.NotFound();
 					}
 
-					if(! await this.AuthenticateUserForSensor(s, false).AwaitBackground()) {
+					if(!await this.AuthenticateUserForSensor(s, false).AwaitBackground()) {
 						return this.Forbid();
 					}
 
