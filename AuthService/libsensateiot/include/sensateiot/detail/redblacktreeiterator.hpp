@@ -10,17 +10,17 @@
 namespace sensateiot::detail
 {
 	template<typename K, typename V, typename C, typename H, bool is_const, bool is_key_iter>
-	RedBlackTreeIterator<K, V, C, H, is_const, is_key_iter>::RedBlackTreeIterator(NodeType &node) : m_node(node)
+	inline RedBlackTreeIterator<K, V, C, H, is_const, is_key_iter>::RedBlackTreeIterator(NodeType &node) : m_node(node)
 	{
 	}
 
 	template<typename K, typename V, typename C, typename H, bool is_const, bool is_key_iter>
-	RedBlackTreeIterator<K, V, C, H, is_const, is_key_iter>::RedBlackTreeIterator(const RedBlackTreeIterator &other) : m_node(other.m_node)
+	inline RedBlackTreeIterator<K, V, C, H, is_const, is_key_iter>::RedBlackTreeIterator(const RedBlackTreeIterator &other) : m_node(other.m_node)
 	{
 	}
 
 	template<typename K, typename V, typename C, typename H, bool is_const, bool is_key_iter>
-	RedBlackTreeIterator <K, V, C, H, is_const, is_key_iter> &
+	inline RedBlackTreeIterator <K, V, C, H, is_const, is_key_iter> &
 	RedBlackTreeIterator<K, V, C, H, is_const, is_key_iter>::operator=(const RedBlackTreeIterator &other)
 	{
 		if(this == &other) {
@@ -32,7 +32,7 @@ namespace sensateiot::detail
 	}
 
 	template<typename K, typename V, typename C, typename H, bool is_const, bool is_key_iter>
-	RedBlackTreeIterator <K, V, C, H, is_const, is_key_iter>
+	inline RedBlackTreeIterator <K, V, C, H, is_const, is_key_iter>
 	RedBlackTreeIterator<K, V, C, H, is_const, is_key_iter>::operator++(int)
 	{
 		RedBlackTreeIterator iter = *this;
@@ -42,7 +42,7 @@ namespace sensateiot::detail
 	}
 
 	template<typename K, typename V, typename C, typename H, bool is_const, bool is_key_iter>
-	RedBlackTreeIterator <K, V, C, H, is_const, is_key_iter> &
+	inline RedBlackTreeIterator <K, V, C, H, is_const, is_key_iter> &
 	RedBlackTreeIterator<K, V, C, H, is_const, is_key_iter>::operator++()
 	{
 		if(this->m_node) {
@@ -53,7 +53,7 @@ namespace sensateiot::detail
 	}
 
 	template<typename K, typename V, typename C, typename H, bool is_const, bool is_key_iter>
-	RedBlackTreeIterator <K, V, C, H, is_const, is_key_iter> &
+	inline RedBlackTreeIterator <K, V, C, H, is_const, is_key_iter> &
 	RedBlackTreeIterator<K, V, C, H, is_const, is_key_iter>::operator--()
 	{
 		if(this->m_node) {
@@ -64,7 +64,7 @@ namespace sensateiot::detail
 	}
 
 	template <typename K, typename V, typename C, typename H, bool is_const, bool is_key_iter>
-	RedBlackTreeIterator<K, V, C, H, is_const, is_key_iter>
+	inline RedBlackTreeIterator<K, V, C, H, is_const, is_key_iter>
 	RedBlackTreeIterator<K, V, C, H, is_const, is_key_iter>:: operator--(int)
 	{
 		auto rv = *this;
@@ -74,7 +74,7 @@ namespace sensateiot::detail
 	}
 
 	template<typename K, typename V, typename C, typename H, bool is_const, bool is_key_iter>
-	boost::chrono::high_resolution_clock::time_point
+	inline boost::chrono::high_resolution_clock::time_point
 	RedBlackTreeIterator<K, V, C, H, is_const, is_key_iter>::CreatedAt() const
 	{
 		return this->m_node->CreatedAt;
