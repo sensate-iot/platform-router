@@ -52,7 +52,7 @@ namespace SensateService.ApiCore.Controllers
 
 		protected async Task<bool> AuthenticateUserForSensor(Sensor sensor, bool strict)
 		{
-			var sensorKey = await this.m_keys.GetByKeyAsync(sensor.Secret).AwaitBackground();
+			var sensorKey = await this.m_keys.GetAsync(sensor.Secret).AwaitBackground();
 			var auth = sensor.Owner == this.CurrentUser.Id && sensorKey != null;
 
 			if(this.ApiKey == null) {
