@@ -16,7 +16,7 @@ env:
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
 jobs:
-  push-data-api:
+  push-auth-service-api:
     runs-on: ubuntu-latest
 
     steps:
