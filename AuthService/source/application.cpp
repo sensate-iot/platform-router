@@ -95,13 +95,17 @@ namespace sensateiot
 		log << "AuthService started!" << util::Log::NewLine;
 
 		std::thread runner([&]() {
-			while(!done) {
-				auto time = service.Process();
-				time_t interval = this->m_config.GetInterval();
+			try {
+				while (!done) {
+					auto time = service.Process();
+					time_t interval = this->m_config.GetInterval();
 
-				if(time < interval) {
-					std::this_thread::sleep_for(std::chrono::milliseconds(interval - time));
+					if (time < interval) {
+						std::this_thread::sleep_for(std::chrono::milliseconds(interval - time));
+					}
 				}
+			} catch (std::exception& ex) {
+				util::Log::GetLog() << "Unable to process messages: " << ex.what() << util::Log::NewLine;
 			}
 		});
 
