@@ -5,7 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
-#include <sensateiot/commands/AbstractCommandHandler.h>
+#include <sensateiot/commands/abstractcommandhandler.h>
 #include <sensateiot/commands/flushusercommandhandler.h>
 #include <sensateiot/util/log.h>
 

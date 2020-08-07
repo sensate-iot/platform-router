@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <sensateiot/commands/AbstractCommandHandler.h>
+#include <sensateiot/commands/abstractcommandhandler.h>
 #include <sensateiot/services/messageservice.h>
 
 namespace sensateiot::commands
