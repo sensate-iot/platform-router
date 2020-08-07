@@ -2,6 +2,9 @@
 # CMakeLists for libauthservice.
 #
 
+include (${PROJECT_SOURCE_DIR}/cmake/util.cmake)
+include (${PROJECT_SOURCE_DIR}/cmake/flags.cmake)
+
 # Lib sensateiot source / header files
 
 SET(SOURCES
@@ -200,30 +203,6 @@ install(TARGETS sensateiot
 	# ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR # DESTINATION error
 	ARCHIVE DESTINATION lib ${CMAKE_INSTALL_LIBDIR} # should add lib
 )
-
-option(CONFIG_PCH "Enable Precompiled Headers" OFF)
-if(CONFIG_PCH)
-  # This sets a global PCH parameter, each project will build its own PCH, which is a good idea if any #define's change
-  #
-  # consider breaking this out per project as necessary
-  target_precompile_headers(
-    project_options
-    INTERFACE
-    <vector>
-    <string>
-    <map>
-    <utility>
-	
-	<boost/log/core.hpp>
-	<boost/log/trivial.hpp>
-	<boost/log/sources/severity_logger.hpp>
-	<boost/log/expressions.hpp>
-	<boost/log/sinks/text_file_backend.hpp>
-	<boost/log/utility/setup/file.hpp>
-	<boost/log/utility/setup/console.hpp>
-	<boost/log/utility/setup/common_attributes.hpp>
-	)
-endif()
 
 message(STATUS "Generating MSVS filters.")
 foreach(source IN LISTS ${SOURCES})
