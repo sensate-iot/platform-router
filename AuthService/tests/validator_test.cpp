@@ -45,7 +45,7 @@ static void test_bad_input()
 			if (result.first) {
 				count += 1;
 			}
-		} catch (std::exception& ex) {
+		} catch (std::exception&) {
 			count += 1;
 		}
 
@@ -55,7 +55,7 @@ static void test_bad_input()
 			if (result.has_value()) {
 				count += 1;
 			}
-		} catch (std::exception& ex) {
+		} catch (std::exception&) {
 			count += 1;
 		}
 	}

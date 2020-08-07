@@ -185,7 +185,7 @@ int main(int argc, char** argv)
 	try {
 		test_datacache();
 		test_measurement_processing();
-	} catch (std::exception& ex) {
+	} catch (std::exception&) {
 		std::cerr << "Unable to complete message service test!" << std::endl;
 		std::exit(1);
 	}
