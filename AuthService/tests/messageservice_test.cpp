@@ -104,7 +104,6 @@ static void test_measurement_processing()
 	users.AddUser(u);
 	keys.AddKey(key);
 
-	//for(auto idx = 0U; idx < 75000; idx++) {
 	for(auto idx = 0U; idx < 10; idx++) {
 		service.AddMeasurement(std::string(json));
 	}
@@ -167,21 +166,31 @@ static void test_datacache()
 
 	auto now = boost::chrono::high_resolution_clock::now();
 	auto sensor = cache.GetSensor(id, now);
-	assert(!std::get<0>(sensor));
-	assert(!sensor.second.has_value());
+
+	if (sensor.first || sensor.second.has_value()) {
+		throw std::exception();
+	}
 
 	sensor = cache.GetSensor(testId, now);
-	assert(std::get<0>(sensor));
-	assert(sensor.second.has_value());
+
+	if (!sensor.first || !sensor.second.has_value()) {
+		throw std::exception();
+	}
 }
 
 int main(int argc, char** argv)
 {
 	mongoc_init();
-	test_datacache();
-	test_measurement_processing();
-	mongoc_cleanup();
 
+	try {
+		test_datacache();
+		test_measurement_processing();
+	} catch (std::exception& ex) {
+		std::cerr << "Unable to complete message service test!" << std::endl;
+		std::exit(1);
+	}
+
+	mongoc_cleanup();
 	google::protobuf::ShutdownProtobufLibrary();
 
 	return -EXIT_SUCCESS;

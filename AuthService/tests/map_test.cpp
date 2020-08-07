@@ -9,6 +9,7 @@
 #include <chrono>
 #include <vector>
 #include <thread>
+#include <iostream>
 
 #include <mongoc.h>
 
@@ -389,6 +390,7 @@ int main(int argc, char** argv)
 		concurrent_test();
 		timeout_test();
 	} catch(std::exception&) {
+		std::cerr << "Unable to complete map test!" << std::endl;
 		std::exit(1);
 	}
 
