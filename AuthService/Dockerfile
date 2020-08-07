@@ -1,14 +1,27 @@
 #
-# AMD64 Dockerfile
+# Docker file for DataApi.
+#
+# @author Michel Megens
+# @email  michel@michelmegens.net
 #
 
-FROM ubuntu:bionic
+FROM python:3-buster AS build-env
 
-ENV LD_LIBRARY_PATH=/auth-service/lib:${LD_LIBRARY_PATH}
+WORKDIR /build
+COPY . .
+RUN pip install conan && \
+ apt-get update && \
+ apt-get install -y cmake build-essential && \
+ mkdir compile-out && cd compile-out/ && \
+ conan install --build missing .. && \
+ cmake -DCMAKE_BUILD_TYPE=Release -DCONFIG_BUILD_TESTS=False -DCMAKE_INSTALL_PREFIX=`pwd`/install ../ && \
+ make -j4 && make install
+	
+FROM debian:buster-slim
 
-RUN apt-get update && apt-get install -y wget zip unzip
-RUN wget https://staging.sensateiot.com/wp-content/uploads/2020/04/auth-service.zip && \
-    unzip auth-service.zip
+ENV LD_LIBRARY_PATH=/app/lib:${LD_LIBRARY_PATH}
+COPY --from=build-env /build/compile-out/install /app
+WORKDIR /app
 
-WORKDIR /auth-service
-ENTRYPOINT ["/auth-service/bin/auth-service"]
+EXPOSE 8080
+ENTRYPOINT ["bin/auth-service", "-c", "/app/etc/appsettings.json"]
