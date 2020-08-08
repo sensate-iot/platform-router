@@ -49,7 +49,8 @@ namespace sensateiot::mqtt
 	{
 		auto& log = util::Log::GetLog();
 		log << "Internal MQTT client connected!" << util::Log::NewLine;
-		this->m_cli->subscribe(this->m_config.GetMqtt().GetPrivateBroker().GetCommandTopic(), QOS);
+		auto sub = this->m_cli->subscribe(this->m_config.GetMqtt().GetPrivateBroker().GetCommandTopic(), QOS);
+		sub->wait();
 	}
 
 	void MqttInternalCallback::connection_lost(const std::string &cause)
