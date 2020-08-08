@@ -32,8 +32,8 @@ namespace SensateService.Services.Processing
 		private long _totalCount;
 
 		public AuthProxyService(ILogger<AuthProxyService> logger,
-		                        IMeasurementAuthorizationProxyCache measurements,
-		                        IMessageAuthorizationProxyCache messages,
+								IMeasurementAuthorizationProxyCache measurements,
+								IMessageAuthorizationProxyCache messages,
 								SystemConfig config
 			)
 		{

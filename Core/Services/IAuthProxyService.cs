@@ -9,6 +9,6 @@ namespace SensateService.Services
 {
 	public interface IAuthProxyService
 	{
-		
+
 	}
 }

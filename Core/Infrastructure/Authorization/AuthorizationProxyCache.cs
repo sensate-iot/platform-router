@@ -24,8 +24,8 @@ namespace SensateService.Infrastructure.Authorization
 		private SpinLockWrapper m_lock;
 		private readonly HttpClient m_client;
 
-		private const int ListCapacity  = 100000;
-		private const int PartitionSize =    100;
+		private const int ListCapacity = 100000;
+		private const int PartitionSize = 100;
 
 		public AuthorizationProxyCache()
 		{

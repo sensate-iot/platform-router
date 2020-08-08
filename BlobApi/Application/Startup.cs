@@ -64,7 +64,8 @@ namespace SensateService.BlobApi.Application
 			services.AddReverseProxy(sys);
 
 			services.Configure<BlobStorageSettings>(settings => {
-				settings.StorageType = storage.StorageType switch {
+				settings.StorageType = storage.StorageType switch
+				{
 					"DigitalOceanSpaces" => StorageType.DigitalOceanSpaces,
 					"FTP" => StorageType.FTP,
 					_ => StorageType.FileSystem

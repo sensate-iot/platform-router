@@ -44,7 +44,7 @@ namespace SensateService.Infrastructure.Storage
 		private const int InitialListSize = 512;
 		private const int DatabaseTimeout = 20;
 
-		public CachedMeasurementStore( IServiceProvider provider, ILogger<CachedMeasurementStore> logger )
+		public CachedMeasurementStore(IServiceProvider provider, ILogger<CachedMeasurementStore> logger)
 		{
 			this.m_provider = provider;
 			this.m_logger = logger;
@@ -128,7 +128,7 @@ namespace SensateService.Infrastructure.Storage
 				asyncio[0] = IncrementStatistics(statsdb, statsdata, cts.Token);
 				asyncio[1] = measurementsdb.StoreAsync(measurementsDict, cts.Token);
 
-				livedata = measurementsDict.Select(x => new MeasurementQueue { SensorId =  x.Key, Measurements = x.Value}).ToList();
+				livedata = measurementsDict.Select(x => new MeasurementQueue { SensorId = x.Key, Measurements = x.Value }).ToList();
 				asyncio[2] = this.InvokeEventHandlersAsync(livedata, cts.Token);
 
 				count = measurements.Sum(x => x.Measurements.Count);
@@ -173,15 +173,15 @@ namespace SensateService.Infrastructure.Storage
 					select new MeasurementQueue {
 						SensorId = ObjectId.Parse(g.Key),
 						Measurements = g.Select(m => new Measurement {
-                            Data = m.Datapoints.ToDictionary(p => p.Key, p => new DataPoint {
-                                Accuracy = p.Accuracy,
-                                Precision = p.Precision,
-                                Unit = p.Unit,
-                                Value = Convert.ToDecimal(p.Value),
-                            }),
-                            Location = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(new GeoJson2DGeographicCoordinates(m.Longitude, m.Latitude)),
-                            PlatformTime = DateTime.Parse(m.PlatformTime),
-                            Timestamp = DateTime.Parse(m.Timestamp)
+							Data = m.Datapoints.ToDictionary(p => p.Key, p => new DataPoint {
+								Accuracy = p.Accuracy,
+								Precision = p.Precision,
+								Unit = p.Unit,
+								Value = Convert.ToDecimal(p.Value),
+							}),
+							Location = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(new GeoJson2DGeographicCoordinates(m.Longitude, m.Latitude)),
+							PlatformTime = DateTime.Parse(m.PlatformTime),
+							Timestamp = DateTime.Parse(m.Timestamp)
 						}).ToList()
 					};
 

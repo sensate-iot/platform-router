@@ -41,7 +41,7 @@ namespace SensateService.Infrastructure.Storage
 		private const int InitialListSize = 512;
 		private const int DatabaseTimeout = 20;
 
-		public CachedCachedMessageStore(IServiceProvider provider, ILogger<CachedCachedMessageStore> logger )
+		public CachedCachedMessageStore(IServiceProvider provider, ILogger<CachedCachedMessageStore> logger)
 		{
 			this.m_provider = provider;
 			this.m_logger = logger;

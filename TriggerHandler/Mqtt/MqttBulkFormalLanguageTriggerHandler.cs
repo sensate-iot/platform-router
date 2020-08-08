@@ -85,8 +85,8 @@ namespace SensateService.TriggerHandler.Mqtt
 				var triggers = raw_triggers.ToList();
 				var triggered = new List<Tuple<Trigger, TriggerInvocation>>();
 				var regexes = triggers.Select(x => new Tuple<Trigger, Regex>(
-					                              x, new Regex(x.FormalLanguage)
-					                              ) ).ToList();
+												  x, new Regex(x.FormalLanguage)
+												  )).ToList();
 
 				foreach(var mCollection in messages) {
 					var subset = regexes.Where(trigger => trigger.Item1.SensorId == mCollection.SensorId).ToList();
@@ -100,7 +100,7 @@ namespace SensateService.TriggerHandler.Mqtt
 							from t in subset
 							where t.Item2.IsMatch(msg.Data)
 							let inv = new TriggerInvocation {
-								TriggerId = t.Item1.Id, 
+								TriggerId = t.Item1.Id,
 								Timestamp = new DateTimeOffset(msg.Timestamp.ToUniversalTime(), TimeSpan.Zero)
 							}
 							select new Tuple<Trigger, TriggerInvocation>(t.Item1, inv));
