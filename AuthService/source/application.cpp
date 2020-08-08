@@ -7,6 +7,7 @@
 
 #include <sensateiot/application.h>
 #include <sensateiot/configparser.h>
+#include <sensateiot/version.h>
 
 #include <sensateiot/consumers/commandconsumer.h>
 #include <sensateiot/util/mongodbclientpool.h>
@@ -59,10 +60,8 @@ namespace sensateiot
 		util::Log::StartLogging(this->m_config.GetLogging());
 		auto &log = util::Log::GetLog();
 
-		log << "Starting Sensate IoT AuthService..." << util::Log::NewLine;
-
+		log << "Starting Sensate IoT AuthService " << version::VersionString << util::Log::NewLine;
 		util::MongoDBClientPool::Init(this->m_config.GetDatabase().GetMongoDB());
-
 		consumers::CommandConsumer commands;
 
 		// Internal client

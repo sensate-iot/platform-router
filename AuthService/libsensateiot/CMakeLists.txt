@@ -78,6 +78,8 @@ set(LIB_HEADERS
 	config/mqtt.h
 	config/mqttbroker.h
 
+	sensateiot/version.h
+
 	sensateiot/compiler/compiler-msvc.h
 	sensateiot/compiler/compiler.h
 
