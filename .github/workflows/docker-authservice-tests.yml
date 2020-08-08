@@ -5,7 +5,12 @@ on:
       branches:
         - master # Publish `master` as Docker `latest` image.
         - develop # Publish `master` as Docker `staging` image.
-        - feature/security
+        - feature/**
+        - release/**
+  pull_request:
+      branches:
+      - master
+      - develop
       # Publish `v1.2.3` tags as releases.
       tags:
         - v*
