@@ -6,6 +6,8 @@
  */
 
 #include <string>
+#include <iostream>
+
 #include <boost/algorithm/hex.hpp>
 
 #include <sensateiot/util/sha256.h>
@@ -25,5 +27,11 @@ int main(int argc, char** argv)
 	std::string output;
 
 	boost::algorithm::hex(input.begin(), input.end(), std::back_inserter(output));
+
+	if(output != "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f") {
+		std::cerr << "SHA256 hash invalid!" << std::endl;
+		return -EXIT_FAILURE;
+	}
+	
 	return -EXIT_SUCCESS;
 }

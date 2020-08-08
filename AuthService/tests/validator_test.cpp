@@ -64,7 +64,7 @@ static void test_bad_input()
 		throw std::exception();
 	}
 
-	std::cerr << "Done testing bad input: " << count << " error occurred!";
+	std::cout << "Done testing bad input: " << count << " error occurred!" << std::endl;
 }
 
 static void validate_bulk()
