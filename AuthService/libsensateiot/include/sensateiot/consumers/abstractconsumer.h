@@ -17,6 +17,7 @@
 #include <sensateiot/models/objectid.h>
 #include <sensateiot/util/protobuf.h>
 #include <sensateiot/util/gzip.h>
+#include <sensateiot/util/sha256.h>
 
 namespace sensateiot::consumers
 {
@@ -93,6 +94,8 @@ namespace sensateiot::consumers
 		std::shared_mutex m_lock;
 
 		/* Methods */
+		static constexpr auto HashCompare = util::sha256_compare;
+
 		virtual void PublishAuthorizedMessages(const std::vector<ModelType>& authorized, const std::string& topic) 
 		{
 			std::vector<ns_base::mqtt::delivery_token_ptr> tokens;

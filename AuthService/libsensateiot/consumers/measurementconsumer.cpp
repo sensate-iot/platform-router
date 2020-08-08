@@ -50,7 +50,7 @@ namespace sensateiot::consumers
 		if(result) {
 			auto offset = pair.second.GetKey().length() - SecretSubStringOffset;
 			auto key = pair.second.GetKey().substr(SecretSubstringStart, offset);
-			return util::sha256_compare(pair.first, key);
+			return HashCompare(pair.first, key);
 		}
 
 		/* This is not a SHA256 secured message. Authorize manually. */
