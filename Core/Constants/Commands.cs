@@ -10,7 +10,7 @@ namespace SensateService.Constants
 	public class Commands
 	{
 		public const string FlushUser = "flush_user";
-		public const string FlushSensor= "flush_sensor";
+		public const string FlushSensor = "flush_sensor";
 		public const string FlushKey = "flush_key";
 
 		public const string CommandKey = "cmd";

@@ -83,7 +83,8 @@ namespace SensateService.Services.Processing
 		public async Task PublishCommand(AuthServiceCommand cmd, string argument, bool retain)
 		{
 			var obj = new JObject {
-				[Commands.CommandKey] = cmd switch {
+				[Commands.CommandKey] = cmd switch
+				{
 					AuthServiceCommand.FlushKey => Commands.FlushKey,
 					AuthServiceCommand.FlushSensor => Commands.FlushSensor,
 					AuthServiceCommand.FlushUser => Commands.FlushUser,
