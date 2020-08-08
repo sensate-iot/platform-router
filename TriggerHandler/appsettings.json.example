@@ -64,9 +64,6 @@
       "Ssl": "false",
       "Port": 1883,
       "Host": "",
-      "RealTimeShareTopic": "sensate/measurements/rt",
-      "ShareTopic": "sensate/measurements",
-      "BulkShareTopic": "sensate/measurements/bulk",
       "ActuatorTopic": "sensate/actuator/$sensorId"
     },
     "InternalBroker": {

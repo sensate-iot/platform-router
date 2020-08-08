@@ -19,8 +19,7 @@
 
   "System": {
     "ProxyLevel": 1,
-    "MeasurementAuthProxyUrl": "http://127.0.0.1:8080/v1/processor/measurements",
-    "MessageAuthProxyUrl": "http://127.0.0.1:8080/v1/processor/messages"
+    "InstanceName": "kerby"
   },
 
   "Authentication": {
@@ -31,23 +30,22 @@
     "JwtKey": "",
     "JwtIssuer": "api.dev.sensateiot.com:5000/auth",
     "JwtExpireMinutes": 43200,
-    "PrimaryAuthHost": true
+    "PrimaryAuthHost": false 
   },
 
   "Cache": {
     "Enabled": true,
-    "Interval": 1000, 
-    "Type": "Memory"
+    "Type": "Distributed"
   },
 
   "Database": {
     "MongoDB": {
       "DatabaseName": "Sensate",
       "ConnectionString": "mongodb://127.0.0.1:27017/Sensate",
-      "MaxConnections": 1000
+      "MaxConnections": 300
     },
     "PgSQL": {
-      "ConnectionString": "User ID = postgres;Password=postgres;Server=127.0.0.1;Port=5432;Database=Sensate"
+      "ConnectionString": "User ID = postgres;Password=DefaultPassword;Server=127.0.0.1;Port=5432;Database=Sensate"
     },
     "Redis": {
       "Host": "127.0.0.1",
@@ -61,7 +59,17 @@
       "Password": "",
       "Ssl": "false",
       "Port": 1883,
-      "Host": "127.0.0.1"
-    }
+      "Host": "127.0.0.1",
+      "ActuatorTopic": "sensate/actuator/$sensorId"
+    },
+    "InternalBroker": {
+      "Username": "",
+      "Password": "",
+      "Ssl": "false",
+      "Port": 1883,
+      "Host": "127.0.0.1",
+      "InternalCommandsTopic": "sensate-auth/internal/commands" 
+    } 
   }
 }
+

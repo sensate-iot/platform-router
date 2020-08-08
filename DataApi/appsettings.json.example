@@ -31,7 +31,7 @@
     "JwtKey": "",
     "JwtIssuer": "api.dev.sensateiot.com:5000/auth",
     "JwtExpireMinutes": 43200,
-    "PrimaryAuthHost": true
+    "PrimaryAuthHost": false
   },
 
   "Cache": {
