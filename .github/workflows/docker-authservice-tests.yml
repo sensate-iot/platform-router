@@ -25,4 +25,4 @@ jobs:
       - name: Build image
         run: |
           cd AuthService
-          docker build . --tag $IMAGE_NAME
+          docker build -f Dockerfile.test . --tag $IMAGE_NAME
