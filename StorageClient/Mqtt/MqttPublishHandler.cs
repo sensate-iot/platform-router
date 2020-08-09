@@ -38,7 +38,6 @@ namespace SensateService.StorageClient.Mqtt
 			var client = scope.ServiceProvider.GetRequiredService<IMqttPublishService>();
 
 			data = e.Compressed;
-			//await client.PublishOnAsync(this._options.InternalBulkMeasurementTopic, data, false).AwaitBackground();
 			await client.PublishOnAsync(this.m_opts.InternalBulkMeasurementTopic, data, false).AwaitBackground();
 		}
 
