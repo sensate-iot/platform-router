@@ -3,14 +3,14 @@
     "IncludeScopes": false,
     "Debug": {
       "LogLevel": {
-        "Default": "Warning",
+        "Default": "Debug",
         "Microsoft": "Warning",
         "System": "Warning"
       }
     },
     "Console": {
       "LogLevel": {
-        "Default": "Warning",
+        "Default": "Debug",
         "Microsoft": "Warning",
         "System": "Warning"
       }
@@ -41,13 +41,14 @@
   },
 
   "Authentication": {
-    "PublicUrl": "localhost:5000",
-    "Scheme":  "http", 
+    "PublicUrl": "login.dev.sensateiot.com/confirm",
+    "UpdateEmailUrl": "dev.sensateiot.com:4200/apps/dashboard/confirm-update-email",
+    "Scheme": "http",
     "JwtRefreshExpireMinutes": 43200,
     "JwtKey": "",
-    "JwtIssuer": "http://localhost:5000/",
-    "PrimaryAuthHost": false,
-    "JwtExpireMinutes": 43200
+    "JwtIssuer": "api.dev.sensateiot.com:5000/auth",
+    "JwtExpireMinutes": 43200,
+    "PrimaryAuthHost": false 
   },
 
   "Timeouts": {

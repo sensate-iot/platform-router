@@ -3,76 +3,36 @@
     "IncludeScopes": false,
     "Debug": {
       "LogLevel": {
-        "Default": "Warning",
+        "Default": "Debug",
         "Microsoft": "Warning",
         "System": "Warning"
       }
     },
     "Console": {
       "LogLevel": {
-        "Default": "Warning",
+        "Default": "Debug",
         "Microsoft": "Warning",
         "System": "Warning"
       }
     }
   },
-  
-  "Authentication" : {
+
+  "Authentication": {
+    "PublicUrl": "login.dev.sensateiot.com/confirm",
+    "UpdateEmailUrl": "dev.sensateiot.com:4200/apps/dashboard/confirm-update-email",
+    "Scheme": "http",
     "JwtRefreshExpireMinutes": 43200,
-    "JwtKey": "3i%bacH6yK8sm0#lYt0**aP567Fz^Ns3HKeZ3GiqlZ2&eFqjy0OqXO",
-    "JwtIssuer": "http://localhost:5000/",
-    "PrimaryAuthHost": false,
+    "JwtKey": "",
+    "JwtIssuer": "api.dev.sensateiot.com:5000/auth",
     "JwtExpireMinutes": 43200,
-    "Scheme": "https"
+    "PrimaryAuthHost": false 
   },
-  
+
   "AllowedHosts": "*",
   "System": {
     "ProxyLevel": 1,
-    "InstanceName": "kerby"
-  },
-
-  "Cache" : {
-    "Enabled": true,
-    "Type": "Distributed",
-    "Interval": 1000
-  },
-
-  "Database" : {
-    "MongoDB" : {
-      "DatabaseName": "Sensate",
-      "ConnectionString": "mongodb://localhost:27017/Sensate",
-      "MaxConnections": 300
-    },
-    "PgSQL" : {
-      "ConnectionString": "User ID = Username;Password=SomePassword;Server=localhost;Port=5432;Database=Sensate"
-    },
-    "Redis" : {
-      "Host": "localhost",
-      "InstanceName": "Sensate"
-    }
-  },
-
-  "Mqtt": {
-    "PublicBroker": {
-      "Username": "",
-      "Password": "",
-      "Ssl": "false",
-      "Port": 1883,
-      "Host": "",
-      "RealTimeShareTopic": "sensate/measurements/rt",
-      "ShareTopic": "sensate/measurements",
-      "BulkShareTopic": "sensate/measurements/bulk"
-    },
-    "InternalBroker": {
-      "Username": "",
-      "Password": "",
-      "Ssl": "false",
-      "Port": 1883,
-      "Host": "",
-      "InternalMeasurementTopic": "sensate/internal/measurements",
-      "InternalBulkMeasurementTopic": "sensate/internal/measurements/bulk",
-      "InternalMessageTopic": "sensate/internal/messages"
-    } 
+    "InstanceName": "kerby",
+    "MeasurementAuthProxyUrl": "http://127.0.0.1:8080/v1/processor/measurements",
+    "MessageAuthProxyUrl": "http://127.0.0.1:8080/v1/processor/messages"
   }
 }
