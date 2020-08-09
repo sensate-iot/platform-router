@@ -21,6 +21,7 @@ using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
 using SensateService.Models.Json.Out;
+using SensateService.Services;
 
 namespace SensateService.AuthApi.Controllers
 {
@@ -31,13 +32,16 @@ namespace SensateService.AuthApi.Controllers
 	{
 		private readonly IApiKeyRepository _keys;
 		private readonly ILogger<ApiKeysController> m_logger;
+		private readonly ICommandPublisher m_publisher;
 
 		public ApiKeysController(IUserRepository users, IApiKeyRepository keys,
 								 ILogger<ApiKeysController> logger,
+								 ICommandPublisher publisher,
 								 IHttpContextAccessor ctx) : base(users, ctx)
 		{
 			this._keys = keys;
 			this.m_logger = logger;
+			this.m_publisher = publisher;
 		}
 
 		[HttpPost("create")]
@@ -102,6 +106,10 @@ namespace SensateService.AuthApi.Controllers
 				return this.BadRequest();
 			}
 
+			if(apikey.Type == ApiKeyType.SensorKey) {
+				await this.m_publisher.PublishCommand(AuthServiceCommand.FlushKey, apikey.ApiKey).AwaitBackground();
+			}
+
 			await this._keys.MarkRevokedAsync(apikey).AwaitBackground();
 			return this.NoContent();
 		}
@@ -137,21 +145,13 @@ namespace SensateService.AuthApi.Controllers
 		{
 			PaginationResult<SensateApiKey> keys;
 
-			if(filter == null) {
-				filter = new ApiKeyFilter() {
-					Limit = 0,
-					Skip = 0,
-					IncludeRevoked = true
-				};
-			}
-
-			if(filter.Limit == null) {
-				filter.Limit = 0;
-			}
-
-			if(filter.Skip == null) {
-				filter.Skip = 0;
-			}
+			filter ??= new ApiKeyFilter() {
+				Limit = 0,
+				Skip = 0,
+				IncludeRevoked = true
+			};
+			filter.Limit ??= 0;
+			filter.Skip ??= 0;
 
 			if(filter.Types == null || filter.Types.Count <= 0) {
 				filter.Types = new List<ApiKeyType> {

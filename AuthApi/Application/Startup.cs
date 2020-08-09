@@ -46,6 +46,7 @@ namespace SensateService.AuthApi.Application
 			var mail = new MailConfig();
 			var text = new TextConfig();
 			var sys = new SystemConfig();
+			var mqtt = new MqttConfig();
 
 			this._configuration.GetSection("Cache").Bind(cache);
 			this._configuration.GetSection("Authentication").Bind(auth);
@@ -53,8 +54,10 @@ namespace SensateService.AuthApi.Application
 			this._configuration.GetSection("Mail").Bind(mail);
 			this._configuration.GetSection("System").Bind(sys);
 			this._configuration.GetSection("Text").Bind(text);
+			this._configuration.GetSection("Mqtt").Bind(mqtt);
 
 			services.AddCors();
+			var privatemqtt = mqtt.InternalBroker;
 
 			services.AddPostgres(db.PgSQL.ConnectionString);
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
@@ -71,6 +74,15 @@ namespace SensateService.AuthApi.Application
 			services.AddDocumentRepositories(cache.Enabled);
 			services.AddSensorServices();
 			services.AddUserService();
+
+			services.AddCommandPublisher(options => {
+				options.Ssl = privatemqtt.Ssl;
+				options.Host = privatemqtt.Host;
+				options.Port = privatemqtt.Port;
+				options.Username = privatemqtt.Username;
+				options.Password = privatemqtt.Password;
+				options.CommandsTopic = privatemqtt.InternalCommandsTopic;
+			});
 
 			if(mail.Provider == "SendGrid") {
 				services.AddSingleton<IEmailSender, SendGridMailer>();

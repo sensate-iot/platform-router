@@ -55,6 +55,7 @@ namespace SensateService.AuthApi.Controllers
 		private readonly IChangePhoneNumberTokenRepository _phonetokens;
 		private readonly TextServiceSettings _text_settings;
 		private readonly ILogger<AccountsController> _logger;
+		private readonly ICommandPublisher m_publisher;
 
 		public AccountsController(
 			IUserRepository repo,
@@ -67,6 +68,7 @@ namespace SensateService.AuthApi.Controllers
 			IUserTokenRepository tokenRepository,
 			ITextSendService text,
 			IUserService userService,
+			ICommandPublisher publisher,
 			IOptions<TextServiceSettings> text_opts,
 			IWebHostEnvironment env,
 			IHttpContextAccessor ctx,
@@ -84,6 +86,7 @@ namespace SensateService.AuthApi.Controllers
 			this._phonetokens = phoneTokens;
 			this._settings = options.Value;
 			this._text = text;
+			this.m_publisher = publisher;
 			this._text_settings = text_opts.Value;
 		}
 
@@ -100,7 +103,7 @@ namespace SensateService.AuthApi.Controllers
 			user = await this._users.GetByEmailAsync(model.Email);
 
 			if(user == null || !user.EmailConfirmed) {
-				return NotFound();
+				return this.NotFound();
 			}
 
 			var mailTask = this.ReadMailTemplate("Confirm_Password_Reset.html", "Confirm_Password_Reset.txt");
@@ -115,7 +118,7 @@ namespace SensateService.AuthApi.Controllers
 			mail.HtmlBody = mail.HtmlBody.Replace("%%TOKEN%%", usertoken);
 			mail.TextBody = string.Format(mail.TextBody, usertoken);
 			await this._mailer.SendEmailAsync(user.Email, "Reset password token", mail);
-			return Ok();
+			return this.Ok();
 		}
 
 		[HttpPost("reset-password")]
@@ -332,9 +335,8 @@ namespace SensateService.AuthApi.Controllers
 			string path;
 
 			path = this._env.GetTemplatePath(template);
-			using(var reader = System.IO.File.OpenText(path)) {
-				body = await reader.ReadLineAsync().AwaitBackground();
-			}
+			using var reader = System.IO.File.OpenText(path);
+			body = await reader.ReadLineAsync().AwaitBackground();
 
 			return body == null ? null : string.Format(body, token);
 		}
@@ -422,7 +424,7 @@ namespace SensateService.AuthApi.Controllers
 				PhoneNumber = user.PhoneNumber,
 				Id = user.Id,
 				RegisteredAt = user.RegisteredAt.ToUniversalTime(),
-				Roles = this._users.GetRoles(user),
+				Roles = await this._users.GetRolesAsync(user).AwaitBackground(),
 				BillingLockout = user.BillingLockout,
 				UnconfirmedPhoneNumber = user.UnconfirmedPhoneNumber,
 				EmailConfirmed = user.EmailConfirmed,
@@ -637,15 +639,19 @@ namespace SensateService.AuthApi.Controllers
 				var user = await this._manager.FindByIdAsync(role.UserId);
 				var roles = role.Role.Split(',');
 
-				bool status = await this._users.ClearRolesForAsync(user);
+				var status = await this._users.ClearRolesForAsync(user);
 
-				if(!status)
+				if(!status) {
 					return this.BadRequest();
+				}
 
 				status = await this._users.AddToRolesAsync(user, roles);
 
-				if(!status)
+				if(!status) {
 					return this.BadRequest();
+				}
+
+				await this.m_publisher.PublishCommand(AuthServiceCommand.FlushUser, user.Id).AwaitBackground();
 
 				var dbgroles = await this._users.GetRolesAsync(user);
 				this._logger.LogInformation($"New roles for {role.UserId}:");
@@ -667,6 +673,7 @@ namespace SensateService.AuthApi.Controllers
 			try {
 				var user = await this.GetCurrentUserAsync().AwaitBackground();
 				await this.m_userService.DeleteAsync(user, CancellationToken.None).AwaitBackground();
+				await this.m_publisher.PublishCommand(AuthServiceCommand.FlushUser, user.Id).AwaitBackground();
 			} catch(Exception ex) {
 				this._logger.LogInformation($"Unable to delete user: {ex.Message}");
 				this._logger.LogDebug(ex.StackTrace);
@@ -693,6 +700,7 @@ namespace SensateService.AuthApi.Controllers
 				this._users.StartUpdate(user);
 				user.BillingLockout = userUpdate.BillingLockout;
 				await this._users.EndUpdateAsync().AwaitBackground();
+				await this.m_publisher.PublishCommand(AuthServiceCommand.FlushUser, user.Id).AwaitBackground();
 			} catch(Exception ex) {
 				this._logger.LogInformation($"Unable to set billing locket: {ex.Message}");
 				this._logger.LogDebug(ex.StackTrace);
