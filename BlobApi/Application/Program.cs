@@ -11,7 +11,6 @@ using System.IO;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace SensateService.BlobApi.Application
@@ -43,10 +42,7 @@ namespace SensateService.BlobApi.Application
 				.UseConfiguration(conf)
 				.UseContentRoot(Directory.GetCurrentDirectory())
 				.ConfigureAppConfiguration((hostingContext, config) => {
-					if(hostingContext.HostingEnvironment.IsProduction())
-						config.AddJsonFile(GetAppSettings(), optional: false, reloadOnChange: true);
-					else
-						config.AddUserSecrets<Startup>();
+					config.AddJsonFile(GetAppSettings(), optional: false, reloadOnChange: true);
 					config.AddEnvironmentVariables();
 				})
 				.ConfigureLogging((hostingContext, logging) => {

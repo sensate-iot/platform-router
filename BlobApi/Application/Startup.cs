@@ -89,7 +89,6 @@ namespace SensateService.BlobApi.Application
 				options.Username = privatemqtt.Username;
 				options.Password = privatemqtt.Password;
 				options.Id = Guid.NewGuid().ToString();
-				options.InternalBulkMeasurementTopic = privatemqtt.InternalBulkMeasurementTopic;
 				options.InternalBlobTopic = privatemqtt.InternalBlobTopic;
 			});
 
