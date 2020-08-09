@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 using SensateService.ApiCore.Init;
@@ -35,24 +34,23 @@ namespace SensateService.AuthApi.Application
 			ILogger<Program> logger;
 			SensateSqlContext ctx;
 
-			using(var scope = wh.Services.CreateScope()) {
-				var services = scope.ServiceProvider;
-				logger = services.GetRequiredService<ILogger<Program>>();
+			using var scope = wh.Services.CreateScope();
+			var services = scope.ServiceProvider;
+			logger = services.GetRequiredService<ILogger<Program>>();
 
-				try {
-					logger.LogInformation("Creating user roles..");
-					ctx = services.GetRequiredService<SensateSqlContext>();
-					var roles = services.GetRequiredService<RoleManager<SensateRole>>();
-					var manager = services.GetRequiredService<UserManager<SensateUser>>();
+			try {
+				logger.LogInformation("Creating user roles..");
+				ctx = services.GetRequiredService<SensateSqlContext>();
+				var roles = services.GetRequiredService<RoleManager<SensateRole>>();
+				var manager = services.GetRequiredService<UserManager<SensateUser>>();
 
-					if(ctx.Roles.Any())
-						return;
+				if(ctx.Roles.Any())
+					return;
 
-					var tsk = UserRoleSeed.Initialize(ctx, roles, manager);
-					tsk.Wait();
-				} catch(Exception ex) {
-					logger.LogError($"Unable to create user roles: {ex.Message}");
-				}
+				var tsk = UserRoleSeed.Initialize(ctx, roles, manager);
+				tsk.Wait();
+			} catch(Exception ex) {
+				logger.LogError($"Unable to create user roles: {ex.Message}");
 			}
 		}
 
@@ -77,12 +75,7 @@ namespace SensateService.AuthApi.Application
 				.UseConfiguration(conf)
 				.UseContentRoot(Directory.GetCurrentDirectory())
 				.ConfigureAppConfiguration((hostingContext, config) => {
-					if(hostingContext.HostingEnvironment.IsProduction()) {
-						config.AddJsonFile(GetAppSettings(), optional: false, reloadOnChange: true);
-					} else {
-						config.AddUserSecrets<Startup>();
-					}
-
+					config.AddJsonFile(GetAppSettings(), optional: false, reloadOnChange: true);
 					config.AddEnvironmentVariables();
 				})
 				.ConfigureLogging((hostingContext, logging) => {
