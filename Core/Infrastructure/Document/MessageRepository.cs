@@ -43,6 +43,11 @@ namespace SensateService.Infrastructure.Document
 			return this._collection.DeleteOneAsync(filter, ct);
 		}
 
+		public Task CreateRangeAsync(IEnumerable<Message> messages, CancellationToken ct = default)
+		{
+			return this._collection.InsertManyAsync(messages, cancellationToken: ct);
+		}
+
 		public async Task<IEnumerable<Message>> GetAsync(Sensor sensor, int skip = 0, int take = -1, OrderDirection order = OrderDirection.None, CancellationToken ct = default)
 		{
 			var fb = Builders<Message>.Filter;
@@ -51,9 +56,9 @@ namespace SensateService.Infrastructure.Document
 			var query = this._collection.Find(filter);
 
 			if(order == OrderDirection.Ascending) {
-				query = query.SortBy(x => x.CreatedAt);
+				query = query.SortBy(x => x.Timestamp);
 			} else if(order == OrderDirection.Descending) {
-				query = query.SortByDescending(x => x.CreatedAt);
+				query = query.SortByDescending(x => x.Timestamp);
 			}
 
 			if(skip > 0) {
@@ -75,15 +80,15 @@ namespace SensateService.Infrastructure.Document
 			var fb = Builders<Message>.Filter;
 
 			var filter = fb.Eq(m => m.SensorId, sensor.InternalId) &
-						 fb.Gte(m => m.CreatedAt, start) &
-						 fb.Lte(m => m.CreatedAt, end);
+						 fb.Gte(m => m.Timestamp, start) &
+						 fb.Lte(m => m.Timestamp, end);
 
 			var query = this._collection.Find(filter);
 
 			if(order == OrderDirection.Ascending) {
-				query = query.SortBy(x => x.CreatedAt);
+				query = query.SortBy(x => x.Timestamp);
 			} else if(order == OrderDirection.Descending) {
-				query = query.SortByDescending(x => x.CreatedAt);
+				query = query.SortByDescending(x => x.Timestamp);
 			}
 
 			if(skip > 0) {
@@ -115,8 +120,8 @@ namespace SensateService.Infrastructure.Document
 			var builder = Builders<Message>.Filter;
 			var ids = sensors.Select(x => x.InternalId);
 			var filter = builder.In(x => x.SensorId, ids) &
-						 builder.Gte(x => x.CreatedAt, start) &
-						 builder.Lte(x => x.CreatedAt, end);
+						 builder.Gte(x => x.Timestamp, start) &
+						 builder.Lte(x => x.Timestamp, end);
 
 			var result = await this._collection.CountDocumentsAsync(filter, cancellationToken: ct).AwaitBackground();
 			return result;
@@ -132,8 +137,8 @@ namespace SensateService.Infrastructure.Document
 		{
 			var builder = Builders<Message>.Filter;
 			var filter = builder.Eq(x => x.SensorId, sensor.InternalId) &
-						 builder.Gte(x => x.CreatedAt, start) &
-						 builder.Lte(x => x.CreatedAt, end);
+						 builder.Gte(x => x.Timestamp, start) &
+						 builder.Lte(x => x.Timestamp, end);
 
 			await this._collection.DeleteManyAsync(filter, ct).AwaitBackground();
 		}

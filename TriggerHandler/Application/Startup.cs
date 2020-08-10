@@ -119,6 +119,7 @@ namespace SensateService.TriggerHandler.Application
 
 			this.SetupCommunicationChannels(services);
 
+			services.AddScoped<ITriggerTextMatchingService, TriggerTextMatchingService>();
 			services.AddScoped<ITriggerNumberMatchingService, TriggerNumberMatchingService>();
 			services.AddScoped<ITriggerHandlerService, TriggerHandlerService>();
 
@@ -129,6 +130,7 @@ namespace SensateService.TriggerHandler.Application
 				options.Username = privatemqtt.Username;
 				options.Password = privatemqtt.Password;
 				options.Id = Guid.NewGuid().ToString();
+				options.TopicShare = "$share/trigger-service/";
 			});
 
 			services.AddMqttPublishService<MqttPublishService>(options => {
@@ -142,7 +144,7 @@ namespace SensateService.TriggerHandler.Application
 			});
 
 			services.AddLogging(builder => {
-				builder.AddConfiguration(Configuration.GetSection("Logging"));
+				builder.AddConfiguration(this.Configuration.GetSection("Logging"));
 				if(IsDevelopment()) {
 					builder.AddDebug();
 				}
@@ -168,9 +170,8 @@ namespace SensateService.TriggerHandler.Application
 			this.Configuration.GetSection("Cache").Bind(cache);
 			var @private = mqtt.InternalBroker;
 
-			provider.MapInternalMqttTopic<MqttBulkNumberTriggerHandler>(@private.InternalBulkMeasurementTopic);
-			provider.MapInternalMqttTopic<MqttNumberTriggerHandler>(@private.InternalMeasurementTopic);
-			provider.MapInternalMqttTopic<MqttFormalLanguageTriggerHandler>(@private.InternalMessageTopic);
+			provider.MapInternalMqttTopic<MqttBulkNumberTriggerHandler>(@private.AuthorizedBulkMeasurementTopic);
+			provider.MapInternalMqttTopic<MqttBulkFormalLanguageTriggerHandler>(@private.AuthorizedBulkMessageTopic);
 		}
 	}
 }

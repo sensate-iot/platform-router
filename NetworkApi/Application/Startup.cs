@@ -52,6 +52,7 @@ namespace SensateService.NetworkApi.Application
 			this._configuration.GetSection("Database").Bind(db);
 
 			var publicmqtt = mqtt.PublicBroker;
+			var privatemqtt = mqtt.InternalBroker;
 
 			services.AddCors();
 			services.AddReverseProxy(sys);
@@ -77,6 +78,15 @@ namespace SensateService.NetworkApi.Application
 				options.Password = publicmqtt.Password;
 				options.Id = Guid.NewGuid().ToString();
 				options.ActuatorTopic = publicmqtt.ActuatorTopic;
+			});
+
+			services.AddCommandPublisher(options => {
+				options.Ssl = privatemqtt.Ssl;
+				options.Host = privatemqtt.Host;
+				options.Port = privatemqtt.Port;
+				options.Username = privatemqtt.Username;
+				options.Password = privatemqtt.Password;
+				options.CommandsTopic = privatemqtt.InternalCommandsTopic;
 			});
 
 			services.AddSwaggerGen(c => {

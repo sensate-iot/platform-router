@@ -5,7 +5,7 @@
   "main": "dist/src/live-data-handler.js",
   "scripts": {
     "start": "node dist/src/app/live-data-handler.js",
-    "build": "tsc -t ES2018 --strictNullChecks --noUnusedLocals --noImplicitReturns", 
+    "build": "tsc -t ES2018 --strictNullChecks --noUnusedLocals --noImplicitReturns",
     "dev": "nodemon -x \"node ./node_modules/ts-node/dist/bin.js\" ./src/app/live-data-handler.ts"
   },
   "author": {

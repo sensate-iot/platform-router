@@ -11,7 +11,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
+
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 using SensateService.Enums;
@@ -72,9 +73,9 @@ namespace SensateService.Infrastructure.Document
 
 		#region Entry creation
 
-		public Task IncrementAsync(Sensor sensor, RequestMethod method)
+		public Task IncrementAsync(ObjectId sensorId, RequestMethod method)
 		{
-			return this.IncrementManyAsync(sensor, method, 1, default);
+			return this.IncrementManyAsync(sensorId, method, 1, default);
 		}
 
 		public async Task<SensorStatisticsEntry> CreateForAsync(Sensor sensor)
@@ -92,7 +93,7 @@ namespace SensateService.Infrastructure.Document
 			return entry;
 		}
 
-		public async Task IncrementManyAsync(Sensor sensor, RequestMethod method, int num, CancellationToken token)
+		public async Task IncrementManyAsync(ObjectId sensorId, RequestMethod method, int num, CancellationToken token)
 		{
 			var update = Builders<SensorStatisticsEntry>.Update;
 			UpdateDefinition<SensorStatisticsEntry> updateDefinition;
@@ -102,7 +103,7 @@ namespace SensateService.Infrastructure.Document
 
 			var opts = new UpdateOptions { IsUpsert = true };
 			try {
-				await this._collection.UpdateOneAsync(x => x.SensorId == sensor.InternalId &&
+				await this._collection.UpdateOneAsync(x => x.SensorId == sensorId &&
 														   x.Date == DateTime.Now.ThisHour() && x.Method == method,
 					updateDefinition, opts, token).AwaitBackground();
 			} catch(Exception ex) {

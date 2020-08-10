@@ -5,12 +5,13 @@
  * @email  dev@bietje.net
  */
 
+const fs = require('fs');
 const socket = require('ws');
 const generate = require('./generate');
 const NanoTimer = require('nanotimer');
 
-function publish(ws, args) {
-	const measurement = generate.generateMeasurement(args);
+function publish(ws, sensors) {
+	const measurement = generate.generateMeasurement(sensors);
 
 	ws.send(JSON.stringify(measurement));
 }
@@ -29,12 +30,12 @@ function publishMessage(ws, args) {
 var timer = undefined;
 
 module.exports.run = function (args) {
+	const raw = fs.readFileSync(args.sensorPath, "utf8");
+	const sensors = JSON.parse(raw);
 	timer = new NanoTimer();
-	const secret = args.config.webSocket.secret;
 
 	if(args.messages) {
 		const host = args.host + ':' + args.port + '/ingress/v1/messages';
-		console.log(host);
 		const ws = new socket(host);
 
 		ws.on('open', () => {
@@ -43,13 +44,11 @@ module.exports.run = function (args) {
 		});
 	} else {
 		const host = args.host + ':' + args.port + '/ingress/v1/measurement';
-
-		console.log(host);
 		const ws = new socket(host);
 
 		ws.on('open', () => {
 			console.log('Websocket connected!');
-			timer.setInterval(publish, [ws, args], args.interval.toString() + 'u');
+			timer.setInterval(publish, [ws, sensors], args.interval.toString() + 'u');
 		});
 	}
 

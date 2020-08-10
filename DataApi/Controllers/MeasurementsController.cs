@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,14 +18,14 @@ using Microsoft.Extensions.Logging;
 
 using MongoDB.Bson;
 using MongoDB.Driver.GeoJsonObjectModel;
-
+using Newtonsoft.Json;
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
 using SensateService.DataApi.Models;
 using SensateService.Enums;
 using SensateService.Helpers;
+using SensateService.Infrastructure.Authorization;
 using SensateService.Infrastructure.Repositories;
-using SensateService.Infrastructure.Storage;
 using SensateService.Models;
 using SensateService.Models.Generic;
 using SensateService.Models.Json.Out;
@@ -36,50 +37,64 @@ namespace SensateService.DataApi.Controllers
 	[Route("data/v1/[controller]")]
 	public class MeasurementsController : AbstractDataController
 	{
-		private readonly IMeasurementCache m_cache;
 		private readonly IMeasurementRepository m_measurements;
 		private readonly ISensorService m_sensorService;
 		private readonly ILogger<MeasurementsController> m_logger;
+		private readonly IMeasurementAuthorizationProxyCache m_proxy;
 
-		public MeasurementsController(IMeasurementCache cache,
-									  IMeasurementRepository measurements,
+		public MeasurementsController(IMeasurementRepository measurements,
 									  ISensorService sensorService,
 									  ISensorLinkRepository links,
 									  ISensorRepository sensors,
 									  IApiKeyRepository keys,
+									  IMeasurementAuthorizationProxyCache proxy,
 									  ILogger<MeasurementsController> logger,
 									  IHttpContextAccessor ctx) : base(ctx, sensors, links, keys)
 		{
-			this.m_cache = cache;
 			this.m_measurements = measurements;
 			this.m_sensorService = sensorService;
 			this.m_logger = logger;
+			this.m_proxy = proxy;
 		}
 
-		[HttpPost("create")]
+		[HttpPost]
 		[ReadWriteApiKey]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status202Accepted)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status400BadRequest)]
-		public async Task<IActionResult> Create([FromBody] string raw)
+		public async Task<IActionResult> Create([FromQuery] bool bulk = false)
 		{
 			var status = new Status();
 
-			if(!(this.HttpContext.Items["ApiKey"] is SensateApiKey key)) {
-				return this.Forbid();
+			try {
+				using var reader = new StreamReader(this.Request.Body);
+				var raw = await reader.ReadToEndAsync();
+
+				if(!(this.HttpContext.Items["ApiKey"] is SensateApiKey)) {
+					return this.Forbid();
+				}
+
+				status.ErrorCode = ReplyCode.Ok;
+				status.Message = "Measurement queued!";
+
+				if(bulk) {
+					this.m_proxy.AddMessages(raw);
+				} else {
+					this.m_proxy.AddMessage(raw);
+				}
+
+				return this.Accepted(status);
+			} catch(JsonException) {
+				status.Message = "Unable to parse measurement";
+				status.ErrorCode = ReplyCode.BadInput;
+				return this.UnprocessableEntity(status);
+			} catch(Exception ex) {
+				status.Message = "Unable to handle request";
+				status.ErrorCode = ReplyCode.UnknownError;
+				this.m_logger.LogInformation($"Unable to process measurement: {ex.Message}");
+				this.m_logger.LogDebug(ex.StackTrace);
+
+				return this.StatusCode(StatusCodes.Status500InternalServerError, status);
 			}
-
-			if(key.Type != ApiKeyType.SensorKey) {
-				status.ErrorCode = ReplyCode.NotAllowed;
-				status.Message = "Invalid sensor API key!";
-
-				return this.BadRequest(status);
-			}
-
-			status.ErrorCode = ReplyCode.Ok;
-			status.Message = "Measurement queued!";
-
-			await this.m_cache.StoreAsync(raw, RequestMethod.HttpPost);
-			return this.Accepted(status);
 		}
 
 		[HttpGet("{bucketId}/{index}")]
@@ -117,7 +132,7 @@ namespace SensateService.DataApi.Controllers
 			return this.Ok(measurement);
 		}
 
-		[HttpPost]
+		[HttpPost("filter")]
 		[ProducesResponseType(typeof(IEnumerable<MeasurementsQueryResult>), StatusCodes.Status200OK)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status422UnprocessableEntity)]
 		public async Task<IActionResult> Filter([FromBody] Filter filter)

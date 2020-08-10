@@ -7,7 +7,6 @@
 
 using System;
 using System.Threading;
-
 using Microsoft.Extensions.Hosting;
 
 namespace SensateService.MqttHandler.Application

@@ -10,21 +10,19 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 
-using SensateService.Enums;
-using SensateService.Exceptions;
 using SensateService.Helpers;
-using SensateService.Infrastructure.Storage;
+using SensateService.Infrastructure.Authorization;
 
 namespace SensateService.MqttHandler.Mqtt
 {
 	public class MqttMeasurementHandler : Middleware.MqttHandler
 	{
-		private readonly IMeasurementCache store;
+		private readonly IMeasurementAuthorizationProxyCache m_proxy;
 		private readonly ILogger<MqttMeasurementHandler> logger;
 
-		public MqttMeasurementHandler(IMeasurementCache store, ILogger<MqttMeasurementHandler> logger)
+		public MqttMeasurementHandler(IMeasurementAuthorizationProxyCache store, ILogger<MqttMeasurementHandler> logger)
 		{
-			this.store = store;
+			this.m_proxy = store;
 			this.logger = logger;
 		}
 
@@ -33,16 +31,16 @@ namespace SensateService.MqttHandler.Mqtt
 			Task.Run(async () => { await this.OnMessageAsync(topic, msg).AwaitBackground(); }).Wait();
 		}
 
-		public override async Task OnMessageAsync(string topic, string message)
+		public override Task OnMessageAsync(string topic, string message)
 		{
 			try {
-				await this.store.StoreAsync(message, RequestMethod.MqttTcp).AwaitBackground();
-			} catch(CachingException ex) {
-				this.logger.LogInformation($"{ex.Key}: {ex.Message}");
+				this.m_proxy.AddMessage(message);
 			} catch(Exception ex) {
 				this.logger.LogInformation($"Error: {ex.Message}");
 				this.logger.LogInformation($"Received a buggy MQTT message: {message}");
 			}
+
+			return Task.CompletedTask;
 		}
 	}
 }

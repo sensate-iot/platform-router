@@ -37,6 +37,20 @@ namespace SensateService.Init
 			return service;
 		}
 
+		public static IServiceCollection AddCommandPublisher(this IServiceCollection service, Action<CommandPublisherOptions> setup)
+		{
+			service.Configure(setup);
+			service.AddSingleton<IHostedService, CommandPublisher>();
+
+			service.AddSingleton(provider => {
+				var s = provider.GetServices<IHostedService>().ToList();
+				var mqservice = s.Find(x => x.GetType() == typeof(CommandPublisher)) as ICommandPublisher;
+				return mqservice;
+			});
+
+			return service;
+		}
+
 		public static IServiceCollection AddMqttPublishService<T>(this IServiceCollection services, Action<MqttPublishServiceOptions> setup = null)
 			where T : AbstractMqttService, IMqttPublishService
 		{

@@ -10,5 +10,5 @@ using System.Threading.Tasks;
 
 namespace SensateService.Infrastructure.Events
 {
-	public delegate Task OnMeasurementsReceived(object sender, MeasurementsReceivedEventArgs args);
+	public delegate Task OnMeasurementsReceived(object sender, DataReceivedEventArgs args);
 }

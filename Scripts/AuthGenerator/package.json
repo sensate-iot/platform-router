@@ -1,0 +1,16 @@
+{
+  "name": "auth-generator",
+  "version": "0.0.1",
+  "description": "Authorization test data generator.",
+  "main": "bin/auth-generator.js",
+  "scripts": {
+    "run": "node bin/auth-generator.js"
+  },
+  "author": "Michel Megens",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "commander": "^5.1.0",
+    "request": "^2.88.2",
+    "unirest": "^0.6.0"
+  }
+}

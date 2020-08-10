@@ -28,10 +28,7 @@ namespace SensateService.TriggerHandler.Application
 			var wh = Host.CreateDefaultBuilder(args)
 				.UseContentRoot(Directory.GetCurrentDirectory())
 				.ConfigureAppConfiguration((hostingContext, config) => {
-					if(hostingContext.HostingEnvironment.IsProduction())
-						config.AddJsonFile(GetAppSettings(), optional: false, reloadOnChange: true);
-					else
-						config.AddUserSecrets<Startup>();
+					config.AddJsonFile(GetAppSettings(), optional: false, reloadOnChange: true);
 					config.AddEnvironmentVariables();
 				})
 				.ConfigureLogging((hostingContext, logging) => {

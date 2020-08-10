@@ -15,9 +15,10 @@ namespace SensateService.Services.Settings
 		public string Id { get; set; }
 		public string Username { get; set; }
 		public string Password { get; set; }
-		public string InternalMeasurementTopic { get; set; }
+		public string AuthorizedBulkMeasurementTopic { get; set; }
+		public string AuthorizedBulkMessageTopic { get; set; }
 		public string InternalBulkMeasurementTopic { get; set; }
-		public string InternalMessageTopic { get; set; }
+		public string InternalBulkMessageTopic { get; set; }
 		public string InternalBlobTopic { get; set; }
 	}
 }

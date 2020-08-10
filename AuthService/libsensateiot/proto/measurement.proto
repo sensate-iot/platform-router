@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package sensateiot;
+option csharp_namespace = "SensateService.Protobuf";
+
+message DataPoint {
+	double value = 1;
+	string unit = 2;
+	double accuracy = 3;
+	double precision = 4;
+	string key = 5;
+}
+
+message Measurement {
+	repeated DataPoint datapoints = 1;
+	double latitude = 2;
+	double longitude = 3;
+	string platformTime = 4;
+	string timestamp = 5;
+	string sensor_id = 6;
+}
+
+message MeasurementData {
+	repeated Measurement measurements = 1;
+}

@@ -1,33 +1,28 @@
 ﻿/*
- * MQTT measurement handler.
+ * Bulk measurement handler.
  *
  * @author Michel Megens
- * @email  michel.megens@sonatolabs.com
+ * @email  michel@michelmegens.net
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using SensateService.Enums;
 using SensateService.Helpers;
-using SensateService.Infrastructure.Storage;
+using SensateService.Infrastructure.Authorization;
 
 namespace SensateService.MqttHandler.Mqtt
 {
 	public class MqttBulkMeasurementHandler : Middleware.MqttHandler
 	{
-		private readonly IMeasurementCache store;
-		private readonly ILogger<MqttMeasurementHandler> logger;
+		private readonly IMeasurementAuthorizationProxyCache m_proxy;
+		private readonly ILogger<MqttBulkMeasurementHandler> logger;
 
-		public MqttBulkMeasurementHandler(IMeasurementCache store, ILogger<MqttMeasurementHandler> logger)
+		public MqttBulkMeasurementHandler(IMeasurementAuthorizationProxyCache store, ILogger<MqttBulkMeasurementHandler> logger)
 		{
-			this.store = store;
+			this.m_proxy = store;
 			this.logger = logger;
 		}
 
@@ -36,18 +31,16 @@ namespace SensateService.MqttHandler.Mqtt
 			Task.Run(async () => { await this.OnMessageAsync(topic, msg).AwaitBackground(); }).Wait();
 		}
 
-		public override async Task OnMessageAsync(string topic, string message)
+		public override Task OnMessageAsync(string topic, string message)
 		{
-			IList<string> raw;
-
 			try {
-				var array = JArray.Parse(message);
-				raw = array.Select(entry => entry.ToString(Formatting.None)).ToList();
-				await this.store.StoreRangeAsync(raw, RequestMethod.WebSocket).AwaitBackground();
+				this.m_proxy.AddMessages(message);
 			} catch(Exception ex) {
 				this.logger.LogInformation($"Error: {ex.Message}");
 				this.logger.LogInformation($"Received a buggy MQTT message: {message}");
 			}
+
+			return Task.CompletedTask;
 		}
 	}
 }

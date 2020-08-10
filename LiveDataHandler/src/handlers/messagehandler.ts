@@ -10,7 +10,7 @@ import { WebSocketServer } from "../app/websocketserver";
 import { MeasurementInfo, BulkMeasurementInfo } from "../models/measurement";
 import { toCamelCase } from "../app/util";
 
-export class MessageHandler implements IMessageHandler {
+export class MeasurementHandler implements IMessageHandler {
     public constructor(private readonly wss: WebSocketServer, private readonly topic: string) {
     }
 
@@ -18,12 +18,11 @@ export class MessageHandler implements IMessageHandler {
         const measurement: MeasurementInfo = JSON.parse(msg, toCamelCase);
         const bulk = new BulkMeasurementInfo();
 
-
         if (measurement == null) {
             return;
         }
 
-        bulk.createdBy = measurement.createdBy;
+        bulk.sensorId = measurement.sensorId;
         bulk.measurements = [measurement.measurement];
 
         this.wss.process(bulk);

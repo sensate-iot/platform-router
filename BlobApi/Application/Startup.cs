@@ -64,19 +64,12 @@ namespace SensateService.BlobApi.Application
 			services.AddReverseProxy(sys);
 
 			services.Configure<BlobStorageSettings>(settings => {
-				switch(storage.StorageType) {
-				default:
-					settings.StorageType = StorageType.FileSystem;
-					break;
-
-				case "DigitalOceanSpaces":
-					settings.StorageType = StorageType.DigitalOceanSpaces;
-					break;
-
-				case "FTP":
-					settings.StorageType = StorageType.FTP;
-					break;
-				}
+				settings.StorageType = storage.StorageType switch
+				{
+					"DigitalOceanSpaces" => StorageType.DigitalOceanSpaces,
+					"FTP" => StorageType.FTP,
+					_ => StorageType.FileSystem
+				};
 
 				settings.StoragePath = storage.Path;
 			});
@@ -96,8 +89,6 @@ namespace SensateService.BlobApi.Application
 				options.Username = privatemqtt.Username;
 				options.Password = privatemqtt.Password;
 				options.Id = Guid.NewGuid().ToString();
-				options.InternalBulkMeasurementTopic = privatemqtt.InternalBulkMeasurementTopic;
-				options.InternalMeasurementTopic = privatemqtt.InternalMeasurementTopic;
 				options.InternalBlobTopic = privatemqtt.InternalBlobTopic;
 			});
 

@@ -10,21 +10,23 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver.GeoJsonObjectModel;
 
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Models;
+using SensateService.Protobuf;
 using SensateService.TriggerHandler.Models;
 using SensateService.TriggerHandler.Services;
 using SensateService.TriggerHandler.Utils;
 
 using Convert = System.Convert;
-using JsonConvert = Newtonsoft.Json.JsonConvert;
+using DataPoint = SensateService.Models.DataPoint;
+using Measurement = SensateService.Models.Measurement;
 
 namespace SensateService.TriggerHandler.Mqtt
 {
@@ -48,39 +50,42 @@ namespace SensateService.TriggerHandler.Mqtt
 			Task.Run(async () => { await this.OnMessageAsync(topic, msg).AwaitBackground(); }).Wait();
 		}
 
-		public static string Decompress(string data)
+		private static IEnumerable<InternalBulkMeasurements> Decompress(string data)
 		{
-			var decoded = Convert.FromBase64String(data);
-			MemoryStream msi, mso;
-			GZipStream gs;
-			string rv;
+			var bytes = Convert.FromBase64String(data);
+			using var to = new MemoryStream();
+			using var from = new MemoryStream(bytes);
+			using var gzip = new GZipStream(@from, CompressionMode.Decompress);
 
-			msi = mso = null;
+			gzip.CopyTo(to);
+			var final = to.ToArray();
+			var protoMeasurements = MeasurementData.Parser.ParseFrom(final);
+			var measurements =
+				from measurement in protoMeasurements.Measurements
+				group measurement by measurement.SensorId into g
+				select new InternalBulkMeasurements {
+					CreatedBy = g.Key,
+					Measurements = g.Select(m => new Measurement {
+						Data = m.Datapoints.ToDictionary(p => p.Key, p => new DataPoint {
+							Accuracy = p.Accuracy,
+							Precision = p.Precision,
+							Unit = p.Unit,
+							Value = Convert.ToDecimal(p.Value),
+						}),
+						Location = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(new GeoJson2DGeographicCoordinates(m.Longitude, m.Latitude)),
+						PlatformTime = DateTime.Parse(m.PlatformTime),
+						Timestamp = DateTime.Parse(m.Timestamp)
+					}).ToList()
+				};
 
-			try {
-				msi = new MemoryStream(decoded);
-				mso = new MemoryStream();
-
-				gs = new GZipStream(msi, CompressionMode.Decompress);
-				gs.CopyTo(mso);
-				gs.Dispose();
-
-				rv = Encoding.UTF8.GetString(mso.ToArray());
-			} finally {
-				mso?.Dispose();
-				msi?.Dispose();
-			}
-
-			return rv;
+			return measurements;
 		}
 
 		public override async Task OnMessageAsync(string topic, string message)
 		{
 			this.logger.LogDebug("Message received!");
 
-			var data = Decompress(message);
-			var measurements = JsonConvert.DeserializeObject<IList<InternalBulkMeasurements>>(data);
-
+			var measurements = Decompress(message).ToList();
 			using var scope = this.m_provider.CreateScope();
 			var triggersdb = scope.ServiceProvider.GetRequiredService<ITriggerRepository>();
 

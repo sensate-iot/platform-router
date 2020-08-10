@@ -19,7 +19,6 @@ using Microsoft.OpenApi.Models;
 using SensateService.ApiCore.Init;
 using SensateService.ApiCore.Middleware;
 using SensateService.Config;
-using SensateService.DataApi.Services;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
 
@@ -42,23 +41,19 @@ namespace SensateService.DataApi.Application
 			var cache = new CacheConfig();
 			var db = new DatabaseConfig();
 			var auth = new AuthenticationConfig();
-			var mqtt = new MqttConfig();
 			var sys = new SystemConfig();
 
 			this._configuration.GetSection("System").Bind(sys);
-			this._configuration.GetSection("Mqtt").Bind(mqtt);
 			this._configuration.GetSection("Authentication").Bind(auth);
 			this._configuration.GetSection("Cache").Bind(cache);
 			this._configuration.GetSection("Database").Bind(db);
 
-			var privatemqtt = mqtt.InternalBroker;
-
 			services.AddCors();
-
 			services.AddPostgres(db.PgSQL.ConnectionString);
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.AddIdentityFramwork(auth);
 			services.AddReverseProxy(sys);
+			services.AddAuthorizationProxy(sys);
 
 			if(cache.Enabled) {
 				services.AddCacheStrategy(cache, db);
@@ -67,23 +62,7 @@ namespace SensateService.DataApi.Application
 			/* Add repositories */
 			services.AddSqlRepositories(cache.Enabled);
 			services.AddDocumentRepositories(cache.Enabled);
-			services.AddMeasurementStorage(cache);
 			services.AddSensorServices();
-			services.AddHashAlgorihms();
-
-			services.AddInternalMqttService(options => {
-				options.Ssl = privatemqtt.Ssl;
-				options.Host = privatemqtt.Host;
-				options.Port = privatemqtt.Port;
-				options.Username = privatemqtt.Username;
-				options.Password = privatemqtt.Password;
-				options.Id = Guid.NewGuid().ToString();
-				options.InternalBulkMeasurementTopic = privatemqtt.InternalBulkMeasurementTopic;
-				options.InternalMeasurementTopic = privatemqtt.InternalMeasurementTopic;
-				options.InternalMessageTopic = privatemqtt.InternalMessageTopic;
-			});
-
-			services.AddHostedService<MqttPublishHandler>();
 
 			services.AddSwaggerGen(c => {
 				c.SwaggerDoc("v1", new OpenApiInfo {
@@ -132,12 +111,6 @@ namespace SensateService.DataApi.Application
 		// ReSharper disable once UnusedMember.Global
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider sp)
 		{
-			var auth = new AuthenticationConfig();
-			var cache = new CacheConfig();
-
-			this._configuration.GetSection("Authentication").Bind(auth);
-			this._configuration.GetSection("Cache").Bind(cache);
-
 			app.UseForwardedHeaders();
 			app.UseRouting();
 

@@ -4,13 +4,13 @@
 
 const program = require('commander');
 const mqtt = require('../lib/mqtt');
+const generate = require('../lib/create-sensors');
 const websocket = require('../lib/websocket');
 const settings = require('../lib/settings-parser');
 
-main();
-
-function main() {
+async function main() {
 	program.version('0.1.0', '-v, --version')
+		.option('-g, --generate', 'generate Sensate IoT sensors', false)
 		.option('-m, --mqtt', 'run the MQTT client')
 		.option('-M, --messages', 'generate message\'s')
 		.option('-w, --websocket', 'run the websocket client')
@@ -23,6 +23,9 @@ function main() {
 		.option('-b --bulk <max>', 'min amount', undefined)
 		.option('-a, --allsensors', 'send measurements from multiple sensors', false)
 		.option('-I, --interval <interval>', 'set the update interval', '1000')
+        .option('-S, --sensors <path>', 'sensor data path', undefined)
+        .option('-k, --key <key>', 'sensor generation API key', undefined)
+        .option('-C, --count <key>', 'number of sensors to generate', 10)
 		.option('-c, --config <config>', 'set configuration file', undefined);
 
 	program.parse(process.argv);
@@ -32,6 +35,7 @@ function main() {
 	}
 
 	const args = {
+		generate: program.generate,
 		username: program.user,
 		password: program.pw,
 		secret: program.secret,
@@ -43,7 +47,8 @@ function main() {
 		raw_config: program.config,
 		config: settings.parse(program.config),
 		allsensors: program.allsensors,
-		messages: program.messages
+		messages: program.messages,
+		sensorPath: `${process.cwd()}/${program.sensors}`
 	}
 
 	if(args.config != undefined) {
@@ -55,8 +60,20 @@ function main() {
 		args.websocket = args.config.webSocket;
 	}
 
-	if(program.mqtt)
+	if(program.generate) {
+        if (program.key == null) {
+            console.log("Please supply a key using -k <key>");
+            program.help();
+        }
+
+		await generate.generateSensors(+program.count, program.key);
+	} else if(program.mqtt) {
 		mqtt.run(args);
-	else
+	} else {
 		websocket.run(args);
+	}
 }
+
+main().catch(error => {
+    console.log("Unable run sensate-sensor");
+});

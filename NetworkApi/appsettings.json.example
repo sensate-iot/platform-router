@@ -3,14 +3,14 @@
     "IncludeScopes": false,
     "Debug": {
       "LogLevel": {
-        "Default": "Warning",
+        "Default": "Debug",
         "Microsoft": "Warning",
         "System": "Warning"
       }
     },
     "Console": {
       "LogLevel": {
-        "Default": "Warning",
+        "Default": "Debug",
         "Microsoft": "Warning",
         "System": "Warning"
       }
@@ -22,17 +22,26 @@
     "InstanceName": "kerby"
   },
 
-  "Cache" : {
+  "Authentication": {
+    "PublicUrl": "login.dev.sensateiot.com/confirm",
+    "UpdateEmailUrl": "dev.sensateiot.com:4200/apps/dashboard/confirm-update-email",
+    "Scheme": "http",
+    "JwtRefreshExpireMinutes": 43200,
+    "JwtKey": "",
+    "JwtIssuer": "api.dev.sensateiot.com:5000/auth",
+    "JwtExpireMinutes": 43200,
+    "PrimaryAuthHost": false 
+  },
+
+  "Cache": {
     "Enabled": true,
-    "Type": "Distributed",
-    "Workers": 4,
-    "Interval": 1000
+    "Type": "Distributed"
   },
 
   "Database": {
     "MongoDB": {
       "DatabaseName": "Sensate",
-      "ConnectionString": "mongodb://sensate:mongopass@127.0.0.1:27017/Sensate",
+      "ConnectionString": "mongodb://127.0.0.1:27017/Sensate",
       "MaxConnections": 300
     },
     "PgSQL": {
@@ -44,27 +53,13 @@
     }
   },
 
-  "PublicUrl": "http://localhost:5000", 
-
-  "Authentication" : {
-    "JwtRefreshExpireMinutes": 43200,
-    "JwtKey": "<key>",
-    "JwtIssuer": "http://localhost:5000/",
-    "JwtExpireMinutes": 43200,
-    "PrimaryAuthHost": false,
-	  "Scheme": "https"
-  },
-
   "Mqtt": {
     "PublicBroker": {
       "Username": "",
       "Password": "",
       "Ssl": "false",
       "Port": 1883,
-      "Host": "",
-      "RealTimeShareTopic": "sensate/measurements/rt",
-      "ShareTopic": "sensate/measurements",
-      "BulkShareTopic": "sensate/measurements/bulk",
+      "Host": "127.0.0.1",
       "ActuatorTopic": "sensate/actuator/$sensorId"
     },
     "InternalBroker": {
@@ -72,9 +67,9 @@
       "Password": "",
       "Ssl": "false",
       "Port": 1883,
-      "Host": "",
-      "InternalMeasurementTopic": "sensate/internal/measurements",
-      "InternalBulkMeasurementTopic": "sensate/internal/measurements/bulk"
+      "Host": "127.0.0.1",
+      "InternalCommandsTopic": "sensate-auth/internal/commands" 
     } 
   }
 }
+

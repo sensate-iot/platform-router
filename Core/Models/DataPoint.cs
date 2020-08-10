@@ -22,7 +22,7 @@ namespace SensateService.Models
 		[BsonRequired]
 		public decimal Value { get; set; }
 		[BsonIgnoreIfNull]
-		public decimal? Precision { get; set; }
+		public double? Precision { get; set; }
 		[BsonIgnoreIfNull]
 		public double? Accuracy { get; set; }
 

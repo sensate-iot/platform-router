@@ -1,0 +1,54 @@
+﻿{
+  "Logging": {
+    "IncludeScopes": false,
+    "Debug": {
+      "LogLevel": {
+        "Default": "Warning",
+        "Microsoft": "Warning",
+        "System": "Warning"
+      }
+    },
+    "Console": {
+      "LogLevel": {
+        "Default": "Warning",
+        "Microsoft": "Warning",
+        "System": "Warning"
+      }
+    }
+  },
+
+  "Cache": {
+    "Enabled": true,
+    "Interval": 1000,
+    "Type": "Distributed"
+  },
+
+  "Database" : {
+    "MongoDB" : {
+      "DatabaseName": "Sensate",
+      "ConnectionString": "mongodb://localhost:27017/Sensate",
+      "MaxConnections": 300
+    },
+    "PgSQL" : {
+      "ConnectionString": "User ID = Username;Password=SomePassword;Server=localhost;Port=5432;Database=Sensate"
+    },
+    "Redis" : {
+      "Host": "localhost",
+      "InstanceName": "Sensate"
+    }
+  },
+
+  "Mqtt": {
+    "InternalBroker": {
+      "Username": "",
+      "Password": "",
+      "Ssl": "false",
+      "Port": 1883,
+      "Host": "",
+      "AuthorizedBulkMeasurementTopic": "$share/sensate-storage/sensate-auth/internal/measurements/bulk",
+      "AuthorizedBulkMessageTopic": "$share/sensate-storage/sensate-auth/internal/messages/bulk",
+      "InternalBulkMeasurementTopic": "sensate/internal/measurements/bulk",
+      "InternalBulkMessageTopic": "sensate/internal/messages/bulk"
+    } 
+  }
+}

@@ -3,14 +3,14 @@
     "IncludeScopes": false,
     "Debug": {
       "LogLevel": {
-        "Default": "Warning",
+        "Default": "Debug",
         "Microsoft": "Warning",
         "System": "Warning"
       }
     },
     "Console": {
       "LogLevel": {
-        "Default": "Warning",
+        "Default": "Debug",
         "Microsoft": "Warning",
         "System": "Warning"
       }
@@ -19,62 +19,39 @@
 
   "System": {
     "ProxyLevel": 1,
-    "InstanceName": "kerby"
+    "MeasurementAuthProxyUrl": "http://127.0.0.1:8080/v1/processor/measurements",
+    "MessageAuthProxyUrl": "http://127.0.0.1:8080/v1/processor/messages"
   },
 
-  "Cache" : {
+  "Authentication": {
+    "PublicUrl": "login.dev.sensateiot.com/confirm",
+    "UpdateEmailUrl": "dev.sensateiot.com:4200/apps/dashboard/confirm-update-email",
+    "Scheme": "http",
+    "JwtRefreshExpireMinutes": 43200,
+    "JwtKey": "",
+    "JwtIssuer": "api.dev.sensateiot.com:5000/auth",
+    "JwtExpireMinutes": 43200,
+    "PrimaryAuthHost": false
+  },
+
+  "Cache": {
     "Enabled": true,
-    "Type": "Distributed",
-    "Workers": 4,
-    "Interval": 1000
+    "Interval": 1000, 
+    "Type": "Distributed"
   },
 
   "Database": {
     "MongoDB": {
       "DatabaseName": "Sensate",
-      "ConnectionString": "mongodb://sensate:mongopass@192.168.127.128:27017/Sensate",
-      "MaxConnections": 300
+      "ConnectionString": "mongodb://127.0.0.1:27017/Sensate",
+      "MaxConnections": 1000
     },
     "PgSQL": {
-      "ConnectionString": "User ID = postgres;Password=DefaultPassword;Server=192.168.127.128;Port=5432;Database=Sensate"
+      "ConnectionString": "User ID = postgres;Password=postgres;Server=127.0.0.1;Port=5432;Database=Sensate"
     },
     "Redis": {
-      "Host": "192.168.127.128",
+      "Host": "127.0.0.1",
       "InstanceName": "Sensate"
     }
-  },
-
-  "PublicUrl": "http://localhost:5000", 
-
-  "Authentication" : {
-    "JwtRefreshExpireMinutes": 43200,
-    "JwtKey": "<key>",
-    "JwtIssuer": "http://localhost:5000/",
-    "JwtExpireMinutes": 43200,
-    "PrimaryAuthHost": false ,
-	  "Scheme": "https"
-  },
-
-  "Mqtt": {
-    "PublicBroker": {
-      "Username": "",
-      "Password": "",
-      "Ssl": "false",
-      "Port": 1883,
-      "Host": "",
-      "RealTimeShareTopic": "sensate/measurements/rt",
-      "ShareTopic": "sensate/measurements",
-      "BulkShareTopic": "sensate/measurements/bulk"
-    },
-    "InternalBroker": {
-      "Username": "",
-      "Password": "",
-      "Ssl": "false",
-      "Port": 1883,
-      "Host": "",
-      "InternalMeasurementTopic": "sensate/internal/measurements",
-      "InternalBulkMeasurementTopic": "sensate/internal/measurements/bulk",
-      "InternalMessageTopic": "sensate/internal/messages" 
-    } 
   }
 }

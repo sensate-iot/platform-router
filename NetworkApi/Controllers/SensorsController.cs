@@ -37,6 +37,7 @@ namespace SensateService.NetworkApi.Controllers
 		private readonly ILogger<SensorsController> m_logger;
 		private readonly IUserRepository m_users;
 		private readonly ISensorService m_sensorService;
+		private readonly ICommandPublisher m_publish;
 
 		public SensorsController(IHttpContextAccessor ctx,
 								 ISensorRepository sensors,
@@ -44,10 +45,12 @@ namespace SensateService.NetworkApi.Controllers
 								 IUserRepository users,
 								 ISensorLinkRepository links,
 								 ISensorService sensorService,
+								 ICommandPublisher commands,
 								 IApiKeyRepository keys) : base(ctx, sensors, links, keys)
 		{
 			this.m_logger = logger;
 			this.m_users = users;
+			this.m_publish = commands;
 			this.m_sensorService = sensorService;
 		}
 
@@ -104,6 +107,7 @@ namespace SensateService.NetworkApi.Controllers
 			try {
 				await this.m_keys.CreateSensorKey(new SensateApiKey(), sensor).AwaitBackground();
 				await this.m_sensors.CreateAsync(sensor).AwaitBackground();
+				await this.m_publish.PublishCommand(AuthServiceCommand.FlushSensor, sensor.InternalId.ToString()).AwaitBackground();
 			} catch(Exception ex) {
 				this.m_logger.LogInformation($"Unable to create sensor: {ex.Message}");
 
@@ -322,10 +326,7 @@ namespace SensateService.NetworkApi.Controllers
 		{
 			Sensor sensor;
 
-			if(update == null) {
-				update = new SensorUpdate();
-			}
-
+			update ??= new SensorUpdate();
 			if(!ObjectId.TryParse(id, out _)) {
 				return this.UnprocessableEntity(new Status {
 					Message = "Unable to parse ID",
@@ -354,6 +355,7 @@ namespace SensateService.NetworkApi.Controllers
 					});
 				}
 
+				var oldSecret = sensor.Secret;
 				sensor.Secret = string.IsNullOrEmpty(update.Secret) ? this.m_keys.GenerateApiKey() : update.Secret;
 
 				if(!string.IsNullOrEmpty(update.Name)) {
@@ -369,6 +371,12 @@ namespace SensateService.NetworkApi.Controllers
 					this.m_sensors.UpdateSecretAsync(sensor, old)
 					).AwaitBackground();
 				await this.m_sensors.UpdateAsync(sensor).AwaitBackground();
+
+				await Task.WhenAll(
+					this.m_publish.PublishCommand(AuthServiceCommand.FlushSensor, sensor.InternalId.ToString()),
+					this.m_publish.PublishCommand(AuthServiceCommand.FlushKey, sensor.Secret),
+					this.m_publish.PublishCommand(AuthServiceCommand.FlushKey, oldSecret)
+				).AwaitBackground();
 			} catch(Exception ex) {
 				this.m_logger.LogInformation($"Unable to update sensor: {ex.Message}");
 
@@ -401,6 +409,10 @@ namespace SensateService.NetworkApi.Controllers
 				}
 
 				await this.m_sensorService.DeleteAsync(sensor, CancellationToken.None).AwaitBackground();
+				await Task.WhenAll(
+					this.m_publish.PublishCommand(AuthServiceCommand.FlushSensor, sensor.InternalId.ToString()),
+					this.m_publish.PublishCommand(AuthServiceCommand.FlushKey, sensor.Secret)
+				).AwaitBackground();
 			} catch(Exception ex) {
 				this.m_logger.LogInformation($"Unable to remove sensor: {ex.Message}");
 				this.m_logger.LogDebug(ex.StackTrace);

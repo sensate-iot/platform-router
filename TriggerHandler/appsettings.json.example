@@ -3,14 +3,14 @@
     "IncludeScopes": false,
     "Debug": {
       "LogLevel": {
-        "Default": "Warning",
+        "Default": "Debug",
         "Microsoft": "Warning",
         "System": "Warning"
       }
     },
     "Console": {
       "LogLevel": {
-        "Default": "Warning",
+        "Default": "Debug",
         "Microsoft": "Warning",
         "System": "Warning"
       }
@@ -41,13 +41,14 @@
   },
 
   "Authentication": {
-    "PublicUrl": "localhost:5000",
-    "Scheme":  "http", 
+    "PublicUrl": "login.dev.sensateiot.com/confirm",
+    "UpdateEmailUrl": "dev.sensateiot.com:4200/apps/dashboard/confirm-update-email",
+    "Scheme": "http",
     "JwtRefreshExpireMinutes": 43200,
     "JwtKey": "",
-    "JwtIssuer": "http://localhost:5000/",
-    "PrimaryAuthHost": false,
-    "JwtExpireMinutes": 43200
+    "JwtIssuer": "api.dev.sensateiot.com:5000/auth",
+    "JwtExpireMinutes": 43200,
+    "PrimaryAuthHost": false 
   },
 
   "Timeouts": {
@@ -64,9 +65,6 @@
       "Ssl": "false",
       "Port": 1883,
       "Host": "",
-      "RealTimeShareTopic": "sensate/measurements/rt",
-      "ShareTopic": "sensate/measurements",
-      "BulkShareTopic": "sensate/measurements/bulk",
       "ActuatorTopic": "sensate/actuator/$sensorId"
     },
     "InternalBroker": {
@@ -75,9 +73,8 @@
       "Ssl": "false",
       "Port": 1883,
       "Host": "",
-      "InternalMeasurementTopic": "sensate/internal/measurements",
-      "InternalBulkMeasurementTopic": "sensate/internal/measurements/bulk",
-      "InternalMessageTopic": "sensate/internal/messages" 
+      "AuthorizedBulkMeasurementTopic": "$share/trigger-service/sensate-auth/internal/measurements/bulk",
+      "AuthorizedBulkMessageTopic": "$share/trigger-service/sensate-auth/internal/messages/bulk"
     }
   },
 

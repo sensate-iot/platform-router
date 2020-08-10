@@ -104,7 +104,7 @@ namespace SensateService.TriggerHandler.Services
 			case TriggerActionChannel.HttpPost:
 			case TriggerActionChannel.HttpGet:
 				var result = Uri.TryCreate(action.Target, UriKind.Absolute, out var output) &&
-							  output.Scheme == Uri.UriSchemeHttp || output.Scheme == Uri.UriSchemeHttps;
+							  output.Scheme == Uri.UriSchemeHttp || output?.Scheme == Uri.UriSchemeHttps;
 
 				if(!result) {
 					break;

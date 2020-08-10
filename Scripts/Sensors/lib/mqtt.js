@@ -8,20 +8,21 @@
 'use strict';
 
 var mqtt = require('mqtt');
+const fs = require('fs');
 var NanoTimer = require('nanotimer');
 const generate = require('./generate');
 
-function publish(client, args) {
-	const measurement = generate.generateMeasurement(args, args);
+function publish(client, sensors) {
+	const measurement = generate.generateMeasurement(sensors);
 	client.publish('sensate/measurements', JSON.stringify(measurement));
 }
 
-function publishBulk(client, args) {
+function publishBulk(client, args, sensors) {
 	let ary = [];
 	const max = getRandNumber(args.bulk, args.bulk + 20);
 
 	for(let idx = 0; idx < max; idx++) {
-		ary.push(generateMeasurement(args, args));
+		ary.push(generateMeasurement(sensors));
 	}
 
 	client.publish('sensate/measurements/bulk', JSON.stringify(ary));
@@ -42,13 +43,17 @@ module.exports.run = function (args) {
 		opts.port = args.port;
 	}
 
+	const raw = fs.readFileSync(args.sensorPath, "utf8");
+	const sensors = JSON.parse(raw);
+
 	var client = mqtt.connect('mqtt://'+args.host, opts);
 	client.on('connect', () => {
 		console.log('Connected to MQTT broker!');
 	});
 
-	if(isNaN(args.bulk))
-		timer.setInterval(publish, [client, args], args.interval.toString() + 'u');
-	else
-		timer.setInterval(publishBulk, [client, args], args.interval.toString() + 'u')
+	if(isNaN(args.bulk)) {
+		timer.setInterval(publish, [client, sensors], args.interval.toString() + 'u');
+	} else {
+		timer.setInterval(publishBulk, [client, args, sensors], args.interval.toString() + 'u')
+	}
 }
