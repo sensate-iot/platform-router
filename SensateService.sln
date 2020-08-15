@@ -4,13 +4,13 @@ VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthApi", "AuthApi\AuthApi.csproj", "{C41C96C6-18AD-4801-8DFF-D3BE09522517}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{C9A2C1FE-9179-45B9-ABDE-3336DD80A60B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateService.Core", "SensateService.Common\SensateService.Core\SensateService.Core.csproj", "{C9A2C1FE-9179-45B9-ABDE-3336DD80A60B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StorageClient", "StorageClient\StorageClient.csproj", "{8D55A3E7-8E0E-4ABB-ADEA-FFD157E9D095}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlSetup", "SqlSetup\SqlSetup.csproj", "{AE713298-9C5F-483D-B4BE-D335BA63B0A2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiCore", "ApiCore\ApiCore.csproj", "{84CAF4A2-7719-492B-B947-21051C76635E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateService.ApiCore", "SensateService.Common\SensateService.ApiCore\SensateService.ApiCore.csproj", "{84CAF4A2-7719-492B-B947-21051C76635E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSocketHandler", "WebSocketHandler\WebSocketHandler.csproj", "{D68B15B0-B7AB-4A54-9925-3F9554DAA7A0}"
 EndProject
@@ -26,7 +26,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetworkApi", "NetworkApi\Ne
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlobApi", "BlobApi\BlobApi.csproj", "{6D192F06-FB6B-4B22-9637-6E56ED753556}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MqttHandler", "MqttHandler\MqttHandler.csproj", "{3ED9C802-AFE4-4145-A2C5-39F267A8D6CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MqttHandler", "MqttHandler\MqttHandler.csproj", "{3ED9C802-AFE4-4145-A2C5-39F267A8D6CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
