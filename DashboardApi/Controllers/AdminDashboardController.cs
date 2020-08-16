@@ -9,8 +9,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
 using SensateService.DashboardApi.Json;
@@ -108,7 +110,7 @@ namespace SensateService.DashboardApi.Controllers
 			var lastweek = now.AddDays((DaysPerWeek - 1) * -1).ToUniversalTime().Date;
 			var registrations = await this._users.CountByDay(lastweek).AwaitBackground();
 
-			for(int idx = 0; idx < DaysPerWeek; idx++) {
+			for(var idx = 0; idx < DaysPerWeek; idx++) {
 				var entry = registrations.ElementAtOrDefault(0);
 
 				if(entry == null || entry.Item1 > lastweek) {

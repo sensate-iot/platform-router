@@ -13,10 +13,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
+using SensateService.Common.IdentityData.Models;
 using SensateService.Config;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
-using SensateService.Models;
 using SensateService.Services;
 using SensateService.Services.Adapters;
 using SensateService.Services.Settings;

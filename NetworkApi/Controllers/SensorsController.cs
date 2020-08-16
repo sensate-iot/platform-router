@@ -20,10 +20,11 @@ using MongoDB.Bson;
 
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
-using SensateService.Enums;
+using SensateService.Common.Data.Enums;
+using SensateService.Common.Data.Models;
+using SensateService.Common.IdentityData.Models;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
-using SensateService.Models;
 using SensateService.Models.Json.Out;
 using SensateService.NetworkApi.Models;
 using SensateService.Services;

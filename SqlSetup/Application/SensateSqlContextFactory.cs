@@ -46,7 +46,7 @@ namespace SensateService.SqlSetup.Application
 				builder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
 
-			Configuration = builder.Build();
+			this.Configuration = builder.Build();
 		}
 	}
 }

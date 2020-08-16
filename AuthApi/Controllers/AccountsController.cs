@@ -19,15 +19,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
 using SensateService.AuthApi.Helpers;
 using SensateService.AuthApi.Json;
-using SensateService.Enums;
+using SensateService.Common.Data.Enums;
+using SensateService.Common.Data.Models;
+using SensateService.Common.IdentityData.Models;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
-using SensateService.Models;
 using SensateService.Models.Generic;
 using SensateService.Models.Json.In;
 using SensateService.Models.Json.Out;

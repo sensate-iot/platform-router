@@ -6,7 +6,7 @@
  */
 
 using System.Collections.Generic;
-using SensateService.Enums;
+using SensateService.Common.IdentityData.Enums;
 
 namespace SensateService.AuthApi.Json
 {

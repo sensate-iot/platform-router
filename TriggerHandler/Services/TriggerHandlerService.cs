@@ -12,9 +12,10 @@ using Microsoft.Extensions.Options;
 
 using MongoDB.Bson;
 
+using SensateService.Common.Data.Models;
+using SensateService.Common.IdentityData.Models;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
-using SensateService.Models;
 using SensateService.Models.Generic;
 using SensateService.Services;
 using SensateService.Services.Settings;

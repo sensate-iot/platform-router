@@ -12,6 +12,6 @@ namespace SensateService.DataApi.Json
 	public class StatisticsEntry
 	{
 		public string SensorId { get; set; }
-		public IEnumerable<SensateService.Models.SensorStatisticsEntry> Statistics { get; set; }
+		public IEnumerable<SensateService.Common.Data.Models.SensorStatisticsEntry> Statistics { get; set; }
 	}
 }

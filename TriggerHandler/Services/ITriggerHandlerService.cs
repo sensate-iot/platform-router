@@ -7,7 +7,8 @@
 
 using System.Threading.Tasks;
 
-using SensateService.Models;
+using SensateService.Common.Data.Models;
+using SensateService.Common.IdentityData.Models;
 
 namespace SensateService.TriggerHandler.Services
 {

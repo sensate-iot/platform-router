@@ -10,8 +10,8 @@ using System.Net;
 
 using Newtonsoft.Json;
 
+using SensateService.Common.Data.Enums;
 using SensateService.Converters;
-using SensateService.Enums;
 
 namespace SensateService.AuthApi.Json
 {

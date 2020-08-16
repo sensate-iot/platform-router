@@ -20,10 +20,10 @@ using Newtonsoft.Json;
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
 using SensateService.BlobApi.Models;
-using SensateService.Enums;
+using SensateService.Common.Data.Enums;
+using SensateService.Common.Data.Models;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
-using SensateService.Models;
 using SensateService.Models.Json.Out;
 using SensateService.Services;
 using SensateService.Services.Settings;
@@ -243,7 +243,7 @@ namespace SensateService.BlobApi.Controllers
 
 				var filePath = $"{blob.Path}{Path.DirectorySeparatorChar}{blob.FileName}";
 				var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-				file = File(stream, "application/octet-stream");
+				file = this.File(stream, "application/octet-stream");
 			} catch(Exception ex) {
 				this.m_logger.LogInformation($"Unable to fetch blob: {ex.Message}");
 				this.m_logger.LogDebug(ex.StackTrace);

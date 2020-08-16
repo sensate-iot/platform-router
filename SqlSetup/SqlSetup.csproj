@@ -40,6 +40,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Core\Sensate.Core.csproj" />
+    <ProjectReference Include="..\Common\SensateService.Common.Core\SensateService.Common.Core.csproj" />
   </ItemGroup>
 </Project>

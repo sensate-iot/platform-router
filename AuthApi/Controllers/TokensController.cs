@@ -17,11 +17,12 @@ using Microsoft.Extensions.Options;
 
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
-using SensateService.Enums;
+using SensateService.Common.Data.Enums;
+using SensateService.Common.IdentityData.Enums;
+using SensateService.Common.IdentityData.Models;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Infrastructure.Sql;
-using SensateService.Models;
 using SensateService.Models.Json.In;
 using SensateService.Models.Json.Out;
 using SensateService.Settings;

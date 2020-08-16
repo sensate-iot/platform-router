@@ -6,7 +6,8 @@
  */
 
 using System.Collections.Generic;
-using SensateService.Models;
+
+using SensateService.Common.Data.Models;
 
 namespace SensateService.TriggerHandler.Models
 {

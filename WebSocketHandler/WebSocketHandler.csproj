@@ -30,9 +30,4 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ApiCore\SensateService.ApiCore.csproj" />
-    <ProjectReference Include="..\Core\Sensate.Core.csproj" />
-  </ItemGroup>
-
 </Project>

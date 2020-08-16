@@ -14,19 +14,20 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+
 using MongoDB.Driver.GeoJsonObjectModel;
 
+using SensateService.Common.Data.Models;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
-using SensateService.Models;
 using SensateService.Protobuf;
 using SensateService.TriggerHandler.Models;
 using SensateService.TriggerHandler.Services;
 using SensateService.TriggerHandler.Utils;
 
 using Convert = System.Convert;
-using DataPoint = SensateService.Models.DataPoint;
-using Measurement = SensateService.Models.Measurement;
+using DataPoint = SensateService.Common.Data.Models.DataPoint;
+using Measurement = SensateService.Common.Data.Models.Measurement;
 
 namespace SensateService.TriggerHandler.Mqtt
 {

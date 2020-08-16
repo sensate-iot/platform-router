@@ -12,12 +12,15 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Logging;
+
 using MongoDB.Driver.GeoJsonObjectModel;
+
+using SensateService.Common.Data.Models;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Middleware;
-using SensateService.Models;
 using SensateService.Protobuf;
 using SensateService.TriggerHandler.Models;
 using SensateService.TriggerHandler.Services;

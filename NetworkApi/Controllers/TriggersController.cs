@@ -17,10 +17,10 @@ using MongoDB.Bson;
 
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
-using SensateService.Enums;
+using SensateService.Common.Data.Enums;
+using SensateService.Common.Data.Models;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
-using SensateService.Models;
 using SensateService.Models.Json.In;
 using SensateService.Models.Json.Out;
 
@@ -158,7 +158,7 @@ namespace SensateService.NetworkApi.Controllers
 				auth = await this.AuthenticateUserForSensor(actuator, false).AwaitBackground();
 			} else {
 				auth = Uri.TryCreate(action.Target, UriKind.Absolute, out var result) &&
-					   result.Scheme == Uri.UriSchemeHttp || result.Scheme == Uri.UriSchemeHttps;
+					   result.Scheme == Uri.UriSchemeHttp || result?.Scheme == Uri.UriSchemeHttps;
 			}
 
 			return auth;

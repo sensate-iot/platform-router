@@ -11,9 +11,6 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.7" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Core\Sensate.Core.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <RuntimeHostConfigurationOption Include="System.Globalization.Invariant" Value="true" />
 </ItemGroup>
   <ItemGroup>
@@ -31,6 +28,9 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\SensateService.Common.Core\SensateService.Common.Core.csproj" />
   </ItemGroup>
   <PropertyGroup>
     <OutputType>Exe</OutputType>

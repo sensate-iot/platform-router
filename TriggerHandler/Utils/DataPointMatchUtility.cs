@@ -5,7 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
-using SensateService.Models;
+using SensateService.Common.Data.Models;
 
 namespace SensateService.TriggerHandler.Utils
 {

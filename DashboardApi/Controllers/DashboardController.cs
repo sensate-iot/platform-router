@@ -15,11 +15,12 @@ using Microsoft.AspNetCore.Mvc;
 
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
+using SensateService.Common.Data.Enums;
+using SensateService.Common.Data.Models;
+using SensateService.Common.IdentityData.Models;
 using SensateService.DashboardApi.Json;
-using SensateService.Enums;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
-using SensateService.Models;
 using SensateService.Models.Json.Out;
 
 namespace SensateService.DashboardApi.Controllers
@@ -207,7 +208,7 @@ namespace SensateService.DashboardApi.Controllers
 				totals[entry.Date] = counter;
 			}
 
-			var sorted = (totals.Keys.AsEnumerable() ?? throw new InvalidOperationException()).OrderBy(value => value).ToArray();
+			var sorted = totals.Keys.AsEnumerable().OrderBy(value => value).ToArray();
 
 			if(sorted.Length <= 0) {
 				return graph;

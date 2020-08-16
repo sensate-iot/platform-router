@@ -37,7 +37,7 @@
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ApiCore\SensateService.ApiCore.csproj" />
-    <ProjectReference Include="..\Core\Sensate.Core.csproj" />
+    <ProjectReference Include="..\Common\SensateService.Common.ApiCore\SensateService.Common.ApiCore.csproj" />
+    <ProjectReference Include="..\Common\SensateService.Common.Core\SensateService.Common.Core.csproj" />
   </ItemGroup>
 </Project>

@@ -8,7 +8,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SensateService.Models;
+
+using SensateService.Common.Data.Models;
 
 namespace SensateService.TriggerHandler.Services
 {

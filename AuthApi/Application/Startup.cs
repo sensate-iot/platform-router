@@ -157,7 +157,7 @@ namespace SensateService.AuthApi.Application
 		}
 
 		// ReSharper disable once UnusedMember.Global
-		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider sp)
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
 			var auth = new AuthenticationConfig();
 			this._configuration.GetSection("Authentication").Bind(auth);
