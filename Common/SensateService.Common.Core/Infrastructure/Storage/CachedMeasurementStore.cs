@@ -20,8 +20,9 @@ using Microsoft.Extensions.Logging;
 
 using MongoDB.Bson;
 using MongoDB.Driver.GeoJsonObjectModel;
+
+using SensateService.Common.Data.Dto.Protobuf;
 using SensateService.Common.Data.Enums;
-using SensateService.Protobuf;
 using SensateService.Exceptions;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Events;

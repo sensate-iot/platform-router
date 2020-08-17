@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
+using SensateService.Common.Data.Dto.Generic;
 using SensateService.Middleware;
-using SensateService.Models.Generic;
 using SensateService.Services.Settings;
 
 namespace SensateService.Services.Adapters

@@ -9,7 +9,6 @@ using System;
 
 using System.Threading;
 using SensateService.Common.Data.Models;
-using SensateService.Models;
 
 namespace SensateService.Infrastructure.Events
 {

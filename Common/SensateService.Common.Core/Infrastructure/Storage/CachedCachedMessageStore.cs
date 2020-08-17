@@ -24,8 +24,7 @@ using SensateService.Exceptions;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Events;
 using SensateService.Infrastructure.Repositories;
-using SensateService.Models;
-using MessageData = SensateService.Protobuf.TextMessageData;
+using MessageData = SensateService.Common.Data.Dto.Protobuf.TextMessageData;
 
 namespace SensateService.Infrastructure.Storage
 {

@@ -10,10 +10,11 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+
 using MongoDB.Bson;
+
 using SensateService.Common.Data.Enums;
 using SensateService.Common.Data.Models;
-using SensateService.Models;
 
 namespace SensateService.Infrastructure.Repositories
 {

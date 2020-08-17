@@ -6,8 +6,7 @@
  */
 
 using System;
-
-using SensateService.Models.Json.Out;
+using SensateService.Common.Data.Dto.Json.Out;
 
 namespace SensateService.AuthApi.Json
 {

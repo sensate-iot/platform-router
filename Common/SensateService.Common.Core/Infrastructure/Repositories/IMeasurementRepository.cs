@@ -12,10 +12,10 @@ using System.Threading;
 
 using MongoDB.Bson;
 using MongoDB.Driver.GeoJsonObjectModel;
+
+using SensateService.Common.Data.Dto.Generic;
 using SensateService.Common.Data.Enums;
 using SensateService.Common.Data.Models;
-using SensateService.Models;
-using SensateService.Models.Generic;
 
 namespace SensateService.Infrastructure.Repositories
 {

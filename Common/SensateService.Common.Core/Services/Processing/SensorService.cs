@@ -8,12 +8,11 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
+using SensateService.Common.Data.Dto.Json.Out;
 using SensateService.Common.Data.Models;
 using SensateService.Common.IdentityData.Models;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
-using SensateService.Models.Json.Out;
 
 namespace SensateService.Services.Processing
 {

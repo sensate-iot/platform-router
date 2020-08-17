@@ -14,10 +14,10 @@ using System.Threading;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SensateService.Common.Data.Dto.Json.Out;
 using SensateService.Common.IdentityData.Models;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
-using SensateService.Models.Json.Out;
 using UserRoles = SensateService.Constants.UserRoles;
 
 namespace SensateService.Infrastructure.Sql

@@ -15,12 +15,11 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 using MongoDB.Driver.GeoJsonObjectModel;
+using SensateService.Common.Data.Dto.Generic;
 using SensateService.Common.Data.Enums;
 using SensateService.Common.Data.Models;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Cache;
-using SensateService.Models;
-using SensateService.Models.Generic;
 using SensateService.Services;
 
 namespace SensateService.Infrastructure.Document

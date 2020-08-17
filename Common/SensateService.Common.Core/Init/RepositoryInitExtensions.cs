@@ -8,8 +8,8 @@
 using System;
 
 using Microsoft.Extensions.DependencyInjection;
-
 using MongoDB.Bson.Serialization;
+
 using SensateService.Common.Data.Models;
 using SensateService.Config;
 using SensateService.Converters;
@@ -18,7 +18,6 @@ using SensateService.Infrastructure.Cache;
 using SensateService.Infrastructure.Document;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Infrastructure.Sql;
-using SensateService.Models;
 using SensateService.Services;
 using SensateService.Services.Processing;
 

@@ -12,7 +12,6 @@ using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Bson.Serialization;
 
-using SensateService.Models;
 using SensateService.Helpers;
 using SensateService.Exceptions;
 using System.Collections.Generic;

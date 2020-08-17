@@ -9,10 +9,9 @@ using System.Linq;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-
+using SensateService.Common.Data.Dto.Json.Out;
 using SensateService.Common.Data.Enums;
 using SensateService.Common.IdentityData.Models;
-using SensateService.Models.Json.Out;
 using UserRoles = SensateService.Constants.UserRoles;
 
 namespace SensateService.ApiCore.Attributes

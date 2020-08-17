@@ -7,9 +7,9 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+
 using SensateService.Common.Data.Models;
 using SensateService.Common.IdentityData.Models;
-using SensateService.Models;
 
 namespace SensateService.Infrastructure.Repositories
 {

@@ -17,12 +17,11 @@ using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-
+using SensateService.Common.Data.Dto.Json.Out;
 using SensateService.Common.Data.Enums;
 using SensateService.Common.IdentityData.Models;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
-using SensateService.Models.Json.Out;
 
 namespace SensateService.ApiCore.Middleware
 {

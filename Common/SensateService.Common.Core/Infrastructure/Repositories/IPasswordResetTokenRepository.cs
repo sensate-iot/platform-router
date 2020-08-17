@@ -5,9 +5,7 @@
  * @email  michel.megens@sonatolabs.com
  */
 
-using System.Threading.Tasks;
 using SensateService.Common.Data.Models;
-using SensateService.Models;
 
 namespace SensateService.Infrastructure.Repositories
 {

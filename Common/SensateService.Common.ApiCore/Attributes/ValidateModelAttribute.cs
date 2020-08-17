@@ -8,10 +8,9 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-
+using SensateService.Common.Data.Dto.Json.Out;
 using SensateService.Common.Data.Enums;
 using SensateService.Constants;
-using SensateService.Models.Json.Out;
 
 namespace SensateService.ApiCore.Attributes
 {

@@ -9,8 +9,8 @@ using System;
 
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+
 using SensateService.Common.Data.Models;
-using SensateService.Models;
 
 namespace SensateService.Infrastructure.Document
 {

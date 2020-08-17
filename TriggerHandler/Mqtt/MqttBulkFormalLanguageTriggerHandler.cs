@@ -17,11 +17,11 @@ using Microsoft.Extensions.Logging;
 
 using MongoDB.Driver.GeoJsonObjectModel;
 
+using SensateService.Common.Data.Dto.Protobuf;
 using SensateService.Common.Data.Models;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Middleware;
-using SensateService.Protobuf;
 using SensateService.TriggerHandler.Models;
 using SensateService.TriggerHandler.Services;
 using Message = SensateService.TriggerHandler.Models.Message;

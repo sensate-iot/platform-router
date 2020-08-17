@@ -22,6 +22,8 @@ using Newtonsoft.Json;
 
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
+using SensateService.Common.Data.Dto.Generic;
+using SensateService.Common.Data.Dto.Json.Out;
 using SensateService.Common.Data.Enums;
 using SensateService.Common.Data.Models;
 using SensateService.Common.IdentityData.Models;
@@ -29,8 +31,6 @@ using SensateService.DataApi.Dto;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Authorization;
 using SensateService.Infrastructure.Repositories;
-using SensateService.Models.Generic;
-using SensateService.Models.Json.Out;
 using SensateService.Services;
 
 namespace SensateService.DataApi.Controllers

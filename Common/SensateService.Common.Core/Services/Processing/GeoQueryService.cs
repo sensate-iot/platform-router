@@ -12,8 +12,8 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using MongoDB.Driver.GeoJsonObjectModel;
+using SensateService.Common.Data.Dto.Generic;
 using SensateService.Common.Data.Enums;
-using SensateService.Models.Generic;
 
 namespace SensateService.Services.Processing
 {

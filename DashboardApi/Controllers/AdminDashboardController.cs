@@ -15,10 +15,10 @@ using Microsoft.AspNetCore.Mvc;
 
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
+using SensateService.Common.Data.Dto.Json.Out;
 using SensateService.DashboardApi.Json;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
-using SensateService.Models.Json.Out;
 
 namespace SensateService.DashboardApi.Controllers
 {

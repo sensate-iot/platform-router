@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package sensateiot;
+option csharp_namespace = "SensateService.Common.Data.Dto.Protobuf";
+
+message TextMessage {
+	string data = 1;
+	string timestamp = 2;
+	double longitude = 3;
+	double latitude = 4;
+	string sensor_id = 5;
+}
+
+message TextMessageData {
+	repeated TextMessage messages = 1;
+}

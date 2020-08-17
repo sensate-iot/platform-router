@@ -7,7 +7,6 @@ using MongoDB.Driver;
 using SensateService.Common.Data.Models;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
-using SensateService.Models;
 
 namespace SensateService.Infrastructure.Document
 {

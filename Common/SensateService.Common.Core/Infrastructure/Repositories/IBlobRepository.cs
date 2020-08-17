@@ -9,10 +9,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+
+using SensateService.Common.Data.Dto.Json.Out;
 using SensateService.Common.Data.Enums;
 using SensateService.Common.Data.Models;
-using SensateService.Models;
-using SensateService.Models.Json.Out;
 
 namespace SensateService.Infrastructure.Repositories
 {

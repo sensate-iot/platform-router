@@ -1,19 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Dto\**" />
-    <EmbeddedResource Remove="Dto\**" />
-    <None Remove="Dto\**" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.13.0" />
     <PackageReference Include="MongoDB.Bson" Version="2.11.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.11.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="SendGrid" Version="9.20.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
   </ItemGroup>
 

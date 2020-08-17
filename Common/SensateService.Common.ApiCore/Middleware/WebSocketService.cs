@@ -14,9 +14,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
+using SensateService.Common.Data.Dto.Generic;
 using SensateService.Helpers;
 using SensateService.Middleware;
-using SensateService.Models.Generic;
 
 namespace SensateService.ApiCore.Middleware
 {

@@ -6,17 +6,15 @@
  */
 
 using System;
-using System.Diagnostics;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
-
+using SensateService.Common.Data.Dto.Generic;
 using SensateService.Exceptions;
 using SensateService.Infrastructure.Authorization;
-using SensateService.Models.Generic;
 
 namespace SensateService.WebSocketHandler.Handlers
 {

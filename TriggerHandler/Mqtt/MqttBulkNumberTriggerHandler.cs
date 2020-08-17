@@ -16,11 +16,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 using MongoDB.Driver.GeoJsonObjectModel;
-
+using SensateService.Common.Data.Dto.Protobuf;
 using SensateService.Common.Data.Models;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
-using SensateService.Protobuf;
 using SensateService.TriggerHandler.Models;
 using SensateService.TriggerHandler.Services;
 using SensateService.TriggerHandler.Utils;

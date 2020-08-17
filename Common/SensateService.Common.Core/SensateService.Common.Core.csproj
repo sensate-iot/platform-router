@@ -55,9 +55,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Models\Protobuf\" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\SensateService.Common.IdentityData\SensateService.Common.IdentityData.csproj" />
     <ProjectReference Include="..\SensateService.Common.Models\SensateService.Common.Data.csproj" />
   </ItemGroup>

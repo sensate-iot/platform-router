@@ -11,12 +11,11 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 
 using MongoDB.Bson;
-
+using SensateService.Common.Data.Dto.Generic;
 using SensateService.Common.Data.Models;
 using SensateService.Common.IdentityData.Models;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
-using SensateService.Models.Generic;
 using SensateService.Services;
 using SensateService.Services.Settings;
 using SensateService.TriggerHandler.Application;

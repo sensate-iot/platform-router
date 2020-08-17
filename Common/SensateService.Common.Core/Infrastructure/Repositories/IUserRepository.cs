@@ -10,8 +10,8 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading;
+using SensateService.Common.Data.Dto.Json.Out;
 using SensateService.Common.IdentityData.Models;
-using SensateService.Models.Json.Out;
 
 namespace SensateService.Infrastructure.Repositories
 {

@@ -10,7 +10,7 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using SensateService.Models.Generic;
+using SensateService.Common.Data.Dto.Generic;
 
 namespace SensateService.Middleware
 {
