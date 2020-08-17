@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
-
+using SensateService.Helpers;
 using SensateService.Middleware;
 using SensateService.Models.Generic;
 
@@ -38,11 +38,12 @@ namespace SensateService.ApiCore.Middleware
 			WebSocket socket;
 			AuthenticatedWebSocket authws;
 
-			if(!ctx.WebSockets.IsWebSocketRequest)
+			if(!ctx.WebSockets.IsWebSocketRequest) {
 				return;
+			}
 
-			var auth = await ctx.AuthenticateAsync(JwtBearerDefaults.AuthenticationScheme);
-			socket = await ctx.WebSockets.AcceptWebSocketAsync();
+			var auth = await ctx.AuthenticateAsync(JwtBearerDefaults.AuthenticationScheme).AwaitBackground();
+			socket = await ctx.WebSockets.AcceptWebSocketAsync().AwaitBackground();
 
 			this._handler.OnConnected(socket);
 			authws = new AuthenticatedWebSocket {
@@ -51,10 +52,10 @@ namespace SensateService.ApiCore.Middleware
 			};
 
 			try {
-				await this.Receive(authws, async (result, buffer) => {
+				await Receive(authws, async (result, buffer) => {
 					switch(result.MessageType) {
 					case WebSocketMessageType.Text:
-						await this._handler.Receive(authws, result, buffer);
+						await this._handler.Receive(authws, result, buffer).AwaitBackground();
 						break;
 					case WebSocketMessageType.Close:
 						this._handler.OnDisconnected(authws);
@@ -62,9 +63,9 @@ namespace SensateService.ApiCore.Middleware
 					case WebSocketMessageType.Binary:
 						break;
 					default:
-						throw new ArgumentOutOfRangeException();
+						throw new ArgumentOutOfRangeException(nameof(result.MessageType));
 					}
-				});
+				}).AwaitBackground();
 			} catch(WebSocketException) {
 				Debug.WriteLine($"Websocket error occurred! Socket state: {socket.State}");
 				this._handler.OnForceClose(authws);
@@ -73,20 +74,20 @@ namespace SensateService.ApiCore.Middleware
 
 			try {
 				if(this._next != null)
-					await this._next.Invoke(context: ctx);
+					await this._next.Invoke(context: ctx).AwaitBackground();
 			} catch(Exception) {
 				// ignored
 			}
 		}
 
-		private async Task Receive(AuthenticatedWebSocket socket, Action<WebSocketReceiveResult, byte[]> handleMessage)
+		private static async Task Receive(AuthenticatedWebSocket socket, Action<WebSocketReceiveResult, byte[]> handleMessage)
 		{
 			byte[] buffer = new byte[RxBufferSize];
 
 			while(socket.Raw.State == WebSocketState.Open) {
 				var result = await socket.Raw.ReceiveAsync(
 					new ArraySegment<byte>(buffer), CancellationToken.None
-				);
+				).AwaitBackground();
 
 				handleMessage(result, buffer);
 			}

@@ -8,27 +8,33 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+
 using SensateService.Common.Data.Enums;
+using SensateService.Constants;
 using SensateService.Models.Json.Out;
 
 namespace SensateService.ApiCore.Attributes
 {
 	public class ValidateModelAttribute : ActionFilterAttribute
 	{
+
 		public override void OnActionExecuting(ActionExecutingContext context)
 		{
 			Status status;
 
 			base.OnActionExecuting(context);
+			status = new Status {
+				ErrorCode = ReplyCode.BadInput,
+				Message = HttpStatusMessages.InvalidRequestReply
+			};
+
+			if(context == null) {
+				return;
+			}
 
 			if(context.ModelState.IsValid) {
 				return;
 			}
-
-			status = new Status {
-				ErrorCode = ReplyCode.BadInput,
-				Message = "Invalid request"
-			};
 
 			context.Result = new BadRequestObjectResult(status);
 		}

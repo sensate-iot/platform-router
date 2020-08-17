@@ -20,7 +20,7 @@ namespace SensateService.ApiCore.Attributes
 
 			base.OnActionExecuting(context);
 
-			if(context.HttpContext.Items["ApiKey"] is SensateApiKey key && !key.Revoked) {
+			if(context?.HttpContext.Items["ApiKey"] is SensateApiKey key && !key.Revoked) {
 				valid = !key.ReadOnly;
 			}
 

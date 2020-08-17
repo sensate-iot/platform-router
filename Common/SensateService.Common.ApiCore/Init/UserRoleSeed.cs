@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Identity;
 using SensateService.Common.IdentityData.Models;
 using SensateService.Infrastructure.Sql;
 using SensateService.Constants;
+using System;
+using SensateService.Helpers;
 
 namespace SensateService.ApiCore.Init
 {
@@ -22,6 +24,18 @@ namespace SensateService.ApiCore.Init
 		public static async Task Initialize(SensateSqlContext ctx,
 			RoleManager<SensateRole> roles, UserManager<SensateUser> manager)
 		{
+			if(ctx == null) {
+				throw new ArgumentNullException(nameof(ctx));
+			}
+
+			if(manager == null) {
+				throw new ArgumentNullException(nameof(manager));
+			}
+
+			if(roles == null) {
+				throw new ArgumentNullException(nameof(roles));
+			}
+
 			SensateUser user;
 			ctx.Database.EnsureCreated();
 			IEnumerable<string> adminroles = new List<string> {
@@ -49,7 +63,7 @@ namespace SensateService.ApiCore.Init
 			};
 
 			foreach(var role in uroles) {
-				await roles.CreateAsync(role);
+				await roles.CreateAsync(role).AwaitBackground();
 			}
 
 			user = new SensateUser {
@@ -63,10 +77,10 @@ namespace SensateService.ApiCore.Init
 
 			user.UserName = user.Email;
 			user.EmailConfirmed = true;
-			await manager.CreateAsync(user, "Root1234#xD");
+			await manager.CreateAsync(user, "Root1234#xD").AwaitBackground();
 			ctx.SaveChanges();
-			user = await manager.FindByEmailAsync("root@example.com");
-			await manager.AddToRolesAsync(user, adminroles);
+			user = await manager.FindByEmailAsync("root@example.com").AwaitBackground();
+			await manager.AddToRolesAsync(user, adminroles).AwaitBackground();
 		}
 	}
 }

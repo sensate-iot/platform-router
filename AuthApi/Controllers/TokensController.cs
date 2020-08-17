@@ -186,16 +186,16 @@ namespace SensateService.AuthApi.Controllers
 			}
 
 			if(string.IsNullOrEmpty(token)) {
-				return this.InvalidInputResult("Token not found!");
+				return InvalidInputResult("Token not found!");
 			}
 
 			authToken = this._tokens.GetById(user, token);
 
 			if(authToken == null)
-				return this.NotFoundInputResult("Token not found!");
+				return NotFoundInputResult("Token not found!");
 
 			if(!authToken.Valid)
-				return this.InvalidInputResult("Token already invalid!");
+				return InvalidInputResult("Token already invalid!");
 
 			await this._tokens.InvalidateTokenAsync(authToken);
 			return this.NoContent();

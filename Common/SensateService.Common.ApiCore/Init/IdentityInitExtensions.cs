@@ -26,6 +26,10 @@ namespace SensateService.ApiCore.Init
 	{
 		public static IServiceCollection AddIdentityFramwork(this IServiceCollection services, AuthenticationConfig auth)
 		{
+			if(auth == null) {
+				throw new ArgumentNullException(nameof(auth));
+			}
+
 			services.Configure<UserAccountSettings>(options => {
 				options.JwtKey = auth.JwtKey;
 				options.JwtIssuer = auth.JwtIssuer;

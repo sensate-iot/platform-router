@@ -128,7 +128,7 @@ namespace SensateService.ApiCore.Middleware
 				this._logger.LogInformation($"Unable to complete request: {ex.Message}");
 				this._logger.LogDebug(ex, "Unknown error occurred!");
 
-				await this.RespondErrorAsync(ctx, ReplyCode.UnknownError, "Bad request!", 400).AwaitBackground();
+				await this.RespondErrorAsync(ctx, ReplyCode.UnknownError, "Bad request!", 500).AwaitBackground();
 			}
 		}
 	}

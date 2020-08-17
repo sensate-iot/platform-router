@@ -5,6 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -42,7 +43,7 @@ namespace SensateService.ApiCore.Controllers
 				return false;
 			}
 
-			return await this.AuthenticateUserForSensor(sensor, strict);
+			return await this.AuthenticateUserForSensor(sensor, strict).AwaitBackground();
 		}
 
 		protected async Task<bool> IsLinkedSensor(string id)
@@ -53,6 +54,10 @@ namespace SensateService.ApiCore.Controllers
 
 		protected async Task<bool> AuthenticateUserForSensor(Sensor sensor, bool strict)
 		{
+			if(sensor == null) {
+				throw new ArgumentNullException(nameof(sensor));
+			}
+
 			var sensorKey = await this.m_keys.GetAsync(sensor.Secret).AwaitBackground();
 			var auth = sensor.Owner == this.CurrentUser.Id && sensorKey != null;
 

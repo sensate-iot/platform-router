@@ -139,7 +139,7 @@ namespace SensateService.AuthApi.Controllers
 			}
 
 			if(token == null) {
-				return this.InvalidInputResult("Security token invalid!");
+				return InvalidInputResult("Security token invalid!");
 			}
 
 			token.IdentityToken = Base64UrlEncoder.Decode(token.IdentityToken);
@@ -150,7 +150,7 @@ namespace SensateService.AuthApi.Controllers
 			}
 
 			var error = result.Errors.First();
-			return error != null ? this.InvalidInputResult(error.Description) :
+			return error != null ? InvalidInputResult(error.Description) :
 				new NotFoundObjectResult(new { Message = result.Errors });
 		}
 
@@ -231,7 +231,7 @@ namespace SensateService.AuthApi.Controllers
 			tokens = await this._tokens.GetByUserAsync(user).AwaitBackground();
 
 			if(token == null) {
-				return this.InvalidInputResult("Token not found!");
+				return InvalidInputResult("Token not found!");
 			}
 
 			var result = await this._manager.ChangeEmailAsync(user, token.Email, token.IdentityToken);
@@ -374,7 +374,7 @@ namespace SensateService.AuthApi.Controllers
 			var valid = await this._text.IsValidNumber(register.PhoneNumber);
 
 			if(!valid) {
-				return this.InvalidInputResult("Invalid phone number!");
+				return InvalidInputResult("Invalid phone number!");
 			}
 
 			var result = await this._manager.CreateAsync(user, register.Password).AwaitBackground();
@@ -505,7 +505,7 @@ namespace SensateService.AuthApi.Controllers
 			var result = await this._manager.ConfirmEmailAsync(user, code).AwaitBackground();
 
 			if(!result.Succeeded) {
-				return this.InvalidInputResult();
+				return InvalidInputResult();
 			}
 
 			/* Send phone number validation token */
@@ -532,7 +532,7 @@ namespace SensateService.AuthApi.Controllers
 			user = await this.GetCurrentUserAsync().AwaitBackground();
 
 			if(string.IsNullOrEmpty(user.UnconfirmedPhoneNumber)) {
-				return this.InvalidInputResult("No confirmable phone number found!");
+				return InvalidInputResult("No confirmable phone number found!");
 			}
 
 			phonetoken = await this._phonetokens.GetLatest(user);
@@ -547,7 +547,7 @@ namespace SensateService.AuthApi.Controllers
 			}
 
 			if(phonetoken.UserToken != token) {
-				return this.InvalidInputResult("Invalid confirmation token!");
+				return InvalidInputResult("Invalid confirmation token!");
 			}
 
 			var result = await this._manager.ChangePhoneNumberAsync(user, phonetoken.PhoneNumber, phonetoken.IdentityToken).AwaitBackground();
@@ -587,7 +587,7 @@ namespace SensateService.AuthApi.Controllers
 				var valid = await this._text.IsValidNumber(update.PhoneNumber);
 
 				if(!valid) {
-					return this.InvalidInputResult("Invalid phone number");
+					return InvalidInputResult("Invalid phone number");
 				}
 			}
 
@@ -730,14 +730,14 @@ namespace SensateService.AuthApi.Controllers
 
 			if(userUpdate.Password != null) {
 				if(userUpdate.CurrentPassword == null) {
-					return this.InvalidInputResult("Current password not given");
+					return InvalidInputResult("Current password not given");
 				}
 
 				var result = await this._manager.ChangePasswordAsync(user,
 					userUpdate.CurrentPassword, userUpdate.Password);
 
 				if(!result.Succeeded) {
-					return this.InvalidInputResult(result.Errors.First().Description);
+					return InvalidInputResult(result.Errors.First().Description);
 				}
 			}
 

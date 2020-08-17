@@ -6,6 +6,7 @@
  */
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -45,17 +46,17 @@ namespace SensateService.ApiCore.Middleware
 			};
 		}
 
-		public static bool IsBanned(SensateUser user, SensateRole role)
+		public static bool IsBanned([NotNull] SensateUser user, [NotNull] SensateRole role)
 		{
 			return user.UserRoles == null || user.UserRoles.Any(r => r.RoleId == role.Id);
 		}
 
 		public static bool IsSwagger(string url)
 		{
-			return url.Contains("swagger");
+			return url.Contains("swagger", StringComparison.OrdinalIgnoreCase);
 		}
 
-		public async Task RespondErrorAsync(HttpContext ctx, ReplyCode code, string err, int http)
+		public async Task RespondErrorAsync([NotNull] HttpContext ctx, ReplyCode code, string err, int http)
 		{
 			var output = new Status {
 				ErrorCode = code,
@@ -68,7 +69,7 @@ namespace SensateService.ApiCore.Middleware
 			await ctx.Response.WriteAsync(JsonConvert.SerializeObject(output, this.m_settings)).AwaitBackground();
 		}
 
-		public async Task Invoke(HttpContext ctx)
+		public async Task Invoke([NotNull] HttpContext ctx)
 		{
 			var query = ctx.Request.Query;
 
@@ -109,7 +110,7 @@ namespace SensateService.ApiCore.Middleware
 				}
 
 				if(token.User.BillingLockout) {
-					await this.RespondErrorAsync(ctx, ReplyCode.BillingLockout, "Billing lockout!", 402);
+					await this.RespondErrorAsync(ctx, ReplyCode.BillingLockout, "Billing lockout!", 402).AwaitBackground();
 					return;
 				}
 

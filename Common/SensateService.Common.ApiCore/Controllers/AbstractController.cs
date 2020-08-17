@@ -31,7 +31,7 @@ namespace SensateService.ApiCore.Controllers
 			this._users = users;
 
 			if(this.CurrentUser == null) {
-				this.CurrentUser = ctx.HttpContext.Items["UserData"] as SensateUser;
+				this.CurrentUser = ctx?.HttpContext.Items["UserData"] as SensateUser;
 			}
 		}
 
@@ -55,16 +55,16 @@ namespace SensateService.ApiCore.Controllers
 			if(this.User == null)
 				return null;
 
-			return await this._users.GetByClaimsPrincipleAsync(this.User);
+			return await this._users.GetByClaimsPrincipleAsync(this.User).AwaitBackground();
 		}
 
-		protected IActionResult InvalidInputResult(string msg = "Invalid input!")
+		protected static IActionResult InvalidInputResult(string msg = "Invalid input!")
 		{
 			var status = new Status { Message = msg, ErrorCode = ReplyCode.BadInput };
 			return new BadRequestObjectResult(status);
 		}
 
-		protected IActionResult NotFoundInputResult(string msg)
+		protected static IActionResult NotFoundInputResult(string msg)
 		{
 			var status = new Status {
 				Message = msg,
@@ -72,15 +72,6 @@ namespace SensateService.ApiCore.Controllers
 			};
 
 			return new NotFoundObjectResult(status);
-		}
-
-		protected bool IsValidUri(string uri)
-		{
-			bool result;
-
-			result = Uri.TryCreate(uri, UriKind.Absolute, out Uri resulturi) &&
-					 (resulturi.Scheme == Uri.UriSchemeHttp || resulturi.Scheme == Uri.UriSchemeHttps);
-			return result;
 		}
 	}
 }
