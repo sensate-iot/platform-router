@@ -8,7 +8,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateService.Common.Core"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateService.Processing.StorageClient", "Processing\SensateService.Processing.StorageClient\SensateService.Processing.StorageClient.csproj", "{8D55A3E7-8E0E-4ABB-ADEA-FFD157E9D095}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlSetup", "SqlSetup\SqlSetup.csproj", "{AE713298-9C5F-483D-B4BE-D335BA63B0A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateService.Common.SqlSetup", "Common\SensateService.Common.SqlSetup\SensateService.Common.SqlSetup.csproj", "{AE713298-9C5F-483D-B4BE-D335BA63B0A2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateService.Common.ApiCore", "Common\SensateService.Common.ApiCore\SensateService.Common.ApiCore.csproj", "{84CAF4A2-7719-492B-B947-21051C76635E}"
 EndProject
