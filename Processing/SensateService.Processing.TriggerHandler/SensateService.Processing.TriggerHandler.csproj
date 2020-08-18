@@ -5,6 +5,7 @@
     <UserSecretsId>SensateService</UserSecretsId>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>SensateService.Processing.TriggerHandler</RootNamespace>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
     <Version>0.5.1</Version>
     <Company>Sensate IoT</Company>
     <Authors>Sensate IoT</Authors>

@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>SensateService.Ingress.MqttHandler</RootNamespace>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
     <PackageLicenseFile>COPYING</PackageLicenseFile>
   </PropertyGroup>
   <ItemGroup>

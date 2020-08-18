@@ -6,6 +6,7 @@
     <RootNamespace>SensateService.Api.NetworkApi</RootNamespace>
     <UserSecretsId>SensateService</UserSecretsId>
     <Version>0.5.1</Version>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
     <Copyright>SensateService</Copyright>
     <PackageLicenseFile>..\COPYING</PackageLicenseFile>
   </PropertyGroup>
