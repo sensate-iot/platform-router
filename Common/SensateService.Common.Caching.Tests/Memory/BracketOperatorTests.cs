@@ -28,7 +28,7 @@ namespace SensateService.Common.Caching.Tests.Memory
 		[Fact]
 		public void CanUseObjectInitializer()
 		{
-			var cache = new MemoryCache<string, string> {["abc"] = "def"};
+			var cache = new MemoryCache<string, string> { ["abc"] = "def" };
 
 			Assert.True(cache.TryGetValue("abc", out var result));
 			Assert.Equal("def", result);
@@ -37,7 +37,7 @@ namespace SensateService.Common.Caching.Tests.Memory
 		[Fact]
 		public void CanGetAValue()
 		{
-			var cache = new MemoryCache<string ,string>();
+			var cache = new MemoryCache<string, string>();
 
 			cache.Add("abc", "def");
 			Assert.Equal("def", cache["abc"]);
@@ -53,7 +53,7 @@ namespace SensateService.Common.Caching.Tests.Memory
 		[Fact]
 		public void CanSetANullValue()
 		{
-			var cache = new MemoryCache<string ,string>();
+			var cache = new MemoryCache<string, string>();
 
 			cache["abc"] = null;
 			Assert.Null(cache["abc"]);
