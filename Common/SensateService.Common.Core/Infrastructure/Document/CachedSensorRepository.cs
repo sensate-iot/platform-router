@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
+
 using Newtonsoft.Json;
 
 using SensateService.Common.Data.Enums;
@@ -30,38 +31,22 @@ namespace SensateService.Infrastructure.Document
 			this._cache = cache;
 		}
 
-		private void Commit(Sensor obj)
+		private Task CommitAsync(Sensor obj, int tmo = 10, CancellationToken ct = default)
 		{
-			this._cache.Set(obj.InternalId.ToString(), obj.ToJson());
+			var str = JsonConvert.SerializeObject(obj);
+			return this._cache.SetAsync(obj.InternalId.ToString(), str, tmo, ct);
 		}
 
-		private async Task CommitAsync(Sensor obj, CancellationToken ct = default(CancellationToken))
-		{
-			await this._cache.SetAsync(
-				obj.InternalId.ToString(),
-				obj.ToJson(),
-				CacheTimeout.Timeout.ToInt(),
-				true,
-				ct
-			).AwaitBackground();
-		}
-
-		public override async Task CreateAsync(Sensor sensor, CancellationToken ct = default(CancellationToken))
+		public override async Task CreateAsync(Sensor sensor, CancellationToken ct = default)
 		{
 			var tasks = new Task[4];
 
 			tasks[0] = base.CreateAsync(sensor, ct);
-			tasks[1] = this.CommitAsync(sensor, ct);
+			tasks[1] = this.CommitAsync(sensor, CacheTimeout.TimeoutMedium.ToInt(), ct);
 			tasks[2] = this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}");
 			tasks[3] = this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}:0:0");
 
 			await Task.WhenAll(tasks).AwaitBackground();
-		}
-
-		public override void Create(Sensor obj)
-		{
-			base.Create(obj);
-			this.Commit(obj);
 		}
 
 		public override async Task<IEnumerable<Sensor>> GetAsync(SensateUser user, int skip = 0, int limit = 0)
@@ -82,7 +67,7 @@ namespace SensateService.Infrastructure.Document
 				return null;
 			}
 
-			await this._cache.SetAsync(key, JsonConvert.SerializeObject(sensors), CacheTimeout.TimeoutMedium.ToInt(), false).AwaitBackground();
+			await this._cache.SetAsync(key, JsonConvert.SerializeObject(sensors), CacheTimeout.TimeoutMedium.ToInt()).AwaitBackground();
 			return sensors;
 		}
 
@@ -112,7 +97,7 @@ namespace SensateService.Infrastructure.Document
 		{
 			var tasks = new[] {
 				this._cache.SetAsync(sensor.InternalId.ToString(), sensor.ToJson(),
-									 CacheTimeout.TimeoutMedium.ToInt(), false),
+									 CacheTimeout.TimeoutMedium.ToInt()),
 				this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}"),
 				this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}:0:0"),
 				this._cache.RemoveAsync(sensor.Owner),

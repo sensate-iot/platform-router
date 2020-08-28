@@ -35,8 +35,7 @@ namespace SensateService.Infrastructure.Sql
 		{
 			return this._cache.SetAsync(
 				user.Id, JsonConvert.SerializeObject(user),
-				CacheTimeout.TimeoutShort.ToInt(),
-				false, ct);
+				CacheTimeout.TimeoutShort.ToInt(), ct);
 		}
 
 		private async Task<SensateUser> LookupAsync(string id, CancellationToken ct)
@@ -49,46 +48,10 @@ namespace SensateService.Infrastructure.Sql
 
 			return JsonConvert.DeserializeObject<SensateUser>(obj);
 		}
-		private void SetCache(SensateUser user)
-		{
-			this._cache.Set(
-				user.Id, JsonConvert.SerializeObject(user),
-				CacheTimeout.TimeoutShort.ToInt(),
-				false);
-		}
-
-		private SensateUser Lookup(string id)
-		{
-			var obj = this._cache.Get(id);
-
-			if(obj == null) {
-				return null;
-			}
-
-			return JsonConvert.DeserializeObject<SensateUser>(obj);
-		}
-
-
-		public override SensateUser Get(string key)
-		{
-			var obj = this.Lookup(key);
-
-			if(obj != null)
-				return obj;
-
-			obj = base.Get(key);
-
-			if(obj == null) {
-				return null;
-			}
-
-			this.SetCache(obj);
-			return obj;
-		}
 
 		public override async Task<SensateUser> GetAsync(string key, bool withKeys)
 		{
-			var obj = await this.LookupAsync($"{key}:{withKeys}", default).ConfigureAwait(false);
+			var obj = await this.LookupAsync($"{key}::{withKeys}", default).ConfigureAwait(false);
 
 			if(obj != null) {
 				var entries = this._sqlContext.ChangeTracker.Entries<SensateUser>().ToList();
@@ -112,9 +75,8 @@ namespace SensateService.Infrastructure.Sql
 
 			await this.SetCacheAsync(obj, default).ConfigureAwait(false);
 			await this._cache.SetAsync(
-				$"{obj.Id}:{withKeys}", JsonConvert.SerializeObject(obj),
-				CacheTimeout.TimeoutShort.ToInt(),
-				false
+				$"{obj.Id}::{withKeys}", JsonConvert.SerializeObject(obj),
+				CacheTimeout.TimeoutShort.ToInt()
 				);
 			return obj;
 		}
@@ -130,7 +92,7 @@ namespace SensateService.Infrastructure.Sql
 
 			var users = await base.GetAllAsync(skip, limit, ct).AwaitBackground();
 			obj = JsonConvert.SerializeObject(users);
-			await this._cache.SetAsync(key, obj, CacheTimeout.Timeout.ToInt(), false, ct);
+			await this._cache.SetAsync(key, obj, CacheTimeout.Timeout.ToInt(), ct);
 
 			return users;
 		}
@@ -158,7 +120,7 @@ namespace SensateService.Infrastructure.Sql
 
 			if(roles != null) {
 				obj = JsonConvert.SerializeObject(roles);
-				await this._cache.SetAsync(id, obj, CacheTimeout.TimeoutShort.ToInt(), false).ConfigureAwait(false);
+				await this._cache.SetAsync(id, obj, CacheTimeout.TimeoutShort.ToInt()).ConfigureAwait(false);
 			}
 
 			return roles;

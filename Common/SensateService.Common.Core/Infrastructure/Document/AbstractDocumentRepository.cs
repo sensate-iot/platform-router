@@ -32,11 +32,6 @@ namespace SensateService.Infrastructure.Document
 			return ObjectId.GenerateNewId(timestamp);
 		}
 
-		public virtual void Create(T obj)
-		{
-			this._collection.InsertOne(obj);
-		}
-
 		public virtual async Task CreateAsync(T obj, CancellationToken ct = default(CancellationToken))
 		{
 			await this._collection.InsertOneAsync(obj, default(InsertOneOptions), ct).AwaitBackground();

@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 using MongoDB.Driver.GeoJsonObjectModel;
+using Newtonsoft.Json;
 using SensateService.Common.Data.Dto.Generic;
 using SensateService.Common.Data.Enums;
 using SensateService.Common.Data.Models;
@@ -37,19 +38,32 @@ namespace SensateService.Infrastructure.Document
 			this._cache = cache;
 		}
 
-		private async Task CacheDataAsync(string key, object data, int tmo, bool slide = true)
+		private Task CacheRangeAsync(string key, IEnumerable<MeasurementsQueryResult> data, int tmo)
 		{
-			if(key == null || data == null)
-				return;
+			if(key == null || data == null) {
+				return Task.CompletedTask;
+			}
 
-			await this._cache.SerializeAsync(key, data, tmo, slide).AwaitBackground();
+			var stringified = JsonConvert.SerializeObject(data);
+			return this._cache.SetAsync(key, stringified, tmo);
+		}
+
+		private async Task<IEnumerable<MeasurementsQueryResult>> GetRangeAsync(string key, CancellationToken ct = default)
+		{
+			if(key == null) {
+				return null;
+			}
+
+			var data = await this._cache.GetAsync(key, ct).AwaitBackground();
+
+			return data == null ? null : JsonConvert.DeserializeObject<IEnumerable<MeasurementsQueryResult>>(data);
 		}
 
 		public override async Task DeleteBySensorAsync(Sensor sensor, CancellationToken ct = default)
 		{
 			string key;
 
-			key = $"measurements::{sensor.InternalId.ToString()}";
+			key = $"measurements::{sensor.InternalId}";
 			var tasks = new[] {
 				this._cache.RemoveAsync(key),
 				base.DeleteBySensorAsync(sensor, ct)
@@ -71,23 +85,6 @@ namespace SensateService.Infrastructure.Document
 			await Task.WhenAll(tasks).AwaitBackground();
 		}
 
-		public override async Task<IEnumerable<Measurement>> GetMeasurementsBySensorAsync(Sensor sensor, int skip = -1, int limit = -1)
-		{
-			string key;
-
-			key = $"measurements::{sensor.InternalId.ToString()}";
-			var measurements = await this._cache.DeserializeAsync<IEnumerable<Measurement>>(key).AwaitBackground();
-
-			if(measurements != null) {
-				return measurements;
-			}
-
-			measurements = await base.GetMeasurementsBySensorAsync(sensor, skip, limit).AwaitBackground();
-			await this.CacheDataAsync(key, measurements, CacheTimeout.TimeoutShort.ToInt(), false).AwaitBackground();
-
-			return measurements;
-		}
-
 		public override async Task<IEnumerable<MeasurementsQueryResult>> GetBetweenAsync(Sensor sensor,
 																						 DateTime start,
 																						 DateTime end,
@@ -96,20 +93,21 @@ namespace SensateService.Infrastructure.Document
 																						 OrderDirection order = OrderDirection.None)
 		{
 			string key;
-			IEnumerable<MeasurementsQueryResult> measurements;
+			IList<MeasurementsQueryResult> measurements;
 
 			var cache_end = end.ThisMinute();
 			var cache_start = start.ThisMinute();
 
 			key = $"{sensor.InternalId}::{cache_start.ToString("u", CultureInfo.InvariantCulture)}::{cache_end.ToString("u", CultureInfo.InvariantCulture)}::{skip}::{limit}::{order}";
-			measurements = await _cache.DeserializeAsync<IEnumerable<MeasurementsQueryResult>>(key);
+			var tmp = await this.GetRangeAsync(key).ConfigureAwait(false);
 
-			if(measurements != null) {
-				return measurements;
+			if(tmp != null) {
+				return tmp;
 			}
 
-			measurements = await base.GetBetweenAsync(sensor, start, end, skip, limit, order).AwaitBackground();
-			await this.CacheDataAsync(key, measurements, CacheTimeout.TimeoutShort.ToInt(), false).AwaitBackground();
+			tmp = await base.GetBetweenAsync(sensor, start, end, skip, limit, order).AwaitBackground();
+			measurements = tmp.ToList();
+			await this.CacheRangeAsync(key, measurements, CacheTimeout.TimeoutShort.ToInt()).AwaitBackground();
 			return measurements;
 
 
@@ -132,16 +130,17 @@ namespace SensateService.Infrastructure.Document
 				$"{skip}::{limit}::" +
 				$"{max}::{coords.Longitude}::{coords.Latitude}::" +
 				$"{order}";
-			measurements = await _cache.DeserializeAsync<IEnumerable<MeasurementsQueryResult>>(key, ct);
+			measurements = await this.GetRangeAsync(key, ct).AwaitBackground();
 
 			if(measurements != null) {
 				return measurements;
 			}
 
 			measurements = await base.GetMeasurementsNearAsync(sensor, start, end, coords, max, skip, limit, order, ct).AwaitBackground();
-			await this.CacheDataAsync(key, measurements, CacheTimeout.TimeoutShort.ToInt(), false).AwaitBackground();
+			var list = measurements.ToList();
+			await this.CacheRangeAsync(key, list, CacheTimeout.TimeoutShort.ToInt()).AwaitBackground();
 
-			return measurements;
+			return list;
 		}
 
 
@@ -164,16 +163,17 @@ namespace SensateService.Infrastructure.Document
 				$"{cache_end.ToString("u", CultureInfo.InvariantCulture)}::" +
 				$"{skip}::{limit}::{order}";
 
-			var measurements = await this._cache.DeserializeAsync<IEnumerable<MeasurementsQueryResult>>(key, ct);
+			var measurements = await this.GetRangeAsync(key, ct).AwaitBackground();
 
 			if(measurements != null) {
 				return measurements;
 			}
 
 			measurements = await base.GetMeasurementsBetweenAsync(ordered, start, end, skip, limit, order, ct).AwaitBackground();
-			await this.CacheDataAsync(key, measurements, CacheTimeout.TimeoutShort.ToInt(), false).AwaitBackground();
+			var list = measurements.ToList();
+			await this.CacheRangeAsync(key, list, CacheTimeout.TimeoutShort.ToInt()).AwaitBackground();
 
-			return measurements;
+			return list;
 		}
 
 		private static int GetSensorListHashCode(List<Sensor> sensors)
@@ -206,7 +206,7 @@ namespace SensateService.Infrastructure.Document
 				$"{max}::{coords.Longitude}::{coords.Latitude}::" +
 				$"{order}";
 
-			var measurements = await this._cache.DeserializeAsync<IEnumerable<MeasurementsQueryResult>>(key, ct);
+			var measurements = await this.GetRangeAsync(key, ct).AwaitBackground();
 
 			if(measurements != null) {
 				return measurements;
@@ -215,9 +215,9 @@ namespace SensateService.Infrastructure.Document
 			measurements = await base.GetMeasurementsNearAsync(ordered, start, end,
 															   coords, max, skip, limit,
 															   order, ct).AwaitBackground();
-			await this.CacheDataAsync(key, measurements, CacheTimeout.TimeoutShort.ToInt(), false).AwaitBackground();
-
-			return measurements;
+			var list = measurements.ToList();
+			await this.CacheRangeAsync(key, list, CacheTimeout.TimeoutShort.ToInt()).AwaitBackground();
+			return list;
 		}
 	}
 }

@@ -8,8 +8,13 @@
 using System;
 
 using Microsoft.Extensions.DependencyInjection;
-using MongoDB.Bson.Serialization;
 
+using MongoDB.Bson.Serialization;
+using StackExchange.Redis;
+
+using SensateService.Common.Caching.Abstract;
+using SensateService.Common.Caching.Memory;
+using SensateService.Common.Caching.Redis;
 using SensateService.Common.Data.Models;
 using SensateService.Config;
 using SensateService.Converters;
@@ -86,10 +91,19 @@ namespace SensateService.Init
 		{
 			services.AddMemoryCache();
 
+			services.AddSingleton<IMemoryCache<string, string>, MemoryCache<string, string>>();
+
 			if(config.Type == "Distributed") {
-				services.AddDistributedRedisCache(opts => {
-					opts.Configuration = db.Redis.Host;
-					opts.InstanceName = db.Redis.InstanceName;
+
+
+				services.AddSingleton<IDistributedCache<string>>(p => {
+					var options = new DistributedCacheOptions {
+						Configuration = new ConfigurationOptions {
+							EndPoints = {{db.Redis.Host, 6379}},
+							ClientName = "sensate-iot"
+						}
+					};
+					return new RedisCache<string>(options);
 				});
 
 				services.AddScoped<ICacheStrategy<string>, DistributedCacheStrategy>();
