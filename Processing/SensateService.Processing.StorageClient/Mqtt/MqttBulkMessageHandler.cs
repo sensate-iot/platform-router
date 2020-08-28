@@ -20,7 +20,7 @@ namespace SensateService.Processing.StorageClient.Mqtt
 		private readonly IMessageCache m_store;
 		private readonly ILogger<MqttBulkMessageHandler> m_logger;
 
-		public MqttBulkMessageHandler( IMessageCache cache, ILogger<MqttBulkMessageHandler> logger )
+		public MqttBulkMessageHandler(IMessageCache cache, ILogger<MqttBulkMessageHandler> logger)
 		{
 			this.m_logger = logger;
 			this.m_store = cache;

@@ -99,7 +99,7 @@ namespace SensateService.Init
 				services.AddSingleton<IDistributedCache<string>>(p => {
 					var options = new DistributedCacheOptions {
 						Configuration = new ConfigurationOptions {
-							EndPoints = {{db.Redis.Host, 6379}},
+							EndPoints = { { db.Redis.Host, 6379 } },
 							ClientName = "sensate-iot"
 						}
 					};
