@@ -7,7 +7,7 @@
 
 using System;
 using System.IO;
-
+using System.Reflection;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -33,8 +33,9 @@ namespace SensateService.Api.DataApi.Application
 
 		private static IWebHost BuildWebHost(string[] args)
 		{
+			var rootLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 			var conf = new ConfigurationBuilder()
-						.SetBasePath(Directory.GetCurrentDirectory())
+						.SetBasePath(rootLocation)
 						.AddJsonFile("hosting.json")
 						.Build();
 

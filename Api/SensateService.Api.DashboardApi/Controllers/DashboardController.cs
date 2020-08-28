@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Microsoft.Net.Http.Headers;
 
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
@@ -21,6 +23,7 @@ using SensateService.Common.Data.Models;
 using SensateService.Common.IdentityData.Models;
 using SensateService.Api.DashboardApi.Json;
 using SensateService.Helpers;
+using SensateService.Infrastructure.Cache;
 using SensateService.Infrastructure.Repositories;
 
 namespace SensateService.Api.DashboardApi.Controllers
@@ -36,18 +39,21 @@ namespace SensateService.Api.DashboardApi.Controllers
 		private readonly ISensorRepository _sensors;
 		private readonly IAuditLogRepository _logs;
 		private readonly IUserTokenRepository _tokens;
+		private readonly ICacheStrategy<string> m_cache;
 
 		public DashboardController(IUserRepository users,
 			ISensorStatisticsRepository stats,
 			ISensorRepository sensors,
 			IUserTokenRepository tokens,
 			IAuditLogRepository logs,
+			ICacheStrategy<string> cache,
 			IHttpContextAccessor ctx) : base(users, ctx)
 		{
 			this._stats = stats;
 			this._sensors = sensors;
 			this._logs = logs;
 			this._tokens = tokens;
+			this.m_cache = cache;
 		}
 
 		[HttpGet]
@@ -56,6 +62,14 @@ namespace SensateService.Api.DashboardApi.Controllers
 		[ProducesResponseType(403)]
 		public async Task<IActionResult> Index()
 		{
+			var key = $"dashboard::{this.CurrentUser.Id}";
+
+			var strResult = await this.m_cache.GetAsync(key).AwaitBackground();
+
+			if(strResult != null) {
+				return this.Content(strResult, MediaTypeHeaderValue.Parse("application/json"));
+			}
+
 			UserDashboard board;
 			var raw = await this.GetStatsFor(this.CurrentUser, DateTime.MinValue).AwaitBackground();
 			List<SensorStatisticsEntry> stats;
@@ -81,7 +95,10 @@ namespace SensateService.Api.DashboardApi.Controllers
 				board.MeasurementsPerDayCumulative = new Graph<int, long>();
 			}
 
-			return this.Ok(board.ToJson());
+			var result = board.ToJson();
+			await this.m_cache.SetAsync(key, result.ToString(), CacheTimeout.TimeoutShort.ToInt()).AwaitBackground();
+
+			return this.Ok(result);
 		}
 
 		private async Task<long> CountSecurityTokensAsync()

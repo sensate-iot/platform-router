@@ -173,6 +173,10 @@ namespace SensateService.Api.DataApi.Controllers
 				filter.OrderDirection = "";
 			}
 
+			if(filter.End == DateTime.MinValue) {
+				filter.End = DateTime.MaxValue;
+			}
+
 			direction = filter.OrderDirection switch
 			{
 				"asc" => OrderDirection.Ascending,
@@ -218,6 +222,10 @@ namespace SensateService.Api.DataApi.Controllers
 
 			if(!await this.AuthenticateUserForSensor(sensor, false).AwaitBackground() && !linked) {
 				return this.Unauthorized();
+			}
+
+			if(end == DateTime.MinValue) {
+				end = DateTime.MaxValue;
 			}
 
 			if(longitude != null && latitude != null) {
