@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+
 using SensateService.Common.Caching.Abstract;
 using SensateService.Common.Caching.Memory;
 
@@ -34,7 +35,7 @@ namespace SensateService.Common.Caching.LoadTest.MemoryTests
 		public async Task TestAsynchronousRead(int size)
 		{
 			Console.WriteLine($"Starting asynchronous lookup test with {size * 4} items!");
-			var cache = BuildTestCache(size * 4);
+			var cache = BuildTestCache(size);
 
 			var t1 = Task.Run(() => TestReads(cache, size));
 			var t2 = Task.Run(() => TestReads(cache, size));
@@ -54,7 +55,7 @@ namespace SensateService.Common.Caching.LoadTest.MemoryTests
 			var sw = Stopwatch.StartNew();
 
 			for(var idx = size - 1; idx >= 0; idx--) {
-				if(!cache.TryGetValue($"key::{idx}", out  _)) {
+				if(!cache.TryGetValue($"key::{idx}", out _)) {
 					throw new AggregateException("Unable to find expected key!");
 				}
 			}
