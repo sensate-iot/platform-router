@@ -96,7 +96,7 @@ namespace SensateService.Common.Caching.Abstract
 		void Remove(TKey key);
 
 		/// <summary>
-		/// 
+		/// Attempt to remove a key.
 		/// </summary>
 		/// <param name="key"></param>
 		/// <exception cref="ArgumentNullException">When the key is <i>null</i>.</exception>
