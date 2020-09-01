@@ -7,10 +7,13 @@
 
 using System;
 using System.Collections.Generic;
+
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver.GeoJsonObjectModel;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
 using SensateService.Common.Data.Converters;
 
 namespace SensateService.Common.Data.Models

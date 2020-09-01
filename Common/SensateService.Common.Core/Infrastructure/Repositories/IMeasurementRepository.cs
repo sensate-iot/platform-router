@@ -17,13 +17,15 @@ using SensateService.Common.Data.Dto.Generic;
 using SensateService.Common.Data.Enums;
 using SensateService.Common.Data.Models;
 
+using MeasurementModel = SensateService.Common.Data.Models.Measurement;
+
 namespace SensateService.Infrastructure.Repositories
 {
-	using MeasurementMap = IDictionary<ObjectId, List<Measurement>>;
+	using MeasurementMap = IDictionary<ObjectId, List<MeasurementModel>>;
 
 	public interface IMeasurementRepository
 	{
-		Task<IEnumerable<Measurement>> GetMeasurementsBySensorAsync(Sensor sensor, int skip = -1, int limit = -1);
+		Task<IEnumerable<MeasurementModel>> GetMeasurementsBySensorAsync(Sensor sensor, int skip = -1, int limit = -1);
 		Task<IEnumerable<MeasurementsQueryResult>> GetBetweenAsync(Sensor sensor, DateTime start, DateTime end,
 																   int skip = -1, int limit = -1,
 																   OrderDirection order = OrderDirection.None);
@@ -45,6 +47,6 @@ namespace SensateService.Infrastructure.Repositories
 		Task<SingleMeasurement> GetMeasurementAsync(MeasurementIndex index, CancellationToken ct = default);
 
 		Task StoreAsync(MeasurementMap measurements, CancellationToken ct = default);
-		Task StoreAsync(Sensor sensor, Measurement measurement, CancellationToken ct = default);
+		Task StoreAsync(Sensor sensor, MeasurementModel measurement, CancellationToken ct = default);
 	}
 }

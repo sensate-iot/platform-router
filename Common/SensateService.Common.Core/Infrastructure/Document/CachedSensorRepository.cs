@@ -43,8 +43,8 @@ namespace SensateService.Infrastructure.Document
 
 			tasks[0] = base.CreateAsync(sensor, ct);
 			tasks[1] = this.CommitAsync(sensor, CacheTimeout.TimeoutMedium.ToInt(), ct);
-			tasks[2] = this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}");
-			tasks[3] = this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}:0:0");
+			tasks[2] = this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}", ct);
+			tasks[3] = this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}:0:0", ct);
 
 			await Task.WhenAll(tasks).AwaitBackground();
 		}
@@ -123,10 +123,10 @@ namespace SensateService.Infrastructure.Document
 		public override async Task DeleteAsync(Sensor sensor, CancellationToken ct = default)
 		{
 			var tsk = new[] {
-				this._cache.RemoveAsync(sensor.InternalId.ToString()),
-				this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}"),
-				this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}:0:0"),
-				this._cache.RemoveAsync(sensor.InternalId.ToString()),
+				this._cache.RemoveAsync(sensor.InternalId.ToString(), ct),
+				this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}", ct),
+				this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}:0:0", ct),
+				this._cache.RemoveAsync(sensor.InternalId.ToString(), ct),
 				base.DeleteAsync(sensor, ct)
 			};
 

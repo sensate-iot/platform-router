@@ -6,7 +6,6 @@
  */
 
 using MongoDB.Bson;
-using SensateService.Common.Data.Models;
 
 namespace SensateService.Common.Data.Dto.Generic
 {
@@ -14,6 +13,6 @@ namespace SensateService.Common.Data.Dto.Generic
 	{
 		public ObjectId Id { get; set; }
 		public ObjectId SensorId { get; set; }
-		public Measurement Measurement { get; set; }
+		public Models.Measurement Measurement { get; set; }
 	}
 }

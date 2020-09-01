@@ -28,19 +28,19 @@ using MessageData = SensateService.Common.Data.Dto.Protobuf.TextMessageData;
 
 namespace SensateService.Infrastructure.Storage
 {
-	public class CachedCachedMessageStore : ICachedMessageStore
+	public class CachedMessageStore : ICachedMessageStore
 	{
 		public static event OnMessagesReceived MessagesReceived;
 
 		private SpinLockWrapper m_lock;
 		private readonly IServiceProvider m_provider;
 		private List<string> m_data;
-		private readonly ILogger<CachedCachedMessageStore> m_logger;
+		private readonly ILogger<CachedMessageStore> m_logger;
 
 		private const int InitialListSize = 512;
 		private const int DatabaseTimeout = 20;
 
-		public CachedCachedMessageStore(IServiceProvider provider, ILogger<CachedCachedMessageStore> logger)
+		public CachedMessageStore(IServiceProvider provider, ILogger<CachedMessageStore> logger)
 		{
 			this.m_provider = provider;
 			this.m_logger = logger;

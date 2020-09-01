@@ -70,17 +70,11 @@ namespace SensateService.Init
 
 		public static IServiceCollection AddInternalMqttService(this IServiceCollection services, Action<InternalMqttServiceOptions> setup)
 		{
-			if(setup != null)
+			if(setup != null) {
 				services.Configure(setup);
+			}
 
-			services.AddSingleton<IHostedService, InternalMqttService>();
-
-			services.AddSingleton(provider => {
-				var s = provider.GetServices<IHostedService>().ToList();
-				var mqservice = s.Find(x => x.GetType() == typeof(InternalMqttService)) as IMqttPublishService;
-				return mqservice;
-			});
-
+			services.AddSingleton<IMqttPublishService, InternalMqttService>();
 			return services;
 		}
 

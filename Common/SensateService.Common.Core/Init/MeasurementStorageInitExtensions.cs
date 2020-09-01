@@ -32,7 +32,7 @@ namespace SensateService.Init
 
 		public static IServiceCollection AddMessageStorage(this IServiceCollection services)
 		{
-			services.AddSingleton<ICachedMessageStore, CachedCachedMessageStore>();
+			services.AddSingleton<ICachedMessageStore, CachedMessageStore>();
 			services.AddSingleton<IMessageCache>(x => {
 				var obj = x.GetRequiredService<ICachedMessageStore>();
 				return obj;
