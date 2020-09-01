@@ -65,20 +65,6 @@ namespace SensateService.Common.Caching.Tests.Abstract
 		}
 
 		[Fact]
-		public void ValueCanBeNull()
-		{
-			var kvp1 = new KeyValuePair<string, string>() {
-				Key = "KVP 2"
-			};
-
-			var kvp2 = new KeyValuePair<string, string>() {
-				Key = "KVP 2"
-			};
-
-			Assert.Equal(kvp1, kvp2);
-		}
-
-		[Fact]
 		public void KeyCannotBeNull()
 		{
 			var kvp1 = new KeyValuePair<string, string> {

@@ -40,12 +40,7 @@ namespace SensateService.SqlSetup.Application
 			builder.SetBasePath(Path.Combine(AppContext.BaseDirectory));
 			builder.AddEnvironmentVariables();
 
-			if(Program.IsDevelopment())
-				builder.AddUserSecrets<Program>();
-			else
-				builder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-
-
+			builder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 			this.Configuration = builder.Build();
 		}
 	}
