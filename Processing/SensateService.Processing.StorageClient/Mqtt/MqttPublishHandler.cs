@@ -55,14 +55,14 @@ namespace SensateService.Processing.StorageClient.Mqtt
 		public Task StartAsync(CancellationToken cancellationToken)
 		{
 			CachedMeasurementStore.MeasurementsReceived += this.MeasurementsStored_Handler;
-			CachedCachedMessageStore.MessagesReceived += this.MessagesStored_Handler;
+			CachedMessageStore.MessagesReceived += this.MessagesStored_Handler;
 			return Task.CompletedTask;
 		}
 
 		public Task StopAsync(CancellationToken cancellationToken)
 		{
 			CachedMeasurementStore.MeasurementsReceived -= this.MeasurementsStored_Handler;
-			CachedCachedMessageStore.MessagesReceived -= this.MessagesStored_Handler;
+			CachedMessageStore.MessagesReceived -= this.MessagesStored_Handler;
 			return Task.CompletedTask;
 		}
 	}
