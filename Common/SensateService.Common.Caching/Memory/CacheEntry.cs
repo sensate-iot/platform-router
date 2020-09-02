@@ -10,7 +10,7 @@ using SensateService.Common.Caching.Internal;
 
 namespace SensateService.Common.Caching.Memory
 {
-	public class CacheEntry<TValue> 
+	public class CacheEntry<TValue>
 	{
 		public TValue Value { get; set; }
 		public int Timeout { get; set; } // Timeout in milliseconds.
