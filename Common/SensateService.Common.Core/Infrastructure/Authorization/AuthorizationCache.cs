@@ -32,6 +32,7 @@ namespace SensateService.Infrastructure.Authorization
 		private readonly IDataCache m_cache;
 		private readonly IList<MeasurementAuthorizationHandler> m_measurementsHandler;
 		private readonly IList<MessageAuthorizationHandler> m_messageHandlers;
+		private readonly ILogger<AuthorizationCache> m_logger;
 
 		private SpinLockWrapper m_lock;
 		private int m_index;
@@ -43,7 +44,7 @@ namespace SensateService.Infrastructure.Authorization
 		public static event OnDataAuthorizedEvent MeasurementDataAuthorized;
 		public static event OnDataAuthorizedEvent MessageDataAuthorized;
 
-		public AuthorizationCache(IServiceProvider provider, IDataCache cache)
+		public AuthorizationCache(IServiceProvider provider, IDataCache cache, ILogger<AuthorizationCache> logger)
 		{
 			this.m_provider = provider;
 			this.m_cache = cache;
@@ -53,6 +54,7 @@ namespace SensateService.Infrastructure.Authorization
 			this.m_commands = new List<Command>();
 			this.m_measurementsHandler = new List<MeasurementAuthorizationHandler>();
 			this.m_messageHandlers = new List<MessageAuthorizationHandler>();
+			this.m_logger = logger;
 
 			var factory = new LoggerFactory();
 
@@ -207,34 +209,50 @@ namespace SensateService.Infrastructure.Authorization
 			}
 
 			foreach(var command in cmds) {
-				switch(command.Cmd) {
-				case AuthServiceCommand.FlushUser:
-					this.m_cache.RemoveUser(command.Arguments);
-					break;
+				try {
+					switch(command.Cmd) {
+					case AuthServiceCommand.FlushUser:
+						this.m_cache.RemoveUser(command.Arguments);
+						break;
 
-				case AuthServiceCommand.FlushSensor:
-					if(ObjectId.TryParse(command.Arguments, out var id)) {
-						this.m_cache.RemoveSensor(id);
+					case AuthServiceCommand.FlushSensor:
+						if(ObjectId.TryParse(command.Arguments, out var id)) {
+							this.m_cache.RemoveSensor(id);
+						}
+
+						break;
+
+					case AuthServiceCommand.FlushKey:
+						this.m_cache.RemoveKey(command.Arguments);
+						break;
+
+					case AuthServiceCommand.AddUser:
+						var user = await repo.GetUserAsync(command.Arguments).AwaitBackground();
+						this.m_cache.Append(user);
+						break;
+
+					case AuthServiceCommand.AddSensor:
+						if(ObjectId.TryParse(command.Arguments, out var objId)) {
+							var sensor = await repo.GetSensorAsync(objId).AwaitBackground();
+							this.m_cache.Append(sensor);
+						}
+
+						break;
+
+					case AuthServiceCommand.AddKey:
+						var key = await repo.GetSensorKeyAsync(command.Arguments).AwaitBackground();
+						this.m_cache.Append(key);
+						break;
+
+					default:
+						continue;
 					}
-					break;
+				} catch(Exception ex) {
+					if(ex is NullReferenceException || ex is ArgumentOutOfRangeException) {
+						continue;
+					}
 
-				case AuthServiceCommand.FlushKey:
-					this.m_cache.RemoveKey(command.Arguments);
-					break;
-
-				case AuthServiceCommand.AddUser:
-					var user = await repo.GetUserAsync(command.Arguments).AwaitBackground();
-					break;
-
-				case AuthServiceCommand.AddSensor:
-					break;
-
-				case AuthServiceCommand.AddKey:
-					var key = await repo.GetSensorKeyAsync(command.Arguments).AwaitBackground();
-					break;
-
-				default:
-					continue;
+					this.m_logger.LogWarning(ex, "Unable to handle command: {message}", ex.Message);
 				}
 			}
 		}

@@ -10,7 +10,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Logging;
+
 using SensateService.Common.Data.Dto.Authorization;
 using SensateService.Common.Data.Dto.Protobuf;
 using SensateService.Crypto;
@@ -71,7 +73,8 @@ namespace SensateService.Infrastructure.Authorization
 					Latitude = message.Message.Latitude,
 					Longitude = message.Message.Longitude,
 					SensorId = message.Message.SensorId.ToString(),
-					Timestamp = message.Message.Timestamp.ToString("O")
+					Timestamp = message.Message.Timestamp.ToString("O"),
+					Data = message.Message.Data
 				};
 
 				data.Add(m);

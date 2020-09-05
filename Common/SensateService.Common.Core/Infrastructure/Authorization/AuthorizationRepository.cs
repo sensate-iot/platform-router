@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Microsoft.EntityFrameworkCore;
@@ -103,6 +104,21 @@ namespace SensateService.Infrastructure.Authorization
 					});
 
 			return await query.ToListAsync().AwaitBackground();
+		}
+
+		public async Task<Sensor> GetSensorAsync(ObjectId sensorId)
+		{
+			var filter = Builders<Common.Data.Models.Sensor>.Filter.Eq(sensor => sensor.InternalId, sensorId);
+			var query =
+				this.m_sensors.Aggregate()
+					.Match(filter)
+					.Project<Sensor>(new BsonDocument {
+						{ "Secret", 1 },
+						{ "UserId", "$Owner" },
+					});
+
+			var data = await query.ToListAsync().AwaitBackground();
+			return data.FirstOrDefault();
 		}
 
 		public async Task<ApiKey> GetSensorKeyAsync(string keyValue)

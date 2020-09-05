@@ -8,6 +8,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+using MongoDB.Bson;
+
 using SensateService.Common.Data.Dto.Authorization;
 
 namespace SensateService.Infrastructure.Repositories
@@ -19,5 +21,6 @@ namespace SensateService.Infrastructure.Repositories
 		Task<IEnumerable<ApiKey>> GetAllSensorKeysAsync();
 		Task<ApiKey> GetSensorKeyAsync(string keyValue);
 		Task<User> GetUserAsync(string userId);
+		Task<Sensor> GetSensorAsync(ObjectId sensorId);
 	}
 }
