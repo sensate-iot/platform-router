@@ -11,6 +11,9 @@ namespace SensateService.Common.Data.Enums
 	{
 		FlushUser,
 		FlushSensor,
-		FlushKey
+		FlushKey,
+		AddUser,
+		AddSensor,
+		AddKey
 	}
 }

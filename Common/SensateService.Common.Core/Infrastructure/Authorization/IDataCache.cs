@@ -21,5 +21,9 @@ namespace SensateService.Infrastructure.Authorization
 		void Append(IEnumerable<User> users);
 		void Append(IEnumerable<ApiKey> keys);
 		Task Clear();
+
+		void RemoveSensor(ObjectId id);
+		void RemoveUser(string id);
+		void RemoveKey(string id);
 	}
 }

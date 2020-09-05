@@ -104,5 +104,20 @@ namespace SensateService.Infrastructure.Authorization
 
 			await tsk.AwaitBackground();
 		}
+
+		public void RemoveSensor(ObjectId id)
+		{
+			this.m_sensors.Remove(id);
+		}
+
+		public void RemoveUser(string id)
+		{
+			this.m_users.Remove(id);
+		}
+
+		public void RemoveKey(string id)
+		{
+			this.m_apiKeys.Remove(id);
+		}
 	}
 }

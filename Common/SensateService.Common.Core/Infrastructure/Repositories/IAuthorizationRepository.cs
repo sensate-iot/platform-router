@@ -17,5 +17,7 @@ namespace SensateService.Infrastructure.Repositories
 		Task<IEnumerable<User>> GetAllUsersAsync();
 		Task<IEnumerable<Sensor>> GetAllSensorsAsync();
 		Task<IEnumerable<ApiKey>> GetAllSensorKeysAsync();
+		Task<ApiKey> GetSensorKeyAsync(string keyValue);
+		Task<User> GetUserAsync(string userId);
 	}
 }

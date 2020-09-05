@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using SensateService.Common.Data.Dto.Authorization;
+using SensateService.Common.Data.Dto.Generic;
 
 namespace SensateService.Infrastructure.Authorization
 {
@@ -20,5 +21,7 @@ namespace SensateService.Infrastructure.Authorization
 		void AddMessages(IEnumerable<JsonMessage> data);
 		Task Load();
 		int Process();
+		void AddCommand(Command cmd);
+		Task ProcessCommandsAsync();
 	}
 }

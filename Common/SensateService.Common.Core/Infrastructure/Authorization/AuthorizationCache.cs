@@ -13,7 +13,12 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+
+using MongoDB.Bson;
+
 using SensateService.Common.Data.Dto.Authorization;
+using SensateService.Common.Data.Dto.Generic;
+using SensateService.Common.Data.Enums;
 using SensateService.Crypto;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Events;
@@ -32,6 +37,9 @@ namespace SensateService.Infrastructure.Authorization
 		private int m_index;
 		private int m_count;
 
+		private SpinLockWrapper m_commandLock;
+		private IList<Command> m_commands;
+
 		public static event OnDataAuthorizedEvent MeasurementDataAuthorized;
 		public static event OnDataAuthorizedEvent MessageDataAuthorized;
 
@@ -41,8 +49,11 @@ namespace SensateService.Infrastructure.Authorization
 			this.m_cache = cache;
 			this.m_index = 0;
 			this.m_lock = new SpinLockWrapper();
+			this.m_commandLock = new SpinLockWrapper();
+			this.m_commands = new List<Command>();
 			this.m_measurementsHandler = new List<MeasurementAuthorizationHandler>();
 			this.m_messageHandlers = new List<MessageAuthorizationHandler>();
+
 			var factory = new LoggerFactory();
 
 			for(var idx = 0; idx < System.Diagnostics.Process.GetCurrentProcess().Threads.Count; idx++) {
@@ -154,6 +165,80 @@ namespace SensateService.Infrastructure.Authorization
 			return rv;
 		}
 
+		public void AddCommand(Command cmd)
+		{
+			this.m_commandLock.Lock();
+
+			try {
+				this.m_commands.Add(cmd);
+			} finally {
+				this.m_commandLock.Unlock();
+			}
+		}
+
+		public static Task InvokeMessageEvent(object measurementAuthorizationHandler, DataAuthorizedEventArgs args)
+		{
+			return MessageDataAuthorized != null ? MessageDataAuthorized.Invoke(measurementAuthorizationHandler, args) : Task.CompletedTask;
+		}
+
+		public static Task InvokeMeasurementEvent(object measurementAuthorizationHandler, DataAuthorizedEventArgs args)
+		{
+			return MeasurementDataAuthorized != null ? MeasurementDataAuthorized.Invoke(measurementAuthorizationHandler, args) : Task.CompletedTask;
+		}
+
+		public async Task ProcessCommandsAsync()
+		{
+			IList<Command> cmds = new List<Command>();
+			using var scope = this.m_provider.CreateScope();
+			var repo = scope.ServiceProvider.GetRequiredService<IAuthorizationRepository>();
+
+			this.m_commandLock.Lock();
+
+			try {
+				var tmp = this.m_commands;
+				this.m_commands = cmds;
+				cmds = tmp;
+			} finally {
+				this.m_commandLock.Unlock();
+			}
+
+			if(cmds.Count <= 0) {
+				return;
+			}
+
+			foreach(var command in cmds) {
+				switch(command.Cmd) {
+				case AuthServiceCommand.FlushUser:
+					this.m_cache.RemoveUser(command.Arguments);
+					break;
+
+				case AuthServiceCommand.FlushSensor:
+					if(ObjectId.TryParse(command.Arguments, out var id)) {
+						this.m_cache.RemoveSensor(id);
+					}
+					break;
+
+				case AuthServiceCommand.FlushKey:
+					this.m_cache.RemoveKey(command.Arguments);
+					break;
+
+				case AuthServiceCommand.AddUser:
+					var user = await repo.GetUserAsync(command.Arguments).AwaitBackground();
+					break;
+
+				case AuthServiceCommand.AddSensor:
+					break;
+
+				case AuthServiceCommand.AddKey:
+					var key = await repo.GetSensorKeyAsync(command.Arguments).AwaitBackground();
+					break;
+
+				default:
+					continue;
+				}
+			}
+		}
+
 		private int GetAndUpdateIndex()
 		{
 			var idx = this.m_index;
@@ -165,24 +250,6 @@ namespace SensateService.Infrastructure.Authorization
 			}
 
 			return idx;
-		}
-
-		public static Task InvokeMessageEvent(object measurementAuthorizationHandler, DataAuthorizedEventArgs args)
-		{
-			if(MessageDataAuthorized != null) {
-				return MessageDataAuthorized.Invoke(measurementAuthorizationHandler, args);
-			}
-
-			return Task.CompletedTask;
-		}
-
-		public static Task InvokeMeasurementEvent(object measurementAuthorizationHandler, DataAuthorizedEventArgs args)
-		{
-			if(MeasurementDataAuthorized != null) {
-				return MeasurementDataAuthorized.Invoke(measurementAuthorizationHandler, args);
-			}
-
-			return Task.CompletedTask;
 		}
 	}
 }
