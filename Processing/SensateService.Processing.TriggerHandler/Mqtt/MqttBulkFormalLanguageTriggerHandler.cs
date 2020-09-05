@@ -52,9 +52,9 @@ namespace SensateService.Processing.TriggerHandler.Mqtt
 			gzip.CopyTo(to);
 			var final = to.ToArray();
 			var protoMeasurements = TextMessageData.Parser.ParseFrom(final);
-			var measurements =
-				from measurement in protoMeasurements.Messages
-				group measurement by measurement.SensorId into g
+			var messages =
+				from message in protoMeasurements.Messages
+				group message by message.SensorId into g
 				select new InternalBulkMessageQueue {
 					SensorId = g.Key,
 					Messages = g.Select(m => new Message {
@@ -64,7 +64,7 @@ namespace SensateService.Processing.TriggerHandler.Mqtt
 					}).ToList()
 				};
 
-			return measurements;
+			return messages;
 		}
 
 		public override void OnMessage(string topic, string msg)
@@ -113,34 +113,6 @@ namespace SensateService.Processing.TriggerHandler.Mqtt
 				await this.m_matcher.HandleTriggerAsync(distinct).AwaitBackground();
 				await this.m_triggers.AddInvocationsAsync(distinct.Select(t => t.Item2)).AwaitBackground();
 
-				/*var msg = JsonConvert.DeserializeObject<Message>(message);
-				var triggers_enum = await this.m_triggers.GetAsync(msg.SensorId.ToString(), TriggerType.Regex)
-					.AwaitBackground();
-				var triggers = triggers_enum.ToList();
-				var tasks = new List<Task>();
-
-				if(triggers.Count <= 0) {
-					return;
-				}
-
-				var sensor = await this.m_sensors.GetAsync(msg.SensorId.ToString()).AwaitBackground();
-				var user = await this.m_users.GetAsync(sensor.Owner).AwaitBackground();
-
-				foreach(var trigger in triggers) {
-					var regex = new Regex(trigger.FormalLanguage);
-
-					if(!regex.IsMatch(msg.Data)) {
-						return;
-					}
-
-					var last = trigger.Invocations.OrderByDescending(x => x.Timestamp).FirstOrDefault();
-
-					foreach(var action in trigger.Actions) {
-						tasks.Add(this.m_handler.HandleTriggerAction(user, trigger, action, last, action.Message));
-					}
-				}
-
-				await Task.WhenAll(tasks).AwaitBackground();*/
 			} catch(Exception ex) {
 				this.m_logger.LogInformation($"Unable to handle message trigger: {ex.Message}");
 				this.m_logger.LogDebug(ex.StackTrace);
