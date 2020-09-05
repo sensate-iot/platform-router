@@ -73,7 +73,7 @@ function generateMeasurement(sensors) {
 }
 
 function send(host, content) {
-	var req = unirest("POST", `http://${host}/v1/processor/measurements`);
+	var req = unirest("POST", `http://${host}/processor/v1/measurements`);
 
 	req.headers({
 		"Cache-Control": "no-cache",
