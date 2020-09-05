@@ -41,7 +41,7 @@ namespace SensateService.Processing.DataAuthorizationApi.Controllers
 			this.m_logger = logger;
 		}
 
-		[HttpPost("messages")]
+		[HttpPost("message")]
 		[ValidateModel]
 		[ProducesResponseType(typeof(AuthorizationResponse), 202)]
 		[ProducesResponseType(typeof(Status), 400)]
