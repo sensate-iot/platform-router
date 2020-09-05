@@ -13,10 +13,10 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+
 using SensateService.Common.Data.Dto.Json.Out;
 using SensateService.Common.Data.Enums;
 using SensateService.Common.IdentityData.Models;
@@ -27,15 +27,13 @@ namespace SensateService.ApiCore.Middleware
 {
 	public class ApiKeyValidationMiddleware
 	{
-		private readonly ILogger<ApiKeyValidationMiddleware> _logger;
 		private readonly IServiceProvider _provider;
 		private readonly RequestDelegate _next;
 		private readonly JsonSerializerSettings m_settings;
 
-		public ApiKeyValidationMiddleware(RequestDelegate next, IServiceProvider sp, ILogger<ApiKeyValidationMiddleware> logger)
+		public ApiKeyValidationMiddleware(RequestDelegate next, IServiceProvider sp)
 		{
 			this._next = next;
-			this._logger = logger;
 			this._provider = sp;
 			this.m_settings = new JsonSerializerSettings {
 				ContractResolver = new DefaultContractResolver {
@@ -82,42 +80,39 @@ namespace SensateService.ApiCore.Middleware
 				return;
 			}
 
-			using(var scope = this._provider.CreateScope()) {
-				var repo = scope.ServiceProvider.GetRequiredService<IApiKeyRepository>();
-				var roles = scope.ServiceProvider.GetRequiredService<IUserRoleRepository>();
-				var users = scope.ServiceProvider.GetRequiredService<IUserRepository>();
-				var token = await repo.GetAsync(key, CancellationToken.None).AwaitBackground();
+			using var scope = this._provider.CreateScope();
+			var repo = scope.ServiceProvider.GetRequiredService<IApiKeyRepository>();
+			var roles = scope.ServiceProvider.GetRequiredService<IUserRoleRepository>();
+			var users = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+			var token = await repo.GetAsync(key, CancellationToken.None).AwaitBackground();
 
-				if(token == null) {
-					await this.RespondErrorAsync(ctx, ReplyCode.BadInput, "API key not found!", 401).AwaitBackground();
-					return;
-				}
-
-				await repo.IncrementRequestCountAsync(token).AwaitBackground();
-
-				token.User = await users.GetAsync(token.UserId, false).AwaitBackground();
-				var banned = await roles.GetByNameAsync(SensateRole.Banned).AwaitBackground();
-
-				if(IsBanned(token.User, banned)) {
-					await this.RespondErrorAsync(ctx, ReplyCode.Banned, "Bad API key!", 403).AwaitBackground();
-					return;
-				}
-
-				if(token.Revoked) {
-					await this.RespondErrorAsync(ctx, ReplyCode.NotAllowed, "Bad API key!", 403).AwaitBackground();
-					return;
-				}
-
-				if(token.User.BillingLockout) {
-					await this.RespondErrorAsync(ctx, ReplyCode.BillingLockout, "Billing lockout!", 402).AwaitBackground();
-					return;
-				}
-
-				ctx.Items["ApiKey"] = token;
-				await this._next(ctx).AwaitBackground();
+			if(token == null) {
+				await this.RespondErrorAsync(ctx, ReplyCode.BadInput, "API key not found!", 401).AwaitBackground();
+				return;
 			}
 
-			this._logger.LogInformation($"Key: {key}");
+			await repo.IncrementRequestCountAsync(token).AwaitBackground();
+
+			token.User = await users.GetAsync(token.UserId, false).AwaitBackground();
+			var banned = await roles.GetByNameAsync(SensateRole.Banned).AwaitBackground();
+
+			if(IsBanned(token.User, banned)) {
+				await this.RespondErrorAsync(ctx, ReplyCode.Banned, "Bad API key!", 403).AwaitBackground();
+				return;
+			}
+
+			if(token.Revoked) {
+				await this.RespondErrorAsync(ctx, ReplyCode.NotAllowed, "Bad API key!", 403).AwaitBackground();
+				return;
+			}
+
+			if(token.User.BillingLockout) {
+				await this.RespondErrorAsync(ctx, ReplyCode.BillingLockout, "Billing lockout!", 402).AwaitBackground();
+				return;
+			}
+
+			ctx.Items["ApiKey"] = token;
+			await this._next(ctx).AwaitBackground();
 		}
 	}
 }

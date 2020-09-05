@@ -25,11 +25,16 @@ namespace SensateService.Infrastructure.Authorization
 		private readonly IMemoryCache<string, User> m_users;
 		private readonly IMemoryCache<string, ApiKey> m_apiKeys;
 
+		private const long CacheCapacity = -1L;
+		private const int TimeoutMinutes = 6;
+
 		public DataCache()
 		{
-			this.m_sensors = new MemoryCache<ObjectId, Sensor>();
-			this.m_users = new MemoryCache<string, User>();
-			this.m_apiKeys = new MemoryCache<string, ApiKey>();
+			var tmo = Convert.ToInt32(TimeSpan.FromMinutes(TimeoutMinutes).TotalMilliseconds);
+
+			this.m_sensors = new MemoryCache<ObjectId, Sensor>(CacheCapacity, tmo);
+			this.m_users = new MemoryCache<string, User>(CacheCapacity, tmo);
+			this.m_apiKeys = new MemoryCache<string, ApiKey>(CacheCapacity, tmo);
 		}
 
 		public Sensor GetSensor(ObjectId id)
@@ -58,7 +63,7 @@ namespace SensateService.Infrastructure.Authorization
 				Key = s.Id
 			});
 
-			this.m_sensors.Add(sensorsKvp);
+			this.m_sensors.AddOrUpdate(sensorsKvp);
 		}
 
 		public void Append(IEnumerable<User> users)
@@ -68,7 +73,7 @@ namespace SensateService.Infrastructure.Authorization
 				Key = u.Id
 			});
 
-			this.m_users.Add(usersKvp);
+			this.m_users.AddOrUpdate(usersKvp);
 		}
 
 		public void Append(IEnumerable<ApiKey> keys)
@@ -78,7 +83,7 @@ namespace SensateService.Infrastructure.Authorization
 				Value = key
 			});
 
-			this.m_apiKeys.Add(keysKvp);
+			this.m_apiKeys.AddOrUpdate(keysKvp);
 		}
 
 		public async Task Clear()

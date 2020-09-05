@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
+
 using SensateService.Helpers;
 using SensateService.Infrastructure.Authorization;
 using SensateService.Services.Settings;
@@ -22,18 +23,16 @@ namespace SensateService.Services.Processing
 		private const int StartDelay = 1000;
 
 		private readonly IAuthorizationCache m_cache;
-		private readonly IDataCache m_dataCache;
 		private readonly ILogger<DataAuthorizationService> m_logger;
 		private readonly TimeSpan m_reloadInterval;
 		private DateTimeOffset m_reloadExpiry;
 
-		public DataAuthorizationService(IAuthorizationCache cache, ILogger<DataAuthorizationService> logger, IDataCache dataCache)
+		public DataAuthorizationService(IAuthorizationCache cache, ILogger<DataAuthorizationService> logger)
 		{
 			this.m_cache = cache;
 			this.m_logger = logger;
 			this.m_reloadExpiry = DateTimeOffset.MinValue;
 			this.m_reloadInterval = TimeSpan.FromMinutes(5);
-			this.m_dataCache = dataCache;
 		}
 
 		protected override async Task ProcessAsync()
@@ -54,14 +53,14 @@ namespace SensateService.Services.Processing
 
 				count = this.m_cache.Process();
 			} catch(Exception ex) {
-				this.m_logger.LogInformation($"Authorization cache failed: {ex.InnerException?.Message}");
+				this.m_logger.LogInformation(ex, $"Authorization cache failed: {ex.InnerException?.Message}");
 			}
 
 			sw.Stop();
 
 			if(count > 0) {
-				this.m_logger.LogInformation($"Number of messages authorized: {count}.{Environment.NewLine}" +
-				                             $"Processing took {sw.ElapsedMilliseconds}ms.{Environment.NewLine}");
+				this.m_logger.LogInformation("Number of messages authorized: {count}" + Environment.NewLine +
+											 "Processing took {duration}ms.", count, sw.ElapsedMilliseconds);
 			}
 		}
 

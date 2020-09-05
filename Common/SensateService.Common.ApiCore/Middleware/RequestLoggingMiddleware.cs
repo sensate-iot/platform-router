@@ -92,40 +92,39 @@ namespace SensateService.ApiCore.Middleware
 				await this._next(ctx).AwaitBackground();
 				sw.Stop();
 
-				using(var scope = this._provider.CreateScope()) {
-					var logs = scope.ServiceProvider.GetRequiredService<IAuditLogRepository>();
-					var users = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+				using var scope = this._provider.CreateScope();
+				var logs = scope.ServiceProvider.GetRequiredService<IAuditLogRepository>();
+				var users = scope.ServiceProvider.GetRequiredService<IUserRepository>();
 
-					this._logger.LogInformation($"{ctx.Request.Method}: {ctx.Request.Path} {Environment.NewLine}");
-					this._logger.LogInformation($"Result: HTTP {ctx.Response?.StatusCode}");
-					this._logger.LogInformation($"Client IP: {ctx.Request.HttpContext.Connection.RemoteIpAddress}");
+				this._logger.LogInformation(
+					"{method} {path} from {ip} resulted in {response} ({duration}ms)",
+					ctx.Request.Method,
+					ctx.Request.Path,
+					ctx.Request.HttpContext.Connection.RemoteIpAddress,
+					ctx.Response?.StatusCode,
+					sw.ElapsedMilliseconds
+				);
 
-					if(ctx.Items["ApiKey"] is SensateApiKey token) {
-						user = token.User;
-					} else {
-						user = await users.GetByClaimsPrincipleAsync(ctx.User).AwaitBackground();
-					}
-
-					log = new AuditLog {
-						Timestamp = DateTime.Now,
-						Method = ToRequestMethod(ctx.Request.Method),
-						Address = ctx.Request.HttpContext.Connection.RemoteIpAddress,
-						AuthorId = user?.Id,
-						Route = ctx.Request.Path + ctx.Request.QueryString.ToString()
-					};
-
-					await logs.CreateAsync(log, CancellationToken.None).AwaitBackground();
+				if(ctx.Items["ApiKey"] is SensateApiKey token) {
+					user = token.User;
+				} else {
+					user = await users.GetByClaimsPrincipleAsync(ctx.User).AwaitBackground();
 				}
 
-				this._logger.LogInformation($"Request completed in {sw.ElapsedMilliseconds}ms");
-			} catch(FormatException ex) {
-				this._logger.LogInformation($"Unable to complete request: {ex.Message}");
-				this._logger.LogDebug(ex, "Invalid format detected!");
+				log = new AuditLog {
+					Timestamp = DateTime.Now,
+					Method = ToRequestMethod(ctx.Request.Method),
+					Address = ctx.Request.HttpContext.Connection.RemoteIpAddress,
+					AuthorId = user?.Id,
+					Route = ctx.Request.Path + ctx.Request.QueryString.ToString()
+				};
 
+				await logs.CreateAsync(log, CancellationToken.None).AwaitBackground();
+			} catch(FormatException ex) {
+				this._logger.LogInformation(ex, "Invalid format detected!");
 				await this.RespondErrorAsync(ctx, ReplyCode.BadInput, "Invalid input supplied!", 422).AwaitBackground();
 			} catch(Exception ex) {
-				this._logger.LogInformation($"Unable to complete request: {ex.Message}");
-				this._logger.LogDebug(ex, "Unknown error occurred!");
+				this._logger.LogWarning(ex, "Unknown error occurred!");
 
 				await this.RespondErrorAsync(ctx, ReplyCode.UnknownError, "Bad request!", 500).AwaitBackground();
 			}

@@ -7,8 +7,8 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using SensateService.Common.Data.Dto.Authorization;
-using SensateService.Common.Data.Dto.Json.In;
 
 namespace SensateService.Infrastructure.Authorization
 {
@@ -16,6 +16,8 @@ namespace SensateService.Infrastructure.Authorization
 	{
 		void AddMeasurement(JsonMeasurement data);
 		void AddMeasurements(IEnumerable<JsonMeasurement> data);
+		void AddMessage(JsonMessage data);
+		void AddMessages(IEnumerable<JsonMessage> data);
 		Task Load();
 		int Process();
 	}

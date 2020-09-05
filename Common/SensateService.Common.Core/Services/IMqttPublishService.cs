@@ -10,7 +10,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace SensateService.Services
 {
-	public interface IMqttPublishService : IHostedService
+	public interface IMqttPublishService
 	{
 		Task PublishOnAsync(string topic, string message, bool retain);
 		void PublishOn(string topic, string message, bool retain);

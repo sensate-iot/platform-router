@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using SensateService.Common.Data.Dto.Authorization;
 using SensateService.Helpers;
 
@@ -17,6 +18,10 @@ namespace SensateService.Infrastructure.Authorization
 	{
 		protected SpinLockWrapper m_lock;
 		protected List<TData> m_messages;
+
+		protected const int SecretSubStringOffset = 3;
+		protected const int SecretSubStringStart = 1;
+		protected const int PartitionSize = 10000;
 
 		protected AbstractAuthorizationHandler()
 		{

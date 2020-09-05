@@ -21,10 +21,11 @@ namespace SensateService.Services.Processing
 
 		public virtual Task StartAsync(CancellationToken cancellationToken)
 		{
-			this._executor = ExecuteAsync(this._stoppingCts.Token);
+			this._executor = this.ExecuteAsync(this._stoppingCts.Token);
 
-			if(this._executor.IsCompleted)
+			if(this._executor.IsCompleted) {
 				return this._executor;
+			}
 
 			return Task.CompletedTask;
 		}

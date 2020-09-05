@@ -5,15 +5,18 @@
  * @email  michel@michelmegens.net
  */
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Microsoft.Extensions.Logging;
 using SensateService.Common.Data.Dto.Authorization;
 using SensateService.Common.Data.Dto.Protobuf;
 using SensateService.Crypto;
-using SensateService.Services;
+using SensateService.Helpers;
+using SensateService.Infrastructure.Events;
+using Measurement = SensateService.Common.Data.Dto.Protobuf.Measurement;
 
 namespace SensateService.Infrastructure.Authorization
 {
@@ -21,22 +24,18 @@ namespace SensateService.Infrastructure.Authorization
 	{
 		private readonly IHashAlgorithm m_algo;
 		private readonly IDataCache m_cache;
-		private readonly IMqttPublishService m_publisher;
+		private readonly ILogger<MeasurementAuthorizationHandler> m_logger;
 
-		private const int SecretSubStringOffset = 3;
-		private const int SecretSubStringStart = 1;
-
-		public MeasurementAuthorizationHandler(IHashAlgorithm algo, IDataCache cache, IMqttPublishService publisher)
+		public MeasurementAuthorizationHandler(IHashAlgorithm algo, IDataCache cache, ILogger<MeasurementAuthorizationHandler> logger)
 		{
+			this.m_logger = logger;
 			this.m_algo = algo;
 			this.m_cache = cache;
-			this.m_publisher = publisher;
 		}
 
-		public override Task ProcessAsync()
+		public override async Task ProcessAsync()
 		{
 			List<JsonMeasurement> measurements;
-			MeasurementData data;
 
 			this.m_lock.Lock();
 
@@ -48,43 +47,76 @@ namespace SensateService.Infrastructure.Authorization
 				this.m_lock.Unlock();
 			}
 
-			if(measurements == null) {
-				return Task.CompletedTask;
+			if(measurements == null || measurements.Count <= 0) {
+				return;
 			}
 
-			data = new MeasurementData();
 			measurements = measurements.OrderBy(m => m.Measurement.SensorId).ToList();
 			Sensor sensor = null;
+			var data = new List<Measurement>();
 
 			foreach(var measurement in measurements) {
-				if(sensor == null || sensor.Id != measurement.Measurement.SensorId) {
-					sensor = this.m_cache.GetSensor(measurement.Measurement.SensorId);
-				}
+				try {
+					if(sensor == null || sensor.Id != measurement.Measurement.SensorId) {
+						sensor = this.m_cache.GetSensor(measurement.Measurement.SensorId);
+					}
 
-				if(sensor == null || !this.AuthorizeMessage(measurement, sensor)) {
-					continue;
-				}
+					if(sensor == null || !this.AuthorizeMessage(measurement, sensor)) {
+						continue;
+					}
 
-				var m = new Common.Data.Dto.Protobuf.Measurement {
-					SensorId = sensor.Id.ToString(),
-				};
+					if(measurement.Measurement.Timestamp == DateTime.MinValue) {
+						measurement.Measurement.Timestamp = DateTime.UtcNow;
+					}
 
-				foreach(var (key, dp) in measurement.Measurement.Data) {
-					var datapoint = new DataPoint {
-						Key = key,
-						Accuracy = dp.Accuracy ?? 0,
-						Precision = dp.Precision ?? 0,
-						Unit = dp.Unit,
-						Value = decimal.ToDouble(dp.Value)
+					var m = new Measurement {
+						SensorId = sensor.Id.ToString(),
+						Latitude = decimal.ToDouble(measurement.Measurement.Latitude),
+						Longitude = decimal.ToDouble(measurement.Measurement.Longitude),
+						PlatformTime = DateTime.UtcNow.ToString("O"),
+						Timestamp = measurement.Measurement.Timestamp.ToString("O")
 					};
 
-					m.Datapoints.Add(datapoint);
-				}
+					foreach(var (key, dp) in measurement.Measurement.Data) {
+						var datapoint = new DataPoint {
+							Key = key,
+							Accuracy = dp.Accuracy ?? 0,
+							Precision = dp.Precision ?? 0,
+							Unit = dp.Unit,
+							Value = decimal.ToDouble(dp.Value)
+						};
 
-				data.Measurements.Add(m);
+						m.Datapoints.Add(datapoint);
+					}
+
+					data.Add(m);
+				} catch(Exception ex) {
+					this.m_logger.LogInformation(ex, "Unable to process measurement: {message}", ex.InnerException?.Message);
+				}
 			}
 
-			return Task.CompletedTask;
+			var tasks = new List<Task>();
+
+			if(data.Count > PartitionSize) {
+				var partitions = data.Partition(PartitionSize);
+				var measurementData = new MeasurementData();
+
+				foreach(var partition in partitions) {
+					measurementData.Measurements.AddRange(partition);
+				}
+
+				var args = new DataAuthorizedEventArgs {Data = measurementData};
+
+				tasks.Add(AuthorizationCache.InvokeMeasurementEvent(this, args));
+			} else {
+				var measurementData = new MeasurementData();
+				measurementData.Measurements.AddRange(data);
+
+				var args = new DataAuthorizedEventArgs {Data = measurementData};
+				tasks.Add(AuthorizationCache.InvokeMeasurementEvent(this, args));
+			}
+
+			await Task.WhenAll(tasks).AwaitBackground();
 		}
 
 		protected override bool AuthorizeMessage(JsonMeasurement measurement, Sensor sensor)
