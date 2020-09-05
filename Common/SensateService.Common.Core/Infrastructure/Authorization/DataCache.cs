@@ -86,6 +86,33 @@ namespace SensateService.Infrastructure.Authorization
 			this.m_apiKeys.AddOrUpdate(keysKvp);
 		}
 
+		public void Append(Sensor sensor)
+		{
+			if(sensor == null) {
+				throw new ArgumentNullException(nameof(sensor));
+			}
+
+			this.m_sensors.Add(sensor.Id, sensor);
+		}
+
+		public void Append(User user)
+		{
+			if(user == null) {
+				throw new ArgumentNullException(nameof(user));
+			}
+
+			this.m_users.AddOrUpdate(user.Id, user);
+		}
+
+		public void Append(ApiKey key)
+		{
+			if(key == null) {
+				throw new ArgumentNullException(nameof(key));
+			}
+
+			this.m_apiKeys.AddOrUpdate(key.Key, key);
+		}
+
 		public async Task Clear()
 		{
 			var tsk = Task.Run(() => {
