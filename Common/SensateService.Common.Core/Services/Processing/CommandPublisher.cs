@@ -26,8 +26,8 @@ namespace SensateService.Services.Processing
 	{
 		private readonly CommandPublisherOptions _options;
 
-		public CommandPublisher(IOptions<CommandPublisherOptions> options, ILogger<CommandPublisher> logger) :
-			base(options.Value.Host, options.Value.Port, options.Value.Ssl, logger)
+		public CommandPublisher(IOptions<CommandPublisherOptions> options, ILogger<CommandPublisher> logger, IServiceProvider sp) :
+			base(options.Value.Host, options.Value.Port, options.Value.Ssl, "", logger, sp)
 		{
 			this._options = options.Value;
 		}

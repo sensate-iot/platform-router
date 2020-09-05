@@ -26,12 +26,19 @@ namespace SensateService.Init
 		{
 			service.AddSingleton<IHostedService, MqttService>();
 
-			if(setup != null)
-				service.Configure<MqttServiceOptions>(setup);
+			if(setup != null) {
+				service.Configure(setup);
+			}
 
+			return service;
+		}
+
+		public static IServiceCollection AddMqttHandlers(this IServiceCollection service)
+		{
 			foreach(var etype in Assembly.GetEntryAssembly().ExportedTypes) {
-				if(etype.GetTypeInfo().BaseType == typeof(MqttHandler))
+				if(etype.GetTypeInfo().BaseType == typeof(MqttHandler)) {
 					service.AddScoped(etype);
+				}
 			}
 
 			return service;
@@ -57,7 +64,7 @@ namespace SensateService.Init
 			services.AddSingleton<IHostedService, T>();
 
 			if(setup != null)
-				services.Configure<MqttPublishServiceOptions>(setup);
+				services.Configure(setup);
 
 			services.AddSingleton(provider => {
 				var s = provider.GetServices<IHostedService>().ToList();
@@ -96,6 +103,24 @@ namespace SensateService.Init
 			 */
 			services = sp.GetServices<IHostedService>().ToList();
 			mqtt = services.Find(x => x.GetType() == typeof(MqttService)) as MqttService;
+			mqtt?.MapTopicHandler<T>(topic);
+		}
+
+		public static void MapInternalMqttTopic<T>(this IServiceProvider sp, string topic) where T : MqttHandler
+		{
+			InternalMqttService mqtt;
+			List<IHostedService> services;
+
+			/*
+			 * If anybody knows a cleaner way of going about
+			 * IHostedServices: do let me know.
+			 *
+			 * For now we just get *every* IHostedService and find the one
+			 * we need. I'm truly sorry you are a witness to this savage
+			 * piece of SWE.
+			 */
+			services = sp.GetServices<IHostedService>().ToList();
+			mqtt = services.Find(x => x.GetType() == typeof(InternalMqttService)) as InternalMqttService;
 			mqtt?.MapTopicHandler<T>(topic);
 		}
 	}

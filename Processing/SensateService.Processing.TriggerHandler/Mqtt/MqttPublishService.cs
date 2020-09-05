@@ -5,6 +5,7 @@
  * @email  michel.megens@sonatolabs.com
  */
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -22,8 +23,8 @@ namespace SensateService.Processing.TriggerHandler.Mqtt
 	{
 		private readonly MqttPublishServiceOptions _options;
 
-		public MqttPublishService(IOptions<MqttPublishServiceOptions> options, ILogger<MqttService> logger) :
-			base(options.Value.Host, options.Value.Port, options.Value.Ssl, logger)
+		public MqttPublishService(IOptions<MqttPublishServiceOptions> options, ILogger<MqttService> logger, IServiceProvider sp) :
+			base(options.Value.Host, options.Value.Port, options.Value.Ssl, "", logger, sp)
 		{
 			this._options = options.Value;
 		}

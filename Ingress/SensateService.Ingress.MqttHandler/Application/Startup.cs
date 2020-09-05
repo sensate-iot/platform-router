@@ -65,6 +65,8 @@ namespace SensateService.Ingress.MqttHandler.Application
 
 				builder.AddConsole();
 			});
+
+			services.AddMqttHandlers();
 		}
 
 		public void Configure(IServiceProvider provider)

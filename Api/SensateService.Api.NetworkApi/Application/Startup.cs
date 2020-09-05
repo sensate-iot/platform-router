@@ -84,7 +84,7 @@ namespace SensateService.Api.NetworkApi.Application
 				options.Port = privatemqtt.Port;
 				options.Username = privatemqtt.Username;
 				options.Password = privatemqtt.Password;
-				options.CommandsTopic = privatemqtt.InternalCommandsTopic;
+				options.CommandsTopic = privatemqtt.InternalCommandTopic;
 			});
 
 			services.AddSwaggerGen(c => {

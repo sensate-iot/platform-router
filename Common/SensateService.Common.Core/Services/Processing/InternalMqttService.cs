@@ -5,6 +5,7 @@
  * @email  michel.megens@sonatolabs.com
  */
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,8 +24,8 @@ namespace SensateService.Services.Processing
 	{
 		private readonly InternalMqttServiceOptions _options;
 
-		public InternalMqttService(IOptions<InternalMqttServiceOptions> options, ILogger<MqttService> logger) :
-			base(options.Value.Host, options.Value.Port, options.Value.Ssl, logger)
+		public InternalMqttService(IOptions<InternalMqttServiceOptions> options, ILogger<MqttService> logger, IServiceProvider sp) :
+			base(options.Value.Host, options.Value.Port, options.Value.Ssl, "", logger, sp)
 		{
 			this._options = options.Value;
 		}
@@ -64,17 +65,6 @@ namespace SensateService.Services.Processing
 		{
 			var task = Task.Run(async () => { await this.PublishOnAsync(topic, message, retain).AwaitBackground(); });
 			task.Wait();
-		}
-
-		protected override Task OnConnectAsync()
-		{
-			this._logger.LogInformation("Internal MQTT client connected!");
-			return Task.CompletedTask;
-		}
-
-		protected override Task OnMessageAsync(string topic, string msg)
-		{
-			return Task.CompletedTask;
 		}
 	}
 }
