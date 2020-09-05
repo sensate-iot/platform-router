@@ -6,11 +6,13 @@
  */
 
 using System;
+
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+
 using SensateService.Common.IdentityData.Models;
 using SensateService.Config;
 using SensateService.Infrastructure.Sql;
@@ -157,6 +159,8 @@ namespace SensateService.Processing.TriggerHandler.Application
 				options.MqttTimeout = timeouts.MqttTimeout;
 				options.HttpTimeout = timeouts.HttpTimeout;
 			});
+
+			services.AddMqttHandlers();
 		}
 
 		public void Configure(IServiceProvider provider)

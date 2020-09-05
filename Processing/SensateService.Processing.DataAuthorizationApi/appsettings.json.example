@@ -60,7 +60,7 @@
       "Ssl": "false",
       "Port": 1883,
       "Host": "127.0.0.1",
-      "InternalCommandTopic": "sensate/internal/auth-service/commands",
+      "InternalCommandTopic": "sensate-auth/internal/commands",
       "InternalBulkMeasurementTopic": "sensate/internal/measurements/bulk",
       "InternalBulkMessageTopic": "sensate/internal/messages/bulk"
     }

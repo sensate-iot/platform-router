@@ -109,6 +109,8 @@ namespace SensateService.Processing.StorageClient.Application
 
 				builder.AddConsole();
 			});
+
+			services.AddMqttHandlers();
 		}
 
 		public void Configure(IServiceProvider provider)

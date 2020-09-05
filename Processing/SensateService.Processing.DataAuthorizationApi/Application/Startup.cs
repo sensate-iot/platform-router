@@ -132,10 +132,13 @@ namespace SensateService.Processing.DataAuthorizationApi.Application
 				}
 			});
 
+			services.AddMqttHandlers();
 		}
 
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider sp)
 		{
+			var mqtt = new MqttConfig();
+
 			app.UseForwardedHeaders();
 			app.UseRouting();
 
@@ -164,6 +167,10 @@ namespace SensateService.Processing.DataAuthorizationApi.Application
 				c.SwaggerEndpoint("/processor/swagger/v1/swagger.json", "Data Authorization API v1");
 				c.RoutePrefix = "processor/swagger";
 			});
+
+			this._configuration.GetSection("Mqtt").Bind(mqtt);
+
+			sp.MapInternalMqttTopic<CommandSubscription>(mqtt.InternalBroker.InternalCommandTopic);
 
 			app.UseMiddleware<SlimRequestLoggingMiddleware>();
 			app.UseMiddleware<ExecutionTimeMeasurementMiddleware>();

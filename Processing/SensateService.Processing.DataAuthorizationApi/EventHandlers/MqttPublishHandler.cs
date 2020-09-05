@@ -44,14 +44,6 @@ namespace SensateService.Processing.DataAuthorizationApi.EventHandlers
 			await client.PublishOnAsync(this.m_settings.MessageTopic, result, false);
 		}
 
-		private static string GetPublishableData(DataAuthorizedEventArgs e)
-		{ 
-			using var stream = new MemoryStream();
-			e.Data.WriteTo(stream);
-
-			return stream.ToArray().Compress();
-		}
-
 		private async Task MeasurementsAuthorized_Handler(object sender, DataAuthorizedEventArgs e)
 		{
 			using var scope = this.m_provider.CreateScope();
@@ -59,6 +51,14 @@ namespace SensateService.Processing.DataAuthorizationApi.EventHandlers
 			var result = GetPublishableData(e);
 
 			await client.PublishOnAsync(this.m_settings.MeasurementTopic, result, false);
+		}
+
+		private static string GetPublishableData(DataAuthorizedEventArgs e)
+		{ 
+			using var stream = new MemoryStream();
+			e.Data.WriteTo(stream);
+
+			return stream.ToArray().Compress();
 		}
 
 		public Task StartAsync(CancellationToken cancellationToken)
