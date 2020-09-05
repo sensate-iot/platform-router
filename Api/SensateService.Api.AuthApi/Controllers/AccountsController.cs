@@ -653,6 +653,7 @@ namespace SensateService.Api.AuthApi.Controllers
 				}
 
 				await this.m_publisher.PublishCommand(AuthServiceCommand.FlushUser, user.Id).AwaitBackground();
+				await this.m_publisher.PublishCommand(AuthServiceCommand.AddUser, user.Id).AwaitBackground();
 
 				var dbgroles = await this._users.GetRolesAsync(user);
 				this._logger.LogInformation($"New roles for {role.UserId}:");
@@ -702,6 +703,7 @@ namespace SensateService.Api.AuthApi.Controllers
 				user.BillingLockout = userUpdate.BillingLockout;
 				await this._users.EndUpdateAsync().AwaitBackground();
 				await this.m_publisher.PublishCommand(AuthServiceCommand.FlushUser, user.Id).AwaitBackground();
+				await this.m_publisher.PublishCommand(AuthServiceCommand.AddUser, user.Id).AwaitBackground();
 			} catch(Exception ex) {
 				this._logger.LogInformation($"Unable to set billing locket: {ex.Message}");
 				this._logger.LogDebug(ex.StackTrace);

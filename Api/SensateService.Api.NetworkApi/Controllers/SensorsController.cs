@@ -105,7 +105,7 @@ namespace SensateService.Api.NetworkApi.Controllers
 			try {
 				await this.m_keys.CreateSensorKey(new SensateApiKey(), sensor).AwaitBackground();
 				await this.m_sensors.CreateAsync(sensor).AwaitBackground();
-				await this.m_publish.PublishCommand(AuthServiceCommand.FlushSensor, sensor.InternalId.ToString()).AwaitBackground();
+				await this.m_publish.PublishCommand(AuthServiceCommand.AddSensor, sensor.InternalId.ToString()).AwaitBackground();
 			} catch(Exception ex) {
 				this.m_logger.LogInformation($"Unable to create sensor: {ex.Message}");
 
@@ -372,8 +372,12 @@ namespace SensateService.Api.NetworkApi.Controllers
 
 				await Task.WhenAll(
 					this.m_publish.PublishCommand(AuthServiceCommand.FlushSensor, sensor.InternalId.ToString()),
-					this.m_publish.PublishCommand(AuthServiceCommand.FlushKey, sensor.Secret),
 					this.m_publish.PublishCommand(AuthServiceCommand.FlushKey, oldSecret)
+				).AwaitBackground();
+
+				await Task.WhenAll(this.m_publish.PublishCommand(AuthServiceCommand.AddKey, sensor.Secret),
+				                   this.m_publish.PublishCommand(AuthServiceCommand.AddSensor,
+				                                                 sensor.InternalId.ToString())
 				).AwaitBackground();
 			} catch(Exception ex) {
 				this.m_logger.LogInformation($"Unable to update sensor: {ex.Message}");

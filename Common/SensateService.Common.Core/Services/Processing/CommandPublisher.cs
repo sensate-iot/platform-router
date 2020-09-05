@@ -88,6 +88,9 @@ namespace SensateService.Services.Processing
 					AuthServiceCommand.FlushKey => Commands.FlushKey,
 					AuthServiceCommand.FlushSensor => Commands.FlushSensor,
 					AuthServiceCommand.FlushUser => Commands.FlushUser,
+					AuthServiceCommand.AddUser => Commands.AddUser,
+					AuthServiceCommand.AddSensor => Commands.AddSensor,
+					AuthServiceCommand.AddKey => Commands.AddKey,
 					_ => throw new ArgumentOutOfRangeException(nameof(cmd))
 				},
 				[Commands.ArgumentKey] = argument

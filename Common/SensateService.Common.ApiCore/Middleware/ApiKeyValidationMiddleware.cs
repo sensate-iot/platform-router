@@ -69,13 +69,18 @@ namespace SensateService.ApiCore.Middleware
 		public async Task Invoke([NotNull] HttpContext ctx)
 		{
 			var query = ctx.Request.Query;
+			string key;
 
 			if(IsSwagger(ctx.Request.Path)) {
 				await this._next(ctx).AwaitBackground();
 				return;
 			}
 
-			if(!query.TryGetValue("key", out var key)) {
+			if(query.TryGetValue("key", out var sv)) {
+				key = sv;
+			} else if(ctx.Request.Headers.TryGetValue("X-ApiKey", out sv)) {
+				key = sv;
+			} else {
 				await this.RespondErrorAsync(ctx, ReplyCode.NotAllowed, "API key missing!", 400).AwaitBackground();
 				return;
 			}
