@@ -17,15 +17,17 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 
 using SensateService.ApiCore.Init;
-using SensateService.ApiCore.Middleware;
 using SensateService.Config;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
+using SensateService.Processing.DataAuthorizationApi.EventHandlers;
+using SensateService.Processing.DataAuthorizationApi.Middleware;
+using SensateService.Settings;
 
 namespace SensateService.Processing.DataAuthorizationApi.Application
 {
-    public class Startup
-    {
+	public class Startup
+	{
 		private readonly IWebHostEnvironment _env;
 		private readonly IConfiguration _configuration;
 
@@ -35,10 +37,10 @@ namespace SensateService.Processing.DataAuthorizationApi.Application
 			this._env = environment;
 		}
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {			
-	        var cache = new CacheConfig();
+		// This method gets called by the runtime. Use this method to add services to the container.
+		public void ConfigureServices(IServiceCollection services)
+		{
+			var cache = new CacheConfig();
 			var db = new DatabaseConfig();
 			var auth = new AuthenticationConfig();
 			var sys = new SystemConfig();
@@ -57,12 +59,14 @@ namespace SensateService.Processing.DataAuthorizationApi.Application
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.AddIdentityFramwork(auth);
 			services.AddReverseProxy(sys);
+			services.AddSingleton<IHostedService, MqttPublishHandler>();
 
 			if(cache.Enabled) {
 				services.AddCacheStrategy(cache, db);
 			}
 
 			services.AddAuthorizationServices();
+
 			services.AddInternalMqttService(options => {
 				options.Ssl = privatemqtt.Ssl;
 				options.Host = privatemqtt.Host;
@@ -76,6 +80,10 @@ namespace SensateService.Processing.DataAuthorizationApi.Application
 				options.InternalBulkMessageTopic = privatemqtt.InternalBulkMessageTopic;
 			});
 
+			services.Configure<DataAuthorizationSettings>(options => {
+				options.MeasurementTopic = privatemqtt.InternalBulkMeasurementTopic;
+				options.MessageTopic = privatemqtt.InternalBulkMessageTopic;
+			});
 
 			/* Add repositories */
 			services.AddSqlRepositories(cache.Enabled);
@@ -124,7 +132,7 @@ namespace SensateService.Processing.DataAuthorizationApi.Application
 				}
 			});
 
-        }
+		}
 
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider sp)
 		{
@@ -157,10 +165,10 @@ namespace SensateService.Processing.DataAuthorizationApi.Application
 				c.RoutePrefix = "processor/swagger";
 			});
 
-			app.UseMiddleware<RequestLoggingMiddleware>();
-			app.UseMiddleware<ApiKeyValidationMiddleware>();
+			app.UseMiddleware<SlimRequestLoggingMiddleware>();
+			app.UseMiddleware<ExecutionTimeMeasurementMiddleware>();
 			app.UseEndpoints(ep => { ep.MapControllers(); });
 		}
 
-    }
+	}
 }
