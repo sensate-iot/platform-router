@@ -54,7 +54,7 @@ namespace SensateService.Services.Processing
 				count = this.m_cache.Process();
 				await this.m_cache.ProcessCommandsAsync().AwaitBackground();
 			} catch(Exception ex) {
-				this.m_logger.LogInformation(ex, $"Authorization cache failed: {ex.InnerException?.Message}");
+				this.m_logger.LogWarning(ex, $"Authorization cache failed: {ex.InnerException?.Message}");
 			}
 
 			sw.Stop();
