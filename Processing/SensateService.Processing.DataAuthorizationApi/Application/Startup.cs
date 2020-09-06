@@ -160,12 +160,12 @@ namespace SensateService.Processing.DataAuthorizationApi.Application
 			}
 
 			app.UseSwagger(c => {
-				c.RouteTemplate = "processor/swagger/{documentName}/swagger.json";
+				c.RouteTemplate = "authorization/swagger/{documentName}/swagger.json";
 			});
 
 			app.UseSwaggerUI(c => {
-				c.SwaggerEndpoint("/processor/swagger/v1/swagger.json", "Data Authorization API v1");
-				c.RoutePrefix = "processor/swagger";
+				c.SwaggerEndpoint("/authorization/swagger/v1/swagger.json", "Data Authorization API v1");
+				c.RoutePrefix = "authorization/swagger";
 			});
 
 			this._configuration.GetSection("Mqtt").Bind(mqtt);

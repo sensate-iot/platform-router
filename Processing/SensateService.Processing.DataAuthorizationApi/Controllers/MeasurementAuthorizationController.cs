@@ -28,7 +28,7 @@ using Measurement = SensateService.Common.Data.Dto.Authorization.Measurement;
 namespace SensateService.Processing.DataAuthorizationApi.Controllers
 {
 	[Produces("application/json")]
-	[Route("processor/v1")]
+	[Route("authorization/v1/processor")]
 	public class MeasurementAuthorizationController : AbstractController
 	{
 		private readonly ILogger<MeasurementAuthorizationController> m_logger;

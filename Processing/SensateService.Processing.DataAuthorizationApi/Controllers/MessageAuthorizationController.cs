@@ -26,7 +26,7 @@ using SensateService.Processing.DataAuthorizationApi.Dto;
 namespace SensateService.Processing.DataAuthorizationApi.Controllers
 {
 	[Produces("application/json")]
-	[Route("processor/v1")]
+	[Route("authorization/v1/processor")]
 	public class MessageAuthorizationController : AbstractApiController
 	{
 		private readonly IAuthorizationCache m_cache;
@@ -94,6 +94,7 @@ namespace SensateService.Processing.DataAuthorizationApi.Controllers
 					};
 
 					ary.Add(m);
+					status.Queued += 1;
 				} catch(JsonSerializationException ex) {
 					this.m_logger.LogInformation(ex, "Unable to parse message: {message}", ex.Message);
 					status.Rejected += 1;
