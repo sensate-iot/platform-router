@@ -6,6 +6,7 @@ on:
       branches:
         - master
         - develop
+        - feature/**
       # Publish `v1.2.3` tags as releases.
       tags:
         - v*
@@ -24,7 +25,7 @@ jobs:
 
       - name: Build image
         run: |
-          docker build . --file TriggerHandler/Dockerfile --tag $IMAGE_NAME
+          docker build . --file Processing/SensateService.Processing.TriggerHandler/Dockerfile --tag $IMAGE_NAME
 
       - name: Log into registry
         run: echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin

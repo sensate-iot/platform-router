@@ -2,20 +2,22 @@ name: Docker
 
 on:
   push:
+      # Publish `master` as Docker `latest` image.
       branches:
-        - master # Publish `master` as Docker `latest` image.
-        - develop # Publish `master` as Docker `staging` image.
+        - master
+        - develop
+		- feature/**
       # Publish `v1.2.3` tags as releases.
       tags:
         - v*
 env:
-  IMAGE_NAME: auth-service
-  IMAGE_ID: sensateiot/auth-service
+  IMAGE_NAME: dataauthorization-api
+  IMAGE_ID: sensateiot/dataauthorization-api
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
 jobs:
-  push-auth-service-api:
+  push-dataauthorization-api:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,8 +25,7 @@ jobs:
 
       - name: Build image
         run: |
-          cd AuthService
-          docker build . --tag $IMAGE_NAME
+          docker build . --file Processing/SensateService.Processing.DataAuthorizationApi/Dockerfile --tag $IMAGE_NAME
 
       - name: Log into registry
         run: echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin
