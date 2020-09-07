@@ -19,14 +19,14 @@ namespace SensateService.Processing.DataAuthorizationApi.Application
 	{
 		public static string GetAppSettings()
 		{
-			return Environment.GetEnvironmentVariable("SENSATE_WEBSOCKETHANDLER_APPSETTINGS") ?? "appsettings.json";
+			return Environment.GetEnvironmentVariable("SENSATE_AUTHORIZATIONAPI_APPSETTINGS") ?? "appsettings.json";
 		}
 
 		public static void Main(string[] args)
 		{
 			IHost wh;
 
-			Console.WriteLine($"Starting WebSocketHandler using {Version.VersionString}");
+			Console.WriteLine($"Starting DataAuthorization API using {Version.VersionString}");
 			wh = BuildWebHost(args);
 			wh.Run();
 		}
