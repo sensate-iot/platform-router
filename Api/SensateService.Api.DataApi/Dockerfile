@@ -8,23 +8,17 @@
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build-env
 
 WORKDIR /build
-COPY Core/*.csproj Core/
-COPY ApiCore/*.csproj ApiCore/
-COPY DataApi/*.csproj DataApi/
-COPY COPYING .
-RUN dotnet restore -r linux-musl-x64 DataApi/DataApi.csproj
 
-COPY Core/ Core/
-COPY DataApi/ DataApi/
-COPY ApiCore/ ApiCore/
-RUN dotnet publish -c Release -o /app/bin -r linux-musl-x64 --no-restore --self-contained true --no-restore DataApi/DataApi.csproj
+COPY . .
+RUN dotnet restore -r linux-musl-x64 Api/SensateService.Api.DataApi/SensateService.Api.DataApi.csproj
+RUN dotnet publish -c Release -o /app/bin -r linux-musl-x64 --no-restore --self-contained true --no-restore Api/SensateService.Api.DataApi/SensateService.Api.DataApi.csproj
 
 FROM alpine:3.11
 
 COPY --from=build-env /app /app
-COPY DataApi/Settings/hosting.json /app/hosting.json
+COPY Api/SensateService.Api.DataApi/Settings/hosting.json /app/hosting.json
 WORKDIR /app
 RUN apk add --no-cache libstdc++ libintl icu
 
 EXPOSE 5000
-ENTRYPOINT ["bin/DataApi"]
+ENTRYPOINT ["bin/SensateService.Api.DataApi"]
