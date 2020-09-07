@@ -50,7 +50,7 @@ namespace SensateService.Processing.DataAuthorizationApi.Controllers
 		[HttpPost("measurements")]
 		[ProducesResponseType(typeof(AuthorizationResponse), 202)]
 		[ProducesResponseType(typeof(Status), 400)]
-		public Task<AcceptedResult> AuthorizeMeasurements([FromBody] JArray data)
+		public Task<AcceptedResult> AuthorizeMeasurements([FromBody] JArray measurements)
 		{
 			var status = new AuthorizationResponse {
 				ErrorCode = ReplyCode.Ok,
@@ -61,7 +61,7 @@ namespace SensateService.Processing.DataAuthorizationApi.Controllers
 
 			var ary = new List<JsonMeasurement>();
 
-			foreach(var token in data) {
+			foreach(var token in measurements) {
 				try {
 					var m = new JsonMeasurement {
 						Json = token.ToString(Formatting.None),
@@ -84,7 +84,7 @@ namespace SensateService.Processing.DataAuthorizationApi.Controllers
 		[HttpPost("measurement")]
 		[ProducesResponseType(typeof(AuthorizationResponse), 202)]
 		[ProducesResponseType(typeof(Status), 400)]
-		public Task<AcceptedResult> AuthorizeMeasurement([FromBody] JToken data)
+		public Task<AcceptedResult> AuthorizeMeasurement([FromBody] JToken measurement)
 		{
 			var status = new AuthorizationResponse {
 				ErrorCode = ReplyCode.Ok,
@@ -95,8 +95,8 @@ namespace SensateService.Processing.DataAuthorizationApi.Controllers
 
 			try {
 				var m = new JsonMeasurement {
-					Json = data.ToString(Formatting.None),
-					Measurement = data.ToObject<Measurement>()
+					Json = measurement.ToString(Formatting.None),
+					Measurement = measurement.ToObject<Measurement>()
 				};
 
 				this.m_cache.AddMeasurement(m);

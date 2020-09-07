@@ -45,7 +45,7 @@ namespace SensateService.Processing.DataAuthorizationApi.Controllers
 		[ValidateModel]
 		[ProducesResponseType(typeof(AuthorizationResponse), 202)]
 		[ProducesResponseType(typeof(Status), 400)]
-		public Task<AcceptedResult> AuthorizeMessages([FromBody] JToken data)
+		public Task<AcceptedResult> AuthorizeMessages([FromBody] JToken message)
 		{
 			var status = new AuthorizationResponse {
 				ErrorCode = ReplyCode.Ok,
@@ -56,8 +56,8 @@ namespace SensateService.Processing.DataAuthorizationApi.Controllers
 
 			try {
 				var m = new JsonMessage {
-					Json = data.ToString(Formatting.None),
-					Message = data.ToObject<Message>()
+					Json = message.ToString(Formatting.None),
+					Message = message.ToObject<Message>()
 				};
 
 				this.m_cache.AddMessage(m);
@@ -75,7 +75,7 @@ namespace SensateService.Processing.DataAuthorizationApi.Controllers
 		[ValidateModel]
 		[ProducesResponseType(typeof(AuthorizationResponse), 202)]
 		[ProducesResponseType(typeof(Status), 400)]
-		public Task<AcceptedResult> AuthorizeMessages([FromBody] JArray data)
+		public Task<AcceptedResult> AuthorizeMessages([FromBody] JArray messages)
 		{
 			var status = new AuthorizationResponse {
 				ErrorCode = ReplyCode.Ok,
@@ -86,7 +86,7 @@ namespace SensateService.Processing.DataAuthorizationApi.Controllers
 
 			var ary = new List<JsonMessage>();
 
-			foreach(var entry in data) {
+			foreach(var entry in messages) {
 				try {
 					var m = new JsonMessage {
 						Message = entry.ToObject<Message>(),
