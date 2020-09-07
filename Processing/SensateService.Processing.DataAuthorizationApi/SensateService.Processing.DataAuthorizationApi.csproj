@@ -2,6 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Version>0.5.1</Version>
+    <PackageLicenseFile>COPYING</PackageLicenseFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,6 +21,13 @@
     <ProjectReference Include="..\..\Common\SensateService.Common.Core\SensateService.Common.Core.csproj" />
     <ProjectReference Include="..\..\Common\SensateService.Common.IdentityData\SensateService.Common.IdentityData.csproj" />
     <ProjectReference Include="..\..\Common\SensateService.Common.Models\SensateService.Common.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\COPYING">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 
