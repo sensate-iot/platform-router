@@ -35,7 +35,7 @@ namespace SensateService.Processing.DataAuthorizationApi.Controllers
 		public MessageAuthorizationController(IHttpContextAccessor ctx,
 												  IAuthorizationCache cache,
 												  ILogger<MessageAuthorizationController> logger
-		                                      ) : base(ctx)
+											  ) : base(ctx)
 		{
 			this.m_cache = cache;
 			this.m_logger = logger;

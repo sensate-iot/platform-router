@@ -87,7 +87,7 @@ namespace SensateService.Infrastructure.Authorization
 				var billing = reader.GetBoolean(1);
 				var banned = reader.GetBoolean(2);
 
-				rv = new User {BillingLockout = billing, Banned = banned, Id = id};
+				rv = new User { BillingLockout = billing, Banned = banned, Id = id };
 			}
 
 			return rv;
@@ -143,7 +143,7 @@ namespace SensateService.Infrastructure.Authorization
 				var revoked = reader.GetBoolean(1);
 				var @readonly = reader.GetBoolean(2);
 
-				rv = new ApiKey {Key = key, ReadOnly = @readonly, Revoked = revoked};
+				rv = new ApiKey { Key = key, ReadOnly = @readonly, Revoked = revoked };
 			}
 
 			return rv;

@@ -62,7 +62,8 @@ namespace SensateService.Processing.DataAuthorizationApi.EventHandlers
 				throw new ArgumentNullException(nameof(cmd));
 			}
 
-			return cmd switch {
+			return cmd switch
+			{
 				Commands.FlushKey => AuthServiceCommand.FlushKey,
 				Commands.FlushSensor => AuthServiceCommand.FlushSensor,
 				Commands.FlushUser => AuthServiceCommand.FlushUser,

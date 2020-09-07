@@ -105,14 +105,14 @@ namespace SensateService.Infrastructure.Authorization
 					measurementData.Measurements.AddRange(partition);
 				}
 
-				var args = new DataAuthorizedEventArgs {Data = measurementData};
+				var args = new DataAuthorizedEventArgs { Data = measurementData };
 
 				tasks.Add(AuthorizationCache.InvokeMeasurementEvent(this, args));
 			} else {
 				var measurementData = new MeasurementData();
 				measurementData.Measurements.AddRange(data);
 
-				var args = new DataAuthorizedEventArgs {Data = measurementData};
+				var args = new DataAuthorizedEventArgs { Data = measurementData };
 				tasks.Add(AuthorizationCache.InvokeMeasurementEvent(this, args));
 			}
 

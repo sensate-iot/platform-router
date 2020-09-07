@@ -54,7 +54,7 @@ namespace SensateService.Processing.DataAuthorizationApi.EventHandlers
 		}
 
 		private static string GetPublishableData(DataAuthorizedEventArgs e)
-		{ 
+		{
 			using var stream = new MemoryStream();
 			e.Data.WriteTo(stream);
 

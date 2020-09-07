@@ -376,8 +376,8 @@ namespace SensateService.Api.NetworkApi.Controllers
 				).AwaitBackground();
 
 				await Task.WhenAll(this.m_publish.PublishCommand(AuthServiceCommand.AddKey, sensor.Secret),
-				                   this.m_publish.PublishCommand(AuthServiceCommand.AddSensor,
-				                                                 sensor.InternalId.ToString())
+								   this.m_publish.PublishCommand(AuthServiceCommand.AddSensor,
+																 sensor.InternalId.ToString())
 				).AwaitBackground();
 			} catch(Exception ex) {
 				this.m_logger.LogInformation($"Unable to update sensor: {ex.Message}");

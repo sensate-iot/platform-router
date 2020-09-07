@@ -90,14 +90,14 @@ namespace SensateService.Infrastructure.Authorization
 					measurementData.Messages.AddRange(partition);
 				}
 
-				var args = new DataAuthorizedEventArgs {Data = measurementData};
+				var args = new DataAuthorizedEventArgs { Data = measurementData };
 
 				tasks.Add(AuthorizationCache.InvokeMessageEvent(this, args));
 			} else {
 				var measurementData = new TextMessageData();
 				measurementData.Messages.AddRange(data);
 
-				var args = new DataAuthorizedEventArgs {Data = measurementData};
+				var args = new DataAuthorizedEventArgs { Data = measurementData };
 				tasks.Add(AuthorizationCache.InvokeMessageEvent(this, args));
 			}
 

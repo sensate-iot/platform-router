@@ -42,7 +42,7 @@ namespace SensateService.Services.Processing
 		protected readonly ILogger _logger;
 
 		protected AbstractMqttService(string host, int port, bool ssl, string share,
-		                              ILogger logger, IServiceProvider provider)
+									  ILogger logger, IServiceProvider provider)
 		{
 			this._host = host;
 			this._port = port;

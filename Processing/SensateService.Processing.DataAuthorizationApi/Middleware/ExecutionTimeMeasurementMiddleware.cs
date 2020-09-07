@@ -32,7 +32,7 @@ namespace SensateService.Processing.DataAuthorizationApi.Middleware
 			ctx.Response.OnStarting(state => {
 				var httpCtx = state as HttpContext;
 
-				httpCtx?.Response.Headers.Add(ExecutionTimeHeader, new[] {sw.ElapsedMilliseconds.ToString()});
+				httpCtx?.Response.Headers.Add(ExecutionTimeHeader, new[] { sw.ElapsedMilliseconds.ToString() });
 				return Task.CompletedTask;
 			}, ctx);
 

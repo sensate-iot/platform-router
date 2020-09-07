@@ -18,7 +18,7 @@ using SensateService.Helpers;
 
 namespace SensateService.Processing.DataAuthorizationApi.Middleware
 {
-	public class SlimRequestLoggingMiddleware 
+	public class SlimRequestLoggingMiddleware
 	{
 		private readonly RequestDelegate _next;
 		private readonly ILogger<ExecutionTimeMeasurementMiddleware> _logger;
