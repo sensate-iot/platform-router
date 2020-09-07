@@ -32,17 +32,14 @@ namespace SensateService.Processing.DataAuthorizationApi.Controllers
 	public class MeasurementAuthorizationController : AbstractController
 	{
 		private readonly ILogger<MeasurementAuthorizationController> m_logger;
-		private readonly IAuthorizationRepository m_repo;
 		private readonly IAuthorizationCache m_cache;
 
 		public MeasurementAuthorizationController(IUserRepository users,
 												  ILogger<MeasurementAuthorizationController> logger,
-												  IAuthorizationRepository auth,
 												  IAuthorizationCache cache,
 												  IHttpContextAccessor ctx) : base(users, ctx)
 		{
 			this.m_logger = logger;
-			this.m_repo = auth;
 			this.m_cache = cache;
 		}
 

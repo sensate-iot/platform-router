@@ -14,7 +14,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Models;
 
 using SensateService.ApiCore.Init;
 using SensateService.Config;
@@ -88,38 +87,6 @@ namespace SensateService.Processing.DataAuthorizationApi.Application
 			services.AddSqlRepositories(cache.Enabled);
 			services.AddDocumentRepositories(cache.Enabled);
 
-			services.AddSwaggerGen(c => {
-				c.SwaggerDoc("v1", new OpenApiInfo {
-					Title = "Sensate IoT Data API - Version 1",
-					Version = "v1"
-				});
-
-				c.AddSecurityDefinition("key", new OpenApiSecurityScheme {
-					In = ParameterLocation.Query,
-					Name = "key",
-					Type = SecuritySchemeType.ApiKey,
-					Description = "API key needed to access the endpoints."
-				});
-
-				c.AddSecurityRequirement(new OpenApiSecurityRequirement
-				{
-					{
-						new OpenApiSecurityScheme
-						{
-							Name = "key",
-							Type = SecuritySchemeType.ApiKey,
-							In = ParameterLocation.Query,
-							Reference = new OpenApiReference
-							{
-								Type = ReferenceType.SecurityScheme,
-								Id = "key"
-							},
-						},
-						new string[] {}
-					}
-				});
-			});
-
 			services.AddRouting();
 			services.AddControllers().AddNewtonsoftJson();
 
@@ -157,15 +124,6 @@ namespace SensateService.Processing.DataAuthorizationApi.Application
 			if(env.IsDevelopment()) {
 				app.UseDeveloperExceptionPage();
 			}
-
-			app.UseSwagger(c => {
-				c.RouteTemplate = "authorization/swagger/{documentName}/swagger.json";
-			});
-
-			app.UseSwaggerUI(c => {
-				c.SwaggerEndpoint("/authorization/swagger/v1/swagger.json", "Data Authorization API v1");
-				c.RoutePrefix = "authorization/swagger";
-			});
 
 			this._configuration.GetSection("Mqtt").Bind(mqtt);
 
