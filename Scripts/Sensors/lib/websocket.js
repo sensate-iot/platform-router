@@ -35,7 +35,7 @@ module.exports.run = function (args) {
 	timer = new NanoTimer();
 
 	if(args.messages) {
-		const host = args.host + ':' + args.port + '/ingress/v1/messages';
+		const host = 'http://' + args.host + ':' + args.port + '/ingress/v1/message';
 		const ws = new socket(host);
 
 		ws.on('open', () => {
@@ -43,7 +43,7 @@ module.exports.run = function (args) {
 			timer.setInterval(publishMessage, [ws, args], args.interval.toString() + 'u');
 		});
 	} else {
-		const host = args.host + ':' + args.port + '/ingress/v1/measurement';
+		const host = 'http://' + args.host + ':' + args.port + '/ingress/v1/measurement';
 		const ws = new socket(host);
 
 		ws.on('open', () => {

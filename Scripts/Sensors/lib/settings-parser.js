@@ -11,7 +11,6 @@ function parse(path) {
 	if(path == undefined)
 		return undefined;
 
-	console.log(path)
 	const json = fs.readFileSync(path);
 
 	return JSON.parse(json);

@@ -75,5 +75,5 @@ async function main() {
 }
 
 main().catch(error => {
-    console.log("Unable run sensate-sensor");
+	console.log("Unable run sensate-sensor");
 });
