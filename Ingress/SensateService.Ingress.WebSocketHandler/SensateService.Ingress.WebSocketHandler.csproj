@@ -5,7 +5,7 @@
     <UserSecretsId>SensateService</UserSecretsId>
     <ServerGarbageCollection>true</ServerGarbageCollection>
     <Version>0.5.1</Version>
-    <AssemblyName>WebSocketHandler</AssemblyName>
+    <AssemblyName>SensateService.Ingress.WebSocketHandler</AssemblyName>
     <RootNamespace>SensateService.Ingress.WebSocketHandler</RootNamespace>
   </PropertyGroup>
 
