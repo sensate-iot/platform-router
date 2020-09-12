@@ -95,6 +95,10 @@ namespace SensateService.Infrastructure.Authorization
 				}
 			}
 
+			if(data.Count <= 0) {
+				return;
+			}
+
 			var tasks = new List<Task>();
 
 			if(data.Count > PartitionSize) {

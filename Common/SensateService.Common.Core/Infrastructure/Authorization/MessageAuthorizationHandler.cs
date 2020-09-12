@@ -80,6 +80,10 @@ namespace SensateService.Infrastructure.Authorization
 				data.Add(m);
 			}
 
+			if(data.Count <= 0) {
+				return;
+			}
+
 			var tasks = new List<Task>();
 
 			if(data.Count > PartitionSize) {
