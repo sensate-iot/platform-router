@@ -6,6 +6,7 @@
  */
 
 using System;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+
 using SensateService.Api.NetworkApi.Mqtt;
 using SensateService.ApiCore.Init;
 using SensateService.ApiCore.Middleware;
@@ -84,7 +86,7 @@ namespace SensateService.Api.NetworkApi.Application
 				options.Port = privatemqtt.Port;
 				options.Username = privatemqtt.Username;
 				options.Password = privatemqtt.Password;
-				options.CommandsTopic = privatemqtt.InternalCommandTopic;
+				options.CommandsTopic = privatemqtt.InternalCommandsTopic;
 			});
 
 			services.AddSwaggerGen(c => {

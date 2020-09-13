@@ -6,15 +6,17 @@
  */
 
 using System;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+
 using MQTTnet;
 using MQTTnet.Client;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
 using SensateService.Common.Data.Enums;
 using SensateService.Constants;
 using SensateService.Helpers;

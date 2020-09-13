@@ -39,6 +39,6 @@ namespace SensateService.Config
 		public string AuthorizedBulkMessageTopic { get; set; }
 		public string AuthorizedBulkMeasurementTopic { get; set; }
 		public string InternalBlobTopic { get; set; }
-		public string InternalCommandTopic { get; set; }
+		public string InternalCommandsTopic { get; set; }
 	}
 }

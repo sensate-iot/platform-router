@@ -126,8 +126,7 @@ namespace SensateService.Processing.DataAuthorizationApi.Application
 
 			this._configuration.GetSection("Mqtt").Bind(mqtt);
 
-			sp.MapInternalMqttTopic<CommandSubscription>(mqtt.InternalBroker.InternalCommandTopic);
-
+			sp.MapInternalMqttTopic<CommandSubscription>(mqtt.InternalBroker.InternalCommandsTopic);
 			app.UseMiddleware<SlimRequestLoggingMiddleware>();
 			app.UseMiddleware<ExecutionTimeMeasurementMiddleware>();
 			app.UseEndpoints(ep => { ep.MapControllers(); });

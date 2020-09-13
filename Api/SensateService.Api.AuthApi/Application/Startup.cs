@@ -81,7 +81,7 @@ namespace SensateService.Api.AuthApi.Application
 				options.Port = privatemqtt.Port;
 				options.Username = privatemqtt.Username;
 				options.Password = privatemqtt.Password;
-				options.CommandsTopic = privatemqtt.InternalCommandTopic;
+				options.CommandsTopic = privatemqtt.InternalCommandsTopic;
 			});
 
 			if(mail.Provider == "SendGrid") {
