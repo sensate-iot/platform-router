@@ -147,24 +147,21 @@ namespace SensateService.Infrastructure.Authorization
 			GC.Collect();
 		}
 
-		public int Process()
+		public async Task<Tuple<int, int>> ProcessAsync()
 		{
-			Parallel.ForEach(this.m_measurementsHandler, async handler => {
-				await handler.ProcessAsync().AwaitBackground();
-			});
-
-			Parallel.ForEach(this.m_messageHandlers, async handler => {
-				await handler.ProcessAsync().AwaitBackground();
-			});
-
+			var tasks = new List<Task<int>>();
 			int rv;
+
+			tasks.AddRange(this.m_measurementsHandler.Select(handler => handler.ProcessAsync()));
+			tasks.AddRange(this.m_messageHandlers.Select(handler => handler.ProcessAsync()));
+			var results = await Task.WhenAll(tasks).AwaitBackground();
 
 			this.m_lock.Lock();
 			rv = this.m_count;
 			this.m_count = 0;
 			this.m_lock.Unlock();
 
-			return rv;
+			return new Tuple<int, int>(rv, results.Sum());
 		}
 
 		public void AddCommand(Command cmd)

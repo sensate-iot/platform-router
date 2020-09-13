@@ -38,11 +38,12 @@ namespace SensateService.Services.Processing
 		protected override async Task ProcessAsync()
 		{
 			Stopwatch sw;
-			long count;
+			long count, authorized;
 
 			sw = Stopwatch.StartNew();
 			this.m_logger.LogDebug("Authorization service triggered!");
 			count = 0L;
+			authorized = 0L;
 
 			try {
 				if(DateTimeOffset.UtcNow > this.m_reloadExpiry) {
@@ -51,7 +52,10 @@ namespace SensateService.Services.Processing
 					await this.m_cache.Load().AwaitBackground();
 				}
 
-				count = this.m_cache.Process();
+				var tmp = await this.m_cache.ProcessAsync().AwaitBackground();
+				count = tmp.Item1;
+				authorized = tmp.Item2;
+
 				await this.m_cache.ProcessCommandsAsync().AwaitBackground();
 			} catch(Exception ex) {
 				this.m_logger.LogWarning(ex, $"Authorization cache failed: {ex.InnerException?.Message}");
@@ -59,9 +63,10 @@ namespace SensateService.Services.Processing
 
 			sw.Stop();
 
-			if(count > 0) {
-				this.m_logger.LogInformation("Number of messages authorized: {count}" + Environment.NewLine +
-											 "Processing took {duration}ms.", count, sw.ElapsedMilliseconds);
+			if(count > 0 || authorized > 0) {
+				this.m_logger.LogInformation("Number of messages processed: {processed}" + Environment.NewLine +
+											 "Number of messages authorized: {authorized}" + Environment.NewLine +
+											 "Processing took {duration}ms.", count, authorized, sw.ElapsedMilliseconds);
 			}
 		}
 

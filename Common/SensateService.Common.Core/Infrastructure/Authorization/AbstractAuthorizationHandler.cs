@@ -52,7 +52,7 @@ namespace SensateService.Infrastructure.Authorization
 		}
 
 		protected abstract bool AuthorizeMessage(TData data, Sensor sensor);
-		public abstract Task ProcessAsync();
+		public abstract Task<int> ProcessAsync();
 
 		protected static byte[] HexToByteArray(string hex)
 		{

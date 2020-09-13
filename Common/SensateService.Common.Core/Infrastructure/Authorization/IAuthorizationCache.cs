@@ -5,6 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -20,7 +21,7 @@ namespace SensateService.Infrastructure.Authorization
 		void AddMessage(JsonMessage data);
 		void AddMessages(IEnumerable<JsonMessage> data);
 		Task Load();
-		int Process();
+		Task<Tuple<int, int>> ProcessAsync();
 		void AddCommand(Command cmd);
 		Task ProcessCommandsAsync();
 	}

@@ -34,7 +34,7 @@ namespace SensateService.Infrastructure.Authorization
 			this.m_logger = logger;
 		}
 
-		public override async Task ProcessAsync()
+		public override async Task<int> ProcessAsync()
 		{
 			List<JsonMessage> messages;
 
@@ -49,7 +49,7 @@ namespace SensateService.Infrastructure.Authorization
 			}
 
 			if(messages == null || messages.Count <= 0) {
-				return;
+				return 0;
 			}
 
 			messages = messages.OrderBy(m => m.Message.SensorId).ToList();
@@ -57,34 +57,39 @@ namespace SensateService.Infrastructure.Authorization
 			var data = new List<TextMessage>();
 
 			foreach(var message in messages) {
-				if(sensor == null || sensor.Id != message.Message.SensorId) {
-					sensor = this.m_cache.GetSensor(message.Message.SensorId);
+				try {
+					if(sensor == null || sensor.Id != message.Message.SensorId) {
+						sensor = this.m_cache.GetSensor(message.Message.SensorId);
+					}
+
+					if(sensor == null || !this.AuthorizeMessage(message, sensor)) {
+						continue;
+					}
+
+					if(message.Message.Timestamp == DateTime.MinValue) {
+						message.Message.Timestamp = DateTime.UtcNow;
+					}
+
+					var m = new TextMessage {
+						Latitude = message.Message.Latitude,
+						Longitude = message.Message.Longitude,
+						SensorId = message.Message.SensorId.ToString(),
+						Timestamp = message.Message.Timestamp.ToString("O"),
+						Data = message.Message.Data
+					};
+
+					data.Add(m);
+				} catch(Exception ex) {
+					this.m_logger.LogInformation(ex, "Unable to process message: {message}", ex.InnerException?.Message);
 				}
-
-				if(sensor == null || !this.AuthorizeMessage(message, sensor)) {
-					continue;
-				}
-
-				if(message.Message.Timestamp == DateTime.MinValue) {
-					message.Message.Timestamp = DateTime.UtcNow;
-				}
-
-				var m = new TextMessage {
-					Latitude = message.Message.Latitude,
-					Longitude = message.Message.Longitude,
-					SensorId = message.Message.SensorId.ToString(),
-					Timestamp = message.Message.Timestamp.ToString("O"),
-					Data = message.Message.Data
-				};
-
-				data.Add(m);
 			}
 
 			if(data.Count <= 0) {
-				return;
+				return 0;
 			}
 
 			var tasks = new List<Task>();
+			var rv = data.Count;
 
 			if(data.Count > PartitionSize) {
 				var partitions = data.Partition(PartitionSize);
@@ -106,6 +111,7 @@ namespace SensateService.Infrastructure.Authorization
 			}
 
 			await Task.WhenAll(tasks).AwaitBackground();
+			return rv;
 		}
 
 		protected override bool AuthorizeMessage(JsonMessage message, Sensor sensor)

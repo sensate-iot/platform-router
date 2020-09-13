@@ -10,7 +10,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Logging;
+
 using SensateService.Common.Data.Dto.Authorization;
 using SensateService.Common.Data.Dto.Protobuf;
 using SensateService.Crypto;
@@ -33,7 +35,7 @@ namespace SensateService.Infrastructure.Authorization
 			this.m_cache = cache;
 		}
 
-		public override async Task ProcessAsync()
+		public override async Task<int> ProcessAsync()
 		{
 			List<JsonMeasurement> measurements;
 
@@ -48,7 +50,7 @@ namespace SensateService.Infrastructure.Authorization
 			}
 
 			if(measurements == null || measurements.Count <= 0) {
-				return;
+				return 0;
 			}
 
 			measurements = measurements.OrderBy(m => m.Measurement.SensorId).ToList();
@@ -96,10 +98,11 @@ namespace SensateService.Infrastructure.Authorization
 			}
 
 			if(data.Count <= 0) {
-				return;
+				return 0;
 			}
 
 			var tasks = new List<Task>();
+			var rv = data.Count;
 
 			if(data.Count > PartitionSize) {
 				var partitions = data.Partition(PartitionSize);
@@ -121,6 +124,7 @@ namespace SensateService.Infrastructure.Authorization
 			}
 
 			await Task.WhenAll(tasks).AwaitBackground();
+			return rv;
 		}
 
 		protected override bool AuthorizeMessage(JsonMeasurement measurement, Sensor sensor)
