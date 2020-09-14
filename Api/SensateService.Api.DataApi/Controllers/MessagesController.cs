@@ -77,7 +77,7 @@ namespace SensateService.Api.DataApi.Controllers
 
 				return this.Accepted(status);
 			} catch(JsonException) {
-				status.Message = "Unable to parse message.";
+				status.Message = "Unable to parse messages";
 				status.ErrorCode = ReplyCode.BadInput;
 				return this.UnprocessableEntity(status);
 			} catch(Exception ex) {

@@ -86,7 +86,7 @@ namespace SensateService.Api.DataApi.Controllers
 
 				return this.Accepted(status);
 			} catch(JsonException) {
-				status.Message = "Unable to parse measurement";
+				status.Message = "Unable to parse measurements";
 				status.ErrorCode = ReplyCode.BadInput;
 				return this.UnprocessableEntity(status);
 			} catch(Exception ex) {
