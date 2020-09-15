@@ -24,6 +24,7 @@ using SensateService.Infrastructure.Document;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Infrastructure.Sql;
 using SensateService.Services;
+using SensateService.Services.DataProcessing;
 using SensateService.Services.Processing;
 
 namespace SensateService.Init

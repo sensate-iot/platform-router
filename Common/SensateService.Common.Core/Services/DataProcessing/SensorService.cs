@@ -8,13 +8,14 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
 using SensateService.Common.Data.Dto.Json.Out;
 using SensateService.Common.Data.Models;
 using SensateService.Common.IdentityData.Models;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 
-namespace SensateService.Services.Processing
+namespace SensateService.Services.DataProcessing
 {
 	public class SensorService : ISensorService
 	{

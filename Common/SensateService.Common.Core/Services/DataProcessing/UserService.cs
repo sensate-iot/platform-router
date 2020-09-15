@@ -17,7 +17,7 @@ using SensateService.Common.IdentityData.Models;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 
-namespace SensateService.Services.Processing
+namespace SensateService.Services.DataProcessing
 {
 	public class UserService : IUserService
 	{

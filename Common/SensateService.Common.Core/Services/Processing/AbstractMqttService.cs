@@ -23,6 +23,7 @@ using MQTTnet.Protocol;
 
 using SensateService.Helpers;
 using SensateService.Middleware;
+using SensateService.Services.Background;
 
 namespace SensateService.Services.Processing
 {

@@ -33,7 +33,9 @@ using SensateService.Common.Data.Models;
 using SensateService.Common.IdentityData.Models;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
-using SensateService.Services;
+using SensateService.Services.Adapters;
+using SensateService.Services.DataProcessing;
+using SensateService.Services.Processing;
 
 namespace SensateService.Api.AuthApi.Controllers
 {

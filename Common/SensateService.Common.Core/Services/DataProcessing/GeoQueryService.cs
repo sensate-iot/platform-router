@@ -12,10 +12,11 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using MongoDB.Driver.GeoJsonObjectModel;
+
 using SensateService.Common.Data.Dto.Generic;
 using SensateService.Common.Data.Enums;
 
-namespace SensateService.Services.Processing
+namespace SensateService.Services.DataProcessing
 {
 	public class GeoQueryService : IGeoQueryService
 	{

@@ -7,9 +7,8 @@
 
 using System.Threading.Tasks;
 using SensateService.Common.Data.Dto.Generic;
-using SensateService.Middleware;
 
-namespace SensateService.Services
+namespace SensateService.Services.Adapters
 {
 	public interface IEmailSender
 	{

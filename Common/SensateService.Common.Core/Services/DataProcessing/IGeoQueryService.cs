@@ -9,10 +9,11 @@ using System.Collections.Generic;
 using System.Threading;
 
 using MongoDB.Driver.GeoJsonObjectModel;
+
 using SensateService.Common.Data.Dto.Generic;
 using SensateService.Common.Data.Enums;
 
-namespace SensateService.Services
+namespace SensateService.Services.DataProcessing
 {
 	public interface IGeoQueryService
 	{

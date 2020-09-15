@@ -21,7 +21,7 @@ using SensateService.Common.Data.Enums;
 using SensateService.Common.Data.Models;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
-using SensateService.Services;
+using SensateService.Services.Processing;
 
 namespace SensateService.Api.NetworkApi.Controllers
 {

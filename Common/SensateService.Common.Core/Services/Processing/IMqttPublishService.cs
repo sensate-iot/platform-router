@@ -6,9 +6,8 @@
  */
 
 using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
 
-namespace SensateService.Services
+namespace SensateService.Services.Processing
 {
 	public interface IMqttPublishService
 	{

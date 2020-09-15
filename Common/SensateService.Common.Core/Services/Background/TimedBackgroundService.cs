@@ -12,7 +12,7 @@ using Microsoft.Extensions.Hosting;
 
 using SensateService.Common.Config.Settings;
 
-namespace SensateService.Services.Processing
+namespace SensateService.Services.Background
 {
 	public abstract class TimedBackgroundService : IHostedService
 	{

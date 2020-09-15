@@ -22,7 +22,7 @@ using SensateService.Common.Data.Models;
 using SensateService.Exceptions;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Helpers;
-using SensateService.Services;
+using SensateService.Services.DataProcessing;
 
 namespace SensateService.Infrastructure.Document
 {

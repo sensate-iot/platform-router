@@ -7,7 +7,7 @@
 
 using System.Threading.Tasks;
 
-namespace SensateService.Services
+namespace SensateService.Services.Adapters
 {
 	public interface ITextSendService
 	{

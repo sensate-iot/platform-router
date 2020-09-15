@@ -9,7 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SensateService.Common.IdentityData.Models;
 
-namespace SensateService.Services
+namespace SensateService.Services.DataProcessing
 {
 	public interface IUserService
 	{

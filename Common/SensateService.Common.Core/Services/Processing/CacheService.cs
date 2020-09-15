@@ -17,6 +17,7 @@ using SensateService.Common.Config.Settings;
 using SensateService.Exceptions;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Storage;
+using SensateService.Services.Background;
 
 namespace SensateService.Services.Processing
 {

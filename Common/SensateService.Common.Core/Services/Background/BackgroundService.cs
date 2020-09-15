@@ -8,9 +8,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Hosting;
 
-namespace SensateService.Services.Processing
+namespace SensateService.Services.Background
 {
 	public abstract class BackgroundService : IHostedService, IDisposable
 	{

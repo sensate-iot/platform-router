@@ -21,7 +21,7 @@ using SensateService.Common.Data.Enums;
 using SensateService.Common.Data.Models;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Cache;
-using SensateService.Services;
+using SensateService.Services.DataProcessing;
 
 namespace SensateService.Infrastructure.Document
 {

@@ -31,7 +31,7 @@ using SensateService.Api.DataApi.Dto;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Authorization;
 using SensateService.Infrastructure.Repositories;
-using SensateService.Services;
+using SensateService.Services.DataProcessing;
 
 namespace SensateService.Api.DataApi.Controllers
 {

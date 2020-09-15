@@ -8,7 +8,7 @@
 using System.Threading.Tasks;
 using SensateService.Common.Data.Enums;
 
-namespace SensateService.Services
+namespace SensateService.Services.Processing
 {
 	public interface ICommandPublisher
 	{

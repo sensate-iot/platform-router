@@ -20,7 +20,8 @@ using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Processing.TriggerHandler.Application;
 using SensateService.Processing.TriggerHandler.Models;
-using SensateService.Services;
+using SensateService.Services.Adapters;
+using SensateService.Services.Processing;
 
 namespace SensateService.Processing.TriggerHandler.Services
 {

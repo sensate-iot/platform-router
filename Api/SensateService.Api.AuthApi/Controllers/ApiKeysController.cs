@@ -23,7 +23,7 @@ using SensateService.Common.IdentityData.Enums;
 using SensateService.Common.IdentityData.Models;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
-using SensateService.Services;
+using SensateService.Services.Processing;
 
 namespace SensateService.Api.AuthApi.Controllers
 {

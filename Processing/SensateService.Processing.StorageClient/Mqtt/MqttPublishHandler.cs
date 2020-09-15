@@ -17,7 +17,7 @@ using SensateService.Common.Config.Settings;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Events;
 using SensateService.Infrastructure.Storage;
-using SensateService.Services;
+using SensateService.Services.Processing;
 
 namespace SensateService.Processing.StorageClient.Mqtt
 {
