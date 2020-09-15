@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 
 using SensateService.Common.Config.Settings;
 using SensateService.Helpers;
-using SensateService.Infrastructure.Authorization;
+using SensateService.Infrastructure.Authorization.Cache;
 using SensateService.Services.Background;
 
 namespace SensateService.Services.Processing

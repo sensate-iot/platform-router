@@ -14,7 +14,9 @@ using Microsoft.EntityFrameworkCore;
 
 using MongoDB.Bson;
 using MongoDB.Driver;
+
 using NpgsqlTypes;
+
 using SensateService.Common.Data.Dto.Authorization;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Document;

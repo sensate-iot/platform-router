@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using SensateService.Common.Data.Dto.Authorization;
 using SensateService.Common.Data.Dto.Generic;
 
-namespace SensateService.Infrastructure.Authorization
+namespace SensateService.Infrastructure.Authorization.Cache
 {
 	public interface IAuthorizationCache
 	{

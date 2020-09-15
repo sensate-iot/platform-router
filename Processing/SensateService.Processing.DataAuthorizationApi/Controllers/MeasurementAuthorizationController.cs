@@ -20,7 +20,7 @@ using SensateService.ApiCore.Controllers;
 using SensateService.Common.Data.Dto.Authorization;
 using SensateService.Common.Data.Dto.Json.Out;
 using SensateService.Common.Data.Enums;
-using SensateService.Infrastructure.Authorization;
+using SensateService.Infrastructure.Authorization.Cache;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Processing.DataAuthorizationApi.Dto;
 using Measurement = SensateService.Common.Data.Dto.Authorization.Measurement;

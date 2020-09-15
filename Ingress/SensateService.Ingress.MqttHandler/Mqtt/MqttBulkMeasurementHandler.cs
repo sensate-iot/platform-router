@@ -7,9 +7,11 @@
 
 using System;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Logging;
+
 using SensateService.Helpers;
-using SensateService.Infrastructure.Authorization;
+using SensateService.Infrastructure.Authorization.Proxy;
 
 namespace SensateService.Ingress.MqttHandler.Mqtt
 {

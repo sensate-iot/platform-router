@@ -7,7 +7,7 @@
 
 using System.Threading.Tasks;
 
-namespace SensateService.Infrastructure.Authorization
+namespace SensateService.Infrastructure.Authorization.Proxy
 {
 	public interface IMeasurementAuthorizationProxyCache
 	{

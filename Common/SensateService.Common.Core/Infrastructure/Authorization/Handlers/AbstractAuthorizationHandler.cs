@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using SensateService.Common.Data.Dto.Authorization;
 using SensateService.Helpers;
 
-namespace SensateService.Infrastructure.Authorization
+namespace SensateService.Infrastructure.Authorization.Handlers
 {
 	public abstract class AbstractAuthorizationHandler<TData> where TData : class
 	{

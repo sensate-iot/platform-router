@@ -7,12 +7,10 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
 using MongoDB.Bson;
-
 using SensateService.Common.Data.Dto.Authorization;
 
-namespace SensateService.Infrastructure.Authorization
+namespace SensateService.Infrastructure.Authorization.Cache
 {
 	public interface IDataCache
 	{

@@ -17,9 +17,10 @@ using SensateService.Common.Data.Dto.Authorization;
 using SensateService.Common.Data.Dto.Protobuf;
 using SensateService.Crypto;
 using SensateService.Helpers;
+using SensateService.Infrastructure.Authorization.Cache;
 using SensateService.Infrastructure.Events;
 
-namespace SensateService.Infrastructure.Authorization
+namespace SensateService.Infrastructure.Authorization.Handlers
 {
 	public class MessageAuthorizationHandler : AbstractAuthorizationHandler<JsonMessage>
 	{

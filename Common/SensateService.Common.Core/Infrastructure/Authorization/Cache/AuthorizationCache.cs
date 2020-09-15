@@ -21,10 +21,11 @@ using SensateService.Common.Data.Dto.Generic;
 using SensateService.Common.Data.Enums;
 using SensateService.Crypto;
 using SensateService.Helpers;
+using SensateService.Infrastructure.Authorization.Handlers;
 using SensateService.Infrastructure.Events;
 using SensateService.Infrastructure.Repositories;
 
-namespace SensateService.Infrastructure.Authorization
+namespace SensateService.Infrastructure.Authorization.Cache
 {
 	public class AuthorizationCache : IAuthorizationCache
 	{

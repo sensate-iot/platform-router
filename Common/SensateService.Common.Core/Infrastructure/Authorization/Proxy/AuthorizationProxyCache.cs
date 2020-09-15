@@ -16,7 +16,7 @@ using Newtonsoft.Json.Linq;
 
 using SensateService.Helpers;
 
-namespace SensateService.Infrastructure.Authorization
+namespace SensateService.Infrastructure.Authorization.Proxy
 {
 	public class AuthorizationProxyCache : IMeasurementAuthorizationProxyCache, IMessageAuthorizationProxyCache
 	{

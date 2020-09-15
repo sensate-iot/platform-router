@@ -18,7 +18,7 @@ using Microsoft.Extensions.Options;
 
 using SensateService.Common.Config.Settings;
 using SensateService.Helpers;
-using SensateService.Infrastructure.Authorization;
+using SensateService.Infrastructure.Authorization.Cache;
 using SensateService.Infrastructure.Events;
 using SensateService.Services.Processing;
 

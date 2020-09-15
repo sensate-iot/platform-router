@@ -17,10 +17,12 @@ using SensateService.Common.Data.Dto.Authorization;
 using SensateService.Common.Data.Dto.Protobuf;
 using SensateService.Crypto;
 using SensateService.Helpers;
+using SensateService.Infrastructure.Authorization.Cache;
 using SensateService.Infrastructure.Events;
+
 using Measurement = SensateService.Common.Data.Dto.Protobuf.Measurement;
 
-namespace SensateService.Infrastructure.Authorization
+namespace SensateService.Infrastructure.Authorization.Handlers
 {
 	public class MeasurementAuthorizationHandler : AbstractAuthorizationHandler<JsonMeasurement>
 	{

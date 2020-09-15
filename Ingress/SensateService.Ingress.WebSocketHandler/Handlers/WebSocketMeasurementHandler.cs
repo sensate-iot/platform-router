@@ -10,11 +10,14 @@ using System.Diagnostics;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.DependencyInjection;
+
 using Newtonsoft.Json.Linq;
+
 using SensateService.Common.Data.Dto.Generic;
 using SensateService.Exceptions;
-using SensateService.Infrastructure.Authorization;
+using SensateService.Infrastructure.Authorization.Proxy;
 
 namespace SensateService.Ingress.WebSocketHandler.Handlers
 {

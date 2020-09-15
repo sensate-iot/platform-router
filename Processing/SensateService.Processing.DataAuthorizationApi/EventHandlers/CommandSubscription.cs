@@ -16,7 +16,7 @@ using Newtonsoft.Json.Linq;
 using SensateService.Common.Data.Dto.Generic;
 using SensateService.Common.Data.Enums;
 using SensateService.Constants;
-using SensateService.Infrastructure.Authorization;
+using SensateService.Infrastructure.Authorization.Cache;
 using SensateService.Middleware;
 
 namespace SensateService.Processing.DataAuthorizationApi.EventHandlers

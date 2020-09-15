@@ -17,7 +17,7 @@ using SensateService.Common.Caching.Memory;
 using SensateService.Common.Data.Dto.Authorization;
 using SensateService.Helpers;
 
-namespace SensateService.Infrastructure.Authorization
+namespace SensateService.Infrastructure.Authorization.Cache
 {
 	public class DataCache : IDataCache
 	{
