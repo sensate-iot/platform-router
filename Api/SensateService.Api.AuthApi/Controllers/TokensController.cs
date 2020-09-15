@@ -17,6 +17,7 @@ using Microsoft.Extensions.Options;
 
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
+using SensateService.Common.Config.Settings;
 using SensateService.Common.Data.Dto.Json.In;
 using SensateService.Common.Data.Dto.Json.Out;
 using SensateService.Common.Data.Enums;
@@ -25,7 +26,6 @@ using SensateService.Common.IdentityData.Models;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Infrastructure.Sql;
-using SensateService.Settings;
 
 namespace SensateService.Api.AuthApi.Controllers
 {

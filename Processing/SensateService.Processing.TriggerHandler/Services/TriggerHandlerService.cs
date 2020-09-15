@@ -7,8 +7,12 @@
 
 using System;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Options;
+
 using MongoDB.Bson;
+
+using SensateService.Common.Config.Settings;
 using SensateService.Common.Data.Dto.Generic;
 using SensateService.Common.Data.Models;
 using SensateService.Common.IdentityData.Models;
@@ -17,7 +21,6 @@ using SensateService.Infrastructure.Repositories;
 using SensateService.Processing.TriggerHandler.Application;
 using SensateService.Processing.TriggerHandler.Models;
 using SensateService.Services;
-using SensateService.Services.Settings;
 
 namespace SensateService.Processing.TriggerHandler.Services
 {

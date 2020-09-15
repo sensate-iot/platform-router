@@ -19,7 +19,7 @@ using Microsoft.OpenApi.Models;
 using SensateService.Api.NetworkApi.Mqtt;
 using SensateService.ApiCore.Init;
 using SensateService.ApiCore.Middleware;
-using SensateService.Config;
+using SensateService.Common.Config.Config;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
 

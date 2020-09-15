@@ -6,12 +6,14 @@
  */
 
 using System;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+
 using SensateService.ApiCore.Init;
-using SensateService.Config;
+using SensateService.Common.Config.Config;
 using SensateService.Ingress.WebSocketHandler.Handlers;
 using SensateService.Init;
 

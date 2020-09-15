@@ -7,7 +7,7 @@
 
 using SensateService.Common.Data.Models;
 
-namespace SensateService.Settings
+namespace SensateService.Common.Config.Settings
 {
 	public class BlobStorageSettings
 	{

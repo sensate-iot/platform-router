@@ -15,8 +15,8 @@ using Microsoft.Extensions.Options;
 using MQTTnet;
 using MQTTnet.Client;
 
+using SensateService.Common.Config.Settings;
 using SensateService.Helpers;
-using SensateService.Services.Settings;
 
 namespace SensateService.Services.Processing
 {

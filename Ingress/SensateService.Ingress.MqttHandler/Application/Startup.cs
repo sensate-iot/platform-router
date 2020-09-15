@@ -6,10 +6,12 @@
  */
 
 using System;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using SensateService.Config;
+
+using SensateService.Common.Config.Config;
 using SensateService.Ingress.MqttHandler.Mqtt;
 using SensateService.Init;
 

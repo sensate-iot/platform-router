@@ -5,7 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
-namespace SensateService.Config
+namespace SensateService.Common.Config.Config
 {
 	public class SystemConfig
 	{

@@ -14,13 +14,14 @@ using Microsoft.Extensions.Options;
 
 using MQTTnet;
 using MQTTnet.Client;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+using SensateService.Common.Config.Settings;
 using SensateService.Common.Data.Enums;
 using SensateService.Constants;
 using SensateService.Helpers;
-using SensateService.Services.Settings;
 
 namespace SensateService.Services.Processing
 {

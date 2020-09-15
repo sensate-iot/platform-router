@@ -8,14 +8,16 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+
+using SensateService.Common.Config.Settings;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Events;
 using SensateService.Infrastructure.Storage;
 using SensateService.Services;
-using SensateService.Services.Settings;
 
 namespace SensateService.Processing.StorageClient.Mqtt
 {

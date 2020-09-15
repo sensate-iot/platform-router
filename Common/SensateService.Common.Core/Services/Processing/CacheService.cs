@@ -12,12 +12,11 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
-
-using SensateService.Config;
+using SensateService.Common.Config.Config;
+using SensateService.Common.Config.Settings;
 using SensateService.Exceptions;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Storage;
-using SensateService.Services.Settings;
 
 namespace SensateService.Services.Processing
 {

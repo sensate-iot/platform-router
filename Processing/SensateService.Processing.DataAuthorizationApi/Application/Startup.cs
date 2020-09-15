@@ -16,12 +16,12 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 using SensateService.ApiCore.Init;
-using SensateService.Config;
+using SensateService.Common.Config.Config;
+using SensateService.Common.Config.Settings;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
 using SensateService.Processing.DataAuthorizationApi.EventHandlers;
 using SensateService.Processing.DataAuthorizationApi.Middleware;
-using SensateService.Settings;
 
 namespace SensateService.Processing.DataAuthorizationApi.Application
 {

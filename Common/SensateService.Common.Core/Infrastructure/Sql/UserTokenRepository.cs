@@ -18,11 +18,11 @@ using System.Threading;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
+using SensateService.Common.Config.Settings;
 using SensateService.Common.IdentityData.Models;
 using SensateService.Exceptions;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Helpers;
-using SensateService.Settings;
 
 namespace SensateService.Infrastructure.Sql
 {

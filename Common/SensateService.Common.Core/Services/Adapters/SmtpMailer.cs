@@ -8,10 +8,11 @@
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Options;
+
+using SensateService.Common.Config.Settings;
 using SensateService.Common.Data.Dto.Generic;
-using SensateService.Middleware;
-using SensateService.Services.Settings;
 
 namespace SensateService.Services.Adapters
 {

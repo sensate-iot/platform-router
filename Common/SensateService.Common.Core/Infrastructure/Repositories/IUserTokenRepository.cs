@@ -10,8 +10,9 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+
+using SensateService.Common.Config.Settings;
 using SensateService.Common.IdentityData.Models;
-using SensateService.Settings;
 
 namespace SensateService.Infrastructure.Repositories
 {

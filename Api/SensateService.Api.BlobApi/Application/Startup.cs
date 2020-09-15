@@ -18,11 +18,11 @@ using Microsoft.OpenApi.Models;
 
 using SensateService.ApiCore.Init;
 using SensateService.ApiCore.Middleware;
+using SensateService.Common.Config.Config;
+using SensateService.Common.Config.Settings;
 using SensateService.Common.Data.Models;
-using SensateService.Config;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
-using SensateService.Settings;
 
 namespace SensateService.Api.BlobApi.Application
 {

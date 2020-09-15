@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SensateService.Common.Caching\SensateService.Common.Caching.csproj" />
+    <ProjectReference Include="..\SensateService.Common.Config\SensateService.Common.Config.csproj" />
     <ProjectReference Include="..\SensateService.Common.IdentityData\SensateService.Common.IdentityData.csproj" />
     <ProjectReference Include="..\SensateService.Common.Models\SensateService.Common.Data.csproj" />
   </ItemGroup>

@@ -16,11 +16,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
+using SensateService.Common.Config.Settings;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Authorization;
 using SensateService.Infrastructure.Events;
 using SensateService.Services;
-using SensateService.Settings;
 
 namespace SensateService.Processing.DataAuthorizationApi.EventHandlers
 {

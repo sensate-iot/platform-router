@@ -9,7 +9,8 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
-using SensateService.Config;
+
+using SensateService.Common.Config.Config;
 
 namespace SensateService.ApiCore.Init
 {

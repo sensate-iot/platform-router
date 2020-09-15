@@ -8,7 +8,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-using SensateService.Config;
+using SensateService.Common.Config.Config;
 using SensateService.Infrastructure.Storage;
 using SensateService.Services.Processing;
 

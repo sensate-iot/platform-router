@@ -24,6 +24,7 @@ using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
 using SensateService.Api.AuthApi.Helpers;
 using SensateService.Api.AuthApi.Json;
+using SensateService.Common.Config.Settings;
 using SensateService.Common.Data.Dto.Generic;
 using SensateService.Common.Data.Dto.Json.In;
 using SensateService.Common.Data.Dto.Json.Out;
@@ -33,8 +34,6 @@ using SensateService.Common.IdentityData.Models;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Services;
-using SensateService.Services.Settings;
-using SensateService.Settings;
 
 namespace SensateService.Api.AuthApi.Controllers
 {

@@ -5,7 +5,7 @@
  * @email  michel.megens@sonatolabs.com
  */
 
-namespace SensateService.Services.Settings
+namespace SensateService.Common.Config.Settings
 {
 	public class TimedBackgroundServiceSettings
 	{

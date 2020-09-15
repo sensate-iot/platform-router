@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
-using SensateService.Config;
+using SensateService.Common.Config.Config;
 using SensateService.Infrastructure.Sql;
 
 namespace SensateService.SqlSetup.Application

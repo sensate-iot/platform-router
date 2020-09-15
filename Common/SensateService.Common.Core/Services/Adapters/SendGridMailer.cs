@@ -6,12 +6,13 @@
  */
 
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Options;
+
 using SendGrid;
 using SendGrid.Helpers.Mail;
+using SensateService.Common.Config.Settings;
 using SensateService.Common.Data.Dto.Generic;
-using SensateService.Middleware;
-using SensateService.Services.Settings;
 
 namespace SensateService.Services.Adapters
 {

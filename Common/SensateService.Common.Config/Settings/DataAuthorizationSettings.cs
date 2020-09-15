@@ -5,7 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
-namespace SensateService.Settings
+namespace SensateService.Common.Config.Settings
 {
 	public class DataAuthorizationSettings
 	{

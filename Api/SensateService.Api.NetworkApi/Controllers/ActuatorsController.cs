@@ -7,19 +7,21 @@
 
 using System;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+
 using SensateService.ApiCore.Attributes;
 using SensateService.ApiCore.Controllers;
+using SensateService.Common.Config.Settings;
 using SensateService.Common.Data.Dto.Json.Out;
 using SensateService.Common.Data.Enums;
 using SensateService.Common.Data.Models;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Services;
-using SensateService.Services.Settings;
 
 namespace SensateService.Api.NetworkApi.Controllers
 {

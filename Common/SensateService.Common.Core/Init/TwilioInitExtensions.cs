@@ -7,12 +7,14 @@
  */
 
 using Microsoft.Extensions.DependencyInjection;
-using SensateService.Config;
-using SensateService.Services;
-using SensateService.Services.Adapters;
-using SensateService.Services.Settings;
+
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
+
+using SensateService.Common.Config.Config;
+using SensateService.Common.Config.Settings;
+using SensateService.Services;
+using SensateService.Services.Adapters;
 
 namespace SensateService.Init
 {

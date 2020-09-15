@@ -15,10 +15,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
+using SensateService.Common.Config.Config;
+using SensateService.Common.Config.Settings;
 using SensateService.Common.IdentityData.Models;
-using SensateService.Config;
 using SensateService.Infrastructure.Sql;
-using SensateService.Settings;
 
 namespace SensateService.ApiCore.Init
 {

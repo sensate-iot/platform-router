@@ -5,7 +5,7 @@
  * @email  michel.megens@sonatolabs.com
  */
 
-namespace SensateService.Config
+namespace SensateService.Common.Config.Config
 {
 	public class MqttConfig
 	{

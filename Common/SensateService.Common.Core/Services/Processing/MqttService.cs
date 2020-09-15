@@ -12,8 +12,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
+using SensateService.Common.Config.Settings;
 using SensateService.Helpers;
-using SensateService.Services.Settings;
 
 namespace SensateService.Services.Processing
 {

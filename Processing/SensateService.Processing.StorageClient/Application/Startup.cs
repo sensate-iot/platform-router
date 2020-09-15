@@ -6,14 +6,16 @@
  */
 
 using System;
+
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+
+using SensateService.Common.Config.Config;
 using SensateService.Common.IdentityData.Models;
-using SensateService.Config;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
 using SensateService.Processing.StorageClient.Mqtt;

@@ -1,20 +1,19 @@
 ﻿/*
- * MQTT background service
+ * MQTT service init.
  *
  * @author: Michel Megens
  * @email:  michel.megens@sonatolabs.com
  */
 
-namespace SensateService.Services.Settings
+namespace SensateService.Common.Config.Settings
 {
-	public class MqttPublishServiceOptions
+	public class CommandPublisherOptions
 	{
+		public string CommandsTopic { get; set; }
 		public string Host { get; set; }
 		public int Port { get; set; }
 		public bool Ssl { get; set; }
-		public string Id { get; set; }
 		public string Username { get; set; }
 		public string Password { get; set; }
-		public string ActuatorTopic { get; set; }
 	}
 }

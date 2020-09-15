@@ -8,14 +8,17 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+
 using MQTTnet;
 using MQTTnet.Client;
+
+using SensateService.Common.Config.Settings;
 using SensateService.Helpers;
 using SensateService.Services;
 using SensateService.Services.Processing;
-using SensateService.Services.Settings;
 
 namespace SensateService.Api.NetworkApi.Mqtt
 {

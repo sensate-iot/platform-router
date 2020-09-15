@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Hosting;
 
-using SensateService.Services.Settings;
+using SensateService.Common.Config.Settings;
 
 namespace SensateService.Services.Processing
 {

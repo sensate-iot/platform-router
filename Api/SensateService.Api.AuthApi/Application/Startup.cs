@@ -18,11 +18,11 @@ using Microsoft.OpenApi.Models;
 
 using SensateService.ApiCore.Init;
 using SensateService.ApiCore.Middleware;
-using SensateService.Config;
+using SensateService.Common.Config.Config;
+using SensateService.Common.Config.Settings;
 using SensateService.Init;
 using SensateService.Services;
 using SensateService.Services.Adapters;
-using SensateService.Services.Settings;
 
 namespace SensateService.Api.AuthApi.Application
 {

@@ -13,8 +13,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
+using SensateService.Common.Config.Config;
+using SensateService.Common.Config.Settings;
 using SensateService.Common.IdentityData.Models;
-using SensateService.Config;
 using SensateService.Infrastructure.Sql;
 using SensateService.Init;
 using SensateService.Processing.TriggerHandler.Models;
@@ -22,7 +23,6 @@ using SensateService.Processing.TriggerHandler.Mqtt;
 using SensateService.Processing.TriggerHandler.Services;
 using SensateService.Services;
 using SensateService.Services.Adapters;
-using SensateService.Services.Settings;
 
 namespace SensateService.Processing.TriggerHandler.Application
 {

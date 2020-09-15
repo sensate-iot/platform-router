@@ -7,9 +7,12 @@
 
 using System.Diagnostics;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SensateService.Services.Settings;
+
+using SensateService.Common.Config.Settings;
+
 using Twilio.Exceptions;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.Types;
