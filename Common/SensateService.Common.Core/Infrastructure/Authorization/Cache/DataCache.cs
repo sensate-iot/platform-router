@@ -46,7 +46,7 @@ namespace SensateService.Infrastructure.Authorization.Cache
 				var key = this.m_apiKeys[s.Secret];
 				var user = this.m_users[s.UserId];
 
-				if(user.Banned || user.BillingLockout || key.ReadOnly || key.ReadOnly) {
+				if(user.Banned || user.BillingLockout || key.ReadOnly || key.Revoked) {
 					return null;
 				}
 			} catch(ArgumentOutOfRangeException) {
