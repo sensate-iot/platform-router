@@ -1,0 +1,28 @@
+name: SensateService Caching Unit test
+on:
+  push:
+      # Publish `master` as Docker `latest` image.
+      branches:
+        - master
+        - develop
+        - feature/**
+        - release/**
+      # Publish `v1.2.3` tags as releases.
+      tags:
+        - v*
+
+jobs:
+  build-ubuntu:
+    name: "Ubuntu"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone source
+        uses: actions/checkout@v1
+
+      - name: Install .NET Core SDK 3.1
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.x
+
+      - name: "Build unit tests"
+        run: dotnet test Common/SensateService.Common.Caching.Tests

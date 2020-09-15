@@ -1,0 +1,68 @@
+﻿{
+  "Logging": {
+    "IncludeScopes": false,
+    "Debug": {
+      "LogLevel": {
+        "Default": "Debug",
+        "Microsoft": "Warning",
+        "System": "Warning"
+      }
+    },
+    "Console": {
+      "LogLevel": {
+        "Default": "Debug",
+        "Microsoft": "Warning",
+        "System": "Warning"
+      }
+    }
+  },
+
+  "System": {
+    "ProxyLevel": 1
+  },
+
+  "Authentication": {
+    "PublicUrl": "login.dev.sensateiot.com/confirm",
+    "UpdateEmailUrl": "dev.sensateiot.com:4200/apps/dashboard/confirm-update-email",
+    "Scheme": "http",
+    "JwtRefreshExpireMinutes": 43200,
+    "JwtKey": "",
+    "JwtIssuer": "api.dev.sensateiot.com:5000/auth",
+    "JwtExpireMinutes": 43200,
+    "PrimaryAuthHost": false
+  },
+
+  "Cache": {
+    "Enabled": true,
+    "Interval": 1000, 
+    "Type": "Distributed"
+  },
+
+  "Database": {
+    "MongoDB": {
+      "DatabaseName": "Sensate",
+      "ConnectionString": "mongodb://127.0.0.1:27017/Sensate",
+      "MaxConnections": 1000
+    },
+    "PgSQL": {
+      "ConnectionString": "User ID = postgres;Password=postgres;Server=127.0.0.1;Port=5432;Database=Sensate;MultipleActiveResultSets=True"
+    },
+    "Redis": {
+      "Host": "127.0.0.1",
+      "InstanceName": "Sensate"
+    }
+  },
+  
+  "Mqtt": {
+    "InternalBroker": {
+      "Username": "sensate",
+      "Password": "sensateiot",
+      "Ssl": "false",
+      "Port": 1883,
+      "Host": "127.0.0.1",
+      "InternalCommandsTopic": "sensate-auth/internal/commands",
+      "InternalBulkMeasurementTopic": "sensate/internal/measurements/bulk",
+      "InternalBulkMessageTopic": "sensate/internal/messages/bulk"
+    }
+  }
+}

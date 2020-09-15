@@ -7,6 +7,7 @@ node_modules/
 Properties/
 SensateService/Properties/
 SensateService/SensateService.csproj.user
+*.njsproj.user
 sensate-service.csproj.user
 appsettings.secrets.json
 .markdownlint.json

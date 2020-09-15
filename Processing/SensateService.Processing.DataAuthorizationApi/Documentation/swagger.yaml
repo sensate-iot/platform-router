@@ -1,0 +1,250 @@
+openapi: 3.0.1
+info:
+  title: Sensate IoT Data API - Version 1
+  version: v1
+servers:
+  - url: http://authorization.prod.sensateiot.com
+    description: Producttion server
+  - url: http://authorization.staging.sensateiot.com
+    description: Staging server
+  - url: http://localhost:5005
+    description: Development server.
+paths:
+  /authorization/v1/processor/measurements:
+    post:
+      summary: Queue measurements for authorization.
+      description: The endpoint allows bulk queuing of measurements for authorization.
+      tags:
+        - MeasurementAuthorization
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Measurement'
+              nullable: true
+      responses:
+        '202':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationResponse'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+  /authorization/v1/processor/measurement:
+    post:
+      summary: Enqueue a single measurement.
+      description: Enqueue a single measurement for data authorization.
+      tags:
+        - MeasurementAuthorization
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: '#/components/schemas/Measurement'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Measurement'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/Measurement'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/Measurement'
+      responses:
+        '202':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationResponse'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+  /authorization/v1/processor/message:
+    post:
+      summary: Message authorization.
+      description: Enqueue a single message for authorization.
+      tags:
+        - MessageAuthorization
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: '#/components/schemas/Message'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/Message'
+      responses:
+        '202':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationResponse'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+  /authorization/v1/processor/messages:
+    post:
+      summary: Enqueue bulk messages.
+      description: Enqueue messages in bulk for data authorization.
+      tags:
+        - MessageAuthorization
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Message'
+              nullable: true
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Message'
+              nullable: true
+          text/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Message'
+              nullable: true
+          application/*+json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Message'
+              nullable: true
+      responses:
+        '202':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationResponse'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+components:
+  schemas:
+    DataPoint:
+      type: object
+      properties:
+        unit:
+          type: string
+          nullable: true
+        value:
+          type: number
+          format: double
+        precision:
+          type: number
+          format: double
+          nullable: true
+        accuracy:
+          type: number
+          format: double
+          nullable: true
+      additionalProperties: false
+    Measurement:
+      type: object
+      properties:
+        sensorId:
+          type: string
+          nullable: false
+        secret:
+          type: string
+          nullable: false
+        longitude:
+          type: number
+          format: double
+        latitude:
+          type: number
+          format: double
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/DataPoint'
+          nullable: true
+      additionalProperties: false
+    ReplyCode:
+      enum:
+        - 200
+        - 400
+        - 401
+        - 402
+        - 403
+        - 404
+        - 500
+      type: integer
+      format: int32
+    AuthorizationResponse:
+      type: object
+      properties:
+        queued:
+          type: integer
+          format: int32
+        rejected:
+          type: integer
+          format: int32
+        errorCode:
+          $ref: '#/components/schemas/ReplyCode'
+        message:
+          type: string
+          nullable: true
+      additionalProperties: false
+    Status:
+      type: object
+      properties:
+        errorCode:
+          $ref: '#/components/schemas/ReplyCode'
+        message:
+          type: string
+          nullable: true
+      additionalProperties: false
+    Message:
+      type: object
+      properties:
+        sensorId:
+          type: string
+        secret:
+          type: string
+          nullable: true
+        data:
+          type: string
+          nullable: true
+        timestamp:
+          type: string
+          format: date-time
+        longitude:
+          type: integer
+          format: int64
+        latitude:
+          type: integer
+          format: int64
+      additionalProperties: false
