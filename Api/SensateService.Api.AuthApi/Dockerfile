@@ -16,8 +16,8 @@ RUN dotnet publish -c Release -o /app/bin -r linux-musl-x64 --no-restore --self-
 FROM alpine:3.11
 
 COPY --from=build-env /app /app
-COPY Api/SensateService.Api.AuthApi/SensateService.Api.AuthApi/Settings/hosting.json /app/hosting.json
-COPY Api/SensateService.Api.AuthApi/SensateService.Api.AuthApi/Templates /app/Templates
+COPY Api/SensateService.Api.AuthApi/Settings/hosting.json /app/hosting.json
+COPY Api/SensateService.Api.AuthApi/Templates /app/Templates
 WORKDIR /app
 RUN apk add --no-cache libstdc++ libintl icu
 
