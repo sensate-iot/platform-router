@@ -1,0 +1,10 @@
+#
+# AuthService dockerignore file.
+#
+
+.idea/
+.vs/
+.git/
+build/
+out/
+Dockerfile
