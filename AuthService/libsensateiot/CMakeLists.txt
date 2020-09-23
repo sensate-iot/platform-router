@@ -80,6 +80,8 @@ set(LIB_HEADERS
 
 	sensateiot/version.h
 
+	sensateiot/cache/memorycache.h
+
 	sensateiot/compiler/compiler-msvc.h
 	sensateiot/compiler/compiler.h
 
@@ -95,6 +97,8 @@ set(LIB_HEADERS
 	sensateiot/detail/redblacktreeiterator.hpp
 	sensateiot/detail/redblacktreenode.h
 	sensateiot/detail/redblacktreenode.hpp
+	sensateiot/detail/memorycache.hpp
+	sensateiot/detail/memorycache.h
 
 	sensateiot/httpd/httpserver.h
 	sensateiot/httpd/httplistener.h
