@@ -24,10 +24,10 @@ SET(AUTHSERVICE_HEADERS
 )
 
 include_directories(
-	${PROJECT_SOURCE_DIR}/external/ctre/single-header
-	${PROJECT_SOURCE_DIR}/external/json
 	${PROJECT_SOURCE_DIR}/include
 	${PROJECT_SOURCE_DIR}/libsensateiot/include
+	SYSTEM ${PROJECT_SOURCE_DIR}/external/json
+	SYSTEM ${PROJECT_SOURCE_DIR}/external/hopscotch-map/include
 	SYSTEM INTERFACE ${CONAN_INCLUDE_DIRS}
 )
 
