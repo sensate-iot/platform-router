@@ -16,6 +16,7 @@
 #include <sensateiot/services/abstractapikeyrepository.h>
 #include <sensateiot/services/abstractpostgresqlrepository.h>
 
+#include <optional>
 #include <string>
 #include <vector>
 #include <pqxx/pqxx>
@@ -29,9 +30,10 @@ namespace sensateiot::services
 		explicit ApiKeyRepository(const config::PostgreSQL& pgsql);
 		~ApiKeyRepository() override = default;
 
-		std::vector<std::string> GetAllSensorKeys() override;
-		std::vector<std::string> GetKeysFor(const std::vector<models::Sensor>& sensors) override;
-		std::vector<std::string> GetKeys(const std::vector<std::string>& ids) override;
-		std::vector<std::string> GetKeysByOwners(const boost::unordered_set<boost::uuids::uuid>& ids) override;
+		std::vector<models::ApiKey> GetAllSensorKeys() override;
+		std::optional<models::ApiKey> GetSensorKey(const std::string& id) override;
+
+	protected:
+		void Reconnect() override;
 	};
 }

@@ -26,6 +26,6 @@ namespace sensateiot::services
 		virtual ~AbstractUserRepository() = default;
 
 		virtual std::vector<models::User> GetAllUsers() = 0;
-		virtual std::vector<models::User> GetRange(const boost::unordered_set<boost::uuids::uuid> &ids) = 0;
+		virtual std::optional<models::User> GetUserById(const boost::uuids::uuid& id) = 0;
 	};
 }

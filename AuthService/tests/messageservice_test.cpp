@@ -33,7 +33,6 @@
 #include "testsensorrepository.h"
 
 static constexpr std::string_view json(R"({"longitude":4.774186840897145,"latitude":51.59384817617493,"sensorId":"5c7c3bbd80e8ae3154d04912","secret":"$4ed836205f02c2d353f5620e762045003a2c512cffc0495f7671002c343183d1==","data":{"x":{"value":3.7348298850142325,"unit":"m/s2"},"y":{"value":95.1696675190223,"unit":"m/s2"},"z":{"value":15.24488164994629,"unit":"m/s2"}}})");
-static std::vector<std::pair<std::string, std::string>> sensors;
 
 static void generate_data(sensateiot::test::SensorRepository& sensors, sensateiot::test::UserRepository& users, sensateiot::test::ApiKeyRepository& keys)
 {
@@ -43,6 +42,7 @@ static void generate_data(sensateiot::test::SensorRepository& sensors, sensateio
 	for(auto idx = 0; idx < 10; idx++) {
 		models::Sensor s;
 		models::User u;
+		models::ApiKey k;
 		bson_oid_t oid;
 		auto owner = gen();
 
@@ -59,7 +59,11 @@ static void generate_data(sensateiot::test::SensorRepository& sensors, sensateio
 
 		sensors.AddSensor(s);
 		users.AddUser(u);
-		keys.AddKey(std::to_string(idx));
+
+		k.SetKey(std::to_string(idx));
+		k.SetUserId(owner);
+		k.SetType(models::ApiKeyType::SensorKey);
+		keys.AddKey(k);
 	}
 }
 
@@ -90,6 +94,7 @@ static void test_measurement_processing()
 	generate_data(sensors, users, keys);
 	models::Sensor s;
 	models::User u;
+	models::ApiKey k;
 	std::string key = "Hello, World!";
 
 	s.SetSecret(key);
@@ -99,10 +104,16 @@ static void test_measurement_processing()
 	u.SetBanned(false);
 	u.SetLockout(false);
 	u.SetId(s.GetOwner());
+	
+	k.SetKey(key);
+	k.SetType(models::ApiKeyType::SensorKey);
+	k.SetReadOnly(false);
+	k.SetRevoked(false);
+	k.SetUserId(u.GetId());
 
 	sensors.AddSensor(s);
 	users.AddUser(u);
-	keys.AddKey(key);
+	keys.AddKey(k);
 
 	for(auto idx = 0U; idx < 10; idx++) {
 		service.AddMeasurement(std::string(json));

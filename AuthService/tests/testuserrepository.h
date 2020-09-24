@@ -20,25 +20,18 @@ namespace sensateiot::test
 
 		std::vector<models::User> GetAllUsers() override
 		{
-			return std::vector<models::User>();
+			return this->m_users;
 		}
-
-		std::vector<models::User> GetRange(const boost::unordered_set<boost::uuids::uuid> &ids) override
+		
+		std::optional<models::User> GetUserById(const boost::uuids::uuid& id) override
 		{
-			std::vector<models::User> rv;
-
-			for(const auto& user : this->m_users) {
-				for(auto& id : ids) {
-					if(user.GetId() != id) {
-						continue;
-					}
-
-					rv.push_back(user);
-					break;
+			for (auto user : this->m_users) {
+				if(user.GetId() == id) {
+					return std::make_optional(user);
 				}
 			}
 
-			return rv;
+			return {};
 		}
 
 		void AddUser(const models::User& user)

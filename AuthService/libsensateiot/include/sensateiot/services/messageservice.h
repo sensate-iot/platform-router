@@ -86,6 +86,8 @@ namespace sensateiot::services
 
 		static constexpr int Increment = 1;
 		static constexpr auto CleanupTimeout = boost::chrono::milliseconds(25);
+		static constexpr auto CacheTimeout   = std::chrono::minutes(6);
+		static constexpr auto ReloadTimeout  = std::chrono::minutes(5);
 
 		void Load(std::vector<models::ObjectId>& objIds);
 	};

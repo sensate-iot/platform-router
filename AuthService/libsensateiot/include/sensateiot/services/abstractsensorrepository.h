@@ -16,6 +16,7 @@
 
 #include <string>
 #include <vector>
+#include <optional>
 
 namespace sensateiot::services
 {
@@ -26,6 +27,7 @@ namespace sensateiot::services
 		virtual ~AbstractSensorRepository() = default;
 
 		virtual std::vector<models::Sensor> GetAllSensors(long skip, long limit) = 0;
+		virtual std::optional<models::Sensor> GetSensorById(const models::ObjectId& id) = 0;
 		virtual std::vector<models::Sensor> GetRange(const std::vector<models::ObjectId>& ids, long skip, long limit) = 0;
 		virtual std::vector<models::Sensor> GetRange(const std::vector<std::string>& ids, long skip, long limit) = 0;
 

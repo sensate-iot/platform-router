@@ -34,6 +34,9 @@
 #include <json.hpp>
 #include <google/protobuf/any.h>
 
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/lexical_cast.hpp>
+
 namespace sensateiot
 {
 	config::Config &Application::GetConfig()
@@ -77,6 +80,13 @@ namespace sensateiot
 		services::UserRepository users(this->m_config.GetDatabase().GetPostgreSQL());
 		services::ApiKeyRepository keys(this->m_config.GetDatabase().GetPostgreSQL());
 		services::SensorRepository sensors(this->m_config.GetDatabase().GetMongoDB());
+
+		auto key = keys.GetSensorKey("1aBWO2V8JIMnFUWw7Ne-Z8Tg6F8UFz@G");
+		auto userId = boost::lexical_cast<boost::uuids::uuid>("5966ddca-bbf2-4de3-9b46-0ee9481a7df8");
+		models::ObjectId sensorId("5efceee08bc90a7fb09810f2");
+		auto sensor = sensors.GetSensorById(sensorId);
+		auto user = users.GetUserById(userId);
+		std::cout << boost::lexical_cast<std::string>(user.value().GetId()) << std::endl;
 		services::MessageService service(iclient, commands, users, keys, sensors, this->m_config);
 
 		commands::FlushSensorCommandHandler sensorHandler(service);

@@ -21,6 +21,7 @@ namespace sensateiot::services
 		auto& log = util::Log::GetLog();
 
 		if(this->m_connection.is_open()) {
+			this->m_connection.prepare("get_user", "SELECT * FROM authorizationctx_getuseraccount($1)");
 			log << "Users: Connected to PostgreSQL!" << util::Log::NewLine;
 		} else {
 			log << "Users: Unable to connect to PostgreSQL!" << util::Log::NewLine;
@@ -29,13 +30,7 @@ namespace sensateiot::services
 
 	std::vector<models::User> UserRepository::GetAllUsers()
 	{
-		std::string query("SELECT \"Users\".\"Id\",\n"
-		             "       \"BillingLockout\",\n"
-		             "       \"Roles\".\"NormalizedName\" = 'BANNED' as \"Banned\"\n"
-		             "FROM \"Users\"\n"
-		             "         INNER JOIN \"UserRoles\" ON \"Users\".\"Id\" = \"UserRoles\".\"UserId\"\n"
-		             "         INNER JOIN \"Roles\" ON \"UserRoles\".\"RoleId\" = \"Roles\".\"Id\"\n"
-		             "GROUP BY \"Users\".\"Id\", \"BillingLockout\", \"Roles\".\"NormalizedName\" = 'BANNED'");
+		std::string query("SELECT * FROM authorizationctx_getuseraccounts()");
 
 		this->Reconnect();
 		pqxx::nontransaction q(this->m_connection);
@@ -55,49 +50,35 @@ namespace sensateiot::services
 		return users;
 	}
 
-	std::vector<models::User> UserRepository::GetRange(const boost::unordered_set<boost::uuids::uuid> &ids)
+	std::optional<models::User> UserRepository::GetUserById(const boost::uuids::uuid& id)
 	{
-		std::string rv("(");
-		auto idx = 0UL;
-
-		for(auto iter = ids.begin(); idx < ids.size(); idx++, ++iter) {
-			rv += '\'' + boost::lexical_cast<std::string>(*iter) + '\'';
-
-			if((idx + 1) != ids.size()) {
-				rv += ",";
-			}
-		}
-
-		rv += ")";
-
-		std::string::size_type pos = 0u;
-		std::string query("SELECT \"Users\".\"Id\",\n"
-		             "       \"BillingLockout\",\n"
-		             "       \"Roles\".\"NormalizedName\" = 'BANNED' as \"Banned\"\n"
-		             "FROM \"Users\"\n"
-		             "         INNER JOIN \"UserRoles\" ON \"Users\".\"Id\" = \"UserRoles\".\"UserId\"\n"
-		             "         INNER JOIN \"Roles\" ON \"UserRoles\".\"RoleId\" = \"Roles\".\"Id\"\n"
-		             "WHERE \"Users\".\"Id\" IN %\n"
-		             "GROUP BY \"Users\".\"Id\", \"BillingLockout\", \"Roles\".\"NormalizedName\" = 'BANNED'");
-
-		pos = query.find('%', pos);
-		query.replace(pos, sizeof(char), rv);
-
+		auto strId = boost::lexical_cast<std::string>(id);
 		this->Reconnect();
+		
 		pqxx::nontransaction q(this->m_connection);
-		pqxx::result res(q.exec(query));
-		std::vector<models::User> users;
+		pqxx::result res(q.exec_prepared("get_user", strId));
 
-		for(const auto& row: res) {
-			models::User user;
-
-			user.SetId(row[0].as<std::string>());
-			user.SetLockout(row[1].as<bool>());
-			user.SetBanned(row[2].as<bool>());
-
-			users.emplace_back(std::move(user));
+		if(res.empty()) {
+			return {};
 		}
 
-		return users;
+		auto row = *res.begin();
+		models::User user;
+
+		user.SetId(row[0].as<std::string>());
+		user.SetLockout(row[1].as<bool>());
+		user.SetBanned(row[2].as<bool>());
+
+		return std::make_optional(std::move(user));
+	}
+
+	void UserRepository::Reconnect()
+	{
+		if(this->m_connection.is_open()) {
+			return;
+		}
+
+		AbstractPostgresqlRepository::Reconnect();
+		this->m_connection.prepare("get_user", "SELECT * FROM authorizationctx_getuseraccount($1)");
 	}
 }

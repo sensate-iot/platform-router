@@ -6,7 +6,6 @@
  */
 
 #include <sensateiot/stl/referencewrapper.h>
-#include <sensateiot/stl/map.h>
 #include <sensateiot/services/messageservice.h>
 #include <sensateiot/consumers/commandconsumer.h>
 

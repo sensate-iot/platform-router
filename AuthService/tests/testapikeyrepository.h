@@ -17,46 +17,28 @@ namespace sensateiot::test
 		{
 		}
 
-		std::vector<std::string> GetAllSensorKeys() override
+		std::vector<models::ApiKey> GetAllSensorKeys() override
 		{
-			return std::vector<std::string>();
+			return std::vector<models::ApiKey>();
 		}
-
-		std::vector<std::string> GetKeys(const std::vector<std::string>& ids) override
+		
+		std::optional<models::ApiKey> GetSensorKey(const std::string& id) override
 		{
-			std::vector<std::string> rv;
-
-			for(const auto& key : this->m_keys) {
-				for(auto& id : ids) {
-					if(key != id) {
-						continue;
-					}
-
-					rv.push_back(key);
-					break;
+			for (auto key : this->m_keys) {
+				if(key.GetKey() == id) {
+					return key;
 				}
 			}
 
-			return rv;
-		}
-		
-		std::vector<std::string> GetKeysFor(const std::vector<models::Sensor>& sensors) override
-		{
-			return this->m_keys;
+			return {};
 		}
 
-		std::vector<std::string>
-		GetKeysByOwners(const boost::unordered_set<boost::uuids::uuid> &ids) override
-		{
-			return this->m_keys;
-		}
-
-		void AddKey(const std::string& key)
+		void AddKey(const models::ApiKey& key)
 		{
 			this->m_keys.push_back(key);
 		}
 
 	private:
-		std::vector<std::string> m_keys;
+		std::vector<models::ApiKey> m_keys;
 	};
 }

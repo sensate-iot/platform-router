@@ -29,7 +29,7 @@ namespace sensateiot::services
 			AbstractApiKeyRepository &keys,
 			AbstractSensorRepository &sensors,
 			const config::Config &conf
-	) : m_conf(conf), m_measurementIndex(0), m_messageIndex(0), m_count(0),
+	) : m_conf(conf), m_measurementIndex(0), m_messageIndex(0), m_cache(CacheTimeout), m_count(0),
 	    m_keyRepo(keys), m_userRepo(users), m_sensorRepo(sensors), m_commands(commands)
 	{
 		std::unique_lock lock(this->m_lock);
@@ -261,7 +261,7 @@ namespace sensateiot::services
 		{
 			this->m_cache.Append(sensors);
 			this->m_cache.Append(users);
-			this->m_cache.Append(keys);
+			//this->m_cache.Append(keys);
 		});
 
 		std::vector<models::ObjectId> objs;
@@ -294,45 +294,5 @@ namespace sensateiot::services
 
 	void MessageService::Load(std::vector<models::ObjectId> &objIds)
 	{
-		std::sort(objIds.begin(), objIds.end(), [](const auto &a, const auto &b) {
-			return a.compare(b) < 0;
-		});
-
-		auto iter = std::unique(objIds.begin(), objIds.end());
-		objIds.resize(static_cast<unsigned long>(std::distance(objIds.begin(), iter)));
-
-		auto sensors = this->m_sensorRepo->GetRange(objIds, 0, 0);
-		boost::unordered_set<boost::uuids::uuid> uuids;
-
-		if(sensors.empty()) {
-			return;
-		}
-
-		for(auto &sensor : sensors) {
-			uuids.insert(sensor.GetOwner());
-		}
-
-		auto user_f = std::async(std::launch::async, [this, &uuids]()
-		{
-			return this->m_userRepo->GetRange(uuids);
-		});
-
-		auto key_f = std::async(std::launch::async, [this, &sensors]()
-		{
-			return this->m_keyRepo->GetKeysFor(sensors);
-		});
-
-		try {
-			auto users = user_f.get();
-			auto keys = key_f.get();
-
-			this->m_cache.Append(sensors);
-			this->m_cache.Append(users);
-			this->m_cache.Append(keys);
-			this->m_cache.AppendBlackList(objIds);
-		} catch (std::exception& ex) {
-			auto& log = util::Log::GetLog();
-			log << "PostgreSQL error while fetching users/keys: " << ex.what() << util::Log::NewLine;
-		}
 	}
 }

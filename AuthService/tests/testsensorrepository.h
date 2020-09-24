@@ -47,6 +47,17 @@ namespace sensateiot::test
 			return rv;
 		}
 
+		std::optional<models::Sensor> GetSensorById(const models::ObjectId& id) override
+		{
+			for (auto sensor : this->m_sensors) {
+				if(sensor.GetId() == id) {
+					return std::make_optional(sensor);
+				}
+			}
+
+			return {};
+		}
+
 		void AddSensor(const models::Sensor& sensor)
 		{
 			this->m_sensors.push_back(sensor);

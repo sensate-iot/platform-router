@@ -34,6 +34,7 @@ namespace sensateiot::services
 		std::vector<models::Sensor> GetAllSensors(long skip, long limit) override;
 		std::vector<models::Sensor> GetRange(const std::vector<models::ObjectId>& ids, long skip, long limit) override;
 		std::vector<models::Sensor> GetRange(const std::vector<std::string> &ids, long skip, long limit) override;
+		std::optional<models::Sensor> GetSensorById(const models::ObjectId& id) override;
 
 	private:
 		using sv = std::string_view;

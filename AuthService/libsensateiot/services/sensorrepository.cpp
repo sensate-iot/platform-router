@@ -158,6 +158,17 @@ namespace sensateiot::services
 		return rv;
 	}
 
+	std::optional<models::Sensor> SensorRepository::GetSensorById(const models::ObjectId& id)
+	{
+		auto sensors = this->GetRange({ id }, 0, 0);
+
+		if(sensors.empty()) {
+			return {};
+		}
+
+		return std::make_optional(std::move(*sensors.begin()));
+	}
+
 	std::vector<models::Sensor>
 	SensorRepository::ExecuteQuery(mongoc_collection_t *col, const bson_t *pipeline)
 	{

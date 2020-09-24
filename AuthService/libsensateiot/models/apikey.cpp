@@ -7,6 +7,9 @@
 
 #include <sensateiot/models/apikey.h>
 
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/lexical_cast.hpp>
+
 namespace sensateiot::models
 {
 	void ApiKey::SetKey(const std::string& str)
@@ -14,9 +17,19 @@ namespace sensateiot::models
 		this->m_key = str;
 	}
 
+	void ApiKey::SetUserId(const IdType& value)
+	{
+		this->m_userId = value;
+	}
+
 	void ApiKey::SetRevoked(bool revoked)
 	{
 		this->m_revoked = revoked;
+	}
+
+	void ApiKey::SetReadOnly(bool value)
+	{
+		this->m_readOnly = value;
 	}
 
 	auto ApiKey::GetKey() const -> const std::string&
@@ -29,22 +42,27 @@ namespace sensateiot::models
 		return this->m_revoked;
 	}
 
-	void ApiKey::SetUserId(const std::string &value)
+	auto ApiKey::GetReadOnly() const -> bool
 	{
-		this->m_userId = value;
+		return this->m_readOnly;
 	}
 
-	auto ApiKey::GetUserId() const -> std::string
+	void ApiKey::SetUserId(const std::string &value)
+	{
+		this->m_userId = boost::lexical_cast<IdType>(value);
+	}
+
+	auto ApiKey::GetUserId() const -> boost::uuids::uuid
 	{
 		return this->m_userId;
 	}
 
-	auto ApiKey::GetType() const -> ApiKey::Type
+	auto ApiKey::GetType() const -> Type
 	{
 		return this->m_type;
 	}
 
-	void ApiKey::SetType(ApiKey::Type type)
+	void ApiKey::SetType(Type type)
 	{
 		this->m_type = type;
 	}
