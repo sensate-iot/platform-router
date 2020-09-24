@@ -44,10 +44,9 @@ namespace sensateiot::services
 		}
 	}
 	
-	std::vector<models::ObjectId> MessageService::Process(bool postProcess)
+	void MessageService::RawProcess()
 	{
 		auto &log = util::Log::GetLog();
-		std::vector<models::ObjectId> ids;
 
 		std::deque<boost::fibers::packaged_task<ProcessingStats()>> queue;
 		std::vector<boost::fibers::future<ProcessingStats>> results;
@@ -58,18 +57,10 @@ namespace sensateiot::services
 			auto processor = [
 				&measurementHandler = this->m_measurementHandlers[idx],
 				&messageHandler = this->m_messageHandlers[idx],
-				&l = this->m_lock,
-				pp = postProcess
+				&l = this->m_lock
 			]() {
-
 				try {
-
 					std::shared_lock lock(l);
-
-					if(pp) {
-						auto messageResult = messageHandler.PostProcess();
-						return std::make_pair(measurementHandler.PostProcess() + messageResult, std::vector<models::ObjectId>());
-					}
 
 					auto messageResult = messageHandler.Process();
 					auto measurementResult = measurementHandler.Process();
@@ -114,14 +105,6 @@ namespace sensateiot::services
 				}
 
 				auto tmp = future.get();
-
-				if(ids.empty()) {
-					ids = std::move(tmp.second);
-				} else {
-					ids.resize(ids.size() + tmp.second.size());
-					std::move(std::begin(tmp.second), std::end(tmp.second), std::back_inserter(ids));
-				}
-
 				authorized += tmp.first;
 			}
 		} catch(boost::fibers::future_error& error) {
@@ -133,8 +116,6 @@ namespace sensateiot::services
 		if(authorized != 0ULL) {
 			log << "Authorized " << authorized << " messages." << util::Log::NewLine;
 		}
-
-		return ids;
 	}
 
 	std::time_t MessageService::Process()
@@ -145,18 +126,14 @@ namespace sensateiot::services
 		if (count <= 0) {
 			this->m_cache.CleanupFor(CleanupTimeout);
 			this->m_commands->Execute();
+
 			return {};
 		}
 
 		log << "Processing " << count << " messages!" << util::Log::NewLine;
 		auto start = boost::chrono::system_clock::now();
-		auto ids = this->Process(false);
+		this->RawProcess();
 
-		if(!ids.empty()) {
-			this->Load(ids);
-		}
-
-		this->Process(true);
 		this->m_cache.CleanupFor(CleanupTimeout);
 		this->m_commands->Execute();
 
@@ -261,17 +238,9 @@ namespace sensateiot::services
 		{
 			this->m_cache.Append(sensors);
 			this->m_cache.Append(users);
-			//this->m_cache.Append(keys);
+			this->m_cache.Append(keys);
 		});
 
-		std::vector<models::ObjectId> objs;
-		objs.reserve(sensors.size());
-
-		for (auto& sensor : sensors) {
-			objs.push_back(sensor.GetId());
-		}
-
-		this->m_cache.AppendBlackList(objs);
 		append_f.wait();
 	}
 

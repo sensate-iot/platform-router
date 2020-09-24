@@ -12,7 +12,7 @@
 #include <sensateiot/models/measurement.h>
 #include <sensateiot/models/apikey.h>
 
-#include <sensateiot/cache/memorycache.h>
+#include <sensateiot/data/memorycache.h>
 
 #include <boost/unordered_set.hpp>
 #include <boost/uuid/uuid.hpp>
@@ -33,7 +33,7 @@ namespace sensateiot::data
 			Unknown
 		};
 
-		typedef boost::chrono::high_resolution_clock::time_point TimePoint;
+		typedef std::chrono::high_resolution_clock::time_point TimePoint;
 		typedef std::pair<bool, std::optional<models::Sensor>> SensorLookupType;
 		static constexpr long DefaultTimeoutMinutes = 6;
 
@@ -43,10 +43,8 @@ namespace sensateiot::data
 		void Append(std::vector<models::Sensor>& sensors);
 		void Append(std::vector<models::User>& users);
 		void Append(std::vector<models::ApiKey>& keys);
-		void AppendBlackList(const models::ObjectId& objId);
-		void AppendBlackList(const std::vector<models::ObjectId>& objIds);
 
-		void CleanupFor(boost::chrono::milliseconds millis);
+		void CleanupFor(std::chrono::high_resolution_clock::duration duration);
 		void Clear();
 		void Cleanup();
 
@@ -56,16 +54,10 @@ namespace sensateiot::data
 
 		/* Found, sensor data */
 		std::pair<bool, std::optional<models::Sensor>> GetSensor(const models::ObjectId& id, TimePoint tp) const;
-		bool IsBlackListed(const models::ObjectId& objId) const;
-		SensorStatus CanProcess(const models::Measurement& raw) const;
 
 	private:
-		cache::MemoryCache<models::ObjectId, models::Sensor> m_sensors;
-		cache::MemoryCache<boost::uuids::uuid, models::User> m_users;
-		cache::MemoryCache<std::string, std::string> m_keys;
-		/*stl::Map<models::ObjectId, models::Sensor> m_sensors;
-		stl::Map<boost::uuids::uuid, models::User> m_users;
-		stl::Set<std::string> m_keys;
-		stl::Set<models::ObjectId> m_blackList;*/
+		MemoryCache<models::ObjectId, models::Sensor> m_sensors;
+		MemoryCache<boost::uuids::uuid, models::User> m_users;
+		MemoryCache<std::string, models::ApiKey> m_keys;
 	};
 }

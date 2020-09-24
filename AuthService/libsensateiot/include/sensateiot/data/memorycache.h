@@ -9,7 +9,7 @@
 
 #include <sensateiot/detail/memorycache.h>
 
-namespace sensateiot::cache
+namespace sensateiot::data
 {
 	using MemoryCacheEntryOptions = detail::MemoryCacheEntryOptions;
 	

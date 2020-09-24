@@ -9,9 +9,9 @@
 #include <thread>
 
 #include <catch2/catch.hpp>
-#include <sensateiot/cache/memorycache.h>
+#include <sensateiot/data/memorycache.h>
 
-using namespace sensateiot::cache;
+using namespace sensateiot::data;
 
 TEST_CASE("Can update an item using AddOrUpdate", "[update]")
 {

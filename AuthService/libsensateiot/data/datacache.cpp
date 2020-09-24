@@ -40,87 +40,55 @@ namespace sensateiot::data
 	void DataCache::Append(std::vector<models::ApiKey>& keys)
 	{
 		for(auto&& key : keys) {
-			//this->m_keys.Emplace(std::forward<std::string>(key));
-		}
-	}
-
-	void DataCache::AppendBlackList(const models::ObjectId& objId)
-	{
-	}
-
-	void DataCache::AppendBlackList(const std::vector<models::ObjectId>& objIds)
-	{
-		for(const auto& id : objIds) {
-			this->AppendBlackList(id);
+			auto entry = std::make_pair(key.GetKey(), std::move(key));
+			this->m_keys.Add(std::move(entry), {});
 		}
 	}
 
 	std::pair<bool, std::optional<models::Sensor>> DataCache::GetSensor(const models::ObjectId& id, TimePoint tp) const
 	{
-		try {
-			/*auto sensor = this->m_sensors.At(id, tp);
-			auto user = this->m_users.At(sensor.GetOwner(), tp);
-			auto validated = this->m_keys.Has(sensor.GetSecret(), tp);
+		auto sensor = this->m_sensors.TryGetValue(id, tp);
 
-			validated = validated && !user.GetBanned() && !user.GetLockout();
-
-			if(validated) {
-				return std::make_pair(true, std::move(sensor));
-			}
-
-			return std::make_pair(true, std::optional<models::Sensor>());*/
-		} catch(std::out_of_range& ) {
-			/* Thrown if not found */
+		if(!sensor.has_value()) {
 			return std::make_pair(false, std::optional<models::Sensor>());
 		}
 
-		return {};
-	}
+		auto user = this->m_users.TryGetValue(sensor.value().GetOwner(), tp);
 
-	bool DataCache::IsBlackListed(const models::ObjectId& objId) const
-	{
-		return false;
-		//return this->m_blackList.Contains(objId);
-	}
-
-	DataCache::SensorStatus DataCache::CanProcess(const models::Measurement& raw) const
-	{
-		SensorStatus rv = SensorStatus::Unknown;
-		auto now = boost::chrono::high_resolution_clock::now();
-
-		try {
-			/*auto sensor = this->m_sensors.At(raw.GetObjectId(), now);
-			auto validKey = this->m_keys.Has(sensor.GetSecret(), now);
-
-			if (validKey) {
-				rv = SensorStatus::Available;
-			} else if (this->m_blackList.Has(sensor.GetId(), now)) {
-				rv = SensorStatus::Unavailable;
-			}*/
-		} catch (std::out_of_range&) {
-			rv = SensorStatus::Unavailable;
+		if(!user.has_value()) {
+			return std::make_pair(false, std::optional<models::Sensor>());
 		}
 
-		return rv;
+		auto key = this->m_keys.TryGetValue(sensor->GetSecret(), tp);
+
+		if(!key.has_value()) {
+			return std::make_pair(false, std::optional<models::Sensor>());
+		}
+
+		auto validated = !key.value().GetReadOnly() && !key.value().GetRevoked() &&
+			key.value().GetType() == models::ApiKeyType::SensorKey &&
+			!user.value().GetBanned() && !user.value().GetLockout();
+
+		if(validated) {
+			return std::make_pair(true, std::move(sensor));
+		}
+
+		return std::make_pair(true, std::optional<models::Sensor>());
 	}
 
-	void DataCache::CleanupFor(boost::chrono::milliseconds millis)
+	void DataCache::CleanupFor(std::chrono::high_resolution_clock::duration duration)
 	{
-		/*if(this->m_users.Size() > 0) {
-			this->m_users.Cleanup(millis);
+		if(this->m_users.Size() > 0) {
+			this->m_users.Cleanup(duration);
 		}
 
 		if(this->m_keys.Size() > 0) {
-			this->m_keys.Cleanup(millis);
+			this->m_keys.Cleanup(duration);
 		}
 
 		if(this->m_sensors.Size() > 0) {
-			this->m_sensors.Cleanup(millis);
+			this->m_sensors.Cleanup(duration);
 		}
-
-		if(this->m_blackList.Size() > 0) {
-			this->m_blackList.Cleanup(millis);
-		}*/
 	}
 
 	void DataCache::Clear()

@@ -31,7 +31,6 @@ namespace sensateiot::consumers
 		virtual ~MeasurementConsumer();
 
 		ProcessingStats Process() override;
-		std::size_t PostProcess() override;
 
 	private:
 		typedef data::DataCache::SensorLookupType SensorLookupType;

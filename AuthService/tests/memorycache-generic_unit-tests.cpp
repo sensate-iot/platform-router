@@ -9,9 +9,9 @@
 #include <thread>
 
 #include <catch2/catch.hpp>
-#include <sensateiot/cache/memorycache.h>
+#include <sensateiot/data/memorycache.h>
 
-using namespace sensateiot::cache;
+using namespace sensateiot::data;
 
 TEST_CASE("Cache can be constructed", "[construct, destruct]")
 {

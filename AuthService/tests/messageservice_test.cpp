@@ -140,13 +140,14 @@ static void test_datacache()
 	data::DataCache cache;
 	std::vector<models::Sensor> sensors;
 	std::vector<models::User> users;
-	std::vector<std::string> keys;
+	std::vector<models::ApiKey> keys;
 	boost::uuids::random_generator gen;
 	models::ObjectId testId;
 
 	for(auto idx = 0; idx < 10; idx++) {
 		models::Sensor s;
 		models::User u;
+		models::ApiKey k;
 		bson_oid_t oid;
 		auto owner = gen();
 
@@ -161,10 +162,16 @@ static void test_datacache()
 		u.SetId(owner);
 		u.SetLockout(false);
 		u.SetBanned(false);
-
+	
+		k.SetKey(std::to_string(idx));
+		k.SetType(models::ApiKeyType::SensorKey);
+		k.SetReadOnly(false);
+		k.SetRevoked(false);
+		k.SetUserId(u.GetId());
+		
 		sensors.emplace_back(std::move(s));
 		users.emplace_back(u);
-		keys.emplace_back(std::to_string(idx));
+		keys.emplace_back(std::move(k));
 	}
 
 	cache.Append(sensors);
@@ -175,7 +182,7 @@ static void test_datacache()
 	bson_oid_init(&oid, nullptr);
 	models::ObjectId id(oid.bytes);
 
-	auto now = boost::chrono::high_resolution_clock::now();
+	auto now = std::chrono::high_resolution_clock::now();
 	auto sensor = cache.GetSensor(id, now);
 
 	if (sensor.first || sensor.second.has_value()) {

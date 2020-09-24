@@ -82,10 +82,10 @@ namespace sensateiot::services
 		stl::ReferenceWrapper<AbstractSensorRepository> m_sensorRepo;
 		stl::ReferenceWrapper<consumers::CommandConsumer> m_commands;
 
-		std::vector<models::ObjectId> Process(bool postProcess);
+		void RawProcess();
 
 		static constexpr int Increment = 1;
-		static constexpr auto CleanupTimeout = boost::chrono::milliseconds(25);
+		static constexpr auto CleanupTimeout = std::chrono::milliseconds(25);
 		static constexpr auto CacheTimeout   = std::chrono::minutes(6);
 		static constexpr auto ReloadTimeout  = std::chrono::minutes(5);
 

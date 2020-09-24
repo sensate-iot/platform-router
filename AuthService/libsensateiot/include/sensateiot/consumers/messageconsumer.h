@@ -1,5 +1,5 @@
 /*
- * MQTT message handler.
+ * Message data consumer.
  *
  * @author Michel Megens
  * @email  michel@michelmegens.net
@@ -33,7 +33,6 @@ namespace sensateiot::consumers
 		virtual ~MessageConsumer();
 		
 		ProcessingStats Process() override;
-		std::size_t PostProcess() override;
 
 	private:
 		typedef data::DataCache::SensorLookupType SensorLookupType;

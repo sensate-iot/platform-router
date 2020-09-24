@@ -80,7 +80,7 @@ set(LIB_HEADERS
 
 	sensateiot/version.h
 
-	sensateiot/cache/memorycache.h
+	sensateiot/data/memorycache.h
 
 	sensateiot/compiler/compiler-msvc.h
 	sensateiot/compiler/compiler.h

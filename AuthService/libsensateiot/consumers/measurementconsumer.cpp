@@ -57,58 +57,6 @@ namespace sensateiot::consumers
 		return pair.second.GetKey() == sensor.GetSecret();
 	}
 
-	std::size_t MeasurementConsumer::PostProcess()
-	{
-		std::vector<MessagePair> data;
-		SensorLookupType sensor;
-
-		this->m_lock.lock();
-
-		if(this->m_leftOver.empty()) {
-			this->m_lock.unlock();
-			return {};
-		}
-		
-		std::swap(this->m_leftOver, data);
-		this->m_leftOver.clear();
-		this->m_lock.unlock();
-
-		std::vector<models::Measurement> authorized;
-		authorized.reserve(data.size());
-
-		std::sort(std::begin(data), std::end(data), [](const auto& x, const auto& y)
-		{
-			return x.second.GetObjectId().compare(y.second.GetObjectId()) < 0;
-		});
-
-		auto now = boost::chrono::high_resolution_clock::now();
-
-		for(auto&& pair : data) {
-			if(!sensor.second.has_value() || sensor.second->GetId() != pair.second.GetObjectId()) {
-				sensor = this->m_cache->GetSensor(pair.second.GetObjectId(), now);
-			}
-
-			if(!sensor.first || !sensor.second.has_value()) {
-				continue;
-			}
-
-			/* Valid sensor. Validate the measurement. */
-			if(!this->ValidateMeasurement(sensor.second.value(), pair)) {
-				continue;
-			}
-
-			authorized.emplace_back(std::move(pair.second));
-		}
-
-		/* Package authorized */
-		if(authorized.empty()) {
-			return {};
-		}
-
-		this->PublishAuthorizedMessages(authorized, this->m_config.GetMqtt().GetPrivateBroker().GetBulkMeasurementTopic());
-		return authorized.size();
-	}
-
 	MeasurementConsumer::ProcessingStats MeasurementConsumer::Process()
 	{
 		std::vector<MessagePair> data;
@@ -129,7 +77,7 @@ namespace sensateiot::consumers
 		
 		std::vector<models::Measurement> authorized;
 		authorized.reserve(data.size());
-		auto now = boost::chrono::high_resolution_clock::now();
+		auto now = std::chrono::high_resolution_clock::now();
 
 		for(auto&& pair : data) {
 			if(!sensor.second.has_value() || sensor.second->GetId() != pair.second.GetObjectId()) {
@@ -137,12 +85,6 @@ namespace sensateiot::consumers
 			}
 
 			if(!sensor.first) {
-				if(!this->m_cache->IsBlackListed(pair.second.GetObjectId())) {
-					/* Add to not found list & continue */
-					notFound.push_back(pair.second.GetObjectId());
-					leftOver.emplace_back(std::forward<MessagePair>(pair));
-				}
-
 				continue;
 			}
 

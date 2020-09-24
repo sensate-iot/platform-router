@@ -17,7 +17,7 @@
 #include <boost/uuid/random_generator.hpp>
 
 #include <sensateiot/util/log.h>
-#include <sensateiot/cache/memorycache.h>
+#include <sensateiot/data/memorycache.h>
 
 //static constexpr int MapSize     = 15000000;
 //static constexpr int LookupSize  = 1000000;
@@ -35,7 +35,7 @@ static std::vector<std::string> sensorStringIds;
 
 static void timeout_test()
 {
-	using namespace sensateiot::cache;
+	using namespace sensateiot::data;
 	using TreeType = MemoryCache<std::string, int>;
 
 	TreeType t;
@@ -90,7 +90,7 @@ static void concurrent_test()
 	static constexpr int MapSize = 10000;
 	static constexpr int LookupSize = 5000;
 
-	using namespace sensateiot::cache;
+	using namespace sensateiot::data;
 	using TreeType = MemoryCache<std::string, int>;
 	TreeType t;
 
@@ -182,7 +182,7 @@ static void concurrent_test()
 
 static void test_insert()
 {
-	using namespace sensateiot::cache;
+	using namespace sensateiot::data;
 	using TreeType = MemoryCache<sensateiot::models::ObjectId, sensateiot::models::Sensor>;
 	TreeType t;
 

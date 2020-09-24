@@ -61,7 +61,6 @@ namespace sensateiot::consumers
 			data.clear();
 		}
 		
-		virtual std::size_t PostProcess() = 0;
 		virtual ProcessingStats Process() = 0;
 
 		virtual void Move(AbstractConsumer& other)
