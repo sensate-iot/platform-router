@@ -80,13 +80,6 @@ namespace sensateiot
 		services::UserRepository users(this->m_config.GetDatabase().GetPostgreSQL());
 		services::ApiKeyRepository keys(this->m_config.GetDatabase().GetPostgreSQL());
 		services::SensorRepository sensors(this->m_config.GetDatabase().GetMongoDB());
-
-		auto key = keys.GetSensorKey("1aBWO2V8JIMnFUWw7Ne-Z8Tg6F8UFz@G");
-		auto userId = boost::lexical_cast<boost::uuids::uuid>("5966ddca-bbf2-4de3-9b46-0ee9481a7df8");
-		models::ObjectId sensorId("5efceee08bc90a7fb09810f2");
-		auto sensor = sensors.GetSensorById(sensorId);
-		auto user = users.GetUserById(userId);
-		std::cout << boost::lexical_cast<std::string>(user.value().GetId()) << std::endl;
 		services::MessageService service(iclient, commands, users, keys, sensors, this->m_config);
 
 		commands::FlushSensorCommandHandler sensorHandler(service);
@@ -143,6 +136,9 @@ void CreateApplication(const char *path)
 		auto &app = sensateiot::Application::GetApplication();
 		app.SetConfig(path);
 		app.Run();
+	} catch(mqtt::exception& ex) {
+		std::cerr << "Unable to run application: " << ex.printable_error(ex.get_return_code(), ex.get_reason_code()) << std::endl;
+		std::cerr << "Exception message: " << ex.what() << std::endl;
 	} catch(std::runtime_error &ex) {
 		std::cerr << "Unable to run application: " << ex.what();
 	} catch(std::exception &ex) {
