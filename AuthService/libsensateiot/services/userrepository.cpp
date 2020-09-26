@@ -28,14 +28,14 @@ namespace sensateiot::services
 		}
 	}
 
-	std::vector<models::User> UserRepository::GetAllUsers()
+	std::vector<std::pair<models::User::IdType, models::User>> UserRepository::GetAllUsers()
 	{
 		std::string query("SELECT * FROM authorizationctx_getuseraccounts()");
 
 		this->Reconnect();
 		pqxx::nontransaction q(this->m_connection);
 		pqxx::result res(q.exec(query));
-		std::vector<models::User> users;
+		std::vector<std::pair<models::User::IdType, models::User>> users;
 
 		for(const auto& row: res) {
 			models::User user;
@@ -44,7 +44,7 @@ namespace sensateiot::services
 			user.SetLockout(row[1].as<bool>());
 			user.SetBanned(row[2].as<bool>());
 
-			users.emplace_back(std::move(user));
+			users.emplace_back(std::make_pair(user.GetId(), std::move(user)));
 		}
 
 		return users;

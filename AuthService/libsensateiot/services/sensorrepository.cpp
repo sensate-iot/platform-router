@@ -18,7 +18,7 @@ namespace sensateiot::services
 	{
 	}
 
-	std::vector<models::Sensor> SensorRepository::GetAllSensors(long skip, long limit)
+	std::vector<std::pair<models::ObjectId, models::Sensor>> SensorRepository::GetAllSensors(long skip, long limit)
 	{
 		auto *project = BCON_NEW("$project", "{", "_id", BCON_BOOL(1), "Secret", BCON_BOOL(1), "Owner", BCON_BOOL(1),
 		                         "}");
@@ -48,7 +48,7 @@ namespace sensateiot::services
 		return rv;
 	}
 
-	std::vector<models::Sensor> SensorRepository::GetRange(const std::vector<models::ObjectId>& ids, long skip, long limit)
+	std::vector<std::pair<models::ObjectId, models::Sensor>> SensorRepository::GetRange(const std::vector<models::ObjectId>& ids, long skip, long limit)
 	{
 		std::vector<stl::SmallVector<std::uint8_t, models::ObjectId::ObjectIdSize>> byteIds;
 		byteIds.reserve(ids.size());
@@ -108,7 +108,7 @@ namespace sensateiot::services
 
 	}
 
-	std::vector<models::Sensor> SensorRepository::GetRange(const std::vector<std::string> &ids, long skip, long limit)
+	std::vector<std::pair<models::ObjectId, models::Sensor>> SensorRepository::GetRange(const std::vector<std::string> &ids, long skip, long limit)
 	{
 		bson_t *parent;
 		bson_t array;
@@ -166,16 +166,17 @@ namespace sensateiot::services
 			return {};
 		}
 
-		return std::make_optional(std::move(*sensors.begin()));
+		auto iter = sensors.begin();
+
+		return std::make_optional(std::move(iter->second));
 	}
 
-	std::vector<models::Sensor>
-	SensorRepository::ExecuteQuery(mongoc_collection_t *col, const bson_t *pipeline)
+	std::vector<std::pair<models::ObjectId, models::Sensor>> SensorRepository::ExecuteQuery(mongoc_collection_t *col, const bson_t *pipeline)
 	{
 		const bson_t *doc;
 
 		auto *cursor = mongoc_collection_aggregate(col, MONGOC_QUERY_NONE, pipeline, nullptr, nullptr);
-		std::vector<models::Sensor> sensors;
+		std::vector<std::pair<models::ObjectId, models::Sensor>> sensors;
 
 		while(mongoc_cursor_next(cursor, &doc)) {
 			bson_iter_t iter;
@@ -208,8 +209,7 @@ namespace sensateiot::services
 				}
 			} while(bson_iter_next(&iter));
 
-
-			sensors.emplace_back(std::move(s));
+			sensors.emplace_back(s.GetId(), std::move(s));
 		}
 
 		mongoc_cursor_destroy(cursor);

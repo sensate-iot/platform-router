@@ -28,7 +28,7 @@ namespace sensateiot::services
 		explicit AbstractApiKeyRepository(config::PostgreSQL pgsql);
 		virtual ~AbstractApiKeyRepository() = default;
 
-		virtual std::vector<models::ApiKey> GetAllSensorKeys() = 0;
+		virtual std::vector<std::pair<std::string, models::ApiKey>> GetAllSensorKeys() = 0;
 		virtual std::optional<models::ApiKey> GetSensorKey(const std::string& id) = 0;
 	};
 }

@@ -19,7 +19,7 @@ namespace sensateiot::services
 		explicit UserRepository(const config::PostgreSQL& pgsql);
 		~UserRepository() override = default;
 
-		std::vector<models::User>   GetAllUsers() override;
+		std::vector<std::pair<models::User::IdType, models::User>> GetAllUsers() override;
 		std::optional<models::User> GetUserById(const boost::uuids::uuid& id) override;
 		
 	protected:

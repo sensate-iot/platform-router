@@ -27,6 +27,10 @@ namespace sensateiot::data
 {
 	class DataCache {
 	public:
+		typedef std::pair<models::ObjectId, models::Sensor> SensorPairType;
+		typedef std::pair<models::User::IdType, models::User> UserPairType;
+		typedef std::pair<std::string, models::ApiKey> ApiKeyPairType;
+		
 		enum class SensorStatus {
 			Available,
 			Unavailable,
@@ -40,9 +44,13 @@ namespace sensateiot::data
 		explicit DataCache(std::chrono::high_resolution_clock::duration timeout);
 		explicit DataCache();
 
-		void Append(std::vector<models::Sensor>& sensors);
-		void Append(std::vector<models::User>& users);
-		void Append(std::vector<models::ApiKey>& keys);
+		void Append(const std::vector<models::Sensor>& sensors);
+		void Append(const std::vector<models::User>& users);
+		void Append(const std::vector<models::ApiKey>& keys);
+		
+		void Append(std::vector<SensorPairType>&& sensors);
+		void Append(std::vector<UserPairType>&& users);
+		void Append(std::vector<ApiKeyPairType>&& keys);
 
 		void CleanupFor(std::chrono::high_resolution_clock::duration duration);
 		void Clear();

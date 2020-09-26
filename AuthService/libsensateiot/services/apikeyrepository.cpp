@@ -31,14 +31,14 @@ namespace sensateiot::services
 		}
 	}
 
-	std::vector<models::ApiKey> ApiKeyRepository::GetAllSensorKeys()
+	std::vector<std::pair<std::string, models::ApiKey>> ApiKeyRepository::GetAllSensorKeys()
 	{
 		std::string query("SELECT * FROM authorizationctx_getapikeys()");
 		this->Reconnect();
 
 		pqxx::nontransaction q(this->m_connection);
 		pqxx::result res(q.exec(query));
-		std::vector<models::ApiKey> keys;
+		std::vector<std::pair<std::string, models::ApiKey>> keys;
 
 		for(const auto &row : res) {
 			models::ApiKey key;
@@ -47,7 +47,8 @@ namespace sensateiot::services
 			key.SetUserId(row[1].as<std::string>());
 			key.SetRevoked(row[2].as<bool>());
 			key.SetReadOnly(row[3].as<bool>());
-			keys.emplace_back(std::move(key));
+			key.SetType(models::ApiKeyType::SensorKey);
+			keys.emplace_back(std::make_pair(row[0].as<std::string>(), std::move(key)));
 		}
 
 		return keys;
@@ -81,6 +82,7 @@ namespace sensateiot::services
 		key.SetUserId(row[1].as<std::string>());
 		key.SetRevoked(row[2].as<bool>());
 		key.SetReadOnly(row[3].as<bool>());
+		key.SetType(models::ApiKeyType::SensorKey);
 
 		return std::make_optional(key);
 	}

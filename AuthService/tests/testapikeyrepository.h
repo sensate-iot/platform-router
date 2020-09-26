@@ -17,9 +17,15 @@ namespace sensateiot::test
 		{
 		}
 
-		std::vector<models::ApiKey> GetAllSensorKeys() override
+		std::vector<std::pair<std::string, models::ApiKey>> GetAllSensorKeys() override
 		{
-			return std::vector<models::ApiKey>();
+			std::vector<std::pair<std::string, models::ApiKey>> rv;
+
+			for (auto key : this->m_keys) {
+				rv.push_back(std::make_pair(key.GetKey(), key));
+			}
+
+			return rv;
 		}
 		
 		std::optional<models::ApiKey> GetSensorKey(const std::string& id) override

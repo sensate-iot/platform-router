@@ -25,7 +25,7 @@ namespace sensateiot::services
 		explicit AbstractUserRepository() = default;
 		virtual ~AbstractUserRepository() = default;
 
-		virtual std::vector<models::User> GetAllUsers() = 0;
+		virtual std::vector<std::pair<models::User::IdType, models::User>> GetAllUsers() = 0;
 		virtual std::optional<models::User> GetUserById(const boost::uuids::uuid& id) = 0;
 	};
 }

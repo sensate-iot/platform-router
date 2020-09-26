@@ -74,6 +74,7 @@ namespace sensateiot::services
 		std::vector<consumers::MessageConsumer> m_messageHandlers;
 
 		data::DataCache m_cache;
+		std::chrono::high_resolution_clock::time_point m_lastReload;
 		data::MeasurementValidator m_validator;
 		std::atomic_uint m_count;
 
@@ -88,7 +89,5 @@ namespace sensateiot::services
 		static constexpr auto CleanupTimeout = std::chrono::milliseconds(25);
 		static constexpr auto CacheTimeout   = std::chrono::minutes(6);
 		static constexpr auto ReloadTimeout  = std::chrono::minutes(5);
-
-		void Load(std::vector<models::ObjectId>& objIds);
 	};
 }

@@ -18,9 +18,15 @@ namespace sensateiot::test
 
 		~UserRepository() override = default;
 
-		std::vector<models::User> GetAllUsers() override
+		std::vector<std::pair<models::User::IdType, models::User>> GetAllUsers() override
 		{
-			return this->m_users;
+			std::vector<std::pair<models::User::IdType, models::User>> users;
+			
+			for (auto user : this->m_users) {
+				users.push_back(std::make_pair(user.GetId(), user));
+			}
+
+			return users;
 		}
 		
 		std::optional<models::User> GetUserById(const boost::uuids::uuid& id) override

@@ -22,14 +22,16 @@ namespace sensateiot::services
 {
 	class DLL_EXPORT AbstractSensorRepository {
 	public:
+		typedef std::pair<models::ObjectId, models::Sensor> ValueType;
+
 		explicit AbstractSensorRepository() = default;
 		explicit AbstractSensorRepository(config::MongoDB mongodb);
 		virtual ~AbstractSensorRepository() = default;
 
-		virtual std::vector<models::Sensor> GetAllSensors(long skip, long limit) = 0;
+		virtual std::vector<ValueType> GetAllSensors(long skip, long limit) = 0;
 		virtual std::optional<models::Sensor> GetSensorById(const models::ObjectId& id) = 0;
-		virtual std::vector<models::Sensor> GetRange(const std::vector<models::ObjectId>& ids, long skip, long limit) = 0;
-		virtual std::vector<models::Sensor> GetRange(const std::vector<std::string>& ids, long skip, long limit) = 0;
+		virtual std::vector<ValueType> GetRange(const std::vector<models::ObjectId>& ids, long skip, long limit) = 0;
+		virtual std::vector<ValueType> GetRange(const std::vector<std::string>& ids, long skip, long limit) = 0;
 
 	protected:
 		config::MongoDB m_mongodb;

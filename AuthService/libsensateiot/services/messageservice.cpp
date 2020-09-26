@@ -29,7 +29,8 @@ namespace sensateiot::services
 			AbstractApiKeyRepository &keys,
 			AbstractSensorRepository &sensors,
 			const config::Config &conf
-	) : m_conf(conf), m_measurementIndex(0), m_messageIndex(0), m_cache(CacheTimeout), m_count(0),
+	) : m_conf(conf), m_measurementIndex(0), m_messageIndex(0),
+		m_cache(CacheTimeout), m_lastReload(std::chrono::high_resolution_clock::now()), m_count(0),
 	    m_keyRepo(keys), m_userRepo(users), m_sensorRepo(sensors), m_commands(commands)
 	{
 		std::unique_lock lock(this->m_lock);
@@ -60,7 +61,7 @@ namespace sensateiot::services
 				&l = this->m_lock
 			]() {
 				try {
-					std::shared_lock lock(l);
+					std::shared_lock lck(l);
 
 					auto messageResult = messageHandler.Process();
 					auto measurementResult = measurementHandler.Process();
@@ -122,7 +123,16 @@ namespace sensateiot::services
 	{
 		auto &log = util::Log::GetLog();
 		auto count = this->m_count.exchange(0ULL);
-	
+
+		auto now = std::chrono::high_resolution_clock::now();
+		auto expiry = this->m_lastReload + ReloadTimeout;
+
+		if(expiry <= now) {
+			log << "Reloading caches" << util::Log::NewLine;
+			this->m_lastReload = now;
+			this->LoadAll();
+		}
+
 		if (count <= 0) {
 			this->m_cache.CleanupFor(CleanupTimeout);
 			this->m_commands->Execute();
@@ -234,14 +244,9 @@ namespace sensateiot::services
 		auto keys = key_f.get();
 		auto users = user_f.get();
 
-		auto append_f = std::async(std::launch::async, [&]()
-		{
-			this->m_cache.Append(sensors);
-			this->m_cache.Append(users);
-			this->m_cache.Append(keys);
-		});
-
-		append_f.wait();
+		this->m_cache.Append(std::move(sensors));
+		this->m_cache.Append(std::move(users));
+		this->m_cache.Append(std::move(keys));
 	}
 
 	void MessageService::FlushUser(const std::string& id)
@@ -259,9 +264,5 @@ namespace sensateiot::services
 	void MessageService::FlushKey(const std::string& key)
 	{
 		this->m_cache.FlushKey(key);
-	}
-
-	void MessageService::Load(std::vector<models::ObjectId> &objIds)
-	{
 	}
 }

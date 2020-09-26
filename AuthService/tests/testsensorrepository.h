@@ -14,28 +14,27 @@
 
 namespace sensateiot::test
 {
-	class DLL_EXPORT SensorRepository : public services::AbstractSensorRepository {
+	class DLL_EXPORT SensorRepository final : public services::AbstractSensorRepository {
 	public:
 		explicit SensorRepository(config::MongoDB mongodb) {}
 
-		std::vector<models::Sensor> GetAllSensors(long skip, long limit) override
+		std::vector<std::pair<models::ObjectId, models::Sensor>> GetAllSensors(long skip, long limit) override
 		{
 			return this->m_sensors;
 		}
 
-		std::vector<models::Sensor> GetRange(const std::vector<std::string> &ids, long skip, long limit) override
+		std::vector<std::pair<models::ObjectId, models::Sensor>> GetRange(const std::vector<std::string> &ids, long skip, long limit) override
 		{
-			abort();
-			return std::vector<models::Sensor>();
+			return {};
 		}
 
-		std::vector<models::Sensor> GetRange(const std::vector<models::ObjectId>& ids, long skip, long limit) override
+		std::vector<std::pair<models::ObjectId, models::Sensor>> GetRange(const std::vector<models::ObjectId>& ids, long skip, long limit) override
 		{
-			std::vector<models::Sensor> rv;
+			std::vector<std::pair<models::ObjectId, models::Sensor>> rv;
 
 			for(const auto& sensor : this->m_sensors) {
 				for(auto& id : ids) {
-					if(sensor.GetId() != id) {
+					if(sensor.first != id) {
 						continue;
 					}
 
@@ -50,8 +49,8 @@ namespace sensateiot::test
 		std::optional<models::Sensor> GetSensorById(const models::ObjectId& id) override
 		{
 			for (auto sensor : this->m_sensors) {
-				if(sensor.GetId() == id) {
-					return std::make_optional(sensor);
+				if(sensor.first == id) {
+					return std::make_optional(sensor.second);
 				}
 			}
 
@@ -60,10 +59,10 @@ namespace sensateiot::test
 
 		void AddSensor(const models::Sensor& sensor)
 		{
-			this->m_sensors.push_back(sensor);
+			this->m_sensors.push_back(std::make_pair(sensor.GetId(), sensor));
 		}
 
 	private:
-		std::vector<models::Sensor> m_sensors;
+		std::vector<std::pair<models::ObjectId, models::Sensor>> m_sensors;
 	};
 }

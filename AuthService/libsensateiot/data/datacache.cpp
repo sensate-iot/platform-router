@@ -21,28 +21,49 @@ namespace sensateiot::data
 	{
 	}
 
-	void DataCache::Append(std::vector<models::Sensor> &sensors)
+	void DataCache::Append(const std::vector<models::Sensor> &sensors)
 	{
-		for(auto&& sensor : sensors) {
-			auto entry = std::make_pair(sensor.GetId(), std::forward<models::Sensor>(sensor));
-			this->m_sensors.Add(std::move(entry), {});
+		MemoryCacheEntryOptions options;
+		
+		for(auto& sensor : sensors) {
+			auto entry = std::make_pair(sensor.GetId(), sensor);
+			this->m_sensors.AddOrUpdate(entry, options);
 		}
 	}
 
-	void DataCache::Append(std::vector<models::User> &users)
+	void DataCache::Append(const std::vector<models::User> &users)
 	{
-		for(auto&& user : users) {
-			auto entry = std::make_pair(user.GetId(), std::forward<models::User>(user));
-			this->m_users.Add(std::move(entry), {});
+		MemoryCacheEntryOptions options;
+		
+		for(auto& user : users) {
+			auto entry = std::make_pair(user.GetId(), user);
+			this->m_users.AddOrUpdate(entry, options);
 		}
 	}
 
-	void DataCache::Append(std::vector<models::ApiKey>& keys)
+	void DataCache::Append(const std::vector<models::ApiKey>& keys)
 	{
-		for(auto&& key : keys) {
-			auto entry = std::make_pair(key.GetKey(), std::move(key));
-			this->m_keys.Add(std::move(entry), {});
+		MemoryCacheEntryOptions options;
+		
+		for(auto& key : keys) {
+			auto entry = std::make_pair(key.GetKey(), key);
+			this->m_keys.AddOrUpdate(entry, options);
 		}
+	}
+
+	void DataCache::Append(std::vector<SensorPairType>&& sensors)
+	{
+		this->m_sensors.AddOrUpdateRange(std::forward<std::vector<SensorPairType>>(sensors), {});
+	}
+
+	void DataCache::Append(std::vector<UserPairType>&& users)
+	{
+		this->m_users.AddOrUpdateRange(std::forward<std::vector<UserPairType>>(users), {});
+	}
+
+	void DataCache::Append(std::vector<ApiKeyPairType>&& keys)
+	{
+		this->m_keys.AddOrUpdateRange(std::forward<std::vector<ApiKeyPairType>>(keys), {});
 	}
 
 	std::pair<bool, std::optional<models::Sensor>> DataCache::GetSensor(const models::ObjectId& id, TimePoint tp) const
@@ -94,36 +115,36 @@ namespace sensateiot::data
 	void DataCache::Clear()
 	{
 		this->m_sensors.Clear();
-		//this->m_users.Clear();
+		this->m_users.Clear();
 		this->m_keys.Clear();
 	}
 
 	void DataCache::Cleanup()
 	{
-		//this->m_users.Cleanup();
+		this->m_users.Cleanup();
 		this->m_keys.Cleanup();
 		this->m_sensors.Cleanup();
 	}
 
 	void DataCache::FlushUser(const boost::uuids::uuid& id)
 	{
-		//this->m_users.Remove(id);
+		this->m_users.Remove(id);
 	}
 
 	void DataCache::FlushSensor(const models::ObjectId& id)
 	{
-		/*try {
-			this->m_sensors.Process(id, [this](const models::Sensor& sensor) {
-				const auto& secret = sensor.GetSecret();
-				this->FlushKey(secret);
-			});
+		auto sensor = this->m_sensors.TryGetValue(id);
 
-			this->m_blackList.Erase(id);
-			this->m_sensors.Erase(id);
-		} catch(std::out_of_range&) {
-			this->m_blackList.Erase(id);
-			this->m_sensors.Erase(id);
-		}*/
+		if(!sensor.has_value()) {
+			return;
+		}
+
+		try {
+			this->m_keys.Remove(sensor.value().GetSecret());
+		} catch(std::out_of_range& ) {
+#ifdef DEBUG
+#endif
+		}
 	}
 
 	void DataCache::FlushKey(const std::string& key)
