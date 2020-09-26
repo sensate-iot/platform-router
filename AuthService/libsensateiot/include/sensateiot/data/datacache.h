@@ -44,9 +44,9 @@ namespace sensateiot::data
 		explicit DataCache(std::chrono::high_resolution_clock::duration timeout);
 		explicit DataCache();
 
-		void Append(const std::vector<models::Sensor>& sensors);
-		void Append(const std::vector<models::User>& users);
-		void Append(const std::vector<models::ApiKey>& keys);
+		void Append(models::Sensor&& sensor);
+		void Append(models::User&& user);
+		void Append(models::ApiKey&& key);
 		
 		void Append(std::vector<SensorPairType>&& sensors);
 		void Append(std::vector<UserPairType>&& users);

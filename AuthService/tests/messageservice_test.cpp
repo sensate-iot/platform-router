@@ -138,9 +138,9 @@ static void test_datacache()
 {
 	using namespace sensateiot;
 	data::DataCache cache;
-	std::vector<models::Sensor> sensors;
-	std::vector<models::User> users;
-	std::vector<models::ApiKey> keys;
+	std::vector<std::pair<models::ObjectId, models::Sensor>> sensors;
+	std::vector<std::pair<models::User::IdType, models::User>> users;
+	std::vector<std::pair<std::string, models::ApiKey>> keys;
 	boost::uuids::random_generator gen;
 	models::ObjectId testId;
 
@@ -169,14 +169,14 @@ static void test_datacache()
 		k.SetRevoked(false);
 		k.SetUserId(u.GetId());
 		
-		sensors.emplace_back(std::move(s));
-		users.emplace_back(u);
-		keys.emplace_back(std::move(k));
+		sensors.emplace_back(std::make_pair(s.GetId(), std::move(s)));
+		keys.emplace_back(std::make_pair(k.GetKey(), std::move(k)));
+		users.emplace_back(std::make_pair(u.GetId(), std::move(u)));
 	}
 
-	cache.Append(sensors);
-	cache.Append(keys);
-	cache.Append(users);
+	cache.Append(std::move(sensors));
+	cache.Append(std::move(keys));
+	cache.Append(std::move(users));
 
 	bson_oid_t oid;
 	bson_oid_init(&oid, nullptr);

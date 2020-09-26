@@ -44,12 +44,12 @@ namespace sensateiot::stl
 			return this->m_values.at(key);
 		}
 		
-		const ValueType& operator=(const KeyType& key) const
+		const ValueType& operator[](const KeyType& key) const
 		{
 			return this->m_values.at(key);
 		}
 		
-		ValueType& operator=(const KeyType& key)
+		ValueType& operator[](const KeyType& key)
 		{
 			return this->m_values.at(key);
 		}

@@ -67,6 +67,9 @@ SET(SOURCES
 	commands/flushusercommandhandler.cpp
 	commands/flushsensorcommandhandler.cpp
 	commands/flushkeycommandhandler.cpp
+	commands/addusercommandhandler.cpp
+	commands/addsensorcommandhandler.cpp
+	commands/addkeycommandhandler.cpp
 )
 
 set(LIB_HEADERS
@@ -159,6 +162,9 @@ set(LIB_HEADERS
 	sensateiot/commands/flushusercommandhandler.h
 	sensateiot/commands/flushsensorcommandhandler.h
 	sensateiot/commands/flushkeycommandhandler.h
+	sensateiot/commands/addusercommandhandler.h
+	sensateiot/commands/addsensorcommandhandler.h
+	sensateiot/commands/addkeycommandhandler.h
 
 	sensateiot.h
 )

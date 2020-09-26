@@ -21,34 +21,22 @@ namespace sensateiot::data
 	{
 	}
 
-	void DataCache::Append(const std::vector<models::Sensor> &sensors)
+	void DataCache::Append(models::Sensor&& sensor)
 	{
-		MemoryCacheEntryOptions options;
-		
-		for(auto& sensor : sensors) {
-			auto entry = std::make_pair(sensor.GetId(), sensor);
-			this->m_sensors.AddOrUpdate(entry, options);
-		}
+		auto entry = std::make_pair(sensor.GetId(), std::forward<models::Sensor>(sensor));
+		this->m_sensors.AddOrUpdate(entry, {});
 	}
 
-	void DataCache::Append(const std::vector<models::User> &users)
+	void DataCache::Append(models::User&& user)
 	{
-		MemoryCacheEntryOptions options;
-		
-		for(auto& user : users) {
-			auto entry = std::make_pair(user.GetId(), user);
-			this->m_users.AddOrUpdate(entry, options);
-		}
+		auto entry = std::make_pair(user.GetId(), std::forward<models::User>(user));
+		this->m_users.AddOrUpdate(entry, {});
 	}
 
-	void DataCache::Append(const std::vector<models::ApiKey>& keys)
+	void DataCache::Append(models::ApiKey&& key)
 	{
-		MemoryCacheEntryOptions options;
-		
-		for(auto& key : keys) {
-			auto entry = std::make_pair(key.GetKey(), key);
-			this->m_keys.AddOrUpdate(entry, options);
-		}
+		auto entry = std::make_pair(key.GetKey(), std::forward<models::ApiKey>(key));
+		this->m_keys.AddOrUpdate(entry, {});
 	}
 
 	void DataCache::Append(std::vector<SensorPairType>&& sensors)

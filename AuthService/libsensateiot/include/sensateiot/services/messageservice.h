@@ -64,6 +64,9 @@ namespace sensateiot::services
 		void FlushUser(const std::string& id);
 		void FlushSensor(const std::string& id);
 		void FlushKey(const std::string& key);
+		void AddUser(const std::string& id);
+		void AddSensor(const std::string& id);
+		void AddKey(const std::string& key);
 
 	private:
 		mutable std::shared_mutex m_lock;

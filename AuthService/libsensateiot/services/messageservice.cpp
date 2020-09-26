@@ -265,4 +265,39 @@ namespace sensateiot::services
 	{
 		this->m_cache.FlushKey(key);
 	}
+
+	void MessageService::AddUser(const std::string& id)
+	{
+		auto userId = boost::lexical_cast<boost::uuids::uuid>(id);
+		auto user = this->m_userRepo->GetUserById(userId);
+
+		if(!user.has_value()) {
+			return;
+		}
+
+		this->m_cache.Append(std::move(*user));
+	}
+
+	void MessageService::AddSensor(const std::string& id)
+	{
+		models::ObjectId sensorId(id);
+		auto sensor = this->m_sensorRepo->GetSensorById(sensorId);
+
+		if(!sensor.has_value()) {
+			return;
+		}
+
+		this->m_cache.Append(std::move(*sensor));
+	}
+
+	void MessageService::AddKey(const std::string& key)
+	{
+		auto k = this->m_keyRepo->GetSensorKey(key);
+
+		if(!k.has_value()) {
+			return;
+		}
+
+		this->m_cache.Append(std::move(*k));
+	}
 }
