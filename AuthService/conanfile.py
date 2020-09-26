@@ -30,16 +30,18 @@ class AuthService(ConanFile):
     def requirements(self):
         self.requires("mongo-c-driver/1.16.1@bincrafters/stable")
         self.requires("boost/1.73.0")
-        self.requires("paho-mqtt-c/1.3.4", override=True)
-        self.requires("paho-mqtt-cpp/1.1", override=False)
         self.requires("zlib/1.2.11", override=True)
         self.requires("libpqxx/7.0.5", override=False)
         self.requires("re2/20200601")
         self.requires("protobuf/3.11.4")
         self.requires("rapidjson/1.1.0")
         self.requires("catch2/2.11.1")
+        self.requires("paho-mqtt-cpp/1.1", override=False)
 
-        if not is_windows():
+        if is_windows():
+            self.requires("paho-mqtt-c/1.3.4", override=True)
+        else:
+            self.requires("paho-mqtt-c/1.3.1", override=True)
             self.requires("openssl/1.1.1g", override=True)
 
     def imports(self):
