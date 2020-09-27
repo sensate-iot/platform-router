@@ -31,10 +31,10 @@
       "Ssl": "false",
       "Port": 1883,
       "Host": "tcp://host.docker.internal",
-	  "ClientId": "dev-auth-01",
-	  "InternalCommandTopic": "sensate/internal/auth-service/commands",
-      "InternalBulkMeasurementTopic": "sensate/internal/measurements/bulk",
-      "InternalBulkMessageTopic": "sensate/internal/messages/bulk"
+      "ClientId": "dev-auth-01",
+      "InternalCommandTopic": "sensate-auth/internal/commands",
+      "InternalBulkMeasurementTopic": "sensate-auth/internal/measurements/bulk",
+      "InternalBulkMessageTopic": "sensate-auth/internal/messages/bulk"
     }
   }
 }
