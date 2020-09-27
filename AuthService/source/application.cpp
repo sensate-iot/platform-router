@@ -31,6 +31,10 @@
 #include <sensateiot/commands/flushkeycommandhandler.h>
 #include <sensateiot/commands/flushusercommandhandler.h>
 
+#include <sensateiot/commands/addsensorcommandhandler.h>
+#include <sensateiot/commands/addkeycommandhandler.h>
+#include <sensateiot/commands/addusercommandhandler.h>
+
 #include <json.hpp>
 #include <google/protobuf/any.h>
 
@@ -85,10 +89,17 @@ namespace sensateiot
 		commands::FlushSensorCommandHandler sensorHandler(service);
 		commands::FlushKeyCommandHandler keyHandler(service);
 		commands::FlushUserCommandHandler userHandler(service);
+		commands::AddSensorCommandHandler addSensorHandler(service);
+		commands::AddKeyCommandHandler addKeyHandler(service);
+		commands::AddUserCommandHandler addUserHandler(service);
 
 		commands.AddHandler(FlushSensorCmd.data(), sensorHandler);
 		commands.AddHandler(FlushKeyCmd.data(), keyHandler);
 		commands.AddHandler(FlushUserCmd.data(), userHandler);
+		
+		commands.AddHandler(AddUserCmd.data(), addUserHandler);
+		commands.AddHandler(AddSensorCmd.data(), addSensorHandler);
+		commands.AddHandler(AddKeyCmd.data(), addKeyHandler);
 
 		if (this->m_config.GetHotLoad()) {
 			service.LoadAll();
