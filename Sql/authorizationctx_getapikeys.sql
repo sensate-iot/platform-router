@@ -1,10 +1,10 @@
 create function authorizationctx_getapikeys()
-    returns table(apikey text, revoked boolean, readonly boolean)
+    returns table(apikey text, userid text, revoked boolean, readonly boolean)
 	language plpgsql
 as $$
 begin
 return query
-        SELECT "ApiKey", "Revoked", "ReadOnly" FROM "ApiKeys"
+        SELECT "ApiKey", "UserId", "Revoked", "ReadOnly" FROM "ApiKeys"
         WHERE "Type" = 0;
 end;
 $$;
