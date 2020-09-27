@@ -127,12 +127,7 @@ namespace sensateiot::data
 			return;
 		}
 
-		try {
-			this->m_keys.Remove(sensor.value().GetSecret());
-		} catch(std::out_of_range& ) {
-#ifdef DEBUG
-#endif
-		}
+		this->m_keys.Remove(sensor.value().GetSecret());
 	}
 
 	void DataCache::FlushKey(const std::string& key)
