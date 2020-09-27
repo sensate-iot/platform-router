@@ -18,10 +18,10 @@ namespace sensateiot::commands
 	void AddSensorCommandHandler::Execute(const Command& cmd)
 	{
 		try {
-			util::Log::GetLog() << "Flushing sensor with ID: " << cmd.args << "!" << util::Log::NewLine;
+			util::Log::GetLog() << "Adding/updating sensor with ID: " << cmd.args << "!" << util::Log::NewLine;
 			this->m_messageService->AddSensor(cmd.args);
 		} catch (std::exception& ex) {
-			util::Log::GetLog() << "Unable to flush sensor with ID: " << cmd.args << " because: " << ex.what() << util::Log::NewLine;
+			util::Log::GetLog() << "Unable to add or update sensor with ID: " << cmd.args << " because: " << ex.what() << util::Log::NewLine;
 		}
 	}
 }

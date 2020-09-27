@@ -18,10 +18,10 @@ namespace sensateiot::commands
 	void AddUserCommandHandler::Execute(const Command& cmd)
 	{
 		try {
-			util::Log::GetLog() << "Adding user with ID: " << cmd.args << "!" << util::Log::NewLine;
+			util::Log::GetLog() << "Adding/updating user with ID: " << cmd.args << "!" << util::Log::NewLine;
 			this->m_messageService->AddUser(cmd.args);
 		} catch (std::exception& ex) {
-			util::Log::GetLog() << "Unable to flush user with ID: " << cmd.args << " because: " << ex.what() << util::Log::NewLine;
+			util::Log::GetLog() << "Unable to add or update user with ID: " << cmd.args << " because: " << ex.what() << util::Log::NewLine;
 		}
 	}
 }
