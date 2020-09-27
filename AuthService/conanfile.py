@@ -1,5 +1,8 @@
 #
+# Conan project configuration.
 #
+# @author Michel Megens
+# @email  michel@michelmegens.net
 #
 
 from conans import ConanFile, CMake
