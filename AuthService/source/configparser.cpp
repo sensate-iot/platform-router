@@ -17,9 +17,6 @@ namespace sensateiot::parser
 {
 	static void ParseMqtt(nlohmann::json &j, config::Config& cfg)
 	{
-		cfg.SetInterval(j["Interval"]);
-		cfg.SetWorkers(j["Workers"]);
-
 		cfg.GetMqtt().GetPrivateBroker()
 				.GetBroker().SetHostName(j["Mqtt"]["InternalBroker"]["Host"]);
 		cfg.GetMqtt().GetPrivateBroker()
@@ -76,13 +73,8 @@ namespace sensateiot::parser
 			cfg.SetInternalBatchSize(j["InternalBatchSize"]);
 			cfg.SetBindAddress(j["BindAddress"]);
 			cfg.SetHttpPort(j["Port"].get<std::uint16_t>());
-
-			if (j.contains("HotLoad") && j["HotLoad"].is_boolean()) {
-				cfg.SetHotLoad(j["HotLoad"]);
-			}
-			else {
-				cfg.SetHotLoad(false);
-			}
+			cfg.SetInterval(j["Interval"]);
+			cfg.SetWorkers(j["Workers"]);
 
 			ParseMqtt(j, cfg);
 			ParseDatabase(j, cfg);

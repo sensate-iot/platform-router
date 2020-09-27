@@ -6,8 +6,6 @@
   "BindAddress": "0.0.0.0",
   "Port": 8080,
   
-  "HotLoad": false,
-
   "Logging": {
     "File": "auth-service_%N.log",
     "Level": "INFO"

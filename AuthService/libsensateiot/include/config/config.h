@@ -43,10 +43,6 @@ namespace sensateiot::config
 		const std::string& GetBindAddress() const;
 		void SetBindAddress(const std::string& addr);
 
-		[[nodiscard]]
-		bool GetHotLoad() const;
-		void SetHotLoad(bool load);
-
 		Logging& GetLogging();
 
 	private:
@@ -58,6 +54,5 @@ namespace sensateiot::config
 		std::size_t m_internalBatchSize{};
 		std::string m_bindAddr;
 		std::uint16_t m_port;
-		bool m_hotLoad;
 	};
 }
