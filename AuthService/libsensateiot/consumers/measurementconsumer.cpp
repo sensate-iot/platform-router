@@ -20,26 +20,16 @@ namespace sensateiot::consumers
 	{
 	}
 
-	MeasurementConsumer::~MeasurementConsumer()
-	{
-		std::scoped_lock l(this->m_lock);
-		this->m_leftOver.clear();
-	}
-
 	MeasurementConsumer::MeasurementConsumer(MeasurementConsumer &&rhs) noexcept :
 		AbstractConsumer(std::forward<AbstractConsumer>(rhs))
 	{
-		std::scoped_lock l(this->m_lock, rhs.m_lock);
-		this->m_leftOver = std::move(rhs.m_leftOver);
 	}
 
 	MeasurementConsumer &MeasurementConsumer::operator=(MeasurementConsumer &&rhs) noexcept
 	{
 		std::scoped_lock l(this->m_lock, rhs.m_lock);
 
-		this->m_leftOver = std::move(rhs.m_leftOver);
 		this->Move(rhs);
-
 		return *this;
 	}
 
@@ -60,8 +50,6 @@ namespace sensateiot::consumers
 	MeasurementConsumer::ProcessingStats MeasurementConsumer::Process()
 	{
 		std::vector<MessagePair> data;
-		std::vector<MessagePair> leftOver;
-		std::vector<models::ObjectId> notFound;
 		SensorLookupType sensor;
 
 		this->m_lock.lock();
@@ -107,9 +95,6 @@ namespace sensateiot::consumers
 			this->PublishAuthorizedMessages(authorized, this->m_config.GetMqtt().GetPrivateBroker().GetBulkMeasurementTopic());
 		}
 
-		std::scoped_lock l(this->m_lock);
-		this->m_leftOver = std::move(leftOver);
-
-		return std::make_pair(authorized.size(), std::move(notFound));
+		return authorized.size();
 	}
 }

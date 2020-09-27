@@ -28,13 +28,12 @@ namespace sensateiot::consumers
 		explicit MeasurementConsumer(mqtt::IMqttClient& client, data::DataCache& cache, config::Config conf);
 		MeasurementConsumer(MeasurementConsumer&& rhs) noexcept ;
 		MeasurementConsumer& operator=(MeasurementConsumer&& rhs) noexcept;
-		virtual ~MeasurementConsumer();
+		~MeasurementConsumer() override = default;
 
 		ProcessingStats Process() override;
 
 	private:
 		typedef data::DataCache::SensorLookupType SensorLookupType;
-		std::vector<MessagePair> m_leftOver;
 
 		bool ValidateMeasurement(const models::Sensor& sensor, MessagePair& pair) const;
 	};

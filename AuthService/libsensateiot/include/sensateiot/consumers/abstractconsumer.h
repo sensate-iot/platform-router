@@ -26,7 +26,7 @@ namespace sensateiot::consumers
 	public:
 		typedef T ModelType;
 		typedef std::pair<std::string, ModelType> MessagePair;
-		typedef std::pair<std::size_t, std::vector<models::ObjectId>> ProcessingStats;
+		typedef std::size_t ProcessingStats;
 
 		explicit AbstractConsumer(mqtt::IMqttClient& client, data::DataCache& cache, config::Config conf) :
 			m_internal(client), m_cache(cache), m_config(std::move(conf)), m_regex(SearchRegex.data())

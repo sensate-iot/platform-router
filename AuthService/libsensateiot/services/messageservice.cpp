@@ -22,6 +22,31 @@
 
 namespace sensateiot::services
 {
+	namespace detail
+	{
+		std::size_t WaitForResults(std::vector<boost::fibers::future<MessageService::ProcessingStats>>& results)
+		{
+			std::size_t authorized = 0UL;
+			auto &log = util::Log::GetLog();
+			
+			try {
+				for(auto& future : results) {
+					if(!future.valid()) {
+						continue;
+					}
+
+					authorized += future.get();
+				}
+			} catch(boost::fibers::future_error& error) {
+				log << "Unable to get data from future: " << error.what() << util::Log::NewLine;
+			} catch(std::system_error& error) {
+				log << "Unable to process messages: " << error.what() << util::Log::NewLine;
+			}
+
+			return authorized;
+		}
+	}
+	
 	MessageService::MessageService(
 			mqtt::IMqttClient &client,
 			consumers::CommandConsumer& commands,
@@ -60,25 +85,21 @@ namespace sensateiot::services
 				&messageHandler = this->m_messageHandlers[idx],
 				&l = this->m_lock
 			]() {
+				std::size_t result;
+
 				try {
 					std::shared_lock lck(l);
 
 					auto messageResult = messageHandler.Process();
 					auto measurementResult = measurementHandler.Process();
 
-					measurementResult.first += messageResult.first;
-					measurementResult.second.reserve(measurementResult.second.size() + messageResult.second.size());
-					std::move(
-						std::begin(messageResult.second),
-						std::end(messageResult.second),
-						std::back_inserter(measurementResult.second)
-					);
-
-					return measurementResult;
+					result = messageResult + measurementResult;
 				} catch(std::exception& ex) {
 					util::Log::GetLog() << "Unable to publish messages: " << ex.what() << util::Log::NewLine;
-					return std::pair(std::size_t{}, std::vector < models::ObjectId>{});
+					result = 0;
 				}
+
+				return result;
 			};
 			
 			boost::fibers::packaged_task<ProcessingStats()> tsk(std::move(processor));
@@ -97,27 +118,13 @@ namespace sensateiot::services
 			exec.detach();
 		}
 
-		std::size_t authorized = 0ULL;
-
-		try {
-			for(auto&& future : results) {
-				if(!future.valid()) {
-					continue;
-				}
-
-				auto tmp = future.get();
-				authorized += tmp.first;
-			}
-		} catch(boost::fibers::future_error& error) {
-			log << "Unable to get data from future: " << error.what() << util::Log::NewLine;
-		} catch(std::system_error& error) {
-			log << "Unable to process messages: " << error.what() << util::Log::NewLine;
-		}
+		std::size_t authorized = detail::WaitForResults(results);
 
 		if(authorized != 0ULL) {
 			log << "Authorized " << authorized << " messages." << util::Log::NewLine;
 		}
 	}
+
 
 	std::time_t MessageService::Process()
 	{

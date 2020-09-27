@@ -30,13 +30,12 @@ namespace sensateiot::consumers
 		explicit MessageConsumer(mqtt::IMqttClient& client, data::DataCache& cache, config::Config conf);
 		MessageConsumer(MessageConsumer&& rhs) noexcept ;
 		MessageConsumer& operator=(MessageConsumer&& rhs) noexcept;
-		virtual ~MessageConsumer();
+		~MessageConsumer() override = default;
 		
 		ProcessingStats Process() override;
 
 	private:
 		typedef data::DataCache::SensorLookupType SensorLookupType;
-		std::vector<MessagePair> m_leftOver;
 
 		/* Methods */
 		bool ValidateMessage(const models::Sensor& sensor, MessagePair& pair) const;

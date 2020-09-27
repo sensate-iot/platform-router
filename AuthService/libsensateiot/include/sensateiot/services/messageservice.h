@@ -43,9 +43,9 @@ namespace sensateiot::consumers
 namespace sensateiot::services
 {
 	class MessageService {
-		typedef std::pair<std::size_t, std::vector<models::ObjectId>> ProcessingStats;
-
 	public:
+		typedef std::size_t ProcessingStats;
+
 		explicit MessageService(mqtt::IMqttClient& client,
 								consumers::CommandConsumer& commands,
 		                        AbstractUserRepository& users,
