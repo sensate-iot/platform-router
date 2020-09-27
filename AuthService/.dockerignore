@@ -5,6 +5,6 @@
 .idea/
 .vs/
 .git/
-build/
-out/
+[Bb]uild/
+[Oo]ut/
 Dockerfile
