@@ -94,12 +94,6 @@ set(LIB_HEADERS
 	sensateiot/data/messagevalidator.h
 	sensateiot/data/bulkmessagevalidator.h
 
-	sensateiot/detail/redblacktree.h
-	sensateiot/detail/redblacktree.hpp
-	sensateiot/detail/redblacktreeiterator.h
-	sensateiot/detail/redblacktreeiterator.hpp
-	sensateiot/detail/redblacktreenode.h
-	sensateiot/detail/redblacktreenode.hpp
 	sensateiot/detail/memorycache.hpp
 	sensateiot/detail/memorycache.h
 
