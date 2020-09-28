@@ -16,7 +16,7 @@ using Newtonsoft.Json.Linq;
 
 using SensateService.Common.Data.Dto.Generic;
 using SensateService.Exceptions;
-using SensateService.Infrastructure.Authorization.Proxy;
+using SensateService.Infrastructure.Authorization;
 
 namespace SensateService.Ingress.WebSocketHandler.Handlers
 {

@@ -29,7 +29,7 @@ using SensateService.Common.Data.Models;
 using SensateService.Common.IdentityData.Models;
 using SensateService.Api.DataApi.Dto;
 using SensateService.Helpers;
-using SensateService.Infrastructure.Authorization.Proxy;
+using SensateService.Infrastructure.Authorization;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Services.DataProcessing;
 
