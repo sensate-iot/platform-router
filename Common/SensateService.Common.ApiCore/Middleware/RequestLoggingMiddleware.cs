@@ -47,26 +47,14 @@ namespace SensateService.ApiCore.Middleware
 
 		private static RequestMethod ToRequestMethod(string method)
 		{
-			switch(method.ToUpper()) {
-			case "GET":
-				return RequestMethod.HttpGet;
-
-			case "POST":
-				return RequestMethod.HttpPost;
-
-			case "PUT":
-				return RequestMethod.HttpPut;
-
-			case "PATCH":
-				return RequestMethod.HttpPatch;
-
-			case "DELETE":
-				return RequestMethod.HttpDelete;
-
-			default:
-				return RequestMethod.Any;
-			}
-
+			return method.ToUpper() switch {
+				"GET" => RequestMethod.HttpGet,
+				"POST" => RequestMethod.HttpPost,
+				"PUT" => RequestMethod.HttpPut,
+				"PATCH" => RequestMethod.HttpPatch,
+				"DELETE" => RequestMethod.HttpDelete,
+				_ => RequestMethod.Any
+			};
 		}
 
 		public async Task RespondErrorAsync(HttpContext ctx, ReplyCode code, string err, int http)
@@ -88,6 +76,10 @@ namespace SensateService.ApiCore.Middleware
 			SensateUser user;
 
 			try {
+				if(ctx == null) {
+					throw new NullReferenceException("Unable to handle NULL context!");
+				}
+
 				var sw = Stopwatch.StartNew();
 				await this._next(ctx).AwaitBackground();
 				sw.Stop();
