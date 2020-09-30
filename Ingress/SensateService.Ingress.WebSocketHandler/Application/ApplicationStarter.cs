@@ -54,17 +54,10 @@ namespace SensateService.Ingress.WebSocketHandler.Application
 			this.Configuration.GetSection("Database").Bind(db);
 
 			services.AddPostgres(db.PgSQL.ConnectionString);
-
-			services.AddIdentity<SensateUser, SensateRole>()
-				.AddEntityFrameworkStores<SensateSqlContext>()
-				.AddDefaultTokenProviders();
-			services.AddDataProtection()
-				.PersistKeysToDbContext<SensateSqlContext>()
-				.DisableAutomaticKeyGeneration();
+			services.AddIdentityFramwork(auth);
 
 			services.AddLogging(builder => { builder.AddConfiguration(this.Configuration.GetSection("Logging")); });
 
-			services.AddIdentityFramwork(auth);
 			services.AddHashAlgorihms();
 			services.AddReverseProxy(sys);
 			services.AddAuthorizationProxy(sys);

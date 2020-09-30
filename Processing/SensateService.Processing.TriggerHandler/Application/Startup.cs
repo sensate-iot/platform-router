@@ -21,7 +21,6 @@ using SensateService.Init;
 using SensateService.Processing.TriggerHandler.Models;
 using SensateService.Processing.TriggerHandler.Mqtt;
 using SensateService.Processing.TriggerHandler.Services;
-using SensateService.Services;
 using SensateService.Services.Adapters;
 
 namespace SensateService.Processing.TriggerHandler.Application
@@ -43,7 +42,6 @@ namespace SensateService.Processing.TriggerHandler.Application
 #else
 			return false;
 #endif
-
 		}
 
 		private void SetupCommunicationChannels(IServiceCollection services)
