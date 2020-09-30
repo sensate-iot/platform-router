@@ -17,7 +17,7 @@ namespace SensateService.Processing.StorageClient.Application
 	{
 		public static string GetAppSettings()
 		{
-			return Environment.GetEnvironmentVariable("SENSATE_MQTTHANDLER_APPSETTINGS") ?? "appsettings.json";
+			return Environment.GetEnvironmentVariable("SENSATE_STORAGECLIENT_APPSETTINGS") ?? "appsettings.json";
 		}
 
 		public static IHost CreateHost(string[] args)
