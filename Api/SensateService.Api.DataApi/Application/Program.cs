@@ -33,9 +33,8 @@ namespace SensateService.Api.DataApi.Application
 
 		private static IWebHost BuildWebHost(string[] args)
 		{
-			var rootLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 			var conf = new ConfigurationBuilder()
-						.SetBasePath(rootLocation)
+						.SetBasePath(Directory.GetCurrentDirectory())
 						.AddJsonFile("hosting.json")
 						.Build();
 

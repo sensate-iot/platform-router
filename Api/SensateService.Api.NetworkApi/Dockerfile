@@ -8,6 +8,7 @@
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build-env
 
 WORKDIR /build
+
 COPY . .
 RUN dotnet restore -r linux-musl-x64 Api/SensateService.Api.NetworkApi/SensateService.Api.NetworkApi.csproj
 RUN dotnet publish -c Release -o /app/bin -r linux-musl-x64 --no-restore --self-contained true --no-restore Api/SensateService.Api.NetworkApi/SensateService.Api.NetworkApi.csproj
