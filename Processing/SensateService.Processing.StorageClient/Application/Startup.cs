@@ -52,7 +52,6 @@ namespace SensateService.Processing.StorageClient.Application
 			this.Configuration.GetSection("Database").Bind(db);
 			this.Configuration.GetSection("Cache").Bind(cache);
 
-			var publicmqtt = mqtt.PublicBroker;
 			var privatemqtt = mqtt.InternalBroker;
 
 			services.AddPostgres(db.PgSQL.ConnectionString);
@@ -77,16 +76,6 @@ namespace SensateService.Processing.StorageClient.Application
 			services.AddMessageStorage();
 			services.AddHashAlgorihms();
 
-			services.AddMqttService(options => {
-				options.Ssl = publicmqtt.Ssl;
-				options.Host = publicmqtt.Host;
-				options.Port = publicmqtt.Port;
-				options.Username = publicmqtt.Username;
-				options.Password = publicmqtt.Password;
-				options.Id = Guid.NewGuid().ToString();
-				options.TopicShare = "$share/sensate-storage/";
-			});
-
 			services.AddInternalMqttService(options => {
 				options.Ssl = privatemqtt.Ssl;
 				options.Host = privatemqtt.Host;
@@ -98,6 +87,7 @@ namespace SensateService.Processing.StorageClient.Application
 				options.AuthorizedBulkMeasurementTopic = privatemqtt.AuthorizedBulkMeasurementTopic;
 				options.AuthorizedBulkMessageTopic = privatemqtt.AuthorizedBulkMessageTopic;
 				options.InternalBulkMessageTopic = privatemqtt.InternalBulkMessageTopic;
+				options.TopicShare = "$share/sensate-storage/";
 			});
 
 			services.AddSingleton<IHostedService, MqttPublishHandler>();
@@ -122,8 +112,8 @@ namespace SensateService.Processing.StorageClient.Application
 			this.Configuration.GetSection("Mqtt").Bind(mqtt);
 			var @private = mqtt.InternalBroker;
 
-			provider.MapMqttTopic<MqttBulkMeasurementHandler>(@private.AuthorizedBulkMeasurementTopic);
-			provider.MapMqttTopic<MqttBulkMessageHandler>(@private.AuthorizedBulkMessageTopic);
+			provider.MapInternalMqttTopic<MqttBulkMeasurementHandler>(@private.AuthorizedBulkMeasurementTopic);
+			provider.MapInternalMqttTopic<MqttBulkMessageHandler>(@private.AuthorizedBulkMessageTopic);
 		}
 	}
 }

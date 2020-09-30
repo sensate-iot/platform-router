@@ -25,7 +25,7 @@ namespace SensateService.Services.Processing
 		private readonly InternalMqttServiceOptions _options;
 
 		public InternalMqttService(IOptions<InternalMqttServiceOptions> options, ILogger<MqttService> logger, IServiceProvider sp) :
-			base(options.Value.Host, options.Value.Port, options.Value.Ssl, "", logger, sp)
+			base(options.Value.Host, options.Value.Port, options.Value.Ssl, options.Value.TopicShare, logger, sp)
 		{
 			this._options = options.Value;
 		}

@@ -20,5 +20,6 @@ namespace SensateService.Common.Config.Settings
 		public string InternalBulkMeasurementTopic { get; set; }
 		public string InternalBulkMessageTopic { get; set; }
 		public string InternalBlobTopic { get; set; }
+		public string TopicShare { get; set; }
 	}
 }
