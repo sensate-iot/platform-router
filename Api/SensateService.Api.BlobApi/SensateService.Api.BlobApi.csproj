@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>SensateService</UserSecretsId>
-    <AssemblyName>BlobApi</AssemblyName>
+    <AssemblyName>SensateService.Api.BlobApi</AssemblyName>
     <RootNamespace>SensateService.Api.BlobApi</RootNamespace>
     <Version>0.5.1</Version>
     <PackageLicenseFile>COPYING</PackageLicenseFile>
@@ -25,10 +25,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.7" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.8" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="swashbuckle.aspnetcore" Version="5.5.1" />
+    <PackageReference Include="swashbuckle.aspnetcore" Version="5.6.3" />
   </ItemGroup>
 
   <ItemGroup>

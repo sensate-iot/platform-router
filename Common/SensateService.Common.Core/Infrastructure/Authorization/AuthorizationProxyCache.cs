@@ -10,13 +10,11 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
 using SensateService.Helpers;
 
-namespace SensateService.Infrastructure.Authorization.Proxy
+namespace SensateService.Infrastructure.Authorization
 {
 	public class AuthorizationProxyCache : IMeasurementAuthorizationProxyCache, IMessageAuthorizationProxyCache
 	{

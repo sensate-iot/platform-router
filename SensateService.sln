@@ -45,9 +45,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateService.Common.Caching.LoadTest", "Common\SensateService.Common.Caching.LoadTest\SensateService.Common.Caching.LoadTest.csproj", "{8655ACD4-A9B3-42FE-A2B9-5FAD707ACCD5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateService.Processing.DataAuthorizationApi", "Processing\SensateService.Processing.DataAuthorizationApi\SensateService.Processing.DataAuthorizationApi.csproj", "{3FA8DAA3-34AB-41FD-B91C-6EA23AC97A5F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SensateService.Common.Config", "Common\SensateService.Common.Config\SensateService.Common.Config.csproj", "{3D5A2F38-5646-4B1F-BC9C-D7B55AF90CFF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateService.Common.Config", "Common\SensateService.Common.Config\SensateService.Common.Config.csproj", "{3D5A2F38-5646-4B1F-BC9C-D7B55AF90CFF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -349,22 +347,6 @@ Global
 		{8655ACD4-A9B3-42FE-A2B9-5FAD707ACCD5}.Release|x64.Build.0 = Release|Any CPU
 		{8655ACD4-A9B3-42FE-A2B9-5FAD707ACCD5}.Release|x86.ActiveCfg = Release|Any CPU
 		{8655ACD4-A9B3-42FE-A2B9-5FAD707ACCD5}.Release|x86.Build.0 = Release|Any CPU
-		{3FA8DAA3-34AB-41FD-B91C-6EA23AC97A5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3FA8DAA3-34AB-41FD-B91C-6EA23AC97A5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3FA8DAA3-34AB-41FD-B91C-6EA23AC97A5F}.Debug|ARM.ActiveCfg = Debug|Any CPU
-		{3FA8DAA3-34AB-41FD-B91C-6EA23AC97A5F}.Debug|ARM.Build.0 = Debug|Any CPU
-		{3FA8DAA3-34AB-41FD-B91C-6EA23AC97A5F}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{3FA8DAA3-34AB-41FD-B91C-6EA23AC97A5F}.Debug|x64.Build.0 = Debug|Any CPU
-		{3FA8DAA3-34AB-41FD-B91C-6EA23AC97A5F}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{3FA8DAA3-34AB-41FD-B91C-6EA23AC97A5F}.Debug|x86.Build.0 = Debug|Any CPU
-		{3FA8DAA3-34AB-41FD-B91C-6EA23AC97A5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3FA8DAA3-34AB-41FD-B91C-6EA23AC97A5F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3FA8DAA3-34AB-41FD-B91C-6EA23AC97A5F}.Release|ARM.ActiveCfg = Release|Any CPU
-		{3FA8DAA3-34AB-41FD-B91C-6EA23AC97A5F}.Release|ARM.Build.0 = Release|Any CPU
-		{3FA8DAA3-34AB-41FD-B91C-6EA23AC97A5F}.Release|x64.ActiveCfg = Release|Any CPU
-		{3FA8DAA3-34AB-41FD-B91C-6EA23AC97A5F}.Release|x64.Build.0 = Release|Any CPU
-		{3FA8DAA3-34AB-41FD-B91C-6EA23AC97A5F}.Release|x86.ActiveCfg = Release|Any CPU
-		{3FA8DAA3-34AB-41FD-B91C-6EA23AC97A5F}.Release|x86.Build.0 = Release|Any CPU
 		{3D5A2F38-5646-4B1F-BC9C-D7B55AF90CFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3D5A2F38-5646-4B1F-BC9C-D7B55AF90CFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D5A2F38-5646-4B1F-BC9C-D7B55AF90CFF}.Debug|ARM.ActiveCfg = Debug|Any CPU
