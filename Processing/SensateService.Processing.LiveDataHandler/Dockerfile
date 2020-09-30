@@ -28,4 +28,4 @@ RUN npm ci --quit --only=production
 COPY --from=builder /usr/src/app/dist/ /app/dist/
 
 EXPOSE 5000
-CMD ["node", "dist/src/app/live-data-handler.js"]
+CMD ["node", "dist/app/live-data-handler.js"]
