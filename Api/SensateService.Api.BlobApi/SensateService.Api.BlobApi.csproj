@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>SensateService</UserSecretsId>
-    <AssemblyName>BlobApi</AssemblyName>
+    <AssemblyName>SensateService.Api.BlobApi</AssemblyName>
     <RootNamespace>SensateService.Api.BlobApi</RootNamespace>
     <Version>0.5.1</Version>
     <PackageLicenseFile>COPYING</PackageLicenseFile>

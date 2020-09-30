@@ -8,7 +8,7 @@
     <Version>0.5.1</Version>
     <ServerGarbageCollection>true</ServerGarbageCollection>
     <RootNamespace>SensateService.Api.DashboardApi</RootNamespace>
-    <AssemblyName>DashboardApi</AssemblyName>
+    <AssemblyName>SensateService.Api.DashboardApi</AssemblyName>
     <Company>Sensate IoT</Company>
   </PropertyGroup>
 
