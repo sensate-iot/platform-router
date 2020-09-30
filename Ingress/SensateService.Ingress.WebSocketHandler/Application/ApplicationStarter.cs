@@ -8,12 +8,16 @@
 using System;
 
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 using SensateService.ApiCore.Init;
 using SensateService.Common.Config.Config;
+using SensateService.Common.IdentityData.Models;
+using SensateService.Infrastructure.Sql;
 using SensateService.Ingress.WebSocketHandler.Handlers;
 using SensateService.Init;
 
@@ -43,9 +47,20 @@ namespace SensateService.Ingress.WebSocketHandler.Application
 		{
 			var auth = new AuthenticationConfig();
 			var sys = new SystemConfig();
+			var db = new DatabaseConfig();
 
 			this.Configuration.GetSection("System").Bind(sys);
 			this.Configuration.GetSection("Authentication").Bind(auth);
+			this.Configuration.GetSection("Database").Bind(db);
+
+			services.AddPostgres(db.PgSQL.ConnectionString);
+
+			services.AddIdentity<SensateUser, SensateRole>()
+				.AddEntityFrameworkStores<SensateSqlContext>()
+				.AddDefaultTokenProviders();
+			services.AddDataProtection()
+				.PersistKeysToDbContext<SensateSqlContext>()
+				.DisableAutomaticKeyGeneration();
 
 			services.AddLogging(builder => { builder.AddConfiguration(this.Configuration.GetSection("Logging")); });
 

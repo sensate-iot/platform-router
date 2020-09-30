@@ -54,7 +54,7 @@ namespace SensateService.Processing.StorageClient.Application
 
 		public static void Main(string[] args)
 		{
-			Console.WriteLine($"Starting MqttHandler using {Version.VersionString}");
+			Console.WriteLine($"Starting StorageClient using {Version.VersionString}");
 
 			var program = new Application(CreateHost(args));
 			program.Run();
