@@ -5,10 +5,13 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using CsvHelper;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+
 using MongoDB.Driver.GeoJsonObjectModel;
+using CsvHelper;
+
 using SensateService.Api.DataApi.Dto;
 using SensateService.ApiCore.Controllers;
 using SensateService.Common.Data.Dto.Generic;
@@ -119,13 +122,8 @@ namespace SensateService.Api.DataApi.Controllers
 				return null;
 			}
 
-			if(filter.Skip == null) {
-				filter.Skip = -1;
-			}
-
-			if(filter.Limit == null) {
-				filter.Limit = -1;
-			}
+			filter.Skip ??= -1;
+			filter.Limit ??= -1;
 
 			var sensors = await this.m_sensorService.GetSensorsAsync(this.CurrentUser).AwaitBackground();
 			var filtered = sensors.Values.Where(x => filter.SensorIds.Contains(x.InternalId.ToString())).ToList();
