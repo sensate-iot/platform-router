@@ -160,6 +160,7 @@ namespace SensateService.Infrastructure.Document
 
 			var projectRewrite = new BsonDocument {
 				{"_id", 1},
+				{"SensorId", 1},
 				{"Timestamp", "$Measurements.Timestamp"},
 				{"Location", "$Measurements.Location"},
 				{"Data", "$Measurements.Data"},
@@ -232,6 +233,7 @@ namespace SensateService.Infrastructure.Document
 
 			var projectRewrite = new BsonDocument {
 				{"_id", 1},
+				{"SensorId", 1},
 				{"Timestamp", "$Measurements.Timestamp"},
 				{"Location", "$Measurements.Location"},
 				{"Data", "$Measurements.Data"},
