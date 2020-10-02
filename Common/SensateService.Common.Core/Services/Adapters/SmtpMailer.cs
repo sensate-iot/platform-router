@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 
 using SensateService.Common.Config.Settings;
 using SensateService.Common.Data.Dto.Generic;
+using SensateService.Helpers;
 
 namespace SensateService.Services.Adapters
 {
@@ -41,7 +42,8 @@ namespace SensateService.Services.Adapters
 			};
 
 			msg.To.Add(recip);
-			await Task.Run(() => this._client.Send(msg));
+
+			await this._client.SendMailAsync(msg).AwaitBackground();
 		}
 
 		public async Task SendEmailAsync(string recip, string subj, string body)
@@ -50,7 +52,7 @@ namespace SensateService.Services.Adapters
 				HtmlBody = body
 			};
 
-			await this.SendEmailAsync(recip, subj, msg);
+			await this.SendEmailAsync(recip, subj, msg).AwaitBackground();
 		}
 	}
 }
