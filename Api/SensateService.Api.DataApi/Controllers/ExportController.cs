@@ -59,13 +59,29 @@ namespace SensateService.Api.DataApi.Controllers
 			foreach(var measurement in measurements) {
 				dynamic record = new ExpandoObject();
 
-				foreach(var kvp in measurement.Data) {
-					AddProperty(record, kvp.Key, kvp.Value.Value);
-					record.Unit = kvp.Value.Unit;
-				}
-
+				record.SensorId = measurement.SensorId;
 				record.Longitude = measurement.Location.Coordinates.Longitude;
 				record.Latitude = measurement.Location.Coordinates.Latitude;
+				record.Timestamp = measurement.Timestamp.ToString("o");
+
+				foreach(var kvp in measurement.Data) {
+					var precision = 0D;
+					var accuracy = 0D;
+
+					AddProperty(record, kvp.Key, kvp.Value.Value);
+
+					if(kvp.Value.Accuracy.HasValue) {
+						precision = kvp.Value.Accuracy.Value;
+					}
+
+					if(kvp.Value.Precision.HasValue) {
+						accuracy = kvp.Value.Precision.Value;
+					}
+
+					AddProperty(record, $"{kvp.Key}_Precision", precision);
+					AddProperty(record, $"{kvp.Key}_Accuracy", accuracy);
+					AddProperty(record, $"{kvp.Key}_Unit", kvp.Value.Unit);
+				}
 
 				records.Add(record);
 			}
