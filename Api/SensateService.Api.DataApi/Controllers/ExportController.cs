@@ -30,9 +30,9 @@ namespace SensateService.Api.DataApi.Controllers
 		public ExportController(IHttpContextAccessor ctx,
 								IMeasurementRepository measurements,
 								ISensorService sensorService,
-		                        ISensorRepository sensors,
-		                        ISensorLinkRepository links,
-		                        IApiKeyRepository keys) : base(ctx, sensors, links, keys)
+								ISensorRepository sensors,
+								ISensorLinkRepository links,
+								IApiKeyRepository keys) : base(ctx, sensors, links, keys)
 		{
 			this.m_measurements = measurements;
 			this.m_sensorService = sensorService;
