@@ -43,8 +43,8 @@ namespace SensateService.Infrastructure.Document
 
 			tasks[0] = base.CreateAsync(sensor, ct);
 			tasks[1] = this.CommitAsync(sensor, CacheTimeout.TimeoutMedium.ToInt(), ct);
-			tasks[2] = this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}", ct);
-			tasks[3] = this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}:0:0", ct);
+			tasks[2] = this._cache.RemoveAsync($"sensors:uuid:{sensor.Owner}", ct);
+			tasks[3] = this._cache.RemoveAsync($"sensors:uuid:{sensor.Owner}:0:0", ct);
 
 			await Task.WhenAll(tasks).AwaitBackground();
 		}
@@ -54,7 +54,7 @@ namespace SensateService.Infrastructure.Document
 			string key, data;
 			IEnumerable<Sensor> sensors;
 
-			key = $"sensors:uid:{user.Id}:{skip}:{limit}";
+			key = $"sensors:uuid:{user.Id}:{skip}:{limit}";
 			data = await this._cache.GetAsync(key);
 
 			if(data != null) {
@@ -88,7 +88,7 @@ namespace SensateService.Infrastructure.Document
 				return null;
 			}
 
-			await this.CommitAsync(sensor).AwaitBackground();
+			await this.CommitAsync(sensor, CacheTimeout.TimeoutMedium.ToInt()).AwaitBackground();
 			return sensor;
 
 		}
@@ -98,8 +98,8 @@ namespace SensateService.Infrastructure.Document
 			var tasks = new[] {
 				this._cache.SetAsync(sensor.InternalId.ToString(), sensor.ToJson(),
 									 CacheTimeout.TimeoutMedium.ToInt()),
-				this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}"),
-				this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}:0:0"),
+				this._cache.RemoveAsync($"sensors:uuid:{sensor.Owner}"),
+				this._cache.RemoveAsync($"sensors:uuid:{sensor.Owner}:0:0"),
 				this._cache.RemoveAsync(sensor.Owner),
 				base.UpdateSecretAsync(sensor, key)
 			};
@@ -110,9 +110,9 @@ namespace SensateService.Infrastructure.Document
 		public override async Task UpdateAsync(Sensor sensor)
 		{
 			var tasks = new[] {
-				this._cache.SetAsync(sensor.InternalId.ToString(), sensor.ToJson()),
-				this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}"),
-				this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}:0:0"),
+				this.CommitAsync(sensor, CacheTimeout.TimeoutMedium.ToInt()),
+				this._cache.RemoveAsync($"sensors:uuid:{sensor.Owner}"),
+				this._cache.RemoveAsync($"sensors:uuid:{sensor.Owner}:0:0"),
 				this._cache.RemoveAsync(sensor.Owner),
 				base.UpdateAsync(sensor),
 			};
@@ -124,8 +124,8 @@ namespace SensateService.Infrastructure.Document
 		{
 			var tsk = new[] {
 				this._cache.RemoveAsync(sensor.InternalId.ToString(), ct),
-				this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}", ct),
-				this._cache.RemoveAsync($"sensors:uid:{sensor.Owner}:0:0", ct),
+				this._cache.RemoveAsync($"sensors:uuid:{sensor.Owner}", ct),
+				this._cache.RemoveAsync($"sensors:uuid:{sensor.Owner}:0:0", ct),
 				this._cache.RemoveAsync(sensor.InternalId.ToString(), ct),
 				base.DeleteAsync(sensor, ct)
 			};
