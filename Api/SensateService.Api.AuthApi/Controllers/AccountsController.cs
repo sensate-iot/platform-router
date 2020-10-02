@@ -721,7 +721,7 @@ namespace SensateService.Api.AuthApi.Controllers
 
 		[ValidateModel]
 		[NormalUser]
-		[HttpPatch("update")]
+		[HttpPatch]
 		[ProducesResponseType(typeof(Status), 400)]
 		[ProducesResponseType(204)]
 		public async Task<IActionResult> UpdateUser([FromBody] UpdateUser userUpdate)
