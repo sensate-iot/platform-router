@@ -149,13 +149,8 @@ namespace SensateService.Api.DataApi.Controllers
 				return this.UnprocessableEntity(status);
 			}
 
-			if(filter.Skip == null) {
-				filter.Skip = -1;
-			}
-
-			if(filter.Limit == null) {
-				filter.Limit = -1;
-			}
+			filter.Skip ??= -1;
+			filter.Limit ??= -1;
 
 			var sensors = await this.m_sensorService.GetSensorsAsync(this.CurrentUser).AwaitBackground();
 			var filtered = sensors.Values.Where(x => filter.SensorIds.Contains(x.InternalId.ToString())).ToList();

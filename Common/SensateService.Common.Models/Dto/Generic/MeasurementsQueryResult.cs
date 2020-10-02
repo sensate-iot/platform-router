@@ -21,6 +21,7 @@ namespace SensateService.Common.Data.Dto.Generic
 	{
 		[JsonIgnore]
 		public ObjectId _id { get; set; }
+		public ObjectId? SensorId { get; set; }
 		public DateTime Timestamp { get; set; }
 		[JsonConverter(typeof(GeoJsonPointJsonConverter))]
 		public GeoJsonPoint<GeoJson2DGeographicCoordinates> Location { get; set; }
