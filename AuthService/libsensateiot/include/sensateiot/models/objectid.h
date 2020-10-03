@@ -33,6 +33,11 @@ namespace sensateiot::models
 		>> ObjectIdType;
 
 		constexpr ObjectId() = default;
+		ObjectId(ObjectId&& other) = default;
+		ObjectId(const ObjectId& other) = default;
+
+		ObjectId& operator= (ObjectId&& other) = default;
+		ObjectId& operator= (const ObjectId& other) = default;
 
 		explicit ObjectId(const std::array<std::byte, ObjectIdSize> &bits)
 		{
