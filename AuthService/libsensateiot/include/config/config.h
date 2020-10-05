@@ -53,6 +53,6 @@ namespace sensateiot::config
 		int m_interval{};
 		std::size_t m_internalBatchSize{};
 		std::string m_bindAddr;
-		std::uint16_t m_port;
+		std::uint16_t m_port{};
 	};
 }
