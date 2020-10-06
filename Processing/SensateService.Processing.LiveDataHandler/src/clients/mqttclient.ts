@@ -13,7 +13,9 @@ export class MqttClient {
     private client: Client;
     private readonly handlers: IMessageHandler[];
 
-    public constructor(private readonly host: string, private readonly port: number) {
+    public constructor(private readonly host: string,
+        private readonly port: number,
+        private readonly share: string) {
         this.handlers = [];
     }
 
@@ -27,6 +29,7 @@ export class MqttClient {
         opts.password = password;
 
         this.client = connect(`mqtt://${this.host}`, opts);
+
         const rv = new Promise((resolve) => {
             this.client.on("connect", () => {
                 resolve();
@@ -34,6 +37,10 @@ export class MqttClient {
         });
 
         this.client.on("message", (topic, msg) => {
+            if (this.share != null && this.share != "") {
+                topic = `${this.share}/${topic}`;
+            }
+
             this.handlers.forEach(handler => {
                 if (handler.getTopic() !== topic) {
                     return;

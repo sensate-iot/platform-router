@@ -10,6 +10,7 @@ interface MqttSettings {
     host: string;
     internalMeasurementTopic: string;
     internalBulkMeasurementTopic: string;
+    topicShare: string;
 }
 
 interface MongoDB {

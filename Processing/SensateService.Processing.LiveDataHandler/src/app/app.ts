@@ -29,7 +29,7 @@ class Application {
         const tmp = JSON.stringify(settings);
         this.config = JSON.parse(tmp);
 
-        this.client = new MqttClient(this.config.mqtt.host, this.config.mqtt.port);
+        this.client = new MqttClient(this.config.mqtt.host, this.config.mqtt.port, this.config.mqtt.topicShare);
         // ReSharper disable once TsResolvedFromInaccessibleModule
         const app: Express = express();
         const pool = connect(this.config);
