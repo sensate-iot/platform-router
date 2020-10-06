@@ -133,9 +133,8 @@ void CreateApplication(const char *path)
 {
 	try {
 		sensateiot::Application app;
-		//auto &app = sensateiot::Application::GetApplication();
-		app.SetConfig(path);
 
+		app.SetConfig(path);
 		app.Startup();
 		app.Run();
 	} catch(mqtt::exception& ex) {

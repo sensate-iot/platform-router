@@ -87,8 +87,8 @@ namespace sensateiot::util
 				}
 			}
 
-			measurement->set_latitude(entry.GetCoordinates().first);
-			measurement->set_longitude(entry.GetCoordinates().second);
+			measurement->set_longitude(entry.GetCoordinates().first);
+			measurement->set_latitude(entry.GetCoordinates().second);
 			measurement->set_platformtime(now);
 			measurement->set_sensor_id(entry.GetObjectId().ToString());
 
