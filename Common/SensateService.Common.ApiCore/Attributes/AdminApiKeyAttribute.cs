@@ -5,6 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
+using System.Globalization;
 using System.Linq;
 
 using Microsoft.AspNetCore.Mvc;
@@ -32,7 +33,7 @@ namespace SensateService.ApiCore.Attributes
 			base.OnActionExecuting(context);
 
 			if(context?.HttpContext.Items["ApiKey"] is SensateApiKey key && !key.Revoked) {
-				valid = !key.ReadOnly && IsInRole(key.User, UserRoles.Administrator);
+				valid = !key.ReadOnly && IsInRole(key.User, UserRoles.Administrator.ToUpper(CultureInfo.InvariantCulture));
 			}
 
 			if(valid)
