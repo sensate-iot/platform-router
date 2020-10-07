@@ -110,7 +110,7 @@ namespace SensateService.Api.DataApi.Controllers
 			}
 		}
 
-		public async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsAsync(Filter filter)
+		private async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsAsync(Filter filter)
 		{
 			var status = new Status();
 			IEnumerable<MeasurementsQueryResult> result;
