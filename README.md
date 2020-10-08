@@ -10,7 +10,7 @@ ensured through clever use of caches and document stores.
 
 [header1]: https://github.com/sensate-iot/SensateService/workflows/Docker/badge.svg "Docker Build"
 [header2]: https://github.com/sensate-iot/SensateService/workflows/Format%20check/badge.svg ".NET format"
-[header3]: https://img.shields.io/badge/version-v0.5.1-informational "Sensate IoT version"
+[header3]: https://img.shields.io/badge/version-v1.0.0-informational "Sensate IoT version"
 
 ## Sensor communication
 
@@ -25,48 +25,46 @@ In both cases, a pseudo model in JSON format is expected by the Sensate backend:
 
 ```
 {
-	"Longitude":4.796483396238929,
-	"Latitude":51.59792154363324,
-	"CreatedAt": "2020-04-02T00:00:00.000Z"
-	"CreatedById":"5aa29b95c8640c2a3865e6fd",
-	"CreatedBySecret":"$6e8b7b65ec31587babd07fc095fd1236a2dd76d03cfdea9c9864306e3b1c1342==",
-	"Data":{
-		"x":{
-			"Value":8.753648712522201,
-			"Precision": 0.125,
-			"Accuracy": 0.998,
-			"Unit":"m/s2"
-
-		},
-		"y":{
-			"Value":11.267976634923137,
-			"Unit":"m/s2",
-			"Precision": 0.1,
-			"Accuracy": 0.98884
-
-		},
-		"z":{
-			"Value":16.580878999366355,
-			"Precision": 0.225,
-			"Accuracy": 0.754,
-			"Unit":"m/s2"
-		}
-	}
+  "longitude":4.79691,
+  "latitude":51.58701,
+  "timestamp": "2020-10-08T06:30:34.1115Z",
+  "sensorId":"5efdaa9f282963000157823f",
+  "secret":"$23c00474e37e82468518699c27411831214a818653d70fe2ee9bd80eea59f418==",
+  "data":{
+    "x":{
+      "value":9.79635,
+      "unit":"m/s2",
+      "precision":0.01,
+      "accuracy":0.5
+    },
+    "y":{
+      "value":12.67006,
+      "unit":"m/s2",
+      "precision":0.01,
+      "accuracy":0.5
+    },
+    "z":{
+      "value":65.89981,
+      "unit":"m/s2",
+      "precision":0.01,
+      "accuracy":0.5
+    }
+  }
 }
 ```
 
 On the root object the follow property's are required:
 
-* CreatedById;
-* CreatedBySecret;
-* Data.
+* sensorId;
+* secret;
+* data.
 
-If the sensor doesn't provide a value for `CreatedAt`, the platform will assign
+If the sensor doesn't provide a value for `timestamp`, the platform will assign
 the current timestamp to the measurment.
 
 The data property is an object of data points. At least one datapoint is required
-and the `Value` is the only required datapoint property. Please note that the array
-length of ```Data``` isn't limited to three. A measurement can contain anywhere
+and the `value` is the only required datapoint property. Please note that the array
+length of ```data``` isn't limited to three. A measurement can contain anywhere
 between 1 and 25 data points.
 
 ## Contributing
