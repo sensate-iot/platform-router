@@ -53,7 +53,7 @@ namespace sensateiot::util
 		std::vector<char> bytes( data.ByteSizeLong());
 
 		if (bytes.size() > std::numeric_limits<int>::max()) {
-			throw std::out_of_range("Serialization length to large!");
+			throw std::out_of_range("Serialization length too large!");
 		}
 
 		data.SerializeToArray(bytes.data(), static_cast<int>(bytes.size()));
@@ -83,7 +83,7 @@ namespace sensateiot::util
 				}
 				
 				if(dp.m_precision.has_value()) {
-					datapoint->set_accuracy(dp.m_precision.value());
+					datapoint->set_precision(dp.m_precision.value());
 				}
 			}
 
@@ -103,7 +103,7 @@ namespace sensateiot::util
 		std::vector<char> bytes( data.ByteSizeLong());
 
 		if (bytes.size() > std::numeric_limits<int>::max()) {
-			throw std::out_of_range("Serialization length to large!");
+			throw std::out_of_range("Serialization length too large!");
 		}
 
 		data.SerializeToArray(bytes.data(), static_cast<int>(bytes.size()));
