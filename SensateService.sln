@@ -41,6 +41,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		docker-compose-dev.yaml = docker-compose-dev.yaml
 		docker-compose-staging.yaml = docker-compose-staging.yaml
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateService.Common.Caching.LoadTest", "Common\SensateService.Common.Caching.LoadTest\SensateService.Common.Caching.LoadTest.csproj", "{8655ACD4-A9B3-42FE-A2B9-5FAD707ACCD5}"
