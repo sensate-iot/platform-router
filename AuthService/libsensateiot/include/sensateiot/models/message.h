@@ -44,7 +44,7 @@ namespace sensateiot::models
 	public:
 		static constexpr auto Secret = std::string_view("secret");
 		static constexpr auto Data = std::string_view("data");
-		static constexpr auto Timestamp = std::string_view("createdAt");
+		static constexpr auto Timestamp = std::string_view("timestamp");
 		static constexpr auto SensorId = std::string_view("sensorId");
 		static constexpr auto Longitude = std::string_view("longitude");
 		static constexpr auto Latitude = std::string_view("latitude");
