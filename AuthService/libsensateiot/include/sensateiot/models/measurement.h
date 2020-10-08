@@ -55,7 +55,7 @@ namespace sensateiot::models
 	private:
 		ObjectId m_id;
 		std::string m_key;
-		std::string m_createdAt;
+		std::string m_timestamp;
 
 		std::vector<DataEntry> m_data;
 		std::pair<double, double> m_coords;

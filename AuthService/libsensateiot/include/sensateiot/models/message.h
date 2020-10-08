@@ -37,7 +37,7 @@ namespace sensateiot::models
 	private:
 		std::string m_secret;
 		std::string m_data;
-		std::string m_createdAt;
+		std::string m_timestamp;
 		ObjectId m_sensorId;
 		std::optional<std::pair<double, double>> m_coords;
 
