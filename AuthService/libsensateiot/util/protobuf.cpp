@@ -83,7 +83,7 @@ namespace sensateiot::util
 				}
 				
 				if(dp.m_precision.has_value()) {
-					datapoint->set_accuracy(dp.m_precision.value());
+					datapoint->set_precision(dp.m_precision.value());
 				}
 			}
 
