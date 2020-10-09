@@ -4,7 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AssemblyName>SensateService.ApiCore</AssemblyName>
     <RootNamespace>SensateService.ApiCore</RootNamespace>
-    <Version>0.5.1</Version>
+    <Version>1.0.0</Version>
     <PackageLicenseFile>COPYING</PackageLicenseFile>
     <PackageId>SensateService.Common.ApiCore</PackageId>
     <Product>SensateService.Common.ApiCore</Product>

@@ -11,8 +11,8 @@ namespace SensateService
 	{
 		public static string VersionString => $"Sensate IoT Core {Major}.{Minor}.{PatchLevel}";
 
-		public const int Major = 0;
-		public const int Minor = 5;
-		public const int PatchLevel = 1;
+		public const int Major = 1;
+		public const int Minor = 0;
+		public const int PatchLevel = 0;
 	}
 }
