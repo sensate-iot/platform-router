@@ -31,12 +31,12 @@ namespace sensateiot::models
 
 	void Measurement::SetCreatedTimestamp(const std::string &timestamp)
 	{
-		this->m_createdAt = timestamp;
+		this->m_timestamp = timestamp;
 	}
 
 	const std::string &Measurement::GetCreatedTimestamp() const
 	{
-		return this->m_createdAt;
+		return this->m_timestamp;
 	}
 
 	void Measurement::SetCoordinates(double lon, double lat)

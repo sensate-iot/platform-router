@@ -35,12 +35,12 @@ namespace sensateiot::models
 
 	void Message::SetCreatedAt(const std::string& date)
 	{
-		this->m_createdAt = date;
+		this->m_timestamp = date;
 	}
 
 	const std::string& Message::GetCreatedAt() const
 	{
-		return this->m_createdAt;
+		return this->m_timestamp;
 	}
 
 	void Message::SetObjectId(const ObjectId& id)
