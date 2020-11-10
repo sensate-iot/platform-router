@@ -5,6 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
+using System.Collections.Generic;
 using SensateIoT.Platform.Network.Data.DTO;
 
 namespace SensateIoT.Platform.Network.Data.Models
@@ -13,9 +14,13 @@ namespace SensateIoT.Platform.Network.Data.Models
 	{
 		public long ID { get; set; }
 		public string SensorID { get; set; }
-		public decimal? LowerEdge { get; set; }
-		public decimal? UpperEdge { get; set; }
+		public string KeyValue { get; set; }
+		public double? LowerEdge { get; set; }
+		public double? UpperEdge { get; set; }
 		public string FormalLanguage { get; set; }
 		public TriggerType Type { get; set; }
+
+        public virtual ICollection<TriggerAction> TriggerActions { get; set; }
+        public virtual ICollection<TriggerInvocation> TriggerInvocations { get; set; }
 	}
 }
