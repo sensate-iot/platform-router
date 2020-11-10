@@ -12,10 +12,6 @@ namespace SensateIoT.Platform.Network.DataAccess.Contexts
 {
 	public class TriggerContext : DbContext
 	{
-		public TriggerContext()
-		{
-		}
-
 		public TriggerContext(DbContextOptions<TriggerContext> options)
 			: base(options)
 		{
