@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.6</TargetFramework>
     <Version>0.0.0</Version>
-    <Description>Message contracts for the Sensate IoT Network services.</Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
