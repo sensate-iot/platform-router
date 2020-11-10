@@ -8,10 +8,22 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SensateIoT.Platform.Network.Database", "SensateIoT.Platform.Network.Database", "{BDB01793-EB03-47FA-B4BE-DB29A55DCB78}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tables", "Tables", "{9BC72E22-368E-439B-9FDB-BCB754554D67}"
+	ProjectSection(SolutionItems) = preProject
+		SensateIoT.Platform.Network.Database\Tables\CreateTriggerActionPricesAuditTable.sql = SensateIoT.Platform.Network.Database\Tables\CreateTriggerActionPricesAuditTable.sql
+		SensateIoT.Platform.Network.Database\Tables\CreateTriggerActionPricesTable.sql = SensateIoT.Platform.Network.Database\Tables\CreateTriggerActionPricesTable.sql
+		SensateIoT.Platform.Network.Database\Tables\CreateTriggerActionsTable.sql = SensateIoT.Platform.Network.Database\Tables\CreateTriggerActionsTable.sql
+		SensateIoT.Platform.Network.Database\Tables\CreateTriggerInvocationsTable.sql = SensateIoT.Platform.Network.Database\Tables\CreateTriggerInvocationsTable.sql
+		SensateIoT.Platform.Network.Database\Tables\CreateTriggersTable.sql = SensateIoT.Platform.Network.Database\Tables\CreateTriggersTable.sql
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Triggers", "Triggers", "{EF31D057-AB3D-413E-B383-25CB53545522}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions", "Functions", "{2BC79829-3F73-43D8-987A-68E72A2F56AA}"
+	ProjectSection(SolutionItems) = preProject
+		SensateIoT.Platform.Network.Database\Functions\Router_GetAccounts.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetAccounts.sql
+		SensateIoT.Platform.Network.Database\Functions\Router_GetSensorKeys.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetSensorKeys.sql
+		SensateIoT.Platform.Network.Database\Functions\Router_GetTriggers.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetTriggers.sql
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E0A0D3A9-F17C-4D4B-9C03-698C53ABCDB3}"
 	ProjectSection(SolutionItems) = preProject
