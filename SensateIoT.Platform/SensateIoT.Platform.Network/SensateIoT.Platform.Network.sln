@@ -39,6 +39,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.DataAccess", "SensateIoT.Platform.Network.DataAccess\SensateIoT.Platform.Network.DataAccess.csproj", "{C6A37203-9699-47AC-9EB6-F15B1EBBF01D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SensateIoT.Platform.Network.Common", "SensateIoT.Platform.Network.Common\SensateIoT.Platform.Network.Common.csproj", "{C6DF3F42-4160-49AD-B095-633573B3A655}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,10 @@ Global
 		{C6A37203-9699-47AC-9EB6-F15B1EBBF01D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6A37203-9699-47AC-9EB6-F15B1EBBF01D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6A37203-9699-47AC-9EB6-F15B1EBBF01D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6DF3F42-4160-49AD-B095-633573B3A655}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6DF3F42-4160-49AD-B095-633573B3A655}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6DF3F42-4160-49AD-B095-633573B3A655}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6DF3F42-4160-49AD-B095-633573B3A655}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
