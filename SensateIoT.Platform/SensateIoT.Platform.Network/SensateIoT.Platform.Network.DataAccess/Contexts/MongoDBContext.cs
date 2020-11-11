@@ -20,7 +20,6 @@ namespace SensateIoT.Platform.Network.DataAccess.Contexts
 	{
 		private readonly IMongoClient m_client;
 		private readonly MongoDBSettings m_settings;
-		private readonly ILogger<MongoDBContext> m_logger;
 
 		public IMongoDatabase Database => this.m_client.GetDatabase(this.m_settings.DatabaseName);
 		public IMongoCollection<Sensor> Sensors => this.Database.GetCollection<Sensor>("Sensors");
@@ -28,7 +27,6 @@ namespace SensateIoT.Platform.Network.DataAccess.Contexts
 		public MongoDBContext(IOptions<MongoDBSettings> settings, ILogger<MongoDBContext> logger)
 		{
 			this.m_settings = settings.Value;
-			this.m_logger = logger;
 
 			try {
 				var mongosettings = MongoClientSettings.FromUrl(new MongoUrl( settings.Value.ConnectionString ));
@@ -36,7 +34,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Contexts
 				mongosettings.MaxConnectionPoolSize = settings.Value.MaxConnections;
 				this.m_client = new MongoClient(mongosettings);
 			} catch(Exception ex) {
-				this.m_logger.LogWarning(
+				logger.LogWarning(
 					"Unable to connect to MongoDB: {message}. Trace: {trace}. Exception: {exception}.", 
 					ex.Message,
 					ex.StackTrace,
