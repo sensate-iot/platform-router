@@ -39,9 +39,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.DataAccess", "SensateIoT.Platform.Network.DataAccess\SensateIoT.Platform.Network.DataAccess.csproj", "{C6A37203-9699-47AC-9EB6-F15B1EBBF01D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SensateIoT.Platform.Network.Common", "SensateIoT.Platform.Network.Common\SensateIoT.Platform.Network.Common.csproj", "{C6DF3F42-4160-49AD-B095-633573B3A655}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.Common", "SensateIoT.Platform.Network.Common\SensateIoT.Platform.Network.Common.csproj", "{C6DF3F42-4160-49AD-B095-633573B3A655}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SensateIoT.Platform.Network.Tests", "SensateIoT.Platform.Network.Tests\SensateIoT.Platform.Network.Tests.csproj", "{759F0161-8102-442B-9535-4620E2B75415}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.Tests", "SensateIoT.Platform.Network.Tests\SensateIoT.Platform.Network.Tests.csproj", "{759F0161-8102-442B-9535-4620E2B75415}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SensateIoT.Platform.Network.LoadTest", "SensateIoT.Platform.Network.LoadTest\SensateIoT.Platform.Network.LoadTest.csproj", "{7C240126-E527-487A-923F-77EDAD011675}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -73,6 +75,10 @@ Global
 		{759F0161-8102-442B-9535-4620E2B75415}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{759F0161-8102-442B-9535-4620E2B75415}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{759F0161-8102-442B-9535-4620E2B75415}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C240126-E527-487A-923F-77EDAD011675}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C240126-E527-487A-923F-77EDAD011675}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C240126-E527-487A-923F-77EDAD011675}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C240126-E527-487A-923F-77EDAD011675}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
