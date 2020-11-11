@@ -10,6 +10,6 @@ namespace SensateIoT.Platform.Network.Data.DTO
 	public enum TriggerType
 	{
 		EdgeTrigger,
-		FormalLanguageTrigger
+		Regex
 	}
 }

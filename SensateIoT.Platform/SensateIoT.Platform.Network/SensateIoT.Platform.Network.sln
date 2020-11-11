@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30128.74
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SensateIoT.Platform.Network.Contracts", "SensateIoT.Platform.Network.Contracts\SensateIoT.Platform.Network.Contracts.csproj", "{6BD51202-2FD5-4E6E-9BAA-6239E2C2E9D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.Contracts", "SensateIoT.Platform.Network.Contracts\SensateIoT.Platform.Network.Contracts.csproj", "{6BD51202-2FD5-4E6E-9BAA-6239E2C2E9D7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SensateIoT.Platform.Network.Database", "SensateIoT.Platform.Network.Database", "{BDB01793-EB03-47FA-B4BE-DB29A55DCB78}"
 EndProject
@@ -23,6 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions", "Functions", "{
 		SensateIoT.Platform.Network.Database\Functions\Router_GetAccounts.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetAccounts.sql
 		SensateIoT.Platform.Network.Database\Functions\Router_GetSensorKeys.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetSensorKeys.sql
 		SensateIoT.Platform.Network.Database\Functions\Router_GetTriggers.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetTriggers.sql
+		SensateIoT.Platform.Network.Database\Functions\Router_GetTriggersById.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetTriggersById.sql
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E0A0D3A9-F17C-4D4B-9C03-698C53ABCDB3}"
@@ -32,11 +33,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		CHANGELOG.md = CHANGELOG.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SensateIoT.Platform.Network.Data", "SensateIoT.Platform.Network.Data\SensateIoT.Platform.Network.Data.csproj", "{C6258E1B-4A0F-4D00-B8CA-4A262F42ADB4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.Data", "SensateIoT.Platform.Network.Data\SensateIoT.Platform.Network.Data.csproj", "{C6258E1B-4A0F-4D00-B8CA-4A262F42ADB4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SensateIoT.Platform.Network.ConfigApi", "SensateIoT.Platform.Network.ConfigApi\SensateIoT.Platform.Network.ConfigApi.csproj", "{49211016-BFBE-4129-A0C7-C8394738A2CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.ConfigApi", "SensateIoT.Platform.Network.ConfigApi\SensateIoT.Platform.Network.ConfigApi.csproj", "{49211016-BFBE-4129-A0C7-C8394738A2CE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SensateIoT.Platform.Network.DataAccess", "SensateIoT.Platform.Network.DataAccess\SensateIoT.Platform.Network.DataAccess.csproj", "{C6A37203-9699-47AC-9EB6-F15B1EBBF01D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.DataAccess", "SensateIoT.Platform.Network.DataAccess\SensateIoT.Platform.Network.DataAccess.csproj", "{C6A37203-9699-47AC-9EB6-F15B1EBBF01D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
