@@ -26,7 +26,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Contexts
 			modelBuilder.HasPostgresExtension("uuid-ossp");
 
 			modelBuilder.Entity<TriggerAction>(entity => {
-				entity.HasIndex(e => new {e.TriggerID, e.Channel, e.Target})
+				entity.HasIndex(e => new { e.TriggerID, e.Channel, e.Target })
 					.HasName("Alternative_Key_TriggerActions")
 					.IsUnique();
 
@@ -45,22 +45,21 @@ namespace SensateIoT.Platform.Network.DataAccess.Contexts
 					.HasForeignKey(d => d.TriggerID)
 					.HasConstraintName("FK_TriggerActions_Triggers_TriggerID");
 			});
-			
-			modelBuilder.Entity<TriggerInvocation>(entity =>
-            {
-                entity.HasIndex(e => e.TriggerActionID)
-                    .HasName("IX_TriggerInvocations_TriggerActionID");
 
-                entity.Property(e => e.ID)
-                    .HasColumnName("ID")
-                    .UseIdentityAlwaysColumn();
+			modelBuilder.Entity<TriggerInvocation>(entity => {
+				entity.HasIndex(e => e.TriggerActionID)
+					.HasName("IX_TriggerInvocations_TriggerActionID");
 
-                entity.Property(e => e.TriggerActionID).HasColumnName("TriggerActionID");
+				entity.Property(e => e.ID)
+					.HasColumnName("ID")
+					.UseIdentityAlwaysColumn();
 
-                entity.HasOne(d => d.TriggerAction)
-                    .WithMany(p => p.TriggerInvocations)
-                    .HasForeignKey(d => d.TriggerActionID);
-            });
+				entity.Property(e => e.TriggerActionID).HasColumnName("TriggerActionID");
+
+				entity.HasOne(d => d.TriggerAction)
+					.WithMany(p => p.TriggerInvocations)
+					.HasForeignKey(d => d.TriggerActionID);
+			});
 
 			modelBuilder.Entity<Trigger>(entity => {
 				entity.HasIndex(e => e.SensorID)

@@ -29,13 +29,13 @@ namespace SensateIoT.Platform.Network.DataAccess.Contexts
 			this.m_settings = settings.Value;
 
 			try {
-				var mongosettings = MongoClientSettings.FromUrl(new MongoUrl( settings.Value.ConnectionString ));
+				var mongosettings = MongoClientSettings.FromUrl(new MongoUrl(settings.Value.ConnectionString));
 
 				mongosettings.MaxConnectionPoolSize = settings.Value.MaxConnections;
 				this.m_client = new MongoClient(mongosettings);
 			} catch(Exception ex) {
 				logger.LogWarning(
-					"Unable to connect to MongoDB: {message}. Trace: {trace}. Exception: {exception}.", 
+					"Unable to connect to MongoDB: {message}. Trace: {trace}. Exception: {exception}.",
 					ex.Message,
 					ex.StackTrace,
 					ex);

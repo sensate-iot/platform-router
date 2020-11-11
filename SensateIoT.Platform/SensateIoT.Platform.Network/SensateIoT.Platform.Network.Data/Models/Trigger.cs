@@ -20,7 +20,7 @@ namespace SensateIoT.Platform.Network.Data.Models
 		public string FormalLanguage { get; set; }
 		public TriggerType Type { get; set; }
 
-        public virtual ICollection<TriggerAction> TriggerActions { get; set; }
-        public virtual ICollection<TriggerInvocation> TriggerInvocations { get; set; }
+		public virtual ICollection<TriggerAction> TriggerActions { get; set; }
+		public virtual ICollection<TriggerInvocation> TriggerInvocations { get; set; }
 	}
 }

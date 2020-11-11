@@ -19,6 +19,6 @@ namespace SensateIoT.Platform.Network.Data.Models
 		public string Message { get; set; }
 
 		public virtual Trigger Trigger { get; set; }
-        public virtual ICollection<TriggerInvocation> TriggerInvocations { get; set; }
+		public virtual ICollection<TriggerInvocation> TriggerInvocations { get; set; }
 	}
 }

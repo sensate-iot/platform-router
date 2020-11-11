@@ -9,6 +9,6 @@ namespace SensateIoT.Platform.Network.Data.DTO
 {
 	public class ApiKey
 	{
-		
+
 	}
 }
