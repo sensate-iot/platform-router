@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using JetBrains.Annotations;
 
 using SensateIoT.Platform.Network.Common.Exceptions;
@@ -56,7 +57,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Abstract
 		/// <exception cref="ObjectDisposedException">When the memory cache instance is disposed.</exception>
 		/// <exception cref="ArgumentNullException">When <i>key</i> is <i>null</i>.</exception>
 		/// <exception cref="CacheException">When the cache entry behind <i>key</i> is in an invalid state.</exception>
-		/// <exception cref="ArgumentOutOfRangeException">When <i>key</i> doesn't exist</exception>
+		/// <exception cref="KeyNotFoundException">When <i>key</i> doesn't exist</exception>
 		TValue this[TKey key] { get; set; }
 
 		/// <summary>
