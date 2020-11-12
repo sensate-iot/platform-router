@@ -12,17 +12,19 @@ namespace SensateIoT.Platform.Network.LoadTest.Application
 {
 	public class Program
 	{
-		private const int ReadTestSize = 1000000;
+		private const int ReadTestSize = 5000000;
 
 		private static void RunMemoryTests()
 		{
 			var reads = new ReadTests();
+
+			reads.GenerateIds(ReadTestSize);
 			reads.TestSynchronousRead(ReadTestSize);
 			Console.WriteLine();
 			Console.WriteLine("------------------------");
 			Console.WriteLine();
 
-			reads.TestAsynchronousRead(ReadTestSize).Wait();
+			reads.TestAsynchronousRead(ReadTestSize);
 		}
 
 		private static void RunDistributedTests()

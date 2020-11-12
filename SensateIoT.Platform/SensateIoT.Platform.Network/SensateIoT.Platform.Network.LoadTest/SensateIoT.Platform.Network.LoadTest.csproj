@@ -10,6 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MongoDB.Bson" Version="2.11.4" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\SensateIoT.Platform.Network.Common\SensateIoT.Platform.Network.Common.csproj" />
   </ItemGroup>
 
