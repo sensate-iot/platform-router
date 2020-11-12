@@ -43,7 +43,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 				cmd.CommandType = CommandType.StoredProcedure;
 				cmd.CommandText = Router_GetTriggerByID;
-				cmd.Parameters.Add(new NpgsqlParameter("id", DbType.String) {Value = sensorID.ToString()});
+				cmd.Parameters.Add(new NpgsqlParameter("id", DbType.String) { Value = sensorID.ToString() });
 
 				using(var reader = await cmd.ExecuteReaderAsync(ct).ConfigureAwait(false)) {
 					while(await reader.ReadAsync(ct)) {
