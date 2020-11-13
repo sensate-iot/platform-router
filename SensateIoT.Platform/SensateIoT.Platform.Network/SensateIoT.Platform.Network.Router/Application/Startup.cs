@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
+using SensateIoT.Platform.Network.Common.Caching.Abstract;
 using SensateIoT.Platform.Network.Common.Caching.Object;
 using SensateIoT.Platform.Network.Common.Init;
 using SensateIoT.Platform.Network.Common.Services.Data;
@@ -43,6 +43,11 @@ namespace SensateIoT.Platform.Network.Router.Application
 			services.Configure<DataReloadSettings>(opts => {
 				opts.StartDelay = TimeSpan.Zero;
 				opts.ReloadInterval = TimeSpan.FromMinutes(5);
+			});
+
+			services.Configure<DataCacheSettings>(opts => {
+				opts.Capacity = 25000;
+				opts.Timeout = TimeSpan.FromMinutes(6);
 			});
 
 			services.AddScoped<ITriggerRepository, TriggerRepository>();

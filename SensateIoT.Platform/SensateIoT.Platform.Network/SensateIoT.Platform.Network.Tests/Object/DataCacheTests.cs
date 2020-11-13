@@ -8,11 +8,12 @@
 using System;
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using MongoDB.Bson;
 using Moq;
-
+using SensateIoT.Platform.Network.Common.Caching.Abstract;
 using SensateIoT.Platform.Network.Common.Caching.Object;
 using SensateIoT.Platform.Network.Data.DTO;
 
@@ -73,7 +74,8 @@ namespace SensateIoT.Platform.Network.Tests.Object
 		private IDataCache buildCache()
 		{
 			var logger = new Mock<ILogger<DataCache>>();
-			var cache = new DataCache(logger.Object);
+			var options = Options.Create(new DataCacheSettings { Timeout = TimeSpan.FromMinutes(1) });
+			var cache = new DataCache(options, logger.Object);
 
 			for(var idx = 0; idx < 10; idx++) {
 				var accountID = Guid.NewGuid();

@@ -21,7 +21,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 		void Append(IEnumerable<Account> accounts);
 		void Append(IEnumerable<ApiKey> keys);
 		void Append(Sensor sensor);
-		void Append(Account user);
+		void Append(Account account);
 		void Append(ApiKey key);
 
 		void Clear();
