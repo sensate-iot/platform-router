@@ -5,6 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,7 +40,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 			await cursor.ForEachAsync(document => {
 				var sensor = new Sensor {
-					AccountID = document["AccountID"].AsGuid,
+					AccountID = Guid.Parse(document["AccountID"].AsString),
 					ID = document["_id"].AsObjectId,
 					SensorKey = document["SensorKey"].AsString
 				};
