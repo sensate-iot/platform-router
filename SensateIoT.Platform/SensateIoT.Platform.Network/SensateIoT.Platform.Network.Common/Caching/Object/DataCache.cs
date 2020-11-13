@@ -39,6 +39,10 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 			this.m_keys = new MemoryCache<string, ApiKey>(DefaultCapacity, tmo);
 			this.m_accounts = new MemoryCache<Guid, Account>(DefaultCapacity, tmo);
 			this.m_logger = logger;
+
+			this.m_sensors.ActiveTimeoutScanningEnabled = false;
+			this.m_accounts.ActiveTimeoutScanningEnabled = false;
+			this.m_keys.ActiveTimeoutScanningEnabled = false;
 		}
 
 		~DataCache()
@@ -154,9 +158,11 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 
 		public async Task ScanCachesAsync()
 		{
-			this.m_sensors.ScanForExpiredItems();
-			this.m_accounts.ScanForExpiredItems();
-			this.m_keys.ScanForExpiredItems();
+			Parallel.Invoke(
+				() => this.m_sensors.ScanForExpiredItems(),
+				() => this.m_accounts.ScanForExpiredItems(),
+				() => this.m_keys.ScanForExpiredItems()
+			);
 
 			await Task.WhenAll(
 				this.m_sensors.RemoveScheduledEntriesAsync(),
