@@ -169,6 +169,8 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 				this.m_accounts.RemoveScheduledEntriesAsync(),
 				this.m_keys.RemoveScheduledEntriesAsync()
 			).ConfigureAwait(false);
+
+			GarbageCollection.Collect();
 		}
 
 		public void Dispose()
