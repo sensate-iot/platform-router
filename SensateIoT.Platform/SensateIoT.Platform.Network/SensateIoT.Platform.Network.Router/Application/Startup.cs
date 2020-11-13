@@ -22,21 +22,21 @@ using SensateIoT.Platform.Network.Router.Config;
 
 namespace SensateIoT.Platform.Network.Router.Application
 {
-    public class Startup
-    {
-	    private readonly IConfiguration Configuration;
+	public class Startup
+	{
+		private readonly IConfiguration Configuration;
 
-	    public Startup(IConfiguration configuration)
-	    {
-		    this.Configuration = configuration;
-	    }
+		public Startup(IConfiguration configuration)
+		{
+			this.Configuration = configuration;
+		}
 
 		public void ConfigureServices(IServiceCollection services)
-        {
-	        var db = new DatabaseConfig();
+		{
+			var db = new DatabaseConfig();
 
-	        this.Configuration.GetSection("Database").Bind(db);
-	        services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
+			this.Configuration.GetSection("Database").Bind(db);
+			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.AddAuthorizationContext(db.SensateIoT.ConnectionString);
 			services.AddTriggerContext(db.SensateIoT.ConnectionString);
 
@@ -50,22 +50,20 @@ namespace SensateIoT.Platform.Network.Router.Application
 			services.AddScoped<ISensorRepository, SensorRepository>();
 			services.AddSingleton<IHostedService, SensorReloadService>();
 			services.AddSingleton<IDataCache, DataCache>();
-	        services.AddGrpc();
-        }
+			services.AddGrpc();
+		}
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+		{
+			if(env.IsDevelopment()) {
+				app.UseDeveloperExceptionPage();
+			}
 
-            app.UseRouting();
+			app.UseRouting();
 
-            app.UseEndpoints(endpoints =>
-            {
+			app.UseEndpoints(endpoints => {
 
-            });
-        }
-    }
+			});
+		}
+	}
 }

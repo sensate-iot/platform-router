@@ -68,7 +68,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 			} catch(CacheException ex) {
 				sensor = null;
 				this.m_logger.LogWarning("Unable to retrieve cache value for key: {id}. " +
-				                         "Reason: {exception}. Trace: {trace}.", ex.Key, ex.Message, ex.StackTrace);
+										 "Reason: {exception}. Trace: {trace}.", ex.Key, ex.Message, ex.StackTrace);
 			}
 
 			return sensor;
@@ -132,7 +132,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 				this.m_sensors.TryRemove(sensorID);
 			} catch(CacheException ex) {
 				this.m_logger.LogWarning("Unable to remove cache value for key: {id}. " +
-				                         "Reason: {exception}. Trace: {trace}.", ex.Key, ex.Message, ex.StackTrace);
+										 "Reason: {exception}. Trace: {trace}.", ex.Key, ex.Message, ex.StackTrace);
 			}
 		}
 
@@ -142,7 +142,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 				this.m_accounts.TryRemove(accountID);
 			} catch(CacheException ex) {
 				this.m_logger.LogWarning("Unable to remove cache value for key: {id}. " +
-				                         "Reason: {exception}. Trace: {trace}.", ex.Key, ex.Message, ex.StackTrace);
+										 "Reason: {exception}. Trace: {trace}.", ex.Key, ex.Message, ex.StackTrace);
 			}
 		}
 
@@ -152,7 +152,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 				this.m_keys.TryRemove(key);
 			} catch(CacheException ex) {
 				this.m_logger.LogWarning("Unable to remove cache value for key: {id}. " +
-				                         "Reason: {exception}. Trace: {trace}.", ex.Key, ex.Message, ex.StackTrace);
+										 "Reason: {exception}. Trace: {trace}.", ex.Key, ex.Message, ex.StackTrace);
 			}
 		}
 
