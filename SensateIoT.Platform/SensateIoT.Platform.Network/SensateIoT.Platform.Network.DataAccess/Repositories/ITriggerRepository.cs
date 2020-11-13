@@ -10,14 +10,13 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using MongoDB.Bson;
-
 using SensateIoT.Platform.Network.Data.Models;
 
 namespace SensateIoT.Platform.Network.DataAccess.Repositories
 {
 	public interface ITriggerRepository
 	{
-		Task<IEnumerable<RoutingTriggerInfo>> GetTriggerInfoAsync(ObjectId sensorID, CancellationToken ct);
-		Task<IEnumerable<RoutingTriggerInfo>> GetTriggerInfoAsync(CancellationToken ct);
+		Task<IEnumerable<TriggerRoutingInfo>> GetTriggerInfoAsync(ObjectId sensorID, CancellationToken ct);
+		Task<IEnumerable<TriggerRoutingInfo>> GetTriggerInfoAsync(CancellationToken ct);
 	}
 }

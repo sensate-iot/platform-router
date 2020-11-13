@@ -9,7 +9,7 @@ using MongoDB.Bson;
 
 namespace SensateIoT.Platform.Network.Data.Models
 {
-	public class RoutingTriggerInfo
+	public class TriggerRoutingInfo
 	{
 		public ObjectId SensorID { get; set; }
 		public long ActionCount { get; set; }

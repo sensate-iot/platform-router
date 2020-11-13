@@ -32,9 +32,9 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			this.m_ctx = ctx;
 		}
 
-		public async Task<IEnumerable<RoutingTriggerInfo>> GetTriggerInfoAsync(ObjectId sensorID, CancellationToken ct)
+		public async Task<IEnumerable<TriggerRoutingInfo>> GetTriggerInfoAsync(ObjectId sensorID, CancellationToken ct)
 		{
-			var result = new List<RoutingTriggerInfo>();
+			var result = new List<TriggerRoutingInfo>();
 
 			using(var cmd = this.m_ctx.Database.GetDbConnection().CreateCommand()) {
 				if(cmd.Connection.State != ConnectionState.Open) {
@@ -47,7 +47,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 				using(var reader = await cmd.ExecuteReaderAsync(ct).ConfigureAwait(false)) {
 					while(await reader.ReadAsync(ct)) {
-						var info = new RoutingTriggerInfo {
+						var info = new TriggerRoutingInfo {
 							SensorID = ObjectId.Parse(reader.GetString(0)),
 							ActionCount = reader.GetInt64(1),
 							TextTrigger = reader.GetBoolean(2)
@@ -61,9 +61,9 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			return result;
 		}
 
-		public async Task<IEnumerable<RoutingTriggerInfo>> GetTriggerInfoAsync(CancellationToken ct)
+		public async Task<IEnumerable<TriggerRoutingInfo>> GetTriggerInfoAsync(CancellationToken ct)
 		{
-			var result = new List<RoutingTriggerInfo>();
+			var result = new List<TriggerRoutingInfo>();
 
 			using(var cmd = this.m_ctx.Database.GetDbConnection().CreateCommand()) {
 				if(cmd.Connection.State != ConnectionState.Open) {
@@ -75,7 +75,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 				using(var reader = await cmd.ExecuteReaderAsync(ct).ConfigureAwait(false)) {
 					while(await reader.ReadAsync(ct)) {
-						var record = new RoutingTriggerInfo {
+						var record = new TriggerRoutingInfo {
 							SensorID = ObjectId.Parse(reader.GetString(0)),
 							ActionCount = reader.GetInt64(1),
 							TextTrigger = reader.GetBoolean(2)
