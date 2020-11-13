@@ -5,6 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,10 +16,10 @@ namespace SensateIoT.Platform.Network.Common.Services.Background
 		private Timer _timer;
 		private long _millis;
 
-		private readonly int m_startDelay;
-		private readonly int m_interval;
+		private readonly TimeSpan m_startDelay;
+		private readonly TimeSpan m_interval;
 
-		protected TimedBackgroundService(int startDelay, int interval)
+		protected TimedBackgroundService(TimeSpan startDelay, TimeSpan interval)
 		{
 			this.m_startDelay = startDelay;
 			this.m_interval = interval;
@@ -40,7 +41,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Background
 
 		public void Invoke(object arg)
 		{
-			Interlocked.Add(ref this._millis, this.m_interval);
+			Interlocked.Add(ref this._millis, Convert.ToInt64(this.m_interval.TotalMilliseconds));
 			var task = Task.Run(async () => { await this.ExecuteAsync(this.m_stoppingCts.Token); });
 			task.Wait();
 		}
