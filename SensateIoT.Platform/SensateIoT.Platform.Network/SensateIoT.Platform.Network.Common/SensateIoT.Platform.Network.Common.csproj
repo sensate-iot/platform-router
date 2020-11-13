@@ -23,4 +23,8 @@
     <ProjectReference Include="..\SensateIoT.Platform.Network.Data\SensateIoT.Platform.Network.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\Data\" />
+  </ItemGroup>
+
 </Project>

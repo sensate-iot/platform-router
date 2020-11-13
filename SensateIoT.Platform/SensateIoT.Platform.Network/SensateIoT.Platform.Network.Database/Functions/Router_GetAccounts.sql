@@ -1,13 +1,12 @@
 
-
 CREATE FUNCTION router_getaccounts()
-    RETURNS TABLE(id text, billinglockout boolean, banned boolean)
+    RETURNS TABLE(id UUID, billinglockout BOOLEAN, banned BOOLEAN)
     LANGUAGE plpgsql
 AS
 $$
 BEGIN
 RETURN query
-    SELECT "Users"."Id",
+    SELECT "Users"."Id"::uuid,
            "BillingLockout",
            "Roles"."NormalizedName" = 'BANNED' AS "Banned"
     FROM "Users"

@@ -13,14 +13,14 @@ CREATE FUNCTION router_gettriggers()
     )
     LANGUAGE plpgsql
 AS
-    $$
-    BEGIN
-        RETURN QUERY
-        SELECT "Triggers"."SensorID",
-               COUNT("TriggerActions"."ID") AS "ActionCount",
-               "Triggers"."FormalLanguage" IS NOT NULL AS "TextTrigger"
-        FROM "Triggers"
-        LEFT JOIN "TriggerActions" ON "Triggers"."ID" = "TriggerActions"."TriggerID"
-        GROUP BY "Triggers"."SensorID", "Triggers"."FormalLanguage";
-    end;
-    $$;
+$$
+BEGIN
+	RETURN QUERY
+	SELECT "Triggers"."SensorID",
+		   COUNT("TriggerActions"."ID") AS "ActionCount",
+		   "Triggers"."FormalLanguage" IS NOT NULL AS "TextTrigger"
+	FROM "Triggers"
+	LEFT JOIN "TriggerActions" ON "Triggers"."ID" = "TriggerActions"."TriggerID"
+	GROUP BY "Triggers"."SensorID", "Triggers"."FormalLanguage";
+end;
+$$;
