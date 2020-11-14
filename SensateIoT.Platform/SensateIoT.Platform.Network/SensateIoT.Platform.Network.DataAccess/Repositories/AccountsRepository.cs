@@ -22,6 +22,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		private readonly AuthorizationContext m_ctx;
 
 		private const string Router_GetAccounts = "router_getaccounts";
+		private const string Router_GetSensorKeys = "router_getsensorkeys";
 
 		public AccountsRepository(AuthorizationContext ctx)
 		{
@@ -66,7 +67,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 				}
 
 				cmd.CommandType = CommandType.StoredProcedure;
-				cmd.CommandText = Router_GetAccounts;
+				cmd.CommandText = Router_GetSensorKeys;
 
 				using(var reader = await cmd.ExecuteReaderAsync(ct).ConfigureAwait(false)) {
 					while(await reader.ReadAsync(ct)) {
