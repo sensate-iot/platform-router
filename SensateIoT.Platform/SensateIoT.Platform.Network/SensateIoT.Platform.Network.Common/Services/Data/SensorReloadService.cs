@@ -1,5 +1,5 @@
 ﻿/*
- * Reload service for sensors.
+ * Reload service for accounts.
  *
  * @author Michel Megens
  * @email  michel@michelmegens.net
