@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using MongoDB.Bson;
+using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Models;
 
 namespace SensateIoT.Platform.Network.DataAccess.Repositories

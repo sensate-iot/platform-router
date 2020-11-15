@@ -24,7 +24,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 {
 	public sealed class DataCache : IDataCache
 	{
-		private readonly IMemoryCache<ObjectId, Sensor> m_sensors;
+		private readonly ISensorCache m_sensors;
 		private readonly IMemoryCache<Guid, Account> m_accounts;
 		private readonly IMemoryCache<string, ApiKey> m_keys;
 		private readonly DataCacheSettings m_settings;
@@ -36,7 +36,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 			var capacity = options.Value.Capacity ?? MemoryCache<int,int>.DefaultCapacity;
 			this.m_settings = options.Value;
 
-			this.m_sensors = new MemoryCache<ObjectId, Sensor>(capacity, tmo);
+			this.m_sensors = new SensorCache(capacity, tmo);
 			this.m_keys = new MemoryCache<string, ApiKey>(capacity, tmo);
 			this.m_accounts = new MemoryCache<Guid, Account>(capacity, tmo);
 			this.m_logger = logger;

@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 
 using MongoDB.Bson;
 using Npgsql;
-
+using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Contexts;
 

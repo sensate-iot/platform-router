@@ -17,7 +17,8 @@ namespace SensateIoT.Platform.Network.Data.DTO
 		public ObjectId ID { get; set; }
 		public string SensorKey { get; set; }
 		public Guid AccountID { get; set; }
-		public ICollection<RoutingTarget> RouteInformation { get; set; }
+		//public IList<RoutingTarget> LiveDataRouting { get; set; }
+		public HashSet<RoutingTarget> LiveDataRouting { get; set; }
 		public SensorTrigger TriggerInformation { get; set; }
 	}
 }
