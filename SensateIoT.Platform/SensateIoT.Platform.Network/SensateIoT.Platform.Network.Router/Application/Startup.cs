@@ -15,9 +15,12 @@ using Microsoft.Extensions.Hosting;
 
 using SensateIoT.Platform.Network.Common.Caching.Abstract;
 using SensateIoT.Platform.Network.Common.Caching.Object;
+using SensateIoT.Platform.Network.Common.Collections;
 using SensateIoT.Platform.Network.Common.Init;
 using SensateIoT.Platform.Network.Common.Services.Data;
+using SensateIoT.Platform.Network.Common.Services.Processing;
 using SensateIoT.Platform.Network.Common.Settings;
+using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Repositories;
 using SensateIoT.Platform.Network.Router.Config;
 
@@ -62,6 +65,10 @@ namespace SensateIoT.Platform.Network.Router.Application
 			services.AddSingleton<IHostedService, SensorReloadService>();
 			services.AddSingleton<IHostedService, AccountReloadService>();
 			services.AddSingleton<IHostedService, ApiKeyReloadService>();
+
+			services.AddSingleton<IQueue<IPlatformMessage>, Deque<IPlatformMessage>>();
+			services.AddSingleton<IRoutingService, RoutingService>();
+			services.AddSingleton<IHostedService>(p => p.GetRequiredService<IRoutingService>());
 
 			services.AddSingleton<IDataCache, DataCache>();
 			services.AddGrpc();

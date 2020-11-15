@@ -5,14 +5,18 @@
  * @email  michel@michelmegens.net
  */
 
-using System.Threading;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
 
+using SensateIoT.Platform.Network.Common.Caching.Object;
+using SensateIoT.Platform.Network.Common.Collections;
 using SensateIoT.Platform.Network.Common.Services.Background;
+using SensateIoT.Platform.Network.Data.Abstract;
 
 namespace SensateIoT.Platform.Network.Common.Services.Processing
 {
-	public class RoutingService : BackgroundService
+	public class RoutingService : BackgroundService, IRoutingService
 	{
 		/*
 		 * Route messages through the platform:
@@ -22,14 +26,22 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 		 *		3 Live data routing;
 		 *		4 Forward to storage.
 		 */
-		public RoutingService()
-		{
 
+		private readonly IDataCache m_cache;
+		private readonly IQueue<IPlatformMessage> m_messages;
+
+		public RoutingService(IDataCache cache, IQueue<IPlatformMessage> messages)
+		{
+			this.m_messages = messages;
 		}
 
 		public override async Task ExecuteAsync(CancellationToken token)
 		{
-			await Task.CompletedTask;
+			do {
+				var messages = this.m_messages.ToArray();
+
+				messages = messages.OrderBy(x => x.SensorID).ToArray();
+			} while(!token.IsCancellationRequested);
 		}
 	}
 }
