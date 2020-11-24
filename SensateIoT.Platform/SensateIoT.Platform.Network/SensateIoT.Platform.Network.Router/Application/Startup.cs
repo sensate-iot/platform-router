@@ -63,6 +63,11 @@ namespace SensateIoT.Platform.Network.Router.Application
 				opts.Timeout = TimeSpan.FromMinutes(reload);
 			});
 
+			services.Configure<QueueSettings>(s => {
+				s.LiveDataQueueTemplate = this.Configuration.GetValue<string>("QueueTopics:LiveDataTopic");
+				s.TriggerQueueTemplate = this.Configuration.GetValue<string>("QueueTopics:TriggerTopic");
+			});
+
 			services.AddInternalMqttService(options => {
 				options.Ssl = privatemqtt.Ssl;
 				options.Host = privatemqtt.Host;

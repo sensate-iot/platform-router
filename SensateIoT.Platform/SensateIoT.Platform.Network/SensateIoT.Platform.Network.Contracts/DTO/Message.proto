@@ -3,9 +3,11 @@ syntax = "proto3";
 package sensateiot;
 option csharp_namespace = "SensateIoT.Platform.Network.Contracts.DTO";
 
+import "google/protobuf/timestamp.proto";
+
 message TextMessage {
 	string Data = 1;
-	string Timestamp = 2;
+	google.protobuf.Timestamp Timestamp = 2;
 	double Longitude = 3;
 	double Latitude = 4;
 	string SensorID = 5;

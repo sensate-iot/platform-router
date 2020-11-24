@@ -24,8 +24,8 @@ namespace SensateIoT.Platform.Network.Data.DTO
 		[JsonRequired]
 		public string Data { get; set; }
 		public DateTime Timestamp { get; set; }
-		public long Longitude { get; set; }
-		public long Latitude { get; set; }
+		public double Longitude { get; set; }
+		public double Latitude { get; set; }
 
 		[JsonIgnore]
 		public ObjectId SensorID => this.SensorId;

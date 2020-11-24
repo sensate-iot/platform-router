@@ -11,6 +11,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="DTO\Measurement.proto" />
+    <None Remove="DTO\Message.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.14.0" />
     <PackageReference Include="Google.Protobuf.Tools" Version="3.14.0" />
     <PackageReference Include="Grpc" Version="2.33.1" />
@@ -18,6 +23,11 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="DTO\Measurement.proto" GrpcServices="Both" />
+    <Protobuf Include="DTO\Message.proto" />
   </ItemGroup>
 
 </Project>
