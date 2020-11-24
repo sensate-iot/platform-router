@@ -5,6 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
+using System;
 using MongoDB.Bson;
 using SensateIoT.Platform.Network.Data.DTO;
 
@@ -14,6 +15,7 @@ namespace SensateIoT.Platform.Network.Data.Abstract
 	{
 		ObjectId SensorID { get; }
 		MessageType Type { get; }
+		DateTime PlatformTimestamp { get; set; }
 
 		bool Validate(Sensor sensor);
 	}
