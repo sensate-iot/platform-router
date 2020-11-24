@@ -8,9 +8,9 @@ message TextMessage {
 	string Timestamp = 2;
 	double Longitude = 3;
 	double Latitude = 4;
+	string SensorID = 5;
 }
 
 message TextMessageData {
-	string SensorID = 1;
-	repeated TextMessage Messages = 2;
+	repeated TextMessage Messages = 1;
 }

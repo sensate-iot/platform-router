@@ -22,6 +22,7 @@ using SensateIoT.Platform.Network.Common.Settings;
 using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Repositories;
 using SensateIoT.Platform.Network.Router.Config;
+using SensateService.Init;
 
 namespace SensateIoT.Platform.Network.Router.Application
 {
@@ -37,11 +38,16 @@ namespace SensateIoT.Platform.Network.Router.Application
 		public void ConfigureServices(IServiceCollection services)
 		{
 			var db = new DatabaseConfig();
+			var mqtt = new MqttConfig();
 
 			this.Configuration.GetSection("Database").Bind(db);
+			this.Configuration.GetSection("Mqtt").Bind(mqtt);
+
 			var reload = this.Configuration.GetValue<int>("Cache:DataReloadInterval");
 			var capacity = this.Configuration.GetValue<int>("Cache:Capacity");
 			var timeout = this.Configuration.GetValue<int>("Cache:Timeout");
+			var privatemqtt = mqtt.InternalBroker;
+			var publicmqtt = mqtt.PublicBroker;
 
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.AddAuthorizationContext(db.SensateIoT.ConnectionString);
@@ -55,6 +61,24 @@ namespace SensateIoT.Platform.Network.Router.Application
 			services.Configure<DataCacheSettings>(opts => {
 				opts.Capacity = capacity;
 				opts.Timeout = TimeSpan.FromMinutes(reload);
+			});
+
+			services.AddInternalMqttService(options => {
+				options.Ssl = privatemqtt.Ssl;
+				options.Host = privatemqtt.Host;
+				options.Port = privatemqtt.Port;
+				options.Username = privatemqtt.Username;
+				options.Password = privatemqtt.Password;
+				options.Id = Guid.NewGuid().ToString();
+			});
+
+			services.AddMqttService(options => {
+				options.Ssl = publicmqtt.Ssl;
+				options.Host = publicmqtt.Host;
+				options.Port = publicmqtt.Port;
+				options.Username = publicmqtt.Username;
+				options.Password = publicmqtt.Password;
+				options.Id = Guid.NewGuid().ToString();
 			});
 
 			services.AddScoped<ITriggerRepository, TriggerRepository>();

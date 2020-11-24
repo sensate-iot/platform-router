@@ -17,9 +17,9 @@ message Measurement {
 	double Longitude = 3;
 	string PlatformTime = 4;
 	string Timestamp = 5;
+	string SensorID = 6;
 }
 
 message MeasurementData {
-	string SensorID = 1;
-	repeated Measurement Measurements = 2;
+	repeated Measurement Measurements = 1;
 }
