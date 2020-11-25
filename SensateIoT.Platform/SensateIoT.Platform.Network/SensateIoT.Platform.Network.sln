@@ -14,6 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tables", "Tables", "{9BC72E
 		SensateIoT.Platform.Network.Database\Tables\CreateTriggerActionsTable.sql = SensateIoT.Platform.Network.Database\Tables\CreateTriggerActionsTable.sql
 		SensateIoT.Platform.Network.Database\Tables\CreateTriggerInvocationsTable.sql = SensateIoT.Platform.Network.Database\Tables\CreateTriggerInvocationsTable.sql
 		SensateIoT.Platform.Network.Database\Tables\CreateTriggersTable.sql = SensateIoT.Platform.Network.Database\Tables\CreateTriggersTable.sql
+		SensateIoT.Platform.Network.Database\Tables\LiveDataHandlers.sql = SensateIoT.Platform.Network.Database\Tables\LiveDataHandlers.sql
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Triggers", "Triggers", "{EF31D057-AB3D-413E-B383-25CB53545522}"
@@ -21,6 +22,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions", "Functions", "{2BC79829-3F73-43D8-987A-68E72A2F56AA}"
 	ProjectSection(SolutionItems) = preProject
 		SensateIoT.Platform.Network.Database\Functions\Router_GetAccounts.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetAccounts.sql
+		SensateIoT.Platform.Network.Database\Functions\Router_GetLiveDataHandlers.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetLiveDataHandlers.sql
 		SensateIoT.Platform.Network.Database\Functions\Router_GetSensorKeys.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetSensorKeys.sql
 		SensateIoT.Platform.Network.Database\Functions\Router_GetTriggers.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetTriggers.sql
 		SensateIoT.Platform.Network.Database\Functions\Router_GetTriggersById.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetTriggersById.sql
@@ -45,7 +47,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.LoadTest", "SensateIoT.Platform.Network.LoadTest\SensateIoT.Platform.Network.LoadTest.csproj", "{7C240126-E527-487A-923F-77EDAD011675}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SensateIoT.Platform.Network.Router", "SensateIoT.Platform.Network.Router\SensateIoT.Platform.Network.Router.csproj", "{18250CDA-1A64-4C23-982C-1CD0C155A46A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.Router", "SensateIoT.Platform.Network.Router\SensateIoT.Platform.Network.Router.csproj", "{18250CDA-1A64-4C23-982C-1CD0C155A46A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Seeds", "Seeds", "{A712B537-357E-46F2-BD0F-3A7C514B540F}"
+	ProjectSection(SolutionItems) = preProject
+		SensateIoT.Platform.Network.Database\Seeds\LiveDataHandlers.sql = SensateIoT.Platform.Network.Database\Seeds\LiveDataHandlers.sql
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -93,6 +100,7 @@ Global
 		{9BC72E22-368E-439B-9FDB-BCB754554D67} = {BDB01793-EB03-47FA-B4BE-DB29A55DCB78}
 		{EF31D057-AB3D-413E-B383-25CB53545522} = {BDB01793-EB03-47FA-B4BE-DB29A55DCB78}
 		{2BC79829-3F73-43D8-987A-68E72A2F56AA} = {BDB01793-EB03-47FA-B4BE-DB29A55DCB78}
+		{A712B537-357E-46F2-BD0F-3A7C514B540F} = {BDB01793-EB03-47FA-B4BE-DB29A55DCB78}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7436C576-E465-4291-A0C2-5D4C9C6F706F}

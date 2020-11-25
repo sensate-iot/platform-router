@@ -15,11 +15,12 @@ using Microsoft.Extensions.Hosting;
 
 using SensateIoT.Platform.Network.Common.Caching.Abstract;
 using SensateIoT.Platform.Network.Common.Caching.Object;
+using SensateIoT.Platform.Network.Common.Collections.Abstract;
+using SensateIoT.Platform.Network.Common.Collections.Local;
 using SensateIoT.Platform.Network.Common.Init;
 using SensateIoT.Platform.Network.Common.Services.Data;
 using SensateIoT.Platform.Network.Common.Services.Processing;
 using SensateIoT.Platform.Network.Common.Settings;
-using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Repositories;
 using SensateIoT.Platform.Network.Router.Config;
 using SensateService.Init;
@@ -89,12 +90,15 @@ namespace SensateIoT.Platform.Network.Router.Application
 			services.AddScoped<ITriggerRepository, TriggerRepository>();
 			services.AddScoped<IAccountsRepository, AccountsRepository>();
 			services.AddScoped<ISensorRepository, SensorRepository>();
+			services.AddScoped<ILiveDataHandlerRepository, LiveDataHandlerRepository>();
 
 			services.AddSingleton<IHostedService, SensorReloadService>();
 			services.AddSingleton<IHostedService, AccountReloadService>();
 			services.AddSingleton<IHostedService, ApiKeyReloadService>();
+			services.AddSingleton<IHostedService, LiveDataHandlerReloadService>();
 
 			//services.AddSingleton<IQueue<IPlatformMessage>, Deque<IPlatformMessage>>();
+			services.AddSingleton<IMessageQueue, MessageQueue>();
 			services.AddSingleton<IRoutingService, RoutingService>();
 			services.AddSingleton<IHostedService>(p => p.GetRequiredService<IRoutingService>());
 

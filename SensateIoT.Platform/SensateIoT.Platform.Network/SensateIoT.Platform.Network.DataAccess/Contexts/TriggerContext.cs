@@ -20,6 +20,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Contexts
 		public virtual DbSet<TriggerAction> TriggerActions { get; set; }
 		public virtual DbSet<TriggerInvocation> TriggerInvocations { get; set; }
 		public virtual DbSet<Trigger> Triggers { get; set; }
+		public virtual DbSet<LiveDataHandler> LiveDataHandlers { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
@@ -83,6 +84,21 @@ namespace SensateIoT.Platform.Network.DataAccess.Contexts
 					.HasMaxLength(24);
 
 				entity.Property(e => e.UpperEdge).HasColumnType("numeric");
+			});
+
+			modelBuilder.Entity<LiveDataHandler>(entity => {
+				entity.Property(e => e.ID)
+					.HasColumnName("ID")
+					.UseIdentityAlwaysColumn();
+
+				entity.HasIndex(h => h.Enabled)
+					.HasName("IX_LiveDataHandlers_Enabled");
+				entity.Property(h => h.Enabled)
+					.IsRequired();
+
+				entity.HasIndex(h => h.Name)
+					.HasName("IX_LiveDataHandlers_Name")
+					.IsUnique();
 			});
 		}
 	}
