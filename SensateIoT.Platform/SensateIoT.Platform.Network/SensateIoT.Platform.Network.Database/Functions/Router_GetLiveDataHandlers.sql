@@ -2,7 +2,7 @@
 --- Get the active live data handlers.
 ---
 
-CREATE OR REPLACE FUNCTION router_getlivedatahandlers()
+CREATE FUNCTION router_getlivedatahandlers()
 	RETURNS TABLE(
 		"Name" VARCHAR(64)
 	)

@@ -22,8 +22,10 @@ using SensateIoT.Platform.Network.Common.Init;
 using SensateIoT.Platform.Network.Common.Services.Data;
 using SensateIoT.Platform.Network.Common.Services.Processing;
 using SensateIoT.Platform.Network.Common.Settings;
+using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Repositories;
 using SensateIoT.Platform.Network.Router.Config;
+using SensateIoT.Platform.Network.Router.Services;
 using SensateService.Init;
 
 namespace SensateIoT.Platform.Network.Router.Application
@@ -66,8 +68,12 @@ namespace SensateIoT.Platform.Network.Router.Application
 			});
 
 			services.Configure<QueueSettings>(s => {
-				s.LiveDataQueueTemplate = this.Configuration.GetValue<string>("QueueTopics:LiveDataTopic");
-				s.TriggerQueueTemplate = this.Configuration.GetValue<string>("QueueTopics:TriggerTopic");
+				s.LiveDataQueueTemplate = this.Configuration.GetValue<string>("Routing:LiveDataTopic");
+				s.TriggerQueueTemplate = this.Configuration.GetValue<string>("Routing:TriggerTopic");
+			});
+
+			services.Configure<RoutingPublishSettings>(s => {
+				s.Interval = TimeSpan.FromMilliseconds(this.Configuration.GetValue<int>("Routing:PublishInterval"));
 			});
 
 			services.AddInternalMqttService(options => {
@@ -97,15 +103,17 @@ namespace SensateIoT.Platform.Network.Router.Application
 			services.AddSingleton<IHostedService, AccountReloadService>();
 			services.AddSingleton<IHostedService, ApiKeyReloadService>();
 			services.AddSingleton<IHostedService, LiveDataHandlerReloadService>();
+			services.AddSingleton<IHostedService, RoutingPublishService>();
 
-			//services.AddSingleton<IQueue<IPlatformMessage>, Deque<IPlatformMessage>>();
+			services.AddSingleton<IQueue<IPlatformMessage>, Deque<IPlatformMessage>>();
 			services.AddSingleton<IMessageQueue, MessageQueue>();
 			services.AddSingleton<IRemoteQueue, MqttQueue>();
-			services.AddSingleton<IRoutingService, RoutingService>();
-			services.AddSingleton<IHostedService>(p => p.GetRequiredService<IRoutingService>());
+			services.AddSingleton<IHostedService, RoutingService>();
 
 			services.AddSingleton<IDataCache, DataCache>();
+
 			services.AddGrpc();
+			services.AddGrpcReflection();
 		}
 
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -117,7 +125,11 @@ namespace SensateIoT.Platform.Network.Router.Application
 			app.UseRouting();
 
 			app.UseEndpoints(endpoints => {
+				endpoints.MapGrpcService<RouterService>();
 
+				if(env.IsDevelopment()) {
+					endpoints.MapGrpcReflectionService();
+				}
 			});
 		}
 	}

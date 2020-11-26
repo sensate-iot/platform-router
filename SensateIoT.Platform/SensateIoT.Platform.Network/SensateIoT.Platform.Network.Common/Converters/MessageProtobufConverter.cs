@@ -8,7 +8,7 @@
 using System.Collections.Generic;
 
 using Google.Protobuf.WellKnownTypes;
-
+using MongoDB.Bson;
 using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.DTO;
 
@@ -43,6 +43,17 @@ namespace SensateIoT.Platform.Network.Common.Converters
 				SensorID = message.SensorID.ToString(),
 				Timestamp = Timestamp.FromDateTime(message.Timestamp),
 				Data = message.Data
+			};
+		}
+
+		public static Message Convert(TextMessage message)
+		{
+			return new Message {
+				Timestamp = message.Timestamp.ToDateTime(),
+				Longitude = message.Longitude,
+				Latitude = message.Latitude,
+				Data = message.Data,
+				SensorId = ObjectId.Parse(message.SensorID)
 			};
 		}
 	}

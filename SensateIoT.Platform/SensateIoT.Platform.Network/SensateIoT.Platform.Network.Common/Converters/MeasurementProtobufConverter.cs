@@ -6,7 +6,9 @@
  */
 
 using System.Collections.Generic;
+using System.Linq;
 using Google.Protobuf.WellKnownTypes;
+using MongoDB.Bson;
 using SensateIoT.Platform.Network.Contracts.DTO;
 
 using Measurement = SensateIoT.Platform.Network.Data.DTO.Measurement;
@@ -63,6 +65,22 @@ namespace SensateIoT.Platform.Network.Common.Converters
 			}
 
 			return data;
+		}
+
+		public static Measurement Convert(Contracts.DTO.Measurement measurement)
+		{
+			return new Measurement {
+				Data = measurement.Datapoints.ToDictionary(x => x.Key, x => new Data.DTO.DataPoint {
+					Value = System.Convert.ToDecimal(x.Value),
+					Accuracy = x.Accuracy,
+					Precision = x.Precision,
+					Unit = x.Unit
+				}),
+				Latitude = System.Convert.ToDecimal(measurement.Latitude),
+				Longitude = System.Convert.ToDecimal(measurement.Longitude),
+				SensorId = ObjectId.Parse(measurement.SensorID),
+				Timestamp = measurement.Timestamp.ToDateTime(),
+			};
 		}
 	}
 }

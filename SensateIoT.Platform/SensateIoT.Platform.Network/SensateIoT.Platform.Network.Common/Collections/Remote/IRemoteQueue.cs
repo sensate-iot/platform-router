@@ -17,7 +17,7 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 	public interface IRemoteQueue
 	{
 		void EnqueueToMessageTriggerService(IPlatformMessage message);
-		void EnqueueToTriggerService(IPlatformMessage message);
+		void EnqueueMeasurementToTriggerService(IPlatformMessage message);
 		void EnqueueMeasurementToTarget(IPlatformMessage message, RoutingTarget target);
 		void EnqueueMessageToTarget(IPlatformMessage message, RoutingTarget target);
 		Task FlushAsync();

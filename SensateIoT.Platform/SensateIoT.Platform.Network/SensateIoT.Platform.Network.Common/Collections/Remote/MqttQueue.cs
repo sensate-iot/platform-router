@@ -80,7 +80,7 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 			}
 		}
 
-		public void EnqueueToTriggerService(IPlatformMessage message)
+		public void EnqueueMeasurementToTriggerService(IPlatformMessage message)
 		{
 			this.m_measurementLock.Lock();
 
@@ -192,6 +192,12 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 
 		private Task PublishData(string topic, IMessage messages)
 		{
+			var size = messages.CalculateSize();
+
+			if(size == 0) {
+				return Task.CompletedTask;
+			}
+
 			using var stream = new MemoryStream();
 			messages.WriteTo(stream);
 			var data = stream.ToArray().Compress();
