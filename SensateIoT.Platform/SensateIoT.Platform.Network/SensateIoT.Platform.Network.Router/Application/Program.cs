@@ -37,10 +37,7 @@ namespace SensateIoT.Platform.Network.Router.Application
 					config.AddEnvironmentVariables();
 				})
 				.ConfigureWebHostDefaults(webBuilder => {
-					webBuilder.UseStartup<Startup>()
-						.UseKestrel(options => {
-							//options.ConfigureEndpoints();
-						});
+					webBuilder.UseStartup<Startup>().UseKestrel();
 				});
 		}
 

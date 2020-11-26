@@ -18,11 +18,11 @@ using SensateIoT.Platform.Network.Common.Settings;
 
 namespace SensateIoT.Platform.Network.Common.Infrastructure
 {
-	public class InternalMqttService : AbstractMqttClient 
+	public class InternalMqttMqttClient : AbstractMqttClient, IInternalMqttClient
 	{
 		private readonly MqttServiceOptions _options;
 
-		public InternalMqttService(IOptions<MqttServiceOptions> options, ILogger<MqttClient> logger, IServiceProvider sp) :
+		public InternalMqttMqttClient(IOptions<MqttServiceOptions> options, ILogger<MqttClient> logger, IServiceProvider sp) :
 			base(options.Value.Host, options.Value.Port, options.Value.Ssl, options.Value.TopicShare, logger, sp)
 		{
 			this._options = options.Value;

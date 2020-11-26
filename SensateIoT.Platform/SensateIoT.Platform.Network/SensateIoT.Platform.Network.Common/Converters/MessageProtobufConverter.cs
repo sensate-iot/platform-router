@@ -6,7 +6,9 @@
  */
 
 using System.Collections.Generic;
+
 using Google.Protobuf.WellKnownTypes;
+
 using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.DTO;
 
@@ -31,6 +33,17 @@ namespace SensateIoT.Platform.Network.Common.Converters
 			}
 
 			return textData;
+		}
+
+		public static TextMessage Convert(Message message)
+		{
+			return new TextMessage {
+				Latitude = message.Latitude,
+				Longitude = message.Longitude,
+				SensorID = message.SensorID.ToString(),
+				Timestamp = Timestamp.FromDateTime(message.Timestamp),
+				Data = message.Data
+			};
 		}
 	}
 }

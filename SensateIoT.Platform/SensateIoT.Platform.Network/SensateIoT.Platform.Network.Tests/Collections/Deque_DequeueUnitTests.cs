@@ -30,12 +30,12 @@ namespace SensateIoT.Platform.Network.Tests.Collections
 		}
 
 		[TestMethod]
-		public void Dequeue_CannotDequeueRangeFromEmptyQueue()
+		public void Dequeue_CanDequeueRangeFromEmptyQueue()
 		{
 			IQueue<int> queue = new Deque<int>();
 			var resuls = queue.Take(10);
 
-			Assert.ThrowsException<UnderflowException>(() => queue.DequeueRange(10));
+			Assert.AreEqual(0, queue.DequeueRange(10).Count());
 			Assert.AreEqual(0, resuls.Count());
 		}
 

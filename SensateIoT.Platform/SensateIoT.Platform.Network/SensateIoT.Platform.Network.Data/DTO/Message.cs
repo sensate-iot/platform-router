@@ -20,8 +20,6 @@ namespace SensateIoT.Platform.Network.Data.DTO
 		[JsonRequired, JsonConverter(typeof(ObjectIdJsonConverter))]
 		public ObjectId SensorId { get; set; }
 		[JsonRequired]
-		public string Secret { get; set; }
-		[JsonRequired]
 		public string Data { get; set; }
 		public DateTime Timestamp { get; set; }
 		public DateTime PlatformTimestamp { get; set; }
@@ -33,10 +31,5 @@ namespace SensateIoT.Platform.Network.Data.DTO
 
 		[JsonIgnore]
 		public MessageType Type => MessageType.Measurement;
-
-		public bool Validate(Sensor sensor)
-		{
-			return this.Secret == sensor.SensorKey;
-		}
 	}
 }

@@ -62,16 +62,16 @@ namespace SensateService.Init
 				services.Configure(setup);
 			}
 
-			services.AddSingleton<InternalMqttService>();
-			services.AddHostedService(p => p.GetRequiredService<InternalMqttService>());
-			//services.AddSingleton<IMqttPublishService>(p => p.GetRequiredService<InternalMqttClient>());
+			services.AddSingleton<InternalMqttMqttClient>();
+			services.AddHostedService(p => p.GetRequiredService<InternalMqttMqttClient>());
+			services.AddSingleton<IInternalMqttClient>(p => p.GetRequiredService<InternalMqttMqttClient>());
 
 			return services;
 		}
 
 		public static void MapInternalMqttTopic<T>(this IServiceProvider sp, string topic) where T : MqttHandler
 		{
-			InternalMqttService mqtt;
+			InternalMqttMqttClient mqttMqtt;
 			List<IHostedService> services;
 
 			/*
@@ -83,8 +83,8 @@ namespace SensateService.Init
 			 * piece of SWE.
 			 */
 			services = sp.GetServices<IHostedService>().ToList();
-			mqtt = services.Find(x => x.GetType() == typeof(InternalMqttService)) as InternalMqttService;
-			mqtt?.MapTopicHandler<T>(topic);
+			mqttMqtt = services.Find(x => x.GetType() == typeof(InternalMqttMqttClient)) as InternalMqttMqttClient;
+			mqttMqtt?.MapTopicHandler<T>(topic);
 		}
 	}
 }

@@ -17,6 +17,7 @@ using SensateIoT.Platform.Network.Common.Caching.Abstract;
 using SensateIoT.Platform.Network.Common.Caching.Object;
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
 using SensateIoT.Platform.Network.Common.Collections.Local;
+using SensateIoT.Platform.Network.Common.Collections.Remote;
 using SensateIoT.Platform.Network.Common.Init;
 using SensateIoT.Platform.Network.Common.Services.Data;
 using SensateIoT.Platform.Network.Common.Services.Processing;
@@ -99,6 +100,7 @@ namespace SensateIoT.Platform.Network.Router.Application
 
 			//services.AddSingleton<IQueue<IPlatformMessage>, Deque<IPlatformMessage>>();
 			services.AddSingleton<IMessageQueue, MessageQueue>();
+			services.AddSingleton<IRemoteQueue, MqttQueue>();
 			services.AddSingleton<IRoutingService, RoutingService>();
 			services.AddSingleton<IHostedService>(p => p.GetRequiredService<IRoutingService>());
 

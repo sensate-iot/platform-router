@@ -5,12 +5,13 @@
  * @email  michel@michelmegens.net
  */
 
+using System;
 using System.Linq;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
 
 using SensateIoT.Platform.Network.Common.Caching.Object;
+using SensateIoT.Platform.Network.Common.Collections.Abstract;
 using SensateIoT.Platform.Network.Common.Services.Background;
 using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
@@ -29,11 +30,13 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 		 */
 
 		private readonly IDataCache m_cache;
-		private readonly IList<IPlatformMessage> m_messages;
+		private readonly IMessageQueue m_messages;
 
-		public RoutingService(IDataCache cache)
+		private const int DequeueCount = 1000;
+
+		public RoutingService(IDataCache cache, IMessageQueue queue)
 		{
-			this.m_messages = new List<IPlatformMessage>();
+			this.m_messages = queue;
 			this.m_cache = cache;
 		}
 
@@ -41,9 +44,13 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 		{
 			do {
 				Sensor sensor = null;
-				var messages = this.m_messages.ToArray();
 
-				this.m_messages.Clear();
+				if(this.m_messages.Count <= 0) {
+					Thread.Sleep(TimeSpan.FromMilliseconds(100));
+					continue;
+				}
+
+				var messages = this.m_messages.DequeueRange(DequeueCount);
 				messages = messages.OrderBy(x => x.SensorID).ToArray();
 
 				foreach(var message in messages) {

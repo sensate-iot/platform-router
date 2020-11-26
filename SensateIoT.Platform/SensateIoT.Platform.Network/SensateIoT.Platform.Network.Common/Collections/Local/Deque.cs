@@ -249,7 +249,9 @@ namespace SensateIoT.Platform.Network.Common.Collections.Local
 			this.m_lock.Lock();
 
 			try {
-				this.VerifyQueueSize();
+				if(this.m_count <= 0) {
+					return new List<TValue>();
+				}
 
 				count = Math.Min(count, this.m_count);
 				result = new TValue[count];
