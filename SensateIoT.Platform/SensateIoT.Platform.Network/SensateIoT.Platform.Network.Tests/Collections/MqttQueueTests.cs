@@ -64,7 +64,7 @@ namespace SensateIoT.Platform.Network.Tests.Collections
 				Longitude = 1.134643M,
 				SensorId = ObjectId.GenerateNewId(),
 				Data = new Dictionary<string, DataPoint>()
-			}, new RoutingTarget() {Target = "Local"});
+			}, new RoutingTarget() { Target = "Local" });
 
 			queue.EnqueueMeasurementToTarget(new Measurement {
 				Timestamp = DateTime.UtcNow,
@@ -73,7 +73,7 @@ namespace SensateIoT.Platform.Network.Tests.Collections
 				Longitude = 1.134643M,
 				SensorId = ObjectId.GenerateNewId(),
 				Data = new Dictionary<string, DataPoint>()
-			}, new RoutingTarget() {Target = "Local"});
+			}, new RoutingTarget() { Target = "Local" });
 
 			queue.FlushLiveDataAsync();
 			Assert.AreEqual(1, ClientStub.GetPublishCount("sensateiot/internal/measurements/Local/bulk"));
@@ -91,7 +91,7 @@ namespace SensateIoT.Platform.Network.Tests.Collections
 
 			var remote = new MqttQueue(new OptionsWrapper<QueueSettings>(settings), ClientStub);
 
-			remote.SyncLiveDataHandlers(new [] {
+			remote.SyncLiveDataHandlers(new[] {
 				new LiveDataHandler {
 					Enabled = true,
 					Name = "Local"

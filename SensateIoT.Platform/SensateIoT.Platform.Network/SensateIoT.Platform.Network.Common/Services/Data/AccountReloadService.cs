@@ -28,9 +28,9 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 		private readonly ILogger<AccountReloadService> m_logger;
 
 		public AccountReloadService(IServiceProvider provider,
-		                            IDataCache cache,
-		                            IOptions<DataReloadSettings> settings,
-		                            ILogger<AccountReloadService> logger) : base(settings.Value.StartDelay, settings.Value.ReloadInterval)
+									IDataCache cache,
+									IOptions<DataReloadSettings> settings,
+									ILogger<AccountReloadService> logger) : base(settings.Value.StartDelay, settings.Value.ReloadInterval)
 		{
 			this.m_provider = provider;
 			this.m_cache = cache;
@@ -50,7 +50,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 			sw.Stop();
 
 			this.m_logger.LogInformation("Finished account reload at {reloadEnd}. Reload took {duration}ms.",
-			                             DateTime.UtcNow, sw.ElapsedMilliseconds);
+										 DateTime.UtcNow, sw.ElapsedMilliseconds);
 		}
 	}
 }

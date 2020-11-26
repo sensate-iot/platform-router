@@ -71,7 +71,7 @@ namespace SensateIoT.Platform.Network.Tests.Object
 				TriggerInformation = s.TriggerInformation
 			};
 
-			cache.Item2.AddOrUpdate(sensor.ID, sensor, new CacheEntryOptions {Size = 1});
+			cache.Item2.AddOrUpdate(sensor.ID, sensor, new CacheEntryOptions { Size = 1 });
 
 			s = cache.Item2[s.ID];
 			Assert.AreEqual(1, s.LiveDataRouting.Count);
@@ -101,10 +101,10 @@ namespace SensateIoT.Platform.Network.Tests.Object
 					SensorKey = "ABC"
 				};
 
-				list.Add(new Common.Caching.Abstract.KeyValuePair<ObjectId, Sensor> {Key = id, Value = newSensor});
+				list.Add(new Common.Caching.Abstract.KeyValuePair<ObjectId, Sensor> { Key = id, Value = newSensor });
 			}
 
-			cache.Item2.AddOrUpdate(list, new CacheEntryOptions {Size = 1});
+			cache.Item2.AddOrUpdate(list, new CacheEntryOptions { Size = 1 });
 			var s = cache.Item2[cache.Item1[0]];
 			Assert.AreEqual(1, s.LiveDataRouting.Count);
 			Assert.AreEqual("s1", s.LiveDataRouting.First().Target);
@@ -146,13 +146,13 @@ namespace SensateIoT.Platform.Network.Tests.Object
 				}
 			};
 
-			cache.Item2.AddLiveDataRouting(new LiveDataRoute {SensorId = cache.Item1[0], Target = "s2"});
+			cache.Item2.AddLiveDataRouting(new LiveDataRoute { SensorId = cache.Item1[0], Target = "s2" });
 
 			cache.Item2.SyncLiveData("s1", routes);
 			cache.Item2.FlushLiveData();
 			var sensor = cache.Item2[cache.Item1[0]];
 
-			cache.Item2.RemoveLiveDataRouting(new LiveDataRoute {SensorId = cache.Item1[0], Target = "s1"});
+			cache.Item2.RemoveLiveDataRouting(new LiveDataRoute { SensorId = cache.Item1[0], Target = "s1" });
 			Assert.AreEqual(1, sensor.LiveDataRouting.Count);
 			Assert.AreEqual("s2", sensor.LiveDataRouting.First().Target);
 			Assert.AreEqual("s1", cache.Item2[cache.Item1[2]].LiveDataRouting.First().Target);

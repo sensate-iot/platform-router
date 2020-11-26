@@ -18,12 +18,12 @@ namespace SensateIoT.Platform.Network.Common.Converters
 		public static Contracts.DTO.Measurement Convert(Measurement measurement)
 		{
 			var m = new Contracts.DTO.Measurement {
-					Latitude = System.Convert.ToDouble(measurement.Latitude),
-					Longitude = System.Convert.ToDouble(measurement.Longitude),
-					PlatformTime = Timestamp.FromDateTime(measurement.PlatformTimestamp),
-					Timestamp = Timestamp.FromDateTime(measurement.Timestamp),
-					SensorID = measurement.SensorID.ToString(),
-				};
+				Latitude = System.Convert.ToDouble(measurement.Latitude),
+				Longitude = System.Convert.ToDouble(measurement.Longitude),
+				PlatformTime = Timestamp.FromDateTime(measurement.PlatformTimestamp),
+				Timestamp = Timestamp.FromDateTime(measurement.Timestamp),
+				SensorID = measurement.SensorID.ToString(),
+			};
 
 			foreach(var (key, dp) in measurement.Data) {
 				m.Datapoints.Add(new DataPoint {

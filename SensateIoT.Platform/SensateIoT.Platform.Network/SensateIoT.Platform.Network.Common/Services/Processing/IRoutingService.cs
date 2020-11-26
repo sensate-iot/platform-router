@@ -11,6 +11,6 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 {
 	public interface IRoutingService : IHostedService
 	{
-		
+
 	}
 }

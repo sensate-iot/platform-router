@@ -46,7 +46,7 @@ namespace SensateIoT.Platform.Network.Common.Infrastructure
 			MqttApplicationMessageBuilder builder;
 			MqttApplicationMessage msg;
 
-			if (!this.Client.IsConnected)
+			if(!this.Client.IsConnected)
 				return;
 
 			builder = new MqttApplicationMessageBuilder();

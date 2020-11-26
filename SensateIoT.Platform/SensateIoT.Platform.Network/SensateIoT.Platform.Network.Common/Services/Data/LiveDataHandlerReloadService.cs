@@ -29,8 +29,8 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 
 		public LiveDataHandlerReloadService(IServiceProvider provider,
 											IRemoteQueue remote,
-		                                    IOptions<DataReloadSettings> settings,
-		                                    ILogger<LiveDataHandlerReloadService> logger) : base(settings.Value.StartDelay, settings.Value.ReloadInterval)
+											IOptions<DataReloadSettings> settings,
+											ILogger<LiveDataHandlerReloadService> logger) : base(settings.Value.StartDelay, settings.Value.ReloadInterval)
 		{
 			this.m_provider = provider;
 			this.m_queue = remote;
@@ -50,7 +50,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 			sw.Stop();
 
 			this.m_logger.LogInformation("Finished live data handler reload at {reloadEnd}. Reload took {duration}ms.",
-			                             DateTime.UtcNow, sw.ElapsedMilliseconds);
+										 DateTime.UtcNow, sw.ElapsedMilliseconds);
 		}
 	}
 }
