@@ -7,9 +7,12 @@
 
 using System;
 using System.Threading.Tasks;
+
+using Microsoft.Extensions.Logging;
+
 using Google.Protobuf;
 using Grpc.Core;
-using Microsoft.Extensions.Logging;
+
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
 using SensateIoT.Platform.Network.Common.Converters;
 using SensateIoT.Platform.Network.Contracts.RPC;
@@ -79,14 +82,56 @@ namespace SensateIoT.Platform.Network.Router.Services
 			return Task.FromResult(response);
 		}
 
-		public virtual Task<RoutingResponse> EnqueueBulkMeasurements(Contracts.DTO.MeasurementData request, ServerCallContext context)
+		public override Task<RoutingResponse> EnqueueBulkMeasurements(Contracts.DTO.MeasurementData request, ServerCallContext context)
 		{
-			return null;
+			RoutingResponse response;
+
+			try {
+				var dto = MeasurementProtobufConverter.Convert(request);
+				this.m_queue.AddRange(dto);
+
+				response = new RoutingResponse {
+					Count = request.Measurements.Count,
+					Message = "Messages queued.",
+					ResponseID = ByteString.CopyFrom(Guid.NewGuid().ToByteArray())
+				};
+			} catch(FormatException ex) {
+				this.m_logger.LogWarning("Received messages from an invalid sensor. Exception: {exception}", ex);
+
+				response = new RoutingResponse {
+					Count = 0,
+					Message = "Messages not queued. Invalid sensor ID.",
+					ResponseID = ByteString.CopyFrom(Guid.NewGuid().ToByteArray())
+				};
+			}
+
+			return Task.FromResult(response);
 		}
 
-		public virtual Task<RoutingResponse> EnqueueBulkMessages( Contracts.DTO.TextMessageData request, ServerCallContext context)
+		public override Task<RoutingResponse> EnqueueBulkMessages( Contracts.DTO.TextMessageData request, ServerCallContext context)
 		{
-			return null;
+			RoutingResponse response;
+
+			try {
+				var dto = MessageProtobufConverter.Convert(request);
+				this.m_queue.AddRange(dto);
+
+				response = new RoutingResponse {
+					Count = request.Messages.Count,
+					Message = "Messages queued.",
+					ResponseID = ByteString.CopyFrom(Guid.NewGuid().ToByteArray())
+				};
+			} catch(FormatException ex) {
+				this.m_logger.LogWarning("Received messages from an invalid sensor. Exception: {exception}", ex);
+
+				response = new RoutingResponse {
+					Count = 0,
+					Message = "Messages not queued. Invalid sensor ID.",
+					ResponseID = ByteString.CopyFrom(Guid.NewGuid().ToByteArray())
+				};
+			}
+
+			return Task.FromResult(response);
 		}
 	}
 }

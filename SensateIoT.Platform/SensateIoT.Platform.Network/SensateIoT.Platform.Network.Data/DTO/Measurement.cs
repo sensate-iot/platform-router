@@ -33,6 +33,6 @@ namespace SensateIoT.Platform.Network.Data.DTO
 		public ObjectId SensorID => this.SensorId;
 
 		[JsonIgnore]
-		public MessageType Type => MessageType.Message;
+		public MessageType Type => MessageType.Measurement;
 	}
 }

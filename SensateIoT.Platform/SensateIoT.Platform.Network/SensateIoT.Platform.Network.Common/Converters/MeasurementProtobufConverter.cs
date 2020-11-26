@@ -7,8 +7,10 @@
 
 using System.Collections.Generic;
 using System.Linq;
+
 using Google.Protobuf.WellKnownTypes;
 using MongoDB.Bson;
+
 using SensateIoT.Platform.Network.Contracts.DTO;
 
 using Measurement = SensateIoT.Platform.Network.Data.DTO.Measurement;
@@ -38,6 +40,11 @@ namespace SensateIoT.Platform.Network.Common.Converters
 			}
 
 			return m;
+		}
+
+		public static IEnumerable<Measurement> Convert(MeasurementData measurements)
+		{
+			return measurements.Measurements.Select(Convert).ToList();
 		}
 
 		public static MeasurementData Convert(IEnumerable<Measurement> measurements)
