@@ -9,12 +9,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SensateIoT.Platform.Network
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tables", "Tables", "{9BC72E22-368E-439B-9FDB-BCB754554D67}"
 	ProjectSection(SolutionItems) = preProject
-		SensateIoT.Platform.Network.Database\Tables\CreateTriggerActionPricesAuditTable.sql = SensateIoT.Platform.Network.Database\Tables\CreateTriggerActionPricesAuditTable.sql
-		SensateIoT.Platform.Network.Database\Tables\CreateTriggerActionPricesTable.sql = SensateIoT.Platform.Network.Database\Tables\CreateTriggerActionPricesTable.sql
-		SensateIoT.Platform.Network.Database\Tables\CreateTriggerActionsTable.sql = SensateIoT.Platform.Network.Database\Tables\CreateTriggerActionsTable.sql
-		SensateIoT.Platform.Network.Database\Tables\CreateTriggerInvocationsTable.sql = SensateIoT.Platform.Network.Database\Tables\CreateTriggerInvocationsTable.sql
-		SensateIoT.Platform.Network.Database\Tables\CreateTriggersTable.sql = SensateIoT.Platform.Network.Database\Tables\CreateTriggersTable.sql
 		SensateIoT.Platform.Network.Database\Tables\LiveDataHandlers.sql = SensateIoT.Platform.Network.Database\Tables\LiveDataHandlers.sql
+		SensateIoT.Platform.Network.Database\Tables\TriggerActionPrices.sql = SensateIoT.Platform.Network.Database\Tables\TriggerActionPrices.sql
+		SensateIoT.Platform.Network.Database\Tables\TriggerActionPricesAudit.sql = SensateIoT.Platform.Network.Database\Tables\TriggerActionPricesAudit.sql
+		SensateIoT.Platform.Network.Database\Tables\TriggerActions.sql = SensateIoT.Platform.Network.Database\Tables\TriggerActions.sql
+		SensateIoT.Platform.Network.Database\Tables\TriggerInvocations.sql = SensateIoT.Platform.Network.Database\Tables\TriggerInvocations.sql
+		SensateIoT.Platform.Network.Database\Tables\Triggers.sql = SensateIoT.Platform.Network.Database\Tables\Triggers.sql
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Triggers", "Triggers", "{EF31D057-AB3D-413E-B383-25CB53545522}"
@@ -32,7 +32,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.dockerignore = .dockerignore
 		.editorconfig = .editorconfig
-		CHANGELOG.md = CHANGELOG.md
+		..\..\CHANGELOG.md = ..\..\CHANGELOG.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.Data", "SensateIoT.Platform.Network.Data\SensateIoT.Platform.Network.Data.csproj", "{C6258E1B-4A0F-4D00-B8CA-4A262F42ADB4}"
