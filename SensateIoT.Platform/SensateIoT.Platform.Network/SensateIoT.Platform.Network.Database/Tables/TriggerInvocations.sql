@@ -9,8 +9,13 @@ CREATE TABLE "TriggerInvocations"
     "TriggerID" BIGINT NOT NULL
         CONSTRAINT "FK_TriggerInvocations_Triggers_TriggerId"
             REFERENCES "Triggers"
-            ON DELETE NO ACTION
+            ON DELETE CASCADE
             ON UPDATE CASCADE,
+    "ActionID" BIGINT NOT NULL
+        CONSTRAINT "FK_TriggerInvocations_TriggerActions_ActionID"
+        REFERENCES "TriggerActions"
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
     "Timestamp" TIMESTAMP NOT NULL
 );
 

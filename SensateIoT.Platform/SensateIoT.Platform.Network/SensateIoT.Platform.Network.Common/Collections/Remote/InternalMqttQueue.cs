@@ -26,7 +26,7 @@ using SensateIoT.Platform.Network.Data.Models;
 
 namespace SensateIoT.Platform.Network.Common.Collections.Remote
 {
-	public class MqttQueue : IRemoteQueue
+	public class InternalMqttQueue : IRemoteQueue
 	{
 		private IDictionary<string, TextMessageData> m_textMessageQueues;
 		private IDictionary<string, MeasurementData> m_measurementQueues;
@@ -48,7 +48,7 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 
 		private readonly IInternalMqttClient m_client;
 
-		public MqttQueue(IOptions<QueueSettings> options, IInternalMqttClient client)
+		public InternalMqttQueue(IOptions<QueueSettings> options, IInternalMqttClient client)
 		{
 			this.m_liveDataLock = new SpinLockWrapper();
 			this.m_liveDataHandlers = new HashSet<string>();

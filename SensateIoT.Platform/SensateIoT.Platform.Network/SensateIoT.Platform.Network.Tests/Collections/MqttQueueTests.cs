@@ -89,7 +89,7 @@ namespace SensateIoT.Platform.Network.Tests.Collections
 			};
 
 
-			var remote = new MqttQueue(new OptionsWrapper<QueueSettings>(settings), ClientStub);
+			var remote = new InternalMqttQueue(new OptionsWrapper<QueueSettings>(settings), ClientStub);
 
 			remote.SyncLiveDataHandlers(new[] {
 				new LiveDataHandler {
