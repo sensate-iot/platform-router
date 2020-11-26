@@ -79,13 +79,13 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 			this.m_dataLock.EnterWriteLock();
 
 			try {
-                this.m_liveSensors.Add(route.SensorId);
+				this.m_liveSensors.Add(route.SensorId);
 				this.m_liveDataEntries.Add(route);
 
-                var sensor = this.m_data[route.SensorId];
+				var sensor = this.m_data[route.SensorId];
 
-                sensor.Value.LiveDataRouting ??= new HashSet<RoutingTarget>(new RoutingTargetEqualityComparer());
-                sensor.Value.LiveDataRouting.Add(new RoutingTarget { Target = route.Target, Type = RouteType.LiveDataSubscription});
+				sensor.Value.LiveDataRouting ??= new HashSet<RoutingTarget>(new RoutingTargetEqualityComparer());
+				sensor.Value.LiveDataRouting.Add(new RoutingTarget { Target = route.Target, Type = RouteType.LiveDataSubscription });
 			} finally {
 				this.m_dataLock.ExitWriteLock();
 			}
@@ -96,12 +96,12 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 			this.m_dataLock.EnterWriteLock();
 
 			try {
-                var sensor = this.m_data[route.SensorId];
-                sensor.Value.LiveDataRouting?.Remove(new RoutingTarget {Target = route.Target, Type = RouteType.LiveDataSubscription});
+				var sensor = this.m_data[route.SensorId];
+				sensor.Value.LiveDataRouting?.Remove(new RoutingTarget { Target = route.Target, Type = RouteType.LiveDataSubscription });
 
-                if(sensor.Value.LiveDataRouting?.Count <= 0) {
-	                this.m_liveSensors.Remove(route.SensorId);
-                }
+				if(sensor.Value.LiveDataRouting?.Count <= 0) {
+					this.m_liveSensors.Remove(route.SensorId);
+				}
 			} finally {
 				this.m_dataLock.ExitWriteLock();
 			}
@@ -140,7 +140,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 						this.m_liveSensors.Add(entry.SensorId);
 					}
 
-					sensor.LiveDataRouting.Add(new RoutingTarget {Target = entry.Target, Type = RouteType.LiveDataSubscription});
+					sensor.LiveDataRouting.Add(new RoutingTarget { Target = entry.Target, Type = RouteType.LiveDataSubscription });
 				}
 			} finally {
 				this.m_dataLock.ExitWriteLock();

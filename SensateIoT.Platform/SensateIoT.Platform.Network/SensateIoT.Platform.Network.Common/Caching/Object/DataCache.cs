@@ -32,8 +32,8 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 
 		public DataCache(IOptions<DataCacheSettings> options, ILogger<DataCache> logger)
 		{
-			var tmo   = options.Value.Timeout;
-			var capacity = options.Value.Capacity ?? MemoryCache<int,int>.DefaultCapacity;
+			var tmo = options.Value.Timeout;
+			var capacity = options.Value.Capacity ?? MemoryCache<int, int>.DefaultCapacity;
 			this.m_settings = options.Value;
 
 			this.m_sensors = new SensorCache(capacity, tmo);
@@ -69,7 +69,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 			} catch(CacheException ex) {
 				sensor = null;
 				this.m_logger.LogError("Unable to retrieve cache value for key: {id}. " +
-				                       "Reason: {exception}. Trace: {trace}.", ex.Key, ex.Message, ex.StackTrace);
+									   "Reason: {exception}. Trace: {trace}.", ex.Key, ex.Message, ex.StackTrace);
 			}
 
 			return sensor;
@@ -120,7 +120,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 		public void Append(Sensor sensor)
 		{
 			try {
-				this.m_sensors.AddOrUpdate(sensor.ID, sensor, new CacheEntryOptions {Size = CalculateEntrySize(this.m_settings)});
+				this.m_sensors.AddOrUpdate(sensor.ID, sensor, new CacheEntryOptions { Size = CalculateEntrySize(this.m_settings) });
 			} catch(ArgumentOutOfRangeException ex) {
 				this.m_logger.LogError("Unable to update cache: {message}.", ex.Message);
 			}
@@ -129,7 +129,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 		public void Append(Account account)
 		{
 			try {
-				this.m_accounts.AddOrUpdate(account.ID, account, new CacheEntryOptions {Size = CalculateEntrySize(this.m_settings)});
+				this.m_accounts.AddOrUpdate(account.ID, account, new CacheEntryOptions { Size = CalculateEntrySize(this.m_settings) });
 			} catch(ArgumentOutOfRangeException ex) {
 				this.m_logger.LogError("Unable to update cache: {message}.", ex.Message);
 			}
@@ -138,7 +138,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 		public void Append(ApiKey key)
 		{
 			try {
-				this.m_keys.AddOrUpdate(key.Key, key, new CacheEntryOptions {Size = CalculateEntrySize(this.m_settings)});
+				this.m_keys.AddOrUpdate(key.Key, key, new CacheEntryOptions { Size = CalculateEntrySize(this.m_settings) });
 			} catch(ArgumentOutOfRangeException ex) {
 				this.m_logger.LogError("Unable to update cache: {message}.", ex.Message);
 			}
