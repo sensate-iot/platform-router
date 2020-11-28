@@ -51,19 +51,20 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			return result;
 		}
 
-		public async Task<Sensor> GetSensorsByID(ObjectId sensorID, CancellationToken ct = default)
+		public async Task<Sensor> GetSensorsByIDAsnc(ObjectId sensorID, CancellationToken ct = default)
 		{
-			var filter = Builders<Data.Models.Sensor>.Filter.Eq(sensor => sensor.InternalId, sensorID);
 			var query = this.m_sensors.Aggregate()
-				.Match(filter)
+				.Match(new BsonDocument("_id", sensorID))
 				.Project(new BsonDocument {
 					{"SensorKey", "$Secret"},
-					{"AccountID", "$Owner"}
+					{"AccountID", "$Owner"},
+					{"_id", 1}
 				});
+
 			var result = await query.FirstOrDefaultAsync(ct).ConfigureAwait(false);
 
 			return new Sensor {
-				AccountID = result["AccountID"].AsGuid,
+				AccountID = Guid.Parse(result["AccountID"].AsString),
 				ID = result["_id"].AsObjectId,
 				SensorKey = result["SensorKey"].AsString
 			};

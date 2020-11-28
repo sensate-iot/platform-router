@@ -17,7 +17,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 {
 	public interface ITriggerRepository
 	{
-		Task<IEnumerable<TriggerRoutingInfo>> GetTriggerInfoAsync(ObjectId sensorID, CancellationToken ct);
+		Task<TriggerRoutingInfo> GetTriggerInfoAsync(ObjectId sensorID, CancellationToken ct);
 		Task<IEnumerable<TriggerRoutingInfo>> GetTriggerInfoAsync(CancellationToken ct);
 	}
 }

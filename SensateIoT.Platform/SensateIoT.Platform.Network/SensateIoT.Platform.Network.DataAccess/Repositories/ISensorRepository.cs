@@ -18,6 +18,6 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 	public interface ISensorRepository
 	{
 		Task<IEnumerable<Sensor>> GetSensorsAsync(CancellationToken ct = default);
-		Task<Sensor> GetSensorsByID(ObjectId sensorID, CancellationToken ct = default);
+		Task<Sensor> GetSensorsByIDAsnc(ObjectId sensorID, CancellationToken ct = default);
 	}
 }

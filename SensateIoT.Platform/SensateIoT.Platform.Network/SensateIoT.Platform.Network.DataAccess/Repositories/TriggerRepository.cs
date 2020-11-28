@@ -32,9 +32,9 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			this.m_ctx = ctx;
 		}
 
-		public async Task<IEnumerable<TriggerRoutingInfo>> GetTriggerInfoAsync(ObjectId sensorID, CancellationToken ct)
+		public async Task<TriggerRoutingInfo> GetTriggerInfoAsync(ObjectId sensorID, CancellationToken ct)
 		{
-			var result = new List<TriggerRoutingInfo>();
+			var result = new TriggerRoutingInfo();
 
 			using(var cmd = this.m_ctx.Database.GetDbConnection().CreateCommand()) {
 				if(cmd.Connection.State != ConnectionState.Open) {
@@ -46,14 +46,12 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 				cmd.Parameters.Add(new NpgsqlParameter("id", DbType.String) { Value = sensorID.ToString() });
 
 				using(var reader = await cmd.ExecuteReaderAsync(ct).ConfigureAwait(false)) {
-					while(await reader.ReadAsync(ct)) {
-						var info = new TriggerRoutingInfo {
+					if(await reader.ReadAsync(ct)) {
+						result = new TriggerRoutingInfo {
 							SensorID = ObjectId.Parse(reader.GetString(0)),
 							ActionCount = reader.GetInt64(1),
 							TextTrigger = reader.GetBoolean(2)
 						};
-
-						result.Add(info);
 					}
 				}
 			}
