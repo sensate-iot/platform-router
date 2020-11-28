@@ -21,8 +21,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Triggers", "Triggers", "{EF
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions", "Functions", "{2BC79829-3F73-43D8-987A-68E72A2F56AA}"
 	ProjectSection(SolutionItems) = preProject
+		SensateIoT.Platform.Network.Database\Functions\Router_GetAccount.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetAccount.sql
 		SensateIoT.Platform.Network.Database\Functions\Router_GetAccounts.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetAccounts.sql
 		SensateIoT.Platform.Network.Database\Functions\Router_GetLiveDataHandlers.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetLiveDataHandlers.sql
+		SensateIoT.Platform.Network.Database\Functions\Router_GetSensorKey.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetSensorKey.sql
 		SensateIoT.Platform.Network.Database\Functions\Router_GetSensorKeys.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetSensorKeys.sql
 		SensateIoT.Platform.Network.Database\Functions\Router_GetTriggers.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetTriggers.sql
 		SensateIoT.Platform.Network.Database\Functions\Router_GetTriggersById.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetTriggersById.sql
