@@ -50,7 +50,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 			sw.Stop();
 
 			this.m_logger.LogInformation("Finished account reload at {reloadEnd}. Reload took {duration}ms.",
-										 DateTime.UtcNow, sw.ElapsedMilliseconds);
+			                             DateTime.UtcNow, sw.ElapsedMilliseconds);
 		}
 	}
 }

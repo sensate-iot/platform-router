@@ -7,8 +7,6 @@
 		public string Host { get; set; }
 		public bool Ssl { get; set; }
 		public short Port { get; set; }
-		public string InternalCommandsTopic { get; set; }
-		public string InternalBulkMeasurementTopic { get; set; }
-		public string InternalBulkMessageTopic { get; set; }
+		public string CommandTopic { get; set; }
 	}
 }

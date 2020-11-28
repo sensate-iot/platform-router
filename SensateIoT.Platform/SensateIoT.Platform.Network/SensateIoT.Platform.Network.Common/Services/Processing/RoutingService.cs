@@ -49,7 +49,12 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 				Sensor sensor = null;
 
 				if(this.m_messages.Count <= 0) {
-					await Task.Delay(TimeSpan.FromMilliseconds(100), token);
+					try {
+						await Task.Delay(TimeSpan.FromMilliseconds(100), token);
+					} catch(OperationCanceledException) {
+						Console.WriteLine("Routing task cancelled.");
+					}
+
 					continue;
 				}
 

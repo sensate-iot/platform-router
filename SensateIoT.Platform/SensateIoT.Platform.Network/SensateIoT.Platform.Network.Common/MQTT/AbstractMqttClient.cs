@@ -11,6 +11,7 @@ using System.Collections.Concurrent;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -22,7 +23,7 @@ using MQTTnet.Protocol;
 
 using SensateIoT.Platform.Network.Common.Services.Background;
 
-namespace SensateIoT.Platform.Network.Common.Infrastructure
+namespace SensateIoT.Platform.Network.Common.MQTT
 {
 	public abstract class AbstractMqttClient : BackgroundService
 	{
@@ -52,11 +53,11 @@ namespace SensateIoT.Platform.Network.Common.Infrastructure
 			this._handlers = new ConcurrentDictionary<string, Type>();
 		}
 
-		public void MapTopicHandler<T>(string topic) where T : MqttHandler
+		public void MapTopicHandler<T>(string topic) where T : IMqttHandler 
 		{
 			this._handlers.TryAdd(topic, typeof(T));
 
-			if(!this._disconnected && this.Client != null) {
+			if(this.Client.IsConnected && !this._disconnected && this.Client != null) {
 				this.SubscribeAsync(topic).Wait();
 			}
 		}
@@ -117,14 +118,14 @@ namespace SensateIoT.Platform.Network.Common.Infrastructure
 
 		protected virtual async Task OnMessageAsync(string topic, string msg)
 		{
-			MqttHandler handler;
+			IMqttHandler handler;
 
 			using var scope = this._provider.CreateScope();
 			if(!this._handlers.TryGetValue(topic, out var handlerType)) {
 				this._handlers.TryGetValue(this._share + topic, out handlerType);
 			}
 
-			handler = scope.ServiceProvider.GetRequiredService(handlerType) as MqttHandler;
+			handler = scope.ServiceProvider.GetRequiredService(handlerType) as IMqttHandler;
 
 			if(handler == null)
 				return;

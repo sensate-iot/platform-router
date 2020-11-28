@@ -14,7 +14,7 @@ using Microsoft.Extensions.Options;
 
 using SensateIoT.Platform.Network.Common.Settings;
 
-namespace SensateIoT.Platform.Network.Common.Infrastructure
+namespace SensateIoT.Platform.Network.Common.MQTT
 {
 	public class MqttClient : AbstractMqttClient
 	{

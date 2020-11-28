@@ -25,8 +25,8 @@ using SensateIoT.Platform.Network.Common.Settings;
 using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Repositories;
 using SensateIoT.Platform.Network.Router.Config;
+using SensateIoT.Platform.Network.Router.MQTT;
 using SensateIoT.Platform.Network.Router.Services;
-using SensateService.Init;
 
 namespace SensateIoT.Platform.Network.Router.Application
 {
@@ -114,15 +114,21 @@ namespace SensateIoT.Platform.Network.Router.Application
 
 			services.AddGrpc();
 			services.AddGrpcReflection();
+			services.AddMqttHandlers();
 		}
 
-		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider provider)
 		{
+			var mqtt = new MqttConfig();
+
+			this.Configuration.GetSection("Mqtt").Bind(mqtt);
+
 			if(env.IsDevelopment()) {
 				app.UseDeveloperExceptionPage();
 			}
 
 			app.UseRouting();
+			provider.MapInternalMqttTopic<CommandConsumer>(mqtt.InternalBroker.CommandTopic);
 
 			app.UseEndpoints(endpoints => {
 				endpoints.MapGrpcService<RouterService>();

@@ -6,17 +6,17 @@
  */
 
 using System;
-using System.Reflection;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-using SensateIoT.Platform.Network.Common.Infrastructure;
+using SensateIoT.Platform.Network.Common.MQTT;
 using SensateIoT.Platform.Network.Common.Settings;
 
-namespace SensateService.Init
+namespace SensateIoT.Platform.Network.Common.Init
 {
 	public static class MqttServiceInitExtensions
 	{
@@ -34,7 +34,7 @@ namespace SensateService.Init
 		public static IServiceCollection AddMqttHandlers(this IServiceCollection service)
 		{
 			foreach(var etype in Assembly.GetEntryAssembly().ExportedTypes) {
-				if(etype.GetTypeInfo().BaseType == typeof(MqttHandler)) {
+				if(etype.GetTypeInfo().BaseType == typeof(IMqttHandler)) {
 					service.AddScoped(etype);
 				}
 			}
@@ -69,7 +69,7 @@ namespace SensateService.Init
 			return services;
 		}
 
-		public static void MapInternalMqttTopic<T>(this IServiceProvider sp, string topic) where T : MqttHandler
+		public static void MapInternalMqttTopic<T>(this IServiceProvider sp, string topic) where T : IMqttHandler
 		{
 			InternalMqttMqttClient mqttMqtt;
 			List<IHostedService> services;

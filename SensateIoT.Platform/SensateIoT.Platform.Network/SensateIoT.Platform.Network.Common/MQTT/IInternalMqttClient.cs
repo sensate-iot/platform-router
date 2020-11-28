@@ -7,7 +7,7 @@
 
 using System.Threading.Tasks;
 
-namespace SensateIoT.Platform.Network.Common.Infrastructure
+namespace SensateIoT.Platform.Network.Common.MQTT
 {
 	public interface IInternalMqttClient
 	{

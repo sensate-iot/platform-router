@@ -17,7 +17,7 @@ using Microsoft.Extensions.Options;
 
 using SensateIoT.Platform.Network.Common.Converters;
 using SensateIoT.Platform.Network.Common.Helpers;
-using SensateIoT.Platform.Network.Common.Infrastructure;
+using SensateIoT.Platform.Network.Common.MQTT;
 using SensateIoT.Platform.Network.Common.Settings;
 using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.Abstract;

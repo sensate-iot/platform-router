@@ -5,11 +5,11 @@
  * @email  michel@michelmegens.net
  */
 
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using SensateIoT.Platform.Network.Common.Helpers;
-using SensateIoT.Platform.Network.Common.Infrastructure;
+using SensateIoT.Platform.Network.Common.MQTT;
 
 namespace SensateIoT.Platform.Network.Tests.Utility
 {
