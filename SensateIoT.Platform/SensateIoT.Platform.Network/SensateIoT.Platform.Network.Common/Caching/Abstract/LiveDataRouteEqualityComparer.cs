@@ -24,12 +24,12 @@ namespace SensateIoT.Platform.Network.Common.Caching.Abstract
 			if(x.GetType() != y.GetType())
 				return false;
 
-			return x.Target == y.Target && x.SensorId.Equals(y.SensorId);
+			return x.Target == y.Target && x.SensorID.Equals(y.SensorID);
 		}
 
 		public int GetHashCode(LiveDataRoute obj)
 		{
-			return HashCode.Combine(obj.Target, obj.SensorId);
+			return HashCode.Combine(obj.Target, obj.SensorID);
 		}
 	}
 }

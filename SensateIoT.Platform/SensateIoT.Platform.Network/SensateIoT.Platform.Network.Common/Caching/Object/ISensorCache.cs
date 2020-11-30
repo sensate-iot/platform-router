@@ -19,7 +19,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 
 		void AddLiveDataRouting(LiveDataRoute route);
 		void RemoveLiveDataRouting(LiveDataRoute route);
-		void SyncLiveData(string origin, ICollection<LiveDataRoute> data);
-		void FlushLiveData();
+		void SyncLiveDataRoutes(ICollection<LiveDataRoute> data);
+		void FlushLiveDataRoutes();
 	}
 }

@@ -21,7 +21,8 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 	public sealed class SensorCache : MemoryCache<ObjectId, Sensor>, ISensorCache
 	{
 		private HashSet<ObjectId> m_liveSensors;
-		private readonly HashSet<LiveDataRoute> m_liveDataEntries;
+		private HashSet<LiveDataRoute> m_liveDataEntries;
+		private HashSet<LiveDataRoute> m_liveDataSyncEntries;
 
 		private bool m_disposed;
 
@@ -29,7 +30,63 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 		{
 			this.m_liveSensors = new HashSet<ObjectId>();
 			this.m_liveDataEntries = new HashSet<LiveDataRoute>(new LiveDataRouteEqualityComparer());
+			this.m_liveDataSyncEntries = new HashSet<LiveDataRoute>(new LiveDataRouteEqualityComparer());
 			this.m_disposed = false;
+		}
+
+		public override void Add(ObjectId key, Sensor value, CacheEntryOptions options = null)
+		{
+			this.m_dataLock.EnterWriteLock();
+
+			try {
+				this.ValidateCacheKey(key, true);
+				base.AddOrUpdate(key, value, options);
+
+				foreach(var entry in this.m_liveDataEntries) {
+					if(entry.SensorID != key || !this.m_data.TryGetValue(entry.SensorID, out var sensor)) {
+						continue;
+					}
+
+					sensor.Value.LiveDataRouting ??= new HashSet<RoutingTarget>();
+					sensor.Value.LiveDataRouting.Add(new RoutingTarget {
+						Target = entry.Target,
+						Type = RouteType.LiveDataSubscription
+					});
+				}
+			} finally {
+				this.m_dataLock.ExitWriteLock();
+			}
+		}
+
+		public override void Add(IEnumerable<Abstract.KeyValuePair<ObjectId, Sensor>> values, CacheEntryOptions options = null)
+		{
+			this.CheckDisposed();
+			this.ValidateCacheEntryOptions(options);
+			// ReSharper disable once PossibleMultipleEnumeration
+			ValidateKeyValuePairs(values);
+
+			this.m_dataLock.EnterWriteLock();
+
+			try {
+				// ReSharper disable once PossibleMultipleEnumeration
+				foreach(var pair in values) {
+					this.InternalAddOrUpdate(pair.Key, pair.Value, options);
+				}
+
+				foreach(var entry in this.m_liveDataEntries) {
+					if(!this.m_data.TryGetValue(entry.SensorID, out var sensor)) {
+						continue;
+					}
+
+					sensor.Value.LiveDataRouting ??= new HashSet<RoutingTarget>();
+					sensor.Value.LiveDataRouting.Add(new RoutingTarget {
+						Target = entry.Target,
+						Type = RouteType.LiveDataSubscription
+					});
+				}
+			} finally {
+				this.m_dataLock.ExitWriteLock();
+			}
 		}
 
 		public override void AddOrUpdate(IEnumerable<Abstract.KeyValuePair<ObjectId, Sensor>> values, CacheEntryOptions options = null)
@@ -44,13 +101,19 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 			try {
 				// ReSharper disable once PossibleMultipleEnumeration
 				foreach(var pair in values) {
-					if(this.m_liveSensors.Contains(pair.Key)) {
-						var sensor = this.m_data[pair.Key];
-						pair.Value.LiveDataRouting = sensor.Value.LiveDataRouting;
+					this.InternalAddOrUpdate(pair.Key, pair.Value, options);
+				}
+
+				foreach(var entry in this.m_liveDataEntries) {
+					if(!this.m_data.TryGetValue(entry.SensorID, out var sensor)) {
+						continue;
 					}
 
-					this.ValidateCacheKey(pair.Key, false);
-					this.InternalAddOrUpdate(pair.Key, pair.Value, options);
+					sensor.Value.LiveDataRouting ??= new HashSet<RoutingTarget>();
+					sensor.Value.LiveDataRouting.Add(new RoutingTarget {
+						Target = entry.Target,
+						Type = RouteType.LiveDataSubscription
+					});
 				}
 			} finally {
 				this.m_dataLock.ExitWriteLock();
@@ -62,16 +125,50 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 			this.m_dataLock.EnterWriteLock();
 
 			try {
-				var result = this.m_data.TryGetValue(key, out var sensor);
-
-				if(result) {
-					value.LiveDataRouting = sensor.Value.LiveDataRouting;
-				}
-
 				base.AddOrUpdate(key, value, options);
+
+
+				foreach(var entry in this.m_liveDataEntries) {
+					if(entry.SensorID != key || !this.m_data.TryGetValue(entry.SensorID, out var sensor)) {
+						continue;
+					}
+
+					sensor.Value.LiveDataRouting ??= new HashSet<RoutingTarget>();
+					sensor.Value.LiveDataRouting.Add(new RoutingTarget {
+						Target = entry.Target,
+						Type = RouteType.LiveDataSubscription
+					});
+				}
 			} finally {
 				this.m_dataLock.ExitWriteLock();
 			}
+		}
+
+		public override void Remove(ObjectId key)
+		{
+			this.m_dataLock.EnterWriteLock();
+
+			try {
+				base.Remove(key);
+				this.m_liveSensors.Remove(key);
+			} finally {
+				this.m_dataLock.ExitWriteLock();
+			}
+		}
+
+		public override bool TryRemove(ObjectId key)
+		{
+			bool rv;
+			this.m_dataLock.EnterWriteLock();
+
+			try {
+				rv = base.TryRemove(key);
+				this.m_liveSensors.Remove(key);
+			} finally {
+				this.m_dataLock.ExitWriteLock();
+			}
+
+			return rv;
 		}
 
 		public void AddLiveDataRouting(LiveDataRoute route)
@@ -79,10 +176,11 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 			this.m_dataLock.EnterWriteLock();
 
 			try {
-				this.m_liveSensors.Add(route.SensorId);
+				this.m_liveSensors.Add(route.SensorID);
 				this.m_liveDataEntries.Add(route);
+				this.m_liveDataSyncEntries.Add(route);
 
-				var sensor = this.m_data[route.SensorId];
+				var sensor = this.m_data[route.SensorID];
 
 				sensor.Value.LiveDataRouting ??= new HashSet<RoutingTarget>(new RoutingTargetEqualityComparer());
 				sensor.Value.LiveDataRouting.Add(new RoutingTarget { Target = route.Target, Type = RouteType.LiveDataSubscription });
@@ -96,51 +194,55 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 			this.m_dataLock.EnterWriteLock();
 
 			try {
-				var sensor = this.m_data[route.SensorId];
+				var sensor = this.m_data[route.SensorID];
 				sensor.Value.LiveDataRouting?.Remove(new RoutingTarget { Target = route.Target, Type = RouteType.LiveDataSubscription });
 
-				if(sensor.Value.LiveDataRouting?.Count <= 0) {
-					this.m_liveSensors.Remove(route.SensorId);
+				this.m_liveDataEntries.Remove(route);
+				this.m_liveDataSyncEntries.Remove(route);
+
+				if(sensor.Value.LiveDataRouting != null && sensor.Value.LiveDataRouting!.All(x => x.Type != RouteType.LiveDataSubscription)) {
+					this.m_liveSensors.Remove(route.SensorID);
 				}
 			} finally {
 				this.m_dataLock.ExitWriteLock();
 			}
 		}
 
-		public void SyncLiveData(string origin, ICollection<LiveDataRoute> data)
+		public void SyncLiveDataRoutes(ICollection<LiveDataRoute> data)
 		{
 			this.m_dataLock.EnterWriteLock();
 
 			try {
-				foreach(var entry in data) {
-					this.m_liveDataEntries.Add(entry);
-					this.m_liveSensors.Add(entry.SensorId);
-				}
-
+				this.m_liveDataSyncEntries.UnionWith(data);
 			} finally {
 				this.m_dataLock.ExitWriteLock();
 			}
 		}
 
-		public void FlushLiveData()
+		public void FlushLiveDataRoutes()
 		{
 			this.m_dataLock.EnterWriteLock();
 
 			try {
 				this.m_liveSensors = new HashSet<ObjectId>();
 
+				this.m_liveDataEntries = this.m_liveDataSyncEntries;
+				this.m_liveDataSyncEntries = new HashSet<LiveDataRoute>(new LiveDataRouteEqualityComparer());
+
 				foreach(var entry in this.m_liveDataEntries) {
-					var sensor = this.m_data[entry.SensorId].Value;
-
-					if(!this.m_liveSensors.Contains(entry.SensorId)) {
-						var liveData = new HashSet<RoutingTarget>(new RoutingTargetEqualityComparer());
-
-						liveData.UnionWith(sensor.LiveDataRouting?.Where(x => x.Type != RouteType.LiveDataSubscription) ?? Array.Empty<RoutingTarget>());
-						sensor.LiveDataRouting = liveData;
-						this.m_liveSensors.Add(entry.SensorId);
+					if(!this.m_data.TryGetValue(entry.SensorID, out var sensor)) {
+						continue;
 					}
 
-					sensor.LiveDataRouting.Add(new RoutingTarget { Target = entry.Target, Type = RouteType.LiveDataSubscription });
+					if(this.m_liveSensors.Add(entry.SensorID)) {
+						sensor.Value.LiveDataRouting ??= new HashSet<RoutingTarget>(new RoutingTargetEqualityComparer());
+						sensor.Value.LiveDataRouting.RemoveWhere(x => x.Type == RouteType.LiveDataSubscription);
+					}
+
+					sensor.Value.LiveDataRouting.Add(new RoutingTarget {
+						Target = entry.Target,
+						Type = RouteType.LiveDataSubscription
+					});
 				}
 			} finally {
 				this.m_dataLock.ExitWriteLock();

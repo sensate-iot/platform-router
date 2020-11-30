@@ -43,15 +43,15 @@ namespace SensateIoT.Platform.Network.Tests.Utility
 		{
 			return new List<LiveDataRoute> {
 				new LiveDataRoute {
-					SensorId = objectIds[0],
+					SensorID = objectIds[0],
 					Target = "s1"
 				},
 				new LiveDataRoute {
-					SensorId = objectIds[0],
+					SensorID = objectIds[0],
 					Target = "s1"
 				},
 				new LiveDataRoute {
-					SensorId = objectIds[2],
+					SensorID = objectIds[2],
 					Target = "s1"
 				}
 			};

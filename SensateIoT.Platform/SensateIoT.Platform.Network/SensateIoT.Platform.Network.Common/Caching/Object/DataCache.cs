@@ -198,6 +198,26 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 			GarbageCollection.Collect();
 		}
 
+		public void AddLiveDataRoute(LiveDataRoute route)
+		{
+			this.m_sensors.AddLiveDataRouting(route);
+		}
+
+		public void RemoveLiveDataRoute(LiveDataRoute route)
+		{
+			this.m_sensors.RemoveLiveDataRouting(route);
+		}
+
+		public void SyncLiveData(ICollection<LiveDataRoute> data)
+		{
+			this.m_sensors.SyncLiveDataRoutes(data);
+		}
+
+		public void FlushLiveData()
+		{
+			this.m_sensors.FlushLiveDataRoutes();
+		}
+
 		private static long? CalculateEntrySize(DataCacheSettings cache)
 		{
 			long? size = null;

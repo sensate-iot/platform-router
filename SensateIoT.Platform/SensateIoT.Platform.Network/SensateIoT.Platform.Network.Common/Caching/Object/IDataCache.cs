@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using MongoDB.Bson;
 
 using SensateIoT.Platform.Network.Data.DTO;
@@ -29,5 +30,10 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 		void RemoveAccount(Guid accountID);
 		void RemoveApiKey(string key);
 		Task ScanCachesAsync();
+
+		void AddLiveDataRoute(LiveDataRoute route);
+		void RemoveLiveDataRoute(LiveDataRoute route);
+		void SyncLiveData(ICollection<LiveDataRoute> data);
+		void FlushLiveData();
 	}
 }

@@ -12,11 +12,11 @@ namespace SensateIoT.Platform.Network.Data.DTO
 	public class LiveDataRoute
 	{
 		public string Target { get; set; }
-		public ObjectId SensorId { get; set; }
+		public ObjectId SensorID { get; set; }
 
 		public override int GetHashCode()
 		{
-			return this.Target.GetHashCode() ^ this.SensorId.GetHashCode();
+			return this.Target.GetHashCode() ^ this.SensorID.GetHashCode();
 		}
 	}
 }

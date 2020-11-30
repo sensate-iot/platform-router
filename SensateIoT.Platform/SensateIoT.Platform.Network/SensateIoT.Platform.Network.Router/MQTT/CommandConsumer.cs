@@ -25,11 +25,13 @@ namespace SensateIoT.Platform.Network.Router.MQTT
 	{
 		private readonly ILogger<CommandConsumer> m_logger;
 		private readonly DataUpdateHandler m_handler;
+		private readonly LiveDataRouteUpdateHandler m_liveUpdater;
 
 		public CommandConsumer(IServiceProvider provider, IDataCache cache, ILogger<CommandConsumer> logger)
 		{
 			this.m_logger = logger;
 			this.m_handler = new DataUpdateHandler(cache, provider);
+			this.m_liveUpdater = new LiveDataRouteUpdateHandler(cache);
 		}
 
 		public override async Task OnMessageAsync(string topic, string message, CancellationToken ct = default)
@@ -48,19 +50,14 @@ namespace SensateIoT.Platform.Network.Router.MQTT
 				break;
 
 			case CommandType.AddLiveDataSensor:
-				break;
-
 			case CommandType.RemoveLiveDataSensor:
-				break;
-
 			case CommandType.SyncLiveDataSensors:
+				this.m_liveUpdater.HandleUpdate(cmd);
 				break;
 
 			default:
 				throw new ArgumentOutOfRangeException();
 			}
-
-			await this.m_handler.UpdateAsync(cmd, default).ConfigureAwait(false);
 		}
 	}
 }
