@@ -105,6 +105,7 @@ namespace SensateIoT.Platform.Network.Router.Application
 			services.AddSingleton<IHostedService, ApiKeyReloadService>();
 			services.AddSingleton<IHostedService, LiveDataHandlerReloadService>();
 			services.AddSingleton<IHostedService, RoutingPublishService>();
+			services.AddSingleton<IHostedService, LiveDataReloadService>();
 
 			services.AddSingleton<IQueue<IPlatformMessage>, Deque<IPlatformMessage>>();
 			services.AddSingleton<IMessageQueue, MessageQueue>();

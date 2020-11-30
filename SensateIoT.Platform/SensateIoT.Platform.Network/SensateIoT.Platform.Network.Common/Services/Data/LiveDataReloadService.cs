@@ -7,8 +7,10 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+
 using SensateIoT.Platform.Network.Common.Caching.Object;
 using SensateIoT.Platform.Network.Common.Services.Background;
 using SensateIoT.Platform.Network.Common.Settings;
@@ -18,18 +20,22 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 	public class LiveDataReloadService : TimedBackgroundService
 	{
 		private readonly ILogger<LiveDataReloadService> m_logger;
+		private readonly IDataCache m_cache;
 
 		public LiveDataReloadService(IDataCache cache,
 		                             IOptions<DataReloadSettings> settings,
-		                             ILogger<LiveDataReloadService> logger) : base(
-			settings.Value.StartDelay, settings.Value.LiveDataReloadInterval)
+		                             ILogger<LiveDataReloadService> logger) : base(settings.Value.StartDelay, settings.Value.LiveDataReloadInterval)
 		{
 			this.m_logger = logger;
+			this.m_cache = cache;
 		}
 
-		public override async Task ExecuteAsync(CancellationToken token)
+		public override Task ExecuteAsync(CancellationToken token)
 		{
-			throw new System.NotImplementedException();
+			this.m_logger.LogInformation("Flushing live data routes.");
+			this.m_cache.FlushLiveData();
+			this.m_logger.LogInformation("Finished flushing live data routes.");
+			return Task.CompletedTask;
 		}
 	}
 }
