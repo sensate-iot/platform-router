@@ -7,13 +7,14 @@
 
 using System;
 using System.Collections.Generic;
+
 using SensateIoT.Platform.Network.Data.DTO;
 
-namespace SensateIoT.Platform.Network.Common.Caching.Abstract
+namespace SensateIoT.Platform.Network.Common.Caching.Comparators
 {
-	public class LiveDataRouteEqualityComparer : IEqualityComparer<LiveDataRoute>
+	public class RoutingTargetEqualityComparer : IEqualityComparer<RoutingTarget>
 	{
-		public bool Equals(LiveDataRoute x, LiveDataRoute y)
+		public bool Equals(RoutingTarget x, RoutingTarget y)
 		{
 			if(ReferenceEquals(x, y))
 				return true;
@@ -24,12 +25,12 @@ namespace SensateIoT.Platform.Network.Common.Caching.Abstract
 			if(x.GetType() != y.GetType())
 				return false;
 
-			return x.Target == y.Target && x.SensorID.Equals(y.SensorID);
+			return x.Type == y.Type && x.Target == y.Target;
 		}
 
-		public int GetHashCode(LiveDataRoute obj)
+		public int GetHashCode(RoutingTarget obj)
 		{
-			return HashCode.Combine(obj.Target, obj.SensorID);
+			return HashCode.Combine(obj.Type, obj.Target);
 		}
 	}
 }

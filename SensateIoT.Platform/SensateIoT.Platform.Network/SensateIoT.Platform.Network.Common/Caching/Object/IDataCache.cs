@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using MongoDB.Bson;
 
 using SensateIoT.Platform.Network.Data.DTO;
+using SensateIoT.Platform.Network.Data.Models;
+using Sensor = SensateIoT.Platform.Network.Data.DTO.Sensor;
 
 namespace SensateIoT.Platform.Network.Common.Caching.Object
 {
@@ -34,6 +36,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 		void AddLiveDataRoute(LiveDataRoute route);
 		void RemoveLiveDataRoute(LiveDataRoute route);
 		void SyncLiveData(ICollection<LiveDataRoute> data);
+		void SetLiveDataRemotes(IEnumerable<LiveDataHandler> remotes);
 		void FlushLiveData();
 	}
 }

@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
+using SensateIoT.Platform.Network.Common.Caching.Object;
 using SensateIoT.Platform.Network.Common.Collections.Remote;
 using SensateIoT.Platform.Network.Common.Services.Background;
 using SensateIoT.Platform.Network.Common.Settings;
@@ -25,16 +26,19 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 	{
 		private readonly IServiceProvider m_provider;
 		private readonly IRemoteQueue m_queue;
+		private readonly IDataCache m_cache;
 		private readonly ILogger<LiveDataHandlerReloadService> m_logger;
 
 		public LiveDataHandlerReloadService(IServiceProvider provider,
 											IRemoteQueue remote,
+											IDataCache cache,
 											IOptions<DataReloadSettings> settings,
 											ILogger<LiveDataHandlerReloadService> logger) : base(settings.Value.StartDelay, settings.Value.DataReloadInterval)
 		{
 			this.m_provider = provider;
 			this.m_queue = remote;
 			this.m_logger = logger;
+			this.m_cache = cache;
 		}
 
 		public override async Task ExecuteAsync(CancellationToken token)
@@ -47,6 +51,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 			var sw = Stopwatch.StartNew();
 			var handlers = await handlerRepo.GetLiveDataHandlers(token).ConfigureAwait(false);
 			this.m_queue.SyncLiveDataHandlers(handlers);
+			this.m_cache.SetLiveDataRemotes(handlers);
 			sw.Stop();
 
 			this.m_logger.LogInformation("Finished live data handler reload at {reloadEnd}. Reload took {duration}ms.",

@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
@@ -16,9 +17,12 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 
 using SensateIoT.Platform.Network.Common.Caching.Abstract;
+using SensateIoT.Platform.Network.Common.Caching.Comparators;
 using SensateIoT.Platform.Network.Common.Caching.Memory;
 using SensateIoT.Platform.Network.Common.Exceptions;
 using SensateIoT.Platform.Network.Data.DTO;
+using SensateIoT.Platform.Network.Data.Models;
+using Sensor = SensateIoT.Platform.Network.Data.DTO.Sensor;
 
 namespace SensateIoT.Platform.Network.Common.Caching.Object
 {
@@ -30,6 +34,9 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 		private readonly DataCacheSettings m_settings;
 		private readonly ILogger<DataCache> m_logger;
 
+		private readonly ReaderWriterLockSlim m_remoteLock;
+		private HashSet<LiveDataHandler> m_remotes;
+
 		public DataCache(IOptions<DataCacheSettings> options, ILogger<DataCache> logger)
 		{
 			var tmo = options.Value.Timeout;
@@ -39,6 +46,8 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 			this.m_sensors = new SensorCache(capacity, tmo);
 			this.m_keys = new MemoryCache<string, ApiKey>(capacity, tmo);
 			this.m_accounts = new MemoryCache<Guid, Account>(capacity, tmo);
+			this.m_remoteLock = new ReaderWriterLockSlim();
+			this.m_remotes = new HashSet<LiveDataHandler>(new LiveDataHandlerEqualityComparer());
 			this.m_logger = logger;
 
 			this.m_sensors.ActiveTimeoutScanningEnabled = false;
@@ -213,6 +222,18 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 			this.m_sensors.SyncLiveDataRoutes(data);
 		}
 
+		public void SetLiveDataRemotes(IEnumerable<LiveDataHandler> remotes)
+		{
+			this.m_remoteLock.EnterWriteLock();
+
+			try {
+				this.m_remotes = new HashSet<LiveDataHandler>(new LiveDataHandlerEqualityComparer());
+				this.m_remotes.UnionWith(remotes);
+			} finally {
+				this.m_remoteLock.ExitWriteLock();
+			}
+		}
+
 		public void FlushLiveData()
 		{
 			this.m_sensors.FlushLiveDataRoutes();
@@ -234,6 +255,8 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 			this.m_sensors.Dispose();
 			this.m_accounts.Dispose();
 			this.m_keys.Dispose();
+			this.m_remoteLock.Dispose();
+
 			GC.SuppressFinalize(this);
 		}
 	}
