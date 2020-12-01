@@ -22,7 +22,9 @@ namespace SensateIoT.Platform.Network.Common.Init
 	{
 		public static IServiceCollection AddMqttService(this IServiceCollection service, Action<MqttServiceOptions> setup)
 		{
-			service.AddSingleton<IHostedService, MqttClient>();
+			service.AddSingleton<MqttClient>();
+			service.AddHostedService(p => p.GetRequiredService<MqttClient>());
+			service.AddSingleton<IPublicMqttClient>(p => p.GetRequiredService<MqttClient>());
 
 			if(setup != null) {
 				service.Configure(setup);
@@ -62,16 +64,16 @@ namespace SensateIoT.Platform.Network.Common.Init
 				services.Configure(setup);
 			}
 
-			services.AddSingleton<InternalMqttMqttClient>();
-			services.AddHostedService(p => p.GetRequiredService<InternalMqttMqttClient>());
-			services.AddSingleton<IInternalMqttClient>(p => p.GetRequiredService<InternalMqttMqttClient>());
+			services.AddSingleton<InternalMqttClient>();
+			services.AddHostedService(p => p.GetRequiredService<InternalMqttClient>());
+			services.AddSingleton<IInternalMqttClient>(p => p.GetRequiredService<InternalMqttClient>());
 
 			return services;
 		}
 
 		public static void MapInternalMqttTopic<T>(this IServiceProvider sp, string topic) where T : IMqttHandler
 		{
-			InternalMqttMqttClient mqttMqtt;
+			InternalMqttClient mqtt;
 			List<IHostedService> services;
 
 			/*
@@ -83,8 +85,8 @@ namespace SensateIoT.Platform.Network.Common.Init
 			 * piece of SWE.
 			 */
 			services = sp.GetServices<IHostedService>().ToList();
-			mqttMqtt = services.Find(x => x.GetType() == typeof(InternalMqttMqttClient)) as InternalMqttMqttClient;
-			mqttMqtt?.MapTopicHandler<T>(topic);
+			mqtt = services.Find(x => x.GetType() == typeof(InternalMqttClient)) as InternalMqttClient;
+			mqtt?.MapTopicHandler<T>(topic);
 		}
 	}
 }

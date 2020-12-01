@@ -17,18 +17,19 @@ using SensateIoT.Platform.Network.Common.Settings;
 
 namespace SensateIoT.Platform.Network.Common.Services.Processing
 {
-	public class RoutingPublishService : TimedBackgroundService
+	public class ActuatorPublishService : TimedBackgroundService
 	{
-		private readonly IInternalRemoteQueue _mInternalRemote;
+		private readonly IPublicRemoteQueue m_remote;
 
-		public RoutingPublishService(IInternalRemoteQueue internalRemote, IOptions<RoutingPublishSettings> options) : base(TimeSpan.FromSeconds(1), options.Value.InternalInterval)
+		public ActuatorPublishService(IPublicRemoteQueue remote,
+		                            IOptions<RoutingPublishSettings> options) : base(TimeSpan.FromSeconds(1), options.Value.PublicInterval)
 		{
-			this._mInternalRemote = internalRemote;
+			this.m_remote = remote;
 		}
 
 		public override async Task ExecuteAsync(CancellationToken token)
 		{
-			await Task.WhenAll(this._mInternalRemote.FlushAsync(), this._mInternalRemote.FlushLiveDataAsync()).ConfigureAwait(false);
+			await this.m_remote.FlushQueueAsync().ConfigureAwait(false);
 		}
 	}
 }

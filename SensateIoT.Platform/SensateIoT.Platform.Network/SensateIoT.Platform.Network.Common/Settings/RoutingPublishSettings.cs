@@ -11,6 +11,8 @@ namespace SensateIoT.Platform.Network.Common.Settings
 {
 	public class RoutingPublishSettings
 	{
-		public TimeSpan Interval { get; set; }
+		public TimeSpan PublicInterval { get; set; }
+		public TimeSpan InternalInterval { get; set; }
+		public string ActuatorTopicFormat { get; set; }
 	}
 }

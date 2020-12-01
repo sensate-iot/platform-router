@@ -1,0 +1,17 @@
+﻿
+syntax = "proto3";
+
+package sensateiot;
+option csharp_namespace = "SensateIoT.Platform.Network.Contracts.DTO";
+
+import "google/protobuf/timestamp.proto";
+
+message ControlMessage {
+	string SensorID = 1;
+	string Data = 2;
+	google.protobuf.Timestamp Timestamp = 3;
+}
+
+message ControlMessageData {
+	repeated ControlMessage messages = 1;
+}

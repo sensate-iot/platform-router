@@ -10,10 +10,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
 
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+
 using SensateIoT.Platform.Network.Common.Caching.Object;
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
 using SensateIoT.Platform.Network.Common.Collections.Remote;
 using SensateIoT.Platform.Network.Common.Services.Background;
+using SensateIoT.Platform.Network.Common.Settings;
 using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
 
@@ -32,15 +37,30 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 
 		private readonly IDataCache m_cache;
 		private readonly IMessageQueue m_messages;
-		private readonly IRemoteQueue m_remote;
+		private readonly IInternalRemoteQueue m_internalRemote;
+		private readonly IAuthorizationService m_authService;
+		private readonly IPublicRemoteQueue m_publicRemote;
+		private readonly ILogger<RoutingService> m_logger;
+		private readonly RoutingPublishSettings m_settings;
 
 		private const int DequeueCount = 1000;
+		private const string FormatNeedle = "$id";
 
-		public RoutingService(IDataCache cache, IMessageQueue queue, IRemoteQueue remote)
+		public RoutingService(IDataCache cache,
+		                      IMessageQueue queue,
+		                      IInternalRemoteQueue internalRemote,
+							  IPublicRemoteQueue publicRemote,
+		                      IAuthorizationService auth,
+							  IOptions<RoutingPublishSettings> settings,
+		                      ILogger<RoutingService> logger)
 		{
+			this.m_settings = settings.Value;
 			this.m_messages = queue;
 			this.m_cache = cache;
-			this.m_remote = remote;
+			this.m_internalRemote = internalRemote;
+			this.m_publicRemote = publicRemote;
+			this.m_authService = auth;
+			this.m_logger = logger;
 		}
 
 		public override async Task ExecuteAsync(CancellationToken token)
@@ -58,16 +78,23 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 					continue;
 				}
 
-				var messages = this.m_messages.DequeueRange(DequeueCount);
-				messages = messages.OrderBy(x => x.SensorID).ToArray();
+				var messages = this.m_messages.DequeueRange(DequeueCount).ToList();
+				messages = messages.OrderBy(x => x.SensorID).ToList();
 
-				foreach(var message in messages) {
+				this.m_logger.LogInformation("Routing {count} messages.", messages.Count);
+
+				var result = Parallel.ForEach(messages, message => {
 					if(sensor?.ID != message.SensorID) {
 						sensor = this.m_cache.GetSensor(message.SensorID);
 					}
 
 					if(sensor == null) {
-						continue;
+						return;
+					}
+
+					if(message.Type == MessageType.ControlMessage) {
+						this.RouteControlMessage(message as ControlMessage, sensor);
+						return;
 					}
 
 					if(sensor.TriggerInformation.HasActions) {
@@ -75,15 +102,36 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 					}
 
 					if(sensor.LiveDataRouting == null || sensor.LiveDataRouting?.Count <= 0) {
-						continue;
+						return;
 					}
 
 					foreach(var info in sensor.LiveDataRouting) {
 						this.EnqueueTo(message, info);
 					}
-				}
+				});
 
+				if(!result.IsCompleted) {
+					this.m_logger.LogWarning("Unable to complete routing messages! Break called at iteration: {iteration}.", result.LowestBreakIteration);
+				}
 			} while(!token.IsCancellationRequested);
+		}
+
+		private void RouteControlMessage(ControlMessage message, Sensor sensor)
+		{
+			/*
+			 * 1. Timestamp the CM;
+			 * 2. Sign the control message;
+			 * 2. Queue to the correct output queue.
+			 */
+
+			message.Timestamp = DateTime.UtcNow;
+			message.Secret = sensor.SensorKey;
+
+			var data = JsonConvert.SerializeObject(message, Formatting.None);
+			this.m_authService.SignControlMessage(message, data);
+			data = JsonConvert.SerializeObject(message);
+			this.m_logger.LogDebug("Publishing control message: {message}", data);
+			this.m_publicRemote.Enqueue(data, this.m_settings.ActuatorTopicFormat.Replace(FormatNeedle, sensor.ID.ToString()));
 		}
 
 		private void EnqueueToTriggerService(IPlatformMessage message, bool isText)
@@ -93,11 +141,11 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 				return;
 
 			case MessageType.Measurement:
-				this.m_remote.EnqueueMeasurementToTriggerService(message);
+				this.m_internalRemote.EnqueueMeasurementToTriggerService(message);
 				break;
 
 			case MessageType.Message:
-				this.m_remote.EnqueueToMessageTriggerService(message);
+				this.m_internalRemote.EnqueueToMessageTriggerService(message);
 				break;
 
 			default:
@@ -109,11 +157,11 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 		{
 			switch(message.Type) {
 			case MessageType.Message:
-				this.m_remote.EnqueueMessageToTarget(message, target);
+				this.m_internalRemote.EnqueueMessageToTarget(message, target);
 				break;
 
 			case MessageType.Measurement:
-				this.m_remote.EnqueueMeasurementToTarget(message, target);
+				this.m_internalRemote.EnqueueMeasurementToTarget(message, target);
 				break;
 
 			default:

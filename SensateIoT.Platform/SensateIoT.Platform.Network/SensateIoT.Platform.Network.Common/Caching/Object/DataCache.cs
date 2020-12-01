@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
@@ -17,7 +16,6 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 
 using SensateIoT.Platform.Network.Common.Caching.Abstract;
-using SensateIoT.Platform.Network.Common.Caching.Comparators;
 using SensateIoT.Platform.Network.Common.Caching.Memory;
 using SensateIoT.Platform.Network.Common.Exceptions;
 using SensateIoT.Platform.Network.Data.DTO;
@@ -33,9 +31,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 		private readonly IMemoryCache<string, ApiKey> m_keys;
 		private readonly DataCacheSettings m_settings;
 		private readonly ILogger<DataCache> m_logger;
-
-		private readonly ReaderWriterLockSlim m_remoteLock;
-		private HashSet<LiveDataHandler> m_remotes;
+		private readonly IMemoryCache<string, LiveDataHandler> m_remotes;
 
 		public DataCache(IOptions<DataCacheSettings> options, ILogger<DataCache> logger)
 		{
@@ -46,8 +42,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 			this.m_sensors = new SensorCache(capacity, tmo);
 			this.m_keys = new MemoryCache<string, ApiKey>(capacity, tmo);
 			this.m_accounts = new MemoryCache<Guid, Account>(capacity, tmo);
-			this.m_remoteLock = new ReaderWriterLockSlim();
-			this.m_remotes = new HashSet<LiveDataHandler>(new LiveDataHandlerEqualityComparer());
+			this.m_remotes = new MemoryCache<string, LiveDataHandler>(MemoryCache<string, LiveDataHandler>.DefaultCapacity, tmo);
 			this.m_logger = logger;
 
 			this.m_sensors.ActiveTimeoutScanningEnabled = false;
@@ -209,6 +204,10 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 
 		public void AddLiveDataRoute(LiveDataRoute route)
 		{
+			if(!this.m_remotes.TryGetValue(route.Target, out var remote) || !remote.Enabled) {
+				return;
+			}
+
 			this.m_sensors.AddLiveDataRouting(route);
 		}
 
@@ -219,19 +218,20 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 
 		public void SyncLiveData(ICollection<LiveDataRoute> data)
 		{
-			this.m_sensors.SyncLiveDataRoutes(data);
+			var list = data.ToList();
+
+			list.RemoveAll(x => !this.m_remotes.TryGetValue(x.Target, out var value) || !value.Enabled);
+			this.m_sensors.SyncLiveDataRoutes(list);
 		}
 
 		public void SetLiveDataRemotes(IEnumerable<LiveDataHandler> remotes)
 		{
-			this.m_remoteLock.EnterWriteLock();
+			var kvp = remotes.Select(x => new Abstract.KeyValuePair<string, LiveDataHandler> {
+				Value = x,
+				Key = x.Name
+			});
 
-			try {
-				this.m_remotes = new HashSet<LiveDataHandler>(new LiveDataHandlerEqualityComparer());
-				this.m_remotes.UnionWith(remotes);
-			} finally {
-				this.m_remoteLock.ExitWriteLock();
-			}
+			this.m_remotes.AddOrUpdate(kvp);
 		}
 
 		public void FlushLiveData()
@@ -255,7 +255,6 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 			this.m_sensors.Dispose();
 			this.m_accounts.Dispose();
 			this.m_keys.Dispose();
-			this.m_remoteLock.Dispose();
 
 			GC.SuppressFinalize(this);
 		}

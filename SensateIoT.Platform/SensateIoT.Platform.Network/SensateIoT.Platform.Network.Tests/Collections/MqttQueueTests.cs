@@ -81,7 +81,7 @@ namespace SensateIoT.Platform.Network.Tests.Collections
 
 		internal static MqttClientStub ClientStub = new MqttClientStub();
 
-		internal static IRemoteQueue BuildRemoteQueue()
+		internal static IInternalRemoteQueue BuildRemoteQueue()
 		{
 			var settings = new QueueSettings {
 				LiveDataQueueTemplate = "sensateiot/internal/$type/$target/bulk",

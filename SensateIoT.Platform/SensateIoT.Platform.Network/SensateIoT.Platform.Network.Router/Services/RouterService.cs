@@ -30,7 +30,8 @@ namespace SensateIoT.Platform.Network.Router.Services
 			this.m_logger = logger;
 		}
 
-		public override Task<RoutingResponse> EnqueueMeasurement(Contracts.DTO.Measurement request, ServerCallContext context)
+		public override Task<RoutingResponse> EnqueueMeasurement(Contracts.DTO.Measurement request,
+		                                                         ServerCallContext context)
 		{
 			RoutingResponse response;
 
@@ -56,7 +57,8 @@ namespace SensateIoT.Platform.Network.Router.Services
 			return Task.FromResult(response);
 		}
 
-		public override Task<RoutingResponse> EnqueueMessage(Contracts.DTO.TextMessage request, ServerCallContext context)
+		public override Task<RoutingResponse> EnqueueMessage(Contracts.DTO.TextMessage request,
+		                                                     ServerCallContext context)
 		{
 			RoutingResponse response;
 
@@ -82,7 +84,8 @@ namespace SensateIoT.Platform.Network.Router.Services
 			return Task.FromResult(response);
 		}
 
-		public override Task<RoutingResponse> EnqueueBulkMeasurements(Contracts.DTO.MeasurementData request, ServerCallContext context)
+		public override Task<RoutingResponse> EnqueueBulkMeasurements(Contracts.DTO.MeasurementData request,
+		                                                              ServerCallContext context)
 		{
 			RoutingResponse response;
 
@@ -108,7 +111,8 @@ namespace SensateIoT.Platform.Network.Router.Services
 			return Task.FromResult(response);
 		}
 
-		public override Task<RoutingResponse> EnqueueBulkMessages( Contracts.DTO.TextMessageData request, ServerCallContext context)
+		public override Task<RoutingResponse> EnqueueBulkMessages(Contracts.DTO.TextMessageData request,
+		                                                          ServerCallContext context)
 		{
 			RoutingResponse response;
 
@@ -118,6 +122,32 @@ namespace SensateIoT.Platform.Network.Router.Services
 
 				response = new RoutingResponse {
 					Count = request.Messages.Count,
+					Message = "Messages queued.",
+					ResponseID = ByteString.CopyFrom(Guid.NewGuid().ToByteArray())
+				};
+			} catch(FormatException ex) {
+				this.m_logger.LogWarning("Received messages from an invalid sensor. Exception: {exception}", ex);
+
+				response = new RoutingResponse {
+					Count = 0,
+					Message = "Messages not queued. Invalid sensor ID.",
+					ResponseID = ByteString.CopyFrom(Guid.NewGuid().ToByteArray())
+				};
+			}
+
+			return Task.FromResult(response);
+		}
+
+		public override Task<RoutingResponse> EnqueueControlMessage(Contracts.DTO.ControlMessage request, ServerCallContext context)
+		{
+			RoutingResponse response;
+
+			try {
+				var dto = ControlMessageProtobufConverter.Convert(request);
+				this.m_queue.Add(dto);
+
+				response = new RoutingResponse {
+					Count = 1,
 					Message = "Messages queued.",
 					ResponseID = ByteString.CopyFrom(Guid.NewGuid().ToByteArray())
 				};

@@ -74,7 +74,9 @@ namespace SensateIoT.Platform.Network.Router.Application
 			});
 
 			services.Configure<RoutingPublishSettings>(s => {
-				s.Interval = TimeSpan.FromMilliseconds(this.Configuration.GetValue<int>("Routing:PublishInterval"));
+				s.PublicInterval = TimeSpan.FromMilliseconds(this.Configuration.GetValue<int>("Routing:InternalPublishInterval"));
+				s.InternalInterval = TimeSpan.FromMilliseconds(this.Configuration.GetValue<int>("Routing:PublicPublishInterval"));
+				s.ActuatorTopicFormat = this.Configuration.GetValue<string>("Routing:ActuatorTopicFormat");
 			});
 
 			services.AddInternalMqttService(options => {
@@ -105,13 +107,15 @@ namespace SensateIoT.Platform.Network.Router.Application
 			services.AddSingleton<IHostedService, ApiKeyReloadService>();
 			services.AddSingleton<IHostedService, LiveDataHandlerReloadService>();
 			services.AddSingleton<IHostedService, RoutingPublishService>();
+			services.AddSingleton<IHostedService, ActuatorPublishService>();
 			services.AddSingleton<IHostedService, LiveDataReloadService>();
 
 			services.AddSingleton<IQueue<IPlatformMessage>, Deque<IPlatformMessage>>();
 			services.AddSingleton<IMessageQueue, MessageQueue>();
-			services.AddSingleton<IRemoteQueue, InternalMqttQueue>();
+			services.AddSingleton<IInternalRemoteQueue, InternalMqttQueue>();
+			services.AddSingleton<IPublicRemoteQueue, PublicMqttQueue>();
 			services.AddSingleton<IHostedService, RoutingService>();
-
+			services.AddSingleton<IAuthorizationService, AuthorizationService>();
 			services.AddSingleton<IDataCache, DataCache>();
 
 			services.AddGrpc();

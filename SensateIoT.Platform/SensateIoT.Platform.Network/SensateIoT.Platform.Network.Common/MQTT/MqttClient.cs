@@ -12,11 +12,14 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
+using MQTTnet;
+using MQTTnet.Client;
+
 using SensateIoT.Platform.Network.Common.Settings;
 
 namespace SensateIoT.Platform.Network.Common.MQTT
 {
-	public class MqttClient : AbstractMqttClient
+	public class MqttClient : AbstractMqttClient, IPublicMqttClient
 	{
 		private readonly MqttServiceOptions _options;
 
@@ -43,6 +46,26 @@ namespace SensateIoT.Platform.Network.Common.MQTT
 		{
 			await base.OnConnectAsync().ConfigureAwait(false);
 			this._logger.LogInformation("MQTT client connected!");
+		}
+
+		public async Task PublishOnAsync(string topic, string message, bool retain)
+		{
+
+			MqttApplicationMessageBuilder builder; 
+			MqttApplicationMessage msg;
+
+			if(!this.Client.IsConnected) {
+				return;
+			}
+
+			builder = new MqttApplicationMessageBuilder();
+			builder.WithAtMostOnceQoS();
+			builder.WithPayload(message);
+			builder.WithTopic(topic);
+			builder.WithRetainFlag(retain);
+			msg = builder.Build();
+
+			await this.Client.PublishAsync(msg).ConfigureAwait(false);
 		}
 	}
 }

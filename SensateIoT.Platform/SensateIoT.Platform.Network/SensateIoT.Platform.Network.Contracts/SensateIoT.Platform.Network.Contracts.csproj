@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="DTO\ControlMessage.proto" />
     <None Remove="DTO\Measurement.proto" />
     <None Remove="DTO\Message.proto" />
     <None Remove="RPC\RoutingResponse.proto" />
@@ -28,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Protobuf Include="DTO\ControlMessage.proto" />
     <Protobuf Include="DTO\Measurement.proto" GrpcServices="Both" />
     <Protobuf Include="DTO\Message.proto" />
     <Protobuf Include="RPC\RoutingResponse.proto" />

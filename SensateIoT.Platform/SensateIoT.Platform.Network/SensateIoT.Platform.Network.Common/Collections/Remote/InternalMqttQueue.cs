@@ -26,7 +26,7 @@ using SensateIoT.Platform.Network.Data.Models;
 
 namespace SensateIoT.Platform.Network.Common.Collections.Remote
 {
-	public class InternalMqttQueue : IRemoteQueue
+	public class InternalMqttQueue : IInternalRemoteQueue
 	{
 		private IDictionary<string, TextMessageData> m_textMessageQueues;
 		private IDictionary<string, MeasurementData> m_measurementQueues;

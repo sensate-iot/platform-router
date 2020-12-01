@@ -14,7 +14,7 @@ using SensateIoT.Platform.Network.Data.Models;
 
 namespace SensateIoT.Platform.Network.Common.Collections.Remote
 {
-	public interface IRemoteQueue
+	public interface IInternalRemoteQueue
 	{
 		void EnqueueToMessageTriggerService(IPlatformMessage message);
 		void EnqueueMeasurementToTriggerService(IPlatformMessage message);

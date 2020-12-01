@@ -19,11 +19,11 @@ using SensateIoT.Platform.Network.Common.Settings;
 
 namespace SensateIoT.Platform.Network.Common.MQTT
 {
-	public class InternalMqttMqttClient : AbstractMqttClient, IInternalMqttClient
+	public class InternalMqttClient : AbstractMqttClient, IInternalMqttClient
 	{
 		private readonly MqttServiceOptions _options;
 
-		public InternalMqttMqttClient(IOptions<MqttServiceOptions> options, ILogger<MqttClient> logger, IServiceProvider sp) :
+		public InternalMqttClient(IOptions<MqttServiceOptions> options, ILogger<MqttClient> logger, IServiceProvider sp) :
 			base(options.Value.Host, options.Value.Port, options.Value.Ssl, options.Value.TopicShare, logger, sp)
 		{
 			this._options = options.Value;
@@ -51,7 +51,7 @@ namespace SensateIoT.Platform.Network.Common.MQTT
 				return;
 
 			builder = new MqttApplicationMessageBuilder();
-			builder.WithAtLeastOnceQoS();
+			builder.WithAtMostOnceQoS();
 			builder.WithPayload(message);
 			builder.WithTopic(topic);
 			builder.WithRetainFlag(retain);
