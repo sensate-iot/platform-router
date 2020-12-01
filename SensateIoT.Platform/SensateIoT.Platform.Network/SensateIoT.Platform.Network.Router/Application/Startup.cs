@@ -59,12 +59,13 @@ namespace SensateIoT.Platform.Network.Router.Application
 
 			services.Configure<DataReloadSettings>(opts => {
 				opts.StartDelay = TimeSpan.FromSeconds(1);
-				opts.ReloadInterval = TimeSpan.FromMinutes(timeout);
+				opts.DataReloadInterval = TimeSpan.FromSeconds(reload);
+				opts.LiveDataReloadInterval = TimeSpan.FromSeconds(this.Configuration.GetValue<int>("Cache:LiveDataReloadInterval"));
 			});
 
 			services.Configure<DataCacheSettings>(opts => {
 				opts.Capacity = capacity;
-				opts.Timeout = TimeSpan.FromMinutes(reload);
+				opts.Timeout = TimeSpan.FromSeconds(timeout);
 			});
 
 			services.Configure<QueueSettings>(s => {

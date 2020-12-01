@@ -30,7 +30,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 		public ApiKeyReloadService(IServiceProvider provider,
 								   IDataCache cache,
 								   IOptions<DataReloadSettings> settings,
-								   ILogger<ApiKeyReloadService> logger) : base(settings.Value.StartDelay, settings.Value.ReloadInterval)
+								   ILogger<ApiKeyReloadService> logger) : base(settings.Value.StartDelay, settings.Value.DataReloadInterval)
 		{
 			this.m_provider = provider;
 			this.m_cache = cache;

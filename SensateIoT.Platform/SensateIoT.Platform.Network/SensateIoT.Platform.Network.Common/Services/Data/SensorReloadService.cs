@@ -32,7 +32,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 		public SensorReloadService(IServiceProvider provider,
 								   IDataCache cache,
 								   IOptions<DataReloadSettings> settings,
-								   ILogger<SensorReloadService> logger) : base(settings.Value.StartDelay, settings.Value.ReloadInterval)
+								   ILogger<SensorReloadService> logger) : base(settings.Value.StartDelay, settings.Value.DataReloadInterval)
 		{
 			this.m_provider = provider;
 			this.m_cache = cache;

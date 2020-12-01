@@ -30,7 +30,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 		public AccountReloadService(IServiceProvider provider,
 									IDataCache cache,
 									IOptions<DataReloadSettings> settings,
-									ILogger<AccountReloadService> logger) : base(settings.Value.StartDelay, settings.Value.ReloadInterval)
+									ILogger<AccountReloadService> logger) : base(settings.Value.StartDelay, settings.Value.DataReloadInterval)
 		{
 			this.m_provider = provider;
 			this.m_cache = cache;

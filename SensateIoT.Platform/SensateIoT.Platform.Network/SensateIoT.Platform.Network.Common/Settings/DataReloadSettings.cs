@@ -11,7 +11,8 @@ namespace SensateIoT.Platform.Network.Common.Settings
 {
 	public class DataReloadSettings
 	{
-		public TimeSpan ReloadInterval { get; set; }
+		public TimeSpan DataReloadInterval { get; set; }
 		public TimeSpan StartDelay { get; set; }
+		public TimeSpan LiveDataReloadInterval { get; set; }
 	}
 }
