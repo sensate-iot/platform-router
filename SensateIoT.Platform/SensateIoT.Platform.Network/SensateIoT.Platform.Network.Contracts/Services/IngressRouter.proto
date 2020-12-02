@@ -14,16 +14,14 @@ import "google/protobuf/timestamp.proto";
 
 import "DTO/Measurement.proto";
 import "DTO/Message.proto";
-import "DTO/ControlMessage.proto";
+
 import "RPC/RoutingResponse.proto";
 
-service Router
+service IngressRouter
 {
 	rpc EnqueueMeasurement(Measurement) returns (RoutingResponse);
 	rpc EnqueueMessage(TextMessage) returns (RoutingResponse);
 
 	rpc EnqueueBulkMeasurements(MeasurementData) returns (RoutingResponse);
 	rpc EnqueueBulkMessages(TextMessageData) returns (RoutingResponse);
-
-	rpc EnqueueControlMessage(ControlMessage) returns (RoutingResponse);
 }

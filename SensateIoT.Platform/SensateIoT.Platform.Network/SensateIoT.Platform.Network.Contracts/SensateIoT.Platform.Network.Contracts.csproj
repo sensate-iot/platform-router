@@ -15,7 +15,8 @@
     <None Remove="DTO\Measurement.proto" />
     <None Remove="DTO\Message.proto" />
     <None Remove="RPC\RoutingResponse.proto" />
-    <None Remove="Services\Router.proto" />
+    <None Remove="Services\EgressRouter.proto" />
+    <None Remove="Services\IngressRouter.proto" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,7 +34,8 @@
     <Protobuf Include="DTO\Measurement.proto" GrpcServices="Both" />
     <Protobuf Include="DTO\Message.proto" />
     <Protobuf Include="RPC\RoutingResponse.proto" />
-    <Protobuf Include="Services\Router.proto" />
+    <Protobuf Include="Services\EgressRouter.proto" />
+    <Protobuf Include="Services\IngressRouter.proto" />
   </ItemGroup>
 
 </Project>

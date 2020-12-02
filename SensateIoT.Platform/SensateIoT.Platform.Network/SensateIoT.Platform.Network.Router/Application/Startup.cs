@@ -137,7 +137,8 @@ namespace SensateIoT.Platform.Network.Router.Application
 			provider.MapInternalMqttTopic<CommandConsumer>(mqtt.InternalBroker.CommandTopic);
 
 			app.UseEndpoints(endpoints => {
-				endpoints.MapGrpcService<RouterService>();
+				endpoints.MapGrpcService<IngressRouter>();
+				endpoints.MapGrpcService<EgressRouter>();
 
 				if(env.IsDevelopment()) {
 					endpoints.MapGrpcReflectionService();

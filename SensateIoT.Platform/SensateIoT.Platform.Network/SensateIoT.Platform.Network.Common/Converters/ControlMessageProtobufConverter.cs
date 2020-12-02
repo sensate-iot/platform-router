@@ -6,7 +6,11 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+
 using MongoDB.Bson;
+
 using SensateIoT.Platform.Network.Data.DTO;
 
 namespace SensateIoT.Platform.Network.Common.Converters
@@ -21,6 +25,11 @@ namespace SensateIoT.Platform.Network.Common.Converters
 				Secret = "",
 				SensorId = ObjectId.Parse(message.SensorID)
 			};
+		}
+
+		public static IEnumerable<ControlMessage> Convert(Contracts.DTO.ControlMessageData message)
+		{
+			return message.Messages.Select(Convert);
 		}
 	}
 }
