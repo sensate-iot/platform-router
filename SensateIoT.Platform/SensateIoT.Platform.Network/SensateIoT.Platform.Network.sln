@@ -36,6 +36,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.dockerignore = .dockerignore
 		.editorconfig = .editorconfig
 		..\..\CHANGELOG.md = ..\..\CHANGELOG.md
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.Data", "SensateIoT.Platform.Network.Data\SensateIoT.Platform.Network.Data.csproj", "{C6258E1B-4A0F-4D00-B8CA-4A262F42ADB4}"
@@ -57,7 +58,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Seeds", "Seeds", "{A712B537
 		SensateIoT.Platform.Network.Database\Seeds\LiveDataHandlers.sql = SensateIoT.Platform.Network.Database\Seeds\LiveDataHandlers.sql
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SensateIoT.Platform.Network.TriggerService", "SensateIoT.Platform.Network.TriggerService\SensateIoT.Platform.Network.TriggerService.csproj", "{E8CAC519-C3FB-4E9B-A295-1CC78676870C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.TriggerService", "SensateIoT.Platform.Network.TriggerService\SensateIoT.Platform.Network.TriggerService.csproj", "{E8CAC519-C3FB-4E9B-A295-1CC78676870C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

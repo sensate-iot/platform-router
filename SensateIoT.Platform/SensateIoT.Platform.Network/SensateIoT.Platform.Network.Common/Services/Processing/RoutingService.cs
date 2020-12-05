@@ -92,28 +92,34 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 						return;
 					}
 
-					if(message.Type == MessageType.ControlMessage) {
-						this.RouteControlMessage(message as ControlMessage, sensor);
-						return;
-					}
-
-					if(sensor.TriggerInformation.HasActions) {
-						this.EnqueueToTriggerService(message, sensor.TriggerInformation.IsTextTrigger);
-					}
-
-					if(sensor.LiveDataRouting == null || sensor.LiveDataRouting?.Count <= 0) {
-						return;
-					}
-
-					foreach(var info in sensor.LiveDataRouting) {
-						this.EnqueueTo(message, info);
-					}
+					this.RouteMessage(message, sensor);
 				});
 
 				if(!result.IsCompleted) {
 					this.m_logger.LogWarning("Unable to complete routing messages! Break called at iteration: {iteration}.", result.LowestBreakIteration);
 				}
 			} while(!token.IsCancellationRequested);
+		}
+
+		private void RouteMessage(IPlatformMessage message, Sensor sensor)
+		{
+			if(message.Type == MessageType.ControlMessage) {
+				this.RouteControlMessage(message as ControlMessage, sensor);
+			} else {
+				message.PlatformTimestamp = DateTime.UtcNow;
+
+				if(sensor.TriggerInformation.HasActions) {
+					this.EnqueueToTriggerService(message, sensor.TriggerInformation.IsTextTrigger);
+				}
+
+				if(sensor.LiveDataRouting == null || sensor.LiveDataRouting?.Count <= 0) {
+					return;
+				}
+
+				foreach(var info in sensor.LiveDataRouting) {
+					this.EnqueueTo(message, info);
+				}
+			}
 		}
 
 		private void RouteControlMessage(ControlMessage message, Sensor sensor)

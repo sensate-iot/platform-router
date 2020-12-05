@@ -5,6 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -50,6 +51,7 @@ namespace SensateIoT.Platform.Network.Common.Converters
 				Longitude = message.Longitude,
 				SensorID = message.SensorID.ToString(),
 				Timestamp = Timestamp.FromDateTime(message.Timestamp),
+				PlatformTime = Timestamp.FromDateTime(message.PlatformTimestamp),
 				Data = message.Data
 			};
 		}
@@ -57,7 +59,8 @@ namespace SensateIoT.Platform.Network.Common.Converters
 		public static Message Convert(TextMessage message)
 		{
 			return new Message {
-				Timestamp = message.Timestamp.ToDateTime(),
+				Timestamp = message.Timestamp == null ? DateTime.UtcNow : message.Timestamp.ToDateTime(),
+				PlatformTimestamp = message.PlatformTime == null ? DateTime.UtcNow : message.PlatformTime.ToDateTime(),
 				Longitude = message.Longitude,
 				Latitude = message.Latitude,
 				Data = message.Data,

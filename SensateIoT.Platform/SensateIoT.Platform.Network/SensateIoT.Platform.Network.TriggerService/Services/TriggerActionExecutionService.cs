@@ -105,6 +105,8 @@ namespace SensateIoT.Platform.Network.TriggerService.Services
 			default:
 				throw new ArgumentOutOfRangeException();
 			}
+
+			action.LastInvocation = DateTime.UtcNow;
 		}
 	}
 }

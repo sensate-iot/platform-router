@@ -111,6 +111,7 @@ namespace SensateIoT.Platform.Network.TriggerService.Application
 			services.AddScoped<IControlMessageRepository, ControlMessageRepository>();
 			services.AddScoped<ITriggerActionExecutionService, TriggerActionExecutionService>();
 			services.AddSingleton<IDataPointMatchingService, DataPointMatchingService>();
+			services.AddSingleton<IRegexMatchingService, RegexMatchingService>();
 			services.AddSingleton<IRouterClient, RouterClient>();
 			services.AddSingleton<IEmailSender, SmtpMailer>();
 
@@ -126,7 +127,7 @@ namespace SensateIoT.Platform.Network.TriggerService.Application
 			var @private = mqtt.InternalBroker;
 
 			provider.MapInternalMqttTopic<MqttBulkNumberTriggerHandler>(@private.BulkMeasurementTopic);
-			//provider.MapInternalMqttTopic<MqttBulkFormalLanguageTriggerHandler>(@private.BulkMessageTopic);
+			provider.MapInternalMqttTopic<MqttRegexTriggerHandler>(@private.BulkMessageTopic);
 		}
 	}
 }
