@@ -1,11 +1,11 @@
 ﻿/*
- * Internal broker configuration.
+ * MQTT configuration.
  *
  * @author Michel Megens
  * @email  michel@michelmegens.net
  */
 
-namespace SensateIoT.Platform.Network.Router.Config
+namespace SensateIoT.Platform.Network.TriggerService.Config
 {
 	public class InternalBrokerConfig
 	{
@@ -14,6 +14,8 @@ namespace SensateIoT.Platform.Network.Router.Config
 		public string Host { get; set; }
 		public bool Ssl { get; set; }
 		public short Port { get; set; }
-		public string CommandTopic { get; set; }
+		public string BulkMeasurementTopic { get; set; }
+		public string BulkMessageTopic { get; set; }
+		public string ActuatorTopicFormat { get; set; }
 	}
 }

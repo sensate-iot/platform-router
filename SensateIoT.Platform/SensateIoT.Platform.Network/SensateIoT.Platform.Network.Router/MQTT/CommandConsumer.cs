@@ -34,7 +34,7 @@ namespace SensateIoT.Platform.Network.Router.MQTT
 			this.m_liveUpdater = new LiveDataRouteUpdateHandler(cache);
 		}
 
-		public override async Task OnMessageAsync(string topic, string message, CancellationToken ct = default)
+		public async Task OnMessageAsync(string topic, string message, CancellationToken ct = default)
 		{
 			var cmd = JsonConvert.DeserializeObject<Command>(message);
 			this.m_logger.LogInformation("Received command: {command}. Argument: {argument}.", cmd.Cmd, cmd.Arguments);
