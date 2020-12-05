@@ -5,6 +5,7 @@
 using System;
 
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 
 using SensateIoT.Platform.Network.Data.Abstract;
@@ -18,14 +19,15 @@ namespace SensateIoT.Platform.Network.Data.DTO
 		public ObjectId SensorId { get; set; }
 
 		public string Data { get; set; }
+		[BsonIgnore]
 		public string Secret { get; set; }
 		public DateTime Timestamp { get; set; }
 
-		[JsonIgnore]
+		[BsonIgnore, JsonIgnore]
 		public ObjectId SensorID => this.SensorId;
-		[JsonIgnore]
+		[BsonIgnore, JsonIgnore]
 		public MessageType Type => MessageType.ControlMessage;
-		[JsonIgnore]
+		[BsonIgnore, JsonIgnore]
 		public DateTime PlatformTimestamp { get; set; }
 	}
 }

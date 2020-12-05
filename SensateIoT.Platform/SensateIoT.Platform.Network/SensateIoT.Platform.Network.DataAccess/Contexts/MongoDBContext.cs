@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using MongoDB.Driver;
+
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Config;
 
@@ -23,6 +24,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Contexts
 
 		public IMongoDatabase Database => this.m_client.GetDatabase(this.m_settings.DatabaseName);
 		public IMongoCollection<Sensor> Sensors => this.Database.GetCollection<Sensor>("Sensors");
+		public IMongoCollection<ControlMessage> ControlMessages => this.Database.GetCollection<ControlMessage>("ControlMessages");
 
 		public MongoDBContext(IOptions<MongoDBSettings> settings, ILogger<MongoDBContext> logger)
 		{
