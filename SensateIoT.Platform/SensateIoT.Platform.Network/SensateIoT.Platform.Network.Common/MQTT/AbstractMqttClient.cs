@@ -57,7 +57,7 @@ namespace SensateIoT.Platform.Network.Common.MQTT
 		{
 			this._handlers.TryAdd(topic, typeof(T));
 
-			if(this.Client.IsConnected && !this._disconnected && this.Client != null) {
+			if(this.Client != null && this.Client.IsConnected && !this._disconnected && this.Client != null) {
 				this.SubscribeAsync(topic).Wait();
 			}
 		}

@@ -10,8 +10,8 @@ using System.Threading.Tasks;
 
 namespace SensateIoT.Platform.Network.Common.MQTT
 {
-	public abstract class IMqttHandler
+	public interface IMqttHandler
 	{
-		public abstract Task OnMessageAsync(string topic, string message, CancellationToken ct = default);
+		Task OnMessageAsync(string topic, string message, CancellationToken ct = default);
 	}
 }

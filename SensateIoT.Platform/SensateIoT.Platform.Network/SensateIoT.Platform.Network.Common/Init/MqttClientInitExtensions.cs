@@ -36,7 +36,7 @@ namespace SensateIoT.Platform.Network.Common.Init
 		public static IServiceCollection AddMqttHandlers(this IServiceCollection service)
 		{
 			foreach(var etype in Assembly.GetEntryAssembly().ExportedTypes) {
-				if(etype.GetTypeInfo().BaseType == typeof(IMqttHandler)) {
+				if(etype.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IMqttHandler))) {
 					service.AddScoped(etype);
 				}
 			}
