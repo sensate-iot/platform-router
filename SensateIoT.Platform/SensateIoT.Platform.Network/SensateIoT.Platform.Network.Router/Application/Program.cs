@@ -18,7 +18,7 @@ namespace SensateIoT.Platform.Network.Router.Application
 	{
 		public static string GetAppSettings()
 		{
-			return Environment.GetEnvironmentVariable("MESSAGEQUEUE_APPSETTINGS") ?? "appsettings.Development.json";
+			return Environment.GetEnvironmentVariable("ROUTER_APPSETTINGS") ?? "appsettings.Development.json";
 		}
 
 		public static void Main(string[] args)

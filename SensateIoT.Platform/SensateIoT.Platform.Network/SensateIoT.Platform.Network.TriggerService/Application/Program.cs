@@ -18,7 +18,7 @@ namespace SensateIoT.Platform.Network.TriggerService.Application
 	{
 		public static string GetAppSettings()
 		{
-			return Environment.GetEnvironmentVariable("SENSATE_TRIGGERHANDLER_APPSETTINGS") ?? "appsettings.Development.json";
+			return Environment.GetEnvironmentVariable("TRIGGERSERVICE_APPSETTINGS") ?? "appsettings.Development.json";
 		}
 
 		public static IHost CreateHost(string[] args)
