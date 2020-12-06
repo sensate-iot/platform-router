@@ -12,6 +12,9 @@ using System.Threading;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+
+using Google.Protobuf;
+
 using Newtonsoft.Json;
 
 using SensateIoT.Platform.Network.Common.Caching.Object;
@@ -38,6 +41,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 		private readonly IDataCache m_cache;
 		private readonly IMessageQueue m_messages;
 		private readonly IInternalRemoteQueue m_internalRemote;
+		private readonly IRemoteStorageQueue m_storageQueue;
 		private readonly IAuthorizationService m_authService;
 		private readonly IPublicRemoteQueue m_publicRemote;
 		private readonly ILogger<RoutingService> m_logger;
@@ -50,6 +54,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 		                      IMessageQueue queue,
 		                      IInternalRemoteQueue internalRemote,
 							  IPublicRemoteQueue publicRemote,
+							  IRemoteStorageQueue storage,
 		                      IAuthorizationService auth,
 							  IOptions<RoutingPublishSettings> settings,
 		                      ILogger<RoutingService> logger)
@@ -61,6 +66,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 			this.m_publicRemote = publicRemote;
 			this.m_authService = auth;
 			this.m_logger = logger;
+			this.m_storageQueue = storage;
 		}
 
 		public override async Task ExecuteAsync(CancellationToken token)
@@ -103,18 +109,36 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 
 		private void RouteMessage(IPlatformMessage message, Sensor sensor)
 		{
+			var evt = new NetworkEvent {
+				SensorID = sensor.ID.ToString(),
+				AccountID = ByteString.CopyFrom(sensor.AccountID.ToByteArray()),
+			};
+			evt.Actions.Add(NetworkEventType.MessageRouted);
+
 			if(message.Type == MessageType.ControlMessage) {
 				this.RouteControlMessage(message as ControlMessage, sensor);
+				evt.MessageType = NetworkMessageType.ControlMessage;
 			} else {
+				evt.MessageType = message.Type == MessageType.Measurement
+					? NetworkMessageType.Measurement
+					: NetworkMessageType.Message;
 				message.PlatformTimestamp = DateTime.UtcNow;
+
+				if(sensor.StorageEnabled) {
+					this.m_storageQueue.Enqueue(message);
+					evt.Actions.Add(NetworkEventType.MessageStorage);
+				}
 
 				if(sensor.TriggerInformation.HasActions) {
 					this.EnqueueToTriggerService(message, sensor.TriggerInformation.IsTextTrigger);
+					evt.Actions.Add(NetworkEventType.MessageTriggered);
 				}
 
 				if(sensor.LiveDataRouting == null || sensor.LiveDataRouting?.Count <= 0) {
 					return;
 				}
+
+				evt.Actions.Add(NetworkEventType.MessageLiveData);
 
 				foreach(var info in sensor.LiveDataRouting) {
 					this.EnqueueTo(message, info);

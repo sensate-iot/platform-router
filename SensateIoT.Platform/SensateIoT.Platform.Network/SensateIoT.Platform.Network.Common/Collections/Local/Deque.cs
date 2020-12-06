@@ -253,6 +253,10 @@ namespace SensateIoT.Platform.Network.Common.Collections.Local
 					return new List<TValue>();
 				}
 
+				if(count < 0) {
+					count = int.MaxValue;
+				}
+
 				count = Math.Min(count, this.m_count);
 				result = new TValue[count];
 

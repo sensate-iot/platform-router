@@ -14,6 +14,7 @@
     <None Remove="DTO\ControlMessage.proto" />
     <None Remove="DTO\Measurement.proto" />
     <None Remove="DTO\Message.proto" />
+    <None Remove="DTO\NetworkEvent.proto" />
     <None Remove="RPC\RoutingResponse.proto" />
     <None Remove="Services\EgressRouter.proto" />
     <None Remove="Services\IngressRouter.proto" />
@@ -33,6 +34,7 @@
     <Protobuf Include="DTO\ControlMessage.proto" />
     <Protobuf Include="DTO\Measurement.proto" GrpcServices="Both" />
     <Protobuf Include="DTO\Message.proto" />
+    <Protobuf Include="DTO\NetworkEvent.proto" />
     <Protobuf Include="RPC\RoutingResponse.proto" />
     <Protobuf Include="Services\EgressRouter.proto" />
     <Protobuf Include="Services\IngressRouter.proto" />

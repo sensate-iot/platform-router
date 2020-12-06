@@ -129,6 +129,11 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 
 				this.m_measurementQueues = new Dictionary<string, MeasurementData>();
 				this.m_textMessageQueues = new Dictionary<string, TextMessageData>();
+
+				foreach(var handler in this.m_liveDataHandlers) {
+					this.m_measurementQueues.Add(handler, new MeasurementData());
+					this.m_textMessageQueues.Add(handler, new TextMessageData());
+				}
 			} finally {
 				this.m_messageLock.Unlock();
 				this.m_measurementLock.Unlock();

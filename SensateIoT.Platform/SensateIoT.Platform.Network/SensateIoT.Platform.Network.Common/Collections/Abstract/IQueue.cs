@@ -28,7 +28,7 @@ namespace SensateIoT.Platform.Network.Common.Collections.Abstract
 		void Add(TValue items);
 
 		TValue Dequeue();
-		IEnumerable<TValue> DequeueRange(int count);
+		IEnumerable<TValue> DequeueRange(int count = -1);
 
 		TValue this[int index] { get; set; }
 		TValue Peek(int index);

@@ -34,7 +34,8 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			var query = this.m_sensors.Aggregate()
 				.Project(new BsonDocument {
 					{"SensorKey", "$Secret"},
-					{"AccountID", "$Owner"}
+					{"AccountID", "$Owner"},
+					{"StorageEnabled", "$StorageEnabled"}
 				});
 			var cursor = await query.ToCursorAsync(ct).ConfigureAwait(false);
 
@@ -42,7 +43,8 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 				var sensor = new Sensor {
 					AccountID = Guid.Parse(document["AccountID"].AsString),
 					ID = document["_id"].AsObjectId,
-					SensorKey = document["SensorKey"].AsString
+					SensorKey = document["SensorKey"].AsString,
+					StorageEnabled = !document.Contains("StorageEnabled") || document["StorageEnabled"].AsBoolean
 				};
 
 				result.Add(sensor);

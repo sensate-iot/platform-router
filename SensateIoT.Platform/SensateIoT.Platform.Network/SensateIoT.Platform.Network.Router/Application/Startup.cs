@@ -71,6 +71,9 @@ namespace SensateIoT.Platform.Network.Router.Application
 			services.Configure<QueueSettings>(s => {
 				s.LiveDataQueueTemplate = this.Configuration.GetValue<string>("Routing:LiveDataTopic");
 				s.TriggerQueueTemplate = this.Configuration.GetValue<string>("Routing:TriggerTopic");
+				s.MessageStorageQueueTopic = this.Configuration.GetValue<string>("Routing:MessageStorageQueueTopic");
+				s.MeasurementStorageQueueTopic = this.Configuration.GetValue<string>("Routing:MeasurementStorageQueueTopic");
+				s.NetworkEventQueueTopic = this.Configuration.GetValue<string>("Routing:NetworkEventQueueTopic");
 			});
 
 			services.Configure<RoutingPublishSettings>(s => {
@@ -116,6 +119,7 @@ namespace SensateIoT.Platform.Network.Router.Application
 			services.AddSingleton<IPublicRemoteQueue, PublicMqttQueue>();
 			services.AddSingleton<IHostedService, RoutingService>();
 			services.AddSingleton<IAuthorizationService, AuthorizationService>();
+			services.AddSingleton<IRemoteStorageQueue, RemoteStorageQueue>();
 			services.AddSingleton<IDataCache, DataCache>();
 
 			services.AddGrpc();

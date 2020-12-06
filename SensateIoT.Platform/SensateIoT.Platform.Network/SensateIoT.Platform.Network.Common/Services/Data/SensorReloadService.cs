@@ -29,10 +29,13 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 		private readonly IDataCache m_cache;
 		private readonly ILogger<SensorReloadService> m_logger;
 
+		private const int StartIntervalOffset = 1;
+
 		public SensorReloadService(IServiceProvider provider,
 								   IDataCache cache,
 								   IOptions<DataReloadSettings> settings,
-								   ILogger<SensorReloadService> logger) : base(settings.Value.StartDelay, settings.Value.DataReloadInterval)
+								   ILogger<SensorReloadService> logger) :
+			base(settings.Value.StartDelay.Add(TimeSpan.FromSeconds(StartIntervalOffset)), settings.Value.DataReloadInterval)
 		{
 			this.m_provider = provider;
 			this.m_cache = cache;
@@ -51,10 +54,11 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 			var sensorTask = sensorRepo.GetSensorsAsync(token);
 			var triggerTask = triggerRepo.GetTriggerInfoAsync(token);
 
-			await Task.WhenAll(sensorTask, triggerTask).ConfigureAwait(false);
-			var dict = sensorTask.Result.ToDictionary(k => k.ID, v => v);
+			var sensors = await sensorTask.ConfigureAwait(false);
+			var dict = sensors.ToDictionary(k => k.ID, v => v);
+			var triggers = await triggerTask.ConfigureAwait(false);
 
-			foreach(var info in triggerTask.Result) {
+			foreach(var info in triggers) {
 				var route = new SensorTrigger {
 					HasActions = info.ActionCount > 0,
 					IsTextTrigger = info.TextTrigger
