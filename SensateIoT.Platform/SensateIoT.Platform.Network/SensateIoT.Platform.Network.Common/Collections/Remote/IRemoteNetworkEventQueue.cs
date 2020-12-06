@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SensateIoT.Platform.Network.Common.Collections.Remote
 {
-	public interface IRemotePriceQueue
+	public interface IRemoteNetworkEventQueue
 	{
 		void EnqueueEvent(NetworkEvent netEvent);
 		Task FlushEventsAsync(CancellationToken ct = default);

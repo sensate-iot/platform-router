@@ -21,19 +21,23 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 	{
 		private readonly IInternalRemoteQueue m_internalRemote;
 		private readonly IRemoteStorageQueue m_remoteStorageQueue;
+		private readonly IRemoteNetworkEventQueue m_eventQueue;
 
 		public RoutingPublishService(IInternalRemoteQueue internalRemote,
 									 IRemoteStorageQueue remoteStorage,
+									 IRemoteNetworkEventQueue remoteEvents,
 		                             IOptions<RoutingPublishSettings> options) : base(TimeSpan.FromSeconds(5), options.Value.InternalInterval)
 		{
 			this.m_internalRemote = internalRemote;
 			this.m_remoteStorageQueue = remoteStorage;
+			this.m_eventQueue = remoteEvents;
 		}
 
 		public override async Task ExecuteAsync(CancellationToken token)
 		{
 			await Task.WhenAll(this.m_internalRemote.FlushAsync(),
 			                   this.m_internalRemote.FlushLiveDataAsync(),
+							   this.m_eventQueue.FlushEventsAsync(token),
 			                   this.m_remoteStorageQueue.FlushMessagesAsync()).ConfigureAwait(false);
 		}
 	}

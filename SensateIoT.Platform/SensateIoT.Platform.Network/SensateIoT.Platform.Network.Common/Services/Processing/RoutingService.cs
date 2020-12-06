@@ -42,6 +42,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 		private readonly IMessageQueue m_messages;
 		private readonly IInternalRemoteQueue m_internalRemote;
 		private readonly IRemoteStorageQueue m_storageQueue;
+		private readonly IRemoteNetworkEventQueue m_eventsQueue;
 		private readonly IAuthorizationService m_authService;
 		private readonly IPublicRemoteQueue m_publicRemote;
 		private readonly ILogger<RoutingService> m_logger;
@@ -55,6 +56,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 		                      IInternalRemoteQueue internalRemote,
 							  IPublicRemoteQueue publicRemote,
 							  IRemoteStorageQueue storage,
+							  IRemoteNetworkEventQueue events,
 		                      IAuthorizationService auth,
 							  IOptions<RoutingPublishSettings> settings,
 		                      ILogger<RoutingService> logger)
@@ -62,6 +64,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 			this.m_settings = settings.Value;
 			this.m_messages = queue;
 			this.m_cache = cache;
+			this.m_eventsQueue = events;
 			this.m_internalRemote = internalRemote;
 			this.m_publicRemote = publicRemote;
 			this.m_authService = auth;
@@ -98,7 +101,8 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 						return;
 					}
 
-					this.RouteMessage(message, sensor);
+					var evt = this.RouteMessage(message, sensor);
+					this.m_eventsQueue.EnqueueEvent(evt);
 				});
 
 				if(!result.IsCompleted) {
@@ -107,7 +111,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 			} while(!token.IsCancellationRequested);
 		}
 
-		private void RouteMessage(IPlatformMessage message, Sensor sensor)
+		private NetworkEvent RouteMessage(IPlatformMessage message, Sensor sensor)
 		{
 			var evt = new NetworkEvent {
 				SensorID = sensor.ID.ToString(),
@@ -135,7 +139,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 				}
 
 				if(sensor.LiveDataRouting == null || sensor.LiveDataRouting?.Count <= 0) {
-					return;
+					return evt;
 				}
 
 				evt.Actions.Add(NetworkEventType.MessageLiveData);
@@ -144,6 +148,8 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 					this.EnqueueTo(message, info);
 				}
 			}
+
+			return evt;
 		}
 
 		private void RouteControlMessage(ControlMessage message, Sensor sensor)

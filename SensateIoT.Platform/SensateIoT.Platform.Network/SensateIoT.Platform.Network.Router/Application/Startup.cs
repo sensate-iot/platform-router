@@ -115,6 +115,7 @@ namespace SensateIoT.Platform.Network.Router.Application
 
 			services.AddSingleton<IQueue<IPlatformMessage>, Deque<IPlatformMessage>>();
 			services.AddSingleton<IMessageQueue, MessageQueue>();
+			services.AddSingleton<IRemoteNetworkEventQueue, RemoteNetworkEventQueue>();
 			services.AddSingleton<IInternalRemoteQueue, InternalMqttQueue>();
 			services.AddSingleton<IPublicRemoteQueue, PublicMqttQueue>();
 			services.AddSingleton<IHostedService, RoutingService>();

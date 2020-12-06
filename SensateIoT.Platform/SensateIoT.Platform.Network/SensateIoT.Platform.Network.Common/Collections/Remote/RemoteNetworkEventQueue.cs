@@ -22,14 +22,14 @@ using SensateIoT.Platform.Network.Common.Settings;
 
 namespace SensateIoT.Platform.Network.Common.Collections.Remote
 {
-	public class RemotePriceQueue : IRemotePriceQueue
+	public class RemoteNetworkEventQueue : IRemoteNetworkEventQueue
 	{
 		private readonly string m_networkEventQueueTopic;
 
 		private readonly IInternalMqttClient m_client;
 		private readonly IQueue<NetworkEvent> m_events;
 
-		public RemotePriceQueue(IOptions<QueueSettings> options, IInternalMqttClient client)
+		public RemoteNetworkEventQueue(IOptions<QueueSettings> options, IInternalMqttClient client)
 		{
 			this.m_networkEventQueueTopic = options.Value.NetworkEventQueueTopic;
 
