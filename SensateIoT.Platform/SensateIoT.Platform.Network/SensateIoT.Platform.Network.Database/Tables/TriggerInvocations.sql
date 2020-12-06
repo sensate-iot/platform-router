@@ -7,10 +7,10 @@ CREATE TABLE "TriggerInvocations"
     "ID"  BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (INCREMENT 1 START 1)
         CONSTRAINT "PK_TriggerInvocations" PRIMARY KEY,
     "TriggerID" BIGINT NOT NULL
-        CONSTRAINT "FK_TriggerInvocations_Triggers_TriggerId"
-            REFERENCES "Triggers"
-            ON DELETE CASCADE
-            ON UPDATE CASCADE,
+        CONSTRAINT "FK_TriggerInvocations_TriggerActions_TriggerID"
+        REFERENCES "Triggers"
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
     "ActionID" BIGINT NOT NULL
         CONSTRAINT "FK_TriggerInvocations_TriggerActions_ActionID"
         REFERENCES "TriggerActions"
@@ -19,5 +19,5 @@ CREATE TABLE "TriggerInvocations"
     "Timestamp" TIMESTAMP NOT NULL
 );
 
-CREATE INDEX "IX_TriggerInvocations_TriggerId"
-    ON "TriggerInvocations" ("TriggerID");
+CREATE INDEX "IX_TriggerInvocations_ActionID"
+    ON "TriggerInvocations" ("ActionID");

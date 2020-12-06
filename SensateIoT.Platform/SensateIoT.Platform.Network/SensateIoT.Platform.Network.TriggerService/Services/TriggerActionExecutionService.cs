@@ -16,8 +16,10 @@ using MongoDB.Bson;
 using SensateIoT.Platform.Network.Common.Services.Adapters;
 using SensateIoT.Platform.Network.Common.Settings;
 using SensateIoT.Platform.Network.Data.DTO;
+using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Repositories;
 using SensateIoT.Platform.Network.TriggerService.Clients;
+using TriggerAction = SensateIoT.Platform.Network.Data.DTO.TriggerAction;
 
 namespace SensateIoT.Platform.Network.TriggerService.Services
 {
@@ -25,6 +27,7 @@ namespace SensateIoT.Platform.Network.TriggerService.Services
 	{
 		private readonly ITextSendService m_text;
 		private readonly IEmailSender m_mail;
+		private readonly ITriggerRepository m_triggerRepo;
 		private readonly IHttpClientFactory m_httpFactory;
 		private readonly TextServiceSettings m_textSettings;
 		private readonly IControlMessageRepository m_controlMessges;
@@ -36,9 +39,11 @@ namespace SensateIoT.Platform.Network.TriggerService.Services
 			IControlMessageRepository controlMessages,
 			ITextSendService text,
 			IEmailSender mail,
+			ITriggerRepository triggers,
 			IOptions<TextServiceSettings> textOptions 
 		)
 		{
+			this.m_triggerRepo = triggers;
 			this.m_text = text;
 			this.m_mail = mail;
 			this.m_textSettings = textOptions.Value;
@@ -49,7 +54,6 @@ namespace SensateIoT.Platform.Network.TriggerService.Services
 
 		public async Task ExecuteAsync(TriggerAction action, string body)
 		{
-
 			switch(action.Channel) {
 			case TriggerChannel.Email:
 				var mail = new EmailBody {
@@ -107,6 +111,11 @@ namespace SensateIoT.Platform.Network.TriggerService.Services
 			}
 
 			action.LastInvocation = DateTime.UtcNow;
+			await this.m_triggerRepo.StoreTriggerInvocation(new TriggerInvocation {
+				Timestamp = action.LastInvocation,
+				ActionID = action.ActionID,
+				TriggerID = action.TriggerID
+			}, default);
 		}
 	}
 }

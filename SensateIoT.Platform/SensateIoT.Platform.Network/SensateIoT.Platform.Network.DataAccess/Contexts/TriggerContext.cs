@@ -24,11 +24,11 @@ namespace SensateIoT.Platform.Network.DataAccess.Contexts
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
+			base.OnModelCreating(modelBuilder);
 			modelBuilder.HasPostgresExtension("uuid-ossp");
 
 			modelBuilder.Entity<TriggerAction>(entity => {
-				entity.HasIndex(e => new { e.TriggerID, e.Channel, e.Target })
-					.HasName("Alternative_Key_TriggerActions")
+				entity.HasIndex(e => new { e.TriggerID, e.Channel, e.Target }, "Alternative_Key_TriggerActions")
 					.IsUnique();
 
 				entity.Property(e => e.ID)
@@ -44,27 +44,26 @@ namespace SensateIoT.Platform.Network.DataAccess.Contexts
 				entity.HasOne(d => d.Trigger)
 					.WithMany(p => p.TriggerActions)
 					.HasForeignKey(d => d.TriggerID)
-					.HasConstraintName("FK_TriggerActions_Triggers_TriggerID");
+					.HasConstraintName("FK_TriggerActions_Triggers_TriggerId");
 			});
 
 			modelBuilder.Entity<TriggerInvocation>(entity => {
-				entity.HasIndex(e => e.TriggerActionID)
-					.HasName("IX_TriggerInvocations_TriggerActionID");
+				entity.HasIndex(e => e.ActionID, "IX_TriggerInvocations_ActionID");
 
 				entity.Property(e => e.ID)
 					.HasColumnName("ID")
 					.UseIdentityAlwaysColumn();
 
-				entity.Property(e => e.TriggerActionID).HasColumnName("TriggerActionID");
+				entity.Property(e => e.ActionID).HasColumnName("ActionID");
 
-				entity.HasOne(d => d.TriggerAction)
+				entity.HasOne(d => d.Action)
 					.WithMany(p => p.TriggerInvocations)
-					.HasForeignKey(d => d.TriggerActionID);
+					.HasForeignKey(d => d.ActionID);
 			});
 
 			modelBuilder.Entity<Trigger>(entity => {
 				entity.HasIndex(e => e.SensorID)
-					.HasName("IX_Triggers_SensorID");
+					.HasDatabaseName("IX_Triggers_SensorID");
 
 				entity.HasIndex(e => e.Type);
 
@@ -92,12 +91,12 @@ namespace SensateIoT.Platform.Network.DataAccess.Contexts
 					.UseIdentityAlwaysColumn();
 
 				entity.HasIndex(h => h.Enabled)
-					.HasName("IX_LiveDataHandlers_Enabled");
+					.HasDatabaseName("IX_LiveDataHandlers_Enabled");
 				entity.Property(h => h.Enabled)
 					.IsRequired();
 
 				entity.HasIndex(h => h.Name)
-					.HasName("IX_LiveDataHandlers_Name")
+					.HasDatabaseName("IX_LiveDataHandlers_Name")
 					.IsUnique();
 			});
 		}

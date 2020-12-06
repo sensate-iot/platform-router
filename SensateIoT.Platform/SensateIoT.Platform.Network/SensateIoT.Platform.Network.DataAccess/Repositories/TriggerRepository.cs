@@ -17,6 +17,7 @@ using MongoDB.Bson;
 using Npgsql;
 
 using SensateIoT.Platform.Network.Data.DTO;
+using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Contexts;
 using TriggerAction = SensateIoT.Platform.Network.Data.DTO.TriggerAction;
 
@@ -127,6 +128,18 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			}
 
 			return result;
+		}
+
+		public async Task StoreTriggerInvocation(TriggerInvocation invocation, CancellationToken ct)
+		{
+			this.m_ctx.TriggerInvocations.Add(invocation);
+			await this.m_ctx.SaveChangesAsync(ct).ConfigureAwait(false);
+		}
+
+		public async Task StoreTriggerInvocations(IEnumerable<TriggerInvocation> invocations, CancellationToken ct)
+		{
+			await this.m_ctx.TriggerInvocations.AddRangeAsync(invocations, ct).ConfigureAwait(false);
+			await this.m_ctx.SaveChangesAsync(ct).ConfigureAwait(false);
 		}
 	}
 }

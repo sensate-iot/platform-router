@@ -23,5 +23,6 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		Task<IEnumerable<TriggerRoutingInfo>> GetTriggerInfoAsync(CancellationToken ct);
 
 		Task<IEnumerable<TriggerAction>> GetTriggerServiceActions(IEnumerable<ObjectId> sensorIds, CancellationToken ct = default);
+		Task StoreTriggerInvocation(TriggerInvocation invocation, CancellationToken ct);
 	}
 }
