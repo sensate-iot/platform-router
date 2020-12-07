@@ -6,7 +6,13 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
 using SensateIoT.Platform.Network.LoadTest.CacheTests;
+using SensateIoT.Platform.Network.LoadTest.Config;
+using SensateIoT.Platform.Network.LoadTest.RouterTest;
 
 namespace SensateIoT.Platform.Network.LoadTest.Application
 {
@@ -39,18 +45,31 @@ namespace SensateIoT.Platform.Network.LoadTest.Application
 			scans.ScanForTimeouts(ScanTestSize);
 		}
 
-		private static void RunDistributedTests()
+		private static async Task RunRouterTest()
 		{
-			//var tests = new GetSetTests();
-			//tests.Run().Wait();
+			Console.WriteLine("Starting router tests!");
+			Console.WriteLine("");
+
+			var textSettings = await File.ReadAllTextAsync("appsettings.json").ConfigureAwait(false);
+			var settings = JsonConvert.DeserializeObject<AppSettings>(textSettings);
+			var sensorData = await File.ReadAllTextAsync(settings.SensorIdPath).ConfigureAwait(false);
+			var sensors = JsonConvert.DeserializeObject<IList<string>>(sensorData);
+			var generator = new MeasurementGenerator(sensors);
+			var client = new RouterClient(settings.RouterHostname, settings.RouterPort);
+
+			await client.RunAsync(generator).ConfigureAwait(false);
 		}
 
 		public static void Main(string[] args)
 		{
+			if(args.Length >= 1 && args[0] == "router-test") {
+				RunRouterTest().Wait();
+				return;
+			}
+
 			Console.WriteLine("Starting load tests for the caching subsystem...");
 
 			RunMemoryTests();
-			RunDistributedTests();
 			RunScanTests();
 #if !DEBUG
 			Console.ReadLine();

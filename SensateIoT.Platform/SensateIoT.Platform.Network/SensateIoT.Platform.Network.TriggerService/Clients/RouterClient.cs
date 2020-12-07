@@ -7,10 +7,14 @@
 
 using System;
 using System.Threading.Tasks;
+
 using Google.Protobuf.WellKnownTypes;
+
 using Grpc.Core;
+
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+
 using SensateIoT.Platform.Network.Contracts.Services;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.TriggerService.Settings;

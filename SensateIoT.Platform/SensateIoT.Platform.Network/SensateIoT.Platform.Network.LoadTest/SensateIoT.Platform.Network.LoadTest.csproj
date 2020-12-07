@@ -15,6 +15,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SensateIoT.Platform.Network.Common\SensateIoT.Platform.Network.Common.csproj" />
+    <ProjectReference Include="..\SensateIoT.Platform.Network.Contracts\SensateIoT.Platform.Network.Contracts.csproj" />
+    <ProjectReference Include="..\SensateIoT.Platform.Network.Data\SensateIoT.Platform.Network.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
