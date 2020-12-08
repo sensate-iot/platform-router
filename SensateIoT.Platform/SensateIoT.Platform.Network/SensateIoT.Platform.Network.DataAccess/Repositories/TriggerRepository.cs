@@ -112,8 +112,6 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 							ActionID = reader.GetInt64(1),
 							SensorID = ObjectId.Parse(reader.GetString(2)),
 							KeyValue = reader.GetString(3),
-							LowerEdge = !reader.IsDBNull(4) ? reader.GetDecimal(4) : 0,
-							UpperEdge = !reader.IsDBNull(5) ? reader.GetDecimal(5) : 0,
 							FormalLanguage = !reader.IsDBNull(6) ? reader.GetString(6) : null,
 							Type = (TriggerType) reader.GetFieldValue<int>(7),
 							Channel = (TriggerChannel) reader.GetFieldValue<int>(8),
@@ -121,6 +119,18 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 							Message = !reader.IsDBNull(10) ? reader.GetString(10) : null,
 							LastInvocation = !reader.IsDBNull(11) ? reader.GetDateTime(11) : DateTime.MinValue
 						};
+
+						if(reader.IsDBNull(4)) {
+							record.LowerEdge = null;
+						} else {
+							record.LowerEdge = reader.GetDecimal(4);
+						}
+
+						if(reader.IsDBNull(5)) {
+							record.UpperEdge = null;
+						} else {
+							record.UpperEdge = reader.GetDecimal(5);
+						}
 
 						result.Add(record);
 					}
