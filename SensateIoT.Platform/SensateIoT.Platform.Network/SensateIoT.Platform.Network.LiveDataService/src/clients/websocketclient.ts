@@ -9,9 +9,8 @@ import { Sensor, SensorModel } from "../models/sensor";
 import { Types } from "mongoose";
 import {createHash} from "crypto";
 import * as WebSocket from "ws";
-import { ISensorAuthRequest } from "../models/sensorauthrequest";
-import { BulkMeasurementInfo } from "../models/measurement";
-import { IWebSocketRequest } from "../models/request";
+import { ISensorAuthRequest } from "../requests/sensorauthrequest";
+import { IWebSocketRequest } from "../requests/request";
 import * as jwt from "jsonwebtoken";
 import { SensorLinksClient } from "./sensorlinksclient";
 import { Pool } from "pg";
@@ -21,7 +20,12 @@ import moment from "moment";
 import { AuditLogsClient } from "./auditlogsclient";
 import { AuditLog, RequestMethod } from "../models/auditlog";
 import { ApiKeyClient } from "./apikeyclient";
-import { IApiKeyAuthenticationRequest } from "../models/apikeyauthenticationrequest";
+import { IApiKeyAuthenticationRequest } from "../requests/apikeyauthenticationrequest";
+import { ClientType } from "../models/clienttype";
+import { MqttClient } from "./mqttclient";
+import { Command, stringifyCommand } from "../commands/command";
+import { LiveSensorCommand } from "../commands/livesensorcommand";
+import { Application } from "../app/app";
 
 export class WebSocketClient {
     private readonly sensors: Map<string, SensorModel>;
@@ -36,7 +40,10 @@ export class WebSocketClient {
         private readonly secret: string,
         private readonly remote: string,
         private readonly timeout: number,
-        socket: WebSocket, pool: Pool
+        private readonly type: ClientType,
+        private readonly mqtt: MqttClient,
+        socket: WebSocket,
+        pool: Pool
     ) {
         this.socket = socket;
         this.sensors = new Map<string, SensorModel>();
@@ -47,10 +54,20 @@ export class WebSocketClient {
     }
 
     private async createLog() {
+        let route = "";
+
+        if (this.type === ClientType.MeasurementClient) {
+            route = "/live/v1/measurements";
+        }
+
+        if (this.type === ClientType.MeasurementClient) {
+            route = "/live/v1/messages";
+        }
+
         const log: AuditLog = {
             timestamp: new Date(),
             authorId: this.userId,
-            route: "/live/v1/measurements",
+            route: route,
             method: RequestMethod.WebSocket,
             ipAddress: this.remote 
         };
@@ -82,6 +99,11 @@ export class WebSocketClient {
             case "auth-apikey":
                 const authRequest = req as IWebSocketRequest<IApiKeyAuthenticationRequest>;
                 this.authorized = await this.keys.validateApiKey(authRequest.data.user, authRequest.data.apikey);
+
+                if (this.authorized) {
+                    this.userId = authRequest.data.user;
+                }
+
                 break;
 
             case "auth":
@@ -110,8 +132,17 @@ export class WebSocketClient {
         }
 
         console.log(`Removing sensor: ${req.data.sensorId}`);
-        // TODO: update router.
         this.sensors.delete(req.data.sensorId);
+
+        const cmd: Command<LiveSensorCommand> = {
+            cmd: "removelivedatasensor",
+            arguments: {
+                sensorId: req.data.sensorId,
+                target: Application.config.id
+            }
+        }
+
+        this.mqtt.publish(Application.config.mqtt.routerCommandTopic, stringifyCommand(cmd));
     }
 
     private async subscribe(req: IWebSocketRequest<ISensorAuthRequest>) {
@@ -156,7 +187,25 @@ export class WebSocketClient {
         this.sensors.set(auth.sensorId, sensor);
         console.log(`Sensor {${auth.sensorId}}{${sensor.Owner}} authorized!`);
 
-        // TODO: subscribe to router
+        const cmd: Command<LiveSensorCommand> = {
+            cmd: "addlivedatasensor",
+            arguments: {
+                sensorId: auth.sensorId,
+                target: Application.config.id
+            }
+        }
+
+        this.mqtt.publish(Application.config.mqtt.routerCommandTopic, stringifyCommand(cmd));
+    }
+
+    public getConnectedSensors(): string[] {
+        const sensorIds: string[] = [];
+
+        this.sensors.forEach((k, v) => {
+            sensorIds.push(v);
+        });
+
+        return sensorIds;
     }
 
     public isServicing(id: string) {

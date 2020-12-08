@@ -20,43 +20,43 @@ import "./jsonmodule";
 import { MessageHandler } from "../handlers/messagehandler";
 import { MeasurementHandler } from "../handlers/measurementhandler";
 
-class Application {
+export class Application {
     private readonly client: MqttClient;
-    private readonly config: Settings;
+    public static config: Settings;
     private readonly wss: WebSocketServer;
 
     public constructor() {
         const tmp = JSON.stringify(settings);
-        this.config = JSON.parse(tmp);
+        Application.config = JSON.parse(tmp);
 
-        this.client = new MqttClient(this.config.mqtt.host, this.config.mqtt.port, this.config.mqtt.topicShare);
+        this.client = new MqttClient(Application.config.mqtt.host, Application.config.mqtt.port, Application.config.mqtt.topicShare);
         // ReSharper disable once TsResolvedFromInaccessibleModule
         const app: Express = express();
-        const pool = connect(this.config);
+        const pool = connect(Application.config);
 
         app.use(cors());
-        this.wss = new WebSocketServer(app, pool, this.config.web.timeout, this.config.web.secret);
+        this.wss = new WebSocketServer(app, pool, Application.config.web.timeout, Application.config.web.secret, this.client);
     }
 
     public run() {
-        mongodb.connect(this.config.mongoDB.connectionString);
+        mongodb.connect(Application.config.mongoDB.connectionString);
 
-        this.client.addHandler(new MessageHandler(this.wss, this.config.mqtt.bulkMessageTopic));
-        this.client.addHandler(new MeasurementHandler(this.wss, this.config.mqtt.bulkMeasurementTopic));
+        this.client.addHandler(new MessageHandler(this.wss, Application.config.mqtt.bulkMessageTopic));
+        this.client.addHandler(new MeasurementHandler(this.wss, Application.config.mqtt.bulkMeasurementTopic));
 
-        this.client.connect(this.config.mqtt.username, this.config.mqtt.password).then(() => {
+        this.client.connect(Application.config.mqtt.username, Application.config.mqtt.password).then(() => {
             console.log("Connected to MQTT!");
-            return this.client.subscribe(this.config.mqtt.bulkMeasurementTopic);
+            return this.client.subscribe(Application.config.mqtt.bulkMeasurementTopic);
         }).then(() => {
-            console.log(`Subscribed to: ${this.config.mqtt.bulkMeasurementTopic}`);
-            return this.client.subscribe(this.config.mqtt.bulkMessageTopic);
+            console.log(`Subscribed to: ${Application.config.mqtt.bulkMeasurementTopic}`);
+            return this.client.subscribe(Application.config.mqtt.bulkMessageTopic);
         }).then(() => {
-            console.log(`Subscribed to: ${this.config.mqtt.bulkMessageTopic}`);
+            console.log(`Subscribed to: ${Application.config.mqtt.bulkMessageTopic}`);
         }).catch(err => {
             console.warn(`Unable to connect to MQTT: ${err.toString()}`);
         });
 
-        this.wss.listen(this.config.web.port);
+        this.wss.listen(Application.config.web.port);
     }
 }
 

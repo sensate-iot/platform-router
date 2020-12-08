@@ -10,6 +10,7 @@ interface MqttSettings {
     host: string;
     bulkMeasurementTopic: string;
     bulkMessageTopic: string;
+    routerCommandTopic: string;
     topicShare: string;
 }
 
@@ -37,4 +38,5 @@ export interface Settings {
     mongoDB: MongoDB;
     postgresql: PostgresQL;
     web: WebServerSettings;
+    id: string;
 }

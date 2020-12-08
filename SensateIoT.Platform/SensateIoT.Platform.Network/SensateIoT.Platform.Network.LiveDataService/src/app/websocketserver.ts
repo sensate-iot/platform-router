@@ -18,6 +18,11 @@ import { getClientIP } from "./util";
 import { ClientType } from "../models/clienttype";
 import { BulkMessageInfo } from "../models/message";
 import { ApiKeyClient } from "../clients/apikeyclient";
+import { MqttClient } from "../clients/mqttclient";
+import { Command, stringifyCommand } from "../commands/command";
+import { SyncLiveDataSensorsCommand } from "../commands/synclivedatasensorscommand";
+import { Application } from "./app";
+import { LiveSensorCommand } from "../commands/livesensorcommand";
 
 export class WebSocketServer {
     private readonly server: http.Server;
@@ -31,7 +36,8 @@ export class WebSocketServer {
     public constructor(expr: express.Express,
         private readonly pool: Pool,
         private readonly timeout: number,
-        private readonly secret: string
+        private readonly secret: string,
+        private readonly mqtt: MqttClient
     ) {
         const server = http.createServer(expr);
         this.server = server;
@@ -41,11 +47,33 @@ export class WebSocketServer {
         this.auditlogs = new AuditLogsClient(pool);
         this.apikeys = new ApiKeyClient(pool);
 
-        setInterval(this.publicationHandler, 60000);
+        //setInterval(this.publicationHandler, 60000);
+        setInterval(() => {
+            this.publicationHandler();
+        }, 60000);
     }
 
     private publicationHandler(): void {
         console.log("Updating message routers!");
+        let sensors: string[] = [];
+
+        this.measurementClients.forEach(m => {
+            sensors = sensors.concat(m.getConnectedSensors());
+        });
+
+        this.messageClients.forEach(m => {
+            sensors = sensors.concat(m.getConnectedSensors());
+        });
+
+        const cmd: Command<SyncLiveDataSensorsCommand> = {
+            cmd: "synclivedatasensors",
+            arguments: {
+                target: Application.config.id,
+                sensors: sensors
+            }
+        }
+
+        this.mqtt.publish(Application.config.mqtt.routerCommandTopic, stringifyCommand(cmd));
     }
 
     public processMessages(messages: BulkMessageInfo) {
@@ -93,13 +121,51 @@ export class WebSocketServer {
         return false;
     }
 
+    private removeSensors(sensors: string[]) {
+        if (sensors.length === 0) {
+            return;
+        }
+
+        sensors.forEach(s => {
+            const cmd: Command<LiveSensorCommand> = {
+                cmd: "removelivedatasensor",
+                arguments: {
+                    sensorId: s,
+                    target: Application.config.id
+                }
+            }
+
+            this.mqtt.publish(Application.config.mqtt.routerCommandTopic, stringifyCommand(cmd));
+        });
+    }
+
     private destroyConnection(ws: WebSocket) {
+        let done = false;
+        let sensors: string[] = [];
+
         this.measurementClients.forEach((info, index) => {
             if (info.compareSocket(ws)) {
                 console.log("Removing web socket!");
-                this.measurementClients.splice(index, 1);
+                const client = this.measurementClients.splice(index, 1);
+                done = true;
+                sensors = client[0].getConnectedSensors();
             }
         });
+
+
+        if (done) {
+            this.removeSensors(sensors);
+            return;
+        }
+
+        this.messageClients.forEach((info, index) => {
+            if (info.compareSocket(ws)) {
+                const client = this.messageClients.splice(index, 1);
+                sensors = client[0].getConnectedSensors();
+            }
+        });
+
+        this.removeSensors(sensors);
     }
 
     private async handleSocketUpgrade(socket: WebSocket, request: any, type: ClientType) {
@@ -115,6 +181,8 @@ export class WebSocketServer {
             this.secret,
             ip,
             this.timeout,
+            type,
+            this.mqtt,
             socket,
             this.pool);
 
