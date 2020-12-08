@@ -1,5 +1,8 @@
 ---
---- Select triggers and last invocations based 
+--- Select triggers and last invocations based.
+---
+--- @author Michel Megens
+--- @email  michel@michelmegens.net
 ---
 
 CREATE FUNCTION triggerservice_gettriggersbysensorid(idlist TEXT)
@@ -48,5 +51,5 @@ BEGIN
 	) inv ON inv."ActionID" = ta."ID"
 	WHERE t."SensorID" = ANY (sensorIds)
 	ORDER BY ta."ID";
-end;
+END;
 $$;
