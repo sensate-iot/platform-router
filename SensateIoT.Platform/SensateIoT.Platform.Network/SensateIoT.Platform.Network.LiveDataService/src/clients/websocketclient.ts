@@ -159,18 +159,11 @@ export class WebSocketClient {
         return other === this.socket;
     }
 
-    public process(measurements: BulkMeasurementInfo) {
+    public process(data: string) {
         if (!this.authorized) {
             return;
         }
 
-        const sensor = this.sensors.get(measurements.sensorId.toString());
-
-        if (sensor === null) {
-            return;
-        }
-
-        const data = JSON.stringify(measurements);
         this.socket.send(data);
     }
 

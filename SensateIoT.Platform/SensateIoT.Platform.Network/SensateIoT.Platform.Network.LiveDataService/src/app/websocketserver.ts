@@ -16,12 +16,14 @@ import { Pool } from "pg";
 import { AuditLogsClient } from "../clients/auditlogsclient";
 import { getClientIP } from "./util";
 import { ClientType } from "../models/clienttype";
+import { BulkMessageInfo } from "../models/message";
 
 export class WebSocketServer {
     private readonly server: http.Server;
     private readonly wss: WebSocket.Server;
 
     private readonly measurementClients: WebSocketClient[];
+    private readonly messageClients: WebSocketClient[];
     private readonly auditlogs: AuditLogsClient;
 
     public constructor(expr: express.Express,
@@ -33,21 +35,51 @@ export class WebSocketServer {
         this.server = server;
         this.wss = new WebSocket.Server({ noServer: true });
         this.measurementClients = [];
+        this.messageClients = [];
         this.auditlogs = new AuditLogsClient(pool);
+
+        setInterval(this.publicationHandler, 60000);
     }
 
-    public process(measurements: BulkMeasurementInfo) {
+    private publicationHandler(): void {
+        console.log("Updating message routers!");
+    }
+
+    public processMessages(messages: BulkMessageInfo) {
+        this.messageClients.forEach(client => {
+            if (messages.sensorId === null || messages.sensorId == undefined) {
+                return;
+            }
+
+            if (!client.isServicing(messages.sensorId.toString())) {
+                return;
+            }
+
+            const data = JSON.stringify(messages);
+            client.process(data);
+        });
+    }
+
+    public processMeasurements(measurements: BulkMeasurementInfo) {
         this.measurementClients.forEach(client => {
+            if (measurements.sensorId === null || measurements.sensorId == undefined) {
+                return;
+            }
+
             if (!client.isServicing(measurements.sensorId.toString())) {
                 return;
             }
 
-            client.process(measurements);
+            const data = JSON.stringify(measurements);
+            client.process(data);
         });
     }
 
-    public hasOpenSocketFor(sensorId: string) {
-        for (let client of this.measurementClients) {
+    public hasOpenSocketFor(sensorId: string, type: ClientType) {
+        const clients = type === ClientType.MeasurementClient ?
+            this.measurementClients : this.messageClients;
+
+        for (let client of clients) {
             if (!client.isServicing(sensorId)) {
                 continue;
             }
@@ -95,6 +127,7 @@ export class WebSocketServer {
                 break;
 
             case ClientType.MessageClient:
+                this.messageClients.push(client);
                 break;
         }
 
@@ -115,6 +148,10 @@ export class WebSocketServer {
             if (pathname === "/live/v1/measurements") {
                 this.wss.handleUpgrade(request, socket, head, async (ws: WebSocket) => {
                     await this.handleSocketUpgrade(ws, request, ClientType.MeasurementClient);
+                });
+            } else if (pathname === "/live/v1/messages") {
+                this.wss.handleUpgrade(request, socket, head, async (ws: WebSocket) => {
+                    await this.handleSocketUpgrade(ws, request, ClientType.MessageClient);
                 });
             }
         });

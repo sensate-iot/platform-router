@@ -6,11 +6,8 @@
  */
 
 import { Types } from "mongoose";
+import { GeoJSON } from "./geojson";
 
-export class GeoJSON {
-    type: string;
-    coordinates: number[];
-}
 
 export class DataPoint {
     unit: string;

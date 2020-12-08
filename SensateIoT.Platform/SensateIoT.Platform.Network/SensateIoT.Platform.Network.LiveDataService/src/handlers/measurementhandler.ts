@@ -11,15 +11,10 @@ import { BulkMeasurementInfo, Measurement } from "../models/measurement";
 import * as gzip from "zlib";
 import { sensateiot } from "../../generated/proto";
 import { ObjectId } from "mongodb";
+import { ClientType } from "../models/clienttype";
 
 export class MeasurementHandler implements IMessageHandler {
-    public constructor(private readonly wss: WebSocketServer, private readonly topic: string) {
-        setInterval(this.publicationHandler, 60000);
-    }
-
-    private publicationHandler(): void {
-        console.log("Updating message routers!");
-    }
+    public constructor(private readonly wss: WebSocketServer, private readonly topic: string) { }
 
     public async handle(topic: string, data: string) {
         const msg = await this.decode(data);
@@ -29,11 +24,11 @@ export class MeasurementHandler implements IMessageHandler {
         blocks.forEach(block => {
             console.log(block);
 
-            if (!this.wss.hasOpenSocketFor(block.sensorId.toString())) {
+            if (!this.wss.hasOpenSocketFor(block.sensorId.toString(), ClientType.MeasurementClient)) {
                 return;
             }
 
-            this.wss.process(block);
+            this.wss.processMeasurements(block);
         });
     }
 
@@ -68,7 +63,7 @@ export class MeasurementHandler implements IMessageHandler {
 
         let dict = {};
 
-        sorted.forEach((el, idx) => {
+        sorted.forEach((el) => {
             if (el.SensorID in dict) {
                 dict[el.SensorID].push(el);
             } else {
@@ -95,7 +90,7 @@ export class MeasurementHandler implements IMessageHandler {
                         accuracy: k.Accuracy,
                         value: k.Value
                     };
-                })
+                });
 
                 m.location = {
                     type: 'point',

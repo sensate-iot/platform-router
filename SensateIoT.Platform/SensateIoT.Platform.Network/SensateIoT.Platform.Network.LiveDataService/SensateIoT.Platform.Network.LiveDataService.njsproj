@@ -69,7 +69,16 @@
     <TypeScriptCompile Include="src\handlers\measurementhandler.ts" />
     <TypeScriptCompile Include="src\handlers\messagehandler.ts" />
     <TypeScriptCompile Include="src\models\auditlog.ts" />
+    <TypeScriptCompile Include="src\models\clienttype.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="src\models\geojson.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="src\models\measurement.ts" />
+    <TypeScriptCompile Include="src\models\message.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="src\models\request.ts" />
     <TypeScriptCompile Include="src\models\sensor.ts" />
     <TypeScriptCompile Include="src\models\sensorauthrequest.ts" />
