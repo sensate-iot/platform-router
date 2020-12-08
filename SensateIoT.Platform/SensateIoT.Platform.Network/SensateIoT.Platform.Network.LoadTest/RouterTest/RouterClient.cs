@@ -26,8 +26,9 @@ namespace SensateIoT.Platform.Network.LoadTest.RouterTest
 			var router = new IngressRouter.IngressRouterClient(this.m_channel);
 
 			while(true) {
-				var measurements = generator.GenerateMeasurementData(10);
+				var measurements = generator.GenerateMeasurementData(100);
 				await router.EnqueueBulkMeasurementsAsync(measurements, Metadata.Empty);
+				await Task.Delay(10);
 			}
 		}
 	}

@@ -24,7 +24,7 @@
     <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
     <TypeScriptSourceMap>true</TypeScriptSourceMap>
     <TypeScriptModuleKind>CommonJS</TypeScriptModuleKind>
-    <TypeScriptToolsVersion>3.9</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>4.0</TypeScriptToolsVersion>
     <EnableTypeScript>true</EnableTypeScript>
     <StartWebBrowser>False</StartWebBrowser>
   </PropertyGroup>
@@ -56,7 +56,7 @@
     <TypeScriptCompile Include="src\app\app.ts" />
     <TypeScriptCompile Include="src\app\guid.ts" />
     <TypeScriptCompile Include="src\app\jsonmodule.ts" />
-    <TypeScriptCompile Include="src\app\live-data-handler.ts" />
+    <TypeScriptCompile Include="src\app\live-data-service.ts" />
     <TypeScriptCompile Include="src\app\mongodb.ts" />
     <TypeScriptCompile Include="src\app\postgresql.ts" />
     <TypeScriptCompile Include="src\app\util.ts" />
@@ -65,8 +65,8 @@
     <TypeScriptCompile Include="src\clients\mqttclient.ts" />
     <TypeScriptCompile Include="src\clients\sensorlinksclient.ts" />
     <TypeScriptCompile Include="src\clients\websocketclient.ts" />
-    <TypeScriptCompile Include="src\handlers\bulkmessagehandler.ts" />
     <TypeScriptCompile Include="src\handlers\imessagehandler.ts" />
+    <TypeScriptCompile Include="src\handlers\measurementhandler.ts" />
     <TypeScriptCompile Include="src\handlers\messagehandler.ts" />
     <TypeScriptCompile Include="src\models\auditlog.ts" />
     <TypeScriptCompile Include="src\models\measurement.ts" />

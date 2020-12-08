@@ -8,8 +8,8 @@ interface MqttSettings {
     ssl: boolean;
     port: number;
     host: string;
-    internalMeasurementTopic: string;
-    internalBulkMeasurementTopic: string;
+    bulkMeasurementTopic: string;
+    bulkMessageTopic: string;
     topicShare: string;
 }
 

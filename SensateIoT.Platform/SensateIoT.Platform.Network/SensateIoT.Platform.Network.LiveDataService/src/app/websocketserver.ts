@@ -15,12 +15,13 @@ import { WebSocketClient } from "../clients/websocketclient";
 import { Pool } from "pg";
 import { AuditLogsClient } from "../clients/auditlogsclient";
 import { getClientIP } from "./util";
+import { ClientType } from "../models/clienttype";
 
 export class WebSocketServer {
     private readonly server: http.Server;
     private readonly wss: WebSocket.Server;
 
-    private readonly clients: WebSocketClient[];
+    private readonly measurementClients: WebSocketClient[];
     private readonly auditlogs: AuditLogsClient;
 
     public constructor(expr: express.Express,
@@ -31,12 +32,12 @@ export class WebSocketServer {
         const server = http.createServer(expr);
         this.server = server;
         this.wss = new WebSocket.Server({ noServer: true });
-        this.clients = [];
+        this.measurementClients = [];
         this.auditlogs = new AuditLogsClient(pool);
     }
 
     public process(measurements: BulkMeasurementInfo) {
-        this.clients.forEach(client => {
+        this.measurementClients.forEach(client => {
             if (!client.isServicing(measurements.sensorId.toString())) {
                 return;
             }
@@ -46,7 +47,7 @@ export class WebSocketServer {
     }
 
     public hasOpenSocketFor(sensorId: string) {
-        for (let client of this.clients) {
+        for (let client of this.measurementClients) {
             if (!client.isServicing(sensorId)) {
                 continue;
             }
@@ -58,15 +59,15 @@ export class WebSocketServer {
     }
 
     private destroyConnection(ws: WebSocket) {
-        this.clients.forEach((info, index) => {
+        this.measurementClients.forEach((info, index) => {
             if (info.compareSocket(ws)) {
                 console.log("Removing web socket!");
-                this.clients.splice(index, 1);
+                this.measurementClients.splice(index, 1);
             }
         });
     }
 
-    private async handleSocketUpgrade(socket: WebSocket, request: any) {
+    private async handleSocketUpgrade(socket: WebSocket, request: any, type: ClientType) {
         let ip = getClientIP(request.headers["x-forwarded-for"]);
 
         if (ip === "") {
@@ -88,8 +89,15 @@ export class WebSocketServer {
             await client.authorize(split[1]);
         }
 
+        switch (type) {
+            case ClientType.MeasurementClient:
+                this.measurementClients.push(client);
+                break;
 
-        this.clients.push(client);
+            case ClientType.MessageClient:
+                break;
+        }
+
         this.wss.emit("connection", socket, request);
     }
 
@@ -106,7 +114,7 @@ export class WebSocketServer {
 
             if (pathname === "/live/v1/measurements") {
                 this.wss.handleUpgrade(request, socket, head, async (ws: WebSocket) => {
-                    await this.handleSocketUpgrade(ws, request);
+                    await this.handleSocketUpgrade(ws, request, ClientType.MeasurementClient);
                 });
             }
         });

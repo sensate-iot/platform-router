@@ -7,27 +7,27 @@
 
 import { Types } from "mongoose";
 
-export interface IGeoJSON {
+export class GeoJSON {
     type: string;
     coordinates: number[];
 }
 
-export interface IDataPoint {
+export class DataPoint {
     unit: string;
     value: number;
     precision?: number;
     accuracy?: number;
 }
 
-export interface Measurement {
+export class Measurement {
     timestamp: Date;
     platformTime: Date;
-    location: IGeoJSON;
-    data: Map<string, IDataPoint>;
+    location: GeoJSON;
+    data: Map<string, DataPoint>;
 }
 
 export class BulkMeasurementInfo {
-    public measurements: [Measurement];
+    public measurements: Measurement[];
     public sensorId: Types.ObjectId;
 }
 
