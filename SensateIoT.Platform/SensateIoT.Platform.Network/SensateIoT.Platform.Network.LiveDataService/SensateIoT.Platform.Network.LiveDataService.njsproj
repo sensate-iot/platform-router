@@ -42,6 +42,9 @@
     <Content Include="settings\appsettings.json">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="src\models\apikeyauthenticationrequest.ts">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="tsconfig.json" />
   </ItemGroup>
   <ItemGroup>
@@ -61,6 +64,9 @@
     <TypeScriptCompile Include="src\app\postgresql.ts" />
     <TypeScriptCompile Include="src\app\util.ts" />
     <TypeScriptCompile Include="src\app\websocketserver.ts" />
+    <TypeScriptCompile Include="src\clients\apikeyclient.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="src\clients\auditlogsclient.ts" />
     <TypeScriptCompile Include="src\clients\mqttclient.ts" />
     <TypeScriptCompile Include="src\clients\sensorlinksclient.ts" />

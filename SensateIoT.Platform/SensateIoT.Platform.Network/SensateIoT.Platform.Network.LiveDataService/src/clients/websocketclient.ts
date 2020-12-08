@@ -20,6 +20,8 @@ import { Pool } from "pg";
 import moment from "moment";
 import { AuditLogsClient } from "./auditlogsclient";
 import { AuditLog, RequestMethod } from "../models/auditlog";
+import { ApiKeyClient } from "./apikeyclient";
+import { IApiKeyAuthenticationRequest } from "../models/apikeyauthenticationrequest";
 
 export class WebSocketClient {
     private readonly sensors: Map<string, SensorModel>;
@@ -30,6 +32,7 @@ export class WebSocketClient {
 
     public constructor(
         private readonly logs: AuditLogsClient,
+        private readonly keys: ApiKeyClient,
         private readonly secret: string,
         private readonly remote: string,
         private readonly timeout: number,
@@ -62,7 +65,7 @@ export class WebSocketClient {
             return;
         }
 
-        if (req.request !== "auth" && !this.authorized) {
+        if ((req.request !== "auth" && req.request !== "auth-apikey") && !this.authorized) {
             console.log(`Received unauthorized request: ${req.request}`);
             return;
         }
@@ -74,6 +77,11 @@ export class WebSocketClient {
 
             case "unsubscribe":
                 this.unsubscribe(req);
+                break;
+
+            case "auth-apikey":
+                const authRequest = req as IWebSocketRequest<IApiKeyAuthenticationRequest>;
+                this.authorized = await this.keys.validateApiKey(authRequest.data.user, authRequest.data.apikey);
                 break;
 
             case "auth":

@@ -22,8 +22,6 @@ export class MeasurementHandler implements IMessageHandler {
         const blocks = this.groupMeasurements(measurements);
 
         blocks.forEach(block => {
-            console.log(block);
-
             if (!this.wss.hasOpenSocketFor(block.sensorId.toString(), ClientType.MeasurementClient)) {
                 return;
             }

@@ -38,7 +38,7 @@ export class MqttClient {
 
         this.client.on("message", (topic, msg) => {
             if (this.share != null && this.share != "") {
-                topic = `${this.share}/${topic}`;
+                topic = `$share/${this.share}/${topic}`;
             }
 
             this.handlers.forEach(handler => {

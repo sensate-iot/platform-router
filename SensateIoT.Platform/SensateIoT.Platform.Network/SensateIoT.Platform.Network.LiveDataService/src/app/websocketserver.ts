@@ -17,6 +17,7 @@ import { AuditLogsClient } from "../clients/auditlogsclient";
 import { getClientIP } from "./util";
 import { ClientType } from "../models/clienttype";
 import { BulkMessageInfo } from "../models/message";
+import { ApiKeyClient } from "../clients/apikeyclient";
 
 export class WebSocketServer {
     private readonly server: http.Server;
@@ -25,6 +26,7 @@ export class WebSocketServer {
     private readonly measurementClients: WebSocketClient[];
     private readonly messageClients: WebSocketClient[];
     private readonly auditlogs: AuditLogsClient;
+    private readonly apikeys: ApiKeyClient;
 
     public constructor(expr: express.Express,
         private readonly pool: Pool,
@@ -37,6 +39,7 @@ export class WebSocketServer {
         this.measurementClients = [];
         this.messageClients = [];
         this.auditlogs = new AuditLogsClient(pool);
+        this.apikeys = new ApiKeyClient(pool);
 
         setInterval(this.publicationHandler, 60000);
     }
@@ -106,7 +109,9 @@ export class WebSocketServer {
             ip = request.connection.remoteAddress.toString();
         }
 
-        const client = new WebSocketClient(this.auditlogs,
+        const client = new WebSocketClient(
+            this.auditlogs,
+            this.apikeys,
             this.secret,
             ip,
             this.timeout,

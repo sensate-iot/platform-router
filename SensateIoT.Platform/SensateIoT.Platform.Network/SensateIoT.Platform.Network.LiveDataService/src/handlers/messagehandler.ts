@@ -23,8 +23,6 @@ export class MessageHandler implements IMessageHandler {
         const blocks = this.groupMessages(messages);
 
         blocks.forEach(block => {
-            console.log(block);
-
             if (!this.wss.hasOpenSocketFor(block.sensorId.toString(), ClientType.MessageClient)) {
                 return;
             }
