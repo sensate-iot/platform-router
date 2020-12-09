@@ -9,8 +9,10 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Google.Protobuf;
+
 using Microsoft.Extensions.Options;
+
+using Google.Protobuf;
 
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
 using SensateIoT.Platform.Network.Common.Collections.Local;
@@ -20,6 +22,7 @@ using SensateIoT.Platform.Network.Common.MQTT;
 using SensateIoT.Platform.Network.Common.Settings;
 using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
+
 using Measurement = SensateIoT.Platform.Network.Data.DTO.Measurement;
 
 namespace SensateIoT.Platform.Network.Common.Collections.Remote

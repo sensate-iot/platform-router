@@ -23,6 +23,7 @@ using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Models;
+using Message = SensateIoT.Platform.Network.Data.DTO.Message;
 
 namespace SensateIoT.Platform.Network.Common.Collections.Remote
 {

@@ -19,6 +19,10 @@ using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.Tests.Utility;
 
+using DataPoint = SensateIoT.Platform.Network.Data.DTO.DataPoint;
+using Measurement = SensateIoT.Platform.Network.Data.DTO.Measurement;
+using Message = SensateIoT.Platform.Network.Data.DTO.Message;
+
 namespace SensateIoT.Platform.Network.Tests.Collections
 {
 	[TestClass]

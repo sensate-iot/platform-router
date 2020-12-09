@@ -70,6 +70,8 @@ namespace SensateIoT.Platform.Network.Common.Converters
 						Value = System.Convert.ToDouble(dp.Value)
 					});
 				}
+
+				data.Measurements.Add(m);
 			}
 
 			return data;
