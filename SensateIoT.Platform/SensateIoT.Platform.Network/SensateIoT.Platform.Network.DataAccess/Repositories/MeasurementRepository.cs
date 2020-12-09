@@ -19,6 +19,7 @@ using MongoDB.Driver;
 
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Contexts;
+using SensateIoT.Platform.Network.DataAccess.Extensions;
 
 namespace SensateIoT.Platform.Network.DataAccess.Repositories
 {
@@ -36,15 +37,6 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		}
 
 		#region Measurement creation
-		private static DateTime GetCurrentHour()
-		{
-			DateTime rounded;
-			var dt = DateTime.UtcNow;
-
-			rounded = new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, 0, 0, dt.Kind);
-			return rounded;
-		}
-
 		private static UpdateDefinition<MeasurementBucket> CreateBucketUpdate(
 			ObjectId sensor, ICollection<Measurement> measurements)
 		{
@@ -53,7 +45,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 			var ubuilder = Builders<MeasurementBucket>.Update;
 			var update = ubuilder.PushEach(x => x.Measurements, measurements)
-				.SetOnInsert(x => x.Timestamp, GetCurrentHour())
+				.SetOnInsert(x => x.Timestamp, DateTime.UtcNow.ThisHour())
 				.SetOnInsert(x => x.SensorId, sensor)
 				.SetOnInsert(x => x.First, first.Timestamp)
 				.Set(x => x.Last, last.Timestamp)
@@ -70,7 +62,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			foreach(var kvpair in measurements) {
 				var fbuilder = Builders<MeasurementBucket>.Filter;
 
-				var filter = fbuilder.Eq(x => x.Timestamp, GetCurrentHour()) &
+				var filter = fbuilder.Eq(x => x.Timestamp, DateTime.UtcNow.ThisHour()) &
 							 fbuilder.Eq(x => x.SensorId, kvpair.Key) &
 							 fbuilder.Lt(x => x.Count, MeasurementBucketSize);
 

@@ -25,6 +25,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Contexts
 		public IMongoDatabase Database => this.m_client.GetDatabase(this.m_settings.DatabaseName);
 		public IMongoCollection<Sensor> Sensors => this.Database.GetCollection<Sensor>("Sensors");
 		public IMongoCollection<MeasurementBucket> Measurements => this.Database.GetCollection<MeasurementBucket>("Measurements");
+		public IMongoCollection<SensorStatisticsEntry> SensorStatistics => this.Database.GetCollection<SensorStatisticsEntry>("SensorStatistics");
 		public IMongoCollection<ControlMessage> ControlMessages => this.Database.GetCollection<ControlMessage>("ControlMessages");
 
 		public MongoDBContext(IOptions<MongoDBSettings> settings, ILogger<MongoDBContext> logger)
