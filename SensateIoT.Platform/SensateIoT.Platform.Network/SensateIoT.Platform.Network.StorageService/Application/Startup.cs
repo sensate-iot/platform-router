@@ -52,6 +52,7 @@ namespace SensateIoT.Platform.Network.StorageService.Application
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.AddScoped<IMeasurementRepository, MeasurementRepository>();
 			services.AddScoped<ISensorStatisticsRepository, SensorStatisticsRepository>();
+			services.AddScoped<IMessageRepository, MessageRepository>();
 
 			services.AddInternalMqttService(options => {
 				options.Ssl = privatemqtt.Ssl;
@@ -88,4 +89,3 @@ namespace SensateIoT.Platform.Network.StorageService.Application
 		}
 	}
 }
-
