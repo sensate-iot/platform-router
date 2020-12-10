@@ -18,7 +18,7 @@ using SensateIoT.Platform.Network.Data.DTO;
 
 namespace SensateIoT.Platform.Network.Common.Converters
 {
-	public class MessageProtobufConverter
+	public static class MessageProtobufConverter
 	{
 		public static TextMessageData Convert(IEnumerable<Message> messages)
 		{
@@ -30,6 +30,7 @@ namespace SensateIoT.Platform.Network.Common.Converters
 					Longitude = message.Longitude,
 					SensorID = message.SensorID.ToString(),
 					Timestamp = Timestamp.FromDateTime(message.Timestamp),
+					PlatformTime = Timestamp.FromDateTime(message.PlatformTimestamp),
 					Data = message.Data
 				};
 

@@ -41,12 +41,10 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		public async Task IncrementManyAsync(ObjectId sensorId, RequestMethod method, int num, CancellationToken token)
 		{
 			var update = Builders<SensorStatisticsEntry>.Update;
-			UpdateDefinition<SensorStatisticsEntry> updateDefinition;
-
-			updateDefinition = update.Inc(x => x.Measurements, num)
+			var opts = new UpdateOptions { IsUpsert = true };
+			var updateDefinition = update.Inc(x => x.Measurements, num)
 				.SetOnInsert(x => x.Method, method);
 
-			var opts = new UpdateOptions { IsUpsert = true };
 			try {
 				await this._stats.UpdateOneAsync(x => x.SensorId == sensorId &&
 														   x.Date == DateTime.Now.ThisHour() && x.Method == method,

@@ -89,7 +89,8 @@ namespace SensateIoT.Platform.Network.Common.Converters
 				Latitude = System.Convert.ToDecimal(measurement.Latitude),
 				Longitude = System.Convert.ToDecimal(measurement.Longitude),
 				SensorId = ObjectId.Parse(measurement.SensorID),
-				Timestamp = measurement.Timestamp == null ? DateTime.UtcNow : measurement.Timestamp.ToDateTime()
+				Timestamp = measurement.Timestamp == null ? DateTime.UtcNow : measurement.Timestamp.ToDateTime(),
+				PlatformTimestamp = measurement.PlatformTime == null ? DateTime.UtcNow : measurement.PlatformTime.ToDateTime()
 			};
 		}
 	}

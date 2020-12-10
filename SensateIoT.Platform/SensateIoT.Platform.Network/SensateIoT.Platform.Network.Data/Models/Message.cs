@@ -23,6 +23,7 @@ namespace SensateIoT.Platform.Network.Data.Models
 		public ObjectId InternalId { get; set; }
 		[BsonRequired]
 		public DateTime Timestamp { get; set; }
+		[BsonRequired]
 		public DateTime PlatformTimestamp { get; set; }
 		[BsonRequired, JsonConverter(typeof(ObjectIdJsonConverter))]
 		public ObjectId SensorId { get; set; }
