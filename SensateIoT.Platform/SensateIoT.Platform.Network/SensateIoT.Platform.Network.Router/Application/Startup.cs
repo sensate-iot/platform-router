@@ -63,7 +63,7 @@ namespace SensateIoT.Platform.Network.Router.Application
 				opts.LiveDataReloadInterval = TimeSpan.FromSeconds(this.Configuration.GetValue<int>("Cache:LiveDataReloadInterval"));
 			});
 
-			services.Configure<DataCacheSettings>(opts => {
+			services.Configure<DataCacheOptions>(opts => {
 				opts.Capacity = capacity;
 				opts.Timeout = TimeSpan.FromSeconds(timeout);
 			});
