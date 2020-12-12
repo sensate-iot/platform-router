@@ -20,6 +20,7 @@ using SensateIoT.Platform.Network.Common.Caching.Memory;
 using SensateIoT.Platform.Network.Common.Exceptions;
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Models;
+
 using Sensor = SensateIoT.Platform.Network.Data.DTO.Sensor;
 
 namespace SensateIoT.Platform.Network.Common.Caching.Object
@@ -29,15 +30,15 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 		private readonly ISensorCache m_sensors;
 		private readonly IMemoryCache<Guid, Account> m_accounts;
 		private readonly IMemoryCache<string, ApiKey> m_keys;
-		private readonly DataCacheSettings m_settings;
+		private readonly DataCacheOptions _mOptions;
 		private readonly ILogger<DataCache> m_logger;
 		private readonly IMemoryCache<string, LiveDataHandler> m_remotes;
 
-		public DataCache(IOptions<DataCacheSettings> options, ILogger<DataCache> logger)
+		public DataCache(IOptions<DataCacheOptions> options, ILogger<DataCache> logger)
 		{
 			var tmo = options.Value.Timeout;
 			var capacity = options.Value.Capacity ?? MemoryCache<int, int>.DefaultCapacity;
-			this.m_settings = options.Value;
+			this._mOptions = options.Value;
 
 			this.m_sensors = new SensorCache(capacity, tmo);
 			this.m_keys = new MemoryCache<string, ApiKey>(capacity, tmo);
@@ -87,7 +88,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 			});
 
 			try {
-				this.m_sensors.AddOrUpdate(sensorsKvp, new CacheEntryOptions { Size = CalculateEntrySize(this.m_settings) });
+				this.m_sensors.AddOrUpdate(sensorsKvp, new CacheEntryOptions { Size = CalculateEntrySize(this._mOptions) });
 			} catch(ArgumentOutOfRangeException ex) {
 				this.m_logger.LogError("Unable to update cache: {message}.", ex.Message);
 			}
@@ -101,7 +102,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 			});
 
 			try {
-				this.m_accounts.AddOrUpdate(accountsKvp, new CacheEntryOptions { Size = CalculateEntrySize(this.m_settings) });
+				this.m_accounts.AddOrUpdate(accountsKvp, new CacheEntryOptions { Size = CalculateEntrySize(this._mOptions) });
 			} catch(ArgumentOutOfRangeException ex) {
 				this.m_logger.LogError("Unable to update cache: {message}.", ex.Message);
 			}
@@ -115,7 +116,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 			});
 
 			try {
-				this.m_keys.AddOrUpdate(keysKvp, new CacheEntryOptions { Size = CalculateEntrySize(this.m_settings) });
+				this.m_keys.AddOrUpdate(keysKvp, new CacheEntryOptions { Size = CalculateEntrySize(this._mOptions) });
 			} catch(ArgumentOutOfRangeException ex) {
 				this.m_logger.LogError("Unable to add key to cache: {message}.", ex.Message);
 			}
@@ -124,7 +125,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 		public void Append(Sensor sensor)
 		{
 			try {
-				this.m_sensors.AddOrUpdate(sensor.ID, sensor, new CacheEntryOptions { Size = CalculateEntrySize(this.m_settings) });
+				this.m_sensors.AddOrUpdate(sensor.ID, sensor, new CacheEntryOptions { Size = CalculateEntrySize(this._mOptions) });
 			} catch(ArgumentOutOfRangeException ex) {
 				this.m_logger.LogError("Unable to update cache: {message}.", ex.Message);
 			}
@@ -133,7 +134,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 		public void Append(Account account)
 		{
 			try {
-				this.m_accounts.AddOrUpdate(account.ID, account, new CacheEntryOptions { Size = CalculateEntrySize(this.m_settings) });
+				this.m_accounts.AddOrUpdate(account.ID, account, new CacheEntryOptions { Size = CalculateEntrySize(this._mOptions) });
 			} catch(ArgumentOutOfRangeException ex) {
 				this.m_logger.LogError("Unable to update cache: {message}.", ex.Message);
 			}
@@ -142,7 +143,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 		public void Append(ApiKey key)
 		{
 			try {
-				this.m_keys.AddOrUpdate(key.Key, key, new CacheEntryOptions { Size = CalculateEntrySize(this.m_settings) });
+				this.m_keys.AddOrUpdate(key.Key, key, new CacheEntryOptions { Size = CalculateEntrySize(this._mOptions) });
 			} catch(ArgumentOutOfRangeException ex) {
 				this.m_logger.LogError("Unable to update cache: {message}.", ex.Message);
 			}
@@ -239,7 +240,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 			this.m_sensors.FlushLiveDataRoutes();
 		}
 
-		private static long? CalculateEntrySize(DataCacheSettings cache)
+		private static long? CalculateEntrySize(DataCacheOptions cache)
 		{
 			long? size = null;
 

@@ -75,7 +75,7 @@ namespace SensateIoT.Platform.Network.Tests.Object
 		private IDataCache buildCache()
 		{
 			var logger = new Mock<ILogger<DataCache>>();
-			var options = Options.Create(new DataCacheSettings { Timeout = TimeSpan.FromMinutes(1) });
+			var options = Options.Create(new DataCacheOptions { Timeout = TimeSpan.FromMinutes(1) });
 			var cache = new DataCache(options, logger.Object);
 
 			for(var idx = 0; idx < 10; idx++) {

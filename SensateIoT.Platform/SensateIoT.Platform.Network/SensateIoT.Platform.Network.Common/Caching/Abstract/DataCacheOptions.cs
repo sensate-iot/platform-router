@@ -9,7 +9,7 @@ using System;
 
 namespace SensateIoT.Platform.Network.Common.Caching.Abstract
 {
-	public class DataCacheSettings
+	public class DataCacheOptions
 	{
 		public long? Capacity { get; set; }
 		public TimeSpan Timeout { get; set; }
