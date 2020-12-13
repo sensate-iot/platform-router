@@ -22,6 +22,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions", "Functions", "{2BC79829-3F73-43D8-987A-68E72A2F56AA}"
 	ProjectSection(SolutionItems) = preProject
 		SensateIoT.Platform.Network.Database\Functions\LiveDataService_GetApiKey.sql = SensateIoT.Platform.Network.Database\Functions\LiveDataService_GetApiKey.sql
+		SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectUsersByID.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectUsersByID.sql
 		SensateIoT.Platform.Network.Database\Functions\Router_GetAccount.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetAccount.sql
 		SensateIoT.Platform.Network.Database\Functions\Router_GetAccounts.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetAccounts.sql
 		SensateIoT.Platform.Network.Database\Functions\Router_GetLiveDataHandlers.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetLiveDataHandlers.sql
@@ -65,7 +66,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.API", "SensateIoT.Platform.Network.API\SensateIoT.Platform.Network.API.csproj", "{77B8B1C7-4C1B-44EC-BB89-2793BA33D48A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SensateIoT.Platform.Network.Adapters", "SensateIoT.Platform.Network.Adapters\SensateIoT.Platform.Network.Adapters.csproj", "{1529501C-D9BE-4E9C-8F17-B7AD4907E7FF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.Adapters", "SensateIoT.Platform.Network.Adapters\SensateIoT.Platform.Network.Adapters.csproj", "{1529501C-D9BE-4E9C-8F17-B7AD4907E7FF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
