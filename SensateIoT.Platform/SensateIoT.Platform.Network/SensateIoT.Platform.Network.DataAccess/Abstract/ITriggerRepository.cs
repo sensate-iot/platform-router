@@ -13,9 +13,10 @@ using MongoDB.Bson;
 
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Models;
+
 using TriggerAction = SensateIoT.Platform.Network.Data.DTO.TriggerAction;
 
-namespace SensateIoT.Platform.Network.DataAccess.Repositories
+namespace SensateIoT.Platform.Network.DataAccess.Abstract
 {
 	public interface ITriggerRepository
 	{

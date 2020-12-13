@@ -17,6 +17,7 @@ using SensateIoT.Platform.Network.Adapters.Abstract;
 using SensateIoT.Platform.Network.Adapters.Mail;
 using SensateIoT.Platform.Network.Adapters.SMS;
 using SensateIoT.Platform.Network.Common.Init;
+using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Repositories;
 using SensateIoT.Platform.Network.TriggerService.Clients;
 using SensateIoT.Platform.Network.TriggerService.Config;

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 using SensateIoT.Platform.Network.Data.Models;
 
-namespace SensateIoT.Platform.Network.DataAccess.Repositories
+namespace SensateIoT.Platform.Network.DataAccess.Abstract
 {
 	public interface IMessageRepository
 	{

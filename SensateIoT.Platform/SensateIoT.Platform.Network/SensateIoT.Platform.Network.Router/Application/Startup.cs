@@ -23,6 +23,7 @@ using SensateIoT.Platform.Network.Common.Services.Data;
 using SensateIoT.Platform.Network.Common.Services.Processing;
 using SensateIoT.Platform.Network.Common.Settings;
 using SensateIoT.Platform.Network.Data.Abstract;
+using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Repositories;
 using SensateIoT.Platform.Network.Router.Config;
 using SensateIoT.Platform.Network.Router.MQTT;

@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 
 using SensateIoT.Platform.Network.Data.Models;
+using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Contexts;
 
 namespace SensateIoT.Platform.Network.DataAccess.Repositories

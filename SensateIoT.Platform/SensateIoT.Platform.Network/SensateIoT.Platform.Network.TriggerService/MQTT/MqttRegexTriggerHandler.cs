@@ -21,7 +21,7 @@ using MongoDB.Bson;
 using SensateIoT.Platform.Network.Common.MQTT;
 using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.DTO;
-using SensateIoT.Platform.Network.DataAccess.Repositories;
+using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Network.TriggerService.DTO;
 using SensateIoT.Platform.Network.TriggerService.Services;
 

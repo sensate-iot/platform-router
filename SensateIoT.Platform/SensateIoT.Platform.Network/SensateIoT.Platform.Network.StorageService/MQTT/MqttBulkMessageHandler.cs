@@ -18,7 +18,7 @@ using SensateIoT.Platform.Network.Common.Converters;
 using SensateIoT.Platform.Network.Common.MQTT;
 using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.Models;
-using SensateIoT.Platform.Network.DataAccess.Repositories;
+using SensateIoT.Platform.Network.DataAccess.Abstract;
 
 namespace SensateIoT.Platform.Network.StorageService.MQTT
 {

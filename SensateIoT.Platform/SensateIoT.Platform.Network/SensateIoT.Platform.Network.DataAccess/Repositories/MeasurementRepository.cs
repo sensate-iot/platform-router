@@ -18,6 +18,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 
 using SensateIoT.Platform.Network.Data.Models;
+using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Contexts;
 using SensateIoT.Platform.Network.DataAccess.Extensions;
 

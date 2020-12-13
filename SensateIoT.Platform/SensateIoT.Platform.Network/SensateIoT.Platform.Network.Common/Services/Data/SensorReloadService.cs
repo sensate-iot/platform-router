@@ -19,6 +19,7 @@ using SensateIoT.Platform.Network.Common.Caching.Object;
 using SensateIoT.Platform.Network.Common.Services.Background;
 using SensateIoT.Platform.Network.Common.Settings;
 using SensateIoT.Platform.Network.Data.DTO;
+using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Repositories;
 
 namespace SensateIoT.Platform.Network.Common.Services.Data

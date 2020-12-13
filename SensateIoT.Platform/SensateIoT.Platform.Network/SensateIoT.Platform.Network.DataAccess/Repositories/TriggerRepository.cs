@@ -18,7 +18,9 @@ using Npgsql;
 
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Models;
+using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Contexts;
+
 using TriggerAction = SensateIoT.Platform.Network.Data.DTO.TriggerAction;
 
 namespace SensateIoT.Platform.Network.DataAccess.Repositories

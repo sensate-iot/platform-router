@@ -13,7 +13,7 @@ using MongoDB.Bson;
 
 using SensateIoT.Platform.Network.Data.DTO;
 
-namespace SensateIoT.Platform.Network.DataAccess.Repositories
+namespace SensateIoT.Platform.Network.DataAccess.Abstract
 {
 	public interface ISensorRepository
 	{

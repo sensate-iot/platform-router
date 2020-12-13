@@ -18,6 +18,7 @@ using Microsoft.Extensions.Logging;
 using SensateIoT.Platform.Network.Common.Converters;
 using SensateIoT.Platform.Network.Common.MQTT;
 using SensateIoT.Platform.Network.Contracts.DTO;
+using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Repositories;
 using SensateIoT.Platform.Network.StorageService.DTO;
 
