@@ -9,6 +9,11 @@
 
   <ItemGroup>
     <Folder Include="Controllers\" />
+    <Folder Include="Constants\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SensateIoT.Platform.Network.Data\SensateIoT.Platform.Network.Data.csproj" />
   </ItemGroup>
 
 
