@@ -16,8 +16,8 @@ namespace SensateIoT.Platform.Network.DataAccess.Abstract
 {
 	public interface IAccountsRepository
 	{
-		Task<IEnumerable<Account>> GetAccountsAsync(CancellationToken ct = default);
-		Task<Account> GetAccountAsync(Guid accountId, CancellationToken ct = default);
+		Task<IEnumerable<Account>> GetAccountsForRoutingAsync(CancellationToken ct = default);
+		Task<Account> GetAccountForRoutingAsync(Guid accountId, CancellationToken ct = default);
 		Task<IEnumerable<ApiKey>> GetApiKeysAsync(CancellationToken ct = default);
 		Task<ApiKey> GetApiKeyAsync(string key, CancellationToken ct = default);
 	}

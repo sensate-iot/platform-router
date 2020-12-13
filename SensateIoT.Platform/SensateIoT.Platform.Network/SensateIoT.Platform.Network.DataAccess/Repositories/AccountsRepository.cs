@@ -36,7 +36,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			this.m_ctx = ctx;
 		}
 
-		public async Task<IEnumerable<Account>> GetAccountsAsync(CancellationToken ct)
+		public async Task<IEnumerable<Account>> GetAccountsForRoutingAsync(CancellationToken ct)
 		{
 			var result = new List<Account>();
 
@@ -64,7 +64,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			return result;
 		}
 
-		public async Task<Account> GetAccountAsync(Guid accountId, CancellationToken ct = default)
+		public async Task<Account> GetAccountForRoutingAsync(Guid accountId, CancellationToken ct = default)
 		{
 			Account result;
 

@@ -52,7 +52,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Realtime
 
 				using(var scope = this.m_provider.CreateScope()) {
 					var userRepo = scope.ServiceProvider.GetRequiredService<IAccountsRepository>();
-					var user = await userRepo.GetAccountAsync(userGuid, ct).ConfigureAwait(false);
+					var user = await userRepo.GetAccountForRoutingAsync(userGuid, ct).ConfigureAwait(false);
 
 					this.m_cache.Append(user);
 				}

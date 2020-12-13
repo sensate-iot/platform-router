@@ -45,7 +45,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 			var accountRepo = scope.ServiceProvider.GetRequiredService<IAccountsRepository>();
 
 			var sw = Stopwatch.StartNew();
-			var accounts = await accountRepo.GetAccountsAsync(token).ConfigureAwait(false);
+			var accounts = await accountRepo.GetAccountsForRoutingAsync(token).ConfigureAwait(false);
 			this.m_cache.Append(accounts);
 			sw.Stop();
 
