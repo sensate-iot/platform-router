@@ -11,14 +11,15 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-using SensateIoT.Platform.Network.Common.Settings;
-
 using Twilio.Exceptions;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.Types;
+
+using SensateIoT.Platform.Network.Adapters.Abstract;
+
 using PhoneNumberResource = Twilio.Rest.Lookups.V1.PhoneNumberResource;
 
-namespace SensateIoT.Platform.Network.Common.Services.Adapters
+namespace SensateIoT.Platform.Network.Adapters.SMS
 {
 	public class TwillioTextSendService : ITextSendService
 	{
@@ -48,10 +49,10 @@ namespace SensateIoT.Platform.Network.Common.Services.Adapters
 				);
 			} catch(ApiException ex) {
 				if(ex.Code == AlphaNumericNotSupportedCode && retry) {
-					this._logger.LogInformation("Unable to send message using alpha-numeric ID. Trying with phone number..");
+					this._logger.LogWarning("Unable to send message using alpha-numeric ID. Trying with phone number..");
 					this.Send(this._settings.PhoneNumber, to, body, false);
 				} else {
-					this._logger.LogInformation($"Unable to send text message: {ex.Message}");
+					this._logger.LogError($"Unable to send text message: {ex.Message}");
 				}
 			}
 		}

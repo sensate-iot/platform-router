@@ -5,7 +5,7 @@
  * @email  michel.megens@sonatolabs.com
  */
 
-namespace SensateIoT.Platform.Network.Common.Settings
+namespace SensateIoT.Platform.Network.Adapters.Abstract
 {
 	public class TextServiceSettings
 	{

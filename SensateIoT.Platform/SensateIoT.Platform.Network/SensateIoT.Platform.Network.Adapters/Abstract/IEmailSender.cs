@@ -8,7 +8,7 @@
 using System.Threading.Tasks;
 using SensateIoT.Platform.Network.Data.DTO;
 
-namespace SensateIoT.Platform.Network.Common.Services.Adapters
+namespace SensateIoT.Platform.Network.Adapters.Abstract
 {
 	public interface IEmailSender
 	{

@@ -10,17 +10,19 @@ using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using Twilio;
+using Twilio.Rest.Api.V2010.Account;
+
+using SensateIoT.Platform.Network.Adapters.Abstract;
+using SensateIoT.Platform.Network.Adapters.Mail;
+using SensateIoT.Platform.Network.Adapters.SMS;
 using SensateIoT.Platform.Network.Common.Init;
-using SensateIoT.Platform.Network.Common.Services.Adapters;
-using SensateIoT.Platform.Network.Common.Settings;
 using SensateIoT.Platform.Network.DataAccess.Repositories;
 using SensateIoT.Platform.Network.TriggerService.Clients;
 using SensateIoT.Platform.Network.TriggerService.Config;
 using SensateIoT.Platform.Network.TriggerService.MQTT;
 using SensateIoT.Platform.Network.TriggerService.Services;
 using SensateIoT.Platform.Network.TriggerService.Settings;
-using Twilio;
-using Twilio.Rest.Api.V2010.Account;
 
 namespace SensateIoT.Platform.Network.TriggerService.Application
 {

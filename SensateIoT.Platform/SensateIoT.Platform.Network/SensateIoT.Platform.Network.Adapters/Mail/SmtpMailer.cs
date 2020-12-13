@@ -11,10 +11,10 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Options;
 
-using SensateIoT.Platform.Network.Common.Settings;
+using SensateIoT.Platform.Network.Adapters.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
 
-namespace SensateIoT.Platform.Network.Common.Services.Adapters
+namespace SensateIoT.Platform.Network.Adapters.Mail
 {
 	public class SmtpMailer : IEmailSender
 	{

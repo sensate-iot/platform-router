@@ -7,7 +7,7 @@
 
 using System.Threading.Tasks;
 
-namespace SensateIoT.Platform.Network.Common.Services.Adapters
+namespace SensateIoT.Platform.Network.Adapters.Abstract
 {
 	public interface ITextSendService
 	{

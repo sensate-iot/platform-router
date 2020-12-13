@@ -13,12 +13,12 @@ using Microsoft.Extensions.Options;
 
 using MongoDB.Bson;
 
-using SensateIoT.Platform.Network.Common.Services.Adapters;
-using SensateIoT.Platform.Network.Common.Settings;
+using SensateIoT.Platform.Network.Adapters.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Repositories;
 using SensateIoT.Platform.Network.TriggerService.Clients;
+
 using TriggerAction = SensateIoT.Platform.Network.Data.DTO.TriggerAction;
 
 namespace SensateIoT.Platform.Network.TriggerService.Services
