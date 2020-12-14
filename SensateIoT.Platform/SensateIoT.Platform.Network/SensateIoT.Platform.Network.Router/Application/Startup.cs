@@ -102,8 +102,7 @@ namespace SensateIoT.Platform.Network.Router.Application
 			});
 
 			services.AddScoped<ITriggerRepository, TriggerRepository>();
-			services.AddScoped<IAccountsRepository, AccountsRepository>();
-			services.AddScoped<ISensorRepository, SensorRepository>();
+			services.AddScoped<IRoutingRepository, RoutingRepository>();
 			services.AddScoped<ILiveDataHandlerRepository, LiveDataHandlerRepository>();
 
 			services.AddSingleton<IHostedService, SensorReloadService>();

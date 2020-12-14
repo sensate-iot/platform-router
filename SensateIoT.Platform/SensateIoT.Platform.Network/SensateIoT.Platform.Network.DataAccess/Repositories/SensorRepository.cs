@@ -28,49 +28,6 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			this.m_sensors = ctx.Sensors;
 		}
 
-		public async Task<IEnumerable<Sensor>> GetSensorsAsync(CancellationToken ct = default)
-		{
-			var result = new List<Sensor>();
-
-			var query = this.m_sensors.Aggregate()
-				.Project(new BsonDocument {
-					{"SensorKey", "$Secret"},
-					{"AccountID", "$Owner"},
-					{"StorageEnabled", "$StorageEnabled"}
-				});
-			var cursor = await query.ToCursorAsync(ct).ConfigureAwait(false);
-
-			await cursor.ForEachAsync(document => {
-				var sensor = new Sensor {
-					AccountID = Guid.Parse(document["AccountID"].AsString),
-					ID = document["_id"].AsObjectId,
-					SensorKey = document["SensorKey"].AsString,
-					StorageEnabled = !document.Contains("StorageEnabled") || document["StorageEnabled"].AsBoolean
-				};
-
-				result.Add(sensor);
-			}, ct).ConfigureAwait(false);
-
-			return result;
-		}
-
-		public async Task<Sensor> GetSensorsByIDAsnc(ObjectId sensorID, CancellationToken ct = default)
-		{
-			var query = this.m_sensors.Aggregate()
-				.Match(new BsonDocument("_id", sensorID))
-				.Project(new BsonDocument {
-					{"SensorKey", "$Secret"},
-					{"AccountID", "$Owner"},
-					{"_id", 1}
-				});
-
-			var result = await query.FirstOrDefaultAsync(ct).ConfigureAwait(false);
-
-			return new Sensor {
-				AccountID = Guid.Parse(result["AccountID"].AsString),
-				ID = result["_id"].AsObjectId,
-				SensorKey = result["SensorKey"].AsString
-			};
-		}
+		
 	}
 }

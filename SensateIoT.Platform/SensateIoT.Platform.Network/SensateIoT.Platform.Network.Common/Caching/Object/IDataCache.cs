@@ -13,6 +13,8 @@ using MongoDB.Bson;
 
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Models;
+
+using ApiKey = SensateIoT.Platform.Network.Data.DTO.ApiKey;
 using Sensor = SensateIoT.Platform.Network.Data.DTO.Sensor;
 
 namespace SensateIoT.Platform.Network.Common.Caching.Object

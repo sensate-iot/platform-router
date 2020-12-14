@@ -15,7 +15,6 @@ using SensateIoT.Platform.Network.Common.Caching.Object;
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Enums;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
-using SensateIoT.Platform.Network.DataAccess.Repositories;
 
 namespace SensateIoT.Platform.Network.Common.Caching.Realtime
 {
@@ -51,7 +50,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Realtime
 				var userGuid = Guid.Parse(cmd.Arguments);
 
 				using(var scope = this.m_provider.CreateScope()) {
-					var userRepo = scope.ServiceProvider.GetRequiredService<IAccountsRepository>();
+					var userRepo = scope.ServiceProvider.GetRequiredService<IRoutingRepository>();
 					var user = await userRepo.GetAccountForRoutingAsync(userGuid, ct).ConfigureAwait(false);
 
 					this.m_cache.Append(user);
@@ -65,7 +64,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Realtime
 
 			case CommandType.AddKey:
 				using(var scope = this.m_provider.CreateScope()) {
-					var userRepo = scope.ServiceProvider.GetRequiredService<IAccountsRepository>();
+					var userRepo = scope.ServiceProvider.GetRequiredService<IRoutingRepository>();
 					var key = await userRepo.GetApiKeyAsync(cmd.Arguments, ct).ConfigureAwait(false);
 
 					this.m_cache.Append(key);
@@ -80,11 +79,10 @@ namespace SensateIoT.Platform.Network.Common.Caching.Realtime
 		private async Task ReloadSensor(ObjectId sensorId, CancellationToken ct)
 		{
 			using var scope = this.m_provider.CreateScope();
-			var sensorRepo = scope.ServiceProvider.GetRequiredService<ISensorRepository>();
-			var triggerRepo = scope.ServiceProvider.GetRequiredService<ITriggerRepository>();
+			var routingRepo = scope.ServiceProvider.GetRequiredService<IRoutingRepository>();
 
-			var triggers = triggerRepo.GetTriggerInfoAsync(sensorId, default);
-			var sensor = await sensorRepo.GetSensorsByIDAsnc(sensorId, ct).ConfigureAwait(false);
+			var triggers = routingRepo.GetTriggerInfoAsync(sensorId, default);
+			var sensor = await routingRepo.GetSensorsByIDAsnc(sensorId, ct).ConfigureAwait(false);
 			await triggers.ConfigureAwait(false);
 
 			sensor.TriggerInformation = new SensorTrigger {

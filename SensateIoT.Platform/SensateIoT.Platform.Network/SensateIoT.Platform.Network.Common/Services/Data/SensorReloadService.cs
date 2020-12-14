@@ -20,7 +20,6 @@ using SensateIoT.Platform.Network.Common.Services.Background;
 using SensateIoT.Platform.Network.Common.Settings;
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
-using SensateIoT.Platform.Network.DataAccess.Repositories;
 
 namespace SensateIoT.Platform.Network.Common.Services.Data
 {
@@ -48,12 +47,11 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 			this.m_logger.LogInformation("Starting sensor reload at {reloadStart}", DateTime.UtcNow);
 
 			using var scope = this.m_provider.CreateScope();
-			var sensorRepo = scope.ServiceProvider.GetRequiredService<ISensorRepository>();
-			var triggerRepo = scope.ServiceProvider.GetRequiredService<ITriggerRepository>();
+			var routingRepo = scope.ServiceProvider.GetRequiredService<IRoutingRepository>();
 
 			var sw = Stopwatch.StartNew();
-			var sensorTask = sensorRepo.GetSensorsAsync(token);
-			var triggerTask = triggerRepo.GetTriggerInfoAsync(token);
+			var sensorTask = routingRepo.GetSensorsAsync(token);
+			var triggerTask = routingRepo.GetTriggerInfoAsync(token);
 
 			var sensors = await sensorTask.ConfigureAwait(false);
 			var dict = sensors.ToDictionary(k => k.ID, v => v);

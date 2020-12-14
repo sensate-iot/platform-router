@@ -110,7 +110,7 @@ namespace SensateIoT.Platform.Network.TriggerService.Application
 
 			services.AddScoped<IControlMessageRepository, ControlMessageRepository>();
 			services.AddScoped<ITriggerRepository, TriggerRepository>();
-			services.AddScoped<IAccountsRepository, AccountsRepository>();
+			services.AddScoped<IRoutingRepository, RoutingRepository>();
 			services.AddScoped<IControlMessageRepository, ControlMessageRepository>();
 			services.AddScoped<ITriggerActionExecutionService, TriggerActionExecutionService>();
 			services.AddSingleton<IDataPointMatchingService, DataPointMatchingService>();

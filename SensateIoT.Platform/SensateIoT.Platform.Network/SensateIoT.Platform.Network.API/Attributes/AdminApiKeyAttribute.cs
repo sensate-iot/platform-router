@@ -7,7 +7,6 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Linq;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -23,8 +22,7 @@ namespace SensateIoT.Platform.Network.API.Attributes
 	{
 		private static bool IsInRole(User user, string role)
 		{
-			var roles = user.UserRoles.Select(x => x.Role.NormalizedName);
-			return roles.Contains(role);
+			return user.UserRoles.Contains(role);
 		}
 
 		public override void OnActionExecuting([NotNull] ActionExecutingContext context)

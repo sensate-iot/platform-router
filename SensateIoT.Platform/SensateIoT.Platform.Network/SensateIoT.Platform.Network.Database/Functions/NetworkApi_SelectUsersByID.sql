@@ -1,10 +1,10 @@
-CREATE FUNCTION networkapi_selectusersbyid(userid TEXT)
+CREATE FUNCTION networkapi_selectusersbyid(userid UUID)
     RETURNS TABLE(
         "ID" UUID,
         "Firstname" TEXT,
         "Lastname" TEXT,
         "Email" VARCHAR(256),
-        "EmailConfirmed" BOOLEAN,
+        "RegisteredAt" TIMESTAMP,
         "PhoneNumber" TEXT,
         "BillingLockout" BOOLEAN,
         "Role" VARCHAR(256)
@@ -18,13 +18,13 @@ BEGIN
            "Users"."FirstName",
            "Users"."LastName",
            "Users"."Email",
-           "Users"."EmailConfirmed",
+           "Users"."RegisteredAt",
            "Users"."PhoneNumber",
            "Users"."BillingLockout",
            "Roles"."NormalizedName" AS "Role"
     FROM "Users"
     INNER JOIN "UserRoles" ON "Users"."Id" = "UserRoles"."UserId"
     JOIN "Roles" ON "UserRoles"."RoleId" = "Roles"."Id"
-    WHERE "Users"."Id" = userid;
+    WHERE "Users"."Id" = userid::TEXT;
 END;
 $$

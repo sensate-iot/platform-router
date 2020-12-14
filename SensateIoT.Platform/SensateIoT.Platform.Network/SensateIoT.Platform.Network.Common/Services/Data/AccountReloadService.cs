@@ -42,7 +42,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 			this.m_logger.LogInformation("Starting account reload at {reloadStart}", DateTime.UtcNow);
 
 			using var scope = this.m_provider.CreateScope();
-			var accountRepo = scope.ServiceProvider.GetRequiredService<IAccountsRepository>();
+			var accountRepo = scope.ServiceProvider.GetRequiredService<IRoutingRepository>();
 
 			var sw = Stopwatch.StartNew();
 			var accounts = await accountRepo.GetAccountsForRoutingAsync(token).ConfigureAwait(false);

@@ -43,7 +43,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 			this.m_logger.LogInformation("Starting API key reload at {reloadStart}", DateTime.UtcNow);
 
 			using var scope = this.m_provider.CreateScope();
-			var apiKeyRepo = scope.ServiceProvider.GetRequiredService<IAccountsRepository>();
+			var apiKeyRepo = scope.ServiceProvider.GetRequiredService<IRoutingRepository>();
 
 			var sw = Stopwatch.StartNew();
 			var keys = await apiKeyRepo.GetApiKeysAsync(token).ConfigureAwait(false);
