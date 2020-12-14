@@ -30,6 +30,8 @@ jobs:
           dotnet format --check
   dotnet-format-network:
     runs-on: windows-latest
+    env:
+      working-directory: ./SensateIoT.Platform/SensateIoT.Platform.Network
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
@@ -43,5 +45,6 @@ jobs:
           echo "$HOME/.dotnet/tools" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
 
       - name: Run dotnet format
+        working-directory: ${{env.working-directory}}
         run: |
-          dotnet format --check -w SensateIoT.Platform/SensateIoT.Platform.Network
+          dotnet format --check
