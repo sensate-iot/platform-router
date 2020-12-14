@@ -59,7 +59,7 @@ namespace SensateIoT.Platform.Network.Tests.Object
 			var cache = SensorCacheGenerationHelper.BuildSensors();
 			var routes = SensorCacheGenerationHelper.GenerateRoutes(cache.Item1);
 
-			cache.Item2.SyncLiveDataRoutes( routes);
+			cache.Item2.SyncLiveDataRoutes(routes);
 			cache.Item2.FlushLiveDataRoutes();
 
 			var s = cache.Item2[cache.Item1[0]];
@@ -86,7 +86,7 @@ namespace SensateIoT.Platform.Network.Tests.Object
 			var cache = SensorCacheGenerationHelper.BuildSensors();
 			var routes = SensorCacheGenerationHelper.GenerateRoutes(cache.Item1);
 
-			cache.Item2.SyncLiveDataRoutes( routes);
+			cache.Item2.SyncLiveDataRoutes(routes);
 			cache.Item2.FlushLiveDataRoutes();
 
 			var list = new List<Common.Caching.Abstract.KeyValuePair<ObjectId, Sensor>>();
@@ -148,7 +148,7 @@ namespace SensateIoT.Platform.Network.Tests.Object
 
 			cache.Item2.AddLiveDataRouting(new LiveDataRoute { SensorID = cache.Item1[0], Target = "s2" });
 
-			cache.Item2.SyncLiveDataRoutes( routes);
+			cache.Item2.SyncLiveDataRoutes(routes);
 			cache.Item2.FlushLiveDataRoutes();
 			var sensor = cache.Item2[cache.Item1[0]];
 

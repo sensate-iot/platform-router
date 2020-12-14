@@ -33,7 +33,7 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 		private readonly ITriggerRepository m_repo;
 		private readonly IRegexMatchingService m_regexMatcher;
 		private readonly ITriggerActionExecutionService m_exec;
-		
+
 		public MqttRegexTriggerHandler(
 			ILogger<MqttRegexTriggerHandler> logger,
 			ITriggerRepository triggers,

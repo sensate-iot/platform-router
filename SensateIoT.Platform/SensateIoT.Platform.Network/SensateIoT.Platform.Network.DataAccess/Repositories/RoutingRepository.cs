@@ -141,7 +141,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			cmd.CommandType = CommandType.StoredProcedure;
 			cmd.CommandText = Router_GetSensorKey;
 
-			var param = new NpgsqlParameter("sensorkey", NpgsqlDbType.Text) { Value =  key };
+			var param = new NpgsqlParameter("sensorkey", NpgsqlDbType.Text) { Value = key };
 			cmd.Parameters.Add(param);
 
 			await using var reader = await cmd.ExecuteReaderAsync(ct).ConfigureAwait(false);

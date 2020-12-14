@@ -51,7 +51,7 @@ namespace SensateIoT.Platform.Network.Common.MQTT
 		public async Task PublishOnAsync(string topic, string message, bool retain)
 		{
 
-			MqttApplicationMessageBuilder builder; 
+			MqttApplicationMessageBuilder builder;
 			MqttApplicationMessage msg;
 
 			if(!this.Client.IsConnected) {

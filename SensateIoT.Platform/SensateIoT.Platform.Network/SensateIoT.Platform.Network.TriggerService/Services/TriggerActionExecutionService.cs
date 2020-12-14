@@ -41,7 +41,7 @@ namespace SensateIoT.Platform.Network.TriggerService.Services
 			ITextSendService text,
 			IEmailSender mail,
 			ITriggerRepository triggers,
-			IOptions<TextServiceSettings> textOptions 
+			IOptions<TextServiceSettings> textOptions
 		)
 		{
 			this.m_triggerRepo = triggers;
@@ -66,7 +66,7 @@ namespace SensateIoT.Platform.Network.TriggerService.Services
 				break;
 
 			case TriggerChannel.SMS:
-					await this.m_text.SendAsync(this.m_textSettings.AlphaCode, action.Target, body).ConfigureAwait(false);
+				await this.m_text.SendAsync(this.m_textSettings.AlphaCode, action.Target, body).ConfigureAwait(false);
 				break;
 
 

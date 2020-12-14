@@ -20,12 +20,12 @@ namespace SensateIoT.Platform.Network.Common.Converters
 		public static IEnumerable<Message> Convert(TextMessageData messages)
 		{
 			return messages.Messages.Select(msg => new Message {
-					Data = msg.Data,
-					Timestamp = msg.Timestamp.ToDateTime(),
-					PlatformTimestamp = msg.PlatformTime.ToDateTime(),
-					SensorId = ObjectId.Parse(msg.SensorID),
-					Location = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(new GeoJson2DGeographicCoordinates(msg.Longitude, msg.Latitude))
-				})
+				Data = msg.Data,
+				Timestamp = msg.Timestamp.ToDateTime(),
+				PlatformTimestamp = msg.PlatformTime.ToDateTime(),
+				SensorId = ObjectId.Parse(msg.SensorID),
+				Location = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(new GeoJson2DGeographicCoordinates(msg.Longitude, msg.Latitude))
+			})
 				.ToList();
 		}
 	}

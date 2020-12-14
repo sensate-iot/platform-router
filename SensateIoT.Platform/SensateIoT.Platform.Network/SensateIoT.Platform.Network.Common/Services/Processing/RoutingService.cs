@@ -27,7 +27,7 @@ using SensateIoT.Platform.Network.Data.DTO;
 
 namespace SensateIoT.Platform.Network.Common.Services.Processing
 {
-	public class RoutingService : BackgroundService 
+	public class RoutingService : BackgroundService
 	{
 		/*
 		 * Route messages through the platform:
@@ -52,14 +52,14 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 		private const string FormatNeedle = "$id";
 
 		public RoutingService(IDataCache cache,
-		                      IMessageQueue queue,
-		                      IInternalRemoteQueue internalRemote,
+							  IMessageQueue queue,
+							  IInternalRemoteQueue internalRemote,
 							  IPublicRemoteQueue publicRemote,
 							  IRemoteStorageQueue storage,
 							  IRemoteNetworkEventQueue events,
-		                      IAuthorizationService auth,
+							  IAuthorizationService auth,
 							  IOptions<RoutingPublishSettings> settings,
-		                      ILogger<RoutingService> logger)
+							  ILogger<RoutingService> logger)
 		{
 			this.m_settings = settings.Value;
 			this.m_messages = queue;

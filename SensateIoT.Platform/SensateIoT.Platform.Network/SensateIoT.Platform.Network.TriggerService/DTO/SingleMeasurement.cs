@@ -16,7 +16,7 @@ namespace SensateIoT.Platform.Network.TriggerService.DTO
 {
 	using DataPointMap = IDictionary<string, DataPoint>;
 
-	public class SingleMeasurement 
+	public class SingleMeasurement
 	{
 		public DataPointMap Data { get; set; }
 		public DateTime Timestamp { get; set; }

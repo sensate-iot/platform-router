@@ -40,8 +40,8 @@ namespace SensateIoT.Platform.Network.StorageService.MQTT
 				await this.m_messages.CreateRangeAsync(databaseMessages, ct).ConfigureAwait(false);
 			} catch(Exception ex) {
 				this.m_logger.LogWarning("Unable to store message: {exception} " +
-				                         "Message content: {message}. " +
-				                         "Stack trace: ", ex.Message, message, ex.StackTrace);
+										 "Message content: {message}. " +
+										 "Stack trace: ", ex.Message, message, ex.StackTrace);
 			}
 		}
 

@@ -39,8 +39,8 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 		private readonly IDataPointMatchingService m_matcher;
 
 		public MqttBulkNumberTriggerHandler(IServiceProvider provider,
-		                                    IDataPointMatchingService matcher,
-		                                    ILogger<MqttBulkNumberTriggerHandler> logger)
+											IDataPointMatchingService matcher,
+											ILogger<MqttBulkNumberTriggerHandler> logger)
 		{
 			this.m_provider = provider;
 			this.logger = logger;

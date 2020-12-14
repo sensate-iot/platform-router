@@ -28,6 +28,6 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			this.m_sensors = ctx.Sensors;
 		}
 
-		
+
 	}
 }

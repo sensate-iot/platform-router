@@ -48,7 +48,7 @@ namespace SensateIoT.Platform.Network.LoadTest.RouterTest
 				Longitude = 57.643,
 				SensorID = sensor,
 				Timestamp = Timestamp.FromDateTime(DateTime.UtcNow),
-				Datapoints = {this.GenerateDataPoint("x"), this.GenerateDataPoint("y"), this.GenerateDataPoint("z")}
+				Datapoints = { this.GenerateDataPoint("x"), this.GenerateDataPoint("y"), this.GenerateDataPoint("z") }
 			};
 		}
 

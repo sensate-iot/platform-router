@@ -31,7 +31,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 		}
 
 		public override Task<RoutingResponse> EnqueueMeasurement(Contracts.DTO.Measurement request,
-		                                                         ServerCallContext context)
+																 ServerCallContext context)
 		{
 			RoutingResponse response;
 
@@ -58,7 +58,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 		}
 
 		public override Task<RoutingResponse> EnqueueMessage(Contracts.DTO.TextMessage request,
-		                                                     ServerCallContext context)
+															 ServerCallContext context)
 		{
 			RoutingResponse response;
 
@@ -85,7 +85,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 		}
 
 		public override Task<RoutingResponse> EnqueueBulkMeasurements(Contracts.DTO.MeasurementData request,
-		                                                              ServerCallContext context)
+																	  ServerCallContext context)
 		{
 			RoutingResponse response;
 
@@ -112,7 +112,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 		}
 
 		public override Task<RoutingResponse> EnqueueBulkMessages(Contracts.DTO.TextMessageData request,
-		                                                          ServerCallContext context)
+																  ServerCallContext context)
 		{
 			RoutingResponse response;
 

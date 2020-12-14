@@ -23,8 +23,8 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 		private readonly IDataCache m_cache;
 
 		public LiveDataReloadService(IDataCache cache,
-		                             IOptions<DataReloadSettings> settings,
-		                             ILogger<LiveDataReloadService> logger) : base(settings.Value.StartDelay, settings.Value.LiveDataReloadInterval)
+									 IOptions<DataReloadSettings> settings,
+									 ILogger<LiveDataReloadService> logger) : base(settings.Value.StartDelay, settings.Value.LiveDataReloadInterval)
 		{
 			this.m_logger = logger;
 			this.m_cache = cache;

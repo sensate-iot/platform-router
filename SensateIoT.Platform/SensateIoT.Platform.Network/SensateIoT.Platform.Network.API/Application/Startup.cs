@@ -23,28 +23,28 @@ using SensateIoT.Platform.Network.DataAccess.Repositories;
 
 namespace SensateIoT.Platform.Network.API.Application
 {
-    public class Startup
-    {
-        public Startup(IConfiguration configuration)
-        {
-            this.Configuration = configuration;
-        }
+	public class Startup
+	{
+		public Startup(IConfiguration configuration)
+		{
+			this.Configuration = configuration;
+		}
 
-        public IConfiguration Configuration { get; }
+		public IConfiguration Configuration { get; }
 
-        public void ConfigureServices(IServiceCollection services)
-        {
-	        var db = new DatabaseConfig();
-	        var mqtt = new MqttConfig();
+		public void ConfigureServices(IServiceCollection services)
+		{
+			var db = new DatabaseConfig();
+			var mqtt = new MqttConfig();
 
-	        this.Configuration.GetSection("Database").Bind(db);
-	        this.Configuration.GetSection("Mqtt").Bind(mqtt);
+			this.Configuration.GetSection("Database").Bind(db);
+			this.Configuration.GetSection("Mqtt").Bind(mqtt);
 
-	        var privatemqtt = mqtt.InternalBroker;
+			var privatemqtt = mqtt.InternalBroker;
 
-	        services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
-	        services.AddAuthorizationContext(db.SensateIoT.ConnectionString);
-	        services.AddTriggerContext(db.SensateIoT.ConnectionString);
+			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
+			services.AddAuthorizationContext(db.SensateIoT.ConnectionString);
+			services.AddTriggerContext(db.SensateIoT.ConnectionString);
 
 			services.AddInternalMqttService(options => {
 				options.Ssl = privatemqtt.Ssl;
@@ -65,24 +65,22 @@ namespace SensateIoT.Platform.Network.API.Application
 			services.AddRouting();
 			services.AddControllers().AddNewtonsoftJson();
 			services.AddMqttHandlers();
-        }
+		}
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            app.UseForwardedHeaders();
-            app.UseRouting();
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+		{
+			app.UseForwardedHeaders();
+			app.UseRouting();
 
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+			if(env.IsDevelopment()) {
+				app.UseDeveloperExceptionPage();
+			}
 
-            app.UseMiddleware<ApiKeyValidationMiddleware>();
+			app.UseMiddleware<ApiKeyValidationMiddleware>();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
-        }
-    }
+			app.UseEndpoints(endpoints => {
+				endpoints.MapControllers();
+			});
+		}
+	}
 }

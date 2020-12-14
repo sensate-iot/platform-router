@@ -12,7 +12,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace SensateIoT.Platform.Network.StorageService.Application
 {
-	public class ApplicationHost 
+	public class ApplicationHost
 	{
 		private readonly ManualResetEvent _reset;
 		private readonly IHost m_host;

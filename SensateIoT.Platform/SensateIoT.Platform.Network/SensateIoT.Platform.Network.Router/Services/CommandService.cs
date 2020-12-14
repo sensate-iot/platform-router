@@ -9,6 +9,6 @@ namespace SensateIoT.Platform.Network.Router.Services
 {
 	public class CommandService
 	{
-		
+
 	}
 }

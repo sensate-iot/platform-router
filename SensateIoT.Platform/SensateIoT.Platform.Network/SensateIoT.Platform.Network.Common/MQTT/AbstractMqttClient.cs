@@ -53,7 +53,7 @@ namespace SensateIoT.Platform.Network.Common.MQTT
 			this._handlers = new ConcurrentDictionary<string, Type>();
 		}
 
-		public void MapTopicHandler<T>(string topic) where T : IMqttHandler 
+		public void MapTopicHandler<T>(string topic) where T : IMqttHandler
 		{
 			this._handlers.TryAdd(topic, typeof(T));
 

@@ -60,9 +60,9 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 							SensorID = ObjectId.Parse(reader.GetString(2)),
 							KeyValue = reader.GetString(3),
 							FormalLanguage = !reader.IsDBNull(6) ? reader.GetString(6) : null,
-							Type = (TriggerType) reader.GetFieldValue<int>(7),
-							Channel = (TriggerChannel) reader.GetFieldValue<int>(8),
-							Target = !reader.IsDBNull(9)? reader.GetString(9): null,
+							Type = (TriggerType)reader.GetFieldValue<int>(7),
+							Channel = (TriggerChannel)reader.GetFieldValue<int>(8),
+							Target = !reader.IsDBNull(9) ? reader.GetString(9) : null,
 							Message = !reader.IsDBNull(10) ? reader.GetString(10) : null,
 							LastInvocation = !reader.IsDBNull(11) ? reader.GetDateTime(11) : DateTime.MinValue
 						};

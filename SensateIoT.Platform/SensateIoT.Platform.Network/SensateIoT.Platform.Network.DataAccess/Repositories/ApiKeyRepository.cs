@@ -58,7 +58,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 				Key = key,
 				UserId = reader.GetGuid(0),
 				Revoked = reader.GetBoolean(1),
-				Type = (ApiKeyType) reader.GetInt32(2),
+				Type = (ApiKeyType)reader.GetInt32(2),
 				ReadOnly = reader.GetBoolean(3)
 			};
 

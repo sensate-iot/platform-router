@@ -11,7 +11,7 @@ using SensateService.Common.IdentityData.Enums;
 
 namespace SensateIoT.Platform.Network.Data.Models
 {
-	public class ApiKey 
+	public class ApiKey
 	{
 		[JsonIgnore]
 		public virtual User User { get; set; }
