@@ -98,6 +98,18 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			}
 		}
 
+		public async Task DeleteBySensorId(ObjectId sensorId, CancellationToken ct = default)
+		{
+			try {
+				FilterDefinition<MeasurementBucket> fd;
+
+				fd = Builders<MeasurementBucket>.Filter.Eq(x => x.SensorId, sensorId);
+				await this.m_buckets.DeleteManyAsync(fd, ct).ConfigureAwait(false);
+			} catch(MongoException ex) {
+				this.m_logger.LogWarning(ex.Message);
+			}
+		}
+
 		public async Task StoreAsync(ObjectId sensorId, Measurement measurement, CancellationToken ct)
 		{
 			var dict = new Dictionary<ObjectId, List<Measurement>>();

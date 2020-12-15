@@ -6,13 +6,14 @@
  */
 
 using Microsoft.EntityFrameworkCore;
+
 using SensateIoT.Platform.Network.Data.Models;
 
 namespace SensateIoT.Platform.Network.DataAccess.Contexts
 {
-	public class TriggerContext : DbContext
+	public class NetworkContext : DbContext
 	{
-		public TriggerContext(DbContextOptions<TriggerContext> options)
+		public NetworkContext(DbContextOptions<NetworkContext> options)
 			: base(options)
 		{
 		}
@@ -21,6 +22,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Contexts
 		public virtual DbSet<TriggerInvocation> TriggerInvocations { get; set; }
 		public virtual DbSet<Trigger> Triggers { get; set; }
 		public virtual DbSet<LiveDataHandler> LiveDataHandlers { get; set; }
+		public virtual DbSet<SensorLink> SensorLinks { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
@@ -36,9 +38,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Contexts
 					.UseIdentityAlwaysColumn();
 
 				entity.Property(e => e.Message).IsRequired();
-
 				entity.Property(e => e.Target).HasMaxLength(255);
-
 				entity.Property(e => e.TriggerID).HasColumnName("TriggerID");
 
 				entity.HasOne(d => d.Trigger)
@@ -98,6 +98,12 @@ namespace SensateIoT.Platform.Network.DataAccess.Contexts
 				entity.HasIndex(h => h.Name)
 					.HasDatabaseName("IX_LiveDataHandlers_Name")
 					.IsUnique();
+			});
+
+			modelBuilder.Entity<SensorLink>(link => {
+				link.HasIndex(e => e.UserId).HasDatabaseName("IX_SensorLinks_UserId");
+				link.HasIndex(e => e.UserId).HasDatabaseName("IX_SensorLinks_SensorId");
+				link.HasKey(x => new {x.UserId, x.SensorId}).HasName("PK_SensorLinks");
 			});
 		}
 	}

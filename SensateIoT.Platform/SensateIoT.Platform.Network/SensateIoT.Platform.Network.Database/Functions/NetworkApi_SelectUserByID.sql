@@ -1,5 +1,4 @@
-
-CREATE FUNCTION networkapi_selectusersbyid(userids TEXT)
+CREATE FUNCTION networkapi_selectuserbyid(userid UUID)
     RETURNS TABLE(
         "ID" UUID,
         "Firstname" TEXT,
@@ -12,9 +11,7 @@ CREATE FUNCTION networkapi_selectusersbyid(userids TEXT)
                  )
     LANGUAGE plpgsql
 AS $$
-DECLARE idlist VARCHAR(36)[];
 BEGIN
-    idlist = ARRAY(SELECT DISTINCT UNNEST(string_to_array(userids, ',')));
 	RETURN QUERY
 
     SELECT "Users"."Id"::UUID AS "ID",
@@ -28,6 +25,6 @@ BEGIN
     FROM "Users"
     INNER JOIN "UserRoles" ON "Users"."Id" = "UserRoles"."UserId"
     JOIN "Roles" ON "UserRoles"."RoleId" = "Roles"."Id"
-    WHERE "Users"."Id" = ANY(idlist);
+    WHERE "Users"."Id" = userid::TEXT;
 END;
 $$

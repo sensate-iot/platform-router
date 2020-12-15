@@ -24,6 +24,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 {
 	public class AccountRepository : IAccountRepository
 	{
+		private const string NetworkApi_GetAccountByID = "networkapi_selectuserbyid";
 		private const string NetworkApi_GetAccountsByID = "networkapi_selectusersbyid";
 
 		private readonly AuthorizationContext m_ctx;
@@ -33,7 +34,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			this.m_ctx = ctx;
 		}
 
-		public async Task<User> GetAccountsAsync(Guid accountGuid, CancellationToken ct = default)
+		public async Task<User> GetAccountAsync(Guid accountGuid, CancellationToken ct = default)
 		{
 			User user;
 
@@ -43,7 +44,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			}
 
 			cmd.CommandType = CommandType.StoredProcedure;
-			cmd.CommandText = NetworkApi_GetAccountsByID;
+			cmd.CommandText = NetworkApi_GetAccountByID;
 
 			var param = new NpgsqlParameter("userid", NpgsqlDbType.Uuid) { Value = accountGuid };
 			cmd.Parameters.Add(param);
@@ -74,5 +75,55 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			return user;
 		}
 
+		public async Task<IEnumerable<User>> GetAccountsAsync(IEnumerable<string> idlist, CancellationToken ct = default)
+		{
+			var users = new List<User>();
+
+			await using var cmd = this.m_ctx.Database.GetDbConnection().CreateCommand();
+			if(cmd.Connection.State != ConnectionState.Open) {
+				await cmd.Connection.OpenAsync(ct).ConfigureAwait(false);
+			}
+
+			cmd.CommandType = CommandType.StoredProcedure;
+			cmd.CommandText = NetworkApi_GetAccountsByID;
+
+			var idArray = string.Join(",", idlist);
+			var param = new NpgsqlParameter("userids", NpgsqlDbType.Text) { Value = idArray };
+			cmd.Parameters.Add(param);
+
+			await using var reader = await cmd.ExecuteReaderAsync(ct).ConfigureAwait(false);
+
+			if(!reader.HasRows) {
+				return null;
+			}
+
+			User user = null;
+
+			while(await reader.ReadAsync(ct).ConfigureAwait(false)) {
+
+				var tmp = new User {
+					ID = reader.GetGuid(0),
+				};
+
+				if(user?.ID == tmp.ID) {
+					user.UserRoles.Add(reader.GetString(7));
+					continue;
+				}
+
+				tmp.FirstName = reader.GetString(1);
+				tmp.LastName = reader.GetString(2);
+				tmp.Email = reader.GetString(3);
+				tmp.RegisteredAt = reader.GetDateTime(4);
+				tmp.PhoneNumber = reader.GetString(5);
+				tmp.BillingLockout = reader.GetBoolean(6);
+				tmp.UserRoles = new List<string> {reader.GetString(7)};
+
+				user = tmp;
+				users.Add(tmp);
+			}
+
+
+			return users;
+		}
 	}
 }

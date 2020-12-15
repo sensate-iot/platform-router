@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 using SensateIoT.Platform.Network.Data.Models;
@@ -30,6 +30,12 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		public Task CreateRangeAsync(IEnumerable<Message> messages, CancellationToken ct = default)
 		{
 			return this.m_messages.InsertManyAsync(messages, cancellationToken: ct);
+		}
+
+		public async Task DeleteBySensorId(ObjectId sensorId, CancellationToken ct = default)
+		{
+			var filter = Builders<Message>.Filter.Eq(x => x.SensorId, sensorId);
+			await this.m_messages.DeleteManyAsync(filter, ct).ConfigureAwait(false);
 		}
 
 		public Task DeleteBySensorAsync(Sensor sensor, CancellationToken ct = default)

@@ -29,7 +29,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 	public class RoutingRepository : IRoutingRepository
 	{
 		private readonly AuthorizationContext m_ctx;
-		private readonly TriggerContext m_triggerContext;
+		private readonly NetworkContext m_networkContext;
 		private readonly IMongoCollection<Data.Models.Sensor> m_sensors;
 
 		private const string Router_GetAccounts = "router_getaccounts";
@@ -39,10 +39,10 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		private const string Router_GetSensorKeys = "router_getsensorkeys";
 		private const string Router_GetSensorKey = "router_getsensorkey";
 
-		public RoutingRepository(AuthorizationContext ctx, TriggerContext tctx, MongoDBContext mctx)
+		public RoutingRepository(AuthorizationContext ctx, NetworkContext tctx, MongoDBContext mctx)
 		{
 			this.m_ctx = ctx;
-			this.m_triggerContext = tctx;
+			this.m_networkContext = tctx;
 			this.m_sensors = mctx.Sensors;
 		}
 
@@ -208,7 +208,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		{
 			var result = new TriggerRoutingInfo();
 
-			await using var cmd = this.m_triggerContext.Database.GetDbConnection().CreateCommand();
+			await using var cmd = this.m_networkContext.Database.GetDbConnection().CreateCommand();
 			if(cmd.Connection.State != ConnectionState.Open) {
 				await cmd.Connection.OpenAsync(ct).ConfigureAwait(false);
 			}
@@ -233,7 +233,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		{
 			var result = new List<TriggerRoutingInfo>();
 
-			await using var cmd = this.m_triggerContext.Database.GetDbConnection().CreateCommand();
+			await using var cmd = this.m_networkContext.Database.GetDbConnection().CreateCommand();
 			if(cmd.Connection.State != ConnectionState.Open) {
 				await cmd.Connection.OpenAsync(ct).ConfigureAwait(false);
 			}

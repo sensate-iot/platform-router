@@ -20,11 +20,11 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 {
 	public class LiveDataHandlerRepository : ILiveDataHandlerRepository
 	{
-		private readonly TriggerContext m_ctx;
+		private readonly NetworkContext m_ctx;
 
 		private const string Router_GetLiveDataHandlers = "router_getlivedatahandlers";
 
-		public LiveDataHandlerRepository(TriggerContext ctx)
+		public LiveDataHandlerRepository(NetworkContext ctx)
 		{
 			this.m_ctx = ctx;
 		}

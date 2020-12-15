@@ -15,5 +15,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Abstract
 	public interface IApiKeyRepository
 	{
 		Task<ApiKey> GetAsync(string key, CancellationToken ct = default);
+		Task DeleteAsync(string key, CancellationToken ct = default);
+		Task<ApiKey> CreateSensorKeyAsync(Sensor sensor, CancellationToken ct = default);
 	}
 }
