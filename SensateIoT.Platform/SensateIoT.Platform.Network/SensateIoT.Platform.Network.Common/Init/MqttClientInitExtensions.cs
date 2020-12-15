@@ -44,20 +44,6 @@ namespace SensateIoT.Platform.Network.Common.Init
 			return service;
 		}
 
-		/*public static IServiceCollection AddCommandPublisher(this IServiceCollection service, Action<CommandPublisherOptions> setup)
-		{
-			service.Configure(setup);
-			service.AddSingleton<IHostedService, CommandPublisher>();
-
-			service.AddSingleton(provider => {
-				var s = provider.GetServices<IHostedService>().ToList();
-				var mqservice = s.Find(x => x.GetType() == typeof(CommandPublisher)) as ICommandPublisher;
-				return mqservice;
-			});
-
-			return service;
-		}*/
-
 		public static IServiceCollection AddInternalMqttService(this IServiceCollection services, Action<MqttServiceOptions> setup)
 		{
 			if(setup != null) {
