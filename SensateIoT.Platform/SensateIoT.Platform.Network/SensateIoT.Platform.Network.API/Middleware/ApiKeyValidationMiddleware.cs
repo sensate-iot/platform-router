@@ -96,7 +96,7 @@ namespace SensateIoT.Platform.Network.API.Middleware
 
 			// TODO: await repo.IncrementRequestCountAsync(token).ConfigureAwait(false);
 
-			token.User = await users.GetAccountsAsync(token.UserId).ConfigureAwait(false);
+			token.User = await users.GetAccountAsync(token.UserId).ConfigureAwait(false);
 
 			if(IsBanned(token.User)) {
 				await this.RespondErrorAsync(ctx, "Bad API key!", 403).ConfigureAwait(false);

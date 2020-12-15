@@ -10,6 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tables", "Tables", "{9BC72E22-368E-439B-9FDB-BCB754554D67}"
 	ProjectSection(SolutionItems) = preProject
 		SensateIoT.Platform.Network.Database\Tables\LiveDataHandlers.sql = SensateIoT.Platform.Network.Database\Tables\LiveDataHandlers.sql
+		SensateIoT.Platform.Network.Database\Tables\SensorLinks.sql = SensateIoT.Platform.Network.Database\Tables\SensorLinks.sql
 		SensateIoT.Platform.Network.Database\Tables\TriggerActionPrices.sql = SensateIoT.Platform.Network.Database\Tables\TriggerActionPrices.sql
 		SensateIoT.Platform.Network.Database\Tables\TriggerActionPricesAudit.sql = SensateIoT.Platform.Network.Database\Tables\TriggerActionPricesAudit.sql
 		SensateIoT.Platform.Network.Database\Tables\TriggerActions.sql = SensateIoT.Platform.Network.Database\Tables\TriggerActions.sql
@@ -22,7 +23,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions", "Functions", "{2BC79829-3F73-43D8-987A-68E72A2F56AA}"
 	ProjectSection(SolutionItems) = preProject
 		SensateIoT.Platform.Network.Database\Functions\LiveDataService_GetApiKey.sql = SensateIoT.Platform.Network.Database\Functions\LiveDataService_GetApiKey.sql
+		SensateIoT.Platform.Network.Database\Functions\NetworkApi_CreateSensorKey.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_CreateSensorKey.sql
+		SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteSensorKey.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteSensorKey.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectApiKeyByKey.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectApiKeyByKey.sql
+		SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectUserByID.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectUserByID.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectUsersByID.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectUsersByID.sql
 		SensateIoT.Platform.Network.Database\Functions\Router_GetAccount.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetAccount.sql
 		SensateIoT.Platform.Network.Database\Functions\Router_GetAccounts.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetAccounts.sql

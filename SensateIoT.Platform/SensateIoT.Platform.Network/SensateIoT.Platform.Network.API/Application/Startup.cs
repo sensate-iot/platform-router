@@ -12,11 +12,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
+using SensateIoT.Platform.Network.API.Abstract;
 using SensateIoT.Platform.Network.API.Config;
 using SensateIoT.Platform.Network.API.Middleware;
+using SensateIoT.Platform.Network.API.Services;
 using SensateIoT.Platform.Network.Common.Init;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Repositories;
@@ -55,12 +56,20 @@ namespace SensateIoT.Platform.Network.API.Application
 				options.Id = Guid.NewGuid().ToString();
 			});
 
+			services.Configure<InternalBrokerConfig>(this.Configuration.GetSection("Mqtt:InternalBroker"));
+
 			services.AddScoped<ITriggerRepository, TriggerRepository>();
+			services.AddScoped<IMessageRepository, MessageRepository>();
+			services.AddScoped<IControlMessageRepository, ControlMessageRepository>();
+			services.AddScoped<IMeasurementRepository, MeasurementRepository>();
 			services.AddScoped<ISensorRepository, SensorRepository>();
+			services.AddScoped<ISensorLinkRepository, SensorLinkRepository>();
 			services.AddScoped<IAccountRepository, AccountRepository>();
 			services.AddScoped<IApiKeyRepository, ApiKeyRepository>();
 			services.AddScoped<ILiveDataHandlerRepository, LiveDataHandlerRepository>();
-			services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+			services.AddScoped<ISensorService, SensorService>();
+			services.AddScoped<ICommandPublisher, CommandPublisher>();
+			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 			services.AddRouting();
 			services.AddControllers().AddNewtonsoftJson();

@@ -26,7 +26,13 @@ namespace SensateIoT.Platform.Network.API.Controllers
 	{
 		private readonly ILiveDataHandlerRepository m_repo;
 
-		public LiveDataHandlersController(IHttpContextAccessor ctx, ILogger<LiveDataHandlersController> logger, ILiveDataHandlerRepository repo) : base(ctx)
+		public LiveDataHandlersController(
+			IHttpContextAccessor ctx,
+			ILogger<LiveDataHandlersController> logger,
+			ISensorLinkRepository links,
+			ISensorRepository sensors,
+			IApiKeyRepository keys,
+			ILiveDataHandlerRepository repo) : base(ctx, sensors, links, keys)
 		{
 			this.m_repo = repo;
 		}
