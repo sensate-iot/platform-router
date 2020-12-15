@@ -103,7 +103,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Contexts
 			modelBuilder.Entity<SensorLink>(link => {
 				link.HasIndex(e => e.UserId).HasDatabaseName("IX_SensorLinks_UserId");
 				link.HasIndex(e => e.UserId).HasDatabaseName("IX_SensorLinks_SensorId");
-				link.HasKey(x => new {x.UserId, x.SensorId}).HasName("PK_SensorLinks");
+				link.HasKey(x => new { x.UserId, x.SensorId }).HasName("PK_SensorLinks");
 			});
 		}
 	}

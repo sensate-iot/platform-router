@@ -90,7 +90,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		}
 
 		public async Task<long> CountAsync(IList<Sensor> sensors, DateTime start, DateTime end, int skip = -1, int limit = -1,
-		                                   CancellationToken ct = default)
+										   CancellationToken ct = default)
 		{
 			var ids = sensors.Select(x => x.InternalId);
 			var builder = Builders<ControlMessage>.Filter;

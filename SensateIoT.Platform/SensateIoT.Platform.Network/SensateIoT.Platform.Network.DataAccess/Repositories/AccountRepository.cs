@@ -116,7 +116,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 				tmp.RegisteredAt = reader.GetDateTime(4);
 				tmp.PhoneNumber = reader.GetString(5);
 				tmp.BillingLockout = reader.GetBoolean(6);
-				tmp.UserRoles = new List<string> {reader.GetString(7)};
+				tmp.UserRoles = new List<string> { reader.GetString(7) };
 
 				user = tmp;
 				users.Add(tmp);
