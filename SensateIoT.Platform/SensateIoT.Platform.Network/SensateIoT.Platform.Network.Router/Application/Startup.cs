@@ -62,6 +62,7 @@ namespace SensateIoT.Platform.Network.Router.Application
 				opts.StartDelay = TimeSpan.FromSeconds(1);
 				opts.DataReloadInterval = TimeSpan.FromSeconds(reload);
 				opts.LiveDataReloadInterval = TimeSpan.FromSeconds(this.Configuration.GetValue<int>("Cache:LiveDataReloadInterval"));
+				opts.TimeoutScanInterval = TimeSpan.FromSeconds(this.Configuration.GetValue<int>("Cache:TimeoutScanInterval"));
 			});
 
 			services.Configure<DataCacheOptions>(opts => {
@@ -112,6 +113,7 @@ namespace SensateIoT.Platform.Network.Router.Application
 			services.AddSingleton<IHostedService, RoutingPublishService>();
 			services.AddSingleton<IHostedService, ActuatorPublishService>();
 			services.AddSingleton<IHostedService, LiveDataReloadService>();
+			services.AddSingleton<IHostedService, CacheTimeoutScanService>();
 
 			services.AddSingleton<IQueue<IPlatformMessage>, Deque<IPlatformMessage>>();
 			services.AddSingleton<IMessageQueue, MessageQueue>();

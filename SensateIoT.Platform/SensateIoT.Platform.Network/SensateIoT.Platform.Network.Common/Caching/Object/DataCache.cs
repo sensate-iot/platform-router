@@ -254,6 +254,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 
 		public void Dispose()
 		{
+			this.Clear();
 			this.m_sensors.Dispose();
 			this.m_accounts.Dispose();
 			this.m_keys.Dispose();
