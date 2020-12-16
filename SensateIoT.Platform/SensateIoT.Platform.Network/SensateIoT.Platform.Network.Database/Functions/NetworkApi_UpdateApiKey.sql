@@ -13,8 +13,14 @@ BEGIN
 	RETURN QUERY
 	
 	UPDATE "ApiKeys"
-	SET
-		"ApiKey" = 'ABCD'
-	WHERE "ApiKey" = 'ABCD'
+	SET	"ApiKey" = new
+	WHERE "ApiKeys"."ApiKey" = old
+    RETURNING
+        "ApiKeys"."Id"::UUID,
+        "ApiKeys"."UserId"::UUID,
+        "ApiKeys"."ApiKey",
+        "ApiKeys"."Revoked",
+        "ApiKeys"."Type",
+        "ApiKeys"."ReadOnly";
 END;
 $$

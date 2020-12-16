@@ -5,10 +5,9 @@
  * @email  michel@michelmegens.net
  */
 
-using System;
+using System.Threading.Tasks;
 using System.Data;
 using System.Threading;
-using System.Threading.Tasks;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -27,15 +26,14 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 	public class ApiKeyRepository : IApiKeyRepository
 	{
 		private readonly AuthorizationContext m_ctx;
-		private readonly Random m_random;
 
 		private const string NetworkApi_GetApiKeyByKey = "networkapi_selectapikeybykey";
 		private const string NetworkApi_DeleteSensorKey = "networkapi_deletesensorkey";
+		private const string NetworkApi_UpdateApiKey = "networkapi_updateapikey";
 
 		public ApiKeyRepository(AuthorizationContext ctx)
 		{
 			this.m_ctx = ctx;
-			this.m_random = new Random(DateTime.UtcNow.Millisecond * DateTime.UtcNow.Second);
 		}
 
 		public async Task<ApiKey> GetAsync(string key, CancellationToken ct = default)
@@ -125,9 +123,41 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			return apikey;
 		}
 
-		public async Task UpdateAsync(string old, string @new, CancellationToken ct = default)
+		public async Task<ApiKey> UpdateAsync(string old, string @new, CancellationToken ct = default)
 		{
-			throw new NotImplementedException();
+			ApiKey apikey;
+
+			await using var cmd = this.m_ctx.Database.GetDbConnection().CreateCommand();
+			if(cmd.Connection.State != ConnectionState.Open) {
+				await cmd.Connection.OpenAsync(ct).ConfigureAwait(false);
+			}
+
+			cmd.CommandType = CommandType.StoredProcedure;
+			cmd.CommandText = NetworkApi_UpdateApiKey;
+
+			var oldArgument = new NpgsqlParameter("old", NpgsqlDbType.Text) { Value = old };
+			var newArgument = new NpgsqlParameter("new", NpgsqlDbType.Text) { Value = @new };
+
+			cmd.Parameters.Add(oldArgument);
+			cmd.Parameters.Add(newArgument);
+
+			await using var reader = await cmd.ExecuteReaderAsync(ct).ConfigureAwait(false);
+
+			if(!reader.HasRows) {
+				return null;
+			}
+
+			await reader.ReadAsync(ct).ConfigureAwait(false);
+
+			apikey = new ApiKey {
+				UserId = reader.GetGuid(1),
+				Key = reader.GetString(2),
+				Revoked = reader.GetBoolean(3),
+				Type = (ApiKeyType)reader.GetInt32(4),
+				ReadOnly = reader.GetBoolean(5)
+			};
+
+			return apikey;
 		}
 	}
 }

@@ -10,10 +10,13 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+
 using MongoDB.Bson;
+
 using SensateIoT.Platform.Network.API.Abstract;
 using SensateIoT.Platform.Network.API.Attributes;
 using SensateIoT.Platform.Network.API.DTO;
@@ -300,17 +303,18 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			return this.Ok(new Response<Sensor>(sensor));
 		}
 
-		/*[HttpPatch("{id}/secret")]
+		[HttpPut("{id}/secret")]
 		[ReadWriteApiKey]
 		[ProducesResponseType(typeof(Response<Sensor>), StatusCodes.Status200OK)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status422UnprocessableEntity)]
-		public async Task<IActionResult> PatchSecret(string id, [FromBody] SensorUpdate update)
+		public async Task<IActionResult> PutSecret(string id, [FromBody] SensorUpdate update)
 		{
 			Sensor sensor;
 
 			update ??= new SensorUpdate();
+
 			if(!ObjectId.TryParse(id, out _)) {
 				var response = new Response<string>();
 
@@ -318,63 +322,45 @@ namespace SensateIoT.Platform.Network.API.Controllers
 				return this.UnprocessableEntity(response);
 			}
 
-			try {
-				sensor = await this.m_sensors.GetAsync(id).ConfigureAwait(false);
+			sensor = await this.m_sensors.GetAsync(id).ConfigureAwait(false);
 
-				if(!await this.AuthenticateUserForSensor(sensor, false).ConfigureAwait(false)) {
-					return this.Forbidden();
-				}
-
-				if(sensor == null) {
-					return this.NotFound();
-				}
-
-				var key = await this.m_keys.GetAsync(update.Secret).ConfigureAwait(false);
-				var old = await this.m_keys.GetAsync(sensor.Secret).ConfigureAwait(false);
-
-				if(key != null) {
-					var resp = new Response<string>();
-
-					resp.AddError("Unable to update sensor secret.");
-					return this.BadRequest(resp);
-				}
-
-				var oldSecret = sensor.Secret;
-				sensor.Secret = string.IsNullOrEmpty(update.Secret) ? NextStringWithSymbols(this.m_rng, SensorSecretLength) : update.Secret;
-
-				if(!string.IsNullOrEmpty(update.Name)) {
-					sensor.Name = update.Name;
-				}
-
-				if(!string.IsNullOrEmpty(update.Description)) {
-					sensor.Description = update.Description;
-				}
-
-				await Task.WhenAll(
-					this.m_keys.RefreshAsync(old, sensor.Secret),
-					this.m_sensors.UpdateSecretAsync(sensor, old)
-					).ConfigureAwait(false);
-				await this.m_sensors.UpdateAsync(sensor).ConfigureAwait(false);
-
-				await Task.WhenAll(
-					this.m_mqtt.PublishCommandAsync(CommandType.FlushSensor, sensor.InternalId.ToString()),
-					this.m_mqtt.PublishCommandAsync(CommandType.FlushKey, oldSecret)
-				).ConfigureAwait(false);
-
-				await Task.WhenAll(this.m_publish.PublishCommand(AuthServiceCommand.AddKey, sensor.Secret),
-								   this.m_publish.PublishCommand(AuthServiceCommand.AddSensor,
-																 sensor.InternalId.ToString())
-				).ConfigureAwait(false);
-			} catch(Exception ex) {
-				this.m_logger.LogInformation($"Unable to update sensor: {ex.Message}");
-
-				return this.BadRequest(new Status {
-					Message = "Unable to update sensor.",
-					ErrorCode = ReplyCode.BadInput
-				});
+			if(!await this.AuthenticateUserForSensor(sensor, false).ConfigureAwait(false)) {
+				return this.Forbidden();
 			}
 
-			return this.Ok(sensor);
+			if(sensor == null) {
+				return this.NotFound();
+			}
+
+			var key = await this.m_keys.GetAsync(update.Secret).ConfigureAwait(false);
+			var old = await this.m_keys.GetAsync(sensor.Secret).ConfigureAwait(false);
+
+			if(key != null) {
+				var resp = new Response<string>();
+
+				resp.AddError("Unable to update sensor secret.");
+				return this.BadRequest(resp);
+			}
+
+			var oldSecret = sensor.Secret;
+			sensor.Secret = string.IsNullOrEmpty(update.Secret) ? NextStringWithSymbols(this.m_rng, SensorSecretLength) : update.Secret;
+
+			await Task.WhenAll(
+				this.m_mqtt.PublishCommandAsync(CommandType.FlushSensor, sensor.InternalId.ToString()),
+				this.m_mqtt.PublishCommandAsync(CommandType.FlushKey, oldSecret)
+			).ConfigureAwait(false);
+
+			await Task.WhenAll(
+				this.m_keys.UpdateAsync(old.Key, sensor.Secret),
+				this.m_sensors.UpdateSecretAsync(sensor.InternalId, sensor.Secret)
+				).ConfigureAwait(false);
+			await this.m_sensors.UpdateAsync(sensor).ConfigureAwait(false);
+
+			await Task.WhenAll(this.m_mqtt.PublishCommandAsync(CommandType.AddKey, sensor.Secret),
+							   this.m_mqtt.PublishCommandAsync(CommandType.AddSensor, sensor.InternalId.ToString())
+			).ConfigureAwait(false);
+
+			return this.Ok(new Response<Sensor>(sensor));
 		}
 
 		/*[HttpDelete("{id}")]
