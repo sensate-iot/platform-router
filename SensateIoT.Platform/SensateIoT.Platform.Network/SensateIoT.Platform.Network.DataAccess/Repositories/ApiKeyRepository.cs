@@ -124,5 +124,10 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 			return apikey;
 		}
+
+		public async Task UpdateAsync(string old, string @new, CancellationToken ct = default)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

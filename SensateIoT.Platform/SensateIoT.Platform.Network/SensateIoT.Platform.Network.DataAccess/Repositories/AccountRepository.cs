@@ -20,6 +20,7 @@ using NpgsqlTypes;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Contexts;
+using SensateIoT.Platform.Network.DataAccess.Extensions;
 
 namespace SensateIoT.Platform.Network.DataAccess.Repositories
 {
@@ -65,11 +66,11 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 			user = new User {
 				ID = reader.GetGuid(0),
-				FirstName = reader.GetString(1),
-				LastName = reader.GetString(2),
+				FirstName = reader.SafeGetString(1),
+				LastName = reader.SafeGetString(2),
 				Email = reader.GetString(3),
 				RegisteredAt = reader.GetDateTime(4),
-				PhoneNumber = reader.GetString(5),
+				PhoneNumber = reader.SafeGetString(5),
 				BillingLockout = reader.GetBoolean(6),
 				UserRoles = new List<string> { reader.GetString(7) }
 			};
@@ -134,11 +135,11 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 					continue;
 				}
 
-				tmp.FirstName = reader.GetString(1);
-				tmp.LastName = reader.GetString(2);
+				tmp.FirstName = reader.SafeGetString(1);
+				tmp.LastName = reader.SafeGetString(2);
 				tmp.Email = reader.GetString(3);
 				tmp.RegisteredAt = reader.GetDateTime(4);
-				tmp.PhoneNumber = reader.GetString(5);
+				tmp.PhoneNumber = reader.SafeGetString(5);
 				tmp.BillingLockout = reader.GetBoolean(6);
 				tmp.UserRoles = new List<string> { reader.GetString(7) };
 

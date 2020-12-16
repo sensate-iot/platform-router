@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
-using Grpc.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -151,15 +150,31 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		{
 			var myemail = this.CurrentUser.Email;
 
-			var auth = await this.AuthenticateUserForSensor(link.SensorId).ConfigureAwait(false);
-			auth |= myemail == link.UserId;
+			try {
+				var auth = await this.AuthenticateUserForSensor(link.SensorId).ConfigureAwait(false);
+				auth |= myemail == link.UserId;
 
-			if(!auth) {
-				return this.Forbid();
+				var user = await this.m_accounts.GetAccountByEmailAsync(link.UserId).ConfigureAwait(false);
+
+				if(user == null) {
+					var response = new Response<string>();
+
+					response.AddError("Invalid 'userId'.");
+					return this.UnprocessableEntity(response);
+				}
+
+				if(!auth) {
+					return this.Forbidden();
+				}
+
+				link.UserId = user.ID.ToString();
+				await this.m_links.DeleteAsync(link).ConfigureAwait(false);
+			} catch(FormatException ex) {
+				var response = new Response<string>();
+
+				response.AddError(ex.Message);
+				return this.UnprocessableEntity(response);
 			}
-
-			link.UserId = this.m_currentUserId;
-			await this.m_links.DeleteAsync(link).ConfigureAwait(false);
 
 			return this.NoContent();
 		}
@@ -222,7 +237,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			var user = await this.m_accounts.GetAccountByEmailAsync(link.UserId).ConfigureAwait(false);
 
 			if(!await this.AuthenticateUserForSensor(sensor, false).ConfigureAwait(false)) {
-				return this.Forbid();
+				return this.Forbidden();
 			}
 
 			if(user == null) {
@@ -265,7 +280,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			sensor = await this.m_sensors.GetAsync(id).ConfigureAwait(false);
 
 			if(!await this.AuthenticateUserForSensor(sensor, false).ConfigureAwait(false)) {
-				return this.Forbid();
+				return this.Forbidden();
 			}
 
 			if(sensor == null) {
@@ -285,7 +300,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			return this.Ok(new Response<Sensor>(sensor));
 		}
 
-		[HttpPatch("{id}/secret")]
+		/*[HttpPatch("{id}/secret")]
 		[ReadWriteApiKey]
 		[ProducesResponseType(typeof(Response<Sensor>), StatusCodes.Status200OK)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
@@ -307,7 +322,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 				sensor = await this.m_sensors.GetAsync(id).ConfigureAwait(false);
 
 				if(!await this.AuthenticateUserForSensor(sensor, false).ConfigureAwait(false)) {
-					return this.Forbid();
+					return this.Forbidden();
 				}
 
 				if(sensor == null) {
@@ -378,7 +393,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 				}
 
 				if(!await this.AuthenticateUserForSensor(sensor, false).ConfigureAwait(false)) {
-					return this.Forbid();
+					return this.Forbidden();
 				}
 
 				await this.m_sensorService.DeleteAsync(sensor, CancellationToken.None).ConfigureAwait(false);
@@ -424,7 +439,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			var linked = await this.IsLinkedSensor(id).ConfigureAwait(false);
 
 			if(!await this.AuthenticateUserForSensor(sensor, false).ConfigureAwait(false) && !linked) {
-				return this.Forbid();
+				return this.Forbidden();
 			}
 
 			return this.Ok(new Response<Sensor> { Data = sensor });

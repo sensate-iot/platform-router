@@ -92,6 +92,11 @@ namespace SensateIoT.Platform.Network.API.Controllers
 
 			return auth && isHealthyUser;
 		}
+
+		protected StatusCodeResult Forbidden()
+		{
+			return this.StatusCode(403);
+		}
 	}
 }
 
