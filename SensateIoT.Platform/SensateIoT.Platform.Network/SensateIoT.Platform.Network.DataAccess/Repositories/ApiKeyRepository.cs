@@ -15,10 +15,12 @@ using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using NpgsqlTypes;
 
+using SensateIoT.Platform.Network.Data.Enums;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Contexts;
-using SensateService.Common.IdentityData.Enums;
+
+using CommandType = System.Data.CommandType;
 
 namespace SensateIoT.Platform.Network.DataAccess.Repositories
 {

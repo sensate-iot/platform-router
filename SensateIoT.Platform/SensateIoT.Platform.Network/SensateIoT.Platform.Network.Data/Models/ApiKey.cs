@@ -7,7 +7,7 @@
 
 using System;
 using Newtonsoft.Json;
-using SensateService.Common.IdentityData.Enums;
+using SensateIoT.Platform.Network.Data.Enums;
 
 namespace SensateIoT.Platform.Network.Data.Models
 {

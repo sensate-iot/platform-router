@@ -21,6 +21,11 @@ namespace SensateIoT.Platform.Network.API.DTO
 			this.ResponseId = Guid.NewGuid();
 		}
 
+		public Response(TValue value) : this()
+		{
+			this.Data = value;
+		}
+
 		public void AddError(string error)
 		{
 			this.Errors ??= new List<string>();

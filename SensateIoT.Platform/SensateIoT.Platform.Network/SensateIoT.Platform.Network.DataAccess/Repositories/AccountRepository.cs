@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,6 +26,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 	public class AccountRepository : IAccountRepository
 	{
 		private const string NetworkApi_GetAccountByID = "networkapi_selectuserbyid";
+		private const string NetworkApi_GetAccountByEmail = "networkapi_selectuserbyemail";
 		private const string NetworkApi_GetAccountsByID = "networkapi_selectusersbyid";
 
 		private readonly AuthorizationContext m_ctx;
@@ -36,8 +38,6 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task<User> GetAccountAsync(Guid accountGuid, CancellationToken ct = default)
 		{
-			User user;
-
 			await using var cmd = this.m_ctx.Database.GetDbConnection().CreateCommand();
 			if(cmd.Connection.State != ConnectionState.Open) {
 				await cmd.Connection.OpenAsync(ct).ConfigureAwait(false);
@@ -50,6 +50,12 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			cmd.Parameters.Add(param);
 
 			await using var reader = await cmd.ExecuteReaderAsync(ct).ConfigureAwait(false);
+			return await this.GetAccountAsync(reader, ct).ConfigureAwait(false);
+		}
+
+		public async Task<User> GetAccountAsync(DbDataReader reader, CancellationToken ct = default)
+		{
+			User user;
 
 			if(!reader.HasRows) {
 				return null;
@@ -73,6 +79,24 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			}
 
 			return user;
+
+		}
+
+		public async Task<User> GetAccountByEmailAsync(string emailAddress, CancellationToken ct = default)
+		{
+			await using var cmd = this.m_ctx.Database.GetDbConnection().CreateCommand();
+			if(cmd.Connection.State != ConnectionState.Open) {
+				await cmd.Connection.OpenAsync(ct).ConfigureAwait(false);
+			}
+
+			cmd.CommandType = CommandType.StoredProcedure;
+			cmd.CommandText = NetworkApi_GetAccountByEmail;
+
+			var email = new NpgsqlParameter("email", NpgsqlDbType.Text) { Value = emailAddress };
+			cmd.Parameters.Add(email);
+
+			await using var reader = await cmd.ExecuteReaderAsync(ct).ConfigureAwait(false);
+			return await this.GetAccountAsync(reader, ct).ConfigureAwait(false);
 		}
 
 		public async Task<IEnumerable<User>> GetAccountsAsync(IEnumerable<string> idlist, CancellationToken ct = default)

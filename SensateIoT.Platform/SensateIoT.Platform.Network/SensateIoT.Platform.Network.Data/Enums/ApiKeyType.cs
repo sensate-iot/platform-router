@@ -5,7 +5,7 @@
  * @email  michel.megens@sonatolabs.com
  */
 
-namespace SensateService.Common.IdentityData.Enums
+namespace SensateIoT.Platform.Network.Data.Enums
 {
 	public enum ApiKeyType
 	{

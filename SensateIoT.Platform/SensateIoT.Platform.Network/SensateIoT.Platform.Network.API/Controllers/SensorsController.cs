@@ -10,11 +10,11 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
-
+using Grpc.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-
+using MongoDB.Bson;
 using SensateIoT.Platform.Network.API.Abstract;
 using SensateIoT.Platform.Network.API.Attributes;
 using SensateIoT.Platform.Network.API.DTO;
@@ -202,7 +202,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			return this.Ok(linkList);
 		}
 
-		/*[HttpPost("links")]
+		[HttpPost("links")]
 		[ReadWriteApiKey, ValidateModel]
 		[ProducesResponseType(StatusCodes.Status204NoContent)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
@@ -210,110 +210,84 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status422UnprocessableEntity)]
 		public async Task<IActionResult> Link([FromBody] SensorLink link)
 		{
-			var status = new Status();
+			var status = new Response<string>();
+			var error = false;
 
 			if(link.UserId == this.CurrentUser.Email) {
-				status.Message = "Unable to link sensor to own account!";
-				status.ErrorCode = ReplyCode.BadInput;
+				status.AddError("Unable to link sensor to own account!");
 				return this.BadRequest(status);
 			}
 
-			try {
-				var sensor = await this.m_sensors.GetAsync(link.SensorId).ConfigureAwait(false);
-				var user = await this.m_users.GetByEmailAsync(link.UserId).ConfigureAwait(false);
+			var sensor = await this.m_sensors.GetAsync(link.SensorId).ConfigureAwait(false);
+			var user = await this.m_accounts.GetAccountByEmailAsync(link.UserId).ConfigureAwait(false);
 
-				if(!await this.AuthenticateUserForSensor(sensor, false).ConfigureAwait(false)) {
-					return this.Forbid();
-				}
-
-				if(user == null) {
-					status.Message = "Target user not known!";
-					status.ErrorCode = ReplyCode.BadInput;
-
-					return this.BadRequest(status);
-				}
-
-				if(!user.EmailConfirmed) {
-					status.Message = "Target user must have a confirmed account!";
-					status.ErrorCode = ReplyCode.BadInput;
-
-					return this.BadRequest(status);
-				}
-
-				if(sensor == null) {
-					status.Message = "Target sensor not known!";
-					status.ErrorCode = ReplyCode.BadInput;
-
-					return this.BadRequest(status);
-				}
-
-				link.UserId = user.Id;
-				await this.m_links.CreateAsync(link).ConfigureAwait(false);
-			} catch(Exception ex) {
-				this.m_logger.LogInformation($"Unable to link sensor: {ex.Message}");
-				this.m_logger.LogDebug(ex.StackTrace);
-
-				return this.BadRequest(new Status {
-					Message = "Unable to link sensor!",
-					ErrorCode = ReplyCode.BadInput
-				});
+			if(!await this.AuthenticateUserForSensor(sensor, false).ConfigureAwait(false)) {
+				return this.Forbid();
 			}
+
+			if(user == null) {
+				status.AddError("Target user not found.");
+				error = true;
+			}
+
+			if(sensor == null) {
+				status.AddError("Target sensor not found.");
+				error = true;
+			}
+
+			if(error) {
+				return this.BadRequest(status);
+			}
+
+			link.UserId = user.ID.ToString();
+			await this.m_links.CreateAsync(link).ConfigureAwait(false);
 
 			return this.NoContent();
 		}
 
-		[HttpPatch("{id}")]
+		[HttpPut("{id}")]
 		[ReadWriteApiKey, ValidateModel]
-		[ProducesResponseType(typeof(Sensor), StatusCodes.Status200OK)]
+		[ProducesResponseType(typeof(Response<Sensor>), StatusCodes.Status200OK)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status422UnprocessableEntity)]
-		public async Task<IActionResult> Patch(string id, [FromBody] SensorUpdate update)
+		public async Task<IActionResult> Put(string id, [FromBody] SensorUpdate update)
 		{
 			Sensor sensor;
+
 			if(!ObjectId.TryParse(id, out _)) {
-				return this.UnprocessableEntity(new Status {
-					Message = "Unable to parse ID",
-					ErrorCode = ReplyCode.BadInput
-				});
+				var response = new Response<string>();
+
+				response.AddError("Unable to parse sensor ID");
+				return this.UnprocessableEntity(response);
 			}
 
+			sensor = await this.m_sensors.GetAsync(id).ConfigureAwait(false);
 
-			try {
-				sensor = await this.m_sensors.GetAsync(id).ConfigureAwait(false);
-
-				if(!await this.AuthenticateUserForSensor(sensor, false).ConfigureAwait(false)) {
-					return this.Forbid();
-				}
-
-				if(sensor == null) {
-					return this.NotFound();
-				}
-
-				if(!string.IsNullOrEmpty(update.Name)) {
-					sensor.Name = update.Name;
-				}
-
-				if(!string.IsNullOrEmpty(update.Description)) {
-					sensor.Description = update.Description;
-				}
-
-				await this.m_sensors.UpdateAsync(sensor).ConfigureAwait(false);
-			} catch(Exception ex) {
-				this.m_logger.LogInformation($"Unable to update sensor: {ex.Message}");
-
-				return this.BadRequest(new Status {
-					Message = "Unable to update sensor.",
-					ErrorCode = ReplyCode.BadInput
-				});
+			if(!await this.AuthenticateUserForSensor(sensor, false).ConfigureAwait(false)) {
+				return this.Forbid();
 			}
 
-			return this.Ok(sensor);
+			if(sensor == null) {
+				return this.NotFound();
+			}
+
+			if(!string.IsNullOrEmpty(update.Name)) {
+				sensor.Name = update.Name;
+			}
+
+			if(!string.IsNullOrEmpty(update.Description)) {
+				sensor.Description = update.Description;
+			}
+
+			await this.m_sensors.UpdateAsync(sensor).ConfigureAwait(false);
+
+			return this.Ok(new Response<Sensor>(sensor));
 		}
 
 		[HttpPatch("{id}/secret")]
 		[ReadWriteApiKey]
-		[ProducesResponseType(typeof(Sensor), StatusCodes.Status200OK)]
+		[ProducesResponseType(typeof(Response<Sensor>), StatusCodes.Status200OK)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status422UnprocessableEntity)]
@@ -323,10 +297,10 @@ namespace SensateIoT.Platform.Network.API.Controllers
 
 			update ??= new SensorUpdate();
 			if(!ObjectId.TryParse(id, out _)) {
-				return this.UnprocessableEntity(new Status {
-					Message = "Unable to parse ID",
-					ErrorCode = ReplyCode.BadInput
-				});
+				var response = new Response<string>();
+
+				response.AddError("Unable to parse sensor ID");
+				return this.UnprocessableEntity(response);
 			}
 
 			try {
@@ -340,18 +314,18 @@ namespace SensateIoT.Platform.Network.API.Controllers
 					return this.NotFound();
 				}
 
-				var key = await this.m_keys.GetByKeyAsync(update.Secret).ConfigureAwait(false);
-				var old = await this.m_keys.GetByKeyAsync(sensor.Secret).ConfigureAwait(false);
+				var key = await this.m_keys.GetAsync(update.Secret).ConfigureAwait(false);
+				var old = await this.m_keys.GetAsync(sensor.Secret).ConfigureAwait(false);
 
 				if(key != null) {
-					return this.BadRequest(new Status {
-						Message = "Unable to update sensor.",
-						ErrorCode = ReplyCode.BadInput
-					});
+					var resp = new Response<string>();
+
+					resp.AddError("Unable to update sensor secret.");
+					return this.BadRequest(resp);
 				}
 
 				var oldSecret = sensor.Secret;
-				sensor.Secret = string.IsNullOrEmpty(update.Secret) ? this.m_keys.GenerateApiKey() : update.Secret;
+				sensor.Secret = string.IsNullOrEmpty(update.Secret) ? NextStringWithSymbols(this.m_rng, SensorSecretLength) : update.Secret;
 
 				if(!string.IsNullOrEmpty(update.Name)) {
 					sensor.Name = update.Name;
@@ -368,8 +342,8 @@ namespace SensateIoT.Platform.Network.API.Controllers
 				await this.m_sensors.UpdateAsync(sensor).ConfigureAwait(false);
 
 				await Task.WhenAll(
-					this.m_publish.PublishCommand(AuthServiceCommand.FlushSensor, sensor.InternalId.ToString()),
-					this.m_publish.PublishCommand(AuthServiceCommand.FlushKey, oldSecret)
+					this.m_mqtt.PublishCommandAsync(CommandType.FlushSensor, sensor.InternalId.ToString()),
+					this.m_mqtt.PublishCommandAsync(CommandType.FlushKey, oldSecret)
 				).ConfigureAwait(false);
 
 				await Task.WhenAll(this.m_publish.PublishCommand(AuthServiceCommand.AddKey, sensor.Secret),
@@ -388,7 +362,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			return this.Ok(sensor);
 		}
 
-		[HttpDelete("{id}")]
+		/*[HttpDelete("{id}")]
 		[ReadWriteApiKey]
 		[ProducesResponseType(StatusCodes.Status204NoContent)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]

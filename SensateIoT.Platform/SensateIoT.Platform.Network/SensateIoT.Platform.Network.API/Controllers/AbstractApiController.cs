@@ -13,9 +13,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 using SensateIoT.Platform.Network.API.Constants;
+using SensateIoT.Platform.Network.Data.Enums;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
-using SensateService.Common.IdentityData.Enums;
 
 namespace SensateIoT.Platform.Network.API.Controllers
 {
