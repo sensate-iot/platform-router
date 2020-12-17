@@ -90,12 +90,14 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			await this.m_ctx.SaveChangesAsync(ct).ConfigureAwait(false);
 		}
 
-		public async Task<IEnumerable<Trigger>> GetAsync(string sensorId, CancellationToken ct = default)
+		public async Task<IEnumerable<Trigger>> GetAsync(string sensorId, TriggerType type, CancellationToken ct = default)
 		{
-			var query = this.m_ctx.Triggers.Where(x => x.SensorID == sensorId)
-				.Include(t => t.TriggerActions);
+			throw new NotImplementedException();
+		}
 
-			return await query.ToListAsync(ct).ConfigureAwait(false);
+		public async Task<Trigger> GetAsync(long id, CancellationToken ct = default)
+		{
+			throw new NotImplementedException();
 		}
 
 		public async Task RemoveActionAsync(Trigger trigger, TriggerChannel id, CancellationToken ct = default)
@@ -109,6 +111,11 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			await this.m_ctx.SaveChangesAsync(ct).ConfigureAwait(false);
 
 			trigger.TriggerActions.Remove(action);
+		}
+
+		public async Task AddActionsAsync(Trigger trigger, IEnumerable<TriggerAction> actions, CancellationToken ct = default)
+		{
+			throw new NotImplementedException();
 		}
 
 		public async Task AddActionAsync(Trigger trigger, TriggerAction action, CancellationToken ct = default)
@@ -146,27 +153,6 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		public async Task CreateAsync(Trigger trigger, CancellationToken ct = default)
 		{
 			await this.m_ctx.Triggers.AddAsync(trigger, ct).ConfigureAwait(false);
-			await this.m_ctx.SaveChangesAsync(ct).ConfigureAwait(false);
-		}
-
-		public async Task UpdateAsync(Trigger trigger, CancellationToken ct = default)
-		{
-			var value = await this.m_ctx.Triggers.FirstOrDefaultAsync(t => t.ID == trigger.ID, ct).ConfigureAwait(false);
-
-			value.SensorID = trigger.SensorID;
-			value.UpperEdge = trigger.UpperEdge;
-			value.LowerEdge = trigger.LowerEdge;
-			value.KeyValue = trigger.KeyValue;
-			value.FormalLanguage = trigger.FormalLanguage;
-			value.Type = trigger.Type;
-
-			this.m_ctx.Triggers.Update(value);
-			await this.m_ctx.SaveChangesAsync(ct).ConfigureAwait(false);
-		}
-
-		public async Task StoreTriggerInvocations(IEnumerable<TriggerInvocation> invocations, CancellationToken ct)
-		{
-			await this.m_ctx.TriggerInvocations.AddRangeAsync(invocations, ct).ConfigureAwait(false);
 			await this.m_ctx.SaveChangesAsync(ct).ConfigureAwait(false);
 		}
 	}

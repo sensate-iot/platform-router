@@ -1,25 +1,24 @@
 ﻿/*
- * Trigger data model.
+ * Trigger API DTO.
  *
  * @author Michel Megens
  * @email  michel@michelmegens.net
  */
 
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using SensateIoT.Platform.Network.Data.DTO;
 
-namespace SensateIoT.Platform.Network.Data.Models
+namespace SensateIoT.Platform.Network.API.DTO
 {
-	public class Trigger
+	public class RawTrigger
 	{
-		public long ID { get; set; }
-		public string SensorID { get; set; }
 		public string KeyValue { get; set; }
 		public double? LowerEdge { get; set; }
 		public double? UpperEdge { get; set; }
 		public string FormalLanguage { get; set; }
+		[Required]
 		public TriggerType Type { get; set; }
-
-		public virtual ICollection<TriggerAction> TriggerActions { get; set; }
+		[Required]
+		public string SensorId { get; set; }
 	}
 }

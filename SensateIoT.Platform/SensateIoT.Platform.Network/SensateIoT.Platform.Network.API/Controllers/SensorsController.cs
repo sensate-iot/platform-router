@@ -124,7 +124,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 
 		[HttpPost]
 		[ReadWriteApiKey, ValidateModel]
-		[ProducesResponseType(typeof(Sensor), StatusCodes.Status201Created)]
+		[ProducesResponseType(typeof(Response<Sensor>), StatusCodes.Status201Created)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status422UnprocessableEntity)]
@@ -402,7 +402,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		}
 
 		[HttpGet("{id}")]
-		[ProducesResponseType(typeof(Sensor), StatusCodes.Status200OK)]
+		[ProducesResponseType(typeof(Response<Sensor>), StatusCodes.Status200OK)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status422UnprocessableEntity)]
