@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
@@ -363,7 +364,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			return this.Ok(new Response<Sensor>(sensor));
 		}
 
-		/*[HttpDelete("{id}")]
+		[HttpDelete("{id}")]
 		[ReadWriteApiKey]
 		[ProducesResponseType(StatusCodes.Status204NoContent)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
@@ -384,21 +385,21 @@ namespace SensateIoT.Platform.Network.API.Controllers
 
 				await this.m_sensorService.DeleteAsync(sensor, CancellationToken.None).ConfigureAwait(false);
 				await Task.WhenAll(
-					this.m_publish.PublishCommand(AuthServiceCommand.FlushSensor, sensor.InternalId.ToString()),
-					this.m_publish.PublishCommand(AuthServiceCommand.FlushKey, sensor.Secret)
+					this.m_mqtt.PublishCommandAsync(CommandType.FlushSensor, sensor.InternalId.ToString()),
+					this.m_mqtt.PublishCommandAsync(CommandType.FlushKey, sensor.Secret)
 				).ConfigureAwait(false);
-			} catch(Exception ex) {
+			} catch(FormatException ex) {
 				this.m_logger.LogInformation($"Unable to remove sensor: {ex.Message}");
 				this.m_logger.LogDebug(ex.StackTrace);
 
-				return this.BadRequest(new Status {
-					Message = "Unable to delete sensor.",
-					ErrorCode = ReplyCode.UnknownError
-				});
+				var response = new Response<string>();
+
+				response.AddError(ex.Message);
+				return this.UnprocessableEntity(response);
 			}
 
 			return this.NoContent();
-		}*/
+		}
 
 		[HttpGet("{id}")]
 		[ProducesResponseType(typeof(Sensor), StatusCodes.Status200OK)]

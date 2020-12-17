@@ -10,13 +10,15 @@ using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
+using Newtonsoft.Json;
+
 namespace SensateIoT.Platform.Network.Data.Models
 {
 	public class Sensor
 	{
 		public const int SecretLength = 256;
 
-		[BsonId, BsonRequired]
+		[BsonId, BsonRequired, JsonProperty("id")]
 		public ObjectId InternalId { get; set; }
 
 		[BsonRequired]
