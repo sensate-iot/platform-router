@@ -23,7 +23,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions", "Functions", "{2BC79829-3F73-43D8-987A-68E72A2F56AA}"
 	ProjectSection(SolutionItems) = preProject
 		SensateIoT.Platform.Network.Database\Functions\LiveDataService_GetApiKey.sql = SensateIoT.Platform.Network.Database\Functions\LiveDataService_GetApiKey.sql
+		SensateIoT.Platform.Network.Database\Functions\NetworkApi_CreateAction.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_CreateAction.sql
+		SensateIoT.Platform.Network.Database\Functions\NetworkApi_CreateInvocation.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_CreateInvocation.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_CreateSensorKey.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_CreateSensorKey.sql
+		SensateIoT.Platform.Network.Database\Functions\NetworkApi_CreateTrigger.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_CreateTrigger.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteSensorKey.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteSensorKey.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectApiKeyByKey.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectApiKeyByKey.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectUserByEmail.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectUserByEmail.sql
