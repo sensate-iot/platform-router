@@ -31,10 +31,10 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		private readonly ITriggerRepository m_triggers;
 
 		public TriggersController(IHttpContextAccessor ctx,
-		                          ISensorRepository sensors,
-		                          ISensorLinkRepository links,
-		                          ITriggerRepository triggers,
-		                          IApiKeyRepository keys) : base(ctx, sensors, links, keys)
+								  ISensorRepository sensors,
+								  ISensorLinkRepository links,
+								  ITriggerRepository triggers,
+								  IApiKeyRepository keys) : base(ctx, sensors, links, keys)
 		{
 			this.m_triggers = triggers;
 		}
@@ -81,8 +81,8 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			trigger.Type = type;
 			await this.m_triggers.CreateAsync(trigger).ConfigureAwait(false);
 
-			return this.CreatedAtAction(nameof(this.GetById), new {triggerId = trigger.ID},
-			                            new Response<Trigger>(trigger));
+			return this.CreatedAtAction(nameof(this.GetById), new { triggerId = trigger.ID },
+										new Response<Trigger>(trigger));
 		}
 
 		[HttpGet("{triggerId}")]
