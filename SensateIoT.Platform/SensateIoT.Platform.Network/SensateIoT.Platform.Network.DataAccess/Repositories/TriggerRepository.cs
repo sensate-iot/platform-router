@@ -15,12 +15,15 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 using MongoDB.Bson;
+
 using Npgsql;
+using NpgsqlTypes;
 
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Contexts;
+using SensateIoT.Platform.Network.DataAccess.Extensions;
 
 using TriggerAction = SensateIoT.Platform.Network.Data.Models.TriggerAction;
 
@@ -31,6 +34,10 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		private readonly NetworkContext m_ctx;
 
 		private const string TriggerService_GetTriggersBySensorID = "triggerservice_gettriggersbysensorid";
+		private const string NetworkApi_CreateTrigger = "networkapi_createtrigger";
+		private const string NetworkApi_DeleteTriggersBySensorID = "networkapi_deletetriggersbysensorid";
+		private const string NetworkApi_DeleteTriggerByID = "networkapi_deletetriggerbyid";
+		private const string NetworkApi_CreateInvocation = "networkapi_createinvocation";
 
 		public TriggerRepository(NetworkContext ctx)
 		{
@@ -86,8 +93,16 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task StoreTriggerInvocation(TriggerInvocation invocation, CancellationToken ct)
 		{
-			await this.m_ctx.TriggerInvocations.AddAsync(invocation, ct);
-			await this.m_ctx.SaveChangesAsync(ct).ConfigureAwait(false);
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
+
+			builder.WithParameter("triggerid", invocation.TriggerID, NpgsqlDbType.Bigint);
+			builder.WithParameter("actionid", invocation.ActionID, NpgsqlDbType.Bigint);
+			builder.WithParameter("timestmp", invocation.Timestamp, NpgsqlDbType.Timestamp);
+
+			builder.WithFunction(NetworkApi_CreateInvocation);
+
+			var reader = await builder.ExecuteAsync(ct).ConfigureAwait(false);
+			await reader.DisposeAsync().ConfigureAwait(false);
 		}
 
 		public async Task<IEnumerable<Trigger>> GetAsync(string sensorId, TriggerType type, CancellationToken ct = default)
@@ -128,32 +143,45 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task DeleteAsync(long id, CancellationToken ct = default)
 		{
-			var entity = await this.m_ctx.Triggers.Where(t => t.ID == id).FirstOrDefaultAsync(ct).ConfigureAwait(false);
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
 
-			if(entity == null) {
-				return;
-			}
+			builder.WithParameter("id", id, NpgsqlDbType.Varchar);
+			builder.WithFunction(NetworkApi_DeleteTriggerByID);
 
-			this.m_ctx.Triggers.Remove(entity);
-			await this.m_ctx.SaveChangesAsync(ct).ConfigureAwait(false);
+			var reader = await builder.ExecuteAsync(ct).ConfigureAwait(false);
+			await reader.DisposeAsync().ConfigureAwait(false);
 		}
 
 		public async Task DeleteBySensorAsync(string sensorId, CancellationToken ct = default)
 		{
-			var entity = this.m_ctx.Triggers.Where(t => t.SensorID == sensorId);
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
 
-			if(!entity.Any()) {
-				return;
-			}
+			builder.WithParameter("sensorid", sensorId, NpgsqlDbType.Varchar);
+			builder.WithFunction(NetworkApi_DeleteTriggersBySensorID);
 
-			this.m_ctx.Triggers.RemoveRange(entity);
-			await this.m_ctx.SaveChangesAsync(ct).ConfigureAwait(false);
+			var reader = await builder.ExecuteAsync(ct).ConfigureAwait(false);
+			await reader.DisposeAsync().ConfigureAwait(false);
 		}
 
 		public async Task CreateAsync(Trigger trigger, CancellationToken ct = default)
 		{
-			await this.m_ctx.Triggers.AddAsync(trigger, ct).ConfigureAwait(false);
-			await this.m_ctx.SaveChangesAsync(ct).ConfigureAwait(false);
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
+
+			builder.WithParameter("sensorid", trigger.SensorID, NpgsqlDbType.Varchar);
+			builder.WithParameter("keyvalue", trigger.KeyValue, NpgsqlDbType.Varchar);
+			builder.WithParameter("loweredge", trigger.LowerEdge, NpgsqlDbType.Numeric);
+			builder.WithParameter("upperedge", trigger.UpperEdge, NpgsqlDbType.Numeric);
+			builder.WithParameter("formallanguage", trigger.FormalLanguage, NpgsqlDbType.Text);
+			builder.WithParameter("type", (int)trigger.Type, NpgsqlDbType.Integer);
+			builder.WithFunction(NetworkApi_CreateTrigger);
+
+			var reader = await builder.ExecuteAsync(ct).ConfigureAwait(false);
+
+			if(await reader.ReadAsync(ct).ConfigureAwait(false)) {
+				trigger.ID = reader.GetInt64(0);
+			}
+
+			await reader.DisposeAsync().ConfigureAwait(false);
 		}
 	}
 }
