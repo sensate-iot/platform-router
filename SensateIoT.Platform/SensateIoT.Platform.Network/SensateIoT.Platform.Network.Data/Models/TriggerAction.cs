@@ -6,6 +6,9 @@
  */
 
 using System.Collections.Generic;
+
+using Newtonsoft.Json;
+
 using SensateIoT.Platform.Network.Data.DTO;
 
 namespace SensateIoT.Platform.Network.Data.Models
@@ -18,7 +21,9 @@ namespace SensateIoT.Platform.Network.Data.Models
 		public string Target { get; set; }
 		public string Message { get; set; }
 
+		[JsonIgnore]
 		public virtual Trigger Trigger { get; set; }
+		[JsonIgnore]
 		public virtual ICollection<TriggerInvocation> TriggerInvocations { get; set; }
 	}
 }

@@ -8,12 +8,13 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MongoDB.Bson;
 
 using Npgsql;
@@ -38,6 +39,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		private const string NetworkApi_DeleteTriggersBySensorID = "networkapi_deletetriggersbysensorid";
 		private const string NetworkApi_DeleteTriggerByID = "networkapi_deletetriggerbyid";
 		private const string NetworkApi_CreateInvocation = "networkapi_createinvocation";
+		private const string NetworkApi_SelectTriggerByID = "networkapi_selecttriggerbyid";
 
 		public TriggerRepository(NetworkContext ctx)
 		{
@@ -112,7 +114,47 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task<Trigger> GetAsync(long id, CancellationToken ct = default)
 		{
-			throw new NotImplementedException();
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
+
+			builder.WithParameter("id", id, NpgsqlDbType.Bigint);
+			builder.WithFunction(NetworkApi_SelectTriggerByID);
+
+			await using var reader = await builder.ExecuteAsync(ct).ConfigureAwait(false);
+			var trigger = new Trigger();
+
+			while(await reader.ReadAsync(ct)) {
+				if(trigger.ID != id) {
+					trigger.ID = id;
+					trigger.SensorID = reader.GetString(1);
+					trigger.KeyValue = reader.GetString(2);
+					trigger.LowerEdge = SafeGetValue<double?>(reader, 3);
+					trigger.UpperEdge = SafeGetValue<double?>(reader, 4);
+					trigger.FormalLanguage = SafeGetValue<string>(reader, 5);
+					trigger.Type = (TriggerType)reader.GetInt32(6);
+				}
+
+				if(await reader.IsDBNullAsync(7, ct)) {
+					continue;
+				}
+
+				var action = new TriggerAction {
+					ID = reader.GetInt64(7),
+					Channel = (TriggerChannel)reader.GetInt32(8),
+					Target = SafeGetValue<string>(reader, 9),
+					Message = reader.GetString(10),
+					TriggerID = id
+				};
+
+				trigger.TriggerActions ??= new List<TriggerAction>();
+				trigger.TriggerActions.Add(action);
+			}
+
+			return trigger;
+		}
+
+		private static ColumnValue SafeGetValue<ColumnValue>(DbDataReader reader, int ordinal)
+		{
+			return reader.IsDBNull(ordinal) ? default : reader.GetFieldValue<ColumnValue>(ordinal);
 		}
 
 		public async Task RemoveActionAsync(Trigger trigger, TriggerChannel id, CancellationToken ct = default)
