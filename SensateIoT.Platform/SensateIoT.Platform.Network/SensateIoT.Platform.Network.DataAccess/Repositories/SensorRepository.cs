@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -33,7 +32,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task CreateAsync(Sensor sensor, CancellationToken ct = default(CancellationToken))
 		{
-			var now = DateTime.Now;
+			var now = DateTime.UtcNow;
 
 			sensor.CreatedAt = now;
 			sensor.UpdatedAt = now;
@@ -166,7 +165,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task UpdateAsync(Sensor sensor)
 		{
-			var update = Builders<Sensor>.Update.Set(x => x.UpdatedAt, DateTime.Now);
+			var update = Builders<Sensor>.Update.Set(x => x.UpdatedAt, DateTime.UtcNow);
 
 			if(sensor.Name != null) {
 				update = update.Set(x => x.Name, sensor.Name);
@@ -181,7 +180,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task UpdateSecretAsync(ObjectId sensorId, string key)
 		{
-			var update = Builders<Sensor>.Update.Set(x => x.UpdatedAt, DateTime.Now)
+			var update = Builders<Sensor>.Update.Set(x => x.UpdatedAt, DateTime.UtcNow)
 				.Set(x => x.Secret, key);
 			await this.m_sensors.FindOneAndUpdateAsync(x => x.InternalId == sensorId, update)
 				.ConfigureAwait(false);

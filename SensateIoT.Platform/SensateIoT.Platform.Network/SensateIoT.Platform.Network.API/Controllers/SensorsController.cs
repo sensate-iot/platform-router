@@ -193,7 +193,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			await this.m_sensors.CreateAsync(sensor).ConfigureAwait(false);
 			await this.m_mqtt.PublishCommandAsync(CommandType.AddSensor, sensor.InternalId.ToString()).ConfigureAwait(false);
 
-			return this.CreatedAtAction(nameof(this.Get), new { Id = sensor.InternalId }, sensor);
+			return this.CreatedAtAction(nameof(this.Get), new { Id = sensor.InternalId }, new Response<Sensor>(sensor));
 		}
 
 		[HttpDelete("links")]
@@ -236,14 +236,15 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			return this.NoContent();
 		}
 
-		[HttpGet("links")]
-		[ProducesResponseType(typeof(IEnumerable<SensorLink>), StatusCodes.Status200OK)]
+		[HttpGet("{sensorId}/links")]
+		[ProducesResponseType(typeof(PaginationResponse<SensorLink>), StatusCodes.Status200OK)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status422UnprocessableEntity)]
-		public async Task<IActionResult> GetLinks([FromQuery][NotNull] string sensorId)
+		public async Task<IActionResult> GetLinks([NotNull] string sensorId)
 		{
 			IEnumerable<SensorLink> links;
+			PaginationResponse<SensorLink> response;
 
 			var sensorTask = this.m_sensors.GetAsync(sensorId);
 
@@ -271,7 +272,16 @@ namespace SensateIoT.Platform.Network.API.Controllers
 				link.UserId = user.Email;
 			}
 
-			return this.Ok(linkList);
+			response = new PaginationResponse<SensorLink> {
+				Data = new PaginationResult<SensorLink> {
+					Values = linkList,
+					Count = linkList.Count,
+					Limit = 0,
+					Skip = 0
+				}
+			};
+
+			return this.Ok(response);
 		}
 
 		[HttpPost("links")]
