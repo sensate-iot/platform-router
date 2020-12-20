@@ -160,7 +160,12 @@ namespace SensateIoT.Platform.Network.API.Controllers
 				return this.Forbidden();
 			}
 
-			await this.m_triggers.RemoveActionAsync(trigger, channel.Value).ConfigureAwait(false);
+			try {
+				await this.m_triggers.RemoveActionAsync(trigger, channel.Value).ConfigureAwait(false);
+			} catch(ArgumentException) {
+				return this.NotFound();
+			}
+
 			return this.NoContent();
 		}
 
@@ -194,15 +199,27 @@ namespace SensateIoT.Platform.Network.API.Controllers
 
 			var authForTrigger = await this.AuthenticateUserForSensor(trigger.SensorID).ConfigureAwait(false);
 
+			var error = new Response<string>();
 			if(action.Channel > TriggerChannel.MQTT) {
-				authForTrigger = await this.CreatedTargetedActionAsync(action).ConfigureAwait(false);
+				authForTrigger = await this.CreatedTargetedActionAsync(action, error).ConfigureAwait(false);
 			}
 
 			if(!authForTrigger) {
-				return this.CreateNotAuthorizedResult();
+				return this.UnprocessableEntity(error);
 			}
 
-			await this.m_triggers.AddActionAsync(trigger, action).ConfigureAwait(false);
+			try {
+				await this.m_triggers.AddActionAsync(trigger, action).ConfigureAwait(false);
+			} catch(FormatException ex) {
+				var response = new Response<string>();
+
+				response.AddError(ex.Message);
+				return this.UnprocessableEntity(response);
+			}
+
+			trigger.TriggerActions ??= new List<TriggerAction>();
+			trigger.TriggerActions.Add(action);
+
 			return this.CreatedAtAction(nameof(this.GetById), new { triggerId = trigger.ID }, new Response<Trigger>(trigger));
 		}
 
@@ -239,7 +256,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			return this.CreatedAtAction(nameof(this.GetById), new { triggerId = trigger.ID }, new Response<Trigger>(trigger));
 		}
 
-		private async Task<bool> CreatedTargetedActionAsync(TriggerAction action)
+		private async Task<bool> CreatedTargetedActionAsync(TriggerAction action, Response<string> response)
 		{
 			bool auth;
 
@@ -254,9 +271,17 @@ namespace SensateIoT.Platform.Network.API.Controllers
 				}
 
 				auth = await this.AuthenticateUserForSensor(actuator, false).ConfigureAwait(false);
+
+				if(!auth) {
+					response.AddError("Unable to authorize target sensor/actuator!");
+				}
 			} else {
 				auth = Uri.TryCreate(action.Target, UriKind.Absolute, out var result) &&
 					result.Scheme == Uri.UriSchemeHttp || result?.Scheme == Uri.UriSchemeHttps;
+
+				if(!auth) {
+					response.AddError("Invalid URL in target field.");
+				}
 			}
 
 			return auth;

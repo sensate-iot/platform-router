@@ -9,14 +9,13 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+
 using MongoDB.Bson;
-using MongoDB.Driver;
+
 using Npgsql;
 using NpgsqlTypes;
 
@@ -36,11 +35,13 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		private const string TriggerService_GetTriggersBySensorID = "triggerservice_gettriggersbysensorid";
 		private const string NetworkApi_CreateTrigger = "networkapi_createtrigger";
+		private const string NetworkApi_CreateAction = "networkapi_createaction";
 		private const string NetworkApi_DeleteTriggersBySensorID = "networkapi_deletetriggersbysensorid";
 		private const string NetworkApi_DeleteTriggerByID = "networkapi_deletetriggerbyid";
 		private const string NetworkApi_CreateInvocation = "networkapi_createinvocation";
 		private const string NetworkApi_SelectTriggerByID = "networkapi_selecttriggerbyid";
 		private const string NetworkApi_SelectTriggersBySensorID = "networkapi_selecttriggerbysensorid";
+		private const string NetworkApi_DeleteTriggerAction = "networkapi_deletetriggeraction";
 
 		public TriggerRepository(NetworkContext ctx)
 		{
@@ -154,16 +155,6 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 				triggers.Add(trigger);
 			}
 
-			/*while(true) {
-				var t = await GetTriggerFromReaderAsync(reader, ct).ConfigureAwait(false);
-
-				if(t == null) {
-					break;
-				}
-
-				triggers.Add(t);
-			}*/
-
 			return triggers;
 		}
 
@@ -211,37 +202,59 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			return reader.IsDBNull(ordinal) ? default : reader.GetFieldValue<ColumnValue>(ordinal);
 		}
 
-		public async Task RemoveActionAsync(Trigger trigger, TriggerChannel id, CancellationToken ct = default)
+		public async Task RemoveActionAsync(Trigger trigger, TriggerChannel channel, CancellationToken ct = default)
 		{
-			var action = trigger.TriggerActions.FirstOrDefault(x => x.TriggerID == trigger.ID && x.Channel == id);
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
 
-			if(action == null)
-				return;
+			builder.WithParameter("triggerid", trigger.ID, NpgsqlDbType.Bigint);
+			builder.WithParameter("channel", (int)channel, NpgsqlDbType.Integer);
+			builder.WithFunction(NetworkApi_DeleteTriggerAction);
 
-			this.m_ctx.TriggerActions.Remove(action);
-			await this.m_ctx.SaveChangesAsync(ct).ConfigureAwait(false);
+			await using var reader = await builder.ExecuteAsync(ct).ConfigureAwait(false);
+			var result = await reader.ReadAsync(ct).ConfigureAwait(false);
 
-			trigger.TriggerActions.Remove(action);
+			if(!result) {
+				throw new ArgumentException("Unable to remove non-existing trigger action.");
+			}
 		}
 
 		public async Task AddActionsAsync(Trigger trigger, IEnumerable<TriggerAction> actions, CancellationToken ct = default)
 		{
-			throw new NotImplementedException();
+			foreach(var action in actions) {
+				await this.AddActionAsync(trigger, action, ct).ConfigureAwait(false);
+			}
 		}
 
 		public async Task AddActionAsync(Trigger trigger, TriggerAction action, CancellationToken ct = default)
 		{
-			await this.m_ctx.TriggerActions.AddAsync(action, ct).ConfigureAwait(false);
-			await this.m_ctx.SaveChangesAsync(ct).ConfigureAwait(false);
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
 
-			trigger.TriggerActions.Add(action);
+			builder.WithParameter("triggerid", trigger.ID, NpgsqlDbType.Bigint);
+			builder.WithParameter("channel", (int)action.Channel, NpgsqlDbType.Integer);
+			builder.WithParameter("target", action.Target, NpgsqlDbType.Varchar);
+			builder.WithParameter("message", action.Message, NpgsqlDbType.Text);
+			builder.WithFunction(NetworkApi_CreateAction);
+
+			try {
+				var reader = await builder.ExecuteAsync(ct).ConfigureAwait(false);
+
+				if(await reader.ReadAsync(ct).ConfigureAwait(false)) {
+					action.ID = reader.GetInt64(0);
+				}
+
+				await reader.DisposeAsync().ConfigureAwait(false);
+			} catch(PostgresException exception) {
+				if(exception.SqlState == PostgresErrorCodes.UniqueViolation) {
+					throw new FormatException("Trigger action for this channel already exists!");
+				}
+			}
 		}
 
 		public async Task DeleteAsync(long id, CancellationToken ct = default)
 		{
 			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
 
-			builder.WithParameter("id", id, NpgsqlDbType.Varchar);
+			builder.WithParameter("id", id, NpgsqlDbType.Bigint);
 			builder.WithFunction(NetworkApi_DeleteTriggerByID);
 
 			var reader = await builder.ExecuteAsync(ct).ConfigureAwait(false);
