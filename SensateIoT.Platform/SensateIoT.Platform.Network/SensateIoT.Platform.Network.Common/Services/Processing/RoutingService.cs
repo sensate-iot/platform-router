@@ -81,7 +81,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 					try {
 						await Task.Delay(TimeSpan.FromMilliseconds(100), token);
 					} catch(OperationCanceledException) {
-						Console.WriteLine("Routing task cancelled.");
+						this.m_logger.LogWarning("Routing task cancelled.");
 					}
 
 					continue;
