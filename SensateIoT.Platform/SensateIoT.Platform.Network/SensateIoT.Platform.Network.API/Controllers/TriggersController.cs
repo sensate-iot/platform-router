@@ -107,45 +107,6 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			return this.Ok(new Response<Trigger>(trigger));
 		}
 
-		[HttpGet]
-		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status422UnprocessableEntity)]
-		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status401Unauthorized)]
-		[ProducesResponseType(typeof(PaginationResponse<Trigger>), StatusCodes.Status200OK)]
-		public async Task<IActionResult> Get([FromQuery] string sensorId, [FromQuery] TriggerType? type)
-		{
-			var invalidResponse = new Response<string>();
-			var err = false;
-
-			if(string.IsNullOrEmpty(sensorId)) {
-				invalidResponse.AddError("Missing value in 'sensorId' attribute.");
-				return this.UnprocessableEntity(invalidResponse);
-			}
-
-			if(!ObjectId.TryParse(sensorId, out _)) {
-				invalidResponse.AddError("Invalid value in 'sensorId' attribute.");
-				err = true;
-			}
-
-			if(type == null) {
-				invalidResponse.AddError("Trigger type not specified.");
-				err = true;
-			}
-
-			if(err) {
-				return this.UnprocessableEntity(invalidResponse);
-			}
-
-			var linked = await this.IsLinkedSensor(sensorId).ConfigureAwait(false);
-			var auth = await this.AuthenticateUserForSensor(sensorId).ConfigureAwait(false);
-
-			if(!auth && !linked) {
-				return this.CreateNotAuthorizedResult();
-			}
-
-			var triggers = await this.m_triggers.GetAsync(sensorId, type.Value);
-			return this.Ok(triggers);
-		}
-
 		[HttpDelete("{triggerId}")]
 		[ReadWriteApiKey]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status422UnprocessableEntity)]
@@ -171,7 +132,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			return this.NoContent();
 		}
 
-		[HttpDelete("{triggerId}/remove-action")]
+		[HttpDelete("{triggerId}/actions")]
 		[ReadWriteApiKey]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status422UnprocessableEntity)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status404NotFound)]
@@ -203,7 +164,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			return this.NoContent();
 		}
 
-		[HttpPost("{triggerId}/add-action")]
+		[HttpPost("{triggerId}/actions")]
 		[ReadWriteApiKey]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status422UnprocessableEntity)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status401Unauthorized)]

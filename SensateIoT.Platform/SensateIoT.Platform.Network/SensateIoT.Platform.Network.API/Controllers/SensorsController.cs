@@ -21,9 +21,12 @@ using MongoDB.Bson;
 using SensateIoT.Platform.Network.API.Abstract;
 using SensateIoT.Platform.Network.API.Attributes;
 using SensateIoT.Platform.Network.API.DTO;
+using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Enums;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
+
+using Sensor = SensateIoT.Platform.Network.Data.Models.Sensor;
 
 namespace SensateIoT.Platform.Network.API.Controllers
 {
@@ -35,6 +38,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		private readonly ISensorService m_sensorService;
 		private readonly ICommandPublisher m_mqtt;
 		private readonly IAccountRepository m_accounts;
+		private readonly ITriggerRepository m_triggers;
 		private readonly Random m_rng;
 
 		private const string Symbols = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@!_-";
@@ -44,6 +48,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 								 ISensorRepository sensors,
 								 ILogger<SensorsController> logger,
 								 ISensorLinkRepository links,
+								 ITriggerRepository triggers,
 								 ISensorService sensorService,
 								 IAccountRepository accounts,
 								 IApiKeyRepository keys,
@@ -52,6 +57,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			this.m_logger = logger;
 			this.m_sensorService = sensorService;
 			this.m_mqtt = mqtt;
+			this.m_triggers = triggers;
 			this.m_accounts = accounts;
 			this.m_rng = new Random(DateTime.UtcNow.Millisecond * DateTime.UtcNow.Second);
 		}
@@ -63,6 +69,53 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			ary = Enumerable.Repeat(Symbols, length)
 				.Select(s => s[rng.Next(0, Symbols.Length)]).ToArray();
 			return new string(ary);
+		}
+
+		[HttpGet("{sensorId}/triggers")]
+		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status422UnprocessableEntity)]
+		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status401Unauthorized)]
+		[ProducesResponseType(typeof(PaginationResponse<Trigger>), StatusCodes.Status200OK)]
+		public async Task<IActionResult> Get(string sensorId, [FromQuery] TriggerType? type)
+		{
+			var invalidResponse = new Response<string>();
+			var err = false;
+
+			if(string.IsNullOrEmpty(sensorId)) {
+				invalidResponse.AddError("Missing value in 'sensorId' attribute.");
+				return this.UnprocessableEntity(invalidResponse);
+			}
+
+			if(!ObjectId.TryParse(sensorId, out _)) {
+				invalidResponse.AddError("Invalid value in 'sensorId' attribute.");
+				err = true;
+			}
+
+			if(type == null) {
+				invalidResponse.AddError("Trigger type not specified.");
+				err = true;
+			}
+
+			if(err) {
+				return this.UnprocessableEntity(invalidResponse);
+			}
+
+			var linked = await this.IsLinkedSensor(sensorId).ConfigureAwait(false);
+			var auth = await this.AuthenticateUserForSensor(sensorId).ConfigureAwait(false);
+
+			if(!auth && !linked) {
+				return this.CreateNotAuthorizedResult();
+			}
+
+			var triggers = await this.m_triggers.GetAsync(sensorId, type.Value).ConfigureAwait(false);
+			var listed = triggers.ToList();
+			var paginationResult = new PaginationResponse<Trigger> {
+				Data = new PaginationResult<Trigger> {
+					Values = listed,
+					Count = listed.Count,
+				}
+			};
+
+			return this.Ok(paginationResult);
 		}
 
 		[HttpGet]
@@ -430,6 +483,14 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			}
 
 			return this.Ok(new Response<Sensor> { Data = sensor });
+		}
+
+		private IActionResult CreateNotAuthorizedResult()
+		{
+			var response = new Response<string>();
+
+			response.AddError("Unable to authorize user!");
+			return this.Unauthorized(response);
 		}
 	}
 }

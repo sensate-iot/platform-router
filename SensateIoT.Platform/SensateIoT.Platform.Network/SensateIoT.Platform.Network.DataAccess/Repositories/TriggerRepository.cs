@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MongoDB.Bson;
-
+using MongoDB.Driver;
 using Npgsql;
 using NpgsqlTypes;
 
@@ -40,6 +40,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		private const string NetworkApi_DeleteTriggerByID = "networkapi_deletetriggerbyid";
 		private const string NetworkApi_CreateInvocation = "networkapi_createinvocation";
 		private const string NetworkApi_SelectTriggerByID = "networkapi_selecttriggerbyid";
+		private const string NetworkApi_SelectTriggersBySensorID = "networkapi_selecttriggerbysensorid";
 
 		public TriggerRepository(NetworkContext ctx)
 		{
@@ -109,7 +110,14 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task<IEnumerable<Trigger>> GetAsync(string sensorId, TriggerType type, CancellationToken ct = default)
 		{
-			throw new NotImplementedException();
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
+
+			builder.WithParameter("sensorid", sensorId, NpgsqlDbType.Varchar);
+			builder.WithFunction(NetworkApi_SelectTriggersBySensorID);
+
+			await using var reader = await builder.ExecuteAsync(ct).ConfigureAwait(false);
+
+			return await GetTriggersFromReaderAsync(reader, ct).ConfigureAwait(false);
 		}
 
 		public async Task<Trigger> GetAsync(long id, CancellationToken ct = default)
@@ -120,21 +128,67 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			builder.WithFunction(NetworkApi_SelectTriggerByID);
 
 			await using var reader = await builder.ExecuteAsync(ct).ConfigureAwait(false);
-			var trigger = new Trigger();
 
-			while(await reader.ReadAsync(ct)) {
+			if(await reader.ReadAsync(ct)) {
+				var trigger = new Trigger {
+					ID = id
+				};
+
+				await GetTriggerFromReaderAsync(trigger, reader, ct).ConfigureAwait(false);
+				return trigger;
+			}
+
+			return null;
+		}
+
+		private static async Task<IList<Trigger>> GetTriggersFromReaderAsync(DbDataReader reader, CancellationToken ct)
+		{
+			var triggers = new List<Trigger>();
+			var done = await reader.ReadAsync(ct).ConfigureAwait(false);
+
+			done = !done;
+
+			while(!done) {
+				var trigger = new Trigger();
+				done = await GetTriggerFromReaderAsync(trigger, reader, ct).ConfigureAwait(false);
+				triggers.Add(trigger);
+			}
+
+			/*while(true) {
+				var t = await GetTriggerFromReaderAsync(reader, ct).ConfigureAwait(false);
+
+				if(t == null) {
+					break;
+				}
+
+				triggers.Add(t);
+			}*/
+
+			return triggers;
+		}
+
+		private static async Task<bool> GetTriggerFromReaderAsync(Trigger trigger, DbDataReader reader, CancellationToken ct)
+		{
+			var id = reader.GetInt64(0);
+
+			trigger.ID = id;
+			trigger.SensorID = reader.GetString(1);
+			trigger.KeyValue = reader.GetString(2);
+			trigger.LowerEdge = SafeGetValue<double?>(reader, 3);
+			trigger.UpperEdge = SafeGetValue<double?>(reader, 4);
+			trigger.FormalLanguage = SafeGetValue<string>(reader, 5);
+			trigger.Type = (TriggerType)reader.GetInt32(6);
+
+			do {
+				id = reader.GetInt64(0);
+
 				if(trigger.ID != id) {
-					trigger.ID = id;
-					trigger.SensorID = reader.GetString(1);
-					trigger.KeyValue = reader.GetString(2);
-					trigger.LowerEdge = SafeGetValue<double?>(reader, 3);
-					trigger.UpperEdge = SafeGetValue<double?>(reader, 4);
-					trigger.FormalLanguage = SafeGetValue<string>(reader, 5);
-					trigger.Type = (TriggerType)reader.GetInt32(6);
+					return false;
 				}
 
 				if(await reader.IsDBNullAsync(7, ct)) {
-					continue;
+					var hasNext = await reader.ReadAsync(ct).ConfigureAwait(false);
+					return !hasNext;
 				}
 
 				var action = new TriggerAction {
@@ -147,9 +201,9 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 				trigger.TriggerActions ??= new List<TriggerAction>();
 				trigger.TriggerActions.Add(action);
-			}
+			} while(await reader.ReadAsync(ct));
 
-			return trigger;
+			return true;
 		}
 
 		private static ColumnValue SafeGetValue<ColumnValue>(DbDataReader reader, int ordinal)
