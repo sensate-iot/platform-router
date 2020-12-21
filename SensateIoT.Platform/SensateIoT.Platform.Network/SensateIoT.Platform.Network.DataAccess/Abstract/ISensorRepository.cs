@@ -19,7 +19,8 @@ namespace SensateIoT.Platform.Network.DataAccess.Abstract
 		Task CreateAsync(Sensor sensor, CancellationToken ct = default(CancellationToken));
 
 		Task<IEnumerable<Sensor>> GetAsync(Guid userId, int skip = 0, int limit = 0);
-		Task<Sensor> GetAsync(string id);
+		Task<Sensor> GetAsync(string id, CancellationToken ct = default);
+		Task<Sensor> GetAsync(ObjectId id, CancellationToken ct = default);
 		Task<IEnumerable<Sensor>> GetAsync(IEnumerable<string> ids);
 		Task<IEnumerable<Sensor>> FindByNameAsync(Guid userId, string name, int skip = 0, int limit = 0);
 

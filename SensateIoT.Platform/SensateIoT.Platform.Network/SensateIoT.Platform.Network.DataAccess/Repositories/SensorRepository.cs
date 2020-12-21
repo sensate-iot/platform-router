@@ -65,20 +65,25 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			return await sensors.ToListAsync().ConfigureAwait(false);
 		}
 
-		public async Task<Sensor> GetAsync(string id)
+		public async Task<Sensor> GetAsync(ObjectId id, CancellationToken ct)
 		{
-			if(!ObjectId.TryParse(id, out var oid)) {
-				throw new FormatException("Invalid SensorID format!");
-			}
-
-			var filter = Builders<Sensor>.Filter.Where(x => x.InternalId == oid);
+			var filter = Builders<Sensor>.Filter.Where(x => x.InternalId == id);
 			var result = await this.m_sensors.FindAsync(filter).ConfigureAwait(false);
 
 			if(result == null) {
 				return null;
 			}
 
-			return await result.FirstOrDefaultAsync().ConfigureAwait(false);
+			return await result.FirstOrDefaultAsync(ct).ConfigureAwait(false);
+		}
+
+		public async Task<Sensor> GetAsync(string id, CancellationToken ct)
+		{
+			if(!ObjectId.TryParse(id, out var oid)) {
+				throw new FormatException("Invalid SensorID format!");
+			}
+
+			return await this.GetAsync(oid, ct);
 		}
 
 		public async Task<IEnumerable<Sensor>> GetAsync(IEnumerable<string> ids)
