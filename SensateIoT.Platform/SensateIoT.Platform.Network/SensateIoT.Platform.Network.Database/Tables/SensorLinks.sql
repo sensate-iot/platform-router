@@ -1,10 +1,7 @@
 CREATE TABLE public."SensorLinks"
 (
 	"SensorId" TEXT NOT NULL,
-	"UserId" TEXT NOT NULL
-		CONSTRAINT "FK_SensorLinks_Users_UserId"
-			REFERENCES public."Users"
-				ON DELETE CASCADE,
+	"UserId" TEXT NOT NULL,
 	CONSTRAINT "PK_SensorLinks"
 		PRIMARY KEY ("UserId", "SensorId")
 );

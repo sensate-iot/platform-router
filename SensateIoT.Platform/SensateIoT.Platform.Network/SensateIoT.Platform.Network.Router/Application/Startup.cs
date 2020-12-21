@@ -56,7 +56,7 @@ namespace SensateIoT.Platform.Network.Router.Application
 
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.AddAuthorizationContext(db.SensateIoT.ConnectionString);
-			services.AddTriggerContext(db.SensateIoT.ConnectionString);
+			services.AddNetworkingContext(db.Networking.ConnectionString);
 
 			services.Configure<DataReloadSettings>(opts => {
 				opts.StartDelay = TimeSpan.FromSeconds(1);

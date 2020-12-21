@@ -1,5 +1,3 @@
-drop function networkapi_selecttriggerbysensorid;
-
 CREATE FUNCTION networkapi_selecttriggerbysensorid(sensorid VARCHAR(24))
     RETURNS TABLE(
         "ID" BIGINT,

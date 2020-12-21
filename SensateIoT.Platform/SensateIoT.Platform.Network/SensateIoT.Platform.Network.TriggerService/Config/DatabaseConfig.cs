@@ -10,6 +10,7 @@ namespace SensateIoT.Platform.Network.TriggerService.Config
 	public class DatabaseConfig
 	{
 		public PgSQLConfig SensateIoT { get; set; }
+		public PgSQLConfig Networking { get; set; }
 		public MongoDBConfig MongoDB { get; set; }
 	}
 

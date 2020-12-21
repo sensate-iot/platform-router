@@ -5,6 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -80,6 +81,15 @@ namespace SensateIoT.Platform.Network.API.Services
 			await this.m_triggers.DeleteBySensorAsync(sensor.InternalId.ToString(), ct);
 			await this.m_apiKeys.DeleteAsync(sensor.Secret, ct).ConfigureAwait(false);
 			await Task.WhenAll(tasks).ConfigureAwait(false);
+		}
+
+		public async Task DeleteAsync(Guid userId, CancellationToken ct = default)
+		{
+			var sensors = await this.m_sensors.GetAsync(userId).ConfigureAwait(false);
+
+			foreach(var sensor in sensors) {
+				await this.DeleteAsync(sensor, ct).ConfigureAwait(false);
+			}
 		}
 
 		public async Task<PaginationResult<Sensor>> GetSensorsAsync(User user, int skip = 0, int limit = 0, CancellationToken token = default)

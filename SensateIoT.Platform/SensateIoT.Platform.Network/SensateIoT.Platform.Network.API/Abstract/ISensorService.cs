@@ -5,6 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using SensateIoT.Platform.Network.API.DTO;
@@ -17,5 +18,6 @@ namespace SensateIoT.Platform.Network.API.Abstract
 		Task<PaginationResult<Sensor>> GetSensorsAsync(User user, int skip = 0, int limit = 0, CancellationToken token = default);
 		Task<PaginationResult<Sensor>> GetSensorsAsync(User user, string name, int skip = 0, int limit = 0, CancellationToken token = default);
 		Task DeleteAsync(Sensor sensor, CancellationToken ct = default);
+		Task DeleteAsync(Guid userId, CancellationToken ct = default);
 	}
 }

@@ -31,7 +31,7 @@ namespace SensateIoT.Platform.Network.Common.Init
 			services.AddDbContextPool<AuthorizationContext>(options => { options.UseNpgsql(conn); }, 128);
 		}
 
-		public static void AddTriggerContext(this IServiceCollection services, string conn)
+		public static void AddNetworkingContext(this IServiceCollection services, string conn)
 		{
 			services.AddDbContextPool<NetworkContext>(options => { options.UseNpgsql(conn); }, 128);
 		}

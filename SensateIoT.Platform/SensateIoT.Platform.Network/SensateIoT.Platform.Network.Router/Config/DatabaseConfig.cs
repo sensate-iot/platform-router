@@ -11,6 +11,7 @@ namespace SensateIoT.Platform.Network.Router.Config
 	{
 		public MongoDBConfig MongoDB { get; set; }
 		public PgSQLConfig SensateIoT { get; set; }
+		public PgSQLConfig Networking { get; set; }
 	}
 
 	public class MongoDBConfig

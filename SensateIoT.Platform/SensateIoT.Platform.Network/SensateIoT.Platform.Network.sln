@@ -11,8 +11,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tables", "Tables", "{9BC72E
 	ProjectSection(SolutionItems) = preProject
 		SensateIoT.Platform.Network.Database\Tables\LiveDataHandlers.sql = SensateIoT.Platform.Network.Database\Tables\LiveDataHandlers.sql
 		SensateIoT.Platform.Network.Database\Tables\SensorLinks.sql = SensateIoT.Platform.Network.Database\Tables\SensorLinks.sql
-		SensateIoT.Platform.Network.Database\Tables\TriggerActionPrices.sql = SensateIoT.Platform.Network.Database\Tables\TriggerActionPrices.sql
-		SensateIoT.Platform.Network.Database\Tables\TriggerActionPricesAudit.sql = SensateIoT.Platform.Network.Database\Tables\TriggerActionPricesAudit.sql
 		SensateIoT.Platform.Network.Database\Tables\TriggerActions.sql = SensateIoT.Platform.Network.Database\Tables\TriggerActions.sql
 		SensateIoT.Platform.Network.Database\Tables\TriggerInvocations.sql = SensateIoT.Platform.Network.Database\Tables\TriggerInvocations.sql
 		SensateIoT.Platform.Network.Database\Tables\Triggers.sql = SensateIoT.Platform.Network.Database\Tables\Triggers.sql
@@ -86,6 +84,11 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.API", "SensateIoT.Platform.Network.API\SensateIoT.Platform.Network.API.csproj", "{77B8B1C7-4C1B-44EC-BB89-2793BA33D48A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.Adapters", "SensateIoT.Platform.Network.Adapters\SensateIoT.Platform.Network.Adapters.csproj", "{1529501C-D9BE-4E9C-8F17-B7AD4907E7FF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Migrations", "Migrations", "{2D648956-50F4-46FB-ABDC-93EC6DA2B69F}"
+	ProjectSection(SolutionItems) = preProject
+		Migrations\Networking.1.1.0.sql = Migrations\Networking.1.1.0.sql
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
