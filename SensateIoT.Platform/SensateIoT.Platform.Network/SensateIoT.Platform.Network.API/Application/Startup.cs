@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using SensateIoT.Platform.Network.API.Abstract;
+using SensateIoT.Platform.Network.API.Authorization;
 using SensateIoT.Platform.Network.API.Config;
 using SensateIoT.Platform.Network.API.Middleware;
 using SensateIoT.Platform.Network.API.Services;
@@ -57,6 +58,7 @@ namespace SensateIoT.Platform.Network.API.Application
 			});
 
 			services.Configure<InternalBrokerConfig>(this.Configuration.GetSection("Mqtt:InternalBroker"));
+			services.Configure<RouterConfig>(this.Configuration.GetSection("Router"));
 
 			services.AddScoped<ITriggerRepository, TriggerRepository>();
 			services.AddScoped<IMessageRepository, MessageRepository>();
@@ -69,7 +71,12 @@ namespace SensateIoT.Platform.Network.API.Application
 			services.AddScoped<ILiveDataHandlerRepository, LiveDataHandlerRepository>();
 			services.AddScoped<ISensorService, SensorService>();
 			services.AddScoped<ICommandPublisher, CommandPublisher>();
+			services.AddSingleton<IRouterClient, RouterClient>();
+			services.AddSingleton<IMeasurementAuthorizationService, MeasurementAuthorizationService>();
+			services.AddSingleton<IHashAlgorithm, SHA256Algorithm>();
 			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+			services.AddHostedService<BatchRoutingService>();
 
 			services.AddRouting();
 			services.AddControllers().AddNewtonsoftJson();
