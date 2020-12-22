@@ -5,7 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Abstract\" />
     <Folder Include="Mail\" />
     <Folder Include="SMS\" />
   </ItemGroup>
