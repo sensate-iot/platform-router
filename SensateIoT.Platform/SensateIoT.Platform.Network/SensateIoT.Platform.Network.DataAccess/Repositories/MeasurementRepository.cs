@@ -110,15 +110,6 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			}
 		}
 
-		public async Task StoreAsync(ObjectId sensorId, Measurement measurement, CancellationToken ct)
-		{
-			var dict = new Dictionary<ObjectId, List<Measurement>>();
-			var measurements = new List<Measurement> { measurement };
-
-			dict[sensorId] = measurements;
-			await this.StoreAsync(dict, ct).ConfigureAwait(false);
-		}
-
 		#endregion
 	}
 }
