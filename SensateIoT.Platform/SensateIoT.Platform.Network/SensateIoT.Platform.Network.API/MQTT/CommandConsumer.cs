@@ -43,7 +43,7 @@ namespace SensateIoT.Platform.Network.API.MQTT
 				var userId = Guid.Parse(cmd.Arguments);
 
 				await repo.DeleteAsync(userId, ct).ConfigureAwait(false);
-				this.m_logger.LogDebug("Flushing user with ID: {userId}.", cmd.Arguments);
+				this.m_logger.LogInformation("Flushed user with ID: {userId}.", cmd.Arguments);
 			}
 		}
 	}

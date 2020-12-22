@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SensateIoT.Platform.Network.Adapters\SensateIoT.Platform.Network.Adapters.csproj" />
     <ProjectReference Include="..\SensateIoT.Platform.Network.Common\SensateIoT.Platform.Network.Common.csproj" />
     <ProjectReference Include="..\SensateIoT.Platform.Network.Data\SensateIoT.Platform.Network.Data.csproj" />
   </ItemGroup>

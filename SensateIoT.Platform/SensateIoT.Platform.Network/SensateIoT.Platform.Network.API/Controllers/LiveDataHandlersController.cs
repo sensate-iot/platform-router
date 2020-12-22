@@ -1,5 +1,5 @@
 ﻿/*
- * Actuators controller.
+ * Live data handler controller.
  *
  * @author Michel Megens
  * @email  michel@michelmegens.net

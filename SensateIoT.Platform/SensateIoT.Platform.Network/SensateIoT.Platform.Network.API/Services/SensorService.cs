@@ -6,10 +6,11 @@
  */
 
 using System;
+using System.Threading.Tasks;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 
+using SensateIoT.Platform.Network.Adapters.Abstract;
 using SensateIoT.Platform.Network.API.Abstract;
 using SensateIoT.Platform.Network.API.DTO;
 using SensateIoT.Platform.Network.Data.Models;
@@ -24,6 +25,8 @@ namespace SensateIoT.Platform.Network.API.Services
 		private readonly IApiKeyRepository m_apiKeys;
 		private readonly IMeasurementRepository m_measurements;
 		private readonly IMessageRepository m_messages;
+		private readonly IBlobRepository m_blobs;
+		private readonly IBlobService m_blobService;
 		private readonly IControlMessageRepository m_control;
 		private readonly ITriggerRepository m_triggers;
 
@@ -34,7 +37,9 @@ namespace SensateIoT.Platform.Network.API.Services
 			ITriggerRepository triggers,
 			IControlMessageRepository control,
 			IMessageRepository messages,
-			IApiKeyRepository keys
+			IApiKeyRepository keys,
+			IBlobService blobService,
+			IBlobRepository blobs
 			)
 		{
 			this.m_links = links;
@@ -44,6 +49,8 @@ namespace SensateIoT.Platform.Network.API.Services
 			this.m_measurements = measurements;
 			this.m_triggers = triggers;
 			this.m_messages = messages;
+			this.m_blobService = blobService;
+			this.m_blobs = blobs;
 		}
 
 		public async Task<PaginationResult<Sensor>> GetSensorsAsync(User user, string name, int skip = 0, int limit = 0, CancellationToken token = default)
@@ -72,11 +79,13 @@ namespace SensateIoT.Platform.Network.API.Services
 		{
 			var tasks = new[] {
 				this.m_sensors.DeleteAsync(sensor.InternalId, ct),
-				this.m_messages.DeleteBySensorId(sensor.InternalId, ct),
 				this.m_control.DeleteBySensorAsync(sensor.InternalId, ct),
-				this.m_measurements.DeleteBySensorId(sensor.InternalId, ct),
+				this.m_blobService.RemoveAsync(sensor.InternalId.ToString(), ct),
+				this.m_messages.DeleteBySensorId(sensor.InternalId, ct),
+				this.m_measurements.DeleteBySensorId(sensor.InternalId, ct)
 			};
 
+			await this.m_blobs.DeleteAsync(sensor.InternalId, ct).ConfigureAwait(false);
 			await this.m_links.DeleteBySensorAsync(sensor.InternalId, ct).ConfigureAwait(false);
 			await this.m_triggers.DeleteBySensorAsync(sensor.InternalId.ToString(), ct);
 			await this.m_apiKeys.DeleteAsync(sensor.Secret, ct).ConfigureAwait(false);
