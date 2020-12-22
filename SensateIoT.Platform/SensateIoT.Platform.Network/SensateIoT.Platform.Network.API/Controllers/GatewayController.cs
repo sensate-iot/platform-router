@@ -30,7 +30,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 	[ApiController]
 	[Produces("application/json")]
 	[Route("network/v1/[controller]")]
-	public class GatewayController : AbstractApiController 
+	public class GatewayController : AbstractApiController
 	{
 		private readonly IMeasurementAuthorizationService m_service;
 		private readonly IBlobRepository m_blobs;
@@ -42,9 +42,9 @@ namespace SensateIoT.Platform.Network.API.Controllers
 								 ISensorRepository sensors,
 								 IApiKeyRepository keys,
 								 ISensorLinkRepository links,
-		                         IBlobRepository blobs, 
-		                         IBlobService blobService,
-		                         ILogger<GatewayController> logger) : base(ctx, sensors, links, keys)
+								 IBlobRepository blobs,
+								 IBlobService blobService,
+								 ILogger<GatewayController> logger) : base(ctx, sensors, links, keys)
 		{
 			this.m_service = service;
 			this.m_blobService = blobService;

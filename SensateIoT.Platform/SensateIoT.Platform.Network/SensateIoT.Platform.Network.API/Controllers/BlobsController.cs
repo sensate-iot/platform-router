@@ -29,11 +29,11 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		private readonly IBlobService m_blobService;
 
 		public BlobsController(IHttpContextAccessor ctx,
-		                       ISensorRepository sensors,
-		                       ISensorLinkRepository links,
+							   ISensorRepository sensors,
+							   ISensorLinkRepository links,
 							   IBlobRepository blobs,
 							   IBlobService blobService,
-		                       IApiKeyRepository keys) : base(ctx, sensors, links, keys)
+							   IApiKeyRepository keys) : base(ctx, sensors, links, keys)
 		{
 			this.m_blobs = blobs;
 			this.m_blobService = blobService;
