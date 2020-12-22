@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SensateIoT.Platform.Network
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tables", "Tables", "{9BC72E22-368E-439B-9FDB-BCB754554D67}"
 	ProjectSection(SolutionItems) = preProject
+		SensateIoT.Platform.Network.Database\Tables\Blobs.sql = SensateIoT.Platform.Network.Database\Tables\Blobs.sql
 		SensateIoT.Platform.Network.Database\Tables\LiveDataHandlers.sql = SensateIoT.Platform.Network.Database\Tables\LiveDataHandlers.sql
 		SensateIoT.Platform.Network.Database\Tables\SensorLinks.sql = SensateIoT.Platform.Network.Database\Tables\SensorLinks.sql
 		SensateIoT.Platform.Network.Database\Tables\TriggerActions.sql = SensateIoT.Platform.Network.Database\Tables\TriggerActions.sql
@@ -22,16 +23,24 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions", "Functions", "{
 	ProjectSection(SolutionItems) = preProject
 		SensateIoT.Platform.Network.Database\Functions\LiveDataService_GetApiKey.sql = SensateIoT.Platform.Network.Database\Functions\LiveDataService_GetApiKey.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_CreateAction.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_CreateAction.sql
+		SensateIoT.Platform.Network.Database\Functions\NetworkApi_CreateBlob.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_CreateBlob.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_CreateInvocation.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_CreateInvocation.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_CreateSensorKey.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_CreateSensorKey.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_CreateSensorLink.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_CreateSensorLink.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_CreateTrigger.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_CreateTrigger.sql
+		SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteBlobByID.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteBlobByID.sql
+		SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteBlobBySensorID.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteBlobBySensorID.sql
+		SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteBlobsByName.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteBlobsByName.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteSensorKey.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteSensorKey.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteSensorLink.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteSensorLink.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteTriggerAction.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteTriggerAction.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteTriggerByID.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteTriggerByID.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteTriggersBySensorID.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteTriggersBySensorID.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectApiKeyByKey.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectApiKeyByKey.sql
+		SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectBlobByID.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectBlobByID.sql
+		SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectBlobByName.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectBlobByName.sql
+		SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectBlobs.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectBlobs.sql
+		SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectBlobsBySensorID.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectBlobsBySensorID.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectSensorLinkBySensorID.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectSensorLinkBySensorID.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectSensorLinkByUserID.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectSensorLinkByUserID.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectTriggerByID.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_SelectTriggerByID.sql
@@ -87,7 +96,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Migrations", "Migrations", "{2D648956-50F4-46FB-ABDC-93EC6DA2B69F}"
 	ProjectSection(SolutionItems) = preProject
-		Migrations\Networking.1.1.0.sql = Migrations\Networking.1.1.0.sql
+		Migrations\Networking.1.0.0.sql = Migrations\Networking.1.0.0.sql
 	EndProjectSection
 EndProject
 Global
