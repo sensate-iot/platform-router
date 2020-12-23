@@ -18,12 +18,6 @@ namespace SensateIoT.Platform.Network.DataAccess.Contexts
 		{
 		}
 
-		public virtual DbSet<TriggerAction> TriggerActions { get; set; }
-		public virtual DbSet<TriggerInvocation> TriggerInvocations { get; set; }
-		public virtual DbSet<Trigger> Triggers { get; set; }
-		public virtual DbSet<LiveDataHandler> LiveDataHandlers { get; set; }
-		public virtual DbSet<SensorLink> SensorLinks { get; set; }
-
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);

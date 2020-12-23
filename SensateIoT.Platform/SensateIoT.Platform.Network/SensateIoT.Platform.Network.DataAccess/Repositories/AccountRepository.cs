@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -103,6 +104,11 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		public async Task<IEnumerable<User>> GetAccountsAsync(IEnumerable<string> idlist, CancellationToken ct = default)
 		{
 			var users = new List<User>();
+			var uidlist = idlist.ToList();
+
+			if(!uidlist.Any()) {
+				return users;
+			}
 
 			await using var cmd = this.m_ctx.Database.GetDbConnection().CreateCommand();
 			if(cmd.Connection.State != ConnectionState.Open) {
@@ -112,7 +118,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			cmd.CommandType = CommandType.StoredProcedure;
 			cmd.CommandText = NetworkApi_GetAccountsByID;
 
-			var idArray = string.Join(",", idlist);
+			var idArray = string.Join(",", uidlist);
 			var param = new NpgsqlParameter("userids", NpgsqlDbType.Text) { Value = idArray };
 			cmd.Parameters.Add(param);
 

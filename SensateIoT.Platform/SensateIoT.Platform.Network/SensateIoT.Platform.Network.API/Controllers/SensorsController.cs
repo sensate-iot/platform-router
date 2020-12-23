@@ -17,7 +17,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 using MongoDB.Bson;
-
+using Npgsql;
 using SensateIoT.Platform.Network.API.Abstract;
 using SensateIoT.Platform.Network.API.Attributes;
 using SensateIoT.Platform.Network.API.DTO;
@@ -295,34 +295,53 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			var status = new Response<string>();
 			var error = false;
 
-			if(link.UserId == this.CurrentUser.Email) {
-				status.AddError("Unable to link sensor to own account!");
-				return this.BadRequest(status);
+			try {
+
+				if(link.UserId == this.CurrentUser.Email) {
+					status.AddError("Unable to link sensor to own account!");
+					return this.BadRequest(status);
+				}
+
+				var sensor = await this.m_sensors.GetAsync(link.SensorId).ConfigureAwait(false);
+				var user = await this.m_accounts.GetAccountByEmailAsync(link.UserId).ConfigureAwait(false);
+
+				if(!await this.AuthenticateUserForSensor(sensor, false).ConfigureAwait(false)) {
+					return this.Forbidden();
+				}
+
+				if(user == null) {
+					status.AddError("Target user not found.");
+					error = true;
+				}
+
+				if(sensor == null) {
+					status.AddError("Target sensor not found.");
+					error = true;
+				}
+
+				if(error) {
+					return this.BadRequest(status);
+				}
+
+				link.UserId = user.ID.ToString();
+
+				await this.m_links.CreateAsync(link).ConfigureAwait(false);
+
+			} catch(PostgresException ex) {
+				if(ex.SqlState != PostgresErrorCodes.UniqueViolation) {
+					return this.StatusCode(500);
+				}
+
+				var response = new Response<string>();
+
+				response.AddError("This link already exists!");
+				return this.UnprocessableEntity(response);
+			} catch(FormatException ex) {
+				var response = new Response<string>();
+
+				response.AddError(ex.Message);
+				return this.UnprocessableEntity(response);
 			}
-
-			var sensor = await this.m_sensors.GetAsync(link.SensorId).ConfigureAwait(false);
-			var user = await this.m_accounts.GetAccountByEmailAsync(link.UserId).ConfigureAwait(false);
-
-			if(!await this.AuthenticateUserForSensor(sensor, false).ConfigureAwait(false)) {
-				return this.Forbidden();
-			}
-
-			if(user == null) {
-				status.AddError("Target user not found.");
-				error = true;
-			}
-
-			if(sensor == null) {
-				status.AddError("Target sensor not found.");
-				error = true;
-			}
-
-			if(error) {
-				return this.BadRequest(status);
-			}
-
-			link.UserId = user.ID.ToString();
-			await this.m_links.CreateAsync(link).ConfigureAwait(false);
 
 			return this.NoContent();
 		}

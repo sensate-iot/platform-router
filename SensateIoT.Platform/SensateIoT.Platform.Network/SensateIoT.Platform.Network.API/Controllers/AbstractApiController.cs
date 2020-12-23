@@ -64,7 +64,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 
 		protected async Task<bool> IsLinkedSensor(string id)
 		{
-			var links = await this.m_links.GetByUserAsync(this.m_currentUserId).ConfigureAwait(false);
+			var links = await this.m_links.GetByUserAsync(this.CurrentUser.ID).ConfigureAwait(false);
 			return links.Any(link => link.SensorId == id);
 		}
 

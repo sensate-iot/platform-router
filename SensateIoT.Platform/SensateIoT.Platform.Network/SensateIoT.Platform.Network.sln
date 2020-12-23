@@ -33,6 +33,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions", "Functions", "{
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteBlobsByName.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteBlobsByName.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteSensorKey.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteSensorKey.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteSensorLink.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteSensorLink.sql
+		SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteSensorLinkBySensorID.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteSensorLinkBySensorID.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteTriggerAction.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteTriggerAction.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteTriggerByID.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteTriggerByID.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteTriggersBySensorID.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_DeleteTriggersBySensorID.sql

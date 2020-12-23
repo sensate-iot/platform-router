@@ -103,7 +103,7 @@ namespace SensateIoT.Platform.Network.API.Services
 
 		public async Task<PaginationResult<Sensor>> GetSensorsAsync(User user, int skip = 0, int limit = 0, CancellationToken token = default)
 		{
-			var worker = this.m_links.GetByUserAsync(user.ID.ToString(), token);
+			var worker = this.m_links.GetByUserAsync(user.ID, token);
 			var ownSensors = await this.m_sensors.GetAsync(user.ID).ConfigureAwait(false);
 			var links = await worker.ConfigureAwait(false);
 
