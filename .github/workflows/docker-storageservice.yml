@@ -10,8 +10,8 @@ on:
       tags:
         - v*
 env:
-  IMAGE_NAME: storageclient
-  IMAGE_ID: sensateiot/storageclient
+  IMAGE_NAME: storageservice
+  IMAGE_ID: sensateiot/storageservice
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
@@ -24,7 +24,7 @@ jobs:
 
       - name: Build image
         run: |
-          docker build . --file Processing/SensateService.Processing.StorageClient/Dockerfile --tag $IMAGE_NAME
+          docker build SensateIoT.Platform/SensateIoT.Platform.Network --file SensateIoT.Platform/SensateIoT.Platform.Network/SensateIoT.Platform.Network.StorageService/Dockerfile --tag $IMAGE_NAME
 
       - name: Log into registry
         run: echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin

@@ -100,6 +100,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Migrations", "Migrations", 
 		Migrations\Networking.1.0.0.sql = Migrations\Networking.1.0.0.sql
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Automated Builds", "Automated Builds", "{0CD2E884-3DA9-485F-A729-93AC8627306F}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\.github\workflows\docker-livedatahandler.yml = ..\..\.github\workflows\docker-livedatahandler.yml
+		..\..\.github\workflows\docker-networkapi.yml = ..\..\.github\workflows\docker-networkapi.yml
+		..\..\.github\workflows\docker-storageservice.yml = ..\..\.github\workflows\docker-storageservice.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

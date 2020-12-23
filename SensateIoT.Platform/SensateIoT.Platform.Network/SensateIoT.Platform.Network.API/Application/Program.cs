@@ -18,7 +18,7 @@ namespace SensateIoT.Platform.Network.API.Application
 	{
 		public static string GetAppSettings()
 		{
-			return Environment.GetEnvironmentVariable("API_APPSETTINGS") ?? "appsettings.Development.json";
+			return Environment.GetEnvironmentVariable("API_APPSETTINGS") ?? "appsettings.json";
 		}
 
 		public static void Main(string[] args)
@@ -32,6 +32,7 @@ namespace SensateIoT.Platform.Network.API.Application
 				.UseContentRoot(Directory.GetCurrentDirectory())
 				.ConfigureAppConfiguration((ctx, config) => {
 					config.AddJsonFile(GetAppSettings(), optional: false, reloadOnChange: true);
+					config.AddJsonFile($"appsettings.{ctx.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true);
 					config.AddEnvironmentVariables();
 				})
 				.ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
