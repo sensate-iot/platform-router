@@ -5,10 +5,11 @@
   "main": "dist/src/live-data-service.js",
   "scripts": {
     "start": "node dist/src/app/live-data-service.js",
-    "build": "tsc -t ES2018 --strictNullChecks --noUnusedLocals --noImplicitReturns",
+    "build": "tsc -t ES2018 --noUnusedLocals --noImplicitReturns",
     "generate-js": "node node_modules/protobufjs/bin/pbjs -t static-module -w commonjs -o generated/proto.js ../SensateIoT.Platform.Network.Contracts/DTO/Measurement.proto ../SensateIoT.Platform.Network.Contracts/DTO/Message.proto",
     "generate-ts": " node node_modules/protobufjs/bin/pbts -o generated/proto.d.ts generated/proto.js",
-    "dev": "nodemon -x \"node ./node_modules/ts-node/dist/bin.js\" ./src/app/live-data-service.ts"
+    "dev": "nodemon -x \"node ./node_modules/ts-node/dist/bin.js\" ./src/app/live-data-service.ts",
+    "generate-js-docker": "node node_modules/protobufjs/bin/pbjs -t static-module -w commonjs -o generated/proto.js Contracts/DTO/Measurement.proto Contracts/DTO/Message.proto"
   },
   "author": {
     "name": "Michel Megens",

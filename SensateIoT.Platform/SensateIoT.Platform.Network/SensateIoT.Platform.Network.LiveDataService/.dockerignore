@@ -17,7 +17,6 @@ tools/
 
 # NodeJS stuff
 node_modules/
-SensateIoT.Platform.Network.LiveDataService/node_modules/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
