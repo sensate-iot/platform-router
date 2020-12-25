@@ -98,6 +98,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Migrations", "Migrations", "{2D648956-50F4-46FB-ABDC-93EC6DA2B69F}"
 	ProjectSection(SolutionItems) = preProject
 		Migrations\Networking.1.0.0.sql = Migrations\Networking.1.0.0.sql
+		Migrations\SensateIoT.1.0.0.sql = Migrations\SensateIoT.1.0.0.sql
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Automated Builds", "Automated Builds", "{0CD2E884-3DA9-485F-A729-93AC8627306F}"
