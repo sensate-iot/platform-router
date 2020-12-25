@@ -28,7 +28,7 @@ namespace SensateIoT.Platform.Network.Router.Application
 				.UseContentRoot(Directory.GetCurrentDirectory())
 				.ConfigureAppConfiguration((ctx, config) => {
 					config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-					config.AddJsonFile($"appsettings.{ctx.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange:true);
+					config.AddJsonFile($"appsettings.{ctx.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true);
 					config.AddEnvironmentVariables();
 				})
 				.ConfigureWebHostDefaults(webBuilder => {
