@@ -6,7 +6,6 @@ on:
       branches:
         - master
         - develop
-        - feature/**
       # Publish `v1.2.3` tags as releases.
       tags:
         - v*
@@ -49,7 +48,7 @@ jobs:
           docker push $IMAGE_ID:staging
    
       - name: Push image
-        if: ${{ env.TAG != 'exists' && github.ref == 'refs/heads/feature/network' }}
+        if: ${{ env.TAG != 'exists' && github.ref == 'refs/heads/master' }}
         run: |
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && docker push $IMAGE_ID:$VERSION
