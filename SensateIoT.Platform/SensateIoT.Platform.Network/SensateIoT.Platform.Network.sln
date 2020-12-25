@@ -104,6 +104,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Automated Builds", "Automat
 	ProjectSection(SolutionItems) = preProject
 		..\..\.github\workflows\docker-livedataservice.yml = ..\..\.github\workflows\docker-livedataservice.yml
 		..\..\.github\workflows\docker-networkapi.yml = ..\..\.github\workflows\docker-networkapi.yml
+		..\..\.github\workflows\docker-router.yml = ..\..\.github\workflows\docker-router.yml
 		..\..\.github\workflows\docker-storageservice.yml = ..\..\.github\workflows\docker-storageservice.yml
 		..\..\.github\workflows\docker-triggerservice.yml = ..\..\.github\workflows\docker-triggerservice.yml
 	EndProjectSection

@@ -16,11 +16,6 @@ namespace SensateIoT.Platform.Network.Router.Application
 {
 	public class Program
 	{
-		public static string GetAppSettings()
-		{
-			return Environment.GetEnvironmentVariable("ROUTER_APPSETTINGS") ?? "appsettings.Development.json";
-		}
-
 		public static void Main(string[] args)
 		{
 			var host = CreateHostBuilder(args).Build();
@@ -32,7 +27,8 @@ namespace SensateIoT.Platform.Network.Router.Application
 			return Host.CreateDefaultBuilder(args)
 				.UseContentRoot(Directory.GetCurrentDirectory())
 				.ConfigureAppConfiguration((ctx, config) => {
-					config.AddJsonFile(GetAppSettings(), optional: false, reloadOnChange: true);
+					config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+					config.AddJsonFile($"appsettings.{ctx.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange:true);
 					config.AddEnvironmentVariables();
 				})
 				.ConfigureWebHostDefaults(webBuilder => {
