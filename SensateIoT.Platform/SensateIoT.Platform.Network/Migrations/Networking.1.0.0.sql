@@ -99,22 +99,6 @@ CREATE INDEX "IX_LiveDataHandlers_Enabled"
 -- Database function migrations.
 --
 
-CREATE FUNCTION livedataservice_getapikey(userid TEXT, apikey TEXT)
-    RETURNS TABLE("UserId" TEXT, "Type" INT)
-    LANGUAGE plpgsql
-AS $$
-BEGIN
-	RETURN QUERY
-	
-	SELECT key."UserId", key."Type"
-	FROM public."ApiKeys" AS key
-	WHERE key."UserId" = userid AND
-	      key."ApiKey" = apikey AND
-	      key."Type"   != 0 AND
-	      key."Revoked" = False;
-END;
-$$;
-
 CREATE FUNCTION networkapi_createaction(
     triggerid BIGINT,
     channel INT,
@@ -147,6 +131,43 @@ BEGIN
 END
 $$;
 
+CREATE FUNCTION networkapi_createblob(sensorid VARCHAR(24), filename TEXT, path TEXT, storage INTEGER, filesize INTEGER)
+    RETURNS TABLE(
+       	"ID" BIGINT,
+		"SensorID" VARCHAR(24),
+		"FileName" TEXT,
+		"Path" TEXT,
+		"StorageType" INTEGER,
+		"Timestamp" TIMESTAMP,
+		"FileSize" BIGINT
+                 )
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+	RETURN QUERY
+
+    INSERT INTO "Blobs" ("SensorID",
+                         "FileName",
+                         "Path",
+                         "StorageType",
+                         "FileSize",
+                         "Timestamp")
+    VALUES (sensorid,
+            filename,
+            path,
+            storage,
+            filesize,
+            NOW())
+    RETURNING
+       	"Blobs"."ID",
+		"Blobs"."SensorID",
+		"Blobs"."FileName",
+		"Blobs"."Path",
+		"Blobs"."StorageType",
+		"Blobs"."Timestamp",
+		"Blobs"."FileSize";
+END;
+$$;
 CREATE FUNCTION networkapi_createinvocation(
     triggerid BIGINT,
     actionid BIGINT,
@@ -176,46 +197,6 @@ BEGIN
         "TriggerInvocations"."Timestamp";
 END
 $$;
-
-CREATE FUNCTION networkapi_createsensorkey(key TEXT, userId TEXT)
-    RETURNS TABLE(
-        "Id" UUID,
-        "UserId" UUID,
-        "ApiKey" TEXT,
-        "Revoked" BOOLEAN,
-        "Type" INT,
-        "ReadOnly" BOOLEAN
-                 )
-    LANGUAGE plpgsql
-AS $$
-BEGIN
-    RETURN QUERY
-    INSERT INTO "ApiKeys" (
-                           "Id",
-                           "UserId",
-                           "ApiKey",
-                           "Revoked",
-                           "CreatedOn",
-                           "Type"
-                           )
-    VALUES (
-            uuid_generate_v4(),
-            userId,
-            key,
-            FALSE,
-            NOW(),
-            0
-    )
-    RETURNING
-        "ApiKeys"."Id"::UUID,
-        "ApiKeys"."UserId"::UUID,
-        "ApiKeys"."ApiKey",
-        "ApiKeys"."Revoked",
-        "ApiKeys"."Type",
-        "ApiKeys"."ReadOnly";
-END;
-$$;
-
 CREATE FUNCTION networkapi_createsensorlink(sensorid VARCHAR(24), userid UUID)
     RETURNS TABLE(
         "SensorID" VARCHAR(24),
@@ -233,7 +214,6 @@ BEGIN
         "SensorLinks"."UserId"::UUID;
 END
 $$;
-
 CREATE FUNCTION networkapi_createtrigger(
     sensorid VARCHAR(24),
     keyvalue VARCHAR(32),
@@ -278,17 +258,88 @@ BEGIN
         "Triggers"."Type";
 END
 $$;
-
-CREATE FUNCTION networkapi_deletesensorkey(key TEXT)
-    RETURNS VOID
+CREATE FUNCTION networkapi_deleteblobbyid(id BIGINT)
+    RETURNS TABLE(
+       	"ID" BIGINT,
+		"SensorID" VARCHAR(24),
+		"FileName" TEXT,
+		"Path" TEXT,
+		"StorageType" INTEGER,
+		"Timestamp" TIMESTAMP,
+		"FileSize" BIGINT
+                 )
     LANGUAGE plpgsql
 AS $$
 BEGIN
-    DELETE FROM "ApiKeys"
-    WHERE "ApiKey" = key;
+
+	RETURN QUERY	
+	DELETE FROM "Blobs"
+	WHERE "Blobs"."ID" = id
+	RETURNING 
+	       "Blobs"."ID",
+	       "Blobs"."SensorID",
+		   "Blobs"."FileName",
+		   "Blobs"."Path",
+		   "Blobs"."StorageType",
+		   "Blobs"."Timestamp",
+		   "Blobs"."FileSize";
 END;
 $$;
+CREATE FUNCTION networkapi_deleteblobsbysensorid(sensorid VARCHAR(24))
+    RETURNS TABLE(
+       	"ID" BIGINT,
+		"SensorID" VARCHAR(24),
+		"FileName" TEXT,
+		"Path" TEXT,
+		"StorageType" INTEGER,
+		"Timestamp" TIMESTAMP,
+		"FileSize" BIGINT
+                 )
+    LANGUAGE plpgsql
+AS $$
+BEGIN
 
+	RETURN QUERY	
+	DELETE FROM "Blobs"
+	WHERE "Blobs"."SensorID" = sensorid
+	RETURNING 
+	       "Blobs"."ID",
+	       "Blobs"."SensorID",
+		   "Blobs"."FileName",
+		   "Blobs"."Path",
+		   "Blobs"."StorageType",
+		   "Blobs"."Timestamp",
+		   "Blobs"."FileSize";
+END;
+$$;
+CREATE FUNCTION networkapi_deleteblobsbyname(sensorid VARCHAR(24), filename TEXT)
+    RETURNS TABLE(
+       	"ID" BIGINT,
+		"SensorID" VARCHAR(24),
+		"FileName" TEXT,
+		"Path" TEXT,
+		"StorageType" INTEGER,
+		"Timestamp" TIMESTAMP,
+		"FileSize" BIGINT
+                 )
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+
+	RETURN QUERY	
+	DELETE FROM "Blobs"
+	WHERE "Blobs"."SensorID" = sensorid AND
+	      "Blobs"."FileName" = filename
+	RETURNING 
+	       "Blobs"."ID",
+	       "Blobs"."SensorID",
+		   "Blobs"."FileName",
+		   "Blobs"."Path",
+		   "Blobs"."StorageType",
+		   "Blobs"."Timestamp",
+		   "Blobs"."FileSize";
+END;
+$$;
 CREATE FUNCTION networkapi_deletesensorlink(sensorid VARCHAR(24), userid UUID)
     RETURNS TABLE(
         "SensorID" VARCHAR(24),
@@ -301,6 +352,19 @@ BEGIN
 	DELETE FROM "SensorLinks"
     WHERE "SensorLinks"."UserId" = userid::TEXT AND
           "SensorLinks"."SensorId" = sensorid::TEXT
+    RETURNING
+        "SensorLinks"."SensorId"::VARCHAR(24),
+        "SensorLinks"."UserId"::UUID;
+END
+$$;
+CREATE FUNCTION networkapi_deletesensorlinkbysensorid(sensorid VARCHAR(24))
+    RETURNS TABLE("SensorID" VARCHAR(24), "UserID" UUID)
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+	RETURN QUERY
+	DELETE FROM "SensorLinks"
+    WHERE "SensorLinks"."SensorId" = sensorid::TEXT
     RETURNING
         "SensorLinks"."SensorId"::VARCHAR(24),
         "SensorLinks"."UserId"::UUID;
@@ -330,7 +394,6 @@ BEGIN
 	    "TriggerActions"."Message";
 END
 $$;
-
 CREATE FUNCTION networkapi_deletetriggerbyid(id BIGINT)
     RETURNS TABLE(
         "ID" BIGINT,
@@ -358,7 +421,6 @@ BEGIN
 	    "Triggers"."Type";
 END
 $$;
-
 CREATE FUNCTION networkapi_deletetriggersbysensorid(sensorid VARCHAR(24))
     RETURNS TABLE(
         "ID" BIGINT,
@@ -386,28 +448,117 @@ BEGIN
 	    "Triggers"."Type";
 END
 $$;
-
-CREATE FUNCTION networkapi_selectapikeybykey(key TEXT)
+CREATE FUNCTION networkapi_selectblobbyid(id BIGINT)
     RETURNS TABLE(
-        "UserId" UUID,
-        "Revoked" BOOLEAN,
-        "Type" INT,
-        "ReadOnly" BOOLEAN
+       	"ID" BIGINT,
+		"SensorID" VARCHAR(24),
+		"FileName" TEXT,
+		"Path" TEXT,
+		"StorageType" INTEGER,
+		"Timestamp" TIMESTAMP,
+		"FileSize" BIGINT
+                 )
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+
+	RETURN QUERY	
+	SELECT b."ID",
+	       b."SensorID",
+		   b."FileName",
+		   b."Path",
+		   b."StorageType",
+		   b."Timestamp",
+		   b."FileSize"
+	FROM "Blobs" AS b
+	WHERE b."ID" = id;
+END;
+$$;
+CREATE FUNCTION networkapi_selectblobbyname(sensorid VARCHAR(24), filename TEXT)
+    RETURNS TABLE(
+       	"ID" BIGINT,
+		"SensorID" VARCHAR(24),
+		"FileName" TEXT,
+		"Path" TEXT,
+		"StorageType" INTEGER,
+		"Timestamp" TIMESTAMP,
+		"FileSize" BIGINT
                  )
     LANGUAGE plpgsql
 AS $$
 BEGIN
 	RETURN QUERY
-
-    SELECT "ApiKeys"."UserId"::UUID,
-           "ApiKeys"."Revoked",
-           "ApiKeys"."Type",
-           "ApiKeys"."ReadOnly"
-    FROM "ApiKeys"
-    WHERE "ApiKey" = key;
+	
+	SELECT b."ID",
+	       b."SensorID",
+		   b."FileName",
+		   b."Path",
+		   b."StorageType",
+		   b."Timestamp",
+		   b."FileSize"
+	FROM "Blobs" AS b
+	WHERE b."SensorID" = sensorid AND
+	      b."FileName" = filename;
 END;
 $$;
+CREATE FUNCTION networkapi_selectblobs(idlist TEXT, offst INTEGER DEFAULT NULL, lim INTEGER DEFAULT NULL)
+    RETURNS TABLE(
+       	"ID" BIGINT,
+		"SensorID" VARCHAR(24),
+		"FileName" TEXT,
+		"Path" TEXT,
+		"StorageType" INTEGER,
+		"Timestamp" TIMESTAMP,
+		"FileSize" BIGINT
+                 )
+    LANGUAGE plpgsql
+AS $$
+DECLARE sensorIds VARCHAR(24)[];
+BEGIN
+	sensorIds = ARRAY(SELECT DISTINCT UNNEST(string_to_array(idlist, ',')));
 
+	RETURN QUERY	
+	SELECT b."ID",
+	       b."SensorID",
+		   b."FileName",
+		   b."Path",
+		   b."StorageType",
+		   b."Timestamp",
+		   b."FileSize"
+	FROM "Blobs" AS b
+	WHERE b."SensorID" = ANY (sensorIds)
+	OFFSET offst
+	LIMIT lim;
+END;
+$$;
+CREATE FUNCTION networkapi_selectblobsbysensorid(sensorid VARCHAR(24), offst INTEGER DEFAULT NULL, lim INTEGER DEFAULT NULL)
+    RETURNS TABLE(
+       	"ID" BIGINT,
+		"SensorID" VARCHAR(24),
+		"FileName" TEXT,
+		"Path" TEXT,
+		"StorageType" INTEGER,
+		"Timestamp" TIMESTAMP,
+		"FileSize" BIGINT
+                 )
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+	RETURN QUERY
+	
+	SELECT b."ID",
+	       b."SensorID",
+		   b."FileName",
+		   b."Path",
+		   b."StorageType",
+		   b."Timestamp",
+		   b."FileSize"
+	FROM "Blobs" AS b
+	WHERE b."SensorID" = sensorid
+	OFFSET offst
+	LIMIT lim;
+END;
+$$;
 CREATE FUNCTION networkapi_selectsensorlinkbysensorid(sensorid VARCHAR(24))
     RETURNS TABLE(
         "SensorID" VARCHAR(24),
@@ -423,7 +574,6 @@ BEGIN
     WHERE "SensorLinks"."SensorId" = sensorid;
 END
 $$;
-
 CREATE FUNCTION networkapi_selectsensorlinkbyuserid(userid UUID)
     RETURNS TABLE(
         "SensorID" VARCHAR(24),
@@ -439,7 +589,6 @@ BEGIN
     WHERE "SensorLinks"."UserId" = userid::TEXT;
 END
 $$;
-
 CREATE FUNCTION networkapi_selecttriggerbyid(id BIGINT)
     RETURNS TABLE(
         "ID" BIGINT,
@@ -475,7 +624,6 @@ BEGIN
 	WHERE "Triggers"."ID" = id;
 END
 $$;
-
 CREATE FUNCTION networkapi_selecttriggerbysensorid(sensorid VARCHAR(24))
     RETURNS TABLE(
         "ID" BIGINT,
@@ -512,7 +660,6 @@ BEGIN
     ORDER BY "Triggers"."ID", ta."ID";
 END
 $$;
-
 CREATE FUNCTION networkapi_selectuserbyemail(email TEXT)
     RETURNS TABLE(
         "ID" UUID,
@@ -543,7 +690,6 @@ BEGIN
     WHERE "Users"."Email" = email;
 END;
 $$;
-
 CREATE FUNCTION networkapi_selectuserbyid(userid UUID)
     RETURNS TABLE(
         "ID" UUID,
@@ -607,69 +753,9 @@ BEGIN
     WHERE "Users"."Id" = ANY(idlist);
 END;
 $$;
-
-CREATE FUNCTION networkapi_updateapikey(old TEXT, new TEXT)
-    RETURNS TABLE(
-        "Id" UUID,
-        "UserId" UUID,
-        "ApiKey" TEXT,
-        "Revoked" BOOLEAN,
-        "Type" INT,
-        "ReadOnly" BOOLEAN
-                 )
-    LANGUAGE plpgsql
-AS $$
-BEGIN
-	RETURN QUERY
-	
-	UPDATE "ApiKeys"
-	SET	"ApiKey" = new
-	WHERE "ApiKeys"."ApiKey" = old
-    RETURNING
-        "ApiKeys"."Id"::UUID,
-        "ApiKeys"."UserId"::UUID,
-        "ApiKeys"."ApiKey",
-        "ApiKeys"."Revoked",
-        "ApiKeys"."Type",
-        "ApiKeys"."ReadOnly";
-END;
-$$;
-
-CREATE FUNCTION router_getaccount(userid UUID)
-    RETURNS TABLE(id UUID, billinglockout BOOLEAN, banned BOOLEAN)
-    LANGUAGE plpgsql
-AS
-$$
-BEGIN
-RETURN query
-    SELECT "Users"."Id"::uuid,
-           "BillingLockout",
-           "Roles"."NormalizedName" = 'BANNED' AS "Banned"
-    FROM "Users"
-    INNER JOIN "UserRoles" ON "Users"."Id" = "UserRoles"."UserId"
-    INNER JOIN "Roles" ON "UserRoles"."RoleId" = "Roles"."Id"
-	WHERE "Users"."Id" = userid::text
-    GROUP BY "Users"."Id", "BillingLockout", "Roles"."NormalizedName" = 'BANNED';
-	
-END
-$$;
-
-CREATE FUNCTION router_getaccounts()
-    RETURNS TABLE(id UUID, billinglockout BOOLEAN, banned BOOLEAN)
-    LANGUAGE plpgsql
-AS
-$$
-BEGIN
-RETURN query
-    SELECT "Users"."Id"::uuid,
-           "BillingLockout",
-           "Roles"."NormalizedName" = 'BANNED' AS "Banned"
-    FROM "Users"
-    INNER JOIN "UserRoles" ON "Users"."Id" = "UserRoles"."UserId"
-    INNER JOIN "Roles" ON "UserRoles"."RoleId" = "Roles"."Id"
-    GROUP BY "Users"."Id", "BillingLockout", "Roles"."NormalizedName" = 'BANNED';
-END
-$$;
+---
+--- Get the active live data handlers.
+---
 
 CREATE FUNCTION router_getlivedatahandlers()
 	RETURNS TABLE(
@@ -685,38 +771,12 @@ BEGIN
 	WHERE ldh."Enabled" = True;
 END;
 $$;
-
-CREATE FUNCTION router_getsensorkey(sensorkey text)
-    RETURNS TABLE(apikey text, userid uuid, revoked boolean, readonly boolean)
-	LANGUAGE plpgsql
-AS
-$$
-BEGIN
-RETURN query
-	SELECT "ApiKey",
-		   "UserId"::uuid,
-		   "Revoked",
-		   "ReadOnly"
-	FROM "ApiKeys"
-	WHERE "Type" = 0 AND "ApiKey" = sensorkey;
-END;
-$$;
-
-CREATE FUNCTION router_getsensorkeys()
-    RETURNS TABLE(apikey text, userid uuid, revoked boolean, readonly boolean)
-	LANGUAGE plpgsql
-AS
-$$
-BEGIN
-RETURN query
-	SELECT "ApiKey",
-		   "UserId"::uuid,
-		   "Revoked",
-		   "ReadOnly"
-	FROM "ApiKeys"
-	WHERE "Type" = 0;
-END;
-$$;
+---
+--- Routing trigger lookup function.
+---
+--- @author Michel Megens
+--- @email  michel@michelmegens.net
+---
 
 CREATE FUNCTION router_gettriggers()
     RETURNS TABLE(
@@ -737,6 +797,12 @@ BEGIN
 	GROUP BY "Triggers"."SensorID", "Triggers"."FormalLanguage";
 end;
 $$;
+---
+--- Lookup routing trigger info by ID.
+---
+--- @author Michel Megens
+--- @email  michel@michelmegens.net
+---
 
 CREATE FUNCTION router_gettriggersbyid(id varchar(24))
     RETURNS TABLE(
@@ -756,8 +822,14 @@ BEGIN
     LEFT JOIN "TriggerActions" ON "Triggers"."ID" = "TriggerActions"."TriggerID"
     WHERE "Triggers"."SensorID" = id
     GROUP BY "Triggers"."SensorID", "Triggers"."FormalLanguage";
- END;
+ end;
 $$;
+---
+--- Select triggers and last invocations based.
+---
+--- @author Michel Megens
+--- @email  michel@michelmegens.net
+---
 
 CREATE FUNCTION triggerservice_gettriggersbysensorid(idlist TEXT)
     RETURNS TABLE(
@@ -807,256 +879,3 @@ BEGIN
 	ORDER BY ta."ID";
 END;
 $$;
-
-CREATE FUNCTION networkapi_selectblobsbysensorid(sensorid VARCHAR(24), offst INTEGER DEFAULT NULL, lim INTEGER DEFAULT NULL)
-    RETURNS TABLE(
-       	"ID" BIGINT,
-		"SensorID" VARCHAR(24),
-		"FileName" TEXT,
-		"Path" TEXT,
-		"StorageType" INTEGER,
-		"Timestamp" TIMESTAMP,
-		"FileSize" BIGINT
-                 )
-    LANGUAGE plpgsql
-AS $$
-BEGIN
-	RETURN QUERY
-
-	SELECT b."ID",
-	       b."SensorID",
-		   b."FileName",
-		   b."Path",
-		   b."StorageType",
-		   b."Timestamp",
-		   b."FileSize"
-	FROM "Blobs" AS b
-	WHERE b."SensorID" = sensorid
-	OFFSET offst
-	LIMIT lim;
-END;
-$$;
-
-CREATE FUNCTION networkapi_selectblobs(idlist TEXT, offst INTEGER DEFAULT NULL, lim INTEGER DEFAULT NULL)
-    RETURNS TABLE(
-       	"ID" BIGINT,
-		"SensorID" VARCHAR(24),
-		"FileName" TEXT,
-		"Path" TEXT,
-		"StorageType" INTEGER,
-		"Timestamp" TIMESTAMP,
-		"FileSize" BIGINT
-                 )
-    LANGUAGE plpgsql
-AS $$
-DECLARE sensorIds VARCHAR(24)[];
-BEGIN
-	sensorIds = ARRAY(SELECT DISTINCT UNNEST(string_to_array(idlist, ',')));
-
-	RETURN QUERY
-	SELECT b."ID",
-	       b."SensorID",
-		   b."FileName",
-		   b."Path",
-		   b."StorageType",
-		   b."Timestamp",
-		   b."FileSize"
-	FROM "Blobs" AS b
-	WHERE b."SensorID" = ANY (sensorIds)
-	OFFSET offst
-	LIMIT lim;
-END;
-$$;
-
-CREATE FUNCTION networkapi_selectblobbyname(sensorid VARCHAR(24), filename TEXT)
-    RETURNS TABLE(
-       	"ID" BIGINT,
-		"SensorID" VARCHAR(24),
-		"FileName" TEXT,
-		"Path" TEXT,
-		"StorageType" INTEGER,
-		"Timestamp" TIMESTAMP,
-		"FileSize" BIGINT
-                 )
-    LANGUAGE plpgsql
-AS $$
-BEGIN
-	RETURN QUERY
-
-	SELECT b."ID",
-	       b."SensorID",
-		   b."FileName",
-		   b."Path",
-		   b."StorageType",
-		   b."Timestamp",
-		   b."FileSize"
-	FROM "Blobs" AS b
-	WHERE b."SensorID" = sensorid AND
-	      b."FileName" = filename;
-END;
-$$;
-
-CREATE FUNCTION networkapi_selectblobbyid(id BIGINT)
-    RETURNS TABLE(
-       	"ID" BIGINT,
-		"SensorID" VARCHAR(24),
-		"FileName" TEXT,
-		"Path" TEXT,
-		"StorageType" INTEGER,
-		"Timestamp" TIMESTAMP,
-		"FileSize" BIGINT
-                 )
-    LANGUAGE plpgsql
-AS $$
-BEGIN
-
-	RETURN QUERY
-	SELECT b."ID",
-	       b."SensorID",
-		   b."FileName",
-		   b."Path",
-		   b."StorageType",
-		   b."Timestamp",
-		   b."FileSize"
-	FROM "Blobs" AS b
-	WHERE b."ID" = id;
-END;
-$$;
-
-CREATE FUNCTION networkapi_deleteblobbyid(id BIGINT)
-    RETURNS TABLE(
-       	"ID" BIGINT,
-		"SensorID" VARCHAR(24),
-		"FileName" TEXT,
-		"Path" TEXT,
-		"StorageType" INTEGER,
-		"Timestamp" TIMESTAMP,
-		"FileSize" BIGINT
-                 )
-    LANGUAGE plpgsql
-AS $$
-BEGIN
-
-	RETURN QUERY
-	DELETE FROM "Blobs"
-	WHERE "Blobs"."ID" = id
-	RETURNING
-	       "Blobs"."ID",
-	       "Blobs"."SensorID",
-		   "Blobs"."FileName",
-		   "Blobs"."Path",
-		   "Blobs"."StorageType",
-		   "Blobs"."Timestamp",
-		   "Blobs"."FileSize";
-END;
-$$;
-
-CREATE FUNCTION networkapi_deleteblobsbysensorid(sensorid VARCHAR(24))
-    RETURNS TABLE(
-       	"ID" BIGINT,
-		"SensorID" VARCHAR(24),
-		"FileName" TEXT,
-		"Path" TEXT,
-		"StorageType" INTEGER,
-		"Timestamp" TIMESTAMP,
-		"FileSize" BIGINT
-                 )
-    LANGUAGE plpgsql
-AS $$
-BEGIN
-
-	RETURN QUERY
-	DELETE FROM "Blobs"
-	WHERE "Blobs"."SensorID" = sensorid
-	RETURNING
-	       "Blobs"."ID",
-	       "Blobs"."SensorID",
-		   "Blobs"."FileName",
-		   "Blobs"."Path",
-		   "Blobs"."StorageType",
-		   "Blobs"."Timestamp",
-		   "Blobs"."FileSize";
-END;
-$$;
-
-CREATE FUNCTION networkapi_deleteblobsbyname(sensorid VARCHAR(24), filename TEXT)
-    RETURNS TABLE(
-       	"ID" BIGINT,
-		"SensorID" VARCHAR(24),
-		"FileName" TEXT,
-		"Path" TEXT,
-		"StorageType" INTEGER,
-		"Timestamp" TIMESTAMP,
-		"FileSize" BIGINT
-                 )
-    LANGUAGE plpgsql
-AS $$
-BEGIN
-
-	RETURN QUERY
-	DELETE FROM "Blobs"
-	WHERE "Blobs"."SensorID" = sensorid AND
-	      "Blobs"."FileName" = filename
-	RETURNING
-	       "Blobs"."ID",
-	       "Blobs"."SensorID",
-		   "Blobs"."FileName",
-		   "Blobs"."Path",
-		   "Blobs"."StorageType",
-		   "Blobs"."Timestamp",
-		   "Blobs"."FileSize";
-END;
-$$;
-
-CREATE FUNCTION networkapi_createblob(sensorid VARCHAR(24), filename TEXT, path TEXT, storage INTEGER, filesize INTEGER)
-    RETURNS TABLE(
-       	"ID" BIGINT,
-		"SensorID" VARCHAR(24),
-		"FileName" TEXT,
-		"Path" TEXT,
-		"StorageType" INTEGER,
-		"Timestamp" TIMESTAMP,
-		"FileSize" BIGINT
-                 )
-    LANGUAGE plpgsql
-AS $$
-BEGIN
-	RETURN QUERY
-
-    INSERT INTO "Blobs" ("SensorID",
-                         "FileName",
-                         "Path",
-                         "StorageType",
-                         "FileSize",
-                         "Timestamp")
-    VALUES (sensorid,
-            filename,
-            path,
-            storage,
-            filesize,
-            NOW())
-    RETURNING
-       	"Blobs"."ID",
-		"Blobs"."SensorID",
-		"Blobs"."FileName",
-		"Blobs"."Path",
-		"Blobs"."StorageType",
-		"Blobs"."Timestamp",
-		"Blobs"."FileSize";
-END;
-$$;
-
-CREATE FUNCTION networkapi_deletesensorlinkbysensorid(sensorid VARCHAR(24))
-    RETURNS TABLE("SensorID" VARCHAR(24), "UserID" UUID)
-    LANGUAGE plpgsql
-AS $$
-BEGIN
-	RETURN QUERY
-	DELETE FROM "SensorLinks"
-    WHERE "SensorLinks"."SensorId" = sensorid::TEXT
-    RETURNING
-        "SensorLinks"."SensorId"::VARCHAR(24),
-        "SensorLinks"."UserId"::UUID;
-END
-$$;
-
