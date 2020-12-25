@@ -6,17 +6,19 @@ on:
       branches:
         - master
         - develop
+        - feature/**
       # Publish `v1.2.3` tags as releases.
       tags:
         - v*
 env:
-  IMAGE_NAME: storageservice
-  IMAGE_ID: sensateiot/storageservice
+  IMAGE_NAME: storage-service
+  IMAGE_ID: sensateiot/storage-service
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  BASE_PATH: SensateIoT.Platform/SensateIoT.Platform.Network/SensateIoT.Platform.Network.StorageService
 
 jobs:
-  push-storageclient:
+  push-storageservice:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,23 +26,32 @@ jobs:
 
       - name: Build image
         run: |
-          docker build SensateIoT.Platform/SensateIoT.Platform.Network --file SensateIoT.Platform/SensateIoT.Platform.Network/SensateIoT.Platform.Network.StorageService/Dockerfile --tag $IMAGE_NAME
+          docker build SensateIoT.Platform/SensateIoT.Platform.Network --file $BASE_PATH/Dockerfile --tag $IMAGE_NAME
 
       - name: Log into registry
         run: echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin
 
-      - name: Push image
+      - name: Get assembly version
         run: |
-          # Strip git ref prefix from version
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          PROJ=$BASE_PATH/SensateIoT.Platform.Network.StorageService.csproj
+          VERSION=$(pwsh -command "Scripts/Deployment/Get-AssemblyVersion.ps1 $PROJ")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^//')
-          
-          [ "$VERSION" == "master" ] && VERSION=latest
-          [ "$VERSION" == "develop" ] && VERSION=staging
-          
-          echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$VERSION
+      - name: Check DockerHub
+        run: |
+          DOCKERTAG=$(pwsh -command "Scripts/Deployment/Check-DockerTag.ps1 $IMAGE_ID $VERSION")
+          echo "TAG=$DOCKERTAG" >> $GITHUB_ENV
+
+      - name: Push staging image
+        if: ${{ github.ref == 'refs/heads/develop' }}
+        run: |
+          docker tag $IMAGE_NAME $IMAGE_ID:staging
+          docker push $IMAGE_ID:staging
+   
+      - name: Push image
+        if: ${{ env.TAG != 'exists' && github.ref == 'refs/heads/feature/network' }}
+        run: |
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && docker push $IMAGE_ID:$VERSION
+          docker tag $IMAGE_NAME $IMAGE_ID:latest
+          docker push $IMAGE_ID:latest

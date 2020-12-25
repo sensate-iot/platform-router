@@ -11,14 +11,14 @@ on:
       tags:
         - v*
 env:
-  IMAGE_NAME: network-api
-  IMAGE_ID: sensateiot/network-api
+  IMAGE_NAME: storage-service
+  IMAGE_ID: sensateiot/storage-service
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-  BASE_PATH: SensateIoT.Platform/SensateIoT.Platform.Network/SensateIoT.Platform.Network.API
+  BASE_PATH: SensateIoT.Platform/SensateIoT.Platform.Network/SensateIoT.Platform.Network.TriggerService
 
 jobs:
-  push-networkapi:
+  push-triggerservice:
     runs-on: ubuntu-latest
 
     steps:
@@ -33,7 +33,7 @@ jobs:
 
       - name: Get assembly version
         run: |
-          PROJ=$BASE_PATH/SensateIoT.Platform.Network.API.csproj
+          PROJ=$BASE_PATH/SensateIoT.Platform.Network.TriggerService.csproj
           VERSION=$(pwsh -command "Scripts/Deployment/Get-AssemblyVersion.ps1 $PROJ")
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 

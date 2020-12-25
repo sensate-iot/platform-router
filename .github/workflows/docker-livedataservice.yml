@@ -11,8 +11,8 @@ on:
       tags:
         - v*
 env:
-  IMAGE_NAME: livedataservice
-  IMAGE_ID: sensateiot/livedataservice
+  IMAGE_NAME: live-data-service
+  IMAGE_ID: sensateiot/live-data-service
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
   BASE_PATH: SensateIoT.Platform/SensateIoT.Platform.Network/SensateIoT.Platform.Network.LiveDataService
@@ -51,7 +51,7 @@ jobs:
       - name: Push image
         if: ${{ env.TAG != 'exists' && github.ref == 'refs/heads/feature/network' }}
         run: |
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$VERSION
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && docker push $IMAGE_ID:$VERSION
           docker tag $IMAGE_NAME $IMAGE_ID:latest
           docker push $IMAGE_ID:latest
