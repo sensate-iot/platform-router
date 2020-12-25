@@ -48,7 +48,7 @@ jobs:
           docker push $IMAGE_ID:staging
    
       - name: Push image
-        if: ${{ env.TAG != 'exists' && github.ref == 'refs/heads/master' }}
+        if: ${{ env.TAG != 'exists' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')) }}
         run: |
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && docker push $IMAGE_ID:$VERSION
