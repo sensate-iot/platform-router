@@ -7,13 +7,16 @@
 
 namespace SensateService.Common.Data.Enums
 {
-	public enum AuthServiceCommand
+	public enum CommandType
 	{
 		FlushUser,
 		FlushSensor,
 		FlushKey,
 		AddUser,
 		AddSensor,
-		AddKey
+		AddKey,
+		AddLiveDataSensor,
+		RemoveLiveDataSensor,
+		SyncLiveDataSensors
 	}
 }

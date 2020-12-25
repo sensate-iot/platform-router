@@ -12,6 +12,6 @@ namespace SensateService.Services.Processing
 {
 	public interface ICommandPublisher
 	{
-		Task PublishCommand(AuthServiceCommand cmd, string argument, bool retain = false);
+		Task PublishCommand(CommandType cmd, string argument, bool retain = false);
 	}
 }
