@@ -57,6 +57,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions", "Functions", "{
 		SensateIoT.Platform.Network.Database\Functions\Router_GetSensorKeys.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetSensorKeys.sql
 		SensateIoT.Platform.Network.Database\Functions\Router_GetTriggers.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetTriggers.sql
 		SensateIoT.Platform.Network.Database\Functions\Router_GetTriggersById.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetTriggersById.sql
+		SensateIoT.Platform.Network.Database\Functions\StatsService_GetBlobs.sql = SensateIoT.Platform.Network.Database\Functions\StatsService_GetBlobs.sql
 		SensateIoT.Platform.Network.Database\Functions\TriggerService_GetTriggersBySensorID.sql = SensateIoT.Platform.Network.Database\Functions\TriggerService_GetTriggersBySensorID.sql
 	EndProjectSection
 EndProject

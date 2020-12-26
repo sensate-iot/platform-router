@@ -16,13 +16,7 @@ namespace SensateService.Infrastructure.Repositories
 {
 	public interface ISensorLinkRepository
 	{
-		Task CreateAsync(SensorLink link, CancellationToken token = default);
-		Task DeleteAsync(SensorLink link, CancellationToken token = default);
-		Task DeleteForAsync(Sensor sensor, CancellationToken token = default);
-		Task<IEnumerable<SensorLink>> GetAsync(string sensorId, CancellationToken ct = default);
 		Task<IEnumerable<SensorLink>> GetByUserAsync(SensateUser user, CancellationToken token = default);
 		Task<int> CountAsync(SensateUser user, CancellationToken ct = default);
-		Task DeleteBySensorAsync(Sensor sensor, CancellationToken ct = default);
-		Task DeleteByUserAsync(SensateUser user, CancellationToken ct = default);
 	}
 }

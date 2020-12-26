@@ -1,5 +1,5 @@
 ﻿/*
- * Trigger database context.
+ * Networking database context.
  *
  * @author Michel Megens
  * @email  michel@michelmegens.net

@@ -25,11 +25,6 @@ namespace SensateService.Infrastructure.Sql
 		public DbSet<ChangePhoneNumberToken> ChangePhoneNumberTokens { get; set; }
 		public DbSet<SensateApiKey> ApiKeys { get; set; }
 		public DbSet<AuditLog> AuditLogs { get; set; }
-		public DbSet<Trigger> Triggers { get; set; }
-		public DbSet<TriggerAction> TriggerActions { get; set; }
-		public DbSet<TriggerInvocation> TriggerInvocations { get; set; }
-		public DbSet<Blob> Blobs { get; set; }
-		public DbSet<SensorLink> SensorLinks { get; set; }
 		public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
 
 		public SensateSqlContext(DbContextOptions<SensateSqlContext> options) : base(options)
