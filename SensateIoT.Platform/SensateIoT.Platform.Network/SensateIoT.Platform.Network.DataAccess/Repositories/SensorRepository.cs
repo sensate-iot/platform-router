@@ -30,7 +30,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			this.m_sensors = ctx.Sensors;
 		}
 
-		public async Task CreateAsync(Sensor sensor, CancellationToken ct = default(CancellationToken))
+		public async Task CreateAsync(Sensor sensor, CancellationToken ct = default)
 		{
 			var now = DateTime.UtcNow;
 

@@ -21,6 +21,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Triggers", "Triggers", "{EF
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions", "Functions", "{2BC79829-3F73-43D8-987A-68E72A2F56AA}"
 	ProjectSection(SolutionItems) = preProject
+		SensateIoT.Platform.Network.Database\Functions\DataApi_SelectInvocationCount.sql = SensateIoT.Platform.Network.Database\Functions\DataApi_SelectInvocationCount.sql
+		SensateIoT.Platform.Network.Database\Functions\DataApi_SelectSensorLinkByUserID.sql = SensateIoT.Platform.Network.Database\Functions\DataApi_SelectSensorLinkByUserID.sql
+		SensateIoT.Platform.Network.Database\Functions\DataApi_SelectSensorLinkCountByUserID.sql = SensateIoT.Platform.Network.Database\Functions\DataApi_SelectSensorLinkCountByUserID.sql
+		SensateIoT.Platform.Network.Database\Functions\Generic_GetBlobs.sql = SensateIoT.Platform.Network.Database\Functions\Generic_GetBlobs.sql
 		SensateIoT.Platform.Network.Database\Functions\LiveDataService_GetApiKey.sql = SensateIoT.Platform.Network.Database\Functions\LiveDataService_GetApiKey.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_CreateAction.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_CreateAction.sql
 		SensateIoT.Platform.Network.Database\Functions\NetworkApi_CreateBlob.sql = SensateIoT.Platform.Network.Database\Functions\NetworkApi_CreateBlob.sql
@@ -57,7 +61,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions", "Functions", "{
 		SensateIoT.Platform.Network.Database\Functions\Router_GetSensorKeys.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetSensorKeys.sql
 		SensateIoT.Platform.Network.Database\Functions\Router_GetTriggers.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetTriggers.sql
 		SensateIoT.Platform.Network.Database\Functions\Router_GetTriggersById.sql = SensateIoT.Platform.Network.Database\Functions\Router_GetTriggersById.sql
-		SensateIoT.Platform.Network.Database\Functions\StatsService_GetBlobs.sql = SensateIoT.Platform.Network.Database\Functions\StatsService_GetBlobs.sql
 		SensateIoT.Platform.Network.Database\Functions\TriggerService_GetTriggersBySensorID.sql = SensateIoT.Platform.Network.Database\Functions\TriggerService_GetTriggersBySensorID.sql
 	EndProjectSection
 EndProject

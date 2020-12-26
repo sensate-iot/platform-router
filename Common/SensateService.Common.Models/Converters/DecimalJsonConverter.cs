@@ -7,7 +7,6 @@
  */
 
 using System;
-using System.Globalization;
 using Newtonsoft.Json;
 
 namespace SensateService.Common.Data.Converters
@@ -21,25 +20,25 @@ namespace SensateService.Common.Data.Converters
 
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
 		{
-			if(reader.TokenType == JsonToken.String && ((string)reader.Value) == String.Empty)
-				return Decimal.MinValue;
-			else if(reader.TokenType == JsonToken.Float || reader.TokenType == JsonToken.Integer)
+			switch(reader.TokenType) {
+			case JsonToken.String when((string)reader.Value) == string.Empty:
+				return decimal.MinValue;
+			case JsonToken.Float:
+			case JsonToken.Integer:
 				return Convert.ToDecimal(reader.Value);
-
-			throw new JsonSerializationException(
-				String.Format("Unexpected token type: {0}", reader.TokenType.ToString())
-			);
+			default:
+				throw new JsonSerializationException($"Unexpected token type: {reader.TokenType}"
+				);
+			}
 		}
 
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
 		{
-			decimal v = (decimal)value;
-			string raw;
+			var v = (decimal)value;
 
-			if(v == Decimal.MinValue || value == null) {
-				writer.WriteValue(String.Empty);
+			if(v == decimal.MinValue) {
+				writer.WriteValue(string.Empty);
 			} else {
-				raw = v.ToString(CultureInfo.InvariantCulture);
 				writer.WriteValue(value);
 			}
 		}

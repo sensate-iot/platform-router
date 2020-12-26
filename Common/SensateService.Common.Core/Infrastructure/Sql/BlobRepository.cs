@@ -42,6 +42,7 @@ namespace SensateService.Infrastructure.Sql
 													  OrderDirection order = OrderDirection.Ascending,
 													  CancellationToken ct = default)
 		{
+			var rv = new List<Blob>();
 			var ids = sensors.Select(x => x.InternalId.ToString());
 			var sensoridlist = string.Join(',', ids);
 
@@ -59,7 +60,7 @@ namespace SensateService.Infrastructure.Sql
 			var _end = new NpgsqlParameter("end", NpgsqlDbType.Timestamp) { Value = end };
 			var _skip = new NpgsqlParameter("ofst", NpgsqlDbType.Integer) { Value = GetNullableInteger(skip) };
 			var _limit = new NpgsqlParameter("lim", NpgsqlDbType.Integer) { Value = GetNullableInteger(limit) };
-			var _direction = new NpgsqlParameter("direction", NpgsqlDbType.Text) { Value = order.ToString("G") };
+			var _direction = new NpgsqlParameter("direction", NpgsqlDbType.Varchar) { Value = order.ToString("G") };
 
 			cmd.Parameters.Add(idlst);
 			cmd.Parameters.Add(_start);
@@ -75,14 +76,20 @@ namespace SensateService.Infrastructure.Sql
 			}
 
 			while(await reader.ReadAsync(ct).ConfigureAwait(false)) {
-
 				var tmp = new Blob {
 					Id = reader.GetInt64(0),
+					SensorId = reader.GetString(1),
+					FileName = reader.GetString(2),
+					Path = reader.GetString(3),
+					StorageType = (StorageType)reader.GetInt64(4),
+					Timestamp = reader.GetDateTime(5),
+					FileSize = reader.GetInt64(6)
 				};
 
-
-					users.Add(tmp);
+				rv.Add(tmp);
 			}
+
+			return rv;
 		}
 
 		private static int? GetNullableInteger(int value)

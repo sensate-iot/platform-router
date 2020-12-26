@@ -880,7 +880,7 @@ BEGIN
 END;
 $$;
 
-CREATE FUNCTION statsservice_getblobs(idlist TEXT,
+CREATE FUNCTION generic_getblobs(idlist TEXT,
                                       start TIMESTAMP,
                                       "end" TIMESTAMP,
                                       ofst INTEGER DEFAULT NULL,
@@ -890,7 +890,10 @@ CREATE FUNCTION statsservice_getblobs(idlist TEXT,
     RETURNS TABLE(
         "ID" BIGINT,
         "SensorID" VARCHAR(24),
-        "Path" TEXT
+        "Path" TEXT,
+        "StorageType" INTEGER,
+        "Timestamp" TIMESTAMP,
+        "FileSize" BIGINT
                  )
     LANGUAGE plpgsql
 AS $$
@@ -904,7 +907,7 @@ BEGIN
    END IF;
 
 	RETURN QUERY EXECUTE
-	    format('SELECT "ID", "SensorID", "Path" ' ||
+	    format('SELECT "ID", "SensorID", "Path", "StorageType", "Timestamp", "FileSize" ' ||
 	           'FROM "Blobs" ' ||
 	           'WHERE "Timestamp" >= $1 AND "Timestamp" < $2 AND "SensorID" = ANY($3) ' ||
 	           'ORDER BY "Timestamp" %s ' ||
@@ -912,5 +915,51 @@ BEGIN
 	           'LIMIT %s',
 	        direction, lim, ofst)
     USING start, "end", sensorIds;
+END
+$$;
+
+CREATE FUNCTION dataapi_selectsensorlinkbyuserid(userid UUID)
+    RETURNS TABLE(
+        "SensorID" VARCHAR(24),
+        "UserID" UUID
+                 )
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+	RETURN QUERY
+    SELECT "SensorLinks"."SensorId"::VARCHAR(24),
+           "SensorLinks"."UserId"::UUID
+    FROM "SensorLinks"
+    WHERE "SensorLinks"."UserId" = userid::TEXT;
+END
+$$;
+
+CREATE FUNCTION dataapi_selectsensorlinkcountbyuserid(userid UUID)
+    RETURNS TABLE("Count" BIGINT)
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+	RETURN QUERY
+
+    SELECT COUNT(*) AS "Count"
+    FROM "SensorLinks"
+    WHERE "UserId" = "UserId"::TEXT;
+END
+$$;
+
+CREATE FUNCTION dataapi_selectinvocationcount(idlist TEXT)
+    RETURNS TABLE("Count" BIGINT)
+    LANGUAGE plpgsql
+AS $$
+DECLARE sensorIds VARCHAR(24)[];
+BEGIN
+	sensorIds = ARRAY(SELECT DISTINCT UNNEST(string_to_array(idlist, ',')));
+
+	RETURN QUERY
+
+    SELECT COUNT(*)
+    FROM "TriggerInvocations" AS inv
+    INNER JOIN "Triggers" AS t ON t."SensorID" = ANY(sensorIds)
+    WHERE inv."TriggerID" = t."ID";
 END
 $$;

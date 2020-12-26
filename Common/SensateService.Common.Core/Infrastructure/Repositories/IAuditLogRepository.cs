@@ -32,7 +32,7 @@ namespace SensateService.Infrastructure.Repositories
 		Task<PaginationResult<AuditLog>> FindAsync(IEnumerable<string> uids, string text, RequestMethod method = RequestMethod.Any, int skip = 0, int limit = 0);
 
 		Task CreateAsync(string route, RequestMethod method, IPAddress address, SensateUser user = null);
-		Task CreateAsync(AuditLog log, CancellationToken ct = default(CancellationToken));
+		Task CreateAsync(AuditLog log, CancellationToken ct = default);
 
 		Task DeleteBetweenAsync(SensateUser user, DateTime start, DateTime end);
 		Task DeleteBetweenAsync(SensateUser user, string route, DateTime start, DateTime end);

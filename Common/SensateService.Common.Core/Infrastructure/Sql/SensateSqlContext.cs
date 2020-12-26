@@ -41,11 +41,6 @@ namespace SensateService.Infrastructure.Sql
 			builder.Entity<SensateUser>().ToTable("Users");
 			builder.Entity<SensateRole>().ToTable("Roles");
 			builder.Entity<SensateUserRole>().ToTable("UserRoles");
-			builder.Entity<Trigger>().ToTable("Triggers");
-			builder.Entity<TriggerAction>().ToTable("TriggerActions");
-			builder.Entity<TriggerInvocation>().ToTable("TriggerInvocations");
-			builder.Entity<Blob>().ToTable("Blobs");
-			builder.Entity<SensorLink>().ToTable("SensorLinks");
 			builder.Entity<DataProtectionKey>().ToTable("DataProtectionKeys");
 
 			builder.Entity<PasswordResetToken>().HasKey(k => k.UserToken);
@@ -71,13 +66,6 @@ namespace SensateService.Infrastructure.Sql
 			});
 
 			builder.Entity<SensateUser>(x => { x.HasIndex(u => u.BillingLockout); });
-
-			builder.Entity<SensorLink>(link => {
-				link.HasKey(k => new { k.UserId, k.SensorId });
-				link.HasIndex(k => k.UserId);
-				link.HasOne<SensateUser>().WithMany().HasForeignKey(x => x.UserId)
-					.IsRequired().OnDelete(DeleteBehavior.Cascade);
-			});
 
 			builder.Entity<SensateApiKey>(key => {
 				key.HasIndex(u => u.ApiKey).IsUnique();
@@ -106,24 +94,6 @@ namespace SensateService.Infrastructure.Sql
 				.OnDelete(DeleteBehavior.Cascade);
 			builder.Entity<AuditLog>().HasIndex(log => log.Method);
 			builder.Entity<AuditLog>().HasIndex(log => log.AuthorId);
-
-			builder.Entity<Trigger>().HasIndex(trigger => trigger.Type);
-			builder.Entity<Trigger>().Property(trigger => trigger.Id).UseIdentityByDefaultColumn();
-			builder.Entity<Trigger>().HasIndex(trigger => trigger.SensorId);
-			builder.Entity<Trigger>().HasMany(trigger => trigger.Invocations).WithOne()
-				.HasForeignKey(invoc => invoc.TriggerId).OnDelete(DeleteBehavior.Cascade);
-			builder.Entity<Trigger>().HasMany(trigger => trigger.Actions).WithOne()
-				.HasForeignKey(action => action.TriggerId).OnDelete(DeleteBehavior.Cascade);
-
-			builder.Entity<TriggerInvocation>().Property(invocation => invocation.Id).UseIdentityByDefaultColumn();
-			builder.Entity<TriggerInvocation>().HasIndex(invocation => invocation.TriggerId);
-			builder.Entity<TriggerAction>(action => {
-				action.HasKey(t => new { t.TriggerId, t.Channel });
-			});
-
-			builder.Entity<Blob>().Property(blob => blob.Id).UseIdentityByDefaultColumn();
-			builder.Entity<Blob>().HasIndex(blob => blob.SensorId);
-			builder.Entity<Blob>().HasIndex(blob => new { blob.SensorId, blob.FileName }).IsUnique();
 		}
 	}
 }

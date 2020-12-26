@@ -17,6 +17,6 @@ namespace SensateService.Infrastructure.Repositories
 	public interface ISensorLinkRepository
 	{
 		Task<IEnumerable<SensorLink>> GetByUserAsync(SensateUser user, CancellationToken token = default);
-		Task<int> CountAsync(SensateUser user, CancellationToken ct = default);
+		Task<long> CountAsync(SensateUser user, CancellationToken ct = default);
 	}
 }

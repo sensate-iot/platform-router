@@ -29,7 +29,7 @@ namespace SensateService.Infrastructure.Repositories
 		Task<SensateUser> GetByClaimsPrincipleAsync(ClaimsPrincipal cp);
 
 		void StartUpdate(SensateUser user);
-		Task EndUpdateAsync(CancellationToken token = default(CancellationToken));
+		Task EndUpdateAsync(CancellationToken token = default);
 		IEnumerable<string> GetRoles(SensateUser user);
 		Task<IEnumerable<string>> GetRolesAsync(SensateUser user);
 

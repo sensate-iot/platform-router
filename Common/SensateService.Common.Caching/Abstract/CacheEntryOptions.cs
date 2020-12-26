@@ -14,7 +14,6 @@ namespace SensateService.Common.Caching.Abstract
 		private TimeSpan? m_timeout;
 		private long? m_size;
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Reviewed")]
 		public TimeSpan? Timeout {
 			get => this.m_timeout;
 			set {
@@ -26,7 +25,6 @@ namespace SensateService.Common.Caching.Abstract
 			}
 		}
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Reviewed")]
 		public long? Size {
 			get => this.m_size;
 			set {

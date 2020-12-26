@@ -32,7 +32,7 @@ namespace SensateService.Infrastructure.Document
 			this._rng = new Random(DateTime.Now.Millisecond);
 		}
 
-		public override async Task CreateAsync(Sensor sensor, CancellationToken ct = default(CancellationToken))
+		public override async Task CreateAsync(Sensor sensor, CancellationToken ct = default)
 		{
 			var now = DateTime.Now;
 

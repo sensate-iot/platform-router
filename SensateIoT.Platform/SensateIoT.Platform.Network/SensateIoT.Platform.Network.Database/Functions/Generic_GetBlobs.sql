@@ -1,4 +1,4 @@
-CREATE FUNCTION statsservice_getblobs(idlist TEXT,
+CREATE FUNCTION generic_getblobs(idlist TEXT,
                                       start TIMESTAMP,
                                       "end" TIMESTAMP,
                                       ofst INTEGER DEFAULT NULL,
@@ -8,7 +8,10 @@ CREATE FUNCTION statsservice_getblobs(idlist TEXT,
     RETURNS TABLE(
         "ID" BIGINT,
         "SensorID" VARCHAR(24),
-        "Path" TEXT
+        "Path" TEXT,
+        "StorageType" INTEGER,
+        "Timestamp" TIMESTAMP,
+        "FileSize" BIGINT
                  )
     LANGUAGE plpgsql
 AS $$
@@ -22,7 +25,7 @@ BEGIN
    END IF;
 
 	RETURN QUERY EXECUTE
-	    format('SELECT "ID", "SensorID", "Path" ' ||
+	    format('SELECT "ID", "SensorID", "Path", "StorageType", "Timestamp", "FileSize" ' ||
 	           'FROM "Blobs" ' ||
 	           'WHERE "Timestamp" >= $1 AND "Timestamp" < $2 AND "SensorID" = ANY($3) ' ||
 	           'ORDER BY "Timestamp" %s ' ||

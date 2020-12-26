@@ -69,7 +69,7 @@ namespace SensateService.Infrastructure.Document
 		}
 
 		#region Entry Getters
-	
+
 		public async Task<IEnumerable<SensorStatisticsEntry>> GetAfterAsync(IEnumerable<Sensor> sensors, DateTime dt)
 		{
 			FilterDefinition<SensorStatisticsEntry> filter;

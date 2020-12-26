@@ -9,14 +9,16 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+
 using MongoDB.Bson;
+
 using SensateIoT.Platform.Network.Data.Models;
 
 namespace SensateIoT.Platform.Network.DataAccess.Abstract
 {
 	public interface ISensorRepository
 	{
-		Task CreateAsync(Sensor sensor, CancellationToken ct = default(CancellationToken));
+		Task CreateAsync(Sensor sensor, CancellationToken ct = default);
 
 		Task<IEnumerable<Sensor>> GetAsync(Guid userId, int skip = 0, int limit = 0);
 		Task<Sensor> GetAsync(string id, CancellationToken ct = default);
