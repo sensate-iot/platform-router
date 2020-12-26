@@ -36,6 +36,9 @@
     "PgSQL": {
       "ConnectionString": "User ID = postgres;Password=DefaultPassword;Server=192.168.127.128;Port=5432;Database=Sensate"
     },
+    "Network": {
+      "ConnectionString": "User ID = postgres;Password=DefaultPassword;Server=127.0.0.1;Port=5432;Database=Sensate"
+    },
     "Redis": {
       "Host": "192.168.127.128",
       "InstanceName": "Sensate"

@@ -28,11 +28,15 @@ namespace SensateService.Init
 			services.AddSingleton<SensateContext>();
 		}
 
-		public static void AddPostgres(this IServiceCollection services, string conn)
+		public static void AddPostgres(this IServiceCollection services, string sensateiot, string network)
 		{
 			services.AddDbContextPool<SensateSqlContext>(options => {
-				options.UseNpgsql(conn);
-			}, 2000);
+				options.UseNpgsql(sensateiot);
+			}, 256);
+
+			services.AddDbContextPool<NetworkContext>(options => {
+				options.UseNpgsql(network);
+			}, 256);
 		}
 	}
 }

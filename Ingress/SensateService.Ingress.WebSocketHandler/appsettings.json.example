@@ -34,5 +34,13 @@
     "InstanceName": "kerby",
     "MeasurementAuthProxyUrl": "http://127.0.0.1:8080/v1/processor/measurements",
     "MessageAuthProxyUrl": "http://127.0.0.1:8080/v1/processor/messages"
+  },
+  "Database": {
+    "PgSQL": {
+      "ConnectionString": "User ID = postgres;Password=DefaultPassword;Server=127.0.0.1;Port=5432;Database=Sensate"
+    },
+    "Network": {
+      "ConnectionString": "User ID = postgres;Password=DefaultPassword;Server=127.0.0.1;Port=5432;Database=Sensate"
+    }
   }
 }
