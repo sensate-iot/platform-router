@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -118,7 +119,8 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 			await using var reader = await builder.ExecuteAsync(ct).ConfigureAwait(false);
 
-			return await GetTriggersFromReaderAsync(reader, ct).ConfigureAwait(false);
+			var result = await GetTriggersFromReaderAsync(reader, ct).ConfigureAwait(false);
+			return result.Where(x => x.Type == type);
 		}
 
 		public async Task<Trigger> GetAsync(long id, CancellationToken ct = default)

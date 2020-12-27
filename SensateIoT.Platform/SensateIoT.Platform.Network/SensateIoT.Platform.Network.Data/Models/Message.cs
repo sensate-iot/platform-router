@@ -29,7 +29,7 @@ namespace SensateIoT.Platform.Network.Data.Models
 		public ObjectId SensorId { get; set; }
 		[JsonConverter(typeof(GeoJsonPointJsonConverter))]
 		public GeoJsonPoint<GeoJson2DGeographicCoordinates> Location { get; set; }
-		[BsonRequired, StringLength(4096, MinimumLength = 1)]
+		[BsonRequired, StringLength(8192, MinimumLength = 1)]
 		public string Data { get; set; }
 	}
 }

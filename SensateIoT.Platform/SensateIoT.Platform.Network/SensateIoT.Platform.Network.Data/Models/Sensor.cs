@@ -28,6 +28,8 @@ namespace SensateIoT.Platform.Network.Data.Models
 		public string Name { get; set; }
 
 		public string Description { get; set; }
+		[BsonDefaultValue(true)]
+		public bool StorageEnabled { get; set; }
 
 		[BsonRequired]
 		public DateTime CreatedAt { get; set; }
