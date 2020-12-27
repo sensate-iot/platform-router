@@ -30,4 +30,4 @@ BEGIN
     JOIN "Roles" ON "UserRoles"."RoleId" = "Roles"."Id"
     WHERE "Users"."Id" = ANY(idlist);
 END;
-$$
+$$;

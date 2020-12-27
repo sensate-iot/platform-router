@@ -1,4 +1,4 @@
-CREATE FUNCTION networkapi_selectuserbyemail(email TEXT)
+CREATE FUNCTION networkapi_selectuserbyid(userid UUID)
     RETURNS TABLE(
         "ID" UUID,
         "Firstname" TEXT,
@@ -25,6 +25,6 @@ BEGIN
     FROM "Users"
     INNER JOIN "UserRoles" ON "Users"."Id" = "UserRoles"."UserId"
     JOIN "Roles" ON "UserRoles"."RoleId" = "Roles"."Id"
-    WHERE "Users"."Email" = email;
+    WHERE "Users"."Id" = userid::TEXT;
 END;
-$$
+$$;

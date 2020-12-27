@@ -103,6 +103,13 @@ namespace SensateIoT.Platform.Network.API.Application
 				app.UseDeveloperExceptionPage();
 			}
 
+			app.UseCors(p => {
+				p.SetIsOriginAllowed(host => true)
+					.AllowAnyHeader()
+					.AllowAnyMethod()
+					.AllowCredentials();
+			});
+
 			app.UseMiddleware<ApiKeyValidationMiddleware>();
 			provider.MapInternalMqttTopic<CommandConsumer>(mqtt.InternalBroker.CommandTopic);
 

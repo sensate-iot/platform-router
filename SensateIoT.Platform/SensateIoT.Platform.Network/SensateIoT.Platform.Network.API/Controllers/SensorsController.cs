@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
@@ -18,6 +19,7 @@ using Microsoft.Extensions.Logging;
 
 using MongoDB.Bson;
 using Npgsql;
+
 using SensateIoT.Platform.Network.API.Abstract;
 using SensateIoT.Platform.Network.API.Attributes;
 using SensateIoT.Platform.Network.API.DTO;
@@ -130,8 +132,16 @@ namespace SensateIoT.Platform.Network.API.Controllers
 
 			if(!link) {
 				if(string.IsNullOrEmpty(name)) {
+					var sw = Stopwatch.StartNew();
 					var s = await this.m_sensors.GetAsync(this.CurrentUser.ID, skip, limit).ConfigureAwait(false);
+
+					var span = TimeSpan.FromTicks(sw.ElapsedTicks);
+					this.m_logger.LogInformation($"Sensor lookup took {span}");
+
 					var count = await this.m_sensors.CountAsync(this.CurrentUser).ConfigureAwait(false);
+					span = TimeSpan.FromTicks(sw.ElapsedTicks);
+
+					this.m_logger.LogInformation($"Counting sensors took {span}");
 
 					sensors = new PaginationResponse<Sensor> {
 						Data = new PaginationResult<Sensor> {
@@ -142,8 +152,14 @@ namespace SensateIoT.Platform.Network.API.Controllers
 						}
 					};
 				} else {
+					var sw = Stopwatch.StartNew();
 					var s = await this.m_sensors.FindByNameAsync(this.CurrentUser.ID, name, skip, limit).ConfigureAwait(false);
+					var span = TimeSpan.FromTicks(sw.ElapsedTicks);
+					this.m_logger.LogInformation($"Sensor lookup took {span}");
 					var count = await this.m_sensors.CountAsync(this.CurrentUser, name).ConfigureAwait(false);
+					span = TimeSpan.FromTicks(sw.ElapsedTicks);
+
+					this.m_logger.LogInformation($"Counting sensors took {span}");
 
 					sensors = new PaginationResponse<Sensor> {
 						Data = new PaginationResult<Sensor> {
@@ -155,6 +171,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 					};
 				}
 			} else {
+				var sw = Stopwatch.StartNew();
 				if(string.IsNullOrEmpty(name)) {
 					sensors = new PaginationResponse<Sensor> {
 						Data = await this.m_sensorService.GetSensorsAsync(this.CurrentUser, skip, limit)
@@ -166,6 +183,10 @@ namespace SensateIoT.Platform.Network.API.Controllers
 							.ConfigureAwait(false)
 					};
 				}
+
+				sw.Stop();
+				var span = TimeSpan.FromTicks(sw.ElapsedTicks);
+				this.m_logger.LogInformation($"Sensor lookup took {span}");
 
 				sensors.Data.Skip = skip;
 				sensors.Data.Limit = limit;
