@@ -185,13 +185,14 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			return result;
 		}
 
-		public async Task<Sensor> GetSensorsByIDAsnc(ObjectId sensorID, CancellationToken ct = default)
+		public async Task<Sensor> GetSensorsByIDAsync(ObjectId sensorID, CancellationToken ct = default)
 		{
 			var query = this.m_sensors.Aggregate()
 				.Match(new BsonDocument("_id", sensorID))
 				.Project(new BsonDocument {
 					{"SensorKey", "$Secret"},
 					{"AccountID", "$Owner"},
+					{"StorageEnabled", "$StorageEnabled"},
 					{"_id", 1}
 				});
 
@@ -200,7 +201,8 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			return new Sensor {
 				AccountID = Guid.Parse(result["AccountID"].AsString),
 				ID = result["_id"].AsObjectId,
-				SensorKey = result["SensorKey"].AsString
+				SensorKey = result["SensorKey"].AsString,
+				StorageEnabled = !result.Contains("StorageEnabled") || result["StorageEnabled"].AsBoolean
 			};
 		}
 

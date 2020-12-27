@@ -82,7 +82,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Realtime
 			var routingRepo = scope.ServiceProvider.GetRequiredService<IRoutingRepository>();
 
 			var triggers = routingRepo.GetTriggerInfoAsync(sensorId, default);
-			var sensor = await routingRepo.GetSensorsByIDAsnc(sensorId, ct).ConfigureAwait(false);
+			var sensor = await routingRepo.GetSensorsByIDAsync(sensorId, ct).ConfigureAwait(false);
 			await triggers.ConfigureAwait(false);
 
 			sensor.TriggerInformation = new SensorTrigger {
