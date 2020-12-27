@@ -19,7 +19,7 @@ using SensateIoT.Platform.Network.API.DTO;
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
-
+using Message = SensateIoT.Platform.Network.Data.Models.Message;
 using TriggerAction = SensateIoT.Platform.Network.Data.Models.TriggerAction;
 
 namespace SensateIoT.Platform.Network.API.Controllers
@@ -297,7 +297,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			var trigger = new Trigger {
 				FormalLanguage = raw.FormalLanguage,
 				SensorID = raw.SensorId,
-				KeyValue = ""
+				KeyValue = nameof(Message.Data)
 			};
 
 			return trigger;
