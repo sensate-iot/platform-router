@@ -15,10 +15,10 @@ RUN dotnet publish -c Release -o /app/bin -r linux-musl-x64 --no-restore --self-
 
 FROM alpine:3.12
 
-COPY --from=build-env /app /app
+COPY --from=build-env /app/bin /app
 COPY SensateIoT.Platform.Network.Router/appsettings.json /app/appsettings.json
 
 WORKDIR /app
 RUN apk add --no-cache libstdc++ libintl icu
 
-ENTRYPOINT ["bin/SensateIoT.Platform.Network.Router"]
+ENTRYPOINT ["/app/SensateIoT.Platform.Network.Router"]
