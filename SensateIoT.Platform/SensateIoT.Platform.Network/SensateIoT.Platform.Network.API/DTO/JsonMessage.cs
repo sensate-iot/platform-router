@@ -1,5 +1,5 @@
 ﻿/*
- * JSON measurement.
+ * JSON message.
  *
  * @author Michel Megens
  * @email  michel@michelmegens.net
@@ -9,9 +9,9 @@ using System;
 
 namespace SensateIoT.Platform.Network.API.DTO
 {
-	public class JsonMeasurement : Tuple<Measurement, string>
+	public class JsonMessage : Tuple<Message, string>
 	{
-		public JsonMeasurement(Measurement m, string t) : base(m, t)
+		public JsonMessage(Message m, string t) : base(m, t)
 		{
 		}
 	}

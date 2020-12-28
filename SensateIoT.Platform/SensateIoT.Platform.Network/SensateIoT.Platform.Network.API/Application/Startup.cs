@@ -80,6 +80,7 @@ namespace SensateIoT.Platform.Network.API.Application
 			services.AddSingleton<IBlobService, FilesystemBlobService>();
 			services.AddSingleton<IRouterClient, RouterClient>();
 			services.AddSingleton<IMeasurementAuthorizationService, MeasurementAuthorizationService>();
+			services.AddSingleton<IMessageAuthorizationService, MessageAuthorizationService>();
 			services.AddSingleton<IHashAlgorithm, SHA256Algorithm>();
 			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 

@@ -33,5 +33,11 @@ namespace SensateIoT.Platform.Network.API.Services
 			var client = new IngressRouter.IngressRouterClient(this.m_channel);
 			return await client.EnqueueBulkMeasurementsAsync(data, cancellationToken: ct);
 		}
+
+		public async Task<RoutingResponse> RouteAsync(TextMessageData data, CancellationToken ct)
+		{
+			var client = new IngressRouter.IngressRouterClient(this.m_channel);
+			return await client.EnqueueBulkMessagesAsync(data, cancellationToken: ct);
+		}
 	}
 }

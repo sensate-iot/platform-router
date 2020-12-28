@@ -16,17 +16,19 @@ namespace SensateIoT.Platform.Network.API.Services
 {
 	public class BatchRoutingService : TimedBackgroundService
 	{
-		private readonly IMeasurementAuthorizationService m_service;
+		private readonly IMeasurementAuthorizationService m_measurements;
+		private readonly IMessageAuthorizationService m_messages;
 
-		public BatchRoutingService(IMeasurementAuthorizationService service) :
+		public BatchRoutingService(IMeasurementAuthorizationService measurements, IMessageAuthorizationService messages) :
 			base(TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(500))
 		{
-			this.m_service = service;
+			this.m_measurements = measurements;
+			this.m_messages = messages;
 		}
 
 		public override async Task ExecuteAsync(CancellationToken token)
 		{
-			await this.m_service.ProcessAsync();
+			await Task.WhenAll(this.m_measurements.ProcessAsync(), this.m_messages.ProcessAsync()).ConfigureAwait(false);
 		}
 	}
 }

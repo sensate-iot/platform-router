@@ -24,6 +24,7 @@ using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
 
 using Measurement = SensateIoT.Platform.Network.API.DTO.Measurement;
+using Message = SensateIoT.Platform.Network.API.DTO.Message;
 
 namespace SensateIoT.Platform.Network.API.Controllers
 {
@@ -32,12 +33,14 @@ namespace SensateIoT.Platform.Network.API.Controllers
 	[Route("network/v1/[controller]")]
 	public class GatewayController : AbstractApiController
 	{
-		private readonly IMeasurementAuthorizationService m_service;
+		private readonly IMeasurementAuthorizationService m_measurementAuthorizationService;
+		private readonly IMessageAuthorizationService m_messageAuthorizationService;
 		private readonly IBlobRepository m_blobs;
 		private readonly IBlobService m_blobService;
 		private readonly ILogger<GatewayController> m_logger;
 
-		public GatewayController(IMeasurementAuthorizationService service,
+		public GatewayController(IMeasurementAuthorizationService measurementAuth,
+								 IMessageAuthorizationService messageAuth,
 								 IHttpContextAccessor ctx,
 								 ISensorRepository sensors,
 								 IApiKeyRepository keys,
@@ -46,7 +49,8 @@ namespace SensateIoT.Platform.Network.API.Controllers
 								 IBlobService blobService,
 								 ILogger<GatewayController> logger) : base(ctx, sensors, links, keys)
 		{
-			this.m_service = service;
+			this.m_measurementAuthorizationService = measurementAuth;
+			this.m_messageAuthorizationService = messageAuth;
 			this.m_blobService = blobService;
 			this.m_blobs = blobs;
 			this.m_logger = logger;
@@ -99,8 +103,20 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		[ReadWriteApiKey, ValidateModel]
 		public async Task<IActionResult> Messages()
 		{
-			await Task.CompletedTask;
-			return this.NoContent();
+			var response = new Response<GatewayResponse>();
+
+			using var reader = new StreamReader(this.Request.Body);
+			var raw = await reader.ReadToEndAsync();
+
+			var message = JsonConvert.DeserializeObject<Message>(raw);
+			this.m_messageAuthorizationService.AddMessage(new JsonMessage(message, raw));
+
+			response.Data = new GatewayResponse {
+				Message = "Measurements received and queued.",
+				Queued = 1
+			};
+
+			return this.Accepted(response);
 		}
 
 		[HttpPost("measurements")]
@@ -113,7 +129,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			var raw = await reader.ReadToEndAsync();
 
 			var measurement = JsonConvert.DeserializeObject<Measurement>(raw);
-			this.m_service.AddMessage(new JsonMeasurement(measurement, raw));
+			this.m_measurementAuthorizationService.AddMessage(new JsonMeasurement(measurement, raw));
 
 			response.Data = new GatewayResponse {
 				Message = "Measurements received and queued.",

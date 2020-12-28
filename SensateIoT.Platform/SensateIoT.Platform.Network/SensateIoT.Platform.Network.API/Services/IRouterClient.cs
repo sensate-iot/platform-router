@@ -16,5 +16,6 @@ namespace SensateIoT.Platform.Network.API.Services
 	public interface IRouterClient
 	{
 		Task<RoutingResponse> RouteAsync(MeasurementData data, CancellationToken ct);
+		Task<RoutingResponse> RouteAsync(TextMessageData data, CancellationToken ct);
 	}
 }
