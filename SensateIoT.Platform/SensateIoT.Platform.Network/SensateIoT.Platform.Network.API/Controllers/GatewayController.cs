@@ -28,7 +28,6 @@ using Message = SensateIoT.Platform.Network.API.DTO.Message;
 
 namespace SensateIoT.Platform.Network.API.Controllers
 {
-	[ApiController]
 	[Produces("application/json")]
 	[Route("network/v1/[controller]")]
 	public class GatewayController : AbstractApiController

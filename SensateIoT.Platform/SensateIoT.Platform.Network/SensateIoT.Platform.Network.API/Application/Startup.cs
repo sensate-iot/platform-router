@@ -19,10 +19,12 @@ using SensateIoT.Platform.Network.Adapters.Blobs;
 using SensateIoT.Platform.Network.API.Abstract;
 using SensateIoT.Platform.Network.API.Authorization;
 using SensateIoT.Platform.Network.API.Config;
+using SensateIoT.Platform.Network.API.DTO;
 using SensateIoT.Platform.Network.API.Middleware;
 using SensateIoT.Platform.Network.API.MQTT;
 using SensateIoT.Platform.Network.API.Services;
 using SensateIoT.Platform.Network.Common.Init;
+using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Repositories;
 
@@ -41,15 +43,18 @@ namespace SensateIoT.Platform.Network.API.Application
 		{
 			var db = new DatabaseConfig();
 			var mqtt = new MqttConfig();
+			var cache = new CacheConfig();
 
 			this.Configuration.GetSection("Database").Bind(db);
 			this.Configuration.GetSection("Mqtt").Bind(mqtt);
+			this.Configuration.GetSection("Cache").Bind(cache);
 
 			var privatemqtt = mqtt.InternalBroker;
 
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.AddAuthorizationContext(db.SensateIoT.ConnectionString);
 			services.AddNetworkingContext(db.Networking.ConnectionString);
+			services.AddDistributedCaches<PaginationResponse<Sensor>>(cache.Host, cache.Port);
 
 			services.AddInternalMqttService(options => {
 				options.Ssl = privatemqtt.Ssl;

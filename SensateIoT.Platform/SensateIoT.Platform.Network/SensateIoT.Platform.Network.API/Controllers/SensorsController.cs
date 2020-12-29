@@ -23,11 +23,12 @@ using Npgsql;
 using SensateIoT.Platform.Network.API.Abstract;
 using SensateIoT.Platform.Network.API.Attributes;
 using SensateIoT.Platform.Network.API.DTO;
+using SensateIoT.Platform.Network.Common.Caching.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Enums;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
-
+using ApiKey = SensateIoT.Platform.Network.Data.Models.ApiKey;
 using Sensor = SensateIoT.Platform.Network.Data.Models.Sensor;
 
 namespace SensateIoT.Platform.Network.API.Controllers
@@ -41,6 +42,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		private readonly ICommandPublisher m_mqtt;
 		private readonly IAccountRepository m_accounts;
 		private readonly ITriggerRepository m_triggers;
+		private readonly IDistributedCache<PaginationResponse<Sensor>> m_cache;
 		private readonly Random m_rng;
 
 		private const string Symbols = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@!_-";
@@ -54,6 +56,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 								 ISensorService sensorService,
 								 IAccountRepository accounts,
 								 IApiKeyRepository keys,
+								 IDistributedCache<PaginationResponse<Sensor>> cache,
 								 ICommandPublisher mqtt) : base(ctx, sensors, links, keys)
 		{
 			this.m_logger = logger;
@@ -61,6 +64,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			this.m_mqtt = mqtt;
 			this.m_triggers = triggers;
 			this.m_accounts = accounts;
+			this.m_cache = cache;
 			this.m_rng = new Random(DateTime.UtcNow.Millisecond * DateTime.UtcNow.Second);
 		}
 
@@ -129,71 +133,91 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		public async Task<IActionResult> Index([FromQuery] string name, [FromQuery] int skip = 0, [FromQuery] int limit = 0, [FromQuery] bool link = true)
 		{
 			PaginationResponse<Sensor> sensors;
+			var sw = Stopwatch.StartNew();
+			var key = this.GenerateCacheKey(name, skip, limit, link);
+
+			try {
+				sensors = await this.m_cache.GetAsync(key).ConfigureAwait(false);
+				return this.Ok(sensors);
+			} catch(ArgumentOutOfRangeException) {
+				this.m_logger.LogDebug("Unable to find cache key: {key} during sensor lookup.", key);
+			}
 
 			if(!link) {
 				if(string.IsNullOrEmpty(name)) {
-					var sw = Stopwatch.StartNew();
-					var s = await this.m_sensors.GetAsync(this.CurrentUser.ID, skip, limit).ConfigureAwait(false);
-
-					var span = TimeSpan.FromTicks(sw.ElapsedTicks);
-					this.m_logger.LogInformation($"Sensor lookup took {span}");
-
-					var count = await this.m_sensors.CountAsync(this.CurrentUser).ConfigureAwait(false);
-					span = TimeSpan.FromTicks(sw.ElapsedTicks);
-
-					this.m_logger.LogInformation($"Counting sensors took {span}");
-
-					sensors = new PaginationResponse<Sensor> {
-						Data = new PaginationResult<Sensor> {
-							Count = (int)count,
-							Skip = skip,
-							Limit = limit,
-							Values = s
-						}
-					};
+					sensors = await this.GetSensors(skip, limit).ConfigureAwait(false);
 				} else {
-					var sw = Stopwatch.StartNew();
-					var s = await this.m_sensors.FindByNameAsync(this.CurrentUser.ID, name, skip, limit).ConfigureAwait(false);
-					var span = TimeSpan.FromTicks(sw.ElapsedTicks);
-					this.m_logger.LogInformation($"Sensor lookup took {span}");
-					var count = await this.m_sensors.CountAsync(this.CurrentUser, name).ConfigureAwait(false);
-					span = TimeSpan.FromTicks(sw.ElapsedTicks);
-
-					this.m_logger.LogInformation($"Counting sensors took {span}");
-
-					sensors = new PaginationResponse<Sensor> {
-						Data = new PaginationResult<Sensor> {
-							Count = (int)count,
-							Skip = skip,
-							Limit = limit,
-							Values = s
-						}
-					};
+					sensors = await this.GetSensors(name, skip, limit).ConfigureAwait(false);
 				}
 			} else {
-				var sw = Stopwatch.StartNew();
-				if(string.IsNullOrEmpty(name)) {
-					sensors = new PaginationResponse<Sensor> {
-						Data = await this.m_sensorService.GetSensorsAsync(this.CurrentUser, skip, limit)
-							.ConfigureAwait(false)
-					};
-				} else {
-					sensors = new PaginationResponse<Sensor> {
-						Data = await this.m_sensorService.GetSensorsAsync(this.CurrentUser, name, skip, limit)
-							.ConfigureAwait(false)
-					};
-				}
-
-				sw.Stop();
-				var span = TimeSpan.FromTicks(sw.ElapsedTicks);
-				this.m_logger.LogInformation($"Sensor lookup took {span}");
-
-				sensors.Data.Skip = skip;
-				sensors.Data.Limit = limit;
+				sensors = await this.GetSensorsWithLinks(name, skip, limit).ConfigureAwait(false);
 			}
 
+			sw.Stop();
+			this.m_logger.LogInformation($"Fetching sensors took: {sw.ElapsedMilliseconds}ms");
+			await this.m_cache.SetAsync(key, sensors, new CacheEntryOptions { Timeout = TimeSpan.FromMinutes(5) }).ConfigureAwait(false);
 
 			return this.Ok(sensors);
+		}
+
+		private async Task<PaginationResponse<Sensor>> GetSensors(string name, int skip, int limit)
+		{
+			PaginationResponse<Sensor> sensors;
+
+			var s = await this.m_sensors.FindByNameAsync(this.CurrentUser.ID, name, skip, limit).ConfigureAwait(false);
+			var count = await this.m_sensors.CountAsync(this.CurrentUser, name).ConfigureAwait(false);
+
+			sensors = new PaginationResponse<Sensor> {
+				Data = new PaginationResult<Sensor> {
+					Count = (int)count,
+					Skip = skip,
+					Limit = limit,
+					Values = s
+				}
+			};
+
+			return sensors;
+		}
+
+		private async Task<PaginationResponse<Sensor>> GetSensors(int skip, int limit)
+		{
+			PaginationResponse<Sensor> sensors;
+
+			var s = await this.m_sensors.GetAsync(this.CurrentUser.ID, skip, limit).ConfigureAwait(false);
+			var count = await this.m_sensors.CountAsync(this.CurrentUser).ConfigureAwait(false);
+
+			sensors = new PaginationResponse<Sensor> {
+				Data = new PaginationResult<Sensor> {
+					Count = (int)count,
+					Skip = skip,
+					Limit = limit,
+					Values = s
+				}
+			};
+
+			return sensors;
+		}
+
+		private async Task<PaginationResponse<Sensor>> GetSensorsWithLinks(string name, int skip, int limit)
+		{
+			PaginationResponse<Sensor> sensors;
+
+			if(string.IsNullOrEmpty(name)) {
+				sensors = new PaginationResponse<Sensor> {
+					Data = await this.m_sensorService.GetSensorsAsync(this.CurrentUser, skip, limit)
+						.ConfigureAwait(false)
+				};
+			} else {
+				sensors = new PaginationResponse<Sensor> {
+					Data = await this.m_sensorService.GetSensorsAsync(this.CurrentUser, name, skip, limit)
+						.ConfigureAwait(false)
+				};
+			}
+
+			sensors.Data.Skip = skip;
+			sensors.Data.Limit = limit;
+
+			return sensors;
 		}
 
 		[HttpPost]
@@ -210,9 +234,11 @@ namespace SensateIoT.Platform.Network.API.Controllers
 				sensor.Secret = NextStringWithSymbols(this.m_rng, SensorSecretLength);
 			}
 
+			var cache = this.m_cache.RemoveAsync(this.GenerateCacheKey(null, 0, 10, true));
 			await this.m_keys.CreateSensorKeyAsync(sensor).ConfigureAwait(false);
 			await this.m_sensors.CreateAsync(sensor).ConfigureAwait(false);
 			await this.m_mqtt.PublishCommandAsync(CommandType.AddSensor, sensor.InternalId.ToString()).ConfigureAwait(false);
+			await cache.ConfigureAwait(false);
 
 			return this.CreatedAtAction(nameof(this.Get), new { Id = sensor.InternalId }, new Response<Sensor>(sensor));
 		}
@@ -402,7 +428,12 @@ namespace SensateIoT.Platform.Network.API.Controllers
 				sensor.Description = update.Description;
 			}
 
-			await this.m_sensors.UpdateAsync(sensor).ConfigureAwait(false);
+			await this.m_mqtt.PublishCommandAsync(CommandType.FlushSensor, sensor.InternalId.ToString()).ConfigureAwait(false);
+
+			var cache = this.m_cache.RemoveAsync(this.GenerateCacheKey(null, 0, 10, true));
+			var sensordb = this.m_sensors.UpdateAsync(sensor);
+			await Task.WhenAll(cache, sensordb).ConfigureAwait(false);
+			await this.m_mqtt.PublishCommandAsync(CommandType.AddSensor, sensor.InternalId.ToString()).ConfigureAwait(false);
 
 			return this.Ok(new Response<Sensor>(sensor));
 		}
@@ -436,7 +467,11 @@ namespace SensateIoT.Platform.Network.API.Controllers
 				return this.NotFound();
 			}
 
-			var key = await this.m_keys.GetAsync(update.Secret).ConfigureAwait(false);
+			ApiKey key = null;
+
+			if(!string.IsNullOrEmpty(update.Secret)) {
+				key = await this.m_keys.GetAsync(update.Secret).ConfigureAwait(false);
+			}
 			var old = await this.m_keys.GetAsync(sensor.Secret).ConfigureAwait(false);
 
 			if(key != null) {
@@ -454,10 +489,12 @@ namespace SensateIoT.Platform.Network.API.Controllers
 				this.m_mqtt.PublishCommandAsync(CommandType.FlushKey, oldSecret)
 			).ConfigureAwait(false);
 
+			var cache = this.m_cache.RemoveAsync(this.GenerateCacheKey(null, 0, 10, true));
 			await Task.WhenAll(
 				this.m_keys.UpdateAsync(old.Key, sensor.Secret),
-				this.m_sensors.UpdateSecretAsync(sensor.InternalId, sensor.Secret)
-				).ConfigureAwait(false);
+				this.m_sensors.UpdateSecretAsync(sensor.InternalId, sensor.Secret),
+				cache
+			).ConfigureAwait(false);
 			await this.m_sensors.UpdateAsync(sensor).ConfigureAwait(false);
 
 			await Task.WhenAll(this.m_mqtt.PublishCommandAsync(CommandType.AddKey, sensor.Secret),
@@ -486,8 +523,11 @@ namespace SensateIoT.Platform.Network.API.Controllers
 					return this.Forbidden();
 				}
 
+				var cache = this.m_cache.RemoveAsync(this.GenerateCacheKey(null, 0, 10, true));
 				await this.m_sensorService.DeleteAsync(sensor, CancellationToken.None).ConfigureAwait(false);
+
 				await Task.WhenAll(
+					cache,
 					this.m_mqtt.PublishCommandAsync(CommandType.FlushSensor, sensor.InternalId.ToString()),
 					this.m_mqtt.PublishCommandAsync(CommandType.FlushKey, sensor.Secret)
 				).ConfigureAwait(false);
@@ -541,6 +581,12 @@ namespace SensateIoT.Platform.Network.API.Controllers
 
 			response.AddError("Unable to authorize user!");
 			return this.Unauthorized(response);
+		}
+
+		private string GenerateCacheKey(string name, int skip, int limit, bool link)
+		{
+			var nameForKey = string.IsNullOrEmpty(name) ? "default" : name;
+			return $"{this.m_currentUserId}::{nameForKey}::{skip}::{limit}::{link}";
 		}
 	}
 }

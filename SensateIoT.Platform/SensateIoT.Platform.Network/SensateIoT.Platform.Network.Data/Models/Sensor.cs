@@ -11,6 +11,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 using Newtonsoft.Json;
+using SensateIoT.Platform.Network.Data.Converters;
 
 namespace SensateIoT.Platform.Network.Data.Models
 {
@@ -18,7 +19,7 @@ namespace SensateIoT.Platform.Network.Data.Models
 	{
 		public const int SecretLength = 256;
 
-		[BsonId, BsonRequired, JsonProperty("id")]
+		[BsonId, BsonRequired, JsonProperty("id"), JsonConverter(typeof(ObjectIdJsonConverter))]
 		public ObjectId InternalId { get; set; }
 
 		[BsonRequired]

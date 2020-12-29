@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 using SensateIoT.Platform.Network.API.Attributes;
 using SensateIoT.Platform.Network.API.DTO;
@@ -19,7 +18,6 @@ using SensateIoT.Platform.Network.DataAccess.Abstract;
 
 namespace SensateIoT.Platform.Network.API.Controllers
 {
-	[ApiController]
 	[Produces("application/json")]
 	[Route("network/v1/[controller]")]
 	public class LiveDataHandlersController : AbstractApiController
@@ -28,7 +26,6 @@ namespace SensateIoT.Platform.Network.API.Controllers
 
 		public LiveDataHandlersController(
 			IHttpContextAccessor ctx,
-			ILogger<LiveDataHandlersController> logger,
 			ISensorLinkRepository links,
 			ISensorRepository sensors,
 			IApiKeyRepository keys,
