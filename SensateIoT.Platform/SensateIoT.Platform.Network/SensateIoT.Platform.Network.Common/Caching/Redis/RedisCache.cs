@@ -20,7 +20,6 @@ using Newtonsoft.Json;
 using StackExchange.Redis;
 
 using SensateIoT.Platform.Network.Common.Caching.Abstract;
-using SensateIoT.Platform.Network.Common.Caching.Memory;
 
 using Generics = System.Collections.Generic;
 
@@ -31,7 +30,6 @@ namespace SensateIoT.Platform.Network.Common.Caching.Redis
 		private readonly DistributedCacheOptions m_options;
 		private readonly bool m_gzip;
 
-		protected readonly ISystemClock m_clock;
 		protected readonly SemaphoreSlim m_networkLock;
 		protected IDatabase m_database;
 		private IConnectionMultiplexer m_connectionMultiplexer;
@@ -44,7 +42,6 @@ namespace SensateIoT.Platform.Network.Common.Caching.Redis
 
 			this.m_options = options.Value;
 			this.m_gzip = options.Value.Gzip;
-			this.m_clock = new SystemClock();
 			this.m_networkLock = new SemaphoreSlim(1, 1);
 		}
 
