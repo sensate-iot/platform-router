@@ -13,11 +13,11 @@ using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
+using SensateIoT.Platform.Network.Data.Enums;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Contexts;
 using SensateIoT.Platform.Network.DataAccess.Extensions;
-using SensateIoT.Platform.Network.StorageService.DTO;
 
 namespace SensateIoT.Platform.Network.DataAccess.Repositories
 {

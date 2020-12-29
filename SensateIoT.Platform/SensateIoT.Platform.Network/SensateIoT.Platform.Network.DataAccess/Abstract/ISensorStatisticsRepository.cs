@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 using MongoDB.Bson;
 
-using SensateIoT.Platform.Network.StorageService.DTO;
+using SensateIoT.Platform.Network.Data.Enums;
 
 namespace SensateIoT.Platform.Network.DataAccess.Abstract
 {

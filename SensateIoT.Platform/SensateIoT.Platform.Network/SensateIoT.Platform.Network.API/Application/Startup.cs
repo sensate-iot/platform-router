@@ -81,6 +81,7 @@ namespace SensateIoT.Platform.Network.API.Application
 			services.AddScoped<ISensorService, SensorService>();
 			services.AddScoped<ICommandPublisher, CommandPublisher>();
 			services.AddScoped<IBlobRepository, BlobRepository>();
+			services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 
 			services.AddSingleton<IBlobService, FilesystemBlobService>();
 			services.AddSingleton<IRouterClient, RouterClient>();
@@ -117,6 +118,7 @@ namespace SensateIoT.Platform.Network.API.Application
 			});
 
 			app.UseMiddleware<ApiKeyValidationMiddleware>();
+			app.UseMiddleware<RequestLoggingMiddleware>();
 			app.UseMiddleware<JsonErrorHandlerMiddleware>();
 
 			provider.MapInternalMqttTopic<CommandConsumer>(mqtt.InternalBroker.CommandTopic);

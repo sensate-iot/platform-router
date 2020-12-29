@@ -5,7 +5,7 @@
  * @email  michel.megens@sonatolabs.com
  */
 
-namespace SensateIoT.Platform.Network.StorageService.DTO
+namespace SensateIoT.Platform.Network.Data.Enums
 {
 	public enum RequestMethod
 	{
