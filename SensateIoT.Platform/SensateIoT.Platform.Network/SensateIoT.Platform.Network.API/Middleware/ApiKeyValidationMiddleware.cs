@@ -94,7 +94,7 @@ namespace SensateIoT.Platform.Network.API.Middleware
 				return;
 			}
 
-			// TODO: await repo.IncrementRequestCountAsync(token).ConfigureAwait(false);
+			await repo.IncrementRequestCountAsync(token.Key).ConfigureAwait(false);
 
 			token.User = await users.GetAccountAsync(token.UserId).ConfigureAwait(false);
 

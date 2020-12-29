@@ -117,6 +117,8 @@ namespace SensateIoT.Platform.Network.API.Application
 			});
 
 			app.UseMiddleware<ApiKeyValidationMiddleware>();
+			app.UseMiddleware<JsonErrorHandlerMiddleware>();
+
 			provider.MapInternalMqttTopic<CommandConsumer>(mqtt.InternalBroker.CommandTopic);
 
 			app.UseEndpoints(endpoints => {

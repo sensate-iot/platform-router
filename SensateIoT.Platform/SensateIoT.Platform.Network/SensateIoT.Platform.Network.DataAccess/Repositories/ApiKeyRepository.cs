@@ -20,6 +20,7 @@ using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Contexts;
 
 using CommandType = System.Data.CommandType;
+using SensateIoT.Platform.Network.DataAccess.Extensions;
 
 namespace SensateIoT.Platform.Network.DataAccess.Repositories
 {
@@ -30,6 +31,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		private const string NetworkApi_GetApiKeyByKey = "networkapi_selectapikeybykey";
 		private const string NetworkApi_DeleteSensorKey = "networkapi_deletesensorkey";
 		private const string NetworkApi_UpdateApiKey = "networkapi_updateapikey";
+		private const string NetworkApi_IncrementRequestCount = "networkapi_incrementrequestcount";
 
 		public ApiKeyRepository(AuthorizationContext ctx)
 		{
@@ -156,6 +158,17 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			};
 
 			return apikey;
+		}
+
+		public async Task IncrementRequestCountAsync(string key, CancellationToken ct = default)
+		{
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
+
+			builder.WithParameter("key", key, NpgsqlDbType.Text);
+			builder.WithFunction(NetworkApi_IncrementRequestCount);
+
+			var reader = await builder.ExecuteAsync(ct).ConfigureAwait(false);
+			await reader.DisposeAsync().ConfigureAwait(false);
 		}
 	}
 }
