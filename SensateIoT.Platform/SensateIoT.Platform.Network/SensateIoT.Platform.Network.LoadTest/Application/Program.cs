@@ -7,12 +7,17 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using SensateIoT.Platform.Network.Common.Caching.Abstract;
 using SensateIoT.Platform.Network.LoadTest.CacheTests;
 using SensateIoT.Platform.Network.LoadTest.Config;
+using SensateIoT.Platform.Network.LoadTest.RedisTest;
 using SensateIoT.Platform.Network.LoadTest.RouterTest;
+using StackExchange.Redis;
 
 namespace SensateIoT.Platform.Network.LoadTest.Application
 {
@@ -60,10 +65,30 @@ namespace SensateIoT.Platform.Network.LoadTest.Application
 			await client.RunAsync(generator).ConfigureAwait(false);
 		}
 
+		private static void RunRedisCache()
+		{
+			var opts = new DistributedCacheOptions {
+				Configuration = new ConfigurationOptions {
+					EndPoints = { {"localhost", 6379 }},
+					AbortOnConnectFail = true,
+					ClientName = "LoadTest-01",
+				}
+			};
+
+			var test = new BulkLoadTest(Options.Create(opts));
+
+
+			test.Run(2_510_918);
+		}
+
 		public static void Main(string[] args)
 		{
 			if(args.Length >= 1 && args[0] == "router-test") {
 				RunRouterTest().Wait();
+				return;
+			} else if(args.Length >= 1 && args[0] == "redis-test") {
+				Console.WriteLine("Starting Redis load test...");
+				RunRedisCache();
 				return;
 			}
 
