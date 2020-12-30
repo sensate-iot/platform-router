@@ -35,7 +35,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
 
 			builder.WithParameter("route", log.Route, NpgsqlDbType.Text);
-			builder.WithParameter("method", (int) log.Method, NpgsqlDbType.Integer);
+			builder.WithParameter("method", (int)log.Method, NpgsqlDbType.Integer);
 			builder.WithParameter("address", log.Address, NpgsqlDbType.Inet);
 			builder.WithParameter("author", log.AuthorId, NpgsqlDbType.Text);
 			builder.WithFunction(NetworkApi_CreateAuditLog);

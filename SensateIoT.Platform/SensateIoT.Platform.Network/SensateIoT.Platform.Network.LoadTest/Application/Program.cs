@@ -69,7 +69,7 @@ namespace SensateIoT.Platform.Network.LoadTest.Application
 		{
 			var opts = new DistributedCacheOptions {
 				Configuration = new ConfigurationOptions {
-					EndPoints = { {"localhost", 6379 }},
+					EndPoints = { { "localhost", 6379 } },
 					AbortOnConnectFail = true,
 					ClientName = "LoadTest-01",
 				}
