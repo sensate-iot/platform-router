@@ -102,8 +102,10 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			cmd.CommandText = NetworkApi_CreateSensorKey;
 
 			var key = new NpgsqlParameter("key", NpgsqlDbType.Text) { Value = sensor.Secret };
+			var uid = new NpgsqlParameter("userid", NpgsqlDbType.Text) { Value = sensor.Owner };
 
 			cmd.Parameters.Add(key);
+			cmd.Parameters.Add(uid);
 
 			await using var reader = await cmd.ExecuteReaderAsync(ct).ConfigureAwait(false);
 
