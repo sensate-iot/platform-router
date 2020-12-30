@@ -32,6 +32,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		private const string NetworkApi_DeleteSensorKey = "networkapi_deletesensorkey";
 		private const string NetworkApi_UpdateApiKey = "networkapi_updateapikey";
 		private const string NetworkApi_IncrementRequestCount = "networkapi_incrementrequestcount";
+		private const string NetworkApi_CreateSensorKey = "networkapi_createsensorkey";
 
 		public ApiKeyRepository(AuthorizationContext ctx)
 		{
@@ -98,7 +99,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			}
 
 			cmd.CommandType = CommandType.StoredProcedure;
-			cmd.CommandText = NetworkApi_GetApiKeyByKey;
+			cmd.CommandText = NetworkApi_CreateSensorKey;
 
 			var key = new NpgsqlParameter("key", NpgsqlDbType.Text) { Value = sensor.Secret };
 

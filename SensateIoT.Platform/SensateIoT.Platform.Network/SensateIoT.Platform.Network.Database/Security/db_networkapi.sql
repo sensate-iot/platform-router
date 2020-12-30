@@ -1,0 +1,30 @@
+CREATE ROLE db_networkapi;
+
+GRANT EXECUTE ON FUNCTION networkapi_createaction(bigint,integer,character varying,text) TO db_networkapi;
+GRANT EXECUTE ON FUNCTION networkapi_createblob(character varying,text,text,integer,integer) TO db_networkapi;
+GRANT EXECUTE ON FUNCTION networkapi_createinvocation(bigint,bigint,timestamp without time zone) TO db_networkapi;
+GRANT EXECUTE ON FUNCTION networkapi_createsensorlink(character varying,uuid) TO db_networkapi;
+GRANT EXECUTE ON FUNCTION networkapi_createtrigger(character varying,character varying,numeric,numeric,text,integer) TO db_networkapi;
+GRANT EXECUTE ON FUNCTION networkapi_deleteblobbyid(bigint) TO db_networkapi;
+GRANT EXECUTE ON FUNCTION networkapi_deleteblobsbyname(character varying,text) TO db_networkapi;
+GRANT EXECUTE ON FUNCTION networkapi_deleteblobsbysensorid(character varying) TO db_networkapi;
+GRANT EXECUTE ON FUNCTION networkapi_deletesensorlink(character varying,uuid) TO db_networkapi;
+GRANT EXECUTE ON FUNCTION networkapi_deletesensorlinkbysensorid(character varying) TO db_networkapi;
+GRANT EXECUTE ON FUNCTION networkapi_deletetriggeraction(bigint,integer) TO db_networkapi;
+GRANT EXECUTE ON FUNCTION networkapi_deletetriggerbyid(bigint) TO db_networkapi;
+GRANT EXECUTE ON FUNCTION networkapi_deletetriggersbysensorid(character varying) TO db_networkapi;
+GRANT EXECUTE ON FUNCTION networkapi_selectblobbyid(bigint) TO db_networkapi;
+GRANT EXECUTE ON FUNCTION networkapi_selectblobbyname(character varying,text) TO db_networkapi;
+GRANT EXECUTE ON FUNCTION networkapi_selectblobs(text,integer,integer) TO db_networkapi;
+GRANT EXECUTE ON FUNCTION networkapi_selectblobsbysensorid(character varying,integer,integer) TO db_networkapi;
+GRANT EXECUTE ON FUNCTION networkapi_selectsensorlinkbysensorid(character varying) TO db_networkapi;
+GRANT EXECUTE ON FUNCTION networkapi_selectsensorlinkbyuserid(uuid) TO db_networkapi;
+GRANT EXECUTE ON FUNCTION networkapi_selecttriggerbyid(bigint) TO db_networkapi;
+GRANT EXECUTE ON FUNCTION networkapi_selecttriggerbysensorid(character varying) TO db_networkapi;
+
+GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE "Blobs" TO db_networkapi;
+GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE "SensorLinks" TO db_networkapi;
+GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE "TriggerActions" TO db_networkapi;
+GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE "Triggers" TO db_networkapi;
+GRANT SELECT, UPDATE, DELETE ON TABLE "TriggerInvocations" TO db_networkapi;
+GRANT SELECT ON TABLE "LiveDataHandlers" TO db_networkapi;

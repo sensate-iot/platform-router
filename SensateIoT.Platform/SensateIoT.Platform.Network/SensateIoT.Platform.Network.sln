@@ -56,7 +56,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "public", "public", "{CEC493
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Security", "Security", "{1B2A938F-74F4-4A39-BD27-4028DFD67952}"
 	ProjectSection(SolutionItems) = preProject
+		SensateIoT.Platform.Network.Database\Security\db_networkapi.sql = SensateIoT.Platform.Network.Database\Security\db_networkapi.sql
 		SensateIoT.Platform.Network.Database\Security\db_router.sql = SensateIoT.Platform.Network.Database\Security\db_router.sql
+		SensateIoT.Platform.Network.Database\Security\sql_networkapi.sql = SensateIoT.Platform.Network.Database\Security\sql_networkapi.sql
 		SensateIoT.Platform.Network.Database\Security\sql_router.sql = SensateIoT.Platform.Network.Database\Security\sql_router.sql
 	EndProjectSection
 EndProject
