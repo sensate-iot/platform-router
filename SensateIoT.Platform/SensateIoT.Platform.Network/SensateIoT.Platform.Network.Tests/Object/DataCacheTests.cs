@@ -103,12 +103,11 @@ namespace SensateIoT.Platform.Network.Tests.Object
 					IsReadOnly = false,
 					IsRevoked = false,
 					AccountID = accountID,
-					Key = apiKey
 				};
 
 				cache.Append(sensor);
 				cache.Append(account);
-				cache.Append(key);
+				cache.Append(apiKey, key);
 			}
 
 			return cache;
@@ -140,12 +139,11 @@ namespace SensateIoT.Platform.Network.Tests.Object
 				IsReadOnly = false,
 				IsRevoked = false,
 				AccountID = accountID,
-				Key = apiKey
 			};
 
 			cache.Append(sensor);
 			cache.Append(account);
-			cache.Append(key);
+			cache.Append(apiKey, key);
 		}
 
 		private void AddBillingLockedUser(IDataCache cache)
@@ -174,19 +172,18 @@ namespace SensateIoT.Platform.Network.Tests.Object
 				IsReadOnly = false,
 				IsRevoked = false,
 				AccountID = accountID,
-				Key = apiKey
 			};
 
 			cache.Append(sensor);
 			cache.Append(account);
-			cache.Append(key);
+			cache.Append(apiKey, key);
 		}
 
 		private void AddReadOnlySensor(IDataCache cache)
 		{
 			var accountID = Guid.NewGuid();
 			var sensorID = ObjectId.GenerateNewId();
-			var apiKey = $"ReadOnlyApiKey";
+			var apiKey = "ReadOnlyApiKey";
 			this.m_readOnlySensorID = sensorID;
 
 			var sensor = new Sensor {
@@ -208,12 +205,11 @@ namespace SensateIoT.Platform.Network.Tests.Object
 				IsReadOnly = true,
 				IsRevoked = false,
 				AccountID = accountID,
-				Key = apiKey
 			};
 
 			cache.Append(sensor);
 			cache.Append(account);
-			cache.Append(key);
+			cache.Append(apiKey, key);
 		}
 
 		private void AddRevokedSensor(IDataCache cache)
@@ -242,12 +238,11 @@ namespace SensateIoT.Platform.Network.Tests.Object
 				IsReadOnly = false,
 				IsRevoked = true,
 				AccountID = accountID,
-				Key = apiKey
 			};
 
 			cache.Append(sensor);
 			cache.Append(account);
-			cache.Append(key);
+			cache.Append(apiKey, key);
 		}
 	}
 }

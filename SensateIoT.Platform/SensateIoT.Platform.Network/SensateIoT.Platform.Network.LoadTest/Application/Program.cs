@@ -7,23 +7,26 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Options;
+
 using Newtonsoft.Json;
+using StackExchange.Redis;
+
 using SensateIoT.Platform.Network.Common.Caching.Abstract;
 using SensateIoT.Platform.Network.LoadTest.CacheTests;
 using SensateIoT.Platform.Network.LoadTest.Config;
 using SensateIoT.Platform.Network.LoadTest.RedisTest;
 using SensateIoT.Platform.Network.LoadTest.RouterTest;
-using StackExchange.Redis;
 
 namespace SensateIoT.Platform.Network.LoadTest.Application
 {
 	public class Program
 	{
-		private const int ReadTestSize = 5000000;
+		//private const int ReadTestSize = 5_000_000;
+		private const int ReadTestSize = 1_000_000;
 		private const int ScanTestSize = 10000000;
 
 		private static void RunMemoryTests()
@@ -96,6 +99,8 @@ namespace SensateIoT.Platform.Network.LoadTest.Application
 
 			RunMemoryTests();
 			RunScanTests();
+			Console.WriteLine("Finished all tests.");
+			//RunScanTests();
 #if !DEBUG
 			Console.ReadLine();
 #endif

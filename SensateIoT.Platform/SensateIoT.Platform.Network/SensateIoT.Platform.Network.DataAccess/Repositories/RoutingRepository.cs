@@ -101,9 +101,9 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			return result;
 		}
 
-		public async Task<IEnumerable<ApiKey>> GetApiKeysAsync(CancellationToken ct = default)
+		public async Task<IEnumerable<Tuple<string, ApiKey>>> GetApiKeysAsync(CancellationToken ct = default)
 		{
-			var result = new List<ApiKey>();
+			var result = new List<Tuple<string, ApiKey>>();
 
 			await using var cmd = this.m_ctx.Database.GetDbConnection().CreateCommand();
 			if(cmd.Connection.State != ConnectionState.Open) {
@@ -116,13 +116,12 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			await using var reader = await cmd.ExecuteReaderAsync(ct).ConfigureAwait(false);
 			while(await reader.ReadAsync(ct)) {
 				var key = new ApiKey {
-					Key = reader.GetString(0),
 					AccountID = reader.GetGuid(1),
 					IsRevoked = reader.GetBoolean(2),
 					IsReadOnly = reader.GetBoolean(3)
 				};
 
-				result.Add(key);
+				result.Add(new Tuple<string, ApiKey>(reader.GetString(0), key));
 			}
 
 			return result;
@@ -147,7 +146,6 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			await using var reader = await cmd.ExecuteReaderAsync(ct).ConfigureAwait(false);
 			if(await reader.ReadAsync(ct).ConfigureAwait(false)) {
 				result = new ApiKey {
-					Key = reader.GetString(0),
 					AccountID = reader.GetGuid(1),
 					IsRevoked = reader.GetBoolean(2),
 					IsReadOnly = reader.GetBoolean(3)

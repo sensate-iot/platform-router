@@ -67,7 +67,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Realtime
 					var userRepo = scope.ServiceProvider.GetRequiredService<IRoutingRepository>();
 					var key = await userRepo.GetApiKeyAsync(cmd.Arguments, ct).ConfigureAwait(false);
 
-					this.m_cache.Append(key);
+					this.m_cache.Append(cmd.Arguments, key);
 				}
 				break;
 

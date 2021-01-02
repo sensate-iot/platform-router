@@ -6,6 +6,7 @@
  */
 
 using MongoDB.Bson;
+using SensateIoT.Platform.Network.Data.Enums;
 
 namespace SensateIoT.Platform.Network.StorageService.DTO
 {

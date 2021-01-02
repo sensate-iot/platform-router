@@ -24,10 +24,10 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 		Sensor GetSensor(ObjectId id);
 		void Append(IEnumerable<Sensor> sensors);
 		void Append(IEnumerable<Account> accounts);
-		void Append(IEnumerable<ApiKey> keys);
+		void Append(IEnumerable<Tuple<string, ApiKey>> keys);
 		void Append(Sensor sensor);
 		void Append(Account account);
-		void Append(ApiKey key);
+		void Append(string key, ApiKey keyObject);
 
 		void Clear();
 		void RemoveSensor(ObjectId sensorID);

@@ -23,7 +23,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Abstract
 	{
 		Task<IEnumerable<Account>> GetAccountsForRoutingAsync(CancellationToken ct = default);
 		Task<Account> GetAccountForRoutingAsync(Guid accountId, CancellationToken ct = default);
-		Task<IEnumerable<ApiKey>> GetApiKeysAsync(CancellationToken ct = default);
+		Task<IEnumerable<Tuple<string, ApiKey>>> GetApiKeysAsync(CancellationToken ct = default);
 		Task<ApiKey> GetApiKeyAsync(string key, CancellationToken ct = default);
 		Task<IEnumerable<Sensor>> GetSensorsAsync(CancellationToken ct = default);
 		Task<Sensor> GetSensorsByIDAsync(ObjectId sensorID, CancellationToken ct = default);
