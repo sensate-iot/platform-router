@@ -53,7 +53,7 @@ namespace SensateIoT.Platform.Network.Router.Application
 				foreach(var address in ipAddresses) {
 					options.Listen(address, port,
 						listenOptions => {
-							listenOptions.Protocols = HttpProtocols.Http2;
+							listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
 
 							if(config.Scheme != "https") {
 								return;

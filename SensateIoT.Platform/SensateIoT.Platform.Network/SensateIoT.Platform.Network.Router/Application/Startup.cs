@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
+using Prometheus;
 using SensateIoT.Platform.Network.Common.Caching.Abstract;
 using SensateIoT.Platform.Network.Common.Caching.Object;
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
@@ -40,7 +40,7 @@ namespace SensateIoT.Platform.Network.Router.Application
 			this.Configuration = configuration;
 		}
 
-		public void ConfigureServices(IServiceCollection services)
+		public void ConfigureServices(IServiceCollection services, IWebHostEnvironment env)
 		{
 			var db = new DatabaseConfig();
 			var mqtt = new MqttConfig();
@@ -128,6 +128,16 @@ namespace SensateIoT.Platform.Network.Router.Application
 			services.AddGrpc();
 			services.AddGrpcReflection();
 			services.AddMqttHandlers();
+
+			MetricServer server;
+
+			if(env.IsDevelopment()) {
+				server = new MetricServer("localhost", 5003);
+			} else {
+				server  = new MetricServer(5003);
+			}
+
+			server.Start();
 		}
 
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider provider)
@@ -141,6 +151,7 @@ namespace SensateIoT.Platform.Network.Router.Application
 			}
 
 			app.UseRouting();
+			app.UseGrpcMetrics();
 			provider.MapInternalMqttTopic<CommandConsumer>(mqtt.InternalBroker.CommandTopic);
 
 			app.UseEndpoints(endpoints => {
