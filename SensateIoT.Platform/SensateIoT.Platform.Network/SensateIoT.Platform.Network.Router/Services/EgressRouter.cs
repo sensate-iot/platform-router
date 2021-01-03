@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 
 using Google.Protobuf;
 using Grpc.Core;
+using Prometheus;
 
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
 using SensateIoT.Platform.Network.Common.Converters;
@@ -24,11 +25,13 @@ namespace SensateIoT.Platform.Network.Router.Services
 	{
 		private readonly IMessageQueue m_queue;
 		private readonly ILogger<EgressRouter> m_logger;
+		private readonly Counter m_requests;
 
 		public EgressRouter(IMessageQueue queue, ILogger<EgressRouter> logger)
 		{
 			this.m_queue = queue;
 			this.m_logger = logger;
+			this.m_requests = Metrics.CreateCounter("router_egress_requests_total", "Total amount of routing egress traffic.");
 		}
 
 		public override Task<RoutingResponse> EnqueueBulkControlMessages(Contracts.DTO.ControlMessageData request, ServerCallContext context)
@@ -37,6 +40,8 @@ namespace SensateIoT.Platform.Network.Router.Services
 
 			try {
 				var dto = ControlMessageProtobufConverter.Convert(request);
+
+				this.m_requests.Inc();
 				this.m_queue.AddRange(dto);
 
 				response = new RoutingResponse {
@@ -63,6 +68,8 @@ namespace SensateIoT.Platform.Network.Router.Services
 
 			try {
 				var dto = ControlMessageProtobufConverter.Convert(request);
+
+				this.m_requests.Inc();
 				this.m_queue.Add(dto);
 
 				response = new RoutingResponse {

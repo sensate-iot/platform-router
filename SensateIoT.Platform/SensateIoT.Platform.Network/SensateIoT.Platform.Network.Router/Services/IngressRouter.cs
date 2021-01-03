@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Google.Protobuf;
 using Grpc.Core;
 using Prometheus;
+
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
 using SensateIoT.Platform.Network.Common.Converters;
 using SensateIoT.Platform.Network.Contracts.RPC;
@@ -40,6 +41,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 
 			try {
 				var dto = MeasurementProtobufConverter.Convert(request);
+
 				this.m_queue.Add(dto);
 				this.m_requests.Inc();
 
