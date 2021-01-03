@@ -58,8 +58,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Security", "Security", "{1B
 	ProjectSection(SolutionItems) = preProject
 		SensateIoT.Platform.Network.Database\Security\db_networkapi.sql = SensateIoT.Platform.Network.Database\Security\db_networkapi.sql
 		SensateIoT.Platform.Network.Database\Security\db_router.sql = SensateIoT.Platform.Network.Database\Security\db_router.sql
+		SensateIoT.Platform.Network.Database\Security\db_triggerservice.sql = SensateIoT.Platform.Network.Database\Security\db_triggerservice.sql
 		SensateIoT.Platform.Network.Database\Security\sql_networkapi.sql = SensateIoT.Platform.Network.Database\Security\sql_networkapi.sql
 		SensateIoT.Platform.Network.Database\Security\sql_router.sql = SensateIoT.Platform.Network.Database\Security\sql_router.sql
+		SensateIoT.Platform.Network.Database\Security\sql_triggerservice.sql = SensateIoT.Platform.Network.Database\Security\sql_triggerservice.sql
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions", "Functions", "{26F5E93B-2D0D-4B46-A23F-C05FAE2DD481}"
