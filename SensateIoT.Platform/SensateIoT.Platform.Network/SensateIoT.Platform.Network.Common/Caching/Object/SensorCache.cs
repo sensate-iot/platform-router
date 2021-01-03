@@ -37,6 +37,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 
 		public override void Add(ObjectId key, Sensor value, CacheEntryOptions options = null)
 		{
+			this.CheckDisposed();
 			this.m_dataLock.EnterWriteLock();
 
 			try {
@@ -123,6 +124,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 
 		public override void AddOrUpdate(ObjectId key, Sensor value, CacheEntryOptions options = null)
 		{
+			this.CheckDisposed();
 			this.m_dataLock.EnterWriteLock();
 
 			try {
@@ -147,6 +149,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 
 		public override void Remove(ObjectId key)
 		{
+			this.CheckDisposed();
 			this.m_dataLock.EnterWriteLock();
 
 			try {
@@ -160,6 +163,8 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 		public override bool TryRemove(ObjectId key)
 		{
 			bool rv;
+
+			this.CheckDisposed();
 			this.m_dataLock.EnterWriteLock();
 
 			try {
@@ -174,6 +179,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 
 		public void AddLiveDataRouting(LiveDataRoute route)
 		{
+			this.CheckDisposed();
 			this.m_dataLock.EnterWriteLock();
 
 			try {
@@ -192,6 +198,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 
 		public void RemoveLiveDataRouting(LiveDataRoute route)
 		{
+			this.CheckDisposed();
 			this.m_dataLock.EnterWriteLock();
 
 			try {
@@ -211,6 +218,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 
 		public void SyncLiveDataRoutes(ICollection<LiveDataRoute> data)
 		{
+			this.CheckDisposed();
 			this.m_dataLock.EnterWriteLock();
 
 			try {
@@ -222,6 +230,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 
 		public void FlushLiveDataRoutes()
 		{
+			this.CheckDisposed();
 			this.m_dataLock.EnterWriteLock();
 
 			try {
