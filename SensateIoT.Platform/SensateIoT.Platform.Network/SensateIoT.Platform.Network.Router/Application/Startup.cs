@@ -20,6 +20,7 @@ using SensateIoT.Platform.Network.Common.Collections.Local;
 using SensateIoT.Platform.Network.Common.Collections.Remote;
 using SensateIoT.Platform.Network.Common.Init;
 using SensateIoT.Platform.Network.Common.Services.Data;
+using SensateIoT.Platform.Network.Common.Services.Metrics;
 using SensateIoT.Platform.Network.Common.Services.Processing;
 using SensateIoT.Platform.Network.Common.Settings;
 using SensateIoT.Platform.Network.Data.Abstract;
@@ -40,7 +41,7 @@ namespace SensateIoT.Platform.Network.Router.Application
 			this.Configuration = configuration;
 		}
 
-		public void ConfigureServices(IServiceCollection services, IWebHostEnvironment env)
+		public void ConfigureServices(IServiceCollection services)
 		{
 			var db = new DatabaseConfig();
 			var mqtt = new MqttConfig();
@@ -84,6 +85,8 @@ namespace SensateIoT.Platform.Network.Router.Application
 				s.ActuatorTopicFormat = this.Configuration.GetValue<string>("Routing:ActuatorTopicFormat");
 			});
 
+			services.Configure<MetricsOptions>(this.Configuration.GetSection("HttpServer:Metrics"));
+
 			services.AddInternalMqttService(options => {
 				options.Ssl = privatemqtt.Ssl;
 				options.Host = privatemqtt.Host;
@@ -125,19 +128,11 @@ namespace SensateIoT.Platform.Network.Router.Application
 			services.AddSingleton<IRemoteStorageQueue, RemoteStorageQueue>();
 			services.AddSingleton<IDataCache, DataCache>();
 
+			services.AddSingleton<IHostedService, MetricsService>();
+
 			services.AddGrpc();
 			services.AddGrpcReflection();
 			services.AddMqttHandlers();
-
-			MetricServer server;
-
-			if(env.IsDevelopment()) {
-				server = new MetricServer("localhost", 5003);
-			} else {
-				server  = new MetricServer(5003);
-			}
-
-			server.Start();
 		}
 
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider provider)
