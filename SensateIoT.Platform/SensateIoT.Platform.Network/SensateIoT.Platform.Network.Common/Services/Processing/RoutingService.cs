@@ -111,7 +111,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 		{
 			var evt = new NetworkEvent {
 				SensorID = sensor.ID.ToString(),
-				AccountID = ByteString.CopyFrom(sensor.AccountID.ToByteArray()),
+				AccountID = ByteString.CopyFrom(sensor.AccountID.ToByteArray())
 			};
 			evt.Actions.Add(NetworkEventType.MessageRouted);
 

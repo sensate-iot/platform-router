@@ -47,7 +47,6 @@ export class WebSocketServer {
         this.auditlogs = new AuditLogsClient(pool);
         this.apikeys = new ApiKeyClient(pool);
 
-        //setInterval(this.publicationHandler, 60000);
         setInterval(() => {
             this.publicationHandler();
         }, 60000);

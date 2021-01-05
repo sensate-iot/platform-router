@@ -41,6 +41,8 @@ export class MqttClient {
                 topic = `$share/${this.share}/${topic}`;
             }
 
+            console.debug(`Received message on topic ${topic}`);
+
             this.handlers.forEach(handler => {
                 if (handler.getTopic() !== topic) {
                     return;
