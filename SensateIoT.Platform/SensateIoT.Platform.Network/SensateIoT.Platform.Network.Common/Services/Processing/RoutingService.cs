@@ -75,8 +75,6 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 		public override async Task ExecuteAsync(CancellationToken token)
 		{
 			do {
-				Sensor sensor = null;
-
 				if(this.m_messages.Count <= 0) {
 					try {
 						await Task.Delay(TimeSpan.FromMilliseconds(100), token);
@@ -93,9 +91,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 				this.m_logger.LogInformation("Routing {count} messages.", messages.Count);
 
 				var result = Parallel.ForEach(messages, message => {
-					if(sensor?.ID != message.SensorID) {
-						sensor = this.m_cache.GetSensor(message.SensorID);
-					}
+					var sensor = this.m_cache.GetSensor(message.SensorID);
 
 					if(sensor == null) {
 						return;
@@ -157,7 +153,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 			/*
 			 * 1. Timestamp the CM;
 			 * 2. Sign the control message;
-			 * 2. Queue to the correct output queue.
+			 * 3. Queue to the correct output queue.
 			 */
 
 			message.Timestamp = DateTime.UtcNow;
