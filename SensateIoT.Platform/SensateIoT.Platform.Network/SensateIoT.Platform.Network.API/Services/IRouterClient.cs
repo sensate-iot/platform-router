@@ -17,5 +17,6 @@ namespace SensateIoT.Platform.Network.API.Services
 	{
 		Task<RoutingResponse> RouteAsync(MeasurementData data, CancellationToken ct);
 		Task<RoutingResponse> RouteAsync(TextMessageData data, CancellationToken ct);
+		Task<RoutingResponse> RouteAsync(ControlMessage data, CancellationToken ct);
 	}
 }

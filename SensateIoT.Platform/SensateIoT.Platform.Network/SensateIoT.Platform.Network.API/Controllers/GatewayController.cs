@@ -8,21 +8,25 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
+using MongoDB.Bson;
 using Newtonsoft.Json;
 
 using SensateIoT.Platform.Network.Adapters.Abstract;
 using SensateIoT.Platform.Network.API.Abstract;
 using SensateIoT.Platform.Network.API.Attributes;
 using SensateIoT.Platform.Network.API.DTO;
+using SensateIoT.Platform.Network.API.Services;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
 
+using ControlMessage = SensateIoT.Platform.Network.Contracts.DTO.ControlMessage;
 using Measurement = SensateIoT.Platform.Network.API.DTO.Measurement;
 using Message = SensateIoT.Platform.Network.API.DTO.Message;
 
@@ -36,6 +40,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		private readonly IMessageAuthorizationService m_messageAuthorizationService;
 		private readonly IBlobRepository m_blobs;
 		private readonly IBlobService m_blobService;
+		private readonly IRouterClient m_client;
 		private readonly ILogger<GatewayController> m_logger;
 
 		public GatewayController(IMeasurementAuthorizationService measurementAuth,
@@ -46,12 +51,14 @@ namespace SensateIoT.Platform.Network.API.Controllers
 								 ISensorLinkRepository links,
 								 IBlobRepository blobs,
 								 IBlobService blobService,
+								 IRouterClient client,
 								 ILogger<GatewayController> logger) : base(ctx, sensors, links, keys)
 		{
 			this.m_measurementAuthorizationService = measurementAuth;
 			this.m_messageAuthorizationService = messageAuth;
 			this.m_blobService = blobService;
 			this.m_blobs = blobs;
+			this.m_client = client;
 			this.m_logger = logger;
 		}
 
@@ -136,6 +143,32 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			};
 
 			return this.Accepted(response);
+		}
+
+		[HttpPost("actuators")]
+		[ReadWriteApiKey, ValidateModel]
+		public async Task<IActionResult> ControlMessages([FromBody] ActuatorMessage message)
+		{
+			var response = new Response<GatewayResponse>();
+
+			if(!ObjectId.TryParse(message.SensorId, out _)) {
+				response.AddError("Invalid sensor ID.");
+				return this.BadRequest(response);
+			}
+
+			var controlMessage = new ControlMessage {
+				Data = message.Data,
+				SensorID = message.SensorId
+			};
+
+			await this.m_client.RouteAsync(controlMessage, CancellationToken.None).ConfigureAwait(false);
+
+			response.Data = new GatewayResponse {
+				Message = "Measurements received and queued.",
+				Queued = 1
+			};
+
+			return this.Ok(response);
 		}
 	}
 }
