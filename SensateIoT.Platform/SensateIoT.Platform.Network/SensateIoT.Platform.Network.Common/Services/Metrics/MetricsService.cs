@@ -7,7 +7,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using Prometheus;
@@ -21,8 +21,10 @@ namespace SensateIoT.Platform.Network.Common.Services.Metrics
 	public class MetricsService : BackgroundService
 	{
 		private readonly MetricServer m_server;
+		private readonly ILogger<MetricsService> m_logger;
+		private readonly MetricsOptions m_options;
 
-		public MetricsService(IOptions<MetricsOptions> options)
+		public MetricsService(IOptions<MetricsOptions> options, ILogger<MetricsService> logger)
 		{
 			var hostname = options.Value.Hostname;
 
@@ -30,11 +32,19 @@ namespace SensateIoT.Platform.Network.Common.Services.Metrics
 				hostname = "+";
 			}
 
+			options.Value.Hostname = hostname;
+
+			this.m_options = options.Value;
 			this.m_server = new MetricServer(hostname, options.Value.Port, options.Value.Endpoint);
+			this.m_logger = logger;
 		}
 
 		public override Task ExecuteAsync(CancellationToken token)
 		{
+			this.m_logger.LogInformation("Starting metrics server on http://{hostname}:{port}/{endpoint}",
+										 this.m_options.Hostname,
+										 this.m_options.Port,
+										 this.m_options.Endpoint);
 			this.m_server.Start();
 			return Task.CompletedTask;
 		}

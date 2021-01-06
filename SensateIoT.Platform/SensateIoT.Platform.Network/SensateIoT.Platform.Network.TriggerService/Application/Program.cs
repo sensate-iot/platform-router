@@ -25,6 +25,7 @@ namespace SensateIoT.Platform.Network.TriggerService.Application
 				.UseContentRoot(Directory.GetCurrentDirectory())
 				.ConfigureAppConfiguration((hostingContext, config) => {
 					config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+					config.AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true);
 					config.AddEnvironmentVariables();
 				})
 				.ConfigureLogging((hostingContext, logging) => {

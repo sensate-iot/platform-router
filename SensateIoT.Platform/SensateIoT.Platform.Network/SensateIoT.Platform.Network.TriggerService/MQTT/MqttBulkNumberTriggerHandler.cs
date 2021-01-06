@@ -20,6 +20,8 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver.GeoJsonObjectModel;
 
+using Prometheus;
+
 using SensateIoT.Platform.Network.Common.MQTT;
 using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.DTO;
@@ -37,6 +39,8 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 		private readonly IServiceProvider m_provider;
 		private readonly ILogger<MqttBulkNumberTriggerHandler> logger;
 		private readonly IDataPointMatchingService m_matcher;
+		private readonly Counter m_measurementCounter;
+		private readonly Counter m_matchCounter;
 
 		public MqttBulkNumberTriggerHandler(IServiceProvider provider,
 											IDataPointMatchingService matcher,
@@ -45,6 +49,9 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 			this.m_provider = provider;
 			this.logger = logger;
 			this.m_matcher = matcher;
+
+			this.m_matchCounter = Metrics.CreateCounter("triggerservice_measurements_matched_total", "Total amount of measurements that matched a trigger.");
+			this.m_measurementCounter = Metrics.CreateCounter("triggerservice_measurements_received_total", "Total amount of measurements received.");
 		}
 
 		private static IEnumerable<InternalBulkMeasurements> Decompress(string data)
@@ -92,6 +99,8 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 				.ToDictionary(x => x.Key, x => x.ToList());
 			var exec = scope.ServiceProvider.GetRequiredService<ITriggerActionExecutionService>();
 
+			this.m_measurementCounter.Inc(measurements.Count);
+
 			foreach(var metaMeasurement in measurements) {
 				var actions = triggerMap[metaMeasurement.SensorID];
 
@@ -101,8 +110,9 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 
 				foreach(var m in metaMeasurement.Measurements) {
 					foreach(var keyValuePair in m.Data) {
-						var matched = this.m_matcher.Match(keyValuePair.Key, keyValuePair.Value, actions);
-						tasks.Add(ExecuteActionsAsync(exec, matched, keyValuePair.Value));
+						this.m_matchCounter.Inc();
+						var matched = this.m_matcher.Match(keyValuePair.Key, keyValuePair.Value, actions).ToList();
+						tasks.Add(ExecuteActionsAsync(exec, matched, keyValuePair.Value, m));
 					}
 				}
 			}
@@ -112,19 +122,19 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 			this.logger.LogDebug("Measurement handled.");
 		}
 
-		private static Task ExecuteActionsAsync(ITriggerActionExecutionService exec, IEnumerable<TriggerAction> actions, DataPoint dp)
+		private static Task ExecuteActionsAsync(ITriggerActionExecutionService exec, IEnumerable<TriggerAction> actions, DataPoint dp, SingleMeasurement m)
 		{
 			var tasks = new List<Task>();
 
 			foreach(var action in actions) {
-				var result = Replace(action.Message, dp);
+				var result = Replace(action.Message, dp, m);
 				tasks.Add(exec.ExecuteAsync(action, result));
 			}
 
 			return Task.WhenAll(tasks);
 		}
 
-		private static string Replace(string message, DataPoint dp)
+		private static string Replace(string message, DataPoint dp, SingleMeasurement m)
 		{
 			string precision;
 			string accuracy;
@@ -134,9 +144,13 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 
 			precision = dp.Precision != null ? dp.Precision.Value.ToString(CultureInfo.InvariantCulture) : "";
 			accuracy = dp.Accuracy != null ? dp.Accuracy.Value.ToString(CultureInfo.InvariantCulture) : "";
+			var lon = m.Location.Coordinates.Longitude.ToString(CultureInfo.InvariantCulture);
+			var lat = m.Location.Coordinates.Latitude.ToString(CultureInfo.InvariantCulture);
 
 			body = body.Replace("$precision", precision);
 			body = body.Replace("$accuracy", accuracy);
+			body = body.Replace("$lon", lon);
+			body = body.Replace("$lat", lat);
 
 			return body;
 		}

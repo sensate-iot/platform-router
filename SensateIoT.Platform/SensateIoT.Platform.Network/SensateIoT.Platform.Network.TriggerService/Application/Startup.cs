@@ -17,6 +17,8 @@ using SensateIoT.Platform.Network.Adapters.Abstract;
 using SensateIoT.Platform.Network.Adapters.Mail;
 using SensateIoT.Platform.Network.Adapters.SMS;
 using SensateIoT.Platform.Network.Common.Init;
+using SensateIoT.Platform.Network.Common.Services.Metrics;
+using SensateIoT.Platform.Network.Common.Settings;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Repositories;
 using SensateIoT.Platform.Network.TriggerService.Clients;
@@ -57,6 +59,9 @@ namespace SensateIoT.Platform.Network.TriggerService.Application
 			services.AddNetworkingContext(db.Networking.ConnectionString);
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.Configure<TimeoutConfig>(this.Configuration.GetSection("Timeouts"));
+
+			services.Configure<MetricsOptions>(this.Configuration.GetSection("HttpServer:Metrics"));
+			services.AddHostedService<MetricsService>();
 
 			services.AddInternalMqttService(options => {
 				options.Ssl = privatemqtt.Ssl;

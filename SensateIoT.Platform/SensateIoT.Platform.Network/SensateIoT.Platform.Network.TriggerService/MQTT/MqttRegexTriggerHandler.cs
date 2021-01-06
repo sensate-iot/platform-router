@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 using MongoDB.Bson;
-
+using Prometheus;
 using SensateIoT.Platform.Network.Common.MQTT;
 using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.DTO;
@@ -33,6 +33,8 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 		private readonly ITriggerRepository m_repo;
 		private readonly IRegexMatchingService m_regexMatcher;
 		private readonly ITriggerActionExecutionService m_exec;
+		private readonly Counter m_messageCounter;
+		private readonly Counter m_matchCounter;
 
 		public MqttRegexTriggerHandler(
 			ILogger<MqttRegexTriggerHandler> logger,
@@ -45,6 +47,8 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 			this.m_repo = triggers;
 			this.m_regexMatcher = matcher;
 			this.m_exec = exec;
+			this.m_matchCounter = Metrics.CreateCounter("triggerservice_messages_matched_total", "Total amount of measurements that matched a trigger.");
+			this.m_messageCounter = Metrics.CreateCounter("triggerservice_messages_received_total", "Total amount of messages received.");
 		}
 
 		private static IEnumerable<InternalBulkMessageQueue> Decompress(string data)
@@ -85,6 +89,8 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 				.GroupBy(x => x.SensorID, x => x)
 				.ToDictionary(x => x.Key, x => x.ToList());
 
+			this.m_messageCounter.Inc(messages.Count);
+
 			foreach(var metaMessages in messages) {
 				var actions = triggerMap[metaMessages.SensorID];
 
@@ -93,8 +99,10 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 				}
 
 				foreach(var m in metaMessages.Messages) {
+					this.m_matchCounter.Inc();
+
 					var matched = this.m_regexMatcher.Match(m, actions);
-					tasks.Add(ExecuteActionsAsync(matched, m));
+					tasks.Add(this.ExecuteActionsAsync(matched, m));
 				}
 			}
 

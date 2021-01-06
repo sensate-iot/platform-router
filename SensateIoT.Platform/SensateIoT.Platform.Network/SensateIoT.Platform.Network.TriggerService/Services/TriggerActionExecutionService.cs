@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 
 using MongoDB.Bson;
+using Prometheus;
 
 using SensateIoT.Platform.Network.Adapters.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
@@ -33,6 +34,11 @@ namespace SensateIoT.Platform.Network.TriggerService.Services
 		private readonly IControlMessageRepository m_controlMessges;
 		private readonly IRouterClient m_router;
 
+		private readonly Counter m_smsCounter;
+		private readonly Counter m_actuatorCounter;
+		private readonly Counter m_emailCounter;
+		private readonly Counter m_httpCounter;
+
 		public TriggerActionExecutionService(
 			IHttpClientFactory factory,
 			IRouterClient router,
@@ -50,6 +56,11 @@ namespace SensateIoT.Platform.Network.TriggerService.Services
 			this.m_httpFactory = factory;
 			this.m_controlMessges = controlMessages;
 			this.m_router = router;
+
+			this.m_actuatorCounter = Metrics.CreateCounter("triggerservice_actuator_total", "Total number of actuator messages sent.");
+			this.m_smsCounter = Metrics.CreateCounter("triggerservice_sms_total", "Total number of SMS messages sent.");
+			this.m_emailCounter = Metrics.CreateCounter("triggerservice_email_total", "Total number of email messages sent.");
+			this.m_httpCounter = Metrics.CreateCounter("triggerservice_http_total", "Total number of HTTP requests sent.");
 		}
 
 		public async Task ExecuteAsync(TriggerAction action, string body)
@@ -61,16 +72,19 @@ namespace SensateIoT.Platform.Network.TriggerService.Services
 					TextBody = body
 				};
 
+				this.m_emailCounter.Inc();
 				await this.m_mail.SendEmailAsync(action.Target, "Sensate IoT trigger", mail).ConfigureAwait(false);
 				break;
 
 			case TriggerChannel.SMS:
+				this.m_smsCounter.Inc();
 				await this.m_text.SendAsync(this.m_textSettings.AlphaCode, action.Target, body).ConfigureAwait(false);
 				break;
 
 
 			case TriggerChannel.HttpPost:
 			case TriggerChannel.HttpGet:
+				this.m_httpCounter.Inc();
 				var client = this.m_httpFactory.CreateClient();
 				var result = Uri.TryCreate(action.Target, UriKind.Absolute, out var output) &&
 							  output.Scheme == Uri.UriSchemeHttp || output?.Scheme == Uri.UriSchemeHttps;
@@ -88,6 +102,8 @@ namespace SensateIoT.Platform.Network.TriggerService.Services
 
 			case TriggerChannel.MQTT:
 			case TriggerChannel.ControlMessage:
+				this.m_actuatorCounter.Inc();
+
 				if(!ObjectId.TryParse(action.Target, out var id)) {
 					break;
 				}
