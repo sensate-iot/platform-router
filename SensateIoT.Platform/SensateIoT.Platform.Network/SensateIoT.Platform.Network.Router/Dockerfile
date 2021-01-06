@@ -18,7 +18,6 @@ FROM mcr.microsoft.com/dotnet/runtime:5.0
 COPY --from=build-env /app/bin /app
 COPY SensateIoT.Platform.Network.Router/appsettings.json /app/appsettings.json
 
-
 EXPOSE 80
 EXPOSE 8080
 WORKDIR /app
