@@ -5,7 +5,6 @@
  * @email  michel@michelmegens.net
  */
 
-using System;
 using System.IO;
 
 using Microsoft.AspNetCore.Hosting;

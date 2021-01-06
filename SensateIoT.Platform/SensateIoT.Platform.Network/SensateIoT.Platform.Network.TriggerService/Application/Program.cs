@@ -8,6 +8,7 @@
 using System;
 using System.IO;
 using System.Reflection;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -16,11 +17,6 @@ namespace SensateIoT.Platform.Network.TriggerService.Application
 {
 	public class Program
 	{
-		public static string GetAppSettings()
-		{
-			return Environment.GetEnvironmentVariable("TRIGGERSERVICE_APPSETTINGS") ?? "appsettings.Development.json";
-		}
-
 		public static IHost CreateHost(string[] args)
 		{
 			Startup starter = null;
@@ -28,7 +24,7 @@ namespace SensateIoT.Platform.Network.TriggerService.Application
 			var wh = Host.CreateDefaultBuilder(args)
 				.UseContentRoot(Directory.GetCurrentDirectory())
 				.ConfigureAppConfiguration((hostingContext, config) => {
-					config.AddJsonFile(GetAppSettings(), optional: false, reloadOnChange: true);
+					config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 					config.AddEnvironmentVariables();
 				})
 				.ConfigureLogging((hostingContext, logging) => {
