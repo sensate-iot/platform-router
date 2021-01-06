@@ -16,7 +16,7 @@ using Microsoft.Extensions.Options;
 using Google.Protobuf;
 
 using Newtonsoft.Json;
-
+using Prometheus;
 using SensateIoT.Platform.Network.Common.Caching.Object;
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
 using SensateIoT.Platform.Network.Common.Collections.Remote;
@@ -47,6 +47,8 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 		private readonly IPublicRemoteQueue m_publicRemote;
 		private readonly ILogger<RoutingService> m_logger;
 		private readonly RoutingPublishSettings m_settings;
+		private readonly Counter m_dropCounter;
+		private readonly Counter m_counter;
 
 		private const int DequeueCount = 1000;
 		private const string FormatNeedle = "$id";
@@ -70,6 +72,11 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 			this.m_authService = auth;
 			this.m_logger = logger;
 			this.m_storageQueue = storage;
+
+			this.m_dropCounter =
+				Prometheus.Metrics.CreateCounter("router_messages_dropped_total", "Total number of measurements/messages dropped.");
+			this.m_counter =
+				Prometheus.Metrics.CreateCounter("router_messages_routed_total", "Total number of measurements/messages routed.");
 		}
 
 		public override async Task ExecuteAsync(CancellationToken token)
@@ -94,10 +101,14 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 					var sensor = this.m_cache.GetSensor(message.SensorID);
 
 					if(sensor == null) {
+						this.m_dropCounter.Inc();
+						this.m_logger.LogDebug("Dropped message for sensor {sensorId} due to invalid sensor or account.",
+											   message.SensorID.ToString());
 						return;
 					}
 
 					var evt = this.RouteMessage(message, sensor);
+					this.m_counter.Inc();
 					this.m_eventsQueue.EnqueueEvent(evt);
 				});
 
@@ -141,6 +152,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 				evt.Actions.Add(NetworkEventType.MessageLiveData);
 
 				foreach(var info in sensor.LiveDataRouting) {
+					this.m_logger.LogDebug("Routing message to live data client: {clientId}.", info.Target);
 					this.EnqueueTo(message, info);
 				}
 			}

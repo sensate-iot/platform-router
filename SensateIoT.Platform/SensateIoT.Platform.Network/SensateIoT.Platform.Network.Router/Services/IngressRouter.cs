@@ -25,13 +25,15 @@ namespace SensateIoT.Platform.Network.Router.Services
 	{
 		private readonly IMessageQueue m_queue;
 		private readonly ILogger<IngressRouter> m_logger;
-		private readonly Counter m_requests;
+		private readonly Counter m_measurementRequests;
+		private readonly Counter m_messageRequests;
 
 		public IngressRouter(IMessageQueue queue, ILogger<IngressRouter> logger)
 		{
 			this.m_queue = queue;
 			this.m_logger = logger;
-			this.m_requests = Metrics.CreateCounter("router_ingress_requests_total", "Total amount of routing ingress traffic.");
+			this.m_measurementRequests = Metrics.CreateCounter("router_measurement_requests_total", "Total amount of measurement routing requests.");
+			this.m_messageRequests = Metrics.CreateCounter("router_message_requests_total", "Total amount of message routing requests.");
 		}
 
 		public override Task<RoutingResponse> EnqueueMeasurement(Contracts.DTO.Measurement request,
@@ -43,7 +45,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 				var dto = MeasurementProtobufConverter.Convert(request);
 
 				this.m_queue.Add(dto);
-				this.m_requests.Inc();
+				this.m_measurementRequests.Inc();
 
 				response = new RoutingResponse {
 					Count = 1,
@@ -72,7 +74,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 				var dto = MessageProtobufConverter.Convert(request);
 
 				this.m_queue.Add(dto);
-				this.m_requests.Inc();
+				this.m_messageRequests.Inc();
 
 				response = new RoutingResponse {
 					Count = 1,
@@ -101,7 +103,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 				var dto = MeasurementProtobufConverter.Convert(request).ToList();
 
 				this.m_queue.AddRange(dto);
-				this.m_requests.Inc(dto.Count);
+				this.m_measurementRequests.Inc();
 
 				response = new RoutingResponse {
 					Count = request.Measurements.Count,
@@ -130,7 +132,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 				var dto = MessageProtobufConverter.Convert(request).ToList();
 
 				this.m_queue.AddRange(dto);
-				this.m_requests.Inc(dto.Count);
+				this.m_messageRequests.Inc();
 
 				response = new RoutingResponse {
 					Count = request.Messages.Count,
