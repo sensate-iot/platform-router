@@ -1,5 +1,5 @@
 #
-# Docker file for the trigger service.
+# Docker file for the routing service.
 #
 # @author Michel Megens
 # @email  michel@michelmegens.net
@@ -13,7 +13,7 @@ COPY . .
 RUN dotnet restore -r linux-x64 SensateIoT.Platform.Network.Router/SensateIoT.Platform.Network.Router.csproj
 RUN dotnet publish -c Release -o /app/bin -r linux-x64 --no-restore SensateIoT.Platform.Network.Router/SensateIoT.Platform.Network.Router.csproj
 
-FROM mcr.microsoft.com/dotnet/runtime:5.0
+FROM mcr.microsoft.com/dotnet/aspnet:5.0
 
 COPY --from=build-env /app/bin /app
 COPY SensateIoT.Platform.Network.Router/appsettings.json /app/appsettings.json

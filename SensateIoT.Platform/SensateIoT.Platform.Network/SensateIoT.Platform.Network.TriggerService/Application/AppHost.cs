@@ -34,7 +34,7 @@ namespace SensateIoT.Platform.Network.TriggerService.Application
 		{
 			this.m_host.RunAsync();
 			this._reset.WaitOne();
-			Console.WriteLine("Stopping MqttHandler!");
+			Console.WriteLine("Stopping TriggerService!");
 		}
 	}
 }

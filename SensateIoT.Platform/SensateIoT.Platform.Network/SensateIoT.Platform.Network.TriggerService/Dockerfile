@@ -10,13 +10,14 @@ FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
 WORKDIR /build
 
 COPY . .
-RUN dotnet restore -r linux-musl-x64 SensateIoT.Platform.Network.TriggerService/SensateIoT.Platform.Network.TriggerService.csproj
-RUN dotnet publish -c Release -o /app/bin -r linux-musl-x64 --no-restore --self-contained true --no-restore SensateIoT.Platform.Network.TriggerService/SensateIoT.Platform.Network.TriggerService.csproj
+RUN dotnet restore -r linux-x64 SensateIoT.Platform.Network.TriggerService/SensateIoT.Platform.Network.TriggerService.csproj
+RUN dotnet publish -c Release -o /app/bin -r linux-x64 --no-restore SensateIoT.Platform.Network.TriggerService/SensateIoT.Platform.Network.TriggerService.csproj
 
-FROM alpine:3.11
+FROM mcr.microsoft.com/dotnet/runtime:5.0
 
-COPY --from=build-env /app /app
+COPY --from=build-env /app/bin /app
+COPY SensateIoT.Platform.Network.TriggerService/appsettings.json /app/appsettings.json
+
+EXPOSE 8080
 WORKDIR /app
-RUN apk add --no-cache libstdc++ libintl icu
-
-ENTRYPOINT ["bin/SensateIoT.Platform.Network.TriggerService"]
+ENTRYPOINT ["/app/SensateIoT.Platform.Network.TriggerService"]

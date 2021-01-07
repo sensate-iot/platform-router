@@ -52,7 +52,7 @@ namespace SensateIoT.Platform.Network.TriggerService.Application
 
 		public static void Main(string[] args)
 		{
-			Console.WriteLine($"Starting TriggerService using {Assembly.GetExecutingAssembly().GetName().Version}");
+			Console.WriteLine($"Starting TriggerService {Assembly.GetExecutingAssembly().GetName().Version}");
 
 			var program = new AppHost(CreateHost(args));
 			program.Run();
