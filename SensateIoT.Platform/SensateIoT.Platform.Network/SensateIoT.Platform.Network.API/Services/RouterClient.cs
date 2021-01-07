@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 
 using Grpc.Core;
 
+using SensateIoT.Platform.Network.API.Abstract;
 using SensateIoT.Platform.Network.API.Config;
 using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Contracts.RPC;

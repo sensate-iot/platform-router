@@ -7,6 +7,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -45,7 +46,10 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 			var accountRepo = scope.ServiceProvider.GetRequiredService<IRoutingRepository>();
 
 			var sw = Stopwatch.StartNew();
-			var accounts = await accountRepo.GetAccountsForRoutingAsync(token).ConfigureAwait(false);
+			var rawAccounts = await accountRepo.GetAccountsForRoutingAsync(token).ConfigureAwait(false);
+			var accounts = rawAccounts.ToList();
+
+			this.m_logger.LogInformation("Bulk loaded {accountCount} accounts.", accounts.Count);
 			this.m_cache.Append(accounts);
 			sw.Stop();
 

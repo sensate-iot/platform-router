@@ -55,7 +55,14 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 
 			var sensors = await sensorTask.ConfigureAwait(false);
 			var dict = sensors.ToDictionary(k => k.ID, v => v);
-			var triggers = await triggerTask.ConfigureAwait(false);
+			this.m_logger.LogDebug("Finished loading sensors {ms} after starting.", sw.ElapsedMilliseconds);
+
+			var rawTriggers = await triggerTask.ConfigureAwait(false);
+			var triggers = rawTriggers.ToList();
+			this.m_logger.LogDebug("Finished loading trigger routes {ms}ms after starting.", sw.ElapsedMilliseconds);
+
+			this.m_logger.LogInformation("Bulk loaded {sensorCount} sensors.", dict.Count);
+			this.m_logger.LogInformation("Bulk loaded {triggerCount} trigger routes.", triggers.Count);
 
 			foreach(var info in triggers) {
 				var route = new SensorTrigger {
@@ -63,7 +70,14 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 					IsTextTrigger = info.TextTrigger
 				};
 
-				dict[info.SensorID].TriggerInformation = route;
+				var sensor = dict[info.SensorID];
+
+				if(sensor == null) {
+					this.m_logger.LogWarning("Found trigger route for a non-existing sensor. Sensor ID: {sensorID}.", info.SensorID.ToString());
+					continue;
+				}
+
+				sensor.TriggerInformation = route;
 			}
 
 			this.m_cache.Append(dict.Values);

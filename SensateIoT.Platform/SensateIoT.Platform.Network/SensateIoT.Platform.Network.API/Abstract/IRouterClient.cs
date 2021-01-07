@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Contracts.RPC;
 
-namespace SensateIoT.Platform.Network.API.Services
+namespace SensateIoT.Platform.Network.API.Abstract
 {
 	public interface IRouterClient
 	{

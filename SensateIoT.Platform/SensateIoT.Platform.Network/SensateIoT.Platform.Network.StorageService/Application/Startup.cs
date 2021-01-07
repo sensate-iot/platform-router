@@ -12,6 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 using SensateIoT.Platform.Network.Common.Init;
+using SensateIoT.Platform.Network.Common.Services.Metrics;
+using SensateIoT.Platform.Network.Common.Settings;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Repositories;
 using SensateIoT.Platform.Network.StorageService.Config;
@@ -54,6 +56,9 @@ namespace SensateIoT.Platform.Network.StorageService.Application
 			services.AddScoped<IMeasurementRepository, MeasurementRepository>();
 			services.AddScoped<ISensorStatisticsRepository, SensorStatisticsRepository>();
 			services.AddScoped<IMessageRepository, MessageRepository>();
+
+			services.Configure<MetricsOptions>(this.Configuration.GetSection("HttpServer:Metrics"));
+			services.AddHostedService<MetricsService>();
 
 			services.AddInternalMqttService(options => {
 				options.Ssl = privatemqtt.Ssl;

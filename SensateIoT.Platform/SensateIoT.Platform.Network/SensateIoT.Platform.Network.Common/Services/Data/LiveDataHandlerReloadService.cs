@@ -7,6 +7,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,7 +20,6 @@ using SensateIoT.Platform.Network.Common.Collections.Remote;
 using SensateIoT.Platform.Network.Common.Services.Background;
 using SensateIoT.Platform.Network.Common.Settings;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
-using SensateIoT.Platform.Network.DataAccess.Repositories;
 
 namespace SensateIoT.Platform.Network.Common.Services.Data
 {
@@ -50,7 +50,10 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 			var handlerRepo = scope.ServiceProvider.GetRequiredService<ILiveDataHandlerRepository>();
 
 			var sw = Stopwatch.StartNew();
-			var handlers = await handlerRepo.GetLiveDataHandlers(token).ConfigureAwait(false);
+			var rawHandlers = await handlerRepo.GetLiveDataHandlers(token).ConfigureAwait(false);
+			var handlers = rawHandlers.ToList();
+			this.m_logger.LogInformation("Bulk loaded {count} live data handlers.", handlers.Count);
+
 			this.m_queue.SyncLiveDataHandlers(handlers);
 			this.m_cache.SetLiveDataRemotes(handlers);
 			sw.Stop();

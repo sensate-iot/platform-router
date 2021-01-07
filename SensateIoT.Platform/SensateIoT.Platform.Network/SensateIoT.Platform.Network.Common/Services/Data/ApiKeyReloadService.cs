@@ -7,6 +7,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -45,7 +46,10 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 			var apiKeyRepo = scope.ServiceProvider.GetRequiredService<IRoutingRepository>();
 
 			var sw = Stopwatch.StartNew();
-			var keys = await apiKeyRepo.GetApiKeysAsync(token).ConfigureAwait(false);
+			var rawKeys = await apiKeyRepo.GetApiKeysAsync(token).ConfigureAwait(false);
+			var keys = rawKeys.ToList();
+
+			this.m_logger.LogInformation("Bulk loaded {keyCount} sensor keys.", keys.Count);
 			this.m_cache.Append(keys);
 			sw.Stop();
 
