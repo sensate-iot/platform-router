@@ -34,6 +34,7 @@ namespace SensateIoT.Platform.Network.API.Middleware
 		{
 			this._next = next;
 			this._provider = sp;
+
 			this.m_settings = new JsonSerializerSettings {
 				ContractResolver = new DefaultContractResolver {
 					NamingStrategy = new CamelCaseNamingStrategy()

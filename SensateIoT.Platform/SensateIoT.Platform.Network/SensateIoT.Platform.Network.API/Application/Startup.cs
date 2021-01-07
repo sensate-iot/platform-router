@@ -24,6 +24,8 @@ using SensateIoT.Platform.Network.API.Middleware;
 using SensateIoT.Platform.Network.API.MQTT;
 using SensateIoT.Platform.Network.API.Services;
 using SensateIoT.Platform.Network.Common.Init;
+using SensateIoT.Platform.Network.Common.Services.Metrics;
+using SensateIoT.Platform.Network.Common.Settings;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Repositories;
@@ -68,6 +70,7 @@ namespace SensateIoT.Platform.Network.API.Application
 			services.Configure<InternalBrokerConfig>(this.Configuration.GetSection("Mqtt:InternalBroker"));
 			services.Configure<RouterConfig>(this.Configuration.GetSection("Router"));
 			services.Configure<BlobOptions>(this.Configuration.GetSection("Storage"));
+			services.Configure<MetricsOptions>(this.Configuration.GetSection("HttpServer:Metrics"));
 
 			services.AddScoped<ITriggerRepository, TriggerRepository>();
 			services.AddScoped<IMessageRepository, MessageRepository>();
@@ -91,6 +94,7 @@ namespace SensateIoT.Platform.Network.API.Application
 			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 			services.AddHostedService<BatchRoutingService>();
+			services.AddHostedService<MetricsService>();
 
 			services.AddRouting();
 			services.AddControllers().AddNewtonsoftJson();
@@ -117,6 +121,7 @@ namespace SensateIoT.Platform.Network.API.Application
 					.AllowCredentials();
 			});
 
+			app.UseMiddleware<ErrorLoggingMiddleware>();
 			app.UseMiddleware<ApiKeyValidationMiddleware>();
 			app.UseMiddleware<RequestLoggingMiddleware>();
 			app.UseMiddleware<JsonErrorHandlerMiddleware>();

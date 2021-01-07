@@ -5,7 +5,6 @@
  * @email  michel@michelmegens.net
  */
 
-using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -13,10 +12,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-
-using SensateIoT.Platform.Network.API.DTO;
 using SensateIoT.Platform.Network.Data.Enums;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
@@ -53,11 +48,7 @@ namespace SensateIoT.Platform.Network.API.Middleware
 				Route = ctx.Request.Path + ctx.Request.QueryString.ToString()
 			});
 
-			try {
-				await this._next(ctx).ConfigureAwait(false);
-			} catch(Exception ex) {
-				this.m_logger.LogError("Uncaught exception: {message}. Trace: {trace}", ex.Message, ex.StackTrace);
-			}
+			await this._next(ctx).ConfigureAwait(false);
 
 			sw.Stop();
 
