@@ -36,8 +36,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 			this.m_messageRequests = Metrics.CreateCounter("router_message_requests_total", "Total amount of message routing requests.");
 		}
 
-		public override Task<RoutingResponse> EnqueueMeasurement(Contracts.DTO.Measurement request,
-																 ServerCallContext context)
+		public override Task<RoutingResponse> EnqueueMeasurement(Contracts.DTO.Measurement request, ServerCallContext context)
 		{
 			RoutingResponse response;
 
@@ -65,8 +64,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 			return Task.FromResult(response);
 		}
 
-		public override Task<RoutingResponse> EnqueueMessage(Contracts.DTO.TextMessage request,
-															 ServerCallContext context)
+		public override Task<RoutingResponse> EnqueueMessage(Contracts.DTO.TextMessage request, ServerCallContext context)
 		{
 			RoutingResponse response;
 
@@ -94,8 +92,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 			return Task.FromResult(response);
 		}
 
-		public override Task<RoutingResponse> EnqueueBulkMeasurements(Contracts.DTO.MeasurementData request,
-																	  ServerCallContext context)
+		public override Task<RoutingResponse> EnqueueBulkMeasurements(Contracts.DTO.MeasurementData request, ServerCallContext context)
 		{
 			RoutingResponse response;
 
@@ -123,8 +120,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 			return Task.FromResult(response);
 		}
 
-		public override Task<RoutingResponse> EnqueueBulkMessages(Contracts.DTO.TextMessageData request,
-																  ServerCallContext context)
+		public override Task<RoutingResponse> EnqueueBulkMessages(Contracts.DTO.TextMessageData request, ServerCallContext context)
 		{
 			RoutingResponse response;
 

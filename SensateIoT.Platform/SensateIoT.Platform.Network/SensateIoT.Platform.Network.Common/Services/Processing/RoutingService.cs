@@ -193,6 +193,8 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 				break;
 
 			default:
+				this.m_logger.LogError("Received invalid message type. Unable to route to trigger service. " +
+									   "The received type is: {type}", message.Type);
 				throw new ArgumentException($"Unable to enqueue message of type {message.Type}.");
 			}
 		}
@@ -209,6 +211,8 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 				break;
 
 			default:
+				this.m_logger.LogError("Received invalid message type. Unable to route to live data service. " +
+									   "The received type is: {type}", message.Type);
 				throw new ArgumentException($"Unable to enqueue message of type {message.Type}.");
 			}
 		}
