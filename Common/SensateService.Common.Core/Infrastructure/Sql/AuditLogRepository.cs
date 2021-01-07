@@ -29,7 +29,11 @@ namespace SensateService.Infrastructure.Sql
 		{
 		}
 
-		public async Task<PaginationResult<AuditLog>> FindAsync(string text, RequestMethod method = RequestMethod.Any, int skip = 0, int limit = 0)
+		public async Task<PaginationResult<AuditLog>> FindAsync(string text,
+																RequestMethod method = RequestMethod.Any,
+																int skip = 0,
+																int limit = 0,
+																OrderDirection direction = OrderDirection.None)
 		{
 			IQueryable<AuditLog> query;
 			var rv = new PaginationResult<AuditLog>();
@@ -54,6 +58,13 @@ namespace SensateService.Infrastructure.Sql
 				query = query.Take(limit);
 			}
 
+			query = direction switch
+			{
+				OrderDirection.Ascending => query.OrderBy(x => x.Timestamp),
+				OrderDirection.Descending => query.OrderByDescending(x => x.Timestamp),
+				_ => query
+			};
+
 			rv.Values = await query.ToListAsync().AwaitBackground();
 
 			foreach(var log in rv.Values) {
@@ -68,7 +79,8 @@ namespace SensateService.Infrastructure.Sql
 			string text,
 			RequestMethod method = RequestMethod.Any,
 			int skip = 0,
-			int limit = 0
+			int limit = 0,
+			OrderDirection direction = OrderDirection.None
 			)
 		{
 			IQueryable<AuditLog> logs;
@@ -95,6 +107,13 @@ namespace SensateService.Infrastructure.Sql
 				}
 			}
 
+			logs = direction switch
+			{
+				OrderDirection.Ascending => logs.OrderBy(x => x.Timestamp),
+				OrderDirection.Descending => logs.OrderByDescending(x => x.Timestamp),
+				_ => logs
+			};
+
 			rv.Count = await logs.CountAsync().AwaitBackground();
 
 			if(skip > 0) {
@@ -114,7 +133,7 @@ namespace SensateService.Infrastructure.Sql
 			return rv;
 		}
 
-		public async Task<IEnumerable<AuditLog>> FindAsync(SensateUser user, string text, int skip = 0, int limit = 0)
+		public async Task<IEnumerable<AuditLog>> FindAsync(SensateUser user, string text, int skip = 0, int limit = 0, OrderDirection direction = OrderDirection.None)
 		{
 			var query = this.Data.Where(log => log.AuthorId == user.Id && log.Route.Contains(text));
 
@@ -125,6 +144,13 @@ namespace SensateService.Infrastructure.Sql
 			if(limit > 0) {
 				query = query.Take(limit);
 			}
+
+			query = direction switch
+			{
+				OrderDirection.Ascending => query.OrderBy(x => x.Timestamp),
+				OrderDirection.Descending => query.OrderByDescending(x => x.Timestamp),
+				_ => query
+			};
 
 			var result = await query.ToListAsync().AwaitBackground();
 
@@ -186,7 +212,13 @@ namespace SensateService.Infrastructure.Sql
 			await this.CommitAsync(ct).AwaitBackground();
 		}
 
-		public async Task<IEnumerable<AuditLog>> GetByRouteAsync(SensateUser user, string route, DateTime start, DateTime end, int skip = 0, int limit = 0)
+		public async Task<IEnumerable<AuditLog>> GetByRouteAsync(SensateUser user,
+																 string route,
+																 DateTime start,
+																 DateTime end,
+																 int skip = 0,
+																 int limit = 0,
+																 OrderDirection direction = OrderDirection.None)
 		{
 			var result =
 				from log in this.Data
@@ -206,6 +238,13 @@ namespace SensateService.Infrastructure.Sql
 				data = data.Take(limit);
 			}
 
+			data = direction switch
+			{
+				OrderDirection.Ascending => data.OrderBy(x => x.Timestamp),
+				OrderDirection.Descending => data.OrderByDescending(x => x.Timestamp),
+				_ => data
+			};
+
 			var rv = await data.ToListAsync().AwaitBackground();
 
 			foreach(var log in result) {
@@ -215,7 +254,11 @@ namespace SensateService.Infrastructure.Sql
 			return rv;
 		}
 
-		public async Task<PaginationResult<AuditLog>> GetByRequestTypeAsync(SensateUser user, RequestMethod method, int skip = 0, int limit = 0)
+		public async Task<PaginationResult<AuditLog>> GetByRequestTypeAsync(SensateUser user,
+																			RequestMethod method,
+																			int skip = 0,
+																			int limit = 0,
+																			OrderDirection direction = OrderDirection.None)
 		{
 			var rv = new PaginationResult<AuditLog>();
 
@@ -236,6 +279,13 @@ namespace SensateService.Infrastructure.Sql
 			if(limit > 0) {
 				data = data.Take(limit);
 			}
+
+			data = direction switch
+			{
+				OrderDirection.Ascending => data.OrderBy(x => x.Timestamp),
+				OrderDirection.Descending => data.OrderByDescending(x => x.Timestamp),
+				_ => data
+			};
 
 			rv.Values = await data.ToListAsync().AwaitBackground();
 
@@ -267,7 +317,7 @@ namespace SensateService.Infrastructure.Sql
 			return log;
 		}
 
-		public async Task<PaginationResult<AuditLog>> GetAllAsync(RequestMethod method, int skip = 0, int limit = 0)
+		public async Task<PaginationResult<AuditLog>> GetAllAsync(RequestMethod method, int skip = 0, int limit = 0, OrderDirection direction = OrderDirection.None)
 		{
 			IQueryable<AuditLog> result;
 			var rv = new PaginationResult<AuditLog>();
@@ -277,6 +327,13 @@ namespace SensateService.Infrastructure.Sql
 			} else {
 				result = this.Data.Where(log => log.Method == method);
 			}
+
+			result = direction switch
+			{
+				OrderDirection.Ascending => result.OrderBy(x => x.Timestamp),
+				OrderDirection.Descending => result.OrderByDescending(x => x.Timestamp),
+				_ => result
+			};
 
 			rv.Count = await result.CountAsync().AwaitBackground();
 
@@ -361,7 +418,10 @@ namespace SensateService.Infrastructure.Sql
 			return this.Data.CountAsync(predicate);
 		}
 
-		public async Task<PaginationResult<AuditLog>> GetByUserAsync(SensateUser user, int skip = 0, int limit = 0)
+		public async Task<PaginationResult<AuditLog>> GetByUserAsync(SensateUser user,
+																	 int skip = 0,
+																	 int limit = 0,
+																	 OrderDirection direction = OrderDirection.None)
 		{
 			var data = this.Data.Where(x => x.AuthorId == user.Id);
 			var rv = new PaginationResult<AuditLog> {
@@ -375,6 +435,13 @@ namespace SensateService.Infrastructure.Sql
 			if(limit > 0) {
 				data = data.Take(limit);
 			}
+
+			data = direction switch
+			{
+				OrderDirection.Ascending => data.OrderBy(x => x.Timestamp),
+				OrderDirection.Descending => data.OrderByDescending(x => x.Timestamp),
+				_ => data
+			};
 
 			rv.Values = await data.ToListAsync().AwaitBackground();
 
