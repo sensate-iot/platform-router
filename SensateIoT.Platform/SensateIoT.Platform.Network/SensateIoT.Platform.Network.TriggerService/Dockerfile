@@ -11,11 +11,11 @@ WORKDIR /build
 
 COPY . .
 RUN dotnet restore -r linux-x64 SensateIoT.Platform.Network.TriggerService/SensateIoT.Platform.Network.TriggerService.csproj
-RUN dotnet publish -c Release -o /app/bin -r linux-x64 --no-restore SensateIoT.Platform.Network.TriggerService/SensateIoT.Platform.Network.TriggerService.csproj
+RUN dotnet publish -c Release -o /build/binaries -r linux-x64 --no-restore SensateIoT.Platform.Network.TriggerService/SensateIoT.Platform.Network.TriggerService.csproj
 
 FROM mcr.microsoft.com/dotnet/runtime:5.0
 
-COPY --from=build-env /app/bin /app
+COPY --from=build-env /build/binaries /app
 COPY SensateIoT.Platform.Network.TriggerService/appsettings.json /app/appsettings.json
 
 EXPOSE 8080

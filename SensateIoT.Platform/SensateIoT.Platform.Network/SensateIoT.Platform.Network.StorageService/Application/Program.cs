@@ -6,8 +6,8 @@
  */
 
 using System;
-using System.IO;
 using System.Reflection;
+using System.IO;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -17,11 +17,6 @@ namespace SensateIoT.Platform.Network.StorageService.Application
 {
 	public class Program
 	{
-		public static string GetAppSettings()
-		{
-			return Environment.GetEnvironmentVariable("SENSATE_STORAGESERVICE_APPSETTINGS") ?? "appsettings.json";
-		}
-
 		public static IHost CreateHost(string[] args)
 		{
 			Startup starter = null;
@@ -29,7 +24,8 @@ namespace SensateIoT.Platform.Network.StorageService.Application
 			var wh = Host.CreateDefaultBuilder(args)
 				.UseContentRoot(Directory.GetCurrentDirectory())
 				.ConfigureAppConfiguration((hostingContext, config) => {
-					config.AddJsonFile(GetAppSettings(), optional: false, reloadOnChange: true);
+					config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+					config.AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", optional: false, reloadOnChange: true);
 					config.AddEnvironmentVariables();
 				})
 				.ConfigureLogging((hostingContext, logging) => {

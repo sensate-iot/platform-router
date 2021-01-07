@@ -10,13 +10,14 @@ FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
 WORKDIR /build
 
 COPY . .
-RUN dotnet restore -r linux-musl-x64 SensateIoT.Platform.Network.StorageService/SensateIoT.Platform.Network.StorageService.csproj
-RUN dotnet publish -c Release -o /app/bin -r linux-musl-x64 --no-restore --self-contained true --no-restore SensateIoT.Platform.Network.StorageService/SensateIoT.Platform.Network.StorageService.csproj
+RUN dotnet restore -r linux-x64 SensateIoT.Platform.Network.StorageService/SensateIoT.Platform.Network.StorageService.csproj
+RUN dotnet publish -c Release -o /build/binaries -r linux-x64 --no-restore SensateIoT.Platform.Network.StorageService/SensateIoT.Platform.Network.StorageService.csproj
 
-FROM alpine:3.11
+FROM mcr.microsoft.com/dotnet/runtime:5.0
 
-COPY --from=build-env /app /app
+COPY --from=build-env /build/binaries /app
+COPY SensateIoT.Platform.Network.StorageService/appsettings.json /app/appsettings.json
+
+EXPOSE 8080
 WORKDIR /app
-RUN apk add --no-cache libstdc++ libintl icu
-
-ENTRYPOINT ["bin/SensateIoT.Platform.Network.StorageService"]
+ENTRYPOINT ["/app/SensateIoT.Platform.Network.StorageService"]
