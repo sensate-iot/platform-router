@@ -34,6 +34,14 @@ namespace SensateIoT.Platform.Network.Common.Services.Metrics
 
 			options.Value.Hostname = hostname;
 
+			if(string.IsNullOrEmpty(options.Value.Endpoint)) {
+				options.Value.Endpoint = "metrics/";
+			}
+
+			if(options.Value.Port == default) {
+				options.Value.Port = 8080;
+			}
+
 			this.m_options = options.Value;
 			this.m_server = new MetricServer(hostname, options.Value.Port, options.Value.Endpoint);
 			this.m_logger = logger;

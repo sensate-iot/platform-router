@@ -15,12 +15,13 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 
+using Prometheus;
+
 using SensateIoT.Platform.Network.Common.Converters;
 using SensateIoT.Platform.Network.Common.MQTT;
 using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.Enums;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
-using SensateIoT.Platform.Network.DataAccess.Repositories;
 using SensateIoT.Platform.Network.StorageService.DTO;
 
 namespace SensateIoT.Platform.Network.StorageService.MQTT
@@ -30,12 +31,14 @@ namespace SensateIoT.Platform.Network.StorageService.MQTT
 		private readonly ILogger<MqttBulkMeasurementHandler> m_logger;
 		private readonly IMeasurementRepository m_measurements;
 		private readonly ISensorStatisticsRepository m_stats;
+		private readonly Counter m_storageCounter;
 
 		public MqttBulkMeasurementHandler(IMeasurementRepository measurements, ISensorStatisticsRepository stats, ILogger<MqttBulkMeasurementHandler> logger)
 		{
 			this.m_logger = logger;
 			this.m_measurements = measurements;
 			this.m_stats = stats;
+			this.m_storageCounter = Metrics.CreateCounter("storageservice_messages_stored_total", "Total number of messages stored.");
 		}
 
 		public async Task OnMessageAsync(string topic, string message, CancellationToken ct)
@@ -43,6 +46,9 @@ namespace SensateIoT.Platform.Network.StorageService.MQTT
 			try {
 				var measurementMap = MeasurementDatabaseConverter.Convert(this.DeserializeMeasurements(message));
 				var stats = measurementMap.Select(m => new StatisticsUpdate(RequestMethod.Any, m.Value.Count, m.Key));
+				var count = measurementMap.Aggregate(0L, (l, pair) => l + pair.Value.Count);
+
+				this.m_storageCounter.Inc(count);
 
 				await Task.WhenAll(
 					this.m_measurements.StoreAsync(measurementMap, ct),
