@@ -50,6 +50,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Automated Builds", "Automat
 		..\..\.github\workflows\docker-router.yml = ..\..\.github\workflows\docker-router.yml
 		..\..\.github\workflows\docker-storageservice.yml = ..\..\.github\workflows\docker-storageservice.yml
 		..\..\.github\workflows\docker-triggerservice.yml = ..\..\.github\workflows\docker-triggerservice.yml
+		..\..\.github\workflows\unittest-network.yml = ..\..\.github\workflows\unittest-network.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "public", "public", "{CEC49365-B8D2-417F-B140-30780F0820A8}"
