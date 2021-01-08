@@ -38,6 +38,8 @@ namespace SensateIoT.Platform.Network.Router.Services
 		{
 			RoutingResponse response;
 
+			this.m_logger.LogDebug("Bulk egress request with {count} messages.", request.Messages.Count);
+
 			try {
 				var dto = ControlMessageProtobufConverter.Convert(request);
 
@@ -65,6 +67,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 		public override Task<RoutingResponse> EnqueueControlMessage(Contracts.DTO.ControlMessage request, ServerCallContext context)
 		{
 			RoutingResponse response;
+			this.m_logger.LogDebug("Received egress routing request for sensor {sensorId}.", request.SensorID);
 
 			try {
 				var dto = ControlMessageProtobufConverter.Convert(request);

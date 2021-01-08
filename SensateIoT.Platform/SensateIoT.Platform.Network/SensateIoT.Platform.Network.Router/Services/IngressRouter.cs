@@ -39,6 +39,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 		public override Task<RoutingResponse> EnqueueMeasurement(Contracts.DTO.Measurement request, ServerCallContext context)
 		{
 			RoutingResponse response;
+			this.m_logger.LogDebug("Received measurement routing request from sensor {sensorId}.", request.SensorID);
 
 			try {
 				var dto = MeasurementProtobufConverter.Convert(request);
@@ -67,6 +68,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 		public override Task<RoutingResponse> EnqueueMessage(Contracts.DTO.TextMessage request, ServerCallContext context)
 		{
 			RoutingResponse response;
+			this.m_logger.LogDebug("Received message routing request from sensor {sensorId}.", request.SensorID);
 
 			try {
 				var dto = MessageProtobufConverter.Convert(request);
@@ -95,6 +97,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 		public override Task<RoutingResponse> EnqueueBulkMeasurements(Contracts.DTO.MeasurementData request, ServerCallContext context)
 		{
 			RoutingResponse response;
+			this.m_logger.LogDebug("Bulk ingress request with {count} measurements.", request.Measurements.Count);
 
 			try {
 				var dto = MeasurementProtobufConverter.Convert(request).ToList();
@@ -123,6 +126,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 		public override Task<RoutingResponse> EnqueueBulkMessages(Contracts.DTO.TextMessageData request, ServerCallContext context)
 		{
 			RoutingResponse response;
+			this.m_logger.LogDebug("Bulk ingress request with {count} messages.", request.Messages.Count);
 
 			try {
 				var dto = MessageProtobufConverter.Convert(request).ToList();
