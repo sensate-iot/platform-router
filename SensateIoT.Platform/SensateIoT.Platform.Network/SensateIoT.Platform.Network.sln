@@ -40,7 +40,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Migrations", "Migrations", "{2D648956-50F4-46FB-ABDC-93EC6DA2B69F}"
 	ProjectSection(SolutionItems) = preProject
 		Migrations\Networking.1.0.0.sql = Migrations\Networking.1.0.0.sql
-		Migrations\SensateIoT.1.0.0.sql = Migrations\SensateIoT.1.0.0.sql
+		Migrations\SensateIoT.1.1.0.sql = Migrations\SensateIoT.1.1.0.sql
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Automated Builds", "Automated Builds", "{0CD2E884-3DA9-485F-A729-93AC8627306F}"
@@ -100,8 +100,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions", "Functions", "{
 		SensateIoT.Platform.Network.Database\public\Functions\Router_GetTriggersById.sql = SensateIoT.Platform.Network.Database\public\Functions\Router_GetTriggersById.sql
 		SensateIoT.Platform.Network.Database\public\Functions\TriggerService_GetTriggersBySensorID.sql = SensateIoT.Platform.Network.Database\public\Functions\TriggerService_GetTriggersBySensorID.sql
 	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Triggers", "Triggers", "{2DEC3757-5C28-45CE-A70B-4B00823EEE07}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tables", "Tables", "{FEDF97F4-27ED-48FC-B57D-F27F112B3CDA}"
 	ProjectSection(SolutionItems) = preProject
@@ -175,7 +173,6 @@ Global
 		{CEC49365-B8D2-417F-B140-30780F0820A8} = {BDB01793-EB03-47FA-B4BE-DB29A55DCB78}
 		{1B2A938F-74F4-4A39-BD27-4028DFD67952} = {BDB01793-EB03-47FA-B4BE-DB29A55DCB78}
 		{26F5E93B-2D0D-4B46-A23F-C05FAE2DD481} = {CEC49365-B8D2-417F-B140-30780F0820A8}
-		{2DEC3757-5C28-45CE-A70B-4B00823EEE07} = {CEC49365-B8D2-417F-B140-30780F0820A8}
 		{FEDF97F4-27ED-48FC-B57D-F27F112B3CDA} = {CEC49365-B8D2-417F-B140-30780F0820A8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

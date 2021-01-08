@@ -6,11 +6,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Network project setup
-- Contracts project
-- Solution folders for:
-  - Database project;
-  - General files.
+- Network:
+  - Network project setup
+  - Contracts project
+  - Solution folders for:
+    - Database project
+    - General files
+  - Message router
+  - Network API + Gateway
+  - Networking database:
+    - Trigger administration
+    - Sensor link administration
+  - Live data service
+
+- Platform:
+  - Moved MQTT ingress service
+  - Forward MQTT ingress to the HTTP gateway
 
 ### Removed
 - Trigger administration (moved to network project)
