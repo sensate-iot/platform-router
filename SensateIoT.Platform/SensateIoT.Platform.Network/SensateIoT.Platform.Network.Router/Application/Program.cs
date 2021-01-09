@@ -10,6 +10,7 @@ using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace SensateIoT.Platform.Network.Router.Application
 {
@@ -29,6 +30,14 @@ namespace SensateIoT.Platform.Network.Router.Application
 					config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 					config.AddJsonFile($"appsettings.{ctx.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true);
 					config.AddEnvironmentVariables();
+				})
+				.ConfigureLogging((ctx, builder) => {
+					builder.ClearProviders();
+					builder.AddConsole();
+
+					if(ctx.HostingEnvironment.IsDevelopment() || ctx.HostingEnvironment.IsStaging()) {
+						builder.AddDebug();
+					}
 				})
 				.ConfigureWebHostDefaults(webBuilder => {
 					webBuilder.UseStartup<Startup>().UseKestrel(options => options.ConfigureEndpoints());

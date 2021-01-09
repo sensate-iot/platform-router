@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
+using Microsoft.OpenApi.Models;
 using SensateIoT.Platform.Network.Adapters.Abstract;
 using SensateIoT.Platform.Network.Adapters.Blobs;
 using SensateIoT.Platform.Network.API.Abstract;
@@ -57,6 +57,7 @@ namespace SensateIoT.Platform.Network.API.Application
 			services.AddAuthorizationContext(db.SensateIoT.ConnectionString);
 			services.AddNetworkingContext(db.Networking.ConnectionString);
 			services.AddDistributedCaches<PaginationResponse<Sensor>>(cache.Host, cache.Port);
+			services.AddCors();
 
 			services.AddInternalMqttService(options => {
 				options.Ssl = privatemqtt.Ssl;
@@ -96,6 +97,38 @@ namespace SensateIoT.Platform.Network.API.Application
 			services.AddHostedService<BatchRoutingService>();
 			services.AddHostedService<MetricsService>();
 
+			services.AddSwaggerGen(c => {
+				c.SwaggerDoc("v1", new OpenApiInfo {
+					Title = "Sensate IoT Network API - Version 1",
+					Version = "v1"
+				});
+
+				c.AddSecurityDefinition("X-ApiKey", new OpenApiSecurityScheme {
+					In = ParameterLocation.Header,
+					Name = "X-ApiKey",
+					Type = SecuritySchemeType.ApiKey,
+					Description = "API key needed to access the endpoints."
+				});
+
+				c.AddSecurityRequirement(new OpenApiSecurityRequirement
+				{
+					{
+						new OpenApiSecurityScheme
+						{
+							Name = "X-ApiKey",
+							Type = SecuritySchemeType.ApiKey,
+							In = ParameterLocation.Header,
+							Reference = new OpenApiReference
+							{
+								Type = ReferenceType.SecurityScheme,
+								Id = "X-ApiKey"
+							},
+						},
+						new string[] {}
+					}
+				});
+			});
+
 			services.AddRouting();
 			services.AddControllers().AddNewtonsoftJson();
 			services.AddMqttHandlers();
@@ -109,6 +142,22 @@ namespace SensateIoT.Platform.Network.API.Application
 
 			app.UseForwardedHeaders();
 			app.UseRouting();
+
+			app.UseCors(p => {
+				p.SetIsOriginAllowed(host => true)
+					.AllowAnyHeader()
+					.AllowAnyMethod()
+					.AllowCredentials();
+			});
+
+			app.UseSwagger(c => {
+				c.RouteTemplate = "network/swagger/{documentName}/swagger.json";
+			});
+
+			app.UseSwaggerUI(c => {
+				c.SwaggerEndpoint("/network/swagger/v1/swagger.json", "Sensate Network API v1");
+				c.RoutePrefix = "network/swagger";
+			});
 
 			if(env.IsDevelopment()) {
 				app.UseDeveloperExceptionPage();

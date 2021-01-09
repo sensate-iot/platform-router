@@ -23,12 +23,12 @@ namespace SensateIoT.Platform.Network.API.Middleware
 	public class ErrorLoggingMiddleware
 	{
 		private readonly RequestDelegate _next;
-		private readonly ILogger<RequestLoggingMiddleware> m_logger;
+		private readonly ILogger<ErrorLoggingMiddleware> m_logger;
 		private readonly JsonSerializerSettings m_settings;
 		private readonly Counter m_requestCounter;
 		private readonly Counter m_requestExceptions;
 
-		public ErrorLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggingMiddleware> logger)
+		public ErrorLoggingMiddleware(RequestDelegate next, ILogger<ErrorLoggingMiddleware> logger)
 		{
 			this._next = next;
 			this.m_logger = logger;

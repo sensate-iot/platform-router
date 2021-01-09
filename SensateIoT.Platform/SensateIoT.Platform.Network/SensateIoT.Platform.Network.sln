@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.Contracts", "SensateIoT.Platform.Network.Contracts\SensateIoT.Platform.Network.Contracts.csproj", "{6BD51202-2FD5-4E6E-9BAA-6239E2C2E9D7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SensateIoT.Platform.Network.Database", "SensateIoT.Platform.Network.Database", "{BDB01793-EB03-47FA-B4BE-DB29A55DCB78}"
+	ProjectSection(SolutionItems) = preProject
+		SensateIoT.Platform.Network.Database\extensions.sql = SensateIoT.Platform.Network.Database\extensions.sql
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E0A0D3A9-F17C-4D4B-9C03-698C53ABCDB3}"
 	ProjectSection(SolutionItems) = preProject
@@ -50,6 +53,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Automated Builds", "Automat
 		..\..\.github\workflows\docker-router.yml = ..\..\.github\workflows\docker-router.yml
 		..\..\.github\workflows\docker-storageservice.yml = ..\..\.github\workflows\docker-storageservice.yml
 		..\..\.github\workflows\docker-triggerservice.yml = ..\..\.github\workflows\docker-triggerservice.yml
+		..\..\.github\workflows\dotnet-format.yml = ..\..\.github\workflows\dotnet-format.yml
 		..\..\.github\workflows\unittest-network.yml = ..\..\.github\workflows\unittest-network.yml
 	EndProjectSection
 EndProject

@@ -1,0 +1,67 @@
+﻿{
+  "Logging": {
+    "IncludeScopes": false,
+    "Debug": {
+      "LogLevel": {
+        "Default": "Warning",
+        "Microsoft": "Warning",
+        "System": "Warning"
+      }
+    },
+    "Console": {
+      "LogLevel": {
+        "Default": "Warning",
+        "Microsoft": "Warning",
+        "System": "Warning"
+      }
+    }
+  },
+
+  "Authentication": {
+    "PublicUrl": "login.dev.sensateiot.com/confirm",
+    "UpdateEmailUrl": "dev.sensateiot.com:4200/apps/dashboard/confirm-update-email",
+    "Scheme": "http",
+    "JwtRefreshExpireMinutes": 43200,
+    "JwtKey": "",
+    "JwtIssuer": "api.dev.sensateiot.com:5000/auth",
+    "JwtExpireMinutes": 43200,
+    "PrimaryAuthHost": false 
+  },
+
+  "InstanceName": "kerby-mqtt",
+
+  "Cache" : {
+    "Enabled": true,
+    "Interval": 1000,
+    "Type": "Distributed"
+  },
+
+  "Database" : {
+    "MongoDB" : {
+      "DatabaseName": "Sensate",
+      "ConnectionString": "mongodb://localhost:27017/Sensate",
+      "MaxConnections": 300
+    },
+    "PgSQL" : {
+      "ConnectionString": "User ID = Username;Password=SomePassword;Server=localhost;Port=5432;Database=Sensate"
+    },
+    "Redis" : {
+      "Host": "localhost",
+      "InstanceName": "Sensate"
+    }
+  },
+
+  "Mqtt": {
+    "PublicBroker": {
+      "Username": "",
+      "Password": "",
+      "Ssl": "false",
+      "Port": 1883,
+      "Host": "127.0.0.1",
+      "MeasurementTopic": "$share/sensate/sensate/measurements",
+      "BulkMeasurementTopic": "$share/sensate/sensate/measurements/bulk",
+      "MessageTopic":  "$share/sensate/sensate/messages",
+      "BulkMessageTopic":  "$share/sensate/sensate/messages/bulk"
+    }
+  }
+}
