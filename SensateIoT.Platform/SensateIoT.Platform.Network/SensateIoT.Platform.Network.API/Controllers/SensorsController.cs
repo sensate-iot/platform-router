@@ -428,6 +428,10 @@ namespace SensateIoT.Platform.Network.API.Controllers
 				sensor.Description = update.Description;
 			}
 
+			if(update.StorageEnabled.HasValue) {
+				sensor.StorageEnabled = update.StorageEnabled.Value;
+			}
+
 			await this.m_mqtt.PublishCommandAsync(CommandType.FlushSensor, sensor.InternalId.ToString()).ConfigureAwait(false);
 
 			var cache = this.m_cache.RemoveAsync(this.GenerateCacheKey(null, 0, 10, true));

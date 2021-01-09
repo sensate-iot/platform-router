@@ -12,5 +12,6 @@ namespace SensateIoT.Platform.Network.API.DTO
 		public string Name { get; set; }
 		public string Description { get; set; }
 		public string Secret { get; set; }
+		public bool? StorageEnabled { get; set; }
 	}
 }

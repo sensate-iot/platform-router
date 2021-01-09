@@ -180,6 +180,8 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 				update = update.Set(x => x.Description, sensor.Description);
 			}
 
+			update = update.Set(x => x.StorageEnabled, sensor.StorageEnabled);
+
 			await this.m_sensors.FindOneAndUpdateAsync(x => x.InternalId == sensor.InternalId, update).ConfigureAwait(false);
 		}
 

@@ -42,7 +42,7 @@ namespace SensateIoT.Platform.Network.API.Middleware
 		{
 			try {
 				await this._next(ctx).ConfigureAwait(false);
-			} catch(JsonSerializationException ex) {
+			} catch(JsonException ex) {
 				await this.RespondErrorAsync(ctx, ex.Message, 400);
 			} catch(FormatException ex) {
 				await this.RespondErrorAsync(ctx, ex.Message, 400);
