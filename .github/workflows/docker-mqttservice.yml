@@ -10,14 +10,14 @@ on:
       tags:
         - v*
 env:
-  IMAGE_NAME: storage-service
-  IMAGE_ID: sensateiot/trigger-service
+  IMAGE_NAME: mqtt-service
+  IMAGE_ID: sensateiot/mqtt-service
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-  BASE_PATH: SensateIoT.Platform/SensateIoT.Platform.Network/SensateIoT.Platform.Network.TriggerService
+  BASE_PATH: SensateIoT.Platform/SensateIoT.Platform.Network/SensateIoT.Platform.Network.MqttService
 
 jobs:
-  push-triggerservice:
+  push-mqttservice:
     runs-on: ubuntu-latest
 
     steps:
@@ -32,7 +32,7 @@ jobs:
 
       - name: Get assembly version
         run: |
-          PROJ=$BASE_PATH/SensateIoT.Platform.Network.TriggerService.csproj
+          PROJ=$BASE_PATH/SensateIoT.Platform.Network.MqttService.csproj
           VERSION=$(pwsh -command "Scripts/Deployment/Get-AssemblyVersion.ps1 $PROJ")
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
