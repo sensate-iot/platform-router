@@ -49,6 +49,7 @@ namespace SensateIoT.Platform.Ingress.MqttService.Application
 
 			services.AddMongoDb(connString, dbName, connectionCount);
 			services.AddLogging(builder => { builder.AddConfiguration(this.Configuration.GetSection("Logging")); });
+			services.Configure<GatewaySettings>(this.Configuration.GetSection("Gateway"));
 
 			services.AddMqttService(options => {
 				options.Ssl = mqtt.Ssl;

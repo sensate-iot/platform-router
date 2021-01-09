@@ -18,11 +18,14 @@ namespace SensateIoT.Platform.Ingress.DataAccess.Repositories
 			this.m_sensors = ctx.Sensors;
 		}
 
-		public async Task<Sensor> GetSensorAsync(ObjectId id)
+		public async Task<SensorSecret> GetSensorAsync(ObjectId id)
 		{
 			return await this.m_sensors
 				.Find(s => s.Id == id)
-				.Project(s => s)
+				.Project(s => new SensorSecret {
+					Id = s.Id,
+					Secret = s.Secret
+				})
 				.FirstOrDefaultAsync();
 		}
 	}

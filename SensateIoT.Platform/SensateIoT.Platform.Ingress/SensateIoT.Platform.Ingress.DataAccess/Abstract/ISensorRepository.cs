@@ -6,6 +6,6 @@ namespace SensateIoT.Platform.Ingress.DataAccess.Abstract
 {
 	public interface ISensorRepository
 	{
-		Task<Sensor> GetSensorAsync(ObjectId id);
+		Task<SensorSecret> GetSensorAsync(ObjectId id);
 	}
 }
