@@ -54,7 +54,7 @@ jobs:
   dotnet-format-ingress:
     runs-on: windows-latest
     env:
-      working-directory: ./SensateIoT.Platform/SensateIoT.Platform.Ingresss
+      working-directory: ./SensateIoT.Platform/SensateIoT.Platform.Ingress
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2

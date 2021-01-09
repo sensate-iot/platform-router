@@ -73,6 +73,7 @@ namespace SensateIoT.Platform.Network.Tests.Caching.Memory
 			Thread.Sleep(150);
 			cache.Remove(1);
 			Thread.Sleep(10);
+			cache.RemoveScheduledEntries();
 
 			Assert.AreEqual(0, cache.Count);
 		}
@@ -87,6 +88,7 @@ namespace SensateIoT.Platform.Network.Tests.Caching.Memory
 			cache.Remove(1);
 
 			Thread.Sleep(10);
+			cache.RemoveScheduledEntries();
 			Assert.AreEqual(0, cache.Count);
 
 			cache.Add(1, 1);
