@@ -32,8 +32,8 @@ namespace SensateIoT.Platform.Ingress.MqttService.Mqtt
 
 		public MqttMessageHandler(IHttpClientFactory factory,
 								  IServiceProvider provider,
-		                          IOptions<GatewaySettings> settings,
-		                          ILogger<MqttMessageHandler> logger)
+								  IOptions<GatewaySettings> settings,
+								  ILogger<MqttMessageHandler> logger)
 		{
 			this.m_logger = logger;
 			this.m_factory = factory;
@@ -44,6 +44,7 @@ namespace SensateIoT.Platform.Ingress.MqttService.Mqtt
 		public async Task OnMessageAsync(string topic, string message, CancellationToken ct = default)
 		{
 			try {
+				this.m_logger.LogInformation("Received message via MQTT.");
 				using var scope = this.m_provider.CreateScope();
 
 				var repo = scope.ServiceProvider.GetRequiredService<ISensorRepository>();
@@ -52,6 +53,7 @@ namespace SensateIoT.Platform.Ingress.MqttService.Mqtt
 
 				if(rawId == null) {
 					this.m_logger.LogWarning("Message has no sensor ID.");
+					return;
 				}
 
 				var sensorId = ObjectId.Parse(rawId!.ToString());
