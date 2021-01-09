@@ -28,6 +28,7 @@ jobs:
       - name: Run dotnet format
         run: |
           dotnet format --check
+
   dotnet-format-network:
     runs-on: windows-latest
     env:
