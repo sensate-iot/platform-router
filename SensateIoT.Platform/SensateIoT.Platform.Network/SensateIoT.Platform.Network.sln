@@ -1,0 +1,181 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30128.74
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.Contracts", "SensateIoT.Platform.Network.Contracts\SensateIoT.Platform.Network.Contracts.csproj", "{6BD51202-2FD5-4E6E-9BAA-6239E2C2E9D7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SensateIoT.Platform.Network.Database", "SensateIoT.Platform.Network.Database", "{BDB01793-EB03-47FA-B4BE-DB29A55DCB78}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E0A0D3A9-F17C-4D4B-9C03-698C53ABCDB3}"
+	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
+		.editorconfig = .editorconfig
+		..\..\CHANGELOG.md = ..\..\CHANGELOG.md
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.Data", "SensateIoT.Platform.Network.Data\SensateIoT.Platform.Network.Data.csproj", "{C6258E1B-4A0F-4D00-B8CA-4A262F42ADB4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.DataAccess", "SensateIoT.Platform.Network.DataAccess\SensateIoT.Platform.Network.DataAccess.csproj", "{C6A37203-9699-47AC-9EB6-F15B1EBBF01D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.Common", "SensateIoT.Platform.Network.Common\SensateIoT.Platform.Network.Common.csproj", "{C6DF3F42-4160-49AD-B095-633573B3A655}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.Tests", "SensateIoT.Platform.Network.Tests\SensateIoT.Platform.Network.Tests.csproj", "{759F0161-8102-442B-9535-4620E2B75415}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.LoadTest", "SensateIoT.Platform.Network.LoadTest\SensateIoT.Platform.Network.LoadTest.csproj", "{7C240126-E527-487A-923F-77EDAD011675}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.Router", "SensateIoT.Platform.Network.Router\SensateIoT.Platform.Network.Router.csproj", "{18250CDA-1A64-4C23-982C-1CD0C155A46A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.TriggerService", "SensateIoT.Platform.Network.TriggerService\SensateIoT.Platform.Network.TriggerService.csproj", "{E8CAC519-C3FB-4E9B-A295-1CC78676870C}"
+EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "SensateIoT.Platform.Network.LiveDataService", "SensateIoT.Platform.Network.LiveDataService\SensateIoT.Platform.Network.LiveDataService.njsproj", "{74A74F73-F76A-40F1-9D73-6B8D4A143F91}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.StorageService", "SensateIoT.Platform.Network.StorageService\SensateIoT.Platform.Network.StorageService.csproj", "{57183CAA-4452-4A65-B211-85CE92DAAE04}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.API", "SensateIoT.Platform.Network.API\SensateIoT.Platform.Network.API.csproj", "{77B8B1C7-4C1B-44EC-BB89-2793BA33D48A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.Adapters", "SensateIoT.Platform.Network.Adapters\SensateIoT.Platform.Network.Adapters.csproj", "{1529501C-D9BE-4E9C-8F17-B7AD4907E7FF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Migrations", "Migrations", "{2D648956-50F4-46FB-ABDC-93EC6DA2B69F}"
+	ProjectSection(SolutionItems) = preProject
+		Migrations\Networking.1.0.0.sql = Migrations\Networking.1.0.0.sql
+		Migrations\SensateIoT.1.1.0.sql = Migrations\SensateIoT.1.1.0.sql
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Automated Builds", "Automated Builds", "{0CD2E884-3DA9-485F-A729-93AC8627306F}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\.github\workflows\docker-livedataservice.yml = ..\..\.github\workflows\docker-livedataservice.yml
+		..\..\.github\workflows\docker-networkapi.yml = ..\..\.github\workflows\docker-networkapi.yml
+		..\..\.github\workflows\docker-router.yml = ..\..\.github\workflows\docker-router.yml
+		..\..\.github\workflows\docker-storageservice.yml = ..\..\.github\workflows\docker-storageservice.yml
+		..\..\.github\workflows\docker-triggerservice.yml = ..\..\.github\workflows\docker-triggerservice.yml
+		..\..\.github\workflows\unittest-network.yml = ..\..\.github\workflows\unittest-network.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "public", "public", "{CEC49365-B8D2-417F-B140-30780F0820A8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Security", "Security", "{1B2A938F-74F4-4A39-BD27-4028DFD67952}"
+	ProjectSection(SolutionItems) = preProject
+		SensateIoT.Platform.Network.Database\Security\db_dataapi.sql = SensateIoT.Platform.Network.Database\Security\db_dataapi.sql
+		SensateIoT.Platform.Network.Database\Security\db_networkapi.sql = SensateIoT.Platform.Network.Database\Security\db_networkapi.sql
+		SensateIoT.Platform.Network.Database\Security\db_router.sql = SensateIoT.Platform.Network.Database\Security\db_router.sql
+		SensateIoT.Platform.Network.Database\Security\db_triggerservice.sql = SensateIoT.Platform.Network.Database\Security\db_triggerservice.sql
+		SensateIoT.Platform.Network.Database\Security\sql_dataapi.sql = SensateIoT.Platform.Network.Database\Security\sql_dataapi.sql
+		SensateIoT.Platform.Network.Database\Security\sql_networkapi.sql = SensateIoT.Platform.Network.Database\Security\sql_networkapi.sql
+		SensateIoT.Platform.Network.Database\Security\sql_router.sql = SensateIoT.Platform.Network.Database\Security\sql_router.sql
+		SensateIoT.Platform.Network.Database\Security\sql_triggerservice.sql = SensateIoT.Platform.Network.Database\Security\sql_triggerservice.sql
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions", "Functions", "{26F5E93B-2D0D-4B46-A23F-C05FAE2DD481}"
+	ProjectSection(SolutionItems) = preProject
+		SensateIoT.Platform.Network.Database\public\Functions\DataApi_SelectInvocationCount.sql = SensateIoT.Platform.Network.Database\public\Functions\DataApi_SelectInvocationCount.sql
+		SensateIoT.Platform.Network.Database\public\Functions\DataApi_SelectSensorLinkBySensorID.sql = SensateIoT.Platform.Network.Database\public\Functions\DataApi_SelectSensorLinkBySensorID.sql
+		SensateIoT.Platform.Network.Database\public\Functions\DataApi_SelectSensorLinkByUserID.sql = SensateIoT.Platform.Network.Database\public\Functions\DataApi_SelectSensorLinkByUserID.sql
+		SensateIoT.Platform.Network.Database\public\Functions\DataApi_SelectSensorLinkCountByUserID.sql = SensateIoT.Platform.Network.Database\public\Functions\DataApi_SelectSensorLinkCountByUserID.sql
+		SensateIoT.Platform.Network.Database\public\Functions\Generic_GetBlobs.sql = SensateIoT.Platform.Network.Database\public\Functions\Generic_GetBlobs.sql
+		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_CreateAction.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_CreateAction.sql
+		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_CreateBlob.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_CreateBlob.sql
+		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_CreateInvocation.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_CreateInvocation.sql
+		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_CreateSensorLink.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_CreateSensorLink.sql
+		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_CreateTrigger.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_CreateTrigger.sql
+		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteBlobByID.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteBlobByID.sql
+		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteBlobBySensorID.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteBlobBySensorID.sql
+		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteBlobsByName.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteBlobsByName.sql
+		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteSensorLink.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteSensorLink.sql
+		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteSensorLinkBySensorID.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteSensorLinkBySensorID.sql
+		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteTriggerAction.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteTriggerAction.sql
+		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteTriggerByID.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteTriggerByID.sql
+		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteTriggersBySensorID.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteTriggersBySensorID.sql
+		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_SelectBlobByID.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_SelectBlobByID.sql
+		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_SelectBlobByName.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_SelectBlobByName.sql
+		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_SelectBlobs.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_SelectBlobs.sql
+		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_SelectBlobsBySensorID.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_SelectBlobsBySensorID.sql
+		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_SelectSensorLinkBySensorID.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_SelectSensorLinkBySensorID.sql
+		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_SelectSensorLinkByUserID.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_SelectSensorLinkByUserID.sql
+		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_SelectTriggerByID.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_SelectTriggerByID.sql
+		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_SelectTriggersBySensorID.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_SelectTriggersBySensorID.sql
+		SensateIoT.Platform.Network.Database\public\Functions\Router_GetLiveDataHandlers.sql = SensateIoT.Platform.Network.Database\public\Functions\Router_GetLiveDataHandlers.sql
+		SensateIoT.Platform.Network.Database\public\Functions\Router_GetTriggers.sql = SensateIoT.Platform.Network.Database\public\Functions\Router_GetTriggers.sql
+		SensateIoT.Platform.Network.Database\public\Functions\Router_GetTriggersById.sql = SensateIoT.Platform.Network.Database\public\Functions\Router_GetTriggersById.sql
+		SensateIoT.Platform.Network.Database\public\Functions\TriggerService_GetTriggersBySensorID.sql = SensateIoT.Platform.Network.Database\public\Functions\TriggerService_GetTriggersBySensorID.sql
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tables", "Tables", "{FEDF97F4-27ED-48FC-B57D-F27F112B3CDA}"
+	ProjectSection(SolutionItems) = preProject
+		SensateIoT.Platform.Network.Database\public\Tables\Blobs.sql = SensateIoT.Platform.Network.Database\public\Tables\Blobs.sql
+		SensateIoT.Platform.Network.Database\public\Tables\LiveDataHandlers.sql = SensateIoT.Platform.Network.Database\public\Tables\LiveDataHandlers.sql
+		SensateIoT.Platform.Network.Database\public\Tables\SensorLinks.sql = SensateIoT.Platform.Network.Database\public\Tables\SensorLinks.sql
+		SensateIoT.Platform.Network.Database\public\Tables\TriggerActions.sql = SensateIoT.Platform.Network.Database\public\Tables\TriggerActions.sql
+		SensateIoT.Platform.Network.Database\public\Tables\TriggerInvocations.sql = SensateIoT.Platform.Network.Database\public\Tables\TriggerInvocations.sql
+		SensateIoT.Platform.Network.Database\public\Tables\Triggers.sql = SensateIoT.Platform.Network.Database\public\Tables\Triggers.sql
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6BD51202-2FD5-4E6E-9BAA-6239E2C2E9D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BD51202-2FD5-4E6E-9BAA-6239E2C2E9D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BD51202-2FD5-4E6E-9BAA-6239E2C2E9D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BD51202-2FD5-4E6E-9BAA-6239E2C2E9D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6258E1B-4A0F-4D00-B8CA-4A262F42ADB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6258E1B-4A0F-4D00-B8CA-4A262F42ADB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6258E1B-4A0F-4D00-B8CA-4A262F42ADB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6258E1B-4A0F-4D00-B8CA-4A262F42ADB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6A37203-9699-47AC-9EB6-F15B1EBBF01D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6A37203-9699-47AC-9EB6-F15B1EBBF01D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6A37203-9699-47AC-9EB6-F15B1EBBF01D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6A37203-9699-47AC-9EB6-F15B1EBBF01D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6DF3F42-4160-49AD-B095-633573B3A655}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6DF3F42-4160-49AD-B095-633573B3A655}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6DF3F42-4160-49AD-B095-633573B3A655}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6DF3F42-4160-49AD-B095-633573B3A655}.Release|Any CPU.Build.0 = Release|Any CPU
+		{759F0161-8102-442B-9535-4620E2B75415}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{759F0161-8102-442B-9535-4620E2B75415}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{759F0161-8102-442B-9535-4620E2B75415}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{759F0161-8102-442B-9535-4620E2B75415}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C240126-E527-487A-923F-77EDAD011675}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C240126-E527-487A-923F-77EDAD011675}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C240126-E527-487A-923F-77EDAD011675}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C240126-E527-487A-923F-77EDAD011675}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18250CDA-1A64-4C23-982C-1CD0C155A46A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18250CDA-1A64-4C23-982C-1CD0C155A46A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18250CDA-1A64-4C23-982C-1CD0C155A46A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18250CDA-1A64-4C23-982C-1CD0C155A46A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8CAC519-C3FB-4E9B-A295-1CC78676870C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8CAC519-C3FB-4E9B-A295-1CC78676870C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8CAC519-C3FB-4E9B-A295-1CC78676870C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8CAC519-C3FB-4E9B-A295-1CC78676870C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74A74F73-F76A-40F1-9D73-6B8D4A143F91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74A74F73-F76A-40F1-9D73-6B8D4A143F91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74A74F73-F76A-40F1-9D73-6B8D4A143F91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74A74F73-F76A-40F1-9D73-6B8D4A143F91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57183CAA-4452-4A65-B211-85CE92DAAE04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57183CAA-4452-4A65-B211-85CE92DAAE04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57183CAA-4452-4A65-B211-85CE92DAAE04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57183CAA-4452-4A65-B211-85CE92DAAE04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77B8B1C7-4C1B-44EC-BB89-2793BA33D48A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77B8B1C7-4C1B-44EC-BB89-2793BA33D48A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77B8B1C7-4C1B-44EC-BB89-2793BA33D48A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77B8B1C7-4C1B-44EC-BB89-2793BA33D48A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1529501C-D9BE-4E9C-8F17-B7AD4907E7FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1529501C-D9BE-4E9C-8F17-B7AD4907E7FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1529501C-D9BE-4E9C-8F17-B7AD4907E7FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1529501C-D9BE-4E9C-8F17-B7AD4907E7FF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CEC49365-B8D2-417F-B140-30780F0820A8} = {BDB01793-EB03-47FA-B4BE-DB29A55DCB78}
+		{1B2A938F-74F4-4A39-BD27-4028DFD67952} = {BDB01793-EB03-47FA-B4BE-DB29A55DCB78}
+		{26F5E93B-2D0D-4B46-A23F-C05FAE2DD481} = {CEC49365-B8D2-417F-B140-30780F0820A8}
+		{FEDF97F4-27ED-48FC-B57D-F27F112B3CDA} = {CEC49365-B8D2-417F-B140-30780F0820A8}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7436C576-E465-4291-A0C2-5D4C9C6F706F}
+	EndGlobalSection
+EndGlobal

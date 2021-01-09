@@ -11,6 +11,7 @@ namespace SensateService.Common.Config.Config
 	{
 		public MongoDBConfig MongoDB { get; set; }
 		public PgSQLConfig PgSQL { get; set; }
+		public PgSQLConfig Network { get; set; }
 		public RedisConfig Redis { get; set; }
 	}
 

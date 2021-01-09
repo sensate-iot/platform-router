@@ -653,8 +653,8 @@ namespace SensateService.Api.AuthApi.Controllers
 					return this.BadRequest();
 				}
 
-				await this.m_publisher.PublishCommand(AuthServiceCommand.FlushUser, user.Id).AwaitBackground();
-				await this.m_publisher.PublishCommand(AuthServiceCommand.AddUser, user.Id).AwaitBackground();
+				await this.m_publisher.PublishCommand(CommandType.FlushUser, user.Id).AwaitBackground();
+				await this.m_publisher.PublishCommand(CommandType.AddUser, user.Id).AwaitBackground();
 
 				var dbgroles = await this._users.GetRolesAsync(user);
 				this._logger.LogInformation($"New roles for {role.UserId}:");
@@ -676,7 +676,7 @@ namespace SensateService.Api.AuthApi.Controllers
 			try {
 				var user = await this.GetCurrentUserAsync().AwaitBackground();
 				await this.m_userService.DeleteAsync(user, CancellationToken.None).AwaitBackground();
-				await this.m_publisher.PublishCommand(AuthServiceCommand.FlushUser, user.Id).AwaitBackground();
+				await this.m_publisher.PublishCommand(CommandType.FlushUser, user.Id).AwaitBackground();
 			} catch(Exception ex) {
 				this._logger.LogInformation($"Unable to delete user: {ex.Message}");
 				this._logger.LogDebug(ex.StackTrace);
@@ -703,8 +703,8 @@ namespace SensateService.Api.AuthApi.Controllers
 				this._users.StartUpdate(user);
 				user.BillingLockout = userUpdate.BillingLockout;
 				await this._users.EndUpdateAsync().AwaitBackground();
-				await this.m_publisher.PublishCommand(AuthServiceCommand.FlushUser, user.Id).AwaitBackground();
-				await this.m_publisher.PublishCommand(AuthServiceCommand.AddUser, user.Id).AwaitBackground();
+				await this.m_publisher.PublishCommand(CommandType.FlushUser, user.Id).AwaitBackground();
+				await this.m_publisher.PublishCommand(CommandType.AddUser, user.Id).AwaitBackground();
 			} catch(Exception ex) {
 				this._logger.LogInformation($"Unable to set billing locket: {ex.Message}");
 				this._logger.LogDebug(ex.StackTrace);

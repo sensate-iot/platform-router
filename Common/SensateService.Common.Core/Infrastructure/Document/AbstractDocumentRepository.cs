@@ -32,9 +32,9 @@ namespace SensateService.Infrastructure.Document
 			return ObjectId.GenerateNewId(timestamp);
 		}
 
-		public virtual async Task CreateAsync(T obj, CancellationToken ct = default(CancellationToken))
+		public virtual async Task CreateAsync(T obj, CancellationToken ct = default)
 		{
-			await this._collection.InsertOneAsync(obj, default(InsertOneOptions), ct).AwaitBackground();
+			await this._collection.InsertOneAsync(obj, default, ct).AwaitBackground();
 		}
 	}
 }

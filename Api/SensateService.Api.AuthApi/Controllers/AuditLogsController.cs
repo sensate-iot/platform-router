@@ -66,10 +66,19 @@ namespace SensateService.Api.AuthApi.Controllers
 		public async Task<IActionResult> Index([FromQuery] int skip = 0,
 											   [FromQuery] int limit = 0,
 											   [FromQuery] RequestMethod method = RequestMethod.Any,
-											   [FromQuery] string email = null)
+											   [FromQuery] string email = null,
+											   [FromQuery] string order = "")
 		{
 			PaginationResult<AuditLog> logs;
 			var rv = new PaginationResult<Json.AuditLog>();
+
+
+			var orderDirection = order switch
+			{
+				"asc" => OrderDirection.Ascending,
+				"desc" => OrderDirection.Descending,
+				_ => OrderDirection.None,
+			};
 
 			try {
 				SensateUser user;
@@ -82,9 +91,9 @@ namespace SensateService.Api.AuthApi.Controllers
 					}
 
 					if(method != RequestMethod.Any) {
-						logs = await this.m_logs.GetByRequestTypeAsync(user, method, skip, limit).AwaitBackground();
+						logs = await this.m_logs.GetByRequestTypeAsync(user, method, skip, limit, orderDirection).AwaitBackground();
 					} else {
-						logs = await this.m_logs.GetByUserAsync(user, skip, limit).AwaitBackground();
+						logs = await this.m_logs.GetByUserAsync(user, skip, limit, orderDirection).AwaitBackground();
 					}
 
 					rv.Values = logs.Values.Select(log => new Json.AuditLog {
@@ -97,7 +106,7 @@ namespace SensateService.Api.AuthApi.Controllers
 					});
 					rv.Count = logs.Count;
 				} else {
-					logs = await this.m_logs.GetAllAsync(method, skip, limit).AwaitBackground();
+					logs = await this.m_logs.GetAllAsync(method, skip, limit, orderDirection).AwaitBackground();
 
 					var ids = logs.Values.DistinctBy(x => x.AuthorId).Select(x => x.AuthorId);
 					var @enum = await this._users.GetRangeAsync(ids).AwaitBackground();
@@ -129,20 +138,28 @@ namespace SensateService.Api.AuthApi.Controllers
 											  [FromQuery] int skip = 0,
 											  [FromQuery] int limit = 0,
 											  [FromQuery] RequestMethod method = RequestMethod.Any,
-											  [FromQuery] string email = null)
+											  [FromQuery] string email = null,
+											  [FromQuery] string order = "")
 		{
 			IList<SensateUser> users;
 			var result = new PaginationResult<Json.AuditLog>();
 			PaginationResult<AuditLog> logs;
+
+			var orderDirection = order switch
+			{
+				"asc" => OrderDirection.Ascending,
+				"desc" => OrderDirection.Descending,
+				_ => OrderDirection.None,
+			};
 
 			try {
 				if(email != null) {
 					users = (await this._users.FindByEmailAsync(email).AwaitBackground()).ToList();
 					var ids = users.Select(x => x.Id);
 
-					logs = await this.m_logs.FindAsync(ids, query, method, skip, limit).AwaitBackground();
+					logs = await this.m_logs.FindAsync(ids, query, method, skip, limit, orderDirection).AwaitBackground();
 				} else {
-					logs = await this.m_logs.FindAsync(query, method, skip, limit).AwaitBackground();
+					logs = await this.m_logs.FindAsync(query, method, skip, limit, orderDirection).AwaitBackground();
 
 					var ids = logs.Values.DistinctBy(x => x.AuthorId).Select(x => x.AuthorId);
 					var @enum = await this._users.GetRangeAsync(ids).AwaitBackground();

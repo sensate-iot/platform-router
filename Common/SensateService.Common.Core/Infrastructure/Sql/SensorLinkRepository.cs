@@ -5,82 +5,69 @@
  * @email  michel@michelmegens.net
  */
 
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.EntityFrameworkCore;
 
+using NpgsqlTypes;
+
 using SensateService.Common.Data.Models;
 using SensateService.Common.IdentityData.Models;
-using SensateService.Helpers;
+using SensateService.Infrastructure.Extensions;
 using SensateService.Infrastructure.Repositories;
 
 namespace SensateService.Infrastructure.Sql
 {
-	public class SensorLinkRepository : AbstractSqlRepository<SensorLink>, ISensorLinkRepository
+	public class SensorLinkRepository : ISensorLinkRepository
 	{
-		public SensorLinkRepository(SensateSqlContext context) : base(context)
+		private const string DataApi_GetByUserID = "dataapi_selectsensorlinkbyuserid";
+		private const string DataApi_Count = "dataapi_selectsensorlinkcountbyuserid";
+
+		private readonly NetworkContext m_ctx;
+
+		public SensorLinkRepository(NetworkContext context)
 		{
-		}
-
-		public async Task DeleteAsync(SensorLink link, CancellationToken token = default)
-		{
-			this.Data.Remove(link);
-			await this.CommitAsync(token).AwaitBackground();
-		}
-
-		public async Task DeleteForAsync(Sensor sensor, CancellationToken token = default)
-		{
-			var id = sensor.InternalId.ToString();
-			var links = this.Data.Where(x => x.SensorId == id);
-
-			this.Data.RemoveRange(links);
-			await this.CommitAsync(token).AwaitBackground();
-		}
-
-		public async Task<IEnumerable<SensorLink>> GetAsync(string sensorId, CancellationToken ct = default)
-		{
-			var links = this.Data.Where(link => link.SensorId == sensorId);
-			var rv = await links.ToListAsync(ct).AwaitBackground();
-
-			return rv;
+			this.m_ctx = context;
 		}
 
 		public async Task<IEnumerable<SensorLink>> GetByUserAsync(SensateUser user, CancellationToken token = default)
 		{
-			if(user == null) {
-				return null;
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
+
+			builder.WithFunction(DataApi_GetByUserID);
+			builder.WithParameter("userid", Guid.Parse(user.Id), NpgsqlDbType.Uuid);
+			await using var reader = await builder.ExecuteAsync(token).ConfigureAwait(false);
+
+			var list = new List<SensorLink>();
+
+			while(await reader.ReadAsync(token).ConfigureAwait(false)) {
+				var link = new SensorLink {
+					SensorId = reader.GetString(0),
+					UserId = reader.GetGuid(1).ToString()
+				};
+
+				list.Add(link);
 			}
 
-			var results = this.Data.Where(x => x.UserId == user.Id);
-			return await results.ToListAsync(token).AwaitBackground();
+			return list;
 		}
 
-		public async Task<int> CountAsync(SensateUser user, CancellationToken ct = default)
+		public async Task<long> CountAsync(SensateUser user, CancellationToken token = default)
 		{
-			var query = this.Data.Where(x => x.UserId == user.Id);
-			var count = await query.CountAsync(ct).AwaitBackground();
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
 
-			return count;
-		}
+			builder.WithFunction(DataApi_Count);
+			builder.WithParameter("userid", Guid.Parse(user.Id), NpgsqlDbType.Uuid);
+			await using var reader = await builder.ExecuteAsync(token).ConfigureAwait(false);
 
-		public async Task DeleteBySensorAsync(Sensor sensor, CancellationToken ct = default)
-		{
-			var id = sensor.InternalId.ToString();
-			var query = this.Data.Where(x => x.SensorId == id);
+			if(!await reader.ReadAsync(token).ConfigureAwait(false)) {
+				return 0;
+			}
 
-			this.Data.RemoveRange(query);
-			await this.CommitAsync(ct).AwaitBackground();
-		}
-
-		public async Task DeleteByUserAsync(SensateUser user, CancellationToken ct = default)
-		{
-			var query = this.Data.Where(x => x.UserId == user.Id);
-
-			this.Data.RemoveRange(query);
-			await this.CommitAsync(ct).AwaitBackground();
+			return reader.GetInt64(0);
 		}
 	}
 }

@@ -17,7 +17,7 @@ namespace SensateService.SqlSetup.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
-                .HasAnnotation("ProductVersion", "3.1.3")
+                .HasAnnotation("ProductVersion", "3.1.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey", b =>
@@ -127,7 +127,7 @@ namespace SensateService.SqlSetup.Migrations
                     b.ToTable("UserTokens");
                 });
 
-            modelBuilder.Entity("SensateService.Models.AuditLog", b =>
+            modelBuilder.Entity("SensateService.Common.Data.Models.AuditLog", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -160,36 +160,7 @@ namespace SensateService.SqlSetup.Migrations
                     b.ToTable("AuditLogs");
                 });
 
-            modelBuilder.Entity("SensateService.Models.AuthUserToken", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("LoginProvider")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("Valid")
-                        .HasColumnType("boolean");
-
-                    b.HasKey("UserId", "Value");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("Value");
-
-                    b.ToTable("AuthTokens");
-                });
-
-            modelBuilder.Entity("SensateService.Models.Blob", b =>
+            modelBuilder.Entity("SensateService.Common.Data.Models.Blob", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -228,7 +199,7 @@ namespace SensateService.SqlSetup.Migrations
                     b.ToTable("Blobs");
                 });
 
-            modelBuilder.Entity("SensateService.Models.ChangeEmailToken", b =>
+            modelBuilder.Entity("SensateService.Common.Data.Models.ChangeEmailToken", b =>
                 {
                     b.Property<string>("IdentityToken")
                         .HasColumnType("text");
@@ -244,7 +215,7 @@ namespace SensateService.SqlSetup.Migrations
                     b.ToTable("EmailTokens");
                 });
 
-            modelBuilder.Entity("SensateService.Models.ChangePhoneNumberToken", b =>
+            modelBuilder.Entity("SensateService.Common.Data.Models.ChangePhoneNumberToken", b =>
                 {
                     b.Property<string>("IdentityToken")
                         .HasColumnType("text");
@@ -274,7 +245,7 @@ namespace SensateService.SqlSetup.Migrations
                     b.ToTable("PhoneNumberTokens");
                 });
 
-            modelBuilder.Entity("SensateService.Models.PasswordResetToken", b =>
+            modelBuilder.Entity("SensateService.Common.Data.Models.PasswordResetToken", b =>
                 {
                     b.Property<string>("UserToken")
                         .HasColumnType("text");
@@ -287,7 +258,129 @@ namespace SensateService.SqlSetup.Migrations
                     b.ToTable("PasswordResetTokens");
                 });
 
-            modelBuilder.Entity("SensateService.Models.SensateApiKey", b =>
+            modelBuilder.Entity("SensateService.Common.Data.Models.SensorLink", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SensorId")
+                        .HasColumnType("text");
+
+                    b.HasKey("UserId", "SensorId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SensorLinks");
+                });
+
+            modelBuilder.Entity("SensateService.Common.Data.Models.Trigger", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("FormalLanguage")
+                        .HasColumnType("text");
+
+                    b.Property<string>("KeyValue")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal?>("LowerEdge")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("SensorId")
+                        .IsRequired()
+                        .HasColumnType("character varying(24)")
+                        .HasMaxLength(24);
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal?>("UpperEdge")
+                        .HasColumnType("numeric");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SensorId");
+
+                    b.HasIndex("Type");
+
+                    b.ToTable("Triggers");
+                });
+
+            modelBuilder.Entity("SensateService.Common.Data.Models.TriggerAction", b =>
+                {
+                    b.Property<long>("TriggerId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Channel")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("character varying(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("Target")
+                        .HasColumnType("text");
+
+                    b.HasKey("TriggerId", "Channel");
+
+                    b.ToTable("TriggerActions");
+                });
+
+            modelBuilder.Entity("SensateService.Common.Data.Models.TriggerInvocation", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<DateTimeOffset>("Timestamp")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("TriggerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TriggerId");
+
+                    b.ToTable("TriggerInvocations");
+                });
+
+            modelBuilder.Entity("SensateService.Common.IdentityData.Models.AuthUserToken", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("Valid")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("UserId", "Value");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("Value");
+
+                    b.ToTable("AuthTokens");
+                });
+
+            modelBuilder.Entity("SensateService.Common.IdentityData.Models.SensateApiKey", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -331,7 +424,7 @@ namespace SensateService.SqlSetup.Migrations
                     b.ToTable("ApiKeys");
                 });
 
-            modelBuilder.Entity("SensateService.Models.SensateRole", b =>
+            modelBuilder.Entity("SensateService.Common.IdentityData.Models.SensateRole", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -360,7 +453,7 @@ namespace SensateService.SqlSetup.Migrations
                     b.ToTable("Roles");
                 });
 
-            modelBuilder.Entity("SensateService.Models.SensateUser", b =>
+            modelBuilder.Entity("SensateService.Common.IdentityData.Models.SensateUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -443,7 +536,7 @@ namespace SensateService.SqlSetup.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("SensateService.Models.SensateUserRole", b =>
+            modelBuilder.Entity("SensateService.Common.IdentityData.Models.SensateUserRole", b =>
                 {
                     b.Property<string>("UserId")
                         .HasColumnType("text");
@@ -458,102 +551,9 @@ namespace SensateService.SqlSetup.Migrations
                     b.ToTable("UserRoles");
                 });
 
-            modelBuilder.Entity("SensateService.Models.SensorLink", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("SensorId")
-                        .HasColumnType("text");
-
-                    b.HasKey("UserId", "SensorId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("SensorLinks");
-                });
-
-            modelBuilder.Entity("SensateService.Models.Trigger", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<string>("FormalLanguage")
-                        .HasColumnType("text");
-
-                    b.Property<string>("KeyValue")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<decimal?>("LowerEdge")
-                        .HasColumnType("numeric");
-
-                    b.Property<string>("SensorId")
-                        .IsRequired()
-                        .HasColumnType("character varying(24)")
-                        .HasMaxLength(24);
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
-
-                    b.Property<decimal?>("UpperEdge")
-                        .HasColumnType("numeric");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SensorId");
-
-                    b.HasIndex("Type");
-
-                    b.ToTable("Triggers");
-                });
-
-            modelBuilder.Entity("SensateService.Models.TriggerAction", b =>
-                {
-                    b.Property<long>("TriggerId")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("Channel")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("character varying(255)")
-                        .HasMaxLength(255);
-
-                    b.Property<string>("Target")
-                        .HasColumnType("text");
-
-                    b.HasKey("TriggerId", "Channel");
-
-                    b.ToTable("TriggerActions");
-                });
-
-            modelBuilder.Entity("SensateService.Models.TriggerInvocation", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<DateTimeOffset>("Timestamp")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<long>("TriggerId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TriggerId");
-
-                    b.ToTable("TriggerInvocations");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
-                    b.HasOne("SensateService.Models.SensateRole", null)
+                    b.HasOne("SensateService.Common.IdentityData.Models.SensateRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -562,7 +562,7 @@ namespace SensateService.SqlSetup.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("SensateService.Models.SensateUser", null)
+                    b.HasOne("SensateService.Common.IdentityData.Models.SensateUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -571,7 +571,7 @@ namespace SensateService.SqlSetup.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("SensateService.Models.SensateUser", null)
+                    b.HasOne("SensateService.Common.IdentityData.Models.SensateUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -580,86 +580,86 @@ namespace SensateService.SqlSetup.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("SensateService.Models.SensateUser", null)
+                    b.HasOne("SensateService.Common.IdentityData.Models.SensateUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SensateService.Models.AuditLog", b =>
+            modelBuilder.Entity("SensateService.Common.Data.Models.AuditLog", b =>
                 {
-                    b.HasOne("SensateService.Models.SensateUser", null)
+                    b.HasOne("SensateService.Common.IdentityData.Models.SensateUser", null)
                         .WithMany()
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("SensateService.Models.AuthUserToken", b =>
+            modelBuilder.Entity("SensateService.Common.Data.Models.ChangePhoneNumberToken", b =>
                 {
-                    b.HasOne("SensateService.Models.SensateUser", "User")
+                    b.HasOne("SensateService.Common.IdentityData.Models.SensateUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SensateService.Models.ChangePhoneNumberToken", b =>
+            modelBuilder.Entity("SensateService.Common.Data.Models.SensorLink", b =>
                 {
-                    b.HasOne("SensateService.Models.SensateUser", null)
+                    b.HasOne("SensateService.Common.IdentityData.Models.SensateUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SensateService.Models.SensateApiKey", b =>
+            modelBuilder.Entity("SensateService.Common.Data.Models.TriggerAction", b =>
                 {
-                    b.HasOne("SensateService.Models.SensateUser", "User")
-                        .WithMany("ApiKeys")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("SensateService.Models.SensateUserRole", b =>
-                {
-                    b.HasOne("SensateService.Models.SensateRole", "Role")
-                        .WithMany("UserRoles")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SensateService.Models.SensateUser", "User")
-                        .WithMany("UserRoles")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("SensateService.Models.SensorLink", b =>
-                {
-                    b.HasOne("SensateService.Models.SensateUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("SensateService.Models.TriggerAction", b =>
-                {
-                    b.HasOne("SensateService.Models.Trigger", null)
+                    b.HasOne("SensateService.Common.Data.Models.Trigger", null)
                         .WithMany("Actions")
                         .HasForeignKey("TriggerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SensateService.Models.TriggerInvocation", b =>
+            modelBuilder.Entity("SensateService.Common.Data.Models.TriggerInvocation", b =>
                 {
-                    b.HasOne("SensateService.Models.Trigger", null)
+                    b.HasOne("SensateService.Common.Data.Models.Trigger", null)
                         .WithMany("Invocations")
                         .HasForeignKey("TriggerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SensateService.Common.IdentityData.Models.AuthUserToken", b =>
+                {
+                    b.HasOne("SensateService.Common.IdentityData.Models.SensateUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SensateService.Common.IdentityData.Models.SensateApiKey", b =>
+                {
+                    b.HasOne("SensateService.Common.IdentityData.Models.SensateUser", "User")
+                        .WithMany("ApiKeys")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SensateService.Common.IdentityData.Models.SensateUserRole", b =>
+                {
+                    b.HasOne("SensateService.Common.IdentityData.Models.SensateRole", "Role")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SensateService.Common.IdentityData.Models.SensateUser", "User")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

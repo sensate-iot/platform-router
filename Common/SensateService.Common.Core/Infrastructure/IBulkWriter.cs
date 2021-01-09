@@ -13,6 +13,6 @@ namespace SensateService.Infrastructure
 {
 	public interface IBulkWriter<in T>
 	{
-		Task CreateRangeAsync(IEnumerable<T> objs, CancellationToken token = default(CancellationToken));
+		Task CreateRangeAsync(IEnumerable<T> objs, CancellationToken token = default);
 	}
 }

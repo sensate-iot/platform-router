@@ -83,23 +83,12 @@ namespace SensateService.Services.Processing
 			return Task.CompletedTask;
 		}
 
-		public async Task PublishCommand(AuthServiceCommand cmd, string argument, bool retain)
+		public async Task PublishCommand(CommandType cmd, string argument, bool retain)
 		{
 			var obj = new JObject {
-				[Commands.CommandKey] = cmd switch
-				{
-					AuthServiceCommand.FlushKey => Commands.FlushKey,
-					AuthServiceCommand.FlushSensor => Commands.FlushSensor,
-					AuthServiceCommand.FlushUser => Commands.FlushUser,
-					AuthServiceCommand.AddUser => Commands.AddUser,
-					AuthServiceCommand.AddSensor => Commands.AddSensor,
-					AuthServiceCommand.AddKey => Commands.AddKey,
-					_ => throw new ArgumentOutOfRangeException(nameof(cmd))
-				},
+				[Commands.CommandKey] = cmd.ToString("G"),
 				[Commands.ArgumentKey] = argument
 			};
-
-
 
 			await this.PublishOnAsync(this._options.CommandsTopic, obj.ToString(Formatting.None), false).AwaitBackground();
 		}

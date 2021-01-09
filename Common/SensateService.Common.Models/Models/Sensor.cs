@@ -28,6 +28,8 @@ namespace SensateService.Common.Data.Models
 		public string Description { get; set; }
 		[BsonRequired]
 		public DateTime CreatedAt { get; set; }
+		[BsonDefaultValue(true)]
+		public bool StorageEnabled { get; set; }
 		[BsonRequired]
 		public DateTime UpdatedAt { get; set; }
 		[BsonRequired]

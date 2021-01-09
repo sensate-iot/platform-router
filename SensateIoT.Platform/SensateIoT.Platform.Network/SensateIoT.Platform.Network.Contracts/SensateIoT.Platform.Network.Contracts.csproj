@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.6</TargetFramework>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <Description>Message contracts for the Sensate IoT Network services.</Description>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="DTO\ControlMessage.proto" />
+    <None Remove="DTO\Measurement.proto" />
+    <None Remove="DTO\Message.proto" />
+    <None Remove="DTO\NetworkEvent.proto" />
+    <None Remove="RPC\RoutingResponse.proto" />
+    <None Remove="Services\EgressRouter.proto" />
+    <None Remove="Services\IngressRouter.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.14.0" />
+    <PackageReference Include="Google.Protobuf.Tools" Version="3.14.0" />
+    <PackageReference Include="Grpc" Version="2.34.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.34.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="DTO\ControlMessage.proto" />
+    <Protobuf Include="DTO\Measurement.proto" GrpcServices="Both" />
+    <Protobuf Include="DTO\Message.proto" />
+    <Protobuf Include="DTO\NetworkEvent.proto" />
+    <Protobuf Include="RPC\RoutingResponse.proto" />
+    <Protobuf Include="Services\EgressRouter.proto" />
+    <Protobuf Include="Services\IngressRouter.proto" />
+  </ItemGroup>
+
+</Project>

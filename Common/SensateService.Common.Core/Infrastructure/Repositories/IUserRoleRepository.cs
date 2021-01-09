@@ -16,7 +16,7 @@ namespace SensateService.Infrastructure.Repositories
 	public interface IUserRoleRepository
 	{
 		void Create(SensateRole role);
-		Task CreateAsync(SensateRole role, CancellationToken ct = default(CancellationToken));
+		Task CreateAsync(SensateRole role, CancellationToken ct = default);
 		void Create(string name, string description);
 		Task CreateAsync(string name, string description);
 

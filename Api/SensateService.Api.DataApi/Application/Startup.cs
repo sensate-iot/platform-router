@@ -49,7 +49,7 @@ namespace SensateService.Api.DataApi.Application
 			this._configuration.GetSection("Database").Bind(db);
 
 			services.AddCors();
-			services.AddPostgres(db.PgSQL.ConnectionString);
+			services.AddPostgres(db.PgSQL.ConnectionString, db.Network.ConnectionString);
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.AddIdentityFramwork(auth);
 			services.AddReverseProxy(sys);

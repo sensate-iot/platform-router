@@ -31,7 +31,7 @@ namespace SensateService.Infrastructure.Sql
 			this._rng = new Random(StaticRandom.Next());
 		}
 
-		public override Task CreateAsync(SensateApiKey key, CancellationToken token = default(CancellationToken))
+		public override Task CreateAsync(SensateApiKey key, CancellationToken token = default)
 		{
 			key.ApiKey = this._rng.NextStringWithSymbols(UserTokenLength);
 			key.CreatedOn = DateTime.UtcNow;
@@ -61,7 +61,7 @@ namespace SensateService.Infrastructure.Sql
 			await this.CommitAsync(token).AwaitBackground();
 		}
 
-		public async Task<SensateApiKey> GetAsync(string key, CancellationToken token = default(CancellationToken))
+		public async Task<SensateApiKey> GetAsync(string key, CancellationToken token = default)
 		{
 			var query = this.Data.Where(k => k.ApiKey == key);
 			var apikey = await query.FirstOrDefaultAsync(token);
@@ -74,7 +74,7 @@ namespace SensateService.Infrastructure.Sql
 			return apikey;
 		}
 
-		public async Task<SensateApiKey> GetByKeyAsync(string key, CancellationToken token = default(CancellationToken))
+		public async Task<SensateApiKey> GetByKeyAsync(string key, CancellationToken token = default)
 		{
 			var query = this.Data.Where(apikey => apikey.ApiKey == key).Include(apikey => apikey.User)
 				.ThenInclude(user => user.ApiKeys);
@@ -164,14 +164,14 @@ namespace SensateService.Infrastructure.Sql
 			await this.CommitAsync(ct).AwaitBackground();
 		}
 
-		public Task MarkRevokedAsync(SensateApiKey key, CancellationToken token = default(CancellationToken))
+		public Task MarkRevokedAsync(SensateApiKey key, CancellationToken token = default)
 		{
 			this.StartUpdate(key);
 			key.Revoked = true;
 			return this.EndUpdateAsync(token);
 		}
 
-		public Task MarkRevokedRangeAsync(IEnumerable<SensateApiKey> keys, CancellationToken token = default(CancellationToken))
+		public Task MarkRevokedRangeAsync(IEnumerable<SensateApiKey> keys, CancellationToken token = default)
 		{
 			var apikeys = keys.ToList();
 
@@ -196,7 +196,7 @@ namespace SensateService.Infrastructure.Sql
 			return apikey;
 		}
 
-		public async Task<SensateApiKey> RefreshAsync(SensateApiKey apikey, CancellationToken token = default(CancellationToken))
+		public async Task<SensateApiKey> RefreshAsync(SensateApiKey apikey, CancellationToken token = default)
 		{
 			this.StartUpdate(apikey);
 			apikey.ApiKey = this._rng.NextStringWithSymbols(UserTokenLength);
@@ -205,7 +205,7 @@ namespace SensateService.Infrastructure.Sql
 			return apikey;
 		}
 
-		public async Task<SensateApiKey> RefreshAsync(string id, CancellationToken token = default(CancellationToken))
+		public async Task<SensateApiKey> RefreshAsync(string id, CancellationToken token = default)
 		{
 			var apikey = await this.GetByIdAsync(id, token).AwaitBackground();
 
@@ -220,7 +220,7 @@ namespace SensateService.Infrastructure.Sql
 			return this._rng.NextStringWithSymbols(UserTokenLength);
 		}
 
-		public async Task<IEnumerable<SensateApiKey>> GetByUserAsync(SensateUser user, int skip = 0, int limit = 0, CancellationToken token = default(CancellationToken))
+		public async Task<IEnumerable<SensateApiKey>> GetByUserAsync(SensateUser user, int skip = 0, int limit = 0, CancellationToken token = default)
 		{
 			IQueryable<SensateApiKey> query = this.Data.Where(apikey => apikey.UserId == user.Id).Include(apikey => apikey.User)
 				.ThenInclude(u => u.ApiKeys);
@@ -248,7 +248,7 @@ namespace SensateService.Infrastructure.Sql
 
 		public async Task<IEnumerable<SensateApiKey>> GetByUserAsync(SensateUser user, ApiKeyType type,
 																	 int skip = 0, int limit = 0,
-																	 CancellationToken token = default(CancellationToken))
+																	 CancellationToken token = default)
 		{
 			IQueryable<SensateApiKey> query = this.Data.Where(apikey => apikey.UserId == user.Id && apikey.Type == type).Include(apikey => apikey.User)
 				.ThenInclude(u => u.ApiKeys);

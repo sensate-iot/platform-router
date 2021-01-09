@@ -19,7 +19,7 @@ namespace SensateService.Infrastructure.Repositories
 	public interface IUserTokenRepository
 	{
 		void Create(AuthUserToken token);
-		Task CreateAsync(AuthUserToken token, CancellationToken ct = default(CancellationToken));
+		Task CreateAsync(AuthUserToken token, CancellationToken ct = default);
 
 		Task<long> CountAsync(Expression<Func<AuthUserToken, bool>> expr);
 

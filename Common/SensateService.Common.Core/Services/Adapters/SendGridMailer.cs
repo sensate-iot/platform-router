@@ -56,13 +56,6 @@ namespace SensateService.Services.Adapters
 			SendGridMessage msg;
 			var client = new SendGridClient(this._options.Key);
 
-			msg = new SendGridMessage() {
-				From = new EmailAddress(this._options.From, this._options.FromName),
-				Subject = subj,
-				PlainTextContent = body.TextBody,
-				HtmlContent = body.HtmlBody
-			};
-
 			body.AddRecip(recip);
 			body.FromEmail = this._options.From;
 			body.FromName = this._options.FromName;

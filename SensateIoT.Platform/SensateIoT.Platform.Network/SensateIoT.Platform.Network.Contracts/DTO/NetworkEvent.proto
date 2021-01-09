@@ -1,0 +1,37 @@
+﻿/*
+ * Network events.
+ *
+ * @author Michel Megens
+ * @email  michel@michelmegens.net
+ */
+
+syntax = "proto3";
+
+enum NetworkEventType
+{
+	MessageRouted = 0;
+	MessageStorage = 1;
+	MessageTriggered = 2;
+	MessageLiveData = 3;
+}
+
+enum NetworkMessageType
+{
+	Message = 0;
+	Measurement = 1;
+	ControlMessage = 2;
+}
+
+message NetworkEvent
+{
+	repeated NetworkEventType Actions = 1;
+	NetworkMessageType MessageType = 2;
+
+	bytes AccountID = 3;
+	string SensorID = 4;
+}
+
+message NetworkEventData
+{
+	repeated NetworkEvent Events = 1;
+}

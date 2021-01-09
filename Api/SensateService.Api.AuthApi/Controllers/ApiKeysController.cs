@@ -109,7 +109,7 @@ namespace SensateService.Api.AuthApi.Controllers
 			}
 
 			if(apikey.Type == ApiKeyType.SensorKey) {
-				await this.m_publisher.PublishCommand(AuthServiceCommand.FlushKey, apikey.ApiKey).AwaitBackground();
+				await this.m_publisher.PublishCommand(CommandType.FlushKey, apikey.ApiKey).AwaitBackground();
 			}
 
 			await this._keys.MarkRevokedAsync(apikey).AwaitBackground();

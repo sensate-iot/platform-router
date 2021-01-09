@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+
 using SensateService.Common.Data.Dto.Json.Out;
 using SensateService.Common.Data.Models;
 using SensateService.Common.IdentityData.Enums;
@@ -17,18 +18,18 @@ namespace SensateService.Infrastructure.Repositories
 {
 	public interface IApiKeyRepository
 	{
-		Task CreateAsync(SensateApiKey key, CancellationToken token = default(CancellationToken));
+		Task CreateAsync(SensateApiKey key, CancellationToken token = default);
 		Task CreateSensorKey(SensateApiKey key, Sensor sensor, CancellationToken token = default);
-		Task<SensateApiKey> GetByKeyAsync(string key, CancellationToken token = default(CancellationToken));
-		Task<SensateApiKey> GetByIdAsync(string id, CancellationToken token = default(CancellationToken));
-		Task MarkRevokedAsync(SensateApiKey key, CancellationToken token = default(CancellationToken));
-		Task MarkRevokedRangeAsync(IEnumerable<SensateApiKey> keys, CancellationToken token = default(CancellationToken));
+		Task<SensateApiKey> GetByKeyAsync(string key, CancellationToken token = default);
+		Task<SensateApiKey> GetByIdAsync(string id, CancellationToken token = default);
+		Task MarkRevokedAsync(SensateApiKey key, CancellationToken token = default);
+		Task MarkRevokedRangeAsync(IEnumerable<SensateApiKey> keys, CancellationToken token = default);
 		Task<SensateApiKey> RefreshAsync(SensateApiKey apikey, string key, CancellationToken token = default);
 		Task<SensateApiKey> RefreshAsync(SensateApiKey key, CancellationToken token = default);
 		Task<SensateApiKey> RefreshAsync(string id, CancellationToken token = default);
 		string GenerateApiKey();
-		Task<IEnumerable<SensateApiKey>> GetByUserAsync(SensateUser user, int skip = 0, int limit = 0, CancellationToken token = default(CancellationToken));
-		Task<SensateApiKey> GetAsync(string key, CancellationToken token = default(CancellationToken));
+		Task<IEnumerable<SensateApiKey>> GetByUserAsync(SensateUser user, int skip = 0, int limit = 0, CancellationToken token = default);
+		Task<SensateApiKey> GetAsync(string key, CancellationToken token = default);
 		Task<IEnumerable<SensateApiKey>> GetByUserAsync(SensateUser user, ApiKeyType type,
 														int skip = 0, int limit = 0,
 														CancellationToken token = default);

@@ -11,7 +11,7 @@ namespace SensateService.Common.Data.Dto.Generic
 {
 	public class Command
 	{
-		public AuthServiceCommand Cmd { get; set; }
+		public CommandType Cmd { get; set; }
 		public string Arguments { get; set; }
 	}
 }

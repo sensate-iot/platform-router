@@ -8,9 +8,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-
-using Microsoft.Extensions.Logging;
-
 using Newtonsoft.Json;
 
 using SensateService.Common.Data.Enums;
@@ -25,8 +22,8 @@ namespace SensateService.Infrastructure.Document
 	{
 		private readonly ICacheStrategy<string> _cache;
 
-		public CachedSensorRepository(SensateContext context, ILogger<SensorRepository> logger, ICacheStrategy<string> cache) :
-			base(context, logger)
+		public CachedSensorRepository(SensateContext context, ICacheStrategy<string> cache) :
+			base(context)
 		{
 			this._cache = cache;
 		}
@@ -35,18 +32,6 @@ namespace SensateService.Infrastructure.Document
 		{
 			var str = JsonConvert.SerializeObject(obj);
 			return this._cache.SetAsync(obj.InternalId.ToString(), str, tmo, ct);
-		}
-
-		public override async Task CreateAsync(Sensor sensor, CancellationToken ct = default)
-		{
-			var tasks = new Task[4];
-
-			tasks[0] = base.CreateAsync(sensor, ct);
-			tasks[1] = this.CommitAsync(sensor, CacheTimeout.TimeoutMedium.ToInt(), ct);
-			tasks[2] = this._cache.RemoveAsync($"sensors:uuid:{sensor.Owner}", ct);
-			tasks[3] = this._cache.RemoveAsync($"sensors:uuid:{sensor.Owner}:0:0", ct);
-
-			await Task.WhenAll(tasks).AwaitBackground();
 		}
 
 		public override async Task<IEnumerable<Sensor>> GetAsync(SensateUser user, int skip = 0, int limit = 0)
@@ -90,47 +75,6 @@ namespace SensateService.Infrastructure.Document
 
 			await this.CommitAsync(sensor, CacheTimeout.TimeoutMedium.ToInt()).AwaitBackground();
 			return sensor;
-
-		}
-
-		public override async Task UpdateSecretAsync(Sensor sensor, SensateApiKey key)
-		{
-			var tasks = new[] {
-				this._cache.SetAsync(sensor.InternalId.ToString(), sensor.ToJson(),
-									 CacheTimeout.TimeoutMedium.ToInt()),
-				this._cache.RemoveAsync($"sensors:uuid:{sensor.Owner}"),
-				this._cache.RemoveAsync($"sensors:uuid:{sensor.Owner}:0:0"),
-				this._cache.RemoveAsync(sensor.Owner),
-				base.UpdateSecretAsync(sensor, key)
-			};
-
-			await Task.WhenAll(tasks).AwaitBackground();
-		}
-
-		public override async Task UpdateAsync(Sensor sensor)
-		{
-			var tasks = new[] {
-				this.CommitAsync(sensor, CacheTimeout.TimeoutMedium.ToInt()),
-				this._cache.RemoveAsync($"sensors:uuid:{sensor.Owner}"),
-				this._cache.RemoveAsync($"sensors:uuid:{sensor.Owner}:0:0"),
-				this._cache.RemoveAsync(sensor.Owner),
-				base.UpdateAsync(sensor),
-			};
-
-			await Task.WhenAll(tasks).AwaitBackground();
-		}
-
-		public override async Task DeleteAsync(Sensor sensor, CancellationToken ct = default)
-		{
-			var tsk = new[] {
-				this._cache.RemoveAsync(sensor.InternalId.ToString(), ct),
-				this._cache.RemoveAsync($"sensors:uuid:{sensor.Owner}", ct),
-				this._cache.RemoveAsync($"sensors:uuid:{sensor.Owner}:0:0", ct),
-				this._cache.RemoveAsync(sensor.InternalId.ToString(), ct),
-				base.DeleteAsync(sensor, ct)
-			};
-
-			await Task.WhenAll(tsk).AwaitBackground();
 		}
 	}
 }

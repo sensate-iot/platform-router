@@ -1,0 +1,29 @@
+name: Network unit tests
+on:
+  push:
+      # Publish `master` as Docker `latest` image.
+      branches:
+        - master
+        - develop
+        - feature/**
+        - release/**
+        - hotfix/**
+      # Publish `v1.2.3` tags as releases.
+      tags:
+        - v*
+
+jobs:
+  build-ubuntu:
+    name: "Ubuntu"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone source
+        uses: actions/checkout@v1
+
+      - name: Install .NET SDK 5
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+
+      - name: "Build unit tests"
+        run: dotnet test SensateIoT.Platform/SensateIoT.Platform.Network/SensateIoT.Platform.Network.Tests/SensateIoT.Platform.Network.Tests.csproj

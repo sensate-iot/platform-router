@@ -25,6 +25,7 @@ using SensateService.Common.IdentityData.Models;
 using SensateService.Api.DataApi.Json;
 using SensateService.Helpers;
 using SensateService.Infrastructure.Repositories;
+
 using SensorStatisticsEntry = SensateService.Common.Data.Models.SensorStatisticsEntry;
 
 namespace SensateService.Api.DataApi.Controllers
@@ -291,19 +292,15 @@ namespace SensateService.Api.DataApi.Controllers
 														   entry.Method == RequestMethod.HttpPost ||
 														   entry.Method == RequestMethod.HttpPut)).AwaitBackground();
 
-				var text = await this.m_triggers.GetAsync(user.Id, TriggerType.Regex)
-					.AwaitBackground();
-				var num = await this.m_triggers.GetAsync(user.Id).AwaitBackground();
-				var triggers = num.ToList();
-
-				triggers.AddRange(text);
+				var invocationCount = await this.m_triggers.CountAsync(sensors.Select(x => x.InternalId), default)
+					.ConfigureAwait(false);
 
 				count = new Count {
 					BlobStorage = bytes,
 					Sensors = await this._sensors.CountAsync(user).AwaitBackground(),
 					Measurements = aggregated,
 					Links = await this.m_links.CountAsync(user).AwaitBackground(),
-					TriggerInvocations = triggers.Aggregate(0L, (v, trigger) => v + trigger.Invocations.Count),
+					TriggerInvocations = invocationCount,
 					ApiCalls = logs,
 					Messages = await messages.AwaitBackground(),
 					ActuatorMessages = await actuators.AwaitBackground()

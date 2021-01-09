@@ -104,7 +104,6 @@ namespace SensateService.Common.Caching.Memory
 			this.m_size = 0L;
 		}
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1063:Implement IDisposable Correctly", Justification = "Reviewed")]
 		~MemoryCache()
 		{
 			this.Dispose();
@@ -480,7 +479,6 @@ namespace SensateService.Common.Caching.Memory
 			}
 		}
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Reviewed")]
 		private void ScheduleForRemoval(TKey key, CacheEntry<TValue> entry)
 		{
 			var taken = false;
@@ -581,7 +579,6 @@ namespace SensateService.Common.Caching.Memory
 			}
 		}
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1816:Dispose methods should call SuppressFinalize", Justification = "Reviewed.")]
 		protected virtual void Dispose(bool disposing)
 		{
 			if(this.m_disposed) {
@@ -596,7 +593,6 @@ namespace SensateService.Common.Caching.Memory
 			this.m_disposed = true;
 		}
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1816:Dispose methods should call SuppressFinalize", Justification = "Reviewed.")]
 		public void Dispose()
 		{
 			this.Dispose(true);

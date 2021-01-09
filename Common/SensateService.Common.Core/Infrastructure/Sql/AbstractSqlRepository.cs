@@ -32,12 +32,12 @@ namespace SensateService.Infrastructure.Sql
 			this._sqlContext.SaveChanges();
 		}
 
-		public async Task CommitAsync(T obj, CancellationToken ct = default(CancellationToken))
+		public async Task CommitAsync(T obj, CancellationToken ct = default)
 		{
 			await this._sqlContext.SaveChangesAsync(ct).AwaitBackground();
 		}
 
-		public async Task CommitAsync(CancellationToken ct = default(CancellationToken))
+		public async Task CommitAsync(CancellationToken ct = default)
 		{
 			await this._sqlContext.SaveChangesAsync(ct).AwaitBackground();
 		}
@@ -52,7 +52,7 @@ namespace SensateService.Infrastructure.Sql
 			this._sqlContext.Update(obj);
 		}
 
-		public virtual async Task EndUpdateAsync(CancellationToken token = default(CancellationToken))
+		public virtual async Task EndUpdateAsync(CancellationToken token = default)
 		{
 			await this._sqlContext.SaveChangesAsync(token).AwaitBackground();
 		}
@@ -68,7 +68,7 @@ namespace SensateService.Infrastructure.Sql
 			this.Commit();
 		}
 
-		public virtual async Task CreateAsync(T obj, CancellationToken ct = default(CancellationToken))
+		public virtual async Task CreateAsync(T obj, CancellationToken ct = default)
 		{
 			this.Data.Add(obj);
 			await this.CommitAsync(ct).AwaitBackground();

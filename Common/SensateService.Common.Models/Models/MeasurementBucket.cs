@@ -7,9 +7,12 @@
 
 using System;
 using System.Collections.Generic;
+
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+
 using Newtonsoft.Json;
+
 using SensateService.Common.Data.Converters;
 
 namespace SensateService.Common.Data.Models
