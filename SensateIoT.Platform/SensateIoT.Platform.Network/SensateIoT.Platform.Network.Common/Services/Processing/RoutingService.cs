@@ -14,9 +14,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using Google.Protobuf;
-
 using Newtonsoft.Json;
 using Prometheus;
+
 using SensateIoT.Platform.Network.Common.Caching.Object;
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
 using SensateIoT.Platform.Network.Common.Collections.Remote;
@@ -73,10 +73,8 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 			this.m_logger = logger;
 			this.m_storageQueue = storage;
 
-			this.m_dropCounter =
-				Prometheus.Metrics.CreateCounter("router_messages_dropped_total", "Total number of measurements/messages dropped.");
-			this.m_counter =
-				Prometheus.Metrics.CreateCounter("router_messages_routed_total", "Total number of measurements/messages routed.");
+			this.m_dropCounter = Prometheus.Metrics.CreateCounter("router_messages_dropped_total", "Total number of measurements/messages dropped.");
+			this.m_counter = Prometheus.Metrics.CreateCounter("router_messages_routed_total", "Total number of measurements/messages routed.");
 		}
 
 		public override async Task ExecuteAsync(CancellationToken token)

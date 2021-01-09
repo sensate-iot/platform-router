@@ -6,7 +6,7 @@
  */
 
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
@@ -17,7 +17,9 @@ using Prometheus;
 
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
 using SensateIoT.Platform.Network.Common.Converters;
+using SensateIoT.Platform.Network.Common.Validators;
 using SensateIoT.Platform.Network.Contracts.RPC;
+using SensateIoT.Platform.Network.Data.DTO;
 
 namespace SensateIoT.Platform.Network.Router.Services
 {
@@ -42,13 +44,18 @@ namespace SensateIoT.Platform.Network.Router.Services
 			this.m_logger.LogDebug("Received measurement routing request from sensor {sensorId}.", request.SensorID);
 
 			try {
+				var count = 0;
 				var dto = MeasurementProtobufConverter.Convert(request);
 
-				this.m_queue.Add(dto);
-				this.m_measurementRequests.Inc();
+				if(MeasurementValidator.Validate(dto)) {
+					this.m_queue.Add(dto);
+					this.m_measurementRequests.Inc();
+
+					count += 1;
+				}
 
 				response = new RoutingResponse {
-					Count = 1,
+					Count = count,
 					Message = "Measurements queued.",
 					ResponseID = ByteString.CopyFrom(Guid.NewGuid().ToByteArray())
 				};
@@ -71,13 +78,17 @@ namespace SensateIoT.Platform.Network.Router.Services
 			this.m_logger.LogDebug("Received message routing request from sensor {sensorId}.", request.SensorID);
 
 			try {
+				var count = 0;
 				var dto = MessageProtobufConverter.Convert(request);
 
-				this.m_queue.Add(dto);
-				this.m_messageRequests.Inc();
+				if(MessageValidator.Validate(dto)) {
+					this.m_queue.Add(dto);
+					this.m_messageRequests.Inc();
+					count += 1;
+				}
 
 				response = new RoutingResponse {
-					Count = 1,
+					Count = count,
 					Message = "Message queued.",
 					ResponseID = ByteString.CopyFrom(Guid.NewGuid().ToByteArray())
 				};
@@ -100,13 +111,21 @@ namespace SensateIoT.Platform.Network.Router.Services
 			this.m_logger.LogDebug("Bulk ingress request with {count} measurements.", request.Measurements.Count);
 
 			try {
-				var dto = MeasurementProtobufConverter.Convert(request).ToList();
+				var dto = new List<Measurement>();
+
+				foreach(var raw in request.Measurements) {
+					var measurement = MeasurementProtobufConverter.Convert(raw);
+
+					if(MeasurementValidator.Validate(measurement)) {
+						dto.Add(measurement);
+					}
+				}
 
 				this.m_queue.AddRange(dto);
 				this.m_measurementRequests.Inc();
 
 				response = new RoutingResponse {
-					Count = request.Measurements.Count,
+					Count = dto.Count,
 					Message = "Messages queued.",
 					ResponseID = ByteString.CopyFrom(Guid.NewGuid().ToByteArray())
 				};
@@ -129,13 +148,21 @@ namespace SensateIoT.Platform.Network.Router.Services
 			this.m_logger.LogDebug("Bulk ingress request with {count} messages.", request.Messages.Count);
 
 			try {
-				var dto = MessageProtobufConverter.Convert(request).ToList();
+				var dto = new List<Message>();
+
+				foreach(var raw in request.Messages) {
+					var message = MessageProtobufConverter.Convert(raw);
+
+					if(MessageValidator.Validate(message)) {
+						dto.Add(message);
+					}
+				}
 
 				this.m_queue.AddRange(dto);
 				this.m_messageRequests.Inc();
 
 				response = new RoutingResponse {
-					Count = request.Messages.Count,
+					Count = dto.Count,
 					Message = "Messages queued.",
 					ResponseID = ByteString.CopyFrom(Guid.NewGuid().ToByteArray())
 				};

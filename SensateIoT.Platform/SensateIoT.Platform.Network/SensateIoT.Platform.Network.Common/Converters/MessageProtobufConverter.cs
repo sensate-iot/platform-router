@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Google.Protobuf.WellKnownTypes;
 
@@ -38,11 +37,6 @@ namespace SensateIoT.Platform.Network.Common.Converters
 			}
 
 			return textData;
-		}
-
-		public static IEnumerable<Message> Convert(TextMessageData messages)
-		{
-			return messages.Messages.Select(Convert);
 		}
 
 		public static TextMessage Convert(Message message)
