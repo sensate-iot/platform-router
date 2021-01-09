@@ -18,7 +18,7 @@ namespace SensateIoT.Platform.Network.Tests.Caching.Memory
 		[TestMethod]
 		public void RemoveDoesNotInstantlyDelete()
 		{
-			var cache = new MemoryCache<int, int>();
+			var cache = new MemoryCache<int, int> { ActiveTimeoutScanningEnabled = false };
 
 			cache.Add(1, 2);
 			cache.Remove(1);
