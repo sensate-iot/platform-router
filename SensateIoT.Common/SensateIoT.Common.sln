@@ -9,6 +9,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Common.Caching.L
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Common.Caching.Tests", "SensateIoT.Common.Caching.Tests\SensateIoT.Common.Caching.Tests.csproj", "{94D8E796-CED2-4D97-B3BC-1D68D4764C29}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build Automation", "Build Automation", "{7C247F12-B7C3-42A4-A1E0-5AA3301ACEF5}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\dotnet-format.yml = ..\.github\workflows\dotnet-format.yml
+		..\.github\workflows\unittest-memorycache.yml = ..\.github\workflows\unittest-memorycache.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

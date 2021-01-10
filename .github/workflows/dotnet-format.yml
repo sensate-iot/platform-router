@@ -14,11 +14,33 @@ on:
 jobs:
   dotnet-format-api:
     runs-on: windows-latest
+    env:
+      working-directory: ./SensateIoT.API
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
 
-      - name: Setup .NET Core SDK
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "5.0.x"
+      - run: |
+          dotnet tool install -g dotnet-format
+          echo "$HOME/.dotnet/tools" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
+
+      - name: Run dotnet format
+        run: |
+          dotnet format --check
+
+  dotnet-format-common:
+    runs-on: windows-latest
+    env:
+      working-directory: ./SensateIoT.Common
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Setup .NET SDK
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: "5.0.x"
@@ -38,7 +60,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
 
-      - name: Setup .NET Core SDK
+      - name: Setup .NET SDK
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: "5.0.x"
@@ -59,7 +81,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
 
-      - name: Setup .NET Core SDK
+      - name: Setup .NET SDK
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: "5.0.x"

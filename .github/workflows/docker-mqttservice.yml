@@ -14,7 +14,7 @@ env:
   IMAGE_ID: sensateiot/mqtt-service
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-  BASE_PATH: SensateIoT.Platform/SensateIoT.Platform.Network/SensateIoT.Platform.Network.MqttService
+  BASE_PATH: SensateIoT.Platform/SensateIoT.Platform.Ingress/SensateIoT.Platform.Ingress.MqttService
 
 jobs:
   push-mqttservice:
@@ -25,14 +25,14 @@ jobs:
 
       - name: Build image
         run: |
-          docker build SensateIoT.Platform/SensateIoT.Platform.Network --file $BASE_PATH/Dockerfile --tag $IMAGE_NAME
+          docker build SensateIoT.Platform/SensateIoT.Platform.Ingress --file $BASE_PATH/Dockerfile --tag $IMAGE_NAME
 
       - name: Log into registry
         run: echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin
 
       - name: Get assembly version
         run: |
-          PROJ=$BASE_PATH/SensateIoT.Platform.Network.MqttService.csproj
+          PROJ=$BASE_PATH/SensateIoT.Platform.Ingress.MqttService.csproj
           VERSION=$(pwsh -command "Scripts/Deployment/Get-AssemblyVersion.ps1 $PROJ")
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
