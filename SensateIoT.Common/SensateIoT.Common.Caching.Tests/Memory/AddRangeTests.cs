@@ -20,10 +20,10 @@ namespace SensateIoT.Common.Caching.Tests.Memory
 		public void CanAddMultipleKVPairs()
 		{
 			var cache = new MemoryCache<string, string>();
-			var values = new List<Abstract.KeyValuePair<string, string>>();
+			var values = new List<Caching.Abstract.KeyValuePair<string, string>>();
 
 			for(var idx = 0; idx < 100; idx++) {
-				var kvp = new Abstract.KeyValuePair<string, string> {
+				var kvp = new Caching.Abstract.KeyValuePair<string, string> {
 					Key = $"key::{idx}",
 					Value = $"value::{idx}"
 				};
@@ -39,7 +39,7 @@ namespace SensateIoT.Common.Caching.Tests.Memory
 		public void CannotMassUpdate()
 		{
 			var cache = new MemoryCache<string, string>();
-			var values = new List<Abstract.KeyValuePair<string, string>>();
+			var values = new List<Caching.Abstract.KeyValuePair<string, string>>();
 
 			cache["key::10"] = "abc";
 			cache["key::50"] = "def";
@@ -50,7 +50,7 @@ namespace SensateIoT.Common.Caching.Tests.Memory
 			Assert.Equal("duf", cache["key::55"]);
 
 			for(var idx = 0; idx < 100; idx++) {
-				var kvp = new Abstract.KeyValuePair<string, string> {
+				var kvp = new Caching.Abstract.KeyValuePair<string, string> {
 					Key = $"key::{idx}",
 					Value = $"value::{idx}"
 				};
@@ -65,13 +65,13 @@ namespace SensateIoT.Common.Caching.Tests.Memory
 		public void CanMassTimeout()
 		{
 			var cache = new MemoryCache<string, string>();
-			var values = new List<Abstract.KeyValuePair<string, string>>();
+			var values = new List<Caching.Abstract.KeyValuePair<string, string>>();
 			var options = new CacheEntryOptions {
 				Timeout = TimeSpan.FromMilliseconds(50)
 			};
 
 			for(var idx = 0; idx < 100; idx++) {
-				var kvp = new Abstract.KeyValuePair<string, string> {
+				var kvp = new Caching.Abstract.KeyValuePair<string, string> {
 					Key = $"key::{idx}",
 					Value = $"value::{idx}"
 				};

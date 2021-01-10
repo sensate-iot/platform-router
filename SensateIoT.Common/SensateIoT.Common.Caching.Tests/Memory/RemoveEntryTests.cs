@@ -15,17 +15,6 @@ namespace SensateIoT.Common.Caching.Tests.Memory
 	public class RemoveEntryTests
 	{
 		[Fact]
-		public void RemoveDoesNotInstantlyDelete()
-		{
-			var cache = new MemoryCache<int, int>();
-
-			cache.Add(1, 2);
-			cache.Remove(1);
-
-			Assert.Equal(1, cache.Count);
-		}
-
-		[Fact]
 		public void RemoveDoesDeleteAfterScan()
 		{
 			var cache = new MemoryCache<int, int>();
