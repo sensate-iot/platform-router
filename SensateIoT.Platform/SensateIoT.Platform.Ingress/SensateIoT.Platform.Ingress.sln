@@ -3,11 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30709.132
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SensateIoT.Platform.Ingress.MqttService", "SensateIoT.Platform.Ingress.MqttService\SensateIoT.Platform.Ingress.MqttService.csproj", "{E88BC440-52CF-4D88-8FD4-23BD35F2E73A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Ingress.MqttService", "SensateIoT.Platform.Ingress.MqttService\SensateIoT.Platform.Ingress.MqttService.csproj", "{E88BC440-52CF-4D88-8FD4-23BD35F2E73A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SensateIoT.Platform.Ingress.Common", "SensateIoT.Platform.Ingress.Common\SensateIoT.Platform.Ingress.Common.csproj", "{0AEF26F0-79E7-4E6E-AD85-5E4C1EEFBECA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Ingress.Common", "SensateIoT.Platform.Ingress.Common\SensateIoT.Platform.Ingress.Common.csproj", "{0AEF26F0-79E7-4E6E-AD85-5E4C1EEFBECA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SensateIoT.Platform.Ingress.DataAccess", "SensateIoT.Platform.Ingress.DataAccess\SensateIoT.Platform.Ingress.DataAccess.csproj", "{7FF2A0D6-268E-43D9-9D6D-737DE8F2848B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Ingress.DataAccess", "SensateIoT.Platform.Ingress.DataAccess\SensateIoT.Platform.Ingress.DataAccess.csproj", "{7FF2A0D6-268E-43D9-9D6D-737DE8F2848B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build Automation", "Build Automation", "{BDA5EBFC-22E5-46F9-9912-0CB2A4571BBF}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\.github\workflows\docker-mqttservice.yml = ..\..\.github\workflows\docker-mqttservice.yml
+		..\..\.github\workflows\dotnet-format.yml = ..\..\.github\workflows\dotnet-format.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

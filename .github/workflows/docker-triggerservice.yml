@@ -11,7 +11,7 @@ on:
         - v*
 env:
   IMAGE_NAME: storage-service
-  IMAGE_ID: sensateiot/storage-service
+  IMAGE_ID: sensateiot/trigger-service
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
   BASE_PATH: SensateIoT.Platform/SensateIoT.Platform.Network/SensateIoT.Platform.Network.TriggerService
