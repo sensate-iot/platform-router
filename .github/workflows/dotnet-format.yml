@@ -14,8 +14,6 @@ on:
 jobs:
   dotnet-format-api:
     runs-on: windows-latest
-    env:
-      working-directory: ./SensateIoT.API
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
@@ -30,12 +28,10 @@ jobs:
 
       - name: Run dotnet format
         run: |
-          dotnet format --check
+          dotnet format --check SensateIoT.API
 
   dotnet-format-common:
     runs-on: windows-latest
-    env:
-      working-directory: ./SensateIoT.Common
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
@@ -50,12 +46,10 @@ jobs:
 
       - name: Run dotnet format
         run: |
-          dotnet format --check
+          dotnet format --check SensateIoT.Common
 
   dotnet-format-network:
     runs-on: windows-latest
-    env:
-      working-directory: ./SensateIoT.Platform/SensateIoT.Platform.Network
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
@@ -71,12 +65,10 @@ jobs:
       - name: Run dotnet format
         working-directory: ${{env.working-directory}}
         run: |
-          dotnet format --check
+          dotnet format --check SensateIoT.Platform/SensateIoT.Platform.Network
 
   dotnet-format-ingress:
     runs-on: windows-latest
-    env:
-      working-directory: ./SensateIoT.Platform/SensateIoT.Platform.Ingress
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
@@ -92,4 +84,4 @@ jobs:
       - name: Run dotnet format
         working-directory: ${{env.working-directory}}
         run: |
-          dotnet format --check
+          dotnet format --check SensateIoT.Platform/SensateIoT.Platform.Ingress
