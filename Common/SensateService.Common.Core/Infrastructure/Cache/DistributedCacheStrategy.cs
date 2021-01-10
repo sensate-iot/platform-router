@@ -8,8 +8,7 @@
 using System;
 using System.Threading.Tasks;
 using System.Threading;
-
-using SensateService.Common.Caching.Abstract;
+using SensateIoT.Common.Caching.Abstract;
 
 namespace SensateService.Infrastructure.Cache
 {

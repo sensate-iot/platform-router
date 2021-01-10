@@ -18,10 +18,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateService.Common.Data"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateService.Common.IdentityData", "Common\SensateService.Common.IdentityData\SensateService.Common.IdentityData.csproj", "{62A638EA-9A81-4FBF-83E0-AA57D04BACC8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateService.Common.Caching", "Common\SensateService.Common.Caching\SensateService.Common.Caching.csproj", "{7615D809-4E95-4637-A592-52670ECB5E70}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateService.Common.Caching.Tests", "Common\SensateService.Common.Caching.Tests\SensateService.Common.Caching.Tests.csproj", "{0A123E18-0244-44FA-A570-C640B9386B8A}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{83AEE0FA-863A-417E-B346-764AD5A936EC}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
@@ -29,8 +25,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		docker-compose-staging.yaml = docker-compose-staging.yaml
 		README.md = README.md
 	EndProjectSection
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateService.Common.Caching.LoadTest", "Common\SensateService.Common.Caching.LoadTest\SensateService.Common.Caching.LoadTest.csproj", "{8655ACD4-A9B3-42FE-A2B9-5FAD707ACCD5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateService.Common.Config", "Common\SensateService.Common.Config\SensateService.Common.Config.csproj", "{3D5A2F38-5646-4B1F-BC9C-D7B55AF90CFF}"
 EndProject
@@ -174,54 +168,6 @@ Global
 		{62A638EA-9A81-4FBF-83E0-AA57D04BACC8}.Release|x64.Build.0 = Release|Any CPU
 		{62A638EA-9A81-4FBF-83E0-AA57D04BACC8}.Release|x86.ActiveCfg = Release|Any CPU
 		{62A638EA-9A81-4FBF-83E0-AA57D04BACC8}.Release|x86.Build.0 = Release|Any CPU
-		{7615D809-4E95-4637-A592-52670ECB5E70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7615D809-4E95-4637-A592-52670ECB5E70}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7615D809-4E95-4637-A592-52670ECB5E70}.Debug|ARM.ActiveCfg = Debug|Any CPU
-		{7615D809-4E95-4637-A592-52670ECB5E70}.Debug|ARM.Build.0 = Debug|Any CPU
-		{7615D809-4E95-4637-A592-52670ECB5E70}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{7615D809-4E95-4637-A592-52670ECB5E70}.Debug|x64.Build.0 = Debug|Any CPU
-		{7615D809-4E95-4637-A592-52670ECB5E70}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{7615D809-4E95-4637-A592-52670ECB5E70}.Debug|x86.Build.0 = Debug|Any CPU
-		{7615D809-4E95-4637-A592-52670ECB5E70}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7615D809-4E95-4637-A592-52670ECB5E70}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7615D809-4E95-4637-A592-52670ECB5E70}.Release|ARM.ActiveCfg = Release|Any CPU
-		{7615D809-4E95-4637-A592-52670ECB5E70}.Release|ARM.Build.0 = Release|Any CPU
-		{7615D809-4E95-4637-A592-52670ECB5E70}.Release|x64.ActiveCfg = Release|Any CPU
-		{7615D809-4E95-4637-A592-52670ECB5E70}.Release|x64.Build.0 = Release|Any CPU
-		{7615D809-4E95-4637-A592-52670ECB5E70}.Release|x86.ActiveCfg = Release|Any CPU
-		{7615D809-4E95-4637-A592-52670ECB5E70}.Release|x86.Build.0 = Release|Any CPU
-		{0A123E18-0244-44FA-A570-C640B9386B8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0A123E18-0244-44FA-A570-C640B9386B8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0A123E18-0244-44FA-A570-C640B9386B8A}.Debug|ARM.ActiveCfg = Debug|Any CPU
-		{0A123E18-0244-44FA-A570-C640B9386B8A}.Debug|ARM.Build.0 = Debug|Any CPU
-		{0A123E18-0244-44FA-A570-C640B9386B8A}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{0A123E18-0244-44FA-A570-C640B9386B8A}.Debug|x64.Build.0 = Debug|Any CPU
-		{0A123E18-0244-44FA-A570-C640B9386B8A}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{0A123E18-0244-44FA-A570-C640B9386B8A}.Debug|x86.Build.0 = Debug|Any CPU
-		{0A123E18-0244-44FA-A570-C640B9386B8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0A123E18-0244-44FA-A570-C640B9386B8A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0A123E18-0244-44FA-A570-C640B9386B8A}.Release|ARM.ActiveCfg = Release|Any CPU
-		{0A123E18-0244-44FA-A570-C640B9386B8A}.Release|ARM.Build.0 = Release|Any CPU
-		{0A123E18-0244-44FA-A570-C640B9386B8A}.Release|x64.ActiveCfg = Release|Any CPU
-		{0A123E18-0244-44FA-A570-C640B9386B8A}.Release|x64.Build.0 = Release|Any CPU
-		{0A123E18-0244-44FA-A570-C640B9386B8A}.Release|x86.ActiveCfg = Release|Any CPU
-		{0A123E18-0244-44FA-A570-C640B9386B8A}.Release|x86.Build.0 = Release|Any CPU
-		{8655ACD4-A9B3-42FE-A2B9-5FAD707ACCD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8655ACD4-A9B3-42FE-A2B9-5FAD707ACCD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8655ACD4-A9B3-42FE-A2B9-5FAD707ACCD5}.Debug|ARM.ActiveCfg = Debug|Any CPU
-		{8655ACD4-A9B3-42FE-A2B9-5FAD707ACCD5}.Debug|ARM.Build.0 = Debug|Any CPU
-		{8655ACD4-A9B3-42FE-A2B9-5FAD707ACCD5}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{8655ACD4-A9B3-42FE-A2B9-5FAD707ACCD5}.Debug|x64.Build.0 = Debug|Any CPU
-		{8655ACD4-A9B3-42FE-A2B9-5FAD707ACCD5}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{8655ACD4-A9B3-42FE-A2B9-5FAD707ACCD5}.Debug|x86.Build.0 = Debug|Any CPU
-		{8655ACD4-A9B3-42FE-A2B9-5FAD707ACCD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8655ACD4-A9B3-42FE-A2B9-5FAD707ACCD5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8655ACD4-A9B3-42FE-A2B9-5FAD707ACCD5}.Release|ARM.ActiveCfg = Release|Any CPU
-		{8655ACD4-A9B3-42FE-A2B9-5FAD707ACCD5}.Release|ARM.Build.0 = Release|Any CPU
-		{8655ACD4-A9B3-42FE-A2B9-5FAD707ACCD5}.Release|x64.ActiveCfg = Release|Any CPU
-		{8655ACD4-A9B3-42FE-A2B9-5FAD707ACCD5}.Release|x64.Build.0 = Release|Any CPU
-		{8655ACD4-A9B3-42FE-A2B9-5FAD707ACCD5}.Release|x86.ActiveCfg = Release|Any CPU
-		{8655ACD4-A9B3-42FE-A2B9-5FAD707ACCD5}.Release|x86.Build.0 = Release|Any CPU
 		{3D5A2F38-5646-4B1F-BC9C-D7B55AF90CFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3D5A2F38-5646-4B1F-BC9C-D7B55AF90CFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D5A2F38-5646-4B1F-BC9C-D7B55AF90CFF}.Debug|ARM.ActiveCfg = Debug|Any CPU

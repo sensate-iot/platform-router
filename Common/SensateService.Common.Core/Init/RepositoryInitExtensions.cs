@@ -10,11 +10,11 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 
 using MongoDB.Bson.Serialization;
+using SensateIoT.Common.Caching.Abstract;
+using SensateIoT.Common.Caching.Memory;
+using SensateIoT.Common.Caching.Redis;
 using StackExchange.Redis;
 
-using SensateService.Common.Caching.Abstract;
-using SensateService.Common.Caching.Memory;
-using SensateService.Common.Caching.Redis;
 using SensateService.Common.Config.Config;
 using SensateService.Common.Data.Models;
 using SensateService.Converters;
@@ -23,9 +23,7 @@ using SensateService.Infrastructure.Cache;
 using SensateService.Infrastructure.Document;
 using SensateService.Infrastructure.Repositories;
 using SensateService.Infrastructure.Sql;
-using SensateService.Services;
 using SensateService.Services.DataProcessing;
-using SensateService.Services.Processing;
 
 namespace SensateService.Init
 {

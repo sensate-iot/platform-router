@@ -30,6 +30,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="SensateIoT.Common.Caching" Version="1.0.0" />
     <PackageReference Include="Google.Protobuf" Version="3.13.0" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="3.1.8" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="3.1.8" />
@@ -53,7 +54,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SensateService.Common.Caching\SensateService.Common.Caching.csproj" />
     <ProjectReference Include="..\SensateService.Common.Config\SensateService.Common.Config.csproj" />
     <ProjectReference Include="..\SensateService.Common.IdentityData\SensateService.Common.IdentityData.csproj" />
     <ProjectReference Include="..\SensateService.Common.Models\SensateService.Common.Data.csproj" />
