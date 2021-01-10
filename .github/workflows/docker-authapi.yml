@@ -24,7 +24,7 @@ jobs:
 
       - name: Build image
         run: |
-          docker build . --file SensateIoT.API/SensateIoT.API.AuthSensateIoT.API/Dockerfile --tag $IMAGE_NAME
+          docker build --file SensateIoT.API/SensateIoT.API.AuthApi/Dockerfile --tag $IMAGE_NAME SensateIoT.API
 
       - name: Log into registry
         run: echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin

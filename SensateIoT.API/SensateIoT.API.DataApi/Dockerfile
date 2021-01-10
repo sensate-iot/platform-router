@@ -10,15 +10,15 @@ FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build-env
 WORKDIR /build
 
 COPY . .
-RUN dotnet restore -r linux-musl-x64 Api/SensateService.Api.DataApi/SensateService.Api.DataApi.csproj
-RUN dotnet publish -c Release -o /app/bin -r linux-musl-x64 --no-restore --self-contained true --no-restore Api/SensateService.Api.DataApi/SensateService.Api.DataApi.csproj
+RUN dotnet restore -r linux-musl-x64 SensateIoT.API.DataApi/SensateIoT.API.DataApi.csproj
+RUN dotnet publish -c Release -o /app/bin -r linux-musl-x64 --no-restore --self-contained true --no-restore SensateIoT.API.DataApi/SensateIoT.API.DataApi.csproj
 
-FROM alpine:3.11
+FROM alpine:3.12
 
 COPY --from=build-env /app /app
-COPY Api/SensateService.Api.DataApi/Settings/hosting.json /app/hosting.json
+COPY SensateIoT.API.DataApi/Settings/hosting.json /app/hosting.json
 WORKDIR /app
 RUN apk add --no-cache libstdc++ libintl icu
 
 EXPOSE 5000
-ENTRYPOINT ["bin/SensateService.Api.DataApi"]
+ENTRYPOINT ["bin/SensateIoT.API.DataApi"]
