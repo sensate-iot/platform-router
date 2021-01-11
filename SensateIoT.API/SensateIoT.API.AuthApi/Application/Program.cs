@@ -7,7 +7,7 @@
 
 using System;
 using System.IO;
-
+using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -19,8 +19,6 @@ using Microsoft.Extensions.Logging;
 using SensateIoT.API.Common.ApiCore.Init;
 using SensateIoT.API.Common.Core.Infrastructure.Sql;
 using SensateIoT.API.Common.IdentityData.Models;
-
-using Version = SensateIoT.API.Common.Core.Version;
 
 namespace SensateService.Api.AuthApi.Application
 {
@@ -62,7 +60,7 @@ namespace SensateService.Api.AuthApi.Application
 
 		public static void Main(string[] args)
 		{
-			Console.WriteLine($"Starting AuthApi {Version.VersionString}");
+			Console.WriteLine($"Starting Auth API {Assembly.GetExecutingAssembly().GetName().Version}");
 			var builder = CreateHostBuilder(args);
 			var host = builder.Build();
 			CreateUserRoles(host);

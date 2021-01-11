@@ -1,5 +1,5 @@
 #
-# Docker file for AuthApi.
+# Docker file for Authorization API.
 #
 # @author Michel Megens
 # @email  michel@michelmegens.net

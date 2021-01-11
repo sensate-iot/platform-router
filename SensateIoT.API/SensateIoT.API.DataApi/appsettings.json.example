@@ -1,19 +1,9 @@
 ﻿{
   "Logging": {
-    "IncludeScopes": false,
-    "Debug": {
-      "LogLevel": {
-        "Default": "Debug",
-        "Microsoft": "Warning",
-        "System": "Warning"
-      }
-    },
-    "Console": {
-      "LogLevel": {
-        "Default": "Debug",
-        "Microsoft": "Warning",
-        "System": "Warning"
-      }
+    "LogLevel": {
+      "Default": "Debug",
+      "System": "Information",
+      "Microsoft": "Information"
     }
   },
 
@@ -36,7 +26,7 @@
 
   "Cache": {
     "Enabled": true,
-    "Interval": 1000, 
+    "Interval": 1000,
     "Type": "Distributed"
   },
 

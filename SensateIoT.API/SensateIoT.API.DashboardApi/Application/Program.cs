@@ -7,13 +7,12 @@
 
 using System;
 using System.IO;
-
+using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-using Version = SensateIoT.API.Common.Core.Version;
 
 namespace SensateIoT.API.DashboardApi.Application
 {
@@ -26,7 +25,7 @@ namespace SensateIoT.API.DashboardApi.Application
 
 		public static void Main(string[] args)
 		{
-			Console.WriteLine($"Starting AuthApi {Version.VersionString}");
+			Console.WriteLine($"Starting Dashboard API {Assembly.GetExecutingAssembly().GetName().Version}");
 			var builder = CreateHostBuilder(args);
 			var host = builder.Build();
 			host.Run();
