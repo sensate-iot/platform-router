@@ -7,17 +7,19 @@
 
 using System;
 using System.IO;
-using System.Linq;
 
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+
 using SensateIoT.API.Common.ApiCore.Init;
 using SensateIoT.API.Common.Core.Infrastructure.Sql;
 using SensateIoT.API.Common.IdentityData.Models;
+
 using Version = SensateIoT.API.Common.Core.Version;
 
 namespace SensateService.Api.AuthApi.Application
@@ -29,7 +31,7 @@ namespace SensateService.Api.AuthApi.Application
 			return Environment.GetEnvironmentVariable("SENSATE_AUTHAPI_APPSETTINGS") ?? "appsettings.json";
 		}
 
-		private static void CreateUserRoles(IWebHost wh)
+		private static void CreateUserRoles(IHost wh)
 		{
 			ILogger<Program> logger;
 			SensateSqlContext ctx;
@@ -44,8 +46,12 @@ namespace SensateService.Api.AuthApi.Application
 				var roles = services.GetRequiredService<RoleManager<SensateRole>>();
 				var manager = services.GetRequiredService<UserManager<SensateUser>>();
 
-				if(ctx.Roles.Any())
+				var countTask = roles.Roles.CountAsync();
+				countTask.Wait();
+
+				if(countTask.Result > 0) {
 					return;
+				}
 
 				var tsk = UserRoleSeed.Initialize(ctx, roles, manager);
 				tsk.Wait();
@@ -56,39 +62,34 @@ namespace SensateService.Api.AuthApi.Application
 
 		public static void Main(string[] args)
 		{
-			IWebHost wh;
-
 			Console.WriteLine($"Starting AuthApi {Version.VersionString}");
-			wh = BuildWebHost(args);
-			CreateUserRoles(wh);
-			wh.Run();
+			var builder = CreateHostBuilder(args);
+			var host = builder.Build();
+			CreateUserRoles(host);
+			host.Run();
 		}
 
-		private static IWebHost BuildWebHost(string[] args)
+		public static IHostBuilder CreateHostBuilder(string[] args)
 		{
-			var conf = new ConfigurationBuilder()
-						.SetBasePath(Directory.GetCurrentDirectory())
-						.AddJsonFile("hosting.json")
-						.Build();
-
-			var wh = WebHost.CreateDefaultBuilder(args)
-				.UseConfiguration(conf)
+			return Host.CreateDefaultBuilder(args)
 				.UseContentRoot(Directory.GetCurrentDirectory())
-				.ConfigureAppConfiguration((hostingContext, config) => {
+				.ConfigureAppConfiguration((ctx, config) => {
 					config.AddJsonFile(GetAppSettings(), optional: false, reloadOnChange: true);
+					config.AddJsonFile($"appsettings.{ctx.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true);
 					config.AddEnvironmentVariables();
 				})
-				.ConfigureLogging((hostingContext, logging) => {
-					logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
-					logging.AddConsole();
-					logging.AddDebug();
-				})
-				.UseStartup<Startup>()
-				.ConfigureKestrel((ctx, opts) => {
-					opts.AllowSynchronousIO = true;
-				});
+				.ConfigureLogging((ctx, builder) => {
+					builder.ClearProviders();
+					builder.AddConsole();
 
-			return wh.Build();
+					if(ctx.HostingEnvironment.IsDevelopment() || ctx.HostingEnvironment.IsStaging()) {
+						builder.AddDebug();
+					}
+				})
+				.ConfigureWebHostDefaults(webBuilder => {
+					webBuilder.UseStartup<Startup>();
+				});
 		}
+
 	}
 }

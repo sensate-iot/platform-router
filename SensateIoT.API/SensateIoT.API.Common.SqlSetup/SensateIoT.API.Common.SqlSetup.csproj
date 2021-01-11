@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <UserSecretsId>SensateService</UserSecretsId>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>SensateIoT.API.SqlSetup</RootNamespace>
     <AssemblyName>SensateIoT.API.SqlSetup</AssemblyName>
     <Version>1.0.0</Version>

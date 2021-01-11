@@ -19,8 +19,7 @@ namespace SensateIoT.API.Common.ApiCore.Init
 {
 	public static class UserRoleSeed
 	{
-		public static async Task Initialize(SensateSqlContext ctx,
-			RoleManager<SensateRole> roles, UserManager<SensateUser> manager)
+		public static async Task Initialize(SensateSqlContext ctx, RoleManager<SensateRole> roles, UserManager<SensateUser> manager)
 		{
 			if(ctx == null) {
 				throw new ArgumentNullException(nameof(ctx));
@@ -35,10 +34,8 @@ namespace SensateIoT.API.Common.ApiCore.Init
 			}
 
 			SensateUser user;
-			ctx.Database.EnsureCreated();
-			IEnumerable<string> adminroles = new List<string> {
-				"Administrators", "Users"
-			};
+			await ctx.Database.EnsureCreatedAsync().ConfigureAwait(false);
+			IEnumerable<string> adminroles = new List<string> { "Administrators", "Users" };
 
 			if(ctx.Roles.Any() || ctx.Users.Any() || ctx.UserRoles.Any())
 				return;
@@ -76,7 +73,7 @@ namespace SensateIoT.API.Common.ApiCore.Init
 			user.UserName = user.Email;
 			user.EmailConfirmed = true;
 			await manager.CreateAsync(user, "Root1234#xD").AwaitBackground();
-			ctx.SaveChanges();
+			await ctx.SaveChangesAsync().ConfigureAwait(false);
 			user = await manager.FindByEmailAsync("root@example.com").AwaitBackground();
 			await manager.AddToRolesAsync(user, adminroles).AwaitBackground();
 		}

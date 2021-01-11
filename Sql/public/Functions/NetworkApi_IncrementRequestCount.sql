@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION public.networkapi_incrementrequestcount(
+CREATE FUNCTION public.networkapi_incrementrequestcount(
 	key text)
     RETURNS void
     LANGUAGE 'plpgsql'

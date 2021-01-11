@@ -27,7 +27,7 @@ namespace SensateIoT.API.SqlSetup.Application
 			this.BuildConfiguration();
 			this.Configuration.GetSection("Database").Bind(db);
 
-			builder.UseNpgsql(db.PgSQL.ConnectionString, x => x.MigrationsAssembly("SensateService.SqlSetup"));
+			builder.UseNpgsql(db.PgSQL.ConnectionString, x => x.MigrationsAssembly("SensateIoT.API.SqlSetup"));
 			return new SensateSqlContext(builder.Options);
 		}
 

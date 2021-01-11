@@ -146,13 +146,6 @@ namespace SensateService.Api.AuthApi.Application
 
 			services.AddRouting();
 			services.AddControllers().AddNewtonsoftJson();
-
-			services.AddLogging((logging) => {
-				logging.AddConsole();
-				if(this._env.IsDevelopment()) {
-					logging.AddDebug();
-				}
-			});
 		}
 
 		// ReSharper disable once UnusedMember.Global
