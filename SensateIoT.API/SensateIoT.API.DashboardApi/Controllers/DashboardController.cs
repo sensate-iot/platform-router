@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -22,9 +21,9 @@ using SensateIoT.API.Common.Data.Dto.Json.Out;
 using SensateIoT.API.Common.Data.Enums;
 using SensateIoT.API.Common.Data.Models;
 using SensateIoT.API.Common.IdentityData.Models;
-using SensateService.Api.DashboardApi.Json;
+using SensateIoT.API.DashboardApi.Json;
 
-namespace SensateService.Api.DashboardApi.Controllers
+namespace SensateIoT.API.DashboardApi.Controllers
 {
 	[NormalUser]
 	[Produces("application/json")]

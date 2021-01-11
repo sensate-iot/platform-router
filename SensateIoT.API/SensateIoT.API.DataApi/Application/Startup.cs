@@ -99,6 +99,7 @@ namespace SensateService.Api.DataApi.Application
 			services.AddControllers().AddNewtonsoftJson();
 
 			services.AddLogging((logging) => {
+				//logging.AddProvider(new ConsoleLoggerProvider());
 				logging.AddConsole();
 
 				if(this._env.IsDevelopment()) {
@@ -142,6 +143,44 @@ namespace SensateService.Api.DataApi.Application
 			app.UseMiddleware<ApiKeyValidationMiddleware>();
 			app.UseMiddleware<RequestLoggingMiddleware>();
 			app.UseEndpoints(ep => { ep.MapControllers(); });
+		}
+	}
+
+	public class ConsoleLoggerProvider : ILoggerProvider
+	{
+		public void Dispose()
+		{
+		}
+
+		public ILogger CreateLogger(string categoryName)
+			=> new ConsoleLogger(categoryName);
+
+		private class ConsoleLogger : ILogger
+		{
+			private readonly string _categoryName;
+
+			public ConsoleLogger(string categoryName)
+				=> _categoryName = categoryName;
+
+			public void Log<TState>(
+				LogLevel logLevel, EventId eventId, TState state, Exception exception,
+				Func<TState, Exception, string> formatter
+			)
+			{
+				if(!IsEnabled(logLevel)) {
+					return;
+				}
+
+				Console.WriteLine(
+					$"{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} [{logLevel}] {_categoryName}:{Environment.NewLine}{state}{(exception != null ? "\n" : string.Empty)}{exception}"
+				);
+			}
+
+			public bool IsEnabled(LogLevel logLevel)
+				=> true;
+
+			public IDisposable BeginScope<TState>(TState state)
+				=> null;
 		}
 	}
 }

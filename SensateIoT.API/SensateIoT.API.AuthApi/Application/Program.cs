@@ -26,7 +26,7 @@ namespace SensateService.Api.AuthApi.Application
 {
 	public class Program
 	{
-		public static string GetAppSettings()
+		private static string GetAppSettings()
 		{
 			return Environment.GetEnvironmentVariable("SENSATE_AUTHAPI_APPSETTINGS") ?? "appsettings.json";
 		}
@@ -69,7 +69,7 @@ namespace SensateService.Api.AuthApi.Application
 			host.Run();
 		}
 
-		public static IHostBuilder CreateHostBuilder(string[] args)
+		private static IHostBuilder CreateHostBuilder(string[] args)
 		{
 			return Host.CreateDefaultBuilder(args)
 				.UseContentRoot(Directory.GetCurrentDirectory())

@@ -12,16 +12,17 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+
 using SensateIoT.API.Common.ApiCore.Init;
 using SensateIoT.API.Common.ApiCore.Middleware;
 using SensateIoT.API.Common.Config.Config;
 using SensateIoT.API.Common.Core.Infrastructure.Sql;
 using SensateIoT.API.Common.Core.Init;
 
-namespace SensateService.Api.DashboardApi.Application
+namespace SensateIoT.API.DashboardApi.Application
 {
 	public class Startup
 	{
@@ -97,13 +98,6 @@ namespace SensateService.Api.DashboardApi.Application
 
 			services.AddRouting();
 			services.AddControllers().AddNewtonsoftJson();
-
-			services.AddLogging((logging) => {
-				logging.AddConsole();
-				if(this._env.IsDevelopment()) {
-					logging.AddDebug();
-				}
-			});
 		}
 
 		// ReSharper disable once UnusedMember.Global
@@ -121,12 +115,6 @@ namespace SensateService.Api.DashboardApi.Application
 					.AllowAnyMethod()
 					.AllowCredentials();
 			});
-
-			using(var scope = sp.CreateScope()) {
-				var ctx = scope.ServiceProvider.GetRequiredService<SensateSqlContext>();
-				ctx.Database.EnsureCreated();
-				ctx.Database.Migrate();
-			}
 
 			app.UseSwagger(c => {
 				c.RouteTemplate = "stats/swagger/{documentName}/swagger.json";

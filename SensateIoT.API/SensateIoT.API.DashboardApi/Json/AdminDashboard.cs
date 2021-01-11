@@ -9,7 +9,7 @@ using System;
 using Newtonsoft.Json.Linq;
 using SensateIoT.API.Common.Data.Dto.Json.Out;
 
-namespace SensateService.Api.DashboardApi.Json
+namespace SensateIoT.API.DashboardApi.Json
 {
 	public class AdminDashboard
 	{
@@ -24,12 +24,12 @@ namespace SensateService.Api.DashboardApi.Json
 		public JObject ToJson()
 		{
 			JObject json = new JObject {
-				["numberOfUsers"] = NumberOfUsers,
-				["numberOfSensors"] = NumberOfSensors,
-				["measurementStatsLastHour"] = MeasurementStatsLastHour,
-				["numberOfGhosts"] = NumberOfGhosts,
-				["registrations"] = JToken.FromObject(Registrations.Data) as JArray,
-				["measurementStats"] = JToken.FromObject(MeasurementStats.Data) as JArray
+				["numberOfUsers"] = this.NumberOfUsers,
+				["numberOfSensors"] = this.NumberOfSensors,
+				["measurementStatsLastHour"] = this.MeasurementStatsLastHour,
+				["numberOfGhosts"] = this.NumberOfGhosts,
+				["registrations"] = JToken.FromObject(this.Registrations.Data) as JArray,
+				["measurementStats"] = JToken.FromObject(this.MeasurementStats.Data) as JArray
 			};
 
 			return json;

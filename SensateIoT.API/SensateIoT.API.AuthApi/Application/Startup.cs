@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 using Microsoft.OpenApi.Models;
 
@@ -27,13 +26,11 @@ namespace SensateService.Api.AuthApi.Application
 {
 	public class Startup
 	{
-		private readonly IWebHostEnvironment _env;
 		private readonly IConfiguration _configuration;
 
-		public Startup(IConfiguration configuration, IWebHostEnvironment environment)
+		public Startup(IConfiguration configuration)
 		{
 			this._configuration = configuration;
-			this._env = environment;
 		}
 
 		// ReSharper disable once UnusedMember.Global

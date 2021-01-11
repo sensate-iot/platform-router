@@ -9,7 +9,7 @@ using System;
 using Newtonsoft.Json.Linq;
 using SensateIoT.API.Common.Data.Dto.Json.Out;
 
-namespace SensateService.Api.DashboardApi.Json
+namespace SensateIoT.API.DashboardApi.Json
 {
 	public class UserDashboard
 	{
@@ -26,15 +26,15 @@ namespace SensateService.Api.DashboardApi.Json
 		public JObject ToJson()
 		{
 			JObject json = new JObject {
-				["measurementsToday"] = JToken.FromObject(MeasurementsToday.Data) as JArray,
-				["measurementsCumulative"] = JToken.FromObject(MeasurementsCumulative.Data) as JArray,
-				["measurementsPerDayCumulative"] = JToken.FromObject(MeasurementsPerDayCumulative.Data) as JArray,
-				["apiCallsLastWeek"] = JToken.FromObject(ApiCallsLastWeek.Data) as JArray,
+				["measurementsToday"] = JToken.FromObject(this.MeasurementsToday.Data) as JArray,
+				["measurementsCumulative"] = JToken.FromObject(this.MeasurementsCumulative.Data) as JArray,
+				["measurementsPerDayCumulative"] = JToken.FromObject(this.MeasurementsPerDayCumulative.Data) as JArray,
+				["apiCallsLastWeek"] = JToken.FromObject(this.ApiCallsLastWeek.Data) as JArray,
 
-				["sensorCount"] = SensorCount,
-				["measurementsTodayCount"] = MeasurementsTodayCount,
-				["apiCallCount"] = ApiCallCount,
-				["securityTokenCount"] = SecurityTokenCount
+				["sensorCount"] = this.SensorCount,
+				["measurementsTodayCount"] = this.MeasurementsTodayCount,
+				["apiCallCount"] = this.ApiCallCount,
+				["securityTokenCount"] = this.SecurityTokenCount
 			};
 
 			return json;
