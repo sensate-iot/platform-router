@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Platform:
   - Moved MQTT ingress service
   - Forward MQTT ingress to the HTTP gateway
+  
+- API:
+  - Refactor SensateService into SensateIoT.API
+  - Upgrade API's to .NET 5
 
 ### Removed
 - Trigger administration (moved to network project)
