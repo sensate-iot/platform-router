@@ -15,6 +15,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build Automation", "Build A
 		..\..\.github\workflows\dotnet-format.yml = ..\..\.github\workflows\dotnet-format.yml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{100DA72C-F9C7-43B3-BA5C-E04116AB9DA3}"
+	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
