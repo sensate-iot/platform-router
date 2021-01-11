@@ -7,7 +7,7 @@
 
 using System;
 using System.IO;
-
+using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -20,13 +20,11 @@ using SensateIoT.API.Common.ApiCore.Init;
 using SensateIoT.API.Common.Core.Infrastructure.Sql;
 using SensateIoT.API.Common.IdentityData.Models;
 
-using Version = SensateIoT.API.Common.Core.Version;
-
 namespace SensateService.Api.AuthApi.Application
 {
 	public class Program
 	{
-		public static string GetAppSettings()
+		private static string GetAppSettings()
 		{
 			return Environment.GetEnvironmentVariable("SENSATE_AUTHAPI_APPSETTINGS") ?? "appsettings.json";
 		}
@@ -62,14 +60,14 @@ namespace SensateService.Api.AuthApi.Application
 
 		public static void Main(string[] args)
 		{
-			Console.WriteLine($"Starting AuthApi {Version.VersionString}");
+			Console.WriteLine($"Starting Auth API {Assembly.GetExecutingAssembly().GetName().Version}");
 			var builder = CreateHostBuilder(args);
 			var host = builder.Build();
 			CreateUserRoles(host);
 			host.Run();
 		}
 
-		public static IHostBuilder CreateHostBuilder(string[] args)
+		private static IHostBuilder CreateHostBuilder(string[] args)
 		{
 			return Host.CreateDefaultBuilder(args)
 				.UseContentRoot(Directory.GetCurrentDirectory())

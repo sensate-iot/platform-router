@@ -7,13 +7,6 @@
         "Microsoft": "Warning",
         "System": "Warning"
       }
-    },
-    "Console": {
-      "LogLevel": {
-        "Default": "Debug",
-        "Microsoft": "Warning",
-        "System": "Warning"
-      }
     }
   },
 

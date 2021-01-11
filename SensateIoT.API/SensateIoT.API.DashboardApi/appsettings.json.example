@@ -1,28 +1,17 @@
 ﻿{
   "Logging": {
-    "IncludeScopes": false,
-    "Debug": {
-      "LogLevel": {
-        "Default": "Debug",
-        "Microsoft": "Warning",
-        "System": "Warning"
-      }
-    },
-    "Console": {
-      "LogLevel": {
-        "Default": "Debug",
-        "Microsoft": "Warning",
-        "System": "Warning"
-      }
+    "LogLevel": {
+      "Default": "Debug",
+      "System": "Information",
+      "Microsoft": "Information"
     }
   },
-
   "System": {
     "ProxyLevel": 1,
     "InstanceName": "kerby"
   },
 
-  "Cache" : {
+  "Cache": {
     "Enabled": true,
     "Type": "Distributed"
   },
@@ -48,7 +37,7 @@
   "Authentication": {
     "PublicUrl": "login.dev.sensateiot.com/confirm",
     "UpdateEmailUrl": "dev.sensateiot.com:4200/apps/dashboard/confirm-update-email",
-    "Scheme":  "http", 
+    "Scheme": "http",
     "JwtRefreshExpireMinutes": 43200,
     "JwtKey": "3i%bacH6yK8sm0#lYt0**aP567Fz^Ns3HKeZ3GiqlZ2&eFqjy0OqXO",
     "JwtIssuer": "api.dev.sensateiot.com:5000/auth",
