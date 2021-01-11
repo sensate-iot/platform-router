@@ -10,7 +10,7 @@
     <AssemblyName>SensateIoT.API.Common.Core</AssemblyName>
     <Version>1.0.0</Version>
     <Company>Sensate IoT</Company>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>COPYING</PackageLicenseFile>
     <Description>SensateService shared/core feature library.</Description>
