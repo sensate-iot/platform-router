@@ -6,8 +6,7 @@
  */
 
 import { MqttClient } from "../clients/mqttclient";
-import { Settings } from "../models/settings";
-import settings from "../../settings/appsettings.json";
+import { parseSettings, Settings } from "../models/settings";
 import * as mongodb from "./mongodb";
 import { WebSocketServer } from "./websocketserver";
 import { Express } from "express";
@@ -26,8 +25,7 @@ export class Application {
     private readonly wss: WebSocketServer;
 
     public constructor() {
-        const tmp = JSON.stringify(settings);
-        Application.config = JSON.parse(tmp);
+        Application.config = parseSettings();
 
         this.client = new MqttClient(Application.config.mqtt.host, Application.config.mqtt.port, Application.config.mqtt.topicShare);
         // ReSharper disable once TsResolvedFromInaccessibleModule
