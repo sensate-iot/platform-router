@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+
 using SensateIoT.Platform.Network.Adapters.Abstract;
 using SensateIoT.Platform.Network.Adapters.Blobs;
 using SensateIoT.Platform.Network.API.Abstract;
@@ -36,10 +37,10 @@ namespace SensateIoT.Platform.Network.API.Application
 	{
 		public Startup(IConfiguration configuration)
 		{
-			this.Configuration = configuration;
+			this.m_configuration = configuration;
 		}
 
-		public IConfiguration Configuration { get; }
+		private IConfiguration m_configuration;
 
 		public void ConfigureServices(IServiceCollection services)
 		{
@@ -47,9 +48,9 @@ namespace SensateIoT.Platform.Network.API.Application
 			var mqtt = new MqttConfig();
 			var cache = new CacheConfig();
 
-			this.Configuration.GetSection("Database").Bind(db);
-			this.Configuration.GetSection("Mqtt").Bind(mqtt);
-			this.Configuration.GetSection("Cache").Bind(cache);
+			this.m_configuration.GetSection("Database").Bind(db);
+			this.m_configuration.GetSection("Mqtt").Bind(mqtt);
+			this.m_configuration.GetSection("Cache").Bind(cache);
 
 			var privatemqtt = mqtt.InternalBroker;
 
@@ -68,10 +69,10 @@ namespace SensateIoT.Platform.Network.API.Application
 				options.Id = Guid.NewGuid().ToString();
 			});
 
-			services.Configure<InternalBrokerConfig>(this.Configuration.GetSection("Mqtt:InternalBroker"));
-			services.Configure<RouterConfig>(this.Configuration.GetSection("Router"));
-			services.Configure<BlobOptions>(this.Configuration.GetSection("Storage"));
-			services.Configure<MetricsOptions>(this.Configuration.GetSection("HttpServer:Metrics"));
+			services.Configure<InternalBrokerConfig>(this.m_configuration.GetSection("Mqtt:InternalBroker"));
+			services.Configure<RouterConfig>(this.m_configuration.GetSection("Router"));
+			services.Configure<BlobOptions>(this.m_configuration.GetSection("Storage"));
+			services.Configure<MetricsOptions>(this.m_configuration.GetSection("HttpServer:Metrics"));
 
 			services.AddScoped<ITriggerRepository, TriggerRepository>();
 			services.AddScoped<IMessageRepository, MessageRepository>();
@@ -138,7 +139,7 @@ namespace SensateIoT.Platform.Network.API.Application
 		{
 			var mqtt = new MqttConfig();
 
-			this.Configuration.GetSection("Mqtt").Bind(mqtt);
+			this.m_configuration.GetSection("Mqtt").Bind(mqtt);
 
 			app.UseForwardedHeaders();
 			app.UseRouting();

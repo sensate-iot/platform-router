@@ -46,7 +46,8 @@ namespace SensateIoT.Platform.Network.Router.MQTT
 			case CommandType.AddUser:
 			case CommandType.AddSensor:
 			case CommandType.AddKey:
-				await this.m_handler.UpdateAsync(cmd, default).ConfigureAwait(false);
+			case CommandType.DeleteUser:
+				await this.m_handler.UpdateAsync(cmd, ct).ConfigureAwait(false);
 				break;
 
 			case CommandType.AddLiveDataSensor:

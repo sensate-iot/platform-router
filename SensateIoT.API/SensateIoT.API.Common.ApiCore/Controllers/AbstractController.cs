@@ -50,8 +50,9 @@ namespace SensateIoT.API.Common.ApiCore.Controllers
 
 		protected async Task<SensateUser> GetCurrentUserAsync()
 		{
-			if(this.User == null)
+			if(this.User == null) {
 				return null;
+			}
 
 			return await this._users.GetByClaimsPrincipleAsync(this.User).AwaitBackground();
 		}

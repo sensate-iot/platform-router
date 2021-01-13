@@ -32,6 +32,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Realtime
 		public async Task UpdateAsync(Command cmd, CancellationToken ct)
 		{
 			switch(cmd.Cmd) {
+			case CommandType.DeleteUser:
 			case CommandType.FlushUser:
 				var userId = Guid.Parse(cmd.Arguments);
 				this.m_cache.RemoveAccount(userId);

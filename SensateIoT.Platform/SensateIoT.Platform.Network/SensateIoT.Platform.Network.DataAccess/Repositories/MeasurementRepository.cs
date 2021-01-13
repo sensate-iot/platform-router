@@ -29,7 +29,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		private const int MeasurementBucketSize = 500;
 
 		private readonly IMongoCollection<MeasurementBucket> m_buckets;
-		protected readonly ILogger<MeasurementRepository> m_logger;
+		private readonly ILogger<MeasurementRepository> m_logger;
 
 		public MeasurementRepository(MongoDBContext context, ILogger<MeasurementRepository> logger)
 		{
@@ -110,6 +110,12 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			}
 		}
 
-		#endregion
+		public async Task DeleteBySensorId(IEnumerable<ObjectId> sensorIds, CancellationToken ct = default)
+		{
+			var filter = Builders<MeasurementBucket>.Filter.In(x => x.SensorId, sensorIds);
+			await this.m_buckets.DeleteManyAsync(filter, ct).ConfigureAwait(false);
+		}
+
+#endregion
 	}
 }

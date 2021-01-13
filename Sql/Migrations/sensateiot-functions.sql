@@ -15,7 +15,6 @@ BEGIN
 END;
 $$;
 
-
 CREATE FUNCTION networkapi_deletesensorkey(key TEXT)
     RETURNS VOID
     LANGUAGE plpgsql

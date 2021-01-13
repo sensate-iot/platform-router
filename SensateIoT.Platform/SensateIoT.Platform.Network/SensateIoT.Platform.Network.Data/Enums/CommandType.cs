@@ -17,6 +17,7 @@ namespace SensateIoT.Platform.Network.Data.Enums
 		AddKey,
 		AddLiveDataSensor,
 		RemoveLiveDataSensor,
-		SyncLiveDataSensors
+		SyncLiveDataSensors,
+		DeleteUser
 	}
 }

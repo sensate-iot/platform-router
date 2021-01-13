@@ -38,6 +38,12 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			await this.m_messages.DeleteManyAsync(filter, ct).ConfigureAwait(false);
 		}
 
+		public async Task DeleteBySensorId(IEnumerable<ObjectId> sensorIds, CancellationToken ct = default)
+		{
+			var filter = Builders<Message>.Filter.In(x => x.SensorId, sensorIds);
+			await this.m_messages.DeleteManyAsync(filter, ct).ConfigureAwait(false);
+		}
+
 		public Task DeleteBySensorAsync(Sensor sensor, CancellationToken ct = default)
 		{
 			var filter = Builders<Message>.Filter.Eq(x => x.SensorId, sensor.InternalId);

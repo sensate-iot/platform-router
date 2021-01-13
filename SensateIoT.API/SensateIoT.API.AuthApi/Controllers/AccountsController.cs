@@ -675,7 +675,7 @@ namespace SensateService.Api.AuthApi.Controllers
 			try {
 				var user = await this.GetCurrentUserAsync().AwaitBackground();
 				await this.m_userService.DeleteAsync(user, CancellationToken.None).AwaitBackground();
-				await this.m_publisher.PublishCommand(CommandType.FlushUser, user.Id).AwaitBackground();
+				await this.m_publisher.PublishCommand(CommandType.DeleteUser, user.Id).AwaitBackground();
 			} catch(Exception ex) {
 				this._logger.LogInformation($"Unable to delete user: {ex.Message}");
 				this._logger.LogDebug(ex.StackTrace);
