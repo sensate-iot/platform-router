@@ -23,6 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.API.DataApi", "S
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CA89A3CF-3425-41E8-A2C5-319FA3E54C2E}"
 	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
 		..\CHANGELOG.md = ..\CHANGELOG.md
 		..\CODE_OF_CONDUCT.md = ..\CODE_OF_CONDUCT.md
 		..\CODESTYLE.md = ..\CODESTYLE.md

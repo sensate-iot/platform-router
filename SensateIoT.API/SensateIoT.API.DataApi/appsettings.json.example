@@ -8,9 +8,7 @@
   },
 
   "System": {
-    "ProxyLevel": 1,
-    "MeasurementAuthProxyUrl": "http://127.0.0.1:8080/v1/processor/measurements",
-    "MessageAuthProxyUrl": "http://127.0.0.1:8080/v1/processor/messages"
+    "ProxyLevel": 1
   },
 
   "Authentication": {
