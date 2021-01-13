@@ -35,20 +35,19 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="config\custom-environment-variables.json" />
+    <Content Include="config\default.json" />
     <Content Include="Dockerfile">
       <SubType>Code</SubType>
     </Content>
     <Content Include="package.json" />
-    <Content Include="settings\appsettings.json">
-      <SubType>Code</SubType>
-    </Content>
     <Content Include="src\requests\apikeyauthenticationrequest.ts">
       <SubType>Code</SubType>
     </Content>
     <Content Include="tsconfig.json" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="settings\" />
+    <Folder Include="config\" />
     <Folder Include="src\" />
     <Folder Include="src\app\" />
     <Folder Include="src\clients\" />
