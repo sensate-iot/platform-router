@@ -4,7 +4,7 @@
     <UserSecretsId>AuthApi</UserSecretsId>
     <Authors>Michel Megens</Authors>
     <Copyright>Michel Megens &lt;dev@bietje.net&gt;</Copyright>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <ServerGarbageCollection>true</ServerGarbageCollection>
     <RootNamespace>SensateService.Api.AuthApi</RootNamespace>
     <AssemblyName>SensateService.Api.AuthApi</AssemblyName>
