@@ -1,5 +1,8 @@
 ﻿/*
+ * Update handler for live data commands.
  *
+ * @author Michel Megens
+ * @email  michel@michelmegens.net
  */
 
 using System;
@@ -15,18 +18,6 @@ using SensateIoT.Platform.Network.Data.Enums;
 
 namespace SensateIoT.Platform.Network.Common.Caching.Realtime
 {
-	internal class InternalLiveDataRoute
-	{
-		public string SensorID { get; set; }
-		public string Target { get; set; }
-	}
-
-	internal class InternalLiveDataSyncList
-	{
-		public string Target { get; set; }
-		public IEnumerable<string> Sensors { get; set; }
-	}
-
 	public class LiveDataRouteUpdateHandler
 	{
 		private readonly IDataCache m_cache;
@@ -76,5 +67,17 @@ namespace SensateIoT.Platform.Network.Common.Caching.Realtime
 				throw new ArgumentOutOfRangeException();
 			}
 		}
+	}
+
+	internal class InternalLiveDataRoute
+	{
+		public string SensorID { get; set; }
+		public string Target { get; set; }
+	}
+
+	internal class InternalLiveDataSyncList
+	{
+		public string Target { get; set; }
+		public IEnumerable<string> Sensors { get; set; }
 	}
 }
