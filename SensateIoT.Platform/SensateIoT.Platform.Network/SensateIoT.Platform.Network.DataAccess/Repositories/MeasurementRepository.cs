@@ -116,6 +116,6 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			await this.m_buckets.DeleteManyAsync(filter, ct).ConfigureAwait(false);
 		}
 
-#endregion
+		#endregion
 	}
 }
