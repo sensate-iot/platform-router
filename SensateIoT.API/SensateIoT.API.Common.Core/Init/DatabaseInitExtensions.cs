@@ -28,6 +28,13 @@ namespace SensateIoT.API.Common.Core.Init
 			services.AddSingleton<SensateContext>();
 		}
 
+		public static void AddPostgres(this IServiceCollection services, string sensateiot)
+		{
+			services.AddDbContextPool<SensateSqlContext>(options => {
+				options.UseNpgsql(sensateiot);
+			}, 256);
+		}
+
 		public static void AddPostgres(this IServiceCollection services, string sensateiot, string network)
 		{
 			services.AddDbContextPool<SensateSqlContext>(options => {

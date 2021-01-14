@@ -55,7 +55,7 @@ namespace SensateService.Api.AuthApi.Application
 			services.AddCors();
 			var privatemqtt = mqtt.InternalBroker;
 
-			services.AddPostgres(db.PgSQL.ConnectionString, db.Network.ConnectionString);
+			services.AddPostgres(db.PgSQL.ConnectionString);
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.AddIdentityFramwork(auth);
 

@@ -9,30 +9,25 @@ using System;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 
 using SensateIoT.API.Common.ApiCore.Init;
 using SensateIoT.API.Common.ApiCore.Middleware;
 using SensateIoT.API.Common.Config.Config;
-using SensateIoT.API.Common.Core.Infrastructure.Sql;
 using SensateIoT.API.Common.Core.Init;
 
 namespace SensateIoT.API.DashboardApi.Application
 {
 	public class Startup
 	{
-		private readonly IWebHostEnvironment _env;
 		private readonly IConfiguration _configuration;
 
-		public Startup(IConfiguration configuration, IWebHostEnvironment environment)
+		public Startup(IConfiguration configuration)
 		{
 			this._configuration = configuration;
-			this._env = environment;
 		}
 
 		// ReSharper disable once UnusedMember.Global
@@ -50,7 +45,7 @@ namespace SensateIoT.API.DashboardApi.Application
 
 			services.AddCors();
 
-			services.AddPostgres(db.PgSQL.ConnectionString, db.Network.ConnectionString);
+			services.AddPostgres(db.PgSQL.ConnectionString);
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.AddIdentityFramwork(auth);
 			services.AddReverseProxy(sys);
