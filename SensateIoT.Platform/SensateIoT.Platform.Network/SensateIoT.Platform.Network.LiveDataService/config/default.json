@@ -5,7 +5,7 @@
     "timeout": 1500
   },
   "mongodb": {
-    "connectionString": "mongodb://root:root@localhost:27017/Sensate?authSource=admin",
+    "connectionString": "mongodb://root:root@localhost:27017/SensateIoT?authSource=admin",
     "maxConnections": 300
   },
   "postgresql": {
