@@ -63,6 +63,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 
 			try {
 				sensor = this.m_sensors[id];
+				this.m_logger.LogDebug("Found sensor for {sensorId}. Owner: {userId}.", sensor.ID.ToString(), sensor.AccountID.ToString("D"));
 				var account = this.m_accounts[sensor.AccountID];
 				var key = this.m_keys[sensor.SensorKey];
 
@@ -70,8 +71,11 @@ namespace SensateIoT.Platform.Network.Common.Caching.Object
 				   key.IsReadOnly || key.IsRevoked || account.ID != key.AccountID) {
 					sensor = null;
 				}
+
+				this.m_logger.LogDebug(sensor == null ? "Sensor {id} not authorized." : "Sensor {id} authorized.", id.ToString());
 			} catch(KeyNotFoundException) {
 				sensor = null;
+				this.m_logger.LogDebug("Sensor not found: {sensorId}.", id.ToString());
 			} catch(CacheException ex) {
 				sensor = null;
 				this.m_logger.LogError("Unable to retrieve cache value for key: {id}. " +
