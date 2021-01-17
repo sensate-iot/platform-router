@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
 
-using SensateIoT.Platform.Network.Common.Caching.Object;
+using SensateIoT.Platform.Network.Common.Caching.Abstract;
 using SensateIoT.Platform.Network.Common.Caching.Realtime;
 using SensateIoT.Platform.Network.Common.MQTT;
 using SensateIoT.Platform.Network.Data.DTO;

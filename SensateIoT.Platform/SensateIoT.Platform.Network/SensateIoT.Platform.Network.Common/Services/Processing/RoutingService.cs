@@ -17,7 +17,7 @@ using Google.Protobuf;
 using Newtonsoft.Json;
 using Prometheus;
 
-using SensateIoT.Platform.Network.Common.Caching.Object;
+using SensateIoT.Platform.Network.Common.Caching.Abstract;
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
 using SensateIoT.Platform.Network.Common.Collections.Remote;
 using SensateIoT.Platform.Network.Common.Services.Background;

@@ -12,7 +12,7 @@ using System.Linq;
 using MongoDB.Bson;
 using Newtonsoft.Json;
 
-using SensateIoT.Platform.Network.Common.Caching.Object;
+using SensateIoT.Platform.Network.Common.Caching.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Enums;
 

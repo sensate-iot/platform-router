@@ -12,7 +12,7 @@ using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-using SensateIoT.Platform.Network.Common.Caching.Object;
+using SensateIoT.Platform.Network.Common.Caching.Abstract;
 using SensateIoT.Platform.Network.Common.Services.Background;
 using SensateIoT.Platform.Network.Common.Settings;
 

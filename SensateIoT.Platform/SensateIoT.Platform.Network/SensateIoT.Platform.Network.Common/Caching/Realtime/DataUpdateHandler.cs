@@ -8,10 +8,12 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.DependencyInjection;
+
 using MongoDB.Bson;
 
-using SensateIoT.Platform.Network.Common.Caching.Object;
+using SensateIoT.Platform.Network.Common.Caching.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Enums;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
