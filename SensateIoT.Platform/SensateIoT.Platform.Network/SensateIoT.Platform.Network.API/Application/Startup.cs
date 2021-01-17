@@ -26,10 +26,13 @@ using SensateIoT.Platform.Network.API.MQTT;
 using SensateIoT.Platform.Network.API.Services;
 using SensateIoT.Platform.Network.Common.Init;
 using SensateIoT.Platform.Network.Common.Services.Metrics;
+using SensateIoT.Platform.Network.Common.Services.Processing;
 using SensateIoT.Platform.Network.Common.Settings;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Repositories;
+
+using IAuthorizationService = SensateIoT.Platform.Network.Common.Services.Processing.IAuthorizationService;
 
 namespace SensateIoT.Platform.Network.API.Application
 {
@@ -90,6 +93,7 @@ namespace SensateIoT.Platform.Network.API.Application
 
 			services.AddSingleton<IBlobService, FilesystemBlobService>();
 			services.AddSingleton<IRouterClient, RouterClient>();
+			services.AddSingleton<IAuthorizationService, AuthorizationService>();
 			services.AddSingleton<IMeasurementAuthorizationService, MeasurementAuthorizationService>();
 			services.AddSingleton<IMessageAuthorizationService, MessageAuthorizationService>();
 			services.AddSingleton<IHashAlgorithm, SHA256Algorithm>();

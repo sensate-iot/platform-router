@@ -7,5 +7,6 @@
 
 export enum ClientType {
     MessageClient,
-    MeasurementClient
+    MeasurementClient,
+    ControlMessageClient
 }

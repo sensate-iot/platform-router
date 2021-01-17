@@ -23,6 +23,8 @@ using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Models;
+
+using ControlMessage = SensateIoT.Platform.Network.Data.DTO.ControlMessage;
 using Message = SensateIoT.Platform.Network.Data.DTO.Message;
 
 namespace SensateIoT.Platform.Network.Common.Collections.Remote
@@ -31,12 +33,14 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 	{
 		private IDictionary<string, TextMessageData> m_textMessageQueues;
 		private IDictionary<string, MeasurementData> m_measurementQueues;
+		private IDictionary<string, ControlMessageData> m_controlMessageQueues;
 
 		private SpinLockWrapper m_liveDataLock;
 		private HashSet<string> m_liveDataHandlers;
 
 		private SpinLockWrapper m_measurementLock;
 		private SpinLockWrapper m_messageLock;
+		private SpinLockWrapper m_controlLock;
 
 		private MeasurementData m_triggerMeasurements;
 		private TextMessageData m_triggerMessages;
@@ -46,6 +50,7 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 
 		private readonly string m_messageLiveDataTopic;
 		private readonly string m_measurementLiveDataTopic;
+		private readonly string m_controlMessageLiveDataTopic;
 
 		private readonly IInternalMqttClient m_client;
 
@@ -55,16 +60,19 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 			this.m_liveDataHandlers = new HashSet<string>();
 			this.m_textMessageQueues = new Dictionary<string, TextMessageData>();
 			this.m_measurementQueues = new Dictionary<string, MeasurementData>();
+			this.m_controlMessageQueues = new Dictionary<string, ControlMessageData>();
 
 			this.m_messageTriggerTopic = options.Value.TriggerQueueTemplate.Replace("$type", "messages");
 			this.m_measurementTriggerTopic = options.Value.TriggerQueueTemplate.Replace("$type", "measurements");
 
 			this.m_messageLiveDataTopic = options.Value.LiveDataQueueTemplate.Replace("$type", "messages");
 			this.m_measurementLiveDataTopic = options.Value.LiveDataQueueTemplate.Replace("$type", "measurements");
+			this.m_controlMessageLiveDataTopic = options.Value.LiveDataQueueTemplate.Replace("$type", "control");
 
 			this.m_triggerMeasurements = new MeasurementData();
 			this.m_triggerMessages = new TextMessageData();
 
+			this.m_controlLock = new SpinLockWrapper();
 			this.m_measurementLock = new SpinLockWrapper();
 			this.m_messageLock = new SpinLockWrapper();
 			this.m_client = client;
@@ -114,35 +122,59 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 			}
 		}
 
+		public void EnqueueControlMessageToTarget(IPlatformMessage message, RoutingTarget target)
+		{
+			this.m_liveDataLock.Lock();
+
+			try {
+				this.m_controlMessageQueues[target.Target].Messages.Add(ControlMessageProtobufConverter.Convert(message as ControlMessage));
+			} finally {
+				this.m_liveDataLock.Unlock();
+			}
+		}
+
 		public async Task FlushLiveDataAsync()
 		{
-			var publishes = new ConcurrentBag<Task>();
 			IDictionary<string, TextMessageData> messages;
 			IDictionary<string, MeasurementData> measurements;
+			IDictionary<string, ControlMessageData> controlMessages;
 
 			this.m_liveDataLock.Lock();
 			this.m_measurementLock.Lock();
 			this.m_messageLock.Lock();
+			this.m_controlLock.Lock();
 
 			try {
 				measurements = this.m_measurementQueues;
 				messages = this.m_textMessageQueues;
+				controlMessages = this.m_controlMessageQueues;
 
 				this.m_measurementQueues = new Dictionary<string, MeasurementData>();
 				this.m_textMessageQueues = new Dictionary<string, TextMessageData>();
+				this.m_controlMessageQueues = new Dictionary<string, ControlMessageData>();
 
 				foreach(var handler in this.m_liveDataHandlers) {
 					this.m_measurementQueues.Add(handler, new MeasurementData());
 					this.m_textMessageQueues.Add(handler, new TextMessageData());
+					this.m_controlMessageQueues.Add(handler, new ControlMessageData());
 				}
 			} finally {
+				this.m_controlLock.Unlock();
 				this.m_messageLock.Unlock();
 				this.m_measurementLock.Unlock();
 				this.m_liveDataLock.Unlock();
 			}
 
+			await this.PublishLiveData(controlMessages, messages, measurements).ConfigureAwait(false);
+		}
 
-			Parallel.ForEach(measurements, async (kvp) => {
+		private async Task PublishLiveData(IDictionary<string, ControlMessageData> control,
+										   IDictionary<string, TextMessageData> messages,
+										   IDictionary<string, MeasurementData> measurements)
+		{
+			var publishes = new ConcurrentBag<Task>();
+
+			Parallel.ForEach(measurements, async kvp => {
 				if(kvp.Value.Measurements.Count <= 0) {
 					return;
 				}
@@ -155,7 +187,7 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 				publishes.Add(this.m_client.PublishOnAsync(topic, data, false));
 			});
 
-			Parallel.ForEach(messages, async (kvp) => {
+			Parallel.ForEach(messages, async kvp => {
 				if(kvp.Value.Messages.Count <= 0) {
 					return;
 				}
@@ -164,6 +196,19 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 				kvp.Value.WriteTo(stream);
 				var data = stream.ToArray().Compress();
 				var topic = this.m_messageLiveDataTopic.Replace("$target", kvp.Key);
+
+				publishes.Add(this.m_client.PublishOnAsync(topic, data, false));
+			});
+
+			Parallel.ForEach(control, async kvp => {
+				if(kvp.Value.Messages.Count <= 0) {
+					return;
+				}
+
+				await using var stream = new MemoryStream();
+				kvp.Value.WriteTo(stream);
+				var data = stream.ToArray().Compress();
+				var topic = this.m_controlMessageLiveDataTopic.Replace("$target", kvp.Key);
 
 				publishes.Add(this.m_client.PublishOnAsync(topic, data, false));
 			});
@@ -216,6 +261,7 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 			this.m_liveDataLock.Lock();
 			this.m_measurementLock.Lock();
 			this.m_messageLock.Lock();
+			this.m_controlLock.Lock();
 
 			try {
 				var names = handlers.Select(x => x.Name).ToList();
@@ -227,13 +273,16 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 				foreach(var name in dropped) {
 					this.m_measurementQueues.Remove(name);
 					this.m_textMessageQueues.Remove(name);
+					this.m_controlMessageQueues.Remove(name);
 				}
 
 				foreach(var handler in this.m_liveDataHandlers) {
 					this.m_measurementQueues.TryAdd(handler, new MeasurementData());
 					this.m_textMessageQueues.TryAdd(handler, new TextMessageData());
+					this.m_controlMessageQueues.TryAdd(handler, new ControlMessageData());
 				}
 			} finally {
+				this.m_controlLock.Unlock();
 				this.m_messageLock.Unlock();
 				this.m_measurementLock.Unlock();
 				this.m_liveDataLock.Unlock();

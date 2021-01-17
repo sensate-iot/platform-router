@@ -15,6 +15,7 @@ using MongoDB.Bson;
 using Prometheus;
 
 using SensateIoT.Platform.Network.Adapters.Abstract;
+using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
@@ -102,6 +103,7 @@ namespace SensateIoT.Platform.Network.TriggerService.Services
 
 			case TriggerChannel.MQTT:
 			case TriggerChannel.ControlMessage:
+			case TriggerChannel.LiveData:
 				this.m_actuatorCounter.Inc();
 
 				if(!ObjectId.TryParse(action.Target, out var id)) {
@@ -115,7 +117,7 @@ namespace SensateIoT.Platform.Network.TriggerService.Services
 				};
 
 				var io = new[] {
-					this.m_router.RouteControlMessageAsync(msg),
+					this.m_router.RouteControlMessageAsync(msg, action.Channel == TriggerChannel.LiveData ? ControlMessageType.LiveData : ControlMessageType.Mqtt),
 					this.m_controlMessges.CreateAsync(msg)
 				};
 
@@ -123,7 +125,7 @@ namespace SensateIoT.Platform.Network.TriggerService.Services
 				break;
 
 			default:
-				throw new ArgumentOutOfRangeException();
+				throw new ArgumentOutOfRangeException(nameof(TriggerAction.Channel));
 			}
 
 			action.LastInvocation = DateTime.UtcNow;

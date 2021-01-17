@@ -13,11 +13,16 @@ export class AuditLogsClient {
     }
 
     public async createEntry(log: AuditLog) {
-        // INSERT INTO "AuditLogs" ("Route", "Method", "Address", "AuthorId", "Timestamp") VALUES ('/bla', 2, '127.0.0.1', NULL, NOW())
-        const author = log.authorId === "" ? "NULL" : log.authorId;
+        let query;
 
-        const query = `INSERT INTO "AuditLogs" ("Route", "Method", "Address", "AuthorId", "Timestamp") VALUES ` +
-            `('${log.route}', ${log.method}, '${log.ipAddress}', '${author}', NOW())`;
+        if (log.authorId === "" || log.authorId == null) {
+            query = `INSERT INTO "AuditLogs" ("Route", "Method", "Address", "AuthorId", "Timestamp") VALUES ` +
+                `('${log.route}', ${log.method}, '${log.ipAddress}', NULL, NOW())`;
+        } else {
+            query = `INSERT INTO "AuditLogs" ("Route", "Method", "Address", "AuthorId", "Timestamp") VALUES ` +
+                `('${log.route}', ${log.method}, '${log.ipAddress}', '${log.authorId}', NOW())`;
+        }
+
         try {
             await this.pool.query(query);
         } catch (ex) {

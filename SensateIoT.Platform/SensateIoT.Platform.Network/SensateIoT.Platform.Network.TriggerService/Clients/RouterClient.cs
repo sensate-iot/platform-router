@@ -9,13 +9,13 @@ using System;
 using System.Threading.Tasks;
 
 using Google.Protobuf.WellKnownTypes;
-
 using Grpc.Core;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using SensateIoT.Platform.Network.Contracts.Services;
+using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.TriggerService.Settings;
 
@@ -34,12 +34,13 @@ namespace SensateIoT.Platform.Network.TriggerService.Clients
 			this.m_logger = logger;
 		}
 
-		public async Task RouteControlMessageAsync(ControlMessage msg)
+		public async Task RouteControlMessageAsync(ControlMessage msg, ControlMessageType type)
 		{
 			var controlMessage = new Contracts.DTO.ControlMessage {
 				Data = msg.Data,
 				Timestamp = Timestamp.FromDateTime(msg.Timestamp),
-				SensorID = msg.SensorId.ToString()
+				SensorID = msg.SensorId.ToString(),
+				Destination = Convert.ToInt32(type)
 			};
 
 			var client = new EgressRouter.EgressRouterClient(this.m_channel);

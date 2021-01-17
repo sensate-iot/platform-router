@@ -6,12 +6,14 @@
  */
 
 using System.Threading.Tasks;
+
+using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.Models;
 
 namespace SensateIoT.Platform.Network.TriggerService.Clients
 {
 	public interface IRouterClient
 	{
-		Task RouteControlMessageAsync(ControlMessage msg);
+		Task RouteControlMessageAsync(ControlMessage msg, ControlMessageType type);
 	}
 }

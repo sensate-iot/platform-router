@@ -20,6 +20,7 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 		void EnqueueMeasurementToTriggerService(IPlatformMessage message);
 		void EnqueueMeasurementToTarget(IPlatformMessage message, RoutingTarget target);
 		void EnqueueMessageToTarget(IPlatformMessage message, RoutingTarget target);
+		void EnqueueControlMessageToTarget(IPlatformMessage message, RoutingTarget target);
 		Task FlushAsync();
 		Task FlushLiveDataAsync();
 

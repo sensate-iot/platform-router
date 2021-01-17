@@ -55,7 +55,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 
 			var sensors = await sensorTask.ConfigureAwait(false);
 			var dict = sensors.ToDictionary(k => k.ID, v => v);
-			this.m_logger.LogDebug("Finished loading sensors {ms} after starting.", sw.ElapsedMilliseconds);
+			this.m_logger.LogDebug("Finished loading sensors {ms}ms after starting.", sw.ElapsedMilliseconds);
 
 			var rawTriggers = await triggerTask.ConfigureAwait(false);
 			var triggers = rawTriggers.ToList();

@@ -81,11 +81,17 @@
     <TypeScriptCompile Include="src\commands\synclivedatasensorscommand.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="src\handlers\controlmessagehandler.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="src\handlers\imessagehandler.ts" />
     <TypeScriptCompile Include="src\handlers\measurementhandler.ts" />
     <TypeScriptCompile Include="src\handlers\messagehandler.ts" />
     <TypeScriptCompile Include="src\models\auditlog.ts" />
     <TypeScriptCompile Include="src\models\clienttype.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="src\models\controlmessage.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="src\models\geojson.ts">

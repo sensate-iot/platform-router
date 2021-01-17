@@ -15,6 +15,7 @@ export class MqttSettings {
     host: string;
     bulkMeasurementTopic: string;
     bulkMessageTopic: string;
+    bulkControlMessageTopic: string;
     routerCommandTopic: string;
     topicShare: string;
 }
@@ -59,6 +60,7 @@ function parseMqtt(settings: Settings) {
     settings.mqtt.host = config.get('mqtt.host');
     settings.mqtt.bulkMeasurementTopic = config.get('mqtt.bulkMeasurementTopic');
     settings.mqtt.bulkMessageTopic = config.get('mqtt.bulkMessageTopic');
+    settings.mqtt.bulkControlMessageTopic = config.get('mqtt.bulkControlMessageTopic');
     settings.mqtt.routerCommandTopic = config.get('mqtt.routerCommandTopic');
     settings.mqtt.topicShare = config.get('mqtt.topicShare');
 }

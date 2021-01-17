@@ -23,6 +23,7 @@
     "host": "localhost",
     "bulkMeasurementTopic": "$share/live/sensateiot/live/internal/measurements/local-001/bulk",
     "bulkMessageTopic": "$share/live/sensateiot/live/internal/messages/local-001/bulk",
+    "bulkControlMessageTopic": "$share/live/sensateiot/live/internal/control/local-001/bulk",
     "routerCommandTopic": "sensateiot/internal/commands",
     "topicShare": "live"
   },

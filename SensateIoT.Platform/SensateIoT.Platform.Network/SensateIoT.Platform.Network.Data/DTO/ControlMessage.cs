@@ -28,6 +28,8 @@ namespace SensateIoT.Platform.Network.Data.DTO
 		[BsonIgnore, JsonIgnore]
 		public MessageType Type => MessageType.ControlMessage;
 		[BsonIgnore, JsonIgnore]
+		public ControlMessageType Destination { get; set; }
+		[BsonIgnore, JsonIgnore]
 		public DateTime PlatformTimestamp { get; set; }
 	}
 }

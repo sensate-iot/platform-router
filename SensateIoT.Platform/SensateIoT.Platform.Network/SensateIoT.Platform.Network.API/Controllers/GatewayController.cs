@@ -10,7 +10,6 @@ using System.Linq;
 using System.IO;
 using System.Threading.Tasks;
 using System.Threading;
-
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -22,11 +21,12 @@ using SensateIoT.Platform.Network.Adapters.Abstract;
 using SensateIoT.Platform.Network.API.Abstract;
 using SensateIoT.Platform.Network.API.Attributes;
 using SensateIoT.Platform.Network.API.DTO;
-using SensateIoT.Platform.Network.API.Services;
+using SensateIoT.Platform.Network.Common.Converters;
+using SensateIoT.Platform.Network.Common.Services.Processing;
+using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
 
-using ControlMessage = SensateIoT.Platform.Network.Contracts.DTO.ControlMessage;
 using Measurement = SensateIoT.Platform.Network.API.DTO.Measurement;
 using Message = SensateIoT.Platform.Network.API.DTO.Message;
 
@@ -42,6 +42,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		private readonly IBlobService m_blobService;
 		private readonly IRouterClient m_client;
 		private readonly ILogger<GatewayController> m_logger;
+		private readonly IAuthorizationService m_auth;
 
 		public GatewayController(IMeasurementAuthorizationService measurementAuth,
 								 IMessageAuthorizationService messageAuth,
@@ -52,6 +53,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 								 IBlobRepository blobs,
 								 IBlobService blobService,
 								 IRouterClient client,
+								 IAuthorizationService auth,
 								 ILogger<GatewayController> logger) : base(ctx, sensors, links, keys)
 		{
 			this.m_measurementAuthorizationService = measurementAuth;
@@ -60,6 +62,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			this.m_blobs = blobs;
 			this.m_client = client;
 			this.m_logger = logger;
+			this.m_auth = auth;
 		}
 
 		[HttpPost("blobs")]
@@ -118,7 +121,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			this.m_messageAuthorizationService.AddMessage(new JsonMessage(message, raw));
 
 			response.Data = new GatewayResponse {
-				Message = "Measurements received and queued.",
+				Message = "Messages received and queued.",
 				Queued = 1
 			};
 
@@ -151,20 +154,36 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		{
 			var response = new Response<GatewayResponse>();
 
-			if(!ObjectId.TryParse(message.SensorId, out _)) {
+			if(!ObjectId.TryParse(message.SensorId, out var id)) {
 				response.AddError("Invalid sensor ID.");
 				return this.BadRequest(response);
 			}
 
-			var controlMessage = new ControlMessage {
+			var sensor = await this.m_sensors.GetAsync(id).ConfigureAwait(false);
+			var auth = await this.AuthenticateUserForSensor(sensor, false).ConfigureAwait(false);
+
+			if(!auth) {
+				response.AddError($"Sensor {message.SensorId} is not authorized for user {this.m_currentUserId}");
+				return this.Unauthorized(response);
+			}
+
+			var controlMessage = new Data.DTO.ControlMessage() {
 				Data = message.Data,
-				SensorID = message.SensorId
+				Destination = ControlMessageType.Mqtt,
+				PlatformTimestamp = DateTime.UtcNow,
+				Timestamp = DateTime.UtcNow,
+				Secret = sensor.Secret,
+				SensorId = id
 			};
 
-			await this.m_client.RouteAsync(controlMessage, CancellationToken.None).ConfigureAwait(false);
+			var json = JsonConvert.SerializeObject(controlMessage);
+			this.m_auth.SignControlMessage(controlMessage, json);
+
+			await this.m_client.RouteAsync(ControlMessageProtobufConverter.Convert(controlMessage), CancellationToken.None)
+				.ConfigureAwait(false);
 
 			response.Data = new GatewayResponse {
-				Message = "Measurements received and queued.",
+				Message = "Control message received and queued.",
 				Queued = 1
 			};
 

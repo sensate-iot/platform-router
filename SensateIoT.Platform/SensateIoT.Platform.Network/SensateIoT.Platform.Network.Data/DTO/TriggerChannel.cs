@@ -11,6 +11,7 @@ namespace SensateIoT.Platform.Network.Data.DTO
 	{
 		Email,
 		SMS,
+		LiveData,
 		MQTT,
 		HttpPost,
 		HttpGet,

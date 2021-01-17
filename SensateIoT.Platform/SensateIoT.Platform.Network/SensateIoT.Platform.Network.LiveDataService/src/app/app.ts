@@ -18,6 +18,7 @@ import cors from "cors";
 import "./jsonmodule";
 import { MessageHandler } from "../handlers/messagehandler";
 import { MeasurementHandler } from "../handlers/measurementhandler";
+import { ControlMessageHandler } from "../handlers/controlmessagehandler";
 
 export class Application {
     private readonly client: MqttClient;
@@ -41,6 +42,7 @@ export class Application {
 
         this.client.addHandler(new MessageHandler(this.wss, Application.config.mqtt.bulkMessageTopic));
         this.client.addHandler(new MeasurementHandler(this.wss, Application.config.mqtt.bulkMeasurementTopic));
+        this.client.addHandler(new ControlMessageHandler(this.wss, Application.config.mqtt.bulkControlMessageTopic));
 
         this.client.connect(Application.config.mqtt.username, Application.config.mqtt.password).then(() => {
             console.log("Connected to MQTT!");
@@ -50,6 +52,9 @@ export class Application {
             return this.client.subscribe(Application.config.mqtt.bulkMessageTopic);
         }).then(() => {
             console.log(`Subscribed to: ${Application.config.mqtt.bulkMessageTopic}`);
+            return this.client.subscribe(Application.config.mqtt.bulkControlMessageTopic);
+        }).then(() => {
+            console.log(`Subscribed to: ${Application.config.mqtt.bulkControlMessageTopic}`);
         }).catch(err => {
             console.warn(`Unable to connect to MQTT: ${err.toString()}`);
         });
