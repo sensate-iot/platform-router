@@ -31,5 +31,6 @@ namespace SensateIoT.Platform.Network.Data.DTO
 
 		[JsonIgnore]
 		public MessageType Type => MessageType.Message;
+		public MessageEncoding Encoding { get; set; }
 	}
 }

@@ -13,6 +13,7 @@ using Google.Protobuf.WellKnownTypes;
 using MongoDB.Bson;
 
 using SensateIoT.Platform.Network.Contracts.DTO;
+using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
 
 namespace SensateIoT.Platform.Network.Common.Converters
@@ -30,7 +31,8 @@ namespace SensateIoT.Platform.Network.Common.Converters
 					SensorID = message.SensorID.ToString(),
 					Timestamp = Timestamp.FromDateTime(message.Timestamp),
 					PlatformTime = Timestamp.FromDateTime(message.PlatformTimestamp),
-					Data = message.Data
+					Data = message.Data,
+					Encoding = System.Convert.ToInt32(message.Encoding)
 				};
 
 				textData.Messages.Add(m);
@@ -47,7 +49,8 @@ namespace SensateIoT.Platform.Network.Common.Converters
 				SensorID = message.SensorID.ToString(),
 				Timestamp = Timestamp.FromDateTime(message.Timestamp),
 				PlatformTime = Timestamp.FromDateTime(message.PlatformTimestamp),
-				Data = message.Data
+				Data = message.Data,
+				Encoding = System.Convert.ToInt32(message.Encoding)
 			};
 		}
 
@@ -59,7 +62,8 @@ namespace SensateIoT.Platform.Network.Common.Converters
 				Longitude = message.Longitude,
 				Latitude = message.Latitude,
 				Data = message.Data,
-				SensorId = ObjectId.Parse(message.SensorID)
+				SensorId = ObjectId.Parse(message.SensorID),
+				Encoding = (MessageEncoding)message.Encoding
 			};
 		}
 	}
