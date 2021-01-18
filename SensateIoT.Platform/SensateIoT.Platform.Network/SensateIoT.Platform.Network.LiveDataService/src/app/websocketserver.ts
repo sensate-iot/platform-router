@@ -23,7 +23,7 @@ import { Command, stringifyCommand } from "../commands/command";
 import { SyncLiveDataSensorsCommand } from "../commands/synclivedatasensorscommand";
 import { Application } from "./app";
 import { LiveSensorCommand } from "../commands/livesensorcommand";
-import { BulkControlMessage, ControlMessage } from "../models/controlmessage";
+import { BulkControlMessage } from "../models/controlmessage";
 
 export class WebSocketServer {
     private readonly server: http.Server;

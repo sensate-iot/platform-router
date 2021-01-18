@@ -7,12 +7,11 @@
 
 using System;
 using System.Net;
-
 using Newtonsoft.Json;
 using SensateIoT.API.Common.Core.Converters;
 using SensateIoT.API.Common.Data.Enums;
 
-namespace SensateService.Api.AuthApi.Json
+namespace SensateIoT.API.AuthApi.Json
 {
 	public class AuditLog
 	{

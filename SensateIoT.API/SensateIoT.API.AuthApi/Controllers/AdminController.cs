@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -21,7 +20,7 @@ using SensateIoT.API.Common.Data.Dto.Json.In;
 using SensateIoT.API.Common.Data.Dto.Json.Out;
 using SensateIoT.API.Common.Data.Enums;
 
-namespace SensateService.Api.AuthApi.Controllers
+namespace SensateIoT.API.AuthApi.Controllers
 {
 	[AdministratorUser]
 	[Produces("application/json")]

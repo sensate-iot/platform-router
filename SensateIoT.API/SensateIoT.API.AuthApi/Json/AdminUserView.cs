@@ -8,7 +8,7 @@
 using System;
 using SensateIoT.API.Common.Data.Dto.Json.Out;
 
-namespace SensateService.Api.AuthApi.Json
+namespace SensateIoT.API.AuthApi.Json
 {
 	public class AdminUserView : User
 	{

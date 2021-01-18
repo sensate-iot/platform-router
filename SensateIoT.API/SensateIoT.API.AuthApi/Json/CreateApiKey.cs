@@ -5,7 +5,7 @@
  * @email  michel.megens@sonatolabs.com
  */
 
-namespace SensateService.Api.AuthApi.Json
+namespace SensateIoT.API.AuthApi.Json
 {
 	public class CreateApiKey
 	{

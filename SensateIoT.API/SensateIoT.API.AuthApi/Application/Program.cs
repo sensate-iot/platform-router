@@ -8,6 +8,7 @@
 using System;
 using System.IO;
 using System.Reflection;
+
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +21,7 @@ using SensateIoT.API.Common.ApiCore.Init;
 using SensateIoT.API.Common.Core.Infrastructure.Sql;
 using SensateIoT.API.Common.IdentityData.Models;
 
-namespace SensateService.Api.AuthApi.Application
+namespace SensateIoT.API.AuthApi.Application
 {
 	public class Program
 	{

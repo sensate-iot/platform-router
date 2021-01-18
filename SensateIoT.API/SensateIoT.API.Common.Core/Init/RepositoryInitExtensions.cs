@@ -44,9 +44,6 @@ namespace SensateIoT.API.Common.Core.Init
 			services.AddScoped<IChangePhoneNumberTokenRepository, ChangePhoneNumberRepository>();
 			services.AddScoped<IBulkWriter<AuditLog>, AuditLogRepository>();
 			services.AddScoped<IAuditLogRepository, AuditLogRepository>();
-			services.AddScoped<ITriggerRepository, TriggerRepository>();
-			services.AddScoped<IBlobRepository, BlobRepository>();
-			services.AddScoped<ISensorLinkRepository, SensorLinkRepository>();
 
 			return services;
 		}

@@ -85,8 +85,14 @@ namespace SensateIoT.Platform.Network.Common.MQTT
 					UseTls = true
 				});
 
-			if(user != null)
+			if(string.IsNullOrEmpty(user)) {
+				user = null;
+				passwd = null;
+			}
+
+			if(user != null) {
 				builder.WithCredentials(user, passwd);
+			}
 
 			this.Client.UseDisconnectedHandler(e => { this.OnDisconnect_HandlerAsync(); });
 			this.Client.UseConnectedHandler(e => { this.OnConnect_Handler(); });
@@ -159,7 +165,8 @@ namespace SensateIoT.Platform.Network.Common.MQTT
 
 			try {
 				await this.Client.ConnectAsync(this._client_options);
-			} catch {
+			} catch(Exception ex) {
+				this._logger.LogError(ex, "Unable to reconnect to broker: {broker}:{port}.", this._host, this._port);
 				this._logger.LogInformation("Unable to reconnect");
 			}
 		}

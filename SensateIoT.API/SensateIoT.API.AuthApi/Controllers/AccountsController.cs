@@ -11,7 +11,6 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -19,7 +18,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-
+using SensateIoT.API.AuthApi.Helpers;
+using SensateIoT.API.AuthApi.Json;
 using SensateIoT.API.Common.ApiCore.Attributes;
 using SensateIoT.API.Common.ApiCore.Controllers;
 using SensateIoT.API.Common.Config.Settings;
@@ -34,10 +34,8 @@ using SensateIoT.API.Common.Data.Dto.Json.Out;
 using SensateIoT.API.Common.Data.Enums;
 using SensateIoT.API.Common.Data.Models;
 using SensateIoT.API.Common.IdentityData.Models;
-using SensateService.Api.AuthApi.Helpers;
-using SensateService.Api.AuthApi.Json;
 
-namespace SensateService.Api.AuthApi.Controllers
+namespace SensateIoT.API.AuthApi.Controllers
 {
 	[Produces("application/json")]
 	[Route("auth/v1/[controller]")]

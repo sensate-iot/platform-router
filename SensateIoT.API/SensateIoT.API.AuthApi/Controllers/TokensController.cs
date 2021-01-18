@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +25,7 @@ using SensateIoT.API.Common.Data.Enums;
 using SensateIoT.API.Common.IdentityData.Enums;
 using SensateIoT.API.Common.IdentityData.Models;
 
-namespace SensateService.Api.AuthApi.Controllers
+namespace SensateIoT.API.AuthApi.Controllers
 {
 	[Produces("application/json")]
 	[Route("auth/v1/[controller]")]

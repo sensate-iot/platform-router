@@ -20,6 +20,7 @@ using Microsoft.OpenApi.Models;
 using SensateIoT.API.Common.ApiCore.Init;
 using SensateIoT.API.Common.ApiCore.Middleware;
 using SensateIoT.API.Common.Config.Config;
+using SensateIoT.API.Common.Core.Infrastructure.Repositories;
 using SensateIoT.API.Common.Core.Infrastructure.Sql;
 using SensateIoT.API.Common.Core.Init;
 
@@ -55,6 +56,7 @@ namespace SensateService.Api.DataApi.Application
 			services.AddIdentityFramwork(auth);
 			services.AddReverseProxy(sys);
 			services.AddAuthorizationProxy(sys);
+			services.AddScoped<ISensorLinkRepository, SensorLinkRepository>();
 
 			if(cache.Enabled) {
 				services.AddCacheStrategy(cache, db);

@@ -44,7 +44,7 @@ namespace SensateIoT.Platform.Network.Common.Init
 			return service;
 		}
 
-		public static IServiceCollection AddInternalMqttService(this IServiceCollection services, Action<MqttServiceOptions> setup)
+		public static IServiceCollection AddInternalMqttService(this IServiceCollection services, Action<InternalMqttServiceOptions> setup)
 		{
 			if(setup != null) {
 				services.Configure(setup);

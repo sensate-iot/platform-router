@@ -8,7 +8,7 @@
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 
-namespace SensateService.Api.AuthApi.Helpers
+namespace SensateIoT.API.AuthApi.Helpers
 {
 	public static class HostingHelper
 	{

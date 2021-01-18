@@ -7,7 +7,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 
-namespace SensateService.Api.AuthApi.Helpers
+namespace SensateIoT.API.AuthApi.Helpers
 {
 	public static class UrlHelperExtensions
 	{

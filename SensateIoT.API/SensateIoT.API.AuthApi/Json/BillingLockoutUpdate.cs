@@ -7,7 +7,7 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace SensateService.Api.AuthApi.Json
+namespace SensateIoT.API.AuthApi.Json
 {
 	public class BillingLockoutUpdate
 	{

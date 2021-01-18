@@ -21,9 +21,9 @@ namespace SensateIoT.Platform.Network.Common.MQTT
 {
 	public class InternalMqttClient : AbstractMqttClient, IInternalMqttClient
 	{
-		private readonly MqttServiceOptions _options;
+		private readonly InternalMqttServiceOptions _options;
 
-		public InternalMqttClient(IOptions<MqttServiceOptions> options, ILogger<MqttClient> logger, IServiceProvider sp) :
+		public InternalMqttClient(IOptions<InternalMqttServiceOptions> options, ILogger<InternalMqttClient> logger, IServiceProvider sp) :
 			base(options.Value.Host, options.Value.Port, options.Value.Ssl, options.Value.TopicShare, logger, sp)
 		{
 			this._options = options.Value;
@@ -58,12 +58,6 @@ namespace SensateIoT.Platform.Network.Common.MQTT
 			msg = builder.Build();
 
 			await this.Client.PublishAsync(msg).ConfigureAwait(false);
-		}
-
-		public void PublishOn(string topic, string message, bool retain)
-		{
-			var task = Task.Run(async () => { await this.PublishOnAsync(topic, message, retain).ConfigureAwait(false); });
-			task.Wait();
 		}
 
 		protected override async Task OnConnectAsync()

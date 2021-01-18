@@ -5,6 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,7 +25,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 
 		public LiveDataReloadService(IDataCache cache,
 									 IOptions<DataReloadSettings> settings,
-									 ILogger<LiveDataReloadService> logger) : base(settings.Value.StartDelay, settings.Value.LiveDataReloadInterval)
+									 ILogger<LiveDataReloadService> logger) : base(TimeSpan.FromSeconds(5), settings.Value.LiveDataReloadInterval)
 		{
 			this.m_logger = logger;
 			this.m_cache = cache;

@@ -8,7 +8,7 @@
 using System.Collections.Generic;
 using SensateIoT.API.Common.IdentityData.Enums;
 
-namespace SensateService.Api.AuthApi.Json
+namespace SensateIoT.API.AuthApi.Json
 {
 	public class ApiKeyFilter
 	{

@@ -30,7 +30,7 @@ export class MqttClient {
 
         this.client = connect(`mqtt://${this.host}`, opts);
 
-        const rv = new Promise((resolve) => {
+        const rv = new Promise<void>((resolve) => {
             this.client.on("connect", () => {
                 resolve();
             });
@@ -66,10 +66,11 @@ export class MqttClient {
     public subscribe(topic: string) {
         return new Promise((resolve, reject) => {
             this.client.subscribe(topic, (err) => {
-                if (err)
+                if (err) {
                     reject(err);
-                else
-                    resolve();
+                } else {
+                    resolve('');
+                }
             });
         });
     }

@@ -62,7 +62,7 @@ BEGIN
         "ApiKeys"."Type",
         "ApiKeys"."ReadOnly";
 END;
-$$
+$$;
 
 CREATE FUNCTION networkapi_createauditlog(
 	route text,
@@ -89,7 +89,7 @@ BEGIN
             author,
             NOW());
 END;
-$$
+$$;
 
 CREATE FUNCTION livedataservice_getapikey(userid TEXT, apikey TEXT)
     RETURNS TABLE("UserId" TEXT, "Type" INT)
@@ -203,8 +203,7 @@ BEGIN
         "ApiKeys"."Type",
         "ApiKeys"."ReadOnly";
 END;
-$$
-
+$$;
 
 CREATE FUNCTION networkapi_selectusersbyid(userids TEXT)
     RETURNS TABLE(
@@ -320,7 +319,7 @@ BEGIN
     FROM "ApiKeys"
     WHERE "ApiKey" = key;
 END;
-$$
+$$;
 
 CREATE FUNCTION public.livedataservice_createauditlog(
 	route text,

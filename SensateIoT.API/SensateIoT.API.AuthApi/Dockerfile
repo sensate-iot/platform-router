@@ -16,11 +16,10 @@ RUN dotnet publish -c Release -o /app/bin -r linux-musl-x64 --no-restore --self-
 FROM alpine:3.12
 
 COPY --from=build-env /app /app
-COPY SensateIoT.API.AuthApi/Settings/hosting.json /app/hosting.json
 COPY SensateIoT.API.AuthApi/appsettings.json /app/appsettings.json
 COPY SensateIoT.API.AuthApi/Templates /app/Templates
 WORKDIR /app
 RUN apk add --no-cache libstdc++ libintl icu
 
 EXPOSE 5000
-ENTRYPOINT ["bin/SensateIoT.API.AuthApi"]
+ENTRYPOINT ["bin/SensateIoT.API.AuthApi", "--urls", "http://*:80"]

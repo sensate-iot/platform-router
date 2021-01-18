@@ -6,15 +6,12 @@
  */
 
 using System;
-
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
 using Microsoft.OpenApi.Models;
-
 using SensateIoT.API.Common.ApiCore.Init;
 using SensateIoT.API.Common.ApiCore.Middleware;
 using SensateIoT.API.Common.Config.Config;
@@ -22,7 +19,7 @@ using SensateIoT.API.Common.Config.Settings;
 using SensateIoT.API.Common.Core.Init;
 using SensateIoT.API.Common.Core.Services.Adapters;
 
-namespace SensateService.Api.AuthApi.Application
+namespace SensateIoT.API.AuthApi.Application
 {
 	public class Startup
 	{
@@ -68,7 +65,6 @@ namespace SensateService.Api.AuthApi.Application
 			/* Add repositories */
 			services.AddSqlRepositories(cache.Enabled);
 			services.AddDocumentRepositories(cache.Enabled);
-			services.AddSensorServices();
 			services.AddUserService();
 
 			services.AddCommandPublisher(options => {

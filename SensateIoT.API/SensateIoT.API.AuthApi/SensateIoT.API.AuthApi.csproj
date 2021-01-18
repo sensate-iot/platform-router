@@ -2,22 +2,15 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>AuthApi</UserSecretsId>
-    <Authors>Michel Megens</Authors>
-    <Copyright>Michel Megens &lt;dev@bietje.net&gt;</Copyright>
+    <Authors>Sensate IoT</Authors>
     <Version>1.1.0</Version>
     <ServerGarbageCollection>true</ServerGarbageCollection>
-    <RootNamespace>SensateService.Api.AuthApi</RootNamespace>
-    <AssemblyName>SensateService.Api.AuthApi</AssemblyName>
+    <RootNamespace>SensateIoT.API.AuthApi</RootNamespace>
+    <AssemblyName>SensateIoT.API.AuthApi</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
-  <ItemGroup>
-    <Content Remove="appsettings.Development.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.1" />
@@ -40,9 +33,10 @@
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.2" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="appsettings.Development.json">
+    <None Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Settings\appsettings.json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SensateIoT.API.Common.ApiCore\SensateIoT.API.Common.ApiCore.csproj" />
