@@ -13,18 +13,12 @@ export class AuditLogsClient {
     }
 
     public async createEntry(log: AuditLog) {
-        let query;
-
-        if (log.authorId === "" || log.authorId == null) {
-            query = `INSERT INTO "AuditLogs" ("Route", "Method", "Address", "AuthorId", "Timestamp") VALUES ` +
-                `('${log.route}', ${log.method}, '${log.ipAddress}', NULL, NOW())`;
-        } else {
-            query = `INSERT INTO "AuditLogs" ("Route", "Method", "Address", "AuthorId", "Timestamp") VALUES ` +
-                `('${log.route}', ${log.method}, '${log.ipAddress}', '${log.authorId}', NOW())`;
-        }
-
         try {
-            await this.pool.query(query);
+            this.pool.connect().then(client => {
+                client.query('SELECT * FROM livedataservice_createauditlog($1, $2, $3, $4)', [log.route, log.method, log.ipAddress, log.authorId]).then(res => {
+                    client.release();
+                });
+            });
         } catch (ex) {
             console.log(`Unable to create audit log entry (User: ${log.authorId}`);
             console.debug(ex);
