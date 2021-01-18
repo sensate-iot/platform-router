@@ -6,6 +6,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Threading;
@@ -95,10 +96,28 @@ namespace SensateIoT.Platform.Network.API.Services
 		public async Task DeleteAsync(Guid userId, CancellationToken ct = default)
 		{
 			var sensors = await this.m_sensors.GetAsync(userId).ConfigureAwait(false);
+			await this.DeleteAsync(sensors, ct).ConfigureAwait(false);
+		}
 
-			foreach(var sensor in sensors) {
-				await this.DeleteAsync(sensor, ct).ConfigureAwait(false);
+		private async Task DeleteAsync(IEnumerable<Sensor> sensors, CancellationToken ct)
+		{
+			var sensorList = sensors.ToList();
+			var idList = sensorList.Select(x => x.InternalId).ToList();
+
+			var sensorTask = Task.WhenAll(this.m_sensors.DeleteAsync(idList, ct),
+				this.m_messages.DeleteBySensorId(idList, ct),
+				this.m_measurements.DeleteBySensorId(idList, ct),
+				this.m_control.DeleteBySensorIds(idList, ct)
+			);
+
+			var tasks = new List<Task>();
+
+			foreach(var id in idList) {
+				tasks.Add(this.m_blobService.RemoveAsync(id.ToString(), ct));
 			}
+
+			await Task.WhenAll(tasks).ConfigureAwait(false);
+			await sensorTask.ConfigureAwait(false);
 		}
 
 		public async Task<PaginationResult<Sensor>> GetSensorsAsync(User user, int skip = 0, int limit = 0, CancellationToken token = default)

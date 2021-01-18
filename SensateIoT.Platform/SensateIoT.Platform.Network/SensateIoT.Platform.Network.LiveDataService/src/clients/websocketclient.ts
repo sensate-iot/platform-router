@@ -64,6 +64,10 @@ export class WebSocketClient {
             route = "/live/v1/messages";
         }
 
+        if (this.type === ClientType.ControlMessageClient) {
+            route = "/live/v1/control";
+        }
+
         const log: AuditLog = {
             timestamp: new Date(),
             authorId: this.userId,
@@ -97,13 +101,15 @@ export class WebSocketClient {
                 break;
 
             case "auth-apikey":
+                console.debug("Received API key authorization request.")
                 const authRequest = req as IWebSocketRequest<IApiKeyAuthenticationRequest>;
-                this.authorized = await this.keys.validateApiKey(authRequest.data.user, authRequest.data.apikey);
+                this.userId = await this.keys.validateApiKey(authRequest.data.user, authRequest.data.apikey);
+                this.authorized = this.userId != null;
+                this.createLog();
 
                 if (this.authorized) {
                     this.userId = authRequest.data.user;
                 }
-
                 break;
 
             case "auth":
@@ -218,6 +224,7 @@ export class WebSocketClient {
 
     public process(data: string) {
         if (!this.authorized) {
+            console.log("Unable to write live data to unauthorized client!")
             return;
         }
 

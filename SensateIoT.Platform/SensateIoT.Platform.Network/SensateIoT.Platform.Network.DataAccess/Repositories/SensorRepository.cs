@@ -7,15 +7,21 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Microsoft.EntityFrameworkCore;
 
 using MongoDB.Bson;
 using MongoDB.Driver;
 
+using NpgsqlTypes;
+
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Contexts;
+using SensateIoT.Platform.Network.DataAccess.Extensions;
 
 using Sensor = SensateIoT.Platform.Network.Data.Models.Sensor;
 
@@ -24,10 +30,14 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 	public class SensorRepository : ISensorRepository
 	{
 		private readonly IMongoCollection<Sensor> m_sensors;
+		private readonly NetworkContext m_network;
 
-		public SensorRepository(MongoDBContext ctx)
+		private const string NetworkApi_DeleteBySensorIds = "NetworkApi_DeleteBySensorIds";
+
+		public SensorRepository(MongoDBContext ctx, NetworkContext network)
 		{
 			this.m_sensors = ctx.Sensors;
+			this.m_network = network;
 		}
 
 		public async Task CreateAsync(Sensor sensor, CancellationToken ct = default)
@@ -154,13 +164,22 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			return await this.m_sensors.CountDocumentsAsync(filter).ConfigureAwait(false);
 		}
 
-		public async Task DeleteAsync(Guid userId, CancellationToken ct = default)
+		public async Task DeleteAsync(IEnumerable<ObjectId> sensorIds, CancellationToken ct = default)
 		{
-			var builder = Builders<Sensor>.Filter;
-			var uid = userId.ToString();
-			var filter = builder.Eq(x => x.Owner, uid);
+			using var builder = StoredProcedureBuilder.Create(this.m_network.Database.GetDbConnection());
+			var sensorIdList = sensorIds.ToList();
 
+			var idlist = string.Join(',', sensorIdList.Select(x => x.ToString()));
+			builder.WithParameter("idlist", idlist, NpgsqlDbType.Text);
+			builder.WithFunction(NetworkApi_DeleteBySensorIds);
+
+			var networkTask = builder.ExecuteAsync(ct).ConfigureAwait(false);
+
+			var filter = Builders<Sensor>.Filter.In(x => x.InternalId, sensorIdList);
 			await this.m_sensors.DeleteManyAsync(filter, ct).ConfigureAwait(false);
+
+			var reader = await networkTask;
+			await reader.DisposeAsync().ConfigureAwait(false);
 		}
 
 		public async Task DeleteAsync(ObjectId sensorId, CancellationToken ct = default)

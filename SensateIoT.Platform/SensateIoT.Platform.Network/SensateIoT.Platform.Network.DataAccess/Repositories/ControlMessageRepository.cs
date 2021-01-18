@@ -89,6 +89,14 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			await this._collection.DeleteManyAsync(filter, ct).ConfigureAwait(false);
 		}
 
+		public async Task DeleteBySensorIds(IEnumerable<ObjectId> sensorIds, CancellationToken ct = default)
+		{
+			var builder = Builders<ControlMessage>.Filter;
+			var filter = builder.In(x => x.SensorId, sensorIds);
+
+			await this._collection.DeleteManyAsync(filter, ct).ConfigureAwait(false);
+		}
+
 		public async Task<long> CountAsync(IList<Sensor> sensors, DateTime start, DateTime end, int skip = -1, int limit = -1,
 										   CancellationToken ct = default)
 		{

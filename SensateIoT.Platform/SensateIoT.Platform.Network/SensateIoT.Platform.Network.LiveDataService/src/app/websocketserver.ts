@@ -23,6 +23,7 @@ import { Command, stringifyCommand } from "../commands/command";
 import { SyncLiveDataSensorsCommand } from "../commands/synclivedatasensorscommand";
 import { Application } from "./app";
 import { LiveSensorCommand } from "../commands/livesensorcommand";
+import { BulkControlMessage, ControlMessage } from "../models/controlmessage";
 
 export class WebSocketServer {
     private readonly server: http.Server;
@@ -30,6 +31,7 @@ export class WebSocketServer {
 
     private readonly measurementClients: WebSocketClient[];
     private readonly messageClients: WebSocketClient[];
+    private readonly controlClients: WebSocketClient[];
     private readonly auditlogs: AuditLogsClient;
     private readonly apikeys: ApiKeyClient;
 
@@ -44,6 +46,7 @@ export class WebSocketServer {
         this.wss = new WebSocket.Server({ noServer: true });
         this.measurementClients = [];
         this.messageClients = [];
+        this.controlClients = [];
         this.auditlogs = new AuditLogsClient(pool);
         this.apikeys = new ApiKeyClient(pool);
 
@@ -61,6 +64,10 @@ export class WebSocketServer {
         });
 
         this.messageClients.forEach(m => {
+            sensors = sensors.concat(m.getConnectedSensors());
+        });
+
+        this.controlClients.forEach(m => {
             sensors = sensors.concat(m.getConnectedSensors());
         });
 
@@ -105,9 +112,38 @@ export class WebSocketServer {
         });
     }
 
+    public processControlMessages(messages: BulkControlMessage) {
+        this.controlClients.forEach(client => {
+            if (messages.sensorId === null || messages.sensorId == undefined) {
+                return;
+            }
+
+            if (!client.isServicing(messages.sensorId.toString())) {
+                return;
+            }
+
+            const data = JSON.stringify(messages);
+            client.process(data);
+        });
+
+    }
+
+    private getClientsFor(type: ClientType) {
+        switch (type) {
+            case ClientType.ControlMessageClient:
+                return this.controlClients;
+
+            case ClientType.MeasurementClient:
+                return this.measurementClients;
+
+            default:
+            case ClientType.MessageClient:
+                return this.messageClients;
+        }
+    }
+
     public hasOpenSocketFor(sensorId: string, type: ClientType) {
-        const clients = type === ClientType.MeasurementClient ?
-            this.measurementClients : this.messageClients;
+        const clients = this.getClientsFor(type);
 
         for (let client of clients) {
             if (!client.isServicing(sensorId)) {
@@ -139,40 +175,44 @@ export class WebSocketServer {
     }
 
     private destroyConnection(ws: WebSocket) {
-        let done = false;
         let sensors: string[] = [];
 
-        this.measurementClients.forEach((info, index) => {
-            if (info.compareSocket(ws)) {
-                console.log("Removing web socket!");
-                const client = this.measurementClients.splice(index, 1);
-                done = true;
-                sensors = client[0].getConnectedSensors();
-            }
-        });
+        sensors = WebSocketServer.removeClient(this.measurementClients, ws);
+        this.removeSensors(sensors);
 
+        sensors = WebSocketServer.removeClient(this.messageClients, ws);
+        this.removeSensors(sensors);
 
-        if (done) {
-            this.removeSensors(sensors);
-            return;
-        }
-
-        this.messageClients.forEach((info, index) => {
-            if (info.compareSocket(ws)) {
-                const client = this.messageClients.splice(index, 1);
-                sensors = client[0].getConnectedSensors();
-            }
-        });
-
+        sensors = WebSocketServer.removeClient(this.controlClients, ws);
         this.removeSensors(sensors);
     }
 
-    private async handleSocketUpgrade(socket: WebSocket, request: any, type: ClientType) {
+    private static removeClient(clients: WebSocketClient[], ws: WebSocket) {
+        let sensors: string[] = [];
+
+        clients.forEach((info, index) => {
+            if (info.compareSocket(ws)) {
+                console.log("Removing web socket!");
+                const client = clients.splice(index, 1);
+                sensors = client[0].getConnectedSensors();
+            }
+        });
+
+        return sensors;
+    }
+
+    private static getIpFromRequest(request: any): string {
         let ip = getClientIP(request.headers["x-forwarded-for"]);
 
         if (ip === "") {
             ip = request.connection.remoteAddress.toString();
         }
+
+        return ip;
+    }
+
+    private async handleSocketUpgrade(socket: WebSocket, request: any, type: ClientType) {
+        const ip = WebSocketServer.getIpFromRequest(request);
 
         const client = new WebSocketClient(
             this.auditlogs,
@@ -201,6 +241,10 @@ export class WebSocketServer {
             case ClientType.MessageClient:
                 this.messageClients.push(client);
                 break;
+
+            case ClientType.ControlMessageClient:
+                this.controlClients.push(client);
+                break;
         }
 
         this.wss.emit("connection", socket, request);
@@ -217,14 +261,29 @@ export class WebSocketServer {
         this.server.on("upgrade", async (request, socket, head) => {
             const pathname = url.parse(request.url).pathname;
 
-            if (pathname === "/live/v1/measurements") {
-                this.wss.handleUpgrade(request, socket, head, async (ws: WebSocket) => {
-                    await this.handleSocketUpgrade(ws, request, ClientType.MeasurementClient);
-                });
-            } else if (pathname === "/live/v1/messages") {
-                this.wss.handleUpgrade(request, socket, head, async (ws: WebSocket) => {
-                    await this.handleSocketUpgrade(ws, request, ClientType.MessageClient);
-                });
+            switch (pathname) {
+                case "/live/v1/measurements":
+                    this.wss.handleUpgrade(request, socket, head, async (ws: WebSocket) => {
+                        await this.handleSocketUpgrade(ws, request, ClientType.MeasurementClient);
+                    });
+                    break;
+
+                case "/live/v1/messages":
+                    this.wss.handleUpgrade(request, socket, head, async (ws: WebSocket) => {
+                        await this.handleSocketUpgrade(ws, request, ClientType.MessageClient);
+                    });
+                    break;
+
+                case "/live/v1/control":
+                    this.wss.handleUpgrade(request, socket, head, async (ws: WebSocket) => {
+                        await this.handleSocketUpgrade(ws, request, ClientType.ControlMessageClient);
+                    });
+                    break;
+
+                default:
+                    const ip = WebSocketServer.getIpFromRequest(request);
+                    console.log(`Client connecting to invalid path (${ip}).`);
+                    break;
             }
         });
 

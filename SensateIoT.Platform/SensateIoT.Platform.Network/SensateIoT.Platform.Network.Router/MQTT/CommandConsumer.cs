@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
 
-using SensateIoT.Platform.Network.Common.Caching.Object;
+using SensateIoT.Platform.Network.Common.Caching.Abstract;
 using SensateIoT.Platform.Network.Common.Caching.Realtime;
 using SensateIoT.Platform.Network.Common.MQTT;
 using SensateIoT.Platform.Network.Data.DTO;
@@ -46,7 +46,8 @@ namespace SensateIoT.Platform.Network.Router.MQTT
 			case CommandType.AddUser:
 			case CommandType.AddSensor:
 			case CommandType.AddKey:
-				await this.m_handler.UpdateAsync(cmd, default).ConfigureAwait(false);
+			case CommandType.DeleteUser:
+				await this.m_handler.UpdateAsync(cmd, ct).ConfigureAwait(false);
 				break;
 
 			case CommandType.AddLiveDataSensor:

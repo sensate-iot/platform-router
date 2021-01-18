@@ -19,7 +19,6 @@ using Google.Protobuf.WellKnownTypes;
 using SensateIoT.Platform.Network.API.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Network.API.DTO;
-using SensateIoT.Platform.Network.API.Services;
 using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.Models;
 
@@ -122,7 +121,8 @@ namespace SensateIoT.Platform.Network.API.Authorization
 						Latitude = decimal.ToDouble(message.Item1.Latitude),
 						Longitude = decimal.ToDouble(message.Item1.Longitude),
 						Timestamp = Timestamp.FromDateTime(message.Item1.Timestamp),
-						Data = message.Item1.Data
+						Data = message.Item1.Data,
+						Encoding = (int)message.Item1.Encoding
 					};
 
 					data.Add(m);

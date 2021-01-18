@@ -8,10 +8,12 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.DependencyInjection;
+
 using MongoDB.Bson;
 
-using SensateIoT.Platform.Network.Common.Caching.Object;
+using SensateIoT.Platform.Network.Common.Caching.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Enums;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
@@ -32,6 +34,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Realtime
 		public async Task UpdateAsync(Command cmd, CancellationToken ct)
 		{
 			switch(cmd.Cmd) {
+			case CommandType.DeleteUser:
 			case CommandType.FlushUser:
 				var userId = Guid.Parse(cmd.Arguments);
 				this.m_cache.RemoveAccount(userId);

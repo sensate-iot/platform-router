@@ -1,0 +1,25 @@
+{
+  "web": {
+    "port": "web__port",
+    "secret": "web__secret",
+    "timeout": "web__timeout"
+  },
+  "mongodb": {
+    "connectionString": "mongodb__connectionString"
+  },
+  "postgresql": {
+    "user": "postgresql__user",
+    "password": "postgresql__password",
+    "host": "postgresql__host",
+    "database": "postgresql__database",
+    "port": "postgresql__port"
+  },
+  "mqtt": {
+    "username": "mqtt__username",
+    "password": "mqtt__password",
+    "ssl": "mqtt__ssl",
+    "port": "mqtt__port",
+    "host": "mqtt__host"
+  },
+  "id": "id"
+}

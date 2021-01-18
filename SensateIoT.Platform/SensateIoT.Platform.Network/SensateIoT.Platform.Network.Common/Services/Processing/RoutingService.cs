@@ -17,7 +17,7 @@ using Google.Protobuf;
 using Newtonsoft.Json;
 using Prometheus;
 
-using SensateIoT.Platform.Network.Common.Caching.Object;
+using SensateIoT.Platform.Network.Common.Caching.Abstract;
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
 using SensateIoT.Platform.Network.Common.Collections.Remote;
 using SensateIoT.Platform.Network.Common.Services.Background;
@@ -119,7 +119,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 		private NetworkEvent RouteMessage(IPlatformMessage message, Sensor sensor)
 		{
 			var evt = new NetworkEvent {
-				SensorID = sensor.ID.ToString(),
+				SensorID = ByteString.CopyFrom(sensor.ID.ToByteArray()),
 				AccountID = ByteString.CopyFrom(sensor.AccountID.ToByteArray())
 			};
 			evt.Actions.Add(NetworkEventType.MessageRouted);
@@ -166,14 +166,26 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 			 * 3. Queue to the correct output queue.
 			 */
 
+			var data = JsonConvert.SerializeObject(message, Formatting.None);
 			message.Timestamp = DateTime.UtcNow;
 			message.Secret = sensor.SensorKey;
-
-			var data = JsonConvert.SerializeObject(message, Formatting.None);
 			this.m_authService.SignControlMessage(message, data);
-			data = JsonConvert.SerializeObject(message);
-			this.m_logger.LogDebug("Publishing control message: {message}", data);
-			this.m_publicRemote.Enqueue(data, this.m_settings.ActuatorTopicFormat.Replace(FormatNeedle, sensor.ID.ToString()));
+
+
+			if(message.Destination == ControlMessageType.Mqtt) {
+				data = JsonConvert.SerializeObject(message);
+				this.m_publicRemote.Enqueue(data, this.m_settings.ActuatorTopicFormat.Replace(FormatNeedle, sensor.ID.ToString()));
+				this.m_logger.LogDebug("Publishing control message: {message}", data);
+			} else {
+				if(sensor.LiveDataRouting == null || sensor.LiveDataRouting?.Count <= 0) {
+					return;
+				}
+
+				foreach(var info in sensor.LiveDataRouting) {
+					this.m_logger.LogDebug("Routing message to live data client: {clientId}.", info.Target);
+					this.EnqueueTo(message, info);
+				}
+			}
 		}
 
 		private void EnqueueToTriggerService(IPlatformMessage message, bool isText)
@@ -200,6 +212,9 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 		private void EnqueueTo(IPlatformMessage message, RoutingTarget target)
 		{
 			switch(message.Type) {
+			case MessageType.ControlMessage:
+				this.m_internalRemote.EnqueueControlMessageToTarget(message, target);
+				break;
 			case MessageType.Message:
 				this.m_internalRemote.EnqueueMessageToTarget(message, target);
 				break;

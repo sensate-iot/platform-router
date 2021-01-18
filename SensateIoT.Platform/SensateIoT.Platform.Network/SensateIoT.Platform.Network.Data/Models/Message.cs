@@ -11,8 +11,10 @@ using System.ComponentModel.DataAnnotations;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver.GeoJsonObjectModel;
+
 using Newtonsoft.Json;
 
+using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.Converters;
 
 namespace SensateIoT.Platform.Network.Data.Models
@@ -31,5 +33,6 @@ namespace SensateIoT.Platform.Network.Data.Models
 		public GeoJsonPoint<GeoJson2DGeographicCoordinates> Location { get; set; }
 		[BsonRequired, StringLength(8192, MinimumLength = 1)]
 		public string Data { get; set; }
+		public MessageEncoding Encoding { get; set; }
 	}
 }

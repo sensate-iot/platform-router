@@ -17,6 +17,7 @@ FROM alpine:3.12
 
 COPY --from=build-env /app /app
 COPY SensateIoT.API.DashboardApi/Settings/hosting.json /app/hosting.json
+COPY SensateIoT.API.DashboardApi/appsettings.json /app/appsettings.json
 WORKDIR /app
 RUN apk add --no-cache libstdc++ libintl icu
 

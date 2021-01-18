@@ -1,0 +1,31 @@
+{
+  "web": {
+    "port": 4750,
+    "secret": "3i%bacH6yK8sm0#lYt0**aP567Fz^Ns3HKeZ3GiqlZ2&eFqjy0OqXO",
+    "timeout": 1500
+  },
+  "mongodb": {
+    "connectionString": "mongodb://root:root@localhost:27017/SensateIoT?authSource=admin",
+    "maxConnections": 300
+  },
+  "postgresql": {
+    "user": "postgres",
+    "host": "localhost",
+    "database": "Sensate",
+    "password": "DefaultPassword",
+    "port": 5432
+  },
+  "mqtt": {
+    "username": "",
+    "password": "",
+    "ssl": "false",
+    "port": 1883,
+    "host": "localhost",
+    "bulkMeasurementTopic": "$share/live/sensateiot/live/internal/measurements/local-001/bulk",
+    "bulkMessageTopic": "$share/live/sensateiot/live/internal/messages/local-001/bulk",
+    "bulkControlMessageTopic": "$share/live/sensateiot/live/internal/control/local-001/bulk",
+    "routerCommandTopic": "sensateiot/internal/commands",
+    "topicShare": "live"
+  },
+  "id": "local-001"
+}

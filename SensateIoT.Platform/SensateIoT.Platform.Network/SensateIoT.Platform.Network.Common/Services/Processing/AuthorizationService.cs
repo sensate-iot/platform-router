@@ -5,6 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -23,9 +24,9 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 			message.Secret = BytesToHex(hash, false);
 		}
 
-		private static string BytesToHex(byte[] bytes, bool uppercase)
+		private static string BytesToHex(IReadOnlyCollection<byte> bytes, bool uppercase)
 		{
-			var builder = new StringBuilder(bytes.Length * 2);
+			var builder = new StringBuilder(bytes.Count * 2);
 			var format = uppercase ? "X2" : "x2";
 
 			builder.Append('$');

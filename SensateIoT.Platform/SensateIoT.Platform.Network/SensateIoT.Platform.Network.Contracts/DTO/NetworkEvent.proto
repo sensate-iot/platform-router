@@ -28,7 +28,7 @@ message NetworkEvent
 	NetworkMessageType MessageType = 2;
 
 	bytes AccountID = 3;
-	string SensorID = 4;
+	bytes SensorID = 4;
 }
 
 message NetworkEventData

@@ -19,5 +19,6 @@ namespace SensateIoT.Platform.Network.DataAccess.Abstract
 	{
 		Task StoreAsync(IDictionary<ObjectId, List<Measurement>> measurements, CancellationToken ct = default);
 		Task DeleteBySensorId(ObjectId sensorId, CancellationToken ct = default);
+		Task DeleteBySensorId(IEnumerable<ObjectId> sensorId, CancellationToken ct = default);
 	}
 }

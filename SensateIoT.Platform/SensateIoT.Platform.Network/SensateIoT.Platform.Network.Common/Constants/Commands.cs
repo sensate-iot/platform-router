@@ -7,11 +7,12 @@
 
 namespace SensateIoT.Platform.Network.Common.Constants
 {
-	public class Commands
+	public static class Commands
 	{
 		public const string FlushUser = "FlushUser";
 		public const string FlushSensor = "FlushSensor";
 		public const string FlushKey = "FlushKey";
+		public const string DeleteUser = "DeleteUser";
 
 		public const string AddUser = "AddUser";
 		public const string AddSensor = "AddSensor";

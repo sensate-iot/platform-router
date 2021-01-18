@@ -24,11 +24,6 @@ namespace SensateService.Api.AuthApi.Application
 {
 	public class Program
 	{
-		private static string GetAppSettings()
-		{
-			return Environment.GetEnvironmentVariable("SENSATE_AUTHAPI_APPSETTINGS") ?? "appsettings.json";
-		}
-
 		private static void CreateUserRoles(IHost wh)
 		{
 			ILogger<Program> logger;
@@ -72,9 +67,13 @@ namespace SensateService.Api.AuthApi.Application
 			return Host.CreateDefaultBuilder(args)
 				.UseContentRoot(Directory.GetCurrentDirectory())
 				.ConfigureAppConfiguration((ctx, config) => {
-					config.AddJsonFile(GetAppSettings(), optional: false, reloadOnChange: true);
+					config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 					config.AddJsonFile($"appsettings.{ctx.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true);
 					config.AddEnvironmentVariables();
+
+					if(ctx.HostingEnvironment.IsDevelopment()) {
+						config.AddUserSecrets<Program>();
+					}
 				})
 				.ConfigureLogging((ctx, builder) => {
 					builder.ClearProviders();

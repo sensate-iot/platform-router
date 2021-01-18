@@ -5,7 +5,7 @@
     <UserSecretsId>SensateService</UserSecretsId>
     <Authors>Michel Megens</Authors>
     <Copyright>Michel Megens &lt;dev@bietje.net&gt;</Copyright>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <ServerGarbageCollection>true</ServerGarbageCollection>
     <RootNamespace>SensateService.Api.DataApi</RootNamespace>
     <AssemblyName>SensateService.Api.DataApi</AssemblyName>
@@ -25,6 +25,16 @@
     <Content Remove="Services\**" />
     <EmbeddedResource Remove="Services\**" />
     <None Remove="Services\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="appsettings.Development.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="appsettings.Development.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

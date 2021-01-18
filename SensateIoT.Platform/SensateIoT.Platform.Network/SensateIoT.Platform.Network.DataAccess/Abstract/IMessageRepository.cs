@@ -19,5 +19,6 @@ namespace SensateIoT.Platform.Network.DataAccess.Abstract
 	{
 		Task CreateRangeAsync(IEnumerable<Message> messages, CancellationToken ct = default);
 		Task DeleteBySensorId(ObjectId sensorId, CancellationToken ct = default);
+		Task DeleteBySensorId(IEnumerable<ObjectId> sensorIds, CancellationToken ct = default);
 	}
 }

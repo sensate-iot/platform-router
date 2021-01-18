@@ -41,6 +41,7 @@ namespace SensateIoT.Platform.Network.API.Services
 					CommandType.FlushKey => Commands.FlushKey,
 					CommandType.FlushSensor => Commands.FlushSensor,
 					CommandType.FlushUser => Commands.FlushUser,
+					CommandType.DeleteUser => Commands.DeleteUser,
 					CommandType.AddUser => Commands.AddUser,
 					CommandType.AddSensor => Commands.AddSensor,
 					CommandType.AddKey => Commands.AddKey,

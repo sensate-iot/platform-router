@@ -37,7 +37,7 @@ namespace SensateIoT.Platform.Network.API.MQTT
 			var cmd = JsonConvert.DeserializeObject<Command>(message);
 			this.m_logger.LogInformation("Received command: {command}. Argument: {argument}.", cmd.Cmd, cmd.Arguments);
 
-			if(cmd.Cmd == CommandType.FlushUser) {
+			if(cmd.Cmd == CommandType.DeleteUser) {
 				using var scope = this.m_provider.CreateScope();
 				var repo = scope.ServiceProvider.GetRequiredService<ISensorService>();
 				var userId = Guid.Parse(cmd.Arguments);

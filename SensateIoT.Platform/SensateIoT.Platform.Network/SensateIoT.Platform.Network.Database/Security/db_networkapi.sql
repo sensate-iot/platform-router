@@ -22,6 +22,7 @@ GRANT EXECUTE ON FUNCTION networkapi_selectsensorlinkbyuserid(uuid) TO db_networ
 GRANT EXECUTE ON FUNCTION networkapi_selecttriggerbyid(bigint) TO db_networkapi;
 GRANT EXECUTE ON FUNCTION networkapi_selecttriggerbysensorid(character varying) TO db_networkapi;
 GRANT EXECUTE ON FUNCTION generic_getblobs(TEXT, TIMESTAMP, TIMESTAMP, INTEGER, INTEGER, VARCHAR(3)) TO db_networkapi;
+GRANT EXECUTE ON FUNCTION networkapi_deletebysensorids(TEXT) TO db_networkapi;
 
 GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE "Blobs" TO db_networkapi;
 GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE "SensorLinks" TO db_networkapi;

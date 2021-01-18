@@ -89,6 +89,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions", "Functions", "{
 		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteBlobByID.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteBlobByID.sql
 		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteBlobBySensorID.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteBlobBySensorID.sql
 		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteBlobsByName.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteBlobsByName.sql
+		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteBySensorIds.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteBySensorIds.sql
 		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteSensorLink.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteSensorLink.sql
 		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteSensorLinkBySensorID.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteSensorLinkBySensorID.sql
 		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteTriggerAction.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteTriggerAction.sql

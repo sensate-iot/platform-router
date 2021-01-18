@@ -6,13 +6,10 @@
  */
 
 using System.Collections.Generic;
-
 using MongoDB.Bson;
-
-using SensateIoT.Platform.Network.Common.Caching.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
 
-namespace SensateIoT.Platform.Network.Common.Caching.Object
+namespace SensateIoT.Platform.Network.Common.Caching.Abstract
 {
 	public interface ISensorCache : IMemoryCache<ObjectId, Sensor>
 	{

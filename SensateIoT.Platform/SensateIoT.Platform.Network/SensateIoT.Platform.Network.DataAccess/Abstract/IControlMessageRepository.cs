@@ -5,6 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,5 +19,6 @@ namespace SensateIoT.Platform.Network.DataAccess.Abstract
 	{
 		Task CreateAsync(ControlMessage obj, CancellationToken ct = default);
 		Task DeleteBySensorAsync(ObjectId sensor, CancellationToken ct = default);
+		Task DeleteBySensorIds(IEnumerable<ObjectId> sensorIds, CancellationToken ct = default);
 	}
 }

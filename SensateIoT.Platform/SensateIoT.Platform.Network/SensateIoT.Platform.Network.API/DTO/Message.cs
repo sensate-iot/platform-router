@@ -10,7 +10,7 @@ using System;
 using MongoDB.Bson;
 
 using Newtonsoft.Json;
-
+using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.Converters;
 
 namespace SensateIoT.Platform.Network.API.DTO
@@ -26,5 +26,6 @@ namespace SensateIoT.Platform.Network.API.DTO
 		public DateTime Timestamp { get; set; }
 		[JsonRequired]
 		public string Data { get; set; }
+		public MessageEncoding Encoding { get; set; }
 	}
 }

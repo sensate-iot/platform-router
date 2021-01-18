@@ -29,7 +29,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Abstract
 		Task<long> CountAsync(User user = null);
 		Task<long> CountAsync(User user, string name);
 
-		Task DeleteAsync(Guid userId, CancellationToken ct = default);
+		Task DeleteAsync(IEnumerable<ObjectId> sensorIds, CancellationToken ct = default);
 		Task DeleteAsync(ObjectId sensorId, CancellationToken ct = default);
 		Task UpdateAsync(Sensor sensor);
 		Task UpdateSecretAsync(ObjectId sensorId, string key);

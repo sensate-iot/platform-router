@@ -18,6 +18,8 @@ using Microsoft.Extensions.Logging;
 
 using MongoDB.Bson;
 using Prometheus;
+
+using SensateIoT.Platform.Network.Common.Converters;
 using SensateIoT.Platform.Network.Common.MQTT;
 using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.DTO;
@@ -66,13 +68,7 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 				group message by message.SensorID into g
 				select new InternalBulkMessageQueue {
 					SensorID = ObjectId.Parse(g.Key),
-					Messages = g.Select(m => new Message {
-						Data = m.Data,
-						Latitude = m.Latitude,
-						Longitude = m.Longitude,
-						Timestamp = m.Timestamp.ToDateTime(),
-						PlatformTimestamp = m.PlatformTime.ToDateTime()
-					}).ToList()
+					Messages = g.Select(MessageProtobufConverter.Convert).ToList()
 				};
 
 			return messages;
@@ -80,7 +76,7 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 
 		public async Task OnMessageAsync(string topic, string message, CancellationToken ct = default)
 		{
-			this.m_logger.LogDebug("Messages received.");
+			this.m_logger.LogDebug("Trigger messages received.");
 			var tasks = new List<Task>();
 
 			var messages = Decompress(message).ToList();
