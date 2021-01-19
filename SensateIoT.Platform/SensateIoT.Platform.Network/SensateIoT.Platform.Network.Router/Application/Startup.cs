@@ -119,10 +119,7 @@ namespace SensateIoT.Platform.Network.Router.Application
 			services.AddScoped<IRoutingRepository, RoutingRepository>();
 			services.AddScoped<ILiveDataHandlerRepository, LiveDataHandlerRepository>();
 
-			services.AddSingleton<IHostedService, SensorReloadService>();
-			services.AddSingleton<IHostedService, AccountReloadService>();
-			services.AddSingleton<IHostedService, ApiKeyReloadService>();
-			services.AddSingleton<IHostedService, LiveDataHandlerReloadService>();
+			services.AddSingleton<IHostedService, DataReloadService>();
 			services.AddSingleton<IHostedService, RoutingPublishService>();
 			services.AddSingleton<IHostedService, ActuatorPublishService>();
 			services.AddSingleton<IHostedService, LiveDataReloadService>();
