@@ -5,7 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
-namespace SensateService.Api.DataApi.Json
+namespace SensateIoT.API.DataApi.Json
 {
 	public class Count
 	{

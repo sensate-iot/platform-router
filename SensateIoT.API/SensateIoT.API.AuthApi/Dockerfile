@@ -21,5 +21,5 @@ COPY SensateIoT.API.AuthApi/Templates /app/Templates
 WORKDIR /app
 RUN apk add --no-cache libstdc++ libintl icu
 
-EXPOSE 5000
+EXPOSE 80
 ENTRYPOINT ["bin/SensateIoT.API.AuthApi", "--urls", "http://*:80"]

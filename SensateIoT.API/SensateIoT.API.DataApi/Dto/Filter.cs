@@ -8,7 +8,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SensateService.Api.DataApi.Dto
+namespace SensateIoT.API.DataApi.Dto
 {
 	public class Filter
 	{

@@ -11,11 +11,9 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-
 using MongoDB.Bson;
 using MongoDB.Driver.GeoJsonObjectModel;
 using Newtonsoft.Json;
@@ -30,9 +28,9 @@ using SensateIoT.API.Common.Data.Dto.Json.Out;
 using SensateIoT.API.Common.Data.Enums;
 using SensateIoT.API.Common.Data.Models;
 using SensateIoT.API.Common.IdentityData.Models;
-using SensateService.Api.DataApi.Dto;
+using SensateIoT.API.DataApi.Dto;
 
-namespace SensateService.Api.DataApi.Controllers
+namespace SensateIoT.API.DataApi.Controllers
 {
 	[Produces("application/json")]
 	[Route("data/v1/[controller]")]

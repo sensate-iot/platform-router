@@ -9,13 +9,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-
 using MongoDB.Bson;
-
 using SensateIoT.API.Common.ApiCore.Attributes;
 using SensateIoT.API.Common.ApiCore.Controllers;
 using SensateIoT.API.Common.Core.Helpers;
@@ -24,11 +21,10 @@ using SensateIoT.API.Common.Data.Dto.Json.Out;
 using SensateIoT.API.Common.Data.Enums;
 using SensateIoT.API.Common.Data.Models;
 using SensateIoT.API.Common.IdentityData.Models;
-using SensateService.Api.DataApi.Json;
-
+using SensateIoT.API.DataApi.Json;
 using SensorStatisticsEntry = SensateIoT.API.Common.Data.Models.SensorStatisticsEntry;
 
-namespace SensateService.Api.DataApi.Controllers
+namespace SensateIoT.API.DataApi.Controllers
 {
 	[Produces("application/json")]
 	[Route("data/v1/[controller]")]

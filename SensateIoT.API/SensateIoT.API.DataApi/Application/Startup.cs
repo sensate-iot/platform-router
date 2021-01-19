@@ -6,7 +6,6 @@
  */
 
 using System;
-
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -14,9 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-
 using Microsoft.OpenApi.Models;
-
 using SensateIoT.API.Common.ApiCore.Init;
 using SensateIoT.API.Common.ApiCore.Middleware;
 using SensateIoT.API.Common.Config.Config;
@@ -24,7 +21,7 @@ using SensateIoT.API.Common.Core.Infrastructure.Repositories;
 using SensateIoT.API.Common.Core.Infrastructure.Sql;
 using SensateIoT.API.Common.Core.Init;
 
-namespace SensateService.Api.DataApi.Application
+namespace SensateIoT.API.DataApi.Application
 {
 	public class Startup
 	{
@@ -164,19 +161,19 @@ namespace SensateService.Api.DataApi.Application
 			private readonly string _categoryName;
 
 			public ConsoleLogger(string categoryName)
-				=> _categoryName = categoryName;
+				=> this._categoryName = categoryName;
 
 			public void Log<TState>(
 				LogLevel logLevel, EventId eventId, TState state, Exception exception,
 				Func<TState, Exception, string> formatter
 			)
 			{
-				if(!IsEnabled(logLevel)) {
+				if(!this.IsEnabled(logLevel)) {
 					return;
 				}
 
 				Console.WriteLine(
-					$"{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} [{logLevel}] {_categoryName}:{Environment.NewLine}{state}{(exception != null ? "\n" : string.Empty)}{exception}"
+					$"{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} [{logLevel}] {this._categoryName}:{Environment.NewLine}{state}{(exception != null ? "\n" : string.Empty)}{exception}"
 				);
 			}
 

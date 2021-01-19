@@ -5,12 +5,10 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-
+using CsvHelper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-
 using MongoDB.Driver.GeoJsonObjectModel;
-using CsvHelper;
 using SensateIoT.API.Common.ApiCore.Controllers;
 using SensateIoT.API.Common.Core.Helpers;
 using SensateIoT.API.Common.Core.Infrastructure.Repositories;
@@ -18,9 +16,9 @@ using SensateIoT.API.Common.Core.Services.DataProcessing;
 using SensateIoT.API.Common.Data.Dto.Generic;
 using SensateIoT.API.Common.Data.Dto.Json.Out;
 using SensateIoT.API.Common.Data.Enums;
-using SensateService.Api.DataApi.Dto;
+using SensateIoT.API.DataApi.Dto;
 
-namespace SensateService.Api.DataApi.Controllers
+namespace SensateIoT.API.DataApi.Controllers
 {
 	[Produces("application/json")]
 	[Route("data/v1/[controller]")]

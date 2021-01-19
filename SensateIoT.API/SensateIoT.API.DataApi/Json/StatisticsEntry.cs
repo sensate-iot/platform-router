@@ -8,7 +8,7 @@
 using System.Collections.Generic;
 using SensateIoT.API.Common.Data.Models;
 
-namespace SensateService.Api.DataApi.Json
+namespace SensateIoT.API.DataApi.Json
 {
 	public class StatisticsEntry
 	{

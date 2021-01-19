@@ -20,5 +20,5 @@ COPY SensateIoT.API.DashboardApi/appsettings.json /app/appsettings.json
 WORKDIR /app
 RUN apk add --no-cache libstdc++ libintl icu
 
-EXPOSE 5000
+EXPOSE 80
 ENTRYPOINT ["bin/SensateIoT.API.DashboardApi", "--urls", "http://*:80"]

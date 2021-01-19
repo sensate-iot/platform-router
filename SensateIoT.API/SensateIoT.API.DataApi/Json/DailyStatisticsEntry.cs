@@ -5,7 +5,7 @@
  * @email  michel.megens@sonatolabs.com
  */
 
-namespace SensateService.Api.DataApi.Json
+namespace SensateIoT.API.DataApi.Json
 {
 	public class DailyStatisticsEntry
 	{
