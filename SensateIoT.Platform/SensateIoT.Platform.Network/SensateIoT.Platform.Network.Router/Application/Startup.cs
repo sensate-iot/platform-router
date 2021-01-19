@@ -90,8 +90,8 @@ namespace SensateIoT.Platform.Network.Router.Application
 			});
 
 			services.Configure<RoutingPublishSettings>(s => {
-				s.PublicInterval = TimeSpan.FromMilliseconds(this.Configuration.GetValue<int>("Routing:InternalPublishInterval"));
-				s.InternalInterval = TimeSpan.FromMilliseconds(this.Configuration.GetValue<int>("Routing:PublicPublishInterval"));
+				s.InternalInterval = TimeSpan.FromMilliseconds(this.Configuration.GetValue<int>("Routing:InternalPublishInterval"));
+				s.PublicInterval = TimeSpan.FromMilliseconds(this.Configuration.GetValue<int>("Routing:PublicPublishInterval"));
 				s.ActuatorTopicFormat = this.Configuration.GetValue<string>("Routing:ActuatorTopicFormat");
 			});
 
@@ -119,22 +119,22 @@ namespace SensateIoT.Platform.Network.Router.Application
 			services.AddScoped<IRoutingRepository, RoutingRepository>();
 			services.AddScoped<ILiveDataHandlerRepository, LiveDataHandlerRepository>();
 
-			services.AddSingleton<IHostedService, DataReloadService>();
-			services.AddSingleton<IHostedService, RoutingPublishService>();
-			services.AddSingleton<IHostedService, ActuatorPublishService>();
-			services.AddSingleton<IHostedService, LiveDataReloadService>();
-			services.AddSingleton<IHostedService, CacheTimeoutScanService>();
 
 			services.AddSingleton<IQueue<IPlatformMessage>, Deque<IPlatformMessage>>();
 			services.AddSingleton<IMessageQueue, MessageQueue>();
 			services.AddSingleton<IRemoteNetworkEventQueue, RemoteNetworkEventQueue>();
 			services.AddSingleton<IInternalRemoteQueue, InternalMqttQueue>();
 			services.AddSingleton<IPublicRemoteQueue, PublicMqttQueue>();
-			services.AddSingleton<IHostedService, RoutingService>();
 			services.AddSingleton<IAuthorizationService, AuthorizationService>();
 			services.AddSingleton<IRemoteStorageQueue, RemoteStorageQueue>();
 			services.AddSingleton<IDataCache, DataCache>();
 
+			services.AddSingleton<IHostedService, DataReloadService>();
+			services.AddSingleton<IHostedService, CacheTimeoutScanService>();
+			services.AddSingleton<IHostedService, LiveDataReloadService>();
+			services.AddSingleton<IHostedService, RoutingPublishService>();
+			services.AddSingleton<IHostedService, ActuatorPublishService>();
+			services.AddSingleton<IHostedService, RoutingService>();
 			services.AddSingleton<IHostedService, MetricsService>();
 
 			services.AddGrpc();
