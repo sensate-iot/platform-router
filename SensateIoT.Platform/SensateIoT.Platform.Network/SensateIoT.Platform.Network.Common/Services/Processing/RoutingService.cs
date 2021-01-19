@@ -82,7 +82,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 			do {
 				if(this.m_messages.Count <= 0) {
 					try {
-						await Task.Delay(TimeSpan.FromMilliseconds(250), token);
+						await Task.Delay(this.m_settings.InternalInterval, token);
 					} catch(OperationCanceledException) {
 						this.m_logger.LogWarning("Routing task cancelled.");
 					}
