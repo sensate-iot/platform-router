@@ -26,6 +26,7 @@ import { MqttClient } from "./mqttclient";
 import { Command, stringifyCommand } from "../commands/command";
 import { LiveSensorCommand } from "../commands/livesensorcommand";
 import { Application } from "../app/app";
+import { PingRequest } from "../requests/pingrequest";
 
 export class WebSocketClient {
     private readonly sensors: Map<string, SensorModel>;
@@ -112,6 +113,10 @@ export class WebSocketClient {
                 }
                 break;
 
+            case "keepalive":
+                this.ping(req);
+                break;
+
             case "auth":
                 this.authorized = await this.auth(req);
                 break;
@@ -130,6 +135,12 @@ export class WebSocketClient {
 
     public getUserId(): string {
         return this.userId;
+    }
+
+    private ping(req: IWebSocketRequest<PingRequest>) {
+        console.log(`Received PING request from ${this.userId}. Sending PONG.`)
+        req.data.ping = "pong";
+        this.socket.send(JSON.stringify(req.data));
     }
 
     private unsubscribe(req: IWebSocketRequest<ISensorAuthRequest>) {

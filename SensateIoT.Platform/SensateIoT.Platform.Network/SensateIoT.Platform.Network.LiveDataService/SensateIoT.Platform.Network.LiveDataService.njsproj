@@ -101,6 +101,9 @@
     <TypeScriptCompile Include="src\models\message.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="src\requests\pingrequest.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="src\requests\request.ts" />
     <TypeScriptCompile Include="src\models\sensor.ts" />
     <TypeScriptCompile Include="src\models\sensorlink.ts" />
