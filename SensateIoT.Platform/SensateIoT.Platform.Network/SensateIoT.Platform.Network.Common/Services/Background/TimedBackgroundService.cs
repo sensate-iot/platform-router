@@ -39,11 +39,10 @@ namespace SensateIoT.Platform.Network.Common.Services.Background
 			this._timer.Change(Timeout.Infinite, Timeout.Infinite);
 		}
 
-		public void Invoke(object arg)
+		private async void Invoke(object arg)
 		{
 			Interlocked.Add(ref this._millis, Convert.ToInt64(this.m_interval.TotalMilliseconds));
-			var task = Task.Run(async () => { await this.ExecuteAsync(this.m_stoppingCts.Token); });
-			task.Wait();
+			await this.ExecuteAsync(this.m_stoppingCts.Token);
 		}
 
 		public long MillisecondsElapsed()
