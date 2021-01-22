@@ -8,18 +8,17 @@
     "connectionString": "mongodb__connectionString"
   },
   "postgresql": {
-    "user": "postgresql__user",
-    "password": "postgresql__password",
-    "host": "postgresql__host",
-    "database": "postgresql__database",
-    "port": "postgresql__port"
+    "connectionString": "postgresql__connectionString"
   },
   "mqtt": {
     "username": "mqtt__username",
     "password": "mqtt__password",
     "ssl": "mqtt__ssl",
     "port": "mqtt__port",
-    "host": "mqtt__host"
+    "host": "mqtt__host",
+    "bulkMeasurementTopic": "mqtt__bulkMeasurementTopic",
+    "bulkMessageTopic": "mqtt__bulkMessageTopic",
+    "bulkControlMessageTopic": "mqtt__bulkControlMessageTopic"
   },
   "id": "id"
 }

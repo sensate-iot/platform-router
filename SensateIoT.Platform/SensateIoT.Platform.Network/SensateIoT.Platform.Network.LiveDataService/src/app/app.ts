@@ -25,13 +25,26 @@ export class Application {
     public static config: Settings;
     private readonly wss: WebSocketServer;
 
+    private dbConnect() {
+        const pool = connect(Application.config);
+
+        pool.connect(function (err, client, done) {
+            if (err) throw err;
+
+            console.log('Connected to PostgreSQL.');
+        }); 
+
+        return pool;
+    }
+
     public constructor() {
         Application.config = parseSettings();
 
         this.client = new MqttClient(Application.config.mqtt.host, Application.config.mqtt.port, Application.config.mqtt.topicShare);
         // ReSharper disable once TsResolvedFromInaccessibleModule
         const app: Express = express();
-        const pool = connect(Application.config);
+        const pool = this.dbConnect();
+
 
         app.use(cors());
         this.wss = new WebSocketServer(app, pool, Application.config.web.timeout, Application.config.web.secret, this.client);

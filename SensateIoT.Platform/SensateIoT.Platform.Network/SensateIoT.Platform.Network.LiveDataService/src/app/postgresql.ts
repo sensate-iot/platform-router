@@ -9,11 +9,10 @@ import { Settings } from "../models/settings";
 import { Pool } from "pg";
 
 export function connect(settings: Settings) {
+    console.debug(`Connecting to PostgreSQL using: ${JSON.stringify(settings.postgresql)}`);
+
     return new Pool({
-        user: settings.postgresql.user,
-        host: settings.postgresql.host,
-        database: settings.postgresql.database,
-        password: settings.postgresql.password,
-        port: settings.postgresql.port
+        max: 25,
+        connectionString: settings.postgresql.connectionString
     });
 }

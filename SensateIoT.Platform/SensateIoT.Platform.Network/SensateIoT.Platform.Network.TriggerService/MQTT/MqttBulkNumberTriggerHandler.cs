@@ -54,7 +54,7 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 			this.m_measurementCounter = Metrics.CreateCounter("triggerservice_measurements_received_total", "Total amount of measurements received.");
 		}
 
-		private static IEnumerable<InternalBulkMeasurements> Decompress(string data)
+		private IEnumerable<InternalBulkMeasurements> Decompress(string data)
 		{
 			var bytes = Convert.FromBase64String(data);
 			using var to = new MemoryStream();
@@ -82,6 +82,7 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 					}).ToList()
 				};
 
+			this.logger.LogInformation("Received {count} measurements.", protoMeasurements.Measurements.Count);
 			return measurements;
 		}
 

@@ -9,11 +9,7 @@
     "maxConnections": 300
   },
   "postgresql": {
-    "user": "postgres",
-    "host": "localhost",
-    "database": "Sensate",
-    "password": "DefaultPassword",
-    "port": 5432
+    "connectionString": "postgres://postgres:DefaultPassword@localhost:5432/Sensate"
   },
   "mqtt": {
     "username": "",

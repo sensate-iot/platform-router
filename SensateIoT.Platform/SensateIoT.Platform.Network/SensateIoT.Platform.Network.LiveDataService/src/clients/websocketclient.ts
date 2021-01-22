@@ -107,10 +107,6 @@ export class WebSocketClient {
                 this.userId = await this.keys.validateApiKey(authRequest.data.user, authRequest.data.apikey);
                 this.authorized = this.userId != null;
                 this.createLog();
-
-                if (this.authorized) {
-                    this.userId = authRequest.data.user;
-                }
                 break;
 
             case "keepalive":
@@ -239,6 +235,7 @@ export class WebSocketClient {
             return;
         }
 
+        console.log(`Writing data for user ${this.userId}.`);
         this.socket.send(data);
     }
 

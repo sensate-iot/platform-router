@@ -53,7 +53,7 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 			this.m_messageCounter = Metrics.CreateCounter("triggerservice_messages_received_total", "Total amount of messages received.");
 		}
 
-		private static IEnumerable<InternalBulkMessageQueue> Decompress(string data)
+		private IEnumerable<InternalBulkMessageQueue> Decompress(string data)
 		{
 			var bytes = Convert.FromBase64String(data);
 			using var to = new MemoryStream();
@@ -62,15 +62,16 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 
 			gzip.CopyTo(to);
 			var final = to.ToArray();
-			var protoMeasurements = TextMessageData.Parser.ParseFrom(final);
+			var protoMessages = TextMessageData.Parser.ParseFrom(final);
 			var messages =
-				from message in protoMeasurements.Messages
+				from message in protoMessages.Messages
 				group message by message.SensorID into g
 				select new InternalBulkMessageQueue {
 					SensorID = ObjectId.Parse(g.Key),
 					Messages = g.Select(MessageProtobufConverter.Convert).ToList()
 				};
 
+			this.m_logger.LogInformation("Received {count} measurements.", protoMessages.Messages.Count);
 			return messages;
 		}
 

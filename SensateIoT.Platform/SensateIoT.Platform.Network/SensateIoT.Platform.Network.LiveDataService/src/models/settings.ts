@@ -32,11 +32,7 @@ export class WebServerSettings {
 }
 
 export class PostgresQL {
-    user: string;
-    host: string;
-    database: string;
-    password: string;
-    port: number;
+    connectionString: string;
 }
 
 export class Settings {
@@ -66,11 +62,7 @@ function parseMqtt(settings: Settings) {
 }
 
 function parsePostgreSQL(settings: Settings) {
-    settings.postgresql.database = config.get('postgresql.database');
-    settings.postgresql.host = config.get('postgresql.host');
-    settings.postgresql.password = config.get('postgresql.password');
-    settings.postgresql.port = config.get('postgresql.port') as number;
-    settings.postgresql.user = config.get('postgresql.user');
+    settings.postgresql.connectionString = config.get('postgresql.connectionString');
 }
 
 function parseWeb(settings: Settings) {
