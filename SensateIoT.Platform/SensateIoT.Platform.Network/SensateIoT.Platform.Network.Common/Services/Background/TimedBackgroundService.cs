@@ -44,10 +44,5 @@ namespace SensateIoT.Platform.Network.Common.Services.Background
 			Interlocked.Add(ref this._millis, Convert.ToInt64(this.m_interval.TotalMilliseconds));
 			await this.ExecuteAsync(this.m_stoppingCts.Token);
 		}
-
-		public long MillisecondsElapsed()
-		{
-			return Interlocked.Add(ref this._millis, 0);
-		}
 	}
 }
