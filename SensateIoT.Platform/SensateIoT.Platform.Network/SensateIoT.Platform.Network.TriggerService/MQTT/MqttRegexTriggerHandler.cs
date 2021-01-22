@@ -102,7 +102,11 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 				}
 			}
 
-			await Task.WhenAll(tasks);
+			try {
+				await Task.WhenAll(tasks);
+			} catch(Exception ex) {
+				this.m_logger.LogError(ex, "Unable to handle a trigger.");
+			}
 
 			this.m_logger.LogDebug("Messages handled.");
 		}
