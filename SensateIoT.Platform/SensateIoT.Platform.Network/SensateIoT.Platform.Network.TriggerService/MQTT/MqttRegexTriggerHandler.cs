@@ -111,16 +111,12 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 			this.m_logger.LogDebug("Messages handled.");
 		}
 
-		private Task ExecuteActionsAsync(IEnumerable<TriggerAction> actions, Message msg)
+		private async Task ExecuteActionsAsync(IEnumerable<TriggerAction> actions, Message msg)
 		{
-			var tasks = new List<Task>();
-
 			foreach(var action in actions) {
 				var result = Replace(action.Message, msg);
-				tasks.Add(this.m_exec.ExecuteAsync(action, result));
+				await this.m_exec.ExecuteAsync(action, result).ConfigureAwait(false);
 			}
-
-			return Task.WhenAll(tasks);
 		}
 
 		private static string Replace(string message, Message msg)
