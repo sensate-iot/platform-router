@@ -65,7 +65,7 @@ namespace SensateIoT.Platform.Network.LoadTest.Application
 			var generator = new MeasurementGenerator(sensors);
 			var client = new RouterClient(settings.RouterHostname, settings.RouterPort);
 
-			await client.RunAsync(generator).ConfigureAwait(false);
+			await client.RunAsync(generator, settings.BatchSize).ConfigureAwait(false);
 		}
 
 		private static void RunRedisCache()
@@ -87,9 +87,11 @@ namespace SensateIoT.Platform.Network.LoadTest.Application
 		public static void Main(string[] args)
 		{
 			if(args.Length >= 1 && args[0] == "router-test") {
-				RunRouterTest().Wait();
+				RunRouterTest().GetAwaiter().GetResult();
 				return;
-			} else if(args.Length >= 1 && args[0] == "redis-test") {
+			}
+
+			if(args.Length >= 1 && args[0] == "redis-test") {
 				Console.WriteLine("Starting Redis load test...");
 				RunRedisCache();
 				return;
