@@ -6,6 +6,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -144,7 +145,8 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 					continue;
 				}
 
-				sensor.TriggerInformation = route;
+				sensor.TriggerInformation ??= new List<SensorTrigger>();
+				sensor.TriggerInformation.Add(route);
 			}
 
 			this.m_cache.Append(dict.Values);

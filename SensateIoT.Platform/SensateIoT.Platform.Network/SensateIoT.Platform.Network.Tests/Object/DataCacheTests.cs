@@ -6,7 +6,7 @@
  */
 
 using System;
-
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -88,8 +88,11 @@ namespace SensateIoT.Platform.Network.Tests.Object
 					SensorKey = apiKey,
 					AccountID = accountID,
 					ID = sensorID,
-					TriggerInformation = new SensorTrigger {
-						HasActions = true
+					TriggerInformation = new List<SensorTrigger> {
+						new SensorTrigger {
+							HasActions = true,
+							IsTextTrigger = false
+						}
 					}
 				};
 
@@ -124,8 +127,11 @@ namespace SensateIoT.Platform.Network.Tests.Object
 				SensorKey = apiKey,
 				AccountID = accountID,
 				ID = sensorID,
-				TriggerInformation = new SensorTrigger {
-					HasActions = true
+				TriggerInformation = new List<SensorTrigger> {
+					new SensorTrigger {
+						HasActions = true,
+						IsTextTrigger = false
+					}
 				}
 			};
 
@@ -157,8 +163,11 @@ namespace SensateIoT.Platform.Network.Tests.Object
 				SensorKey = apiKey,
 				AccountID = accountID,
 				ID = sensorID,
-				TriggerInformation = new SensorTrigger {
-					HasActions = true
+				TriggerInformation = new List<SensorTrigger> {
+					new SensorTrigger {
+						HasActions = true,
+						IsTextTrigger = false
+					}
 				}
 			};
 
@@ -190,8 +199,11 @@ namespace SensateIoT.Platform.Network.Tests.Object
 				SensorKey = apiKey,
 				AccountID = accountID,
 				ID = sensorID,
-				TriggerInformation = new SensorTrigger {
-					HasActions = true
+				TriggerInformation = new List<SensorTrigger> {
+					new SensorTrigger {
+						HasActions = true,
+						IsTextTrigger = false
+					}
 				}
 			};
 
@@ -223,8 +235,11 @@ namespace SensateIoT.Platform.Network.Tests.Object
 				SensorKey = apiKey,
 				AccountID = accountID,
 				ID = sensorID,
-				TriggerInformation = new SensorTrigger {
-					HasActions = true
+				TriggerInformation = new List<SensorTrigger> {
+					new SensorTrigger {
+						HasActions = true,
+						IsTextTrigger = false
+					}
 				}
 			};
 

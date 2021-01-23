@@ -138,10 +138,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 					evt.Actions.Add(NetworkEventType.MessageStorage);
 				}
 
-				if(sensor.TriggerInformation.HasActions) {
-					this.EnqueueToTriggerService(message, sensor.TriggerInformation.IsTextTrigger);
-					evt.Actions.Add(NetworkEventType.MessageTriggered);
-				}
+				this.MatchTrigger(sensor, message, evt);
 
 				if(sensor.LiveDataRouting == null || sensor.LiveDataRouting?.Count <= 0) {
 					return evt;
@@ -156,6 +153,34 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 			}
 
 			return evt;
+		}
+
+		private void MatchTrigger(Sensor sensor, IPlatformMessage message, NetworkEvent evt)
+		{
+			var textTriggered = false;
+			var measurementTriggered = false;
+
+			if(sensor.TriggerInformation == null || sensor.TriggerInformation.Count <= 0) {
+				return;
+			}
+
+			foreach(var info in sensor.TriggerInformation) {
+				if(info.HasActions) {
+					evt.Actions.Add(NetworkEventType.MessageTriggered);
+
+					if(!textTriggered && info.IsTextTrigger) {
+						textTriggered = true;
+						this.EnqueueToTriggerService(message, info.IsTextTrigger);
+					} else if(!measurementTriggered && !info.IsTextTrigger) {
+						measurementTriggered = true;
+						this.EnqueueToTriggerService(message, info.IsTextTrigger);
+					}
+				}
+
+				if(textTriggered && measurementTriggered) {
+					break;
+				}
+			}
 		}
 
 		private void RouteControlMessage(ControlMessage message, Sensor sensor)
