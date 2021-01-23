@@ -21,6 +21,7 @@ using SensateIoT.Platform.Network.API.Abstract;
 using SensateIoT.Platform.Network.API.Authorization;
 using SensateIoT.Platform.Network.API.Config;
 using SensateIoT.Platform.Network.API.DTO;
+using SensateIoT.Platform.Network.API.Extensions;
 using SensateIoT.Platform.Network.API.Middleware;
 using SensateIoT.Platform.Network.API.MQTT;
 using SensateIoT.Platform.Network.API.Services;
@@ -55,6 +56,7 @@ namespace SensateIoT.Platform.Network.API.Application
 			this.m_configuration.GetSection("Mqtt").Bind(mqtt);
 			this.m_configuration.GetSection("Cache").Bind(cache);
 
+			var proxyLevel = this.m_configuration.GetValue<int>("System:ProxyLevel");
 			var privatemqtt = mqtt.InternalBroker;
 
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
@@ -134,6 +136,7 @@ namespace SensateIoT.Platform.Network.API.Application
 				});
 			});
 
+			services.AddReverseProxy(proxyLevel);
 			services.AddRouting();
 			services.AddControllers().AddNewtonsoftJson();
 			services.AddMqttHandlers();
