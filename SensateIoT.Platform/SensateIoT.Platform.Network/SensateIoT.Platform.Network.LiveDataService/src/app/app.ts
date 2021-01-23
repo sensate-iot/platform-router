@@ -77,7 +77,7 @@ export class Application {
 }
 
 export function main() {
-    console.log(`Starting LiveDataHandler`);
+    console.log(`Starting SensateIoT.Platform.Network.LiveDataService.`);
     const app = new Application();
     app.run();
 }
