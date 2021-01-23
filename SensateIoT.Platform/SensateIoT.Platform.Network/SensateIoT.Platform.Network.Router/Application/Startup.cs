@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 using Prometheus;
 
@@ -38,24 +37,17 @@ namespace SensateIoT.Platform.Network.Router.Application
 	public class Startup
 	{
 		private readonly IConfiguration Configuration;
-		private readonly ILoggerFactory m_factory;
 
 		public Startup(IConfiguration configuration)
 		{
 			this.Configuration = configuration;
-			this.m_factory = LoggerFactory.Create(b => {
-				b.AddConsole();
-				b.AddDebug();
-			});
 		}
 
 		public void ConfigureServices(IServiceCollection services)
 		{
 			var db = new DatabaseConfig();
 			var mqtt = new MqttConfig();
-			var logger = this.m_factory.CreateLogger<Startup>();
 
-			logger.LogInformation("Starting message router at {date}.", DateTime.UtcNow.ToString("F"));
 			this.Configuration.GetSection("Database").Bind(db);
 			this.Configuration.GetSection("Mqtt").Bind(mqtt);
 
@@ -142,7 +134,7 @@ namespace SensateIoT.Platform.Network.Router.Application
 			services.AddMqttHandlers();
 		}
 
-		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider provider, ILogger<Startup> logger)
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider provider)
 		{
 			var mqtt = new MqttConfig();
 

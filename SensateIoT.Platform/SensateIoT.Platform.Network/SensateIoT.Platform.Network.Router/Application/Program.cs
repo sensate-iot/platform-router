@@ -5,6 +5,8 @@
  * @email  michel@michelmegens.net
  */
 
+using System;
+using System.Reflection;
 using System.IO;
 
 using Microsoft.AspNetCore.Hosting;
@@ -12,32 +14,50 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
+using Serilog;
+
 namespace SensateIoT.Platform.Network.Router.Application
 {
 	public class Program
 	{
 		public static void Main(string[] args)
 		{
-			var host = CreateHostBuilder(args).Build();
+			var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+			var config = BuildConfiguration(env);
+			Log.Logger = LoggingUtility.BuildLogger(config, env);
+
+			Log.Logger.Information("Starting {app} {version}.",
+								   Assembly.GetExecutingAssembly().GetName().Name,
+								   Assembly.GetExecutingAssembly().GetName().Version);
+			var host = CreateHostBuilder(args, config).Build();
 			host.Run();
 		}
 
-		public static IHostBuilder CreateHostBuilder(string[] args)
+		private static IConfigurationRoot BuildConfiguration(string env)
+		{
+			var builder = new ConfigurationBuilder()
+				.SetBasePath(Directory.GetCurrentDirectory())
+				.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+				.AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true)
+				.AddEnvironmentVariables();
+
+			return builder.Build();
+		}
+
+		private static IHostBuilder CreateHostBuilder(string[] args, IConfiguration conf)
 		{
 			return Host.CreateDefaultBuilder(args)
 				.UseContentRoot(Directory.GetCurrentDirectory())
-				.ConfigureAppConfiguration((ctx, config) => {
-					config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-					config.AddJsonFile($"appsettings.{ctx.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true);
-					config.AddEnvironmentVariables();
-				})
-				.ConfigureLogging((ctx, builder) => {
+				.ConfigureLogging((context, builder) => {
 					builder.ClearProviders();
-					builder.AddConsole();
+					builder.AddSerilog();
 
-					if(ctx.HostingEnvironment.IsDevelopment() || ctx.HostingEnvironment.IsStaging()) {
+					if(context.HostingEnvironment.IsDevelopment() || context.HostingEnvironment.IsStaging()) {
 						builder.AddDebug();
 					}
+				})
+				.ConfigureAppConfiguration((ctx, config) => {
+					config.AddConfiguration(conf);
 				})
 				.ConfigureWebHostDefaults(webBuilder => {
 					webBuilder.UseStartup<Startup>().UseKestrel(options => options.ConfigureEndpoints());
