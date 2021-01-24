@@ -420,6 +420,19 @@ namespace SensateIoT.Platform.Network.API.Controllers
 				return this.NotFound();
 			}
 
+			this.ApplyUpdate(sensor, update);
+			await this.m_mqtt.PublishCommandAsync(CommandType.FlushSensor, sensor.InternalId.ToString()).ConfigureAwait(false);
+
+			var cache = this.m_cache.RemoveAsync(this.GenerateCacheKey(null, 0, 10, true));
+			var sensordb = this.m_sensors.UpdateAsync(sensor);
+			await Task.WhenAll(cache, sensordb).ConfigureAwait(false);
+			await this.m_mqtt.PublishCommandAsync(CommandType.AddSensor, sensor.InternalId.ToString()).ConfigureAwait(false);
+
+			return this.Ok(new Response<Sensor>(sensor));
+		}
+
+		private void ApplyUpdate(Sensor sensor, SensorUpdate update)
+		{
 			if(!string.IsNullOrEmpty(update.Name)) {
 				sensor.Name = update.Name;
 			}
@@ -431,15 +444,38 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			if(update.StorageEnabled.HasValue) {
 				sensor.StorageEnabled = update.StorageEnabled.Value;
 			}
+		}
 
-			await this.m_mqtt.PublishCommandAsync(CommandType.FlushSensor, sensor.InternalId.ToString()).ConfigureAwait(false);
+		private async Task<bool> UpdateSecret(Sensor sensor, SensorUpdate update)
+		{
+			ApiKey key = null;
+
+			if(!string.IsNullOrEmpty(update.Secret)) {
+				key = await this.m_keys.GetAsync(update.Secret).ConfigureAwait(false);
+			}
+
+			if(key != null) {
+				return false; /* Key already exists */
+			}
+
+			var old = await this.m_keys.GetAsync(sensor.Secret).ConfigureAwait(false);
+
+			var oldSecret = sensor.Secret;
+			sensor.Secret = string.IsNullOrEmpty(update.Secret) ? NextStringWithSymbols(this.m_rng, SensorSecretLength) : update.Secret;
+
+			await Task.WhenAll(
+				this.m_mqtt.PublishCommandAsync(CommandType.FlushSensor, sensor.InternalId.ToString()),
+				this.m_mqtt.PublishCommandAsync(CommandType.FlushKey, oldSecret)
+			).ConfigureAwait(false);
 
 			var cache = this.m_cache.RemoveAsync(this.GenerateCacheKey(null, 0, 10, true));
-			var sensordb = this.m_sensors.UpdateAsync(sensor);
-			await Task.WhenAll(cache, sensordb).ConfigureAwait(false);
-			await this.m_mqtt.PublishCommandAsync(CommandType.AddSensor, sensor.InternalId.ToString()).ConfigureAwait(false);
+			await Task.WhenAll(
+				this.m_keys.UpdateAsync(old.Key, sensor.Secret),
+				this.m_sensors.UpdateSecretAsync(sensor.InternalId, sensor.Secret),
+				cache
+			).ConfigureAwait(false);
 
-			return this.Ok(new Response<Sensor>(sensor));
+			return true;
 		}
 
 		[HttpPut("{id}/secret")]
@@ -471,35 +507,17 @@ namespace SensateIoT.Platform.Network.API.Controllers
 				return this.NotFound();
 			}
 
-			ApiKey key = null;
+			var success = await this.UpdateSecret(sensor, update).ConfigureAwait(false);
 
-			if(!string.IsNullOrEmpty(update.Secret)) {
-				key = await this.m_keys.GetAsync(update.Secret).ConfigureAwait(false);
-			}
-			var old = await this.m_keys.GetAsync(sensor.Secret).ConfigureAwait(false);
-
-			if(key != null) {
+			if(!success) {
 				var resp = new Response<string>();
 
 				resp.AddError("Unable to update sensor secret.");
 				return this.BadRequest(resp);
 			}
 
-			var oldSecret = sensor.Secret;
-			sensor.Secret = string.IsNullOrEmpty(update.Secret) ? NextStringWithSymbols(this.m_rng, SensorSecretLength) : update.Secret;
-
-			await Task.WhenAll(
-				this.m_mqtt.PublishCommandAsync(CommandType.FlushSensor, sensor.InternalId.ToString()),
-				this.m_mqtt.PublishCommandAsync(CommandType.FlushKey, oldSecret)
-			).ConfigureAwait(false);
-
-			var cache = this.m_cache.RemoveAsync(this.GenerateCacheKey(null, 0, 10, true));
-			await Task.WhenAll(
-				this.m_keys.UpdateAsync(old.Key, sensor.Secret),
-				this.m_sensors.UpdateSecretAsync(sensor.InternalId, sensor.Secret),
-				cache
-			).ConfigureAwait(false);
-			await this.m_sensors.UpdateAsync(sensor).ConfigureAwait(false);
+			this.ApplyUpdate(sensor, update);
+			await this.m_sensors.UpdateAsync(sensor).ConfigureAwait(false); /* Update other settings */
 
 			await Task.WhenAll(this.m_mqtt.PublishCommandAsync(CommandType.AddKey, sensor.Secret),
 							   this.m_mqtt.PublishCommandAsync(CommandType.AddSensor, sensor.InternalId.ToString())
