@@ -8,6 +8,8 @@
 using System;
 using System.Collections.Generic;
 
+using JetBrains.Annotations;
+
 namespace SensateIoT.Common.Caching.Abstract
 {
 	/// <summary>
@@ -15,6 +17,7 @@ namespace SensateIoT.Common.Caching.Abstract
 	/// </summary>
 	/// <typeparam name="TKey">Key type.</typeparam>
 	/// <typeparam name="TValue">Value type.</typeparam>
+	[PublicAPI]
 	public interface IMemoryCache<TKey, TValue> : IDisposable
 	{
 		/// <summary>

@@ -10,13 +10,16 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+
 using JetBrains.Annotations;
+
 using SensateIoT.Common.Caching.Abstract;
 using SensateIoT.Common.Caching.Internal;
 
 [assembly: InternalsVisibleTo("SensateService.Common.Caching.Tests")]
 namespace SensateIoT.Common.Caching.Memory
 {
+	[PublicAPI]
 	public class MemoryCache<TKey, TValue> : IMemoryCache<TKey, TValue>
 	{
 		private bool m_disposed;
