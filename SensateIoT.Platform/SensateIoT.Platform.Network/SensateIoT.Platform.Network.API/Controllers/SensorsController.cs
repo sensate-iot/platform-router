@@ -427,7 +427,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 				return this.NotFound();
 			}
 
-			this.ApplyUpdate(sensor, update);
+			ApplyUpdate(sensor, update);
 			await this.m_mqtt.PublishCommandAsync(CommandType.FlushSensor, sensor.InternalId.ToString()).ConfigureAwait(false);
 
 			var cache = this.m_cache.RemoveAsync(this.GenerateCacheKey(null, 0, 10, true));
@@ -438,7 +438,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			return this.Ok(new Response<Sensor>(sensor));
 		}
 
-		private void ApplyUpdate(Sensor sensor, SensorUpdate update)
+		private static void ApplyUpdate(Sensor sensor, SensorUpdate update)
 		{
 			if(!string.IsNullOrEmpty(update.Name)) {
 				sensor.Name = update.Name;
@@ -524,7 +524,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 				return this.BadRequest(resp);
 			}
 
-			this.ApplyUpdate(sensor, update);
+			ApplyUpdate(sensor, update);
 			await this.m_sensors.UpdateAsync(sensor).ConfigureAwait(false); /* Update other settings */
 
 			await Task.WhenAll(this.m_mqtt.PublishCommandAsync(CommandType.AddKey, sensor.Secret),

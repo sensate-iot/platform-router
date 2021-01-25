@@ -204,7 +204,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			try {
 				var buffer = new byte[Convert.ToInt32(this.Request.ContentLength)];
 
-				await this.Request.Body.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
+				await this.Request.Body.ReadAsync(buffer, 0, buffer.Length, CancellationToken.None).ConfigureAwait(false);
 				return Encoding.UTF8.GetString(buffer);
 			} finally {
 				this.Request.Body.Position = 0;

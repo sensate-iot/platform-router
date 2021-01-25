@@ -39,12 +39,12 @@ namespace SensateIoT.Platform.Network.API.Application
 {
 	public class Startup
 	{
+		private readonly IConfiguration m_configuration;
+
 		public Startup(IConfiguration configuration)
 		{
 			this.m_configuration = configuration;
 		}
-
-		private IConfiguration m_configuration;
 
 		public void ConfigureServices(IServiceCollection services)
 		{
@@ -134,7 +134,7 @@ namespace SensateIoT.Platform.Network.API.Application
 								Id = "X-ApiKey"
 							},
 						},
-						new string[] {}
+						Array.Empty<string>()
 					}
 				});
 			});
