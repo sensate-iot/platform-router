@@ -9,25 +9,26 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-
-using MongoDB.Bson;
-using MongoDB.Driver.GeoJsonObjectModel;
 
 using SensateIoT.API.Common.ApiCore.Attributes;
 using SensateIoT.API.Common.ApiCore.Controllers;
 using SensateIoT.API.Common.Core.Helpers;
 using SensateIoT.API.Common.Core.Infrastructure.Repositories;
 using SensateIoT.API.Common.Core.Services.DataProcessing;
+using SensateIoT.API.Common.Data.Converters;
 using SensateIoT.API.Common.Data.Dto.Generic;
 using SensateIoT.API.Common.Data.Dto.Json.Out;
 using SensateIoT.API.Common.Data.Enums;
 using SensateIoT.API.Common.Data.Models;
 using SensateIoT.API.DataApi.Dto;
+
+using MeasurementsQueryResult = SensateIoT.API.Common.Data.Models.MeasurementsQueryResult;
+using MQR = SensateIoT.API.Common.Data.Dto.Generic.MeasurementsQueryResult;
 
 namespace SensateIoT.API.DataApi.Controllers
 {
@@ -52,43 +53,8 @@ namespace SensateIoT.API.DataApi.Controllers
 			this.m_logger = logger;
 		}
 
-		[HttpGet("{bucketId}/{index}")]
-		[ProducesResponseType(typeof(SingleMeasurement), StatusCodes.Status200OK)]
-		[ProducesResponseType(typeof(Status), StatusCodes.Status422UnprocessableEntity)]
-		public async Task<IActionResult> Get(string bucketId, int index = -1)
-		{
-			if(bucketId == null && index < 0) {
-				return this.UnprocessableEntity(new Status {
-					Message = "Invalid query",
-					ErrorCode = ReplyCode.BadInput
-				});
-			}
-
-			var idx = new MeasurementIndex { Index = index };
-
-			if(!ObjectId.TryParse(bucketId, out var id)) {
-				return this.UnprocessableEntity(new Status {
-					Message = "Invalid sensor ID",
-					ErrorCode = ReplyCode.BadInput
-				});
-			}
-
-			idx.MeasurementBucketId = id;
-
-			var measurement = await this.m_measurements.GetMeasurementAsync(idx).AwaitBackground();
-			var auth = await this.AuthenticateUserForSensor(measurement.SensorId.ToString()).AwaitBackground();
-
-			auth |= await this.IsLinkedSensor(measurement.SensorId.ToString()).AwaitBackground();
-
-			if(!auth) {
-				return this.Unauthorized();
-			}
-
-			return this.Ok(measurement);
-		}
-
 		[HttpPost("filter")]
-		[ProducesResponseType(typeof(IEnumerable<MeasurementsQueryResult>), StatusCodes.Status200OK)]
+		[ProducesResponseType(typeof(IEnumerable<MQR>), StatusCodes.Status200OK)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status422UnprocessableEntity)]
 		public async Task<IActionResult> Filter([FromBody] Filter filter)
 		{
@@ -133,7 +99,10 @@ namespace SensateIoT.API.DataApi.Controllers
 			};
 
 			if(filter.Latitude != null & filter.Longitude != null && filter.Radius != null && filter.Radius.Value > 0) {
-				var coords = new GeoJson2DGeographicCoordinates(filter.Longitude.Value, filter.Latitude.Value);
+				var coords = new GeoJsonPoint {
+					Latitude = filter.Latitude.Value,
+					Longitude = filter.Longitude.Value
+				};
 				result = await this.m_measurements
 					.GetMeasurementsNearAsync(filtered, filter.Start, filter.End, coords, filter.Radius.Value,
 						filter.Skip.Value, filter.Limit.Value, direction).AwaitBackground();
@@ -143,11 +112,11 @@ namespace SensateIoT.API.DataApi.Controllers
 												 filter.Limit.Value, direction).AwaitBackground();
 			}
 
-			return this.Ok(result);
+			return this.Ok(MeasurementConverter.Convert(result));
 		}
 
 		[HttpGet]
-		[ProducesResponseType(typeof(IEnumerable<MeasurementsQueryResult>), StatusCodes.Status200OK)]
+		[ProducesResponseType(typeof(IEnumerable<MQR>), StatusCodes.Status200OK)]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
 		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 		public async Task<IActionResult> Get([FromQuery] string sensorId, [FromQuery] DateTime start, [FromQuery] DateTime end,
@@ -176,20 +145,24 @@ namespace SensateIoT.API.DataApi.Controllers
 				end = DateTime.MaxValue;
 			}
 
+			IEnumerable<MeasurementsQueryResult> data;
+
 			if(longitude != null && latitude != null) {
 				var maxDist = radius ?? 100;
-				var coords = new GeoJson2DGeographicCoordinates(longitude.Value, latitude.Value);
-
-				var data = await this.m_measurements
+				var coords = new GeoJsonPoint {
+					Latitude = latitude.Value,
+					Longitude = longitude.Value
+				};
+					
+				data = await this.m_measurements
 					.GetMeasurementsNearAsync(sensor, start, end, coords, maxDist, skip, limit, orderDirection)
 					.AwaitBackground();
-
-				return this.Ok(data);
 			} else {
-				var data = await this.m_measurements.GetBetweenAsync(sensor, start, end,
+				data = await this.m_measurements.GetBetweenAsync(sensor, start, end,
 																	 skip, limit, orderDirection).AwaitBackground();
-				return this.Ok(data);
 			}
+
+			return this.Ok(MeasurementConverter.Convert(data));
 		}
 
 		[HttpDelete]

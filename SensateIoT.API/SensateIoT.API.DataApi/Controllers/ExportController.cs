@@ -5,14 +5,17 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using CsvHelper;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver.GeoJsonObjectModel;
+
+using CsvHelper;
+
 using SensateIoT.API.Common.ApiCore.Controllers;
 using SensateIoT.API.Common.Core.Helpers;
 using SensateIoT.API.Common.Core.Infrastructure.Repositories;
 using SensateIoT.API.Common.Core.Services.DataProcessing;
+using SensateIoT.API.Common.Data.Converters;
 using SensateIoT.API.Common.Data.Dto.Generic;
 using SensateIoT.API.Common.Data.Dto.Json.Out;
 using SensateIoT.API.Common.Data.Enums;
@@ -39,7 +42,6 @@ namespace SensateIoT.API.DataApi.Controllers
 		}
 
 		[HttpPost("measurements")]
-		[ProducesResponseType(typeof(IEnumerable<MeasurementsQueryResult>), StatusCodes.Status200OK)]
 		[ProducesResponseType(typeof(Status), StatusCodes.Status422UnprocessableEntity)]
 		public async Task<IActionResult> Filter([FromBody] Filter filter)
 		{
@@ -60,8 +62,8 @@ namespace SensateIoT.API.DataApi.Controllers
 				dynamic record = new ExpandoObject();
 
 				record.SensorId = measurement.SensorId;
-				record.Longitude = measurement.Location.Coordinates.Longitude;
-				record.Latitude = measurement.Location.Coordinates.Latitude;
+				record.Longitude = measurement.Location.Longitude;
+				record.Latitude = measurement.Location.Latitude;
 				record.Timestamp = measurement.Timestamp.ToString("o");
 
 				foreach(var kvp in measurement.Data) {
@@ -110,7 +112,7 @@ namespace SensateIoT.API.DataApi.Controllers
 		private async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsAsync(Filter filter)
 		{
 			var status = new Status();
-			IEnumerable<MeasurementsQueryResult> result;
+			IEnumerable<Common.Data.Models.MeasurementsQueryResult> result;
 
 			if(filter.SensorIds == null || filter.SensorIds.Count <= 0) {
 				status.ErrorCode = ReplyCode.BadInput;
@@ -150,7 +152,11 @@ namespace SensateIoT.API.DataApi.Controllers
 			};
 
 			if(filter.Latitude != null & filter.Longitude != null && filter.Radius != null && filter.Radius.Value > 0) {
-				var coords = new GeoJson2DGeographicCoordinates(filter.Longitude.Value, filter.Latitude.Value);
+				var coords = new GeoJsonPoint {
+					Latitude = filter.Latitude.Value,
+					Longitude = filter.Longitude.Value
+				};
+
 				result = await this.m_measurements
 					.GetMeasurementsNearAsync(filtered, filter.Start, filter.End, coords, filter.Radius.Value,
 						filter.Skip.Value, filter.Limit.Value, direction).AwaitBackground();
@@ -160,7 +166,7 @@ namespace SensateIoT.API.DataApi.Controllers
 												 filter.Limit.Value, direction).AwaitBackground();
 			}
 
-			return result;
+			return MeasurementConverter.Convert(result);
 		}
 	}
 }

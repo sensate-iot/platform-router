@@ -16,9 +16,11 @@ using Microsoft.AspNetCore.Mvc;
 using SensateIoT.API.Common.ApiCore.Controllers;
 using SensateIoT.API.Common.Core.Helpers;
 using SensateIoT.API.Common.Core.Infrastructure.Repositories;
+using SensateIoT.API.Common.Data.Converters;
 using SensateIoT.API.Common.Data.Dto.Json.Out;
 using SensateIoT.API.Common.Data.Enums;
-using SensateIoT.API.Common.Data.Models;
+
+using Message = SensateIoT.API.Common.Data.Dto.Generic.Message;
 
 namespace SensateIoT.API.DataApi.Controllers
 {
@@ -59,7 +61,7 @@ namespace SensateIoT.API.DataApi.Controllers
 
 			var auth = await this.AuthenticateUserForSensor(msg.SensorId.ToString()).AwaitBackground();
 
-			return auth ? this.Ok(msg) : this.CreateNotAuthorizedResult();
+			return auth ? this.Ok(MessageConverter.Convert(msg)) : this.CreateNotAuthorizedResult();
 		}
 
 		[HttpGet]
@@ -96,7 +98,7 @@ namespace SensateIoT.API.DataApi.Controllers
 			}
 
 			var msgs = await this.m_messages.GetAsync(sensor, start.Value, end.Value, skip, take, orderDirection).AwaitBackground();
-			return this.Ok(msgs);
+			return this.Ok(MessageConverter.Convert(msgs));
 		}
 
 		[HttpDelete]

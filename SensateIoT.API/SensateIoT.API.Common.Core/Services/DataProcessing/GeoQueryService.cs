@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using MongoDB.Driver.GeoJsonObjectModel;
 using SensateIoT.API.Common.Data.Dto.Generic;
 using SensateIoT.API.Common.Data.Enums;
+using MeasurementsQueryResult = SensateIoT.API.Common.Data.Models.MeasurementsQueryResult;
 
 namespace SensateIoT.API.Common.Core.Services.DataProcessing
 {
@@ -56,9 +57,13 @@ namespace SensateIoT.API.Common.Core.Services.DataProcessing
 
 		private delegate double DistanceCalcuationMethod(GeoJson2DGeographicCoordinates p1, GeoJson2DGeographicCoordinates p2);
 
-		public IList<MeasurementsQueryResult> GetMeasurementsNear(
-			List<MeasurementsQueryResult> measurements, GeoJson2DGeographicCoordinates coords,
-			int radius = 100, int skip = -1, int limit = -1, OrderDirection order = OrderDirection.None, CancellationToken ct = default)
+		public IList<MeasurementsQueryResult> GetMeasurementsNear(List<MeasurementsQueryResult> measurements,
+		                                                          GeoJsonPoint coords, 
+		                                                          int radius = 100,
+		                                                          int skip = -1,
+		                                                          int limit = -1, 
+		                                                          OrderDirection order = OrderDirection.None,
+		                                                          CancellationToken ct = default)
 		{
 			DistanceCalcuationMethod calc;
 			var queryResults = new List<MeasurementsQueryResult>(measurements.Count);
@@ -75,10 +80,12 @@ namespace SensateIoT.API.Common.Core.Services.DataProcessing
 				calc = CalculateDistanceBetween;
 			}
 
+			var geoCoords = coords.ToCoordinates();
+
 			Parallel.For(0, measurements.Count, (index, state) => {
 				double maxDist = radius;
 				var measurement = measurements[index];
-				var dist = calc(coords, measurement.Location.Coordinates);
+				var dist = calc(geoCoords, measurement.Location.Coordinates);
 
 				if(dist > maxDist) {
 					return;
@@ -89,11 +96,11 @@ namespace SensateIoT.API.Common.Core.Services.DataProcessing
 
 			queryResults.RemoveAll(x => x == null);
 
-			if(order == OrderDirection.Descending) {
-				queryResults = queryResults.OrderByDescending(x => x.Timestamp).ToList();
-			} else if(order == OrderDirection.Ascending) {
-				queryResults = queryResults.OrderBy(x => x.Timestamp).ToList();
-			}
+			queryResults = order switch {
+				OrderDirection.Descending => queryResults.OrderByDescending(x => x.Timestamp).ToList(),
+				OrderDirection.Ascending => queryResults.OrderBy(x => x.Timestamp).ToList(),
+				_ => queryResults
+			};
 
 			if(skip > 0) {
 				queryResults = queryResults.Skip(skip).ToList();

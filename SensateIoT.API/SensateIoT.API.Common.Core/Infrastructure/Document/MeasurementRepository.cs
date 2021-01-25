@@ -10,10 +10,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Logging;
+
 using MongoDB.Bson;
 using MongoDB.Driver;
-using MongoDB.Driver.GeoJsonObjectModel;
+
 using SensateIoT.API.Common.Core.Exceptions;
 using SensateIoT.API.Common.Core.Helpers;
 using SensateIoT.API.Common.Core.Infrastructure.Repositories;
@@ -21,6 +23,7 @@ using SensateIoT.API.Common.Core.Services.DataProcessing;
 using SensateIoT.API.Common.Data.Dto.Generic;
 using SensateIoT.API.Common.Data.Enums;
 using SensateIoT.API.Common.Data.Models;
+using MeasurementsQueryResult = SensateIoT.API.Common.Data.Models.MeasurementsQueryResult;
 
 namespace SensateIoT.API.Common.Core.Infrastructure.Document
 {
@@ -187,7 +190,7 @@ namespace SensateIoT.API.Common.Core.Infrastructure.Document
 
 		public virtual async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsNearAsync(
 			IEnumerable<Sensor> sensors,
-			DateTime start, DateTime end, GeoJson2DGeographicCoordinates coords,
+			DateTime start, DateTime end, GeoJsonPoint coords,
 			int max = 100, int skip = -1, int limit = -1, OrderDirection order = OrderDirection.None, CancellationToken ct = default
 		)
 		{
@@ -197,7 +200,7 @@ namespace SensateIoT.API.Common.Core.Infrastructure.Document
 
 		public virtual async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsNearAsync(
 			Sensor sensor, DateTime start,
-			DateTime end, GeoJson2DGeographicCoordinates coords,
+			DateTime end, GeoJsonPoint coords,
 			int max = 100, int skip = -1, int limit = -1,
 			OrderDirection order = OrderDirection.None, CancellationToken ct = default)
 		{
