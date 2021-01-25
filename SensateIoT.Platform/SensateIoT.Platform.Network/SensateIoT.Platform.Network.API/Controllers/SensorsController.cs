@@ -28,6 +28,7 @@ using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Enums;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
+
 using ApiKey = SensateIoT.Platform.Network.Data.Models.ApiKey;
 using Sensor = SensateIoT.Platform.Network.Data.Models.Sensor;
 
@@ -129,6 +130,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		[ProducesResponseType(typeof(PaginationResponse<Sensor>), StatusCodes.Status200OK)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
+		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status401Unauthorized)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status422UnprocessableEntity)]
 		public async Task<IActionResult> Index([FromQuery] string name, [FromQuery] int skip = 0, [FromQuery] int limit = 0, [FromQuery] bool link = true)
 		{
@@ -225,6 +227,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		[ProducesResponseType(typeof(Response<Sensor>), StatusCodes.Status201Created)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
+		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status401Unauthorized)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status422UnprocessableEntity)]
 		public async Task<IActionResult> Post([FromBody] Sensor sensor)
 		{
@@ -246,9 +249,10 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		[HttpDelete("links")]
 		[ReadWriteApiKey, ValidateModel]
 		[ProducesResponseType(StatusCodes.Status204NoContent)]
-		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
+		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status401Unauthorized)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status422UnprocessableEntity)]
 		public async Task<IActionResult> DeleteLink([FromBody] SensorLink link)
 		{
@@ -286,6 +290,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		[HttpGet("{sensorId}/links")]
 		[ProducesResponseType(typeof(PaginationResponse<SensorLink>), StatusCodes.Status200OK)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status401Unauthorized)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status422UnprocessableEntity)]
 		public async Task<IActionResult> GetLinks([NotNull] string sensorId)
@@ -335,6 +340,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		[ReadWriteApiKey, ValidateModel]
 		[ProducesResponseType(StatusCodes.Status204NoContent)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status401Unauthorized)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status422UnprocessableEntity)]
 		public async Task<IActionResult> Link([FromBody] SensorLink link)
@@ -398,6 +404,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		[ProducesResponseType(typeof(Response<Sensor>), StatusCodes.Status200OK)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
+		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status401Unauthorized)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status422UnprocessableEntity)]
 		public async Task<IActionResult> Put(string id, [FromBody] SensorUpdate update)
 		{
@@ -482,6 +489,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		[ReadWriteApiKey]
 		[ProducesResponseType(typeof(Response<Sensor>), StatusCodes.Status200OK)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status401Unauthorized)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status422UnprocessableEntity)]
 		public async Task<IActionResult> PutSecret(string id, [FromBody] SensorUpdate update)
@@ -530,6 +538,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		[ReadWriteApiKey]
 		[ProducesResponseType(StatusCodes.Status204NoContent)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status401Unauthorized)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status422UnprocessableEntity)]
 		public async Task<IActionResult> Delete(string id)
@@ -569,6 +578,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		[HttpGet("{id}")]
 		[ProducesResponseType(typeof(Response<Sensor>), StatusCodes.Status200OK)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status401Unauthorized)]
 		[ProducesResponseType(StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status422UnprocessableEntity)]
 		public async Task<IActionResult> Get(string id)

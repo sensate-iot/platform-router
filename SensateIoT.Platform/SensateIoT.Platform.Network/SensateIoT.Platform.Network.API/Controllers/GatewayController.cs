@@ -72,6 +72,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status201Created)]
+		[ProducesResponseType(typeof(Blob), StatusCodes.Status201Created)]
 		public async Task<IActionResult> CreateBlob([FromForm] FileUploadForm upload)
 		{
 			var file = upload.File;
@@ -111,6 +112,10 @@ namespace SensateIoT.Platform.Network.API.Controllers
 
 		[HttpPost("messages")]
 		[ReadWriteApiKey, ValidateModel]
+		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status401Unauthorized)]
+		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
+		[ProducesResponseType(typeof(Response<GatewayResponse>), StatusCodes.Status202Accepted)]
 		public async Task<IActionResult> Messages()
 		{
 			var response = new Response<GatewayResponse>();
@@ -131,6 +136,10 @@ namespace SensateIoT.Platform.Network.API.Controllers
 
 		[HttpPost("measurements")]
 		[ReadWriteApiKey, ValidateModel]
+		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status401Unauthorized)]
+		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
+		[ProducesResponseType(typeof(Response<GatewayResponse>), StatusCodes.Status202Accepted)]
 		public async Task<IActionResult> Measurements()
 		{
 			var response = new Response<GatewayResponse>();
@@ -151,6 +160,10 @@ namespace SensateIoT.Platform.Network.API.Controllers
 
 		[HttpPost("actuators")]
 		[ReadWriteApiKey, ValidateModel]
+		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status401Unauthorized)]
+		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
+		[ProducesResponseType(typeof(Response<GatewayResponse>), StatusCodes.Status202Accepted)]
 		public async Task<IActionResult> ControlMessages([FromBody] ActuatorMessage message)
 		{
 			var response = new Response<GatewayResponse>();
@@ -168,7 +181,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 				return this.Unauthorized(response);
 			}
 
-			var controlMessage = new Data.DTO.ControlMessage() {
+			var controlMessage = new Data.DTO.ControlMessage {
 				Data = message.Data,
 				Destination = ControlMessageType.Mqtt,
 				PlatformTimestamp = DateTime.UtcNow,
