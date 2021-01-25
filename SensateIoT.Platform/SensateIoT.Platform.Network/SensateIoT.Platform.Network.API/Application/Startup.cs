@@ -110,6 +110,9 @@ namespace SensateIoT.Platform.Network.API.Application
 					Version = "v1"
 				});
 
+				c.SchemaFilter<ObjectIdSchemaFilter>();
+				c.OperationFilter<ObjectIdOperationFilter>();
+
 				c.AddSecurityDefinition("X-ApiKey", new OpenApiSecurityScheme {
 					In = ParameterLocation.Header,
 					Name = "X-ApiKey",

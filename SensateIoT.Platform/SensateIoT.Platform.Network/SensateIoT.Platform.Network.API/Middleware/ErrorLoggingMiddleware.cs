@@ -47,6 +47,7 @@ namespace SensateIoT.Platform.Network.API.Middleware
 		public async Task Invoke(HttpContext ctx)
 		{
 			try {
+				ctx.Request.EnableBuffering();
 				await this._next(ctx).ConfigureAwait(false);
 				this.m_requestCounter.Inc();
 			} catch(Exception ex) {

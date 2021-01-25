@@ -174,7 +174,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 			builder.WithFunction(SelectBlobsBySensorID);
 
-			builder.WithParameter("sensorids", sensorId, NpgsqlDbType.Varchar);
+			builder.WithParameter("sensorid", sensorId, NpgsqlDbType.Varchar);
 			builder.WithParameter("offst", GetNullableInteger(skip), NpgsqlDbType.Integer);
 			builder.WithParameter("lim", GetNullableInteger(limit), NpgsqlDbType.Integer);
 

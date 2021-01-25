@@ -8,6 +8,7 @@
 using System;
 using System.Linq;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 
@@ -116,14 +117,11 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(typeof(Response<GatewayResponse>), StatusCodes.Status202Accepted)]
-		public async Task<IActionResult> Messages()
+		public async Task<IActionResult> Messages(Message message)
 		{
 			var response = new Response<GatewayResponse>();
 
-			using var reader = new StreamReader(this.Request.Body);
-			var raw = await reader.ReadToEndAsync();
-
-			var message = JsonConvert.DeserializeObject<Message>(raw);
+			var raw = await this.PeekRequestBodyAsString().ConfigureAwait(false);
 			this.m_messageAuthorizationService.AddMessage(new JsonMessage(message, raw));
 
 			response.Data = new GatewayResponse {
@@ -140,14 +138,11 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(typeof(Response<GatewayResponse>), StatusCodes.Status202Accepted)]
-		public async Task<IActionResult> Measurements()
+		public async Task<IActionResult> Measurements(Measurement measurement)
 		{
 			var response = new Response<GatewayResponse>();
 
-			using var reader = new StreamReader(this.Request.Body);
-			var raw = await reader.ReadToEndAsync();
-
-			var measurement = JsonConvert.DeserializeObject<Measurement>(raw);
+			var raw = await this.PeekRequestBodyAsString().ConfigureAwait(false);
 			this.m_measurementAuthorizationService.AddMessage(new JsonMeasurement(measurement, raw));
 
 			response.Data = new GatewayResponse {
@@ -202,6 +197,18 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			};
 
 			return this.Ok(response);
+		}
+
+		private async Task<string> PeekRequestBodyAsString()
+		{
+			try {
+				var buffer = new byte[Convert.ToInt32(this.Request.ContentLength)];
+
+				await this.Request.Body.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
+				return Encoding.UTF8.GetString(buffer);
+			} finally {
+				this.Request.Body.Position = 0;
+			}
 		}
 	}
 }
