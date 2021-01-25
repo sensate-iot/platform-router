@@ -52,7 +52,6 @@ namespace SensateIoT.API.DataApi.Application
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.AddIdentityFramwork(auth);
 			services.AddReverseProxy(sys);
-			services.AddAuthorizationProxy(sys);
 			services.AddScoped<ISensorLinkRepository, SensorLinkRepository>();
 
 			if(cache.Enabled) {

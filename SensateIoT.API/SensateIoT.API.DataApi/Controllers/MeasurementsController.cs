@@ -8,26 +8,25 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
+
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+
 using MongoDB.Bson;
 using MongoDB.Driver.GeoJsonObjectModel;
-using Newtonsoft.Json;
+
 using SensateIoT.API.Common.ApiCore.Attributes;
 using SensateIoT.API.Common.ApiCore.Controllers;
 using SensateIoT.API.Common.Core.Helpers;
-using SensateIoT.API.Common.Core.Infrastructure.Authorization;
 using SensateIoT.API.Common.Core.Infrastructure.Repositories;
 using SensateIoT.API.Common.Core.Services.DataProcessing;
 using SensateIoT.API.Common.Data.Dto.Generic;
 using SensateIoT.API.Common.Data.Dto.Json.Out;
 using SensateIoT.API.Common.Data.Enums;
 using SensateIoT.API.Common.Data.Models;
-using SensateIoT.API.Common.IdentityData.Models;
 using SensateIoT.API.DataApi.Dto;
 
 namespace SensateIoT.API.DataApi.Controllers
@@ -39,61 +38,18 @@ namespace SensateIoT.API.DataApi.Controllers
 		private readonly IMeasurementRepository m_measurements;
 		private readonly ISensorService m_sensorService;
 		private readonly ILogger<MeasurementsController> m_logger;
-		private readonly IMeasurementAuthorizationProxyCache m_proxy;
 
 		public MeasurementsController(IMeasurementRepository measurements,
 									  ISensorService sensorService,
 									  ISensorLinkRepository links,
 									  ISensorRepository sensors,
 									  IApiKeyRepository keys,
-									  IMeasurementAuthorizationProxyCache proxy,
 									  ILogger<MeasurementsController> logger,
 									  IHttpContextAccessor ctx) : base(ctx, sensors, links, keys)
 		{
 			this.m_measurements = measurements;
 			this.m_sensorService = sensorService;
 			this.m_logger = logger;
-			this.m_proxy = proxy;
-		}
-
-		[HttpPost]
-		[ReadWriteApiKey]
-		[ProducesResponseType(typeof(Status), StatusCodes.Status202Accepted)]
-		[ProducesResponseType(typeof(Status), StatusCodes.Status400BadRequest)]
-		public async Task<IActionResult> Create([FromQuery] bool bulk = false)
-		{
-			var status = new Status();
-
-			try {
-				using var reader = new StreamReader(this.Request.Body);
-				var raw = await reader.ReadToEndAsync();
-
-				if(!(this.HttpContext.Items["ApiKey"] is SensateApiKey)) {
-					return this.Forbid();
-				}
-
-				status.ErrorCode = ReplyCode.Ok;
-				status.Message = "Measurement queued!";
-
-				if(bulk) {
-					this.m_proxy.AddMessages(raw);
-				} else {
-					this.m_proxy.AddMessage(raw);
-				}
-
-				return this.Accepted(status);
-			} catch(JsonException) {
-				status.Message = "Unable to parse measurements";
-				status.ErrorCode = ReplyCode.BadInput;
-				return this.UnprocessableEntity(status);
-			} catch(Exception ex) {
-				status.Message = "Unable to handle request";
-				status.ErrorCode = ReplyCode.UnknownError;
-				this.m_logger.LogInformation($"Unable to process measurement: {ex.Message}");
-				this.m_logger.LogDebug(ex.StackTrace);
-
-				return this.StatusCode(StatusCodes.Status500InternalServerError, status);
-			}
 		}
 
 		[HttpGet("{bucketId}/{index}")]
