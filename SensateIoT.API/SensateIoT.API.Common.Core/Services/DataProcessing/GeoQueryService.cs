@@ -58,12 +58,12 @@ namespace SensateIoT.API.Common.Core.Services.DataProcessing
 		private delegate double DistanceCalcuationMethod(GeoJson2DGeographicCoordinates p1, GeoJson2DGeographicCoordinates p2);
 
 		public IList<MeasurementsQueryResult> GetMeasurementsNear(List<MeasurementsQueryResult> measurements,
-		                                                          GeoJsonPoint coords, 
-		                                                          int radius = 100,
-		                                                          int skip = -1,
-		                                                          int limit = -1, 
-		                                                          OrderDirection order = OrderDirection.None,
-		                                                          CancellationToken ct = default)
+																  GeoJsonPoint coords,
+																  int radius = 100,
+																  int skip = -1,
+																  int limit = -1,
+																  OrderDirection order = OrderDirection.None,
+																  CancellationToken ct = default)
 		{
 			DistanceCalcuationMethod calc;
 			var queryResults = new List<MeasurementsQueryResult>(measurements.Count);
@@ -96,7 +96,8 @@ namespace SensateIoT.API.Common.Core.Services.DataProcessing
 
 			queryResults.RemoveAll(x => x == null);
 
-			queryResults = order switch {
+			queryResults = order switch
+			{
 				OrderDirection.Descending => queryResults.OrderByDescending(x => x.Timestamp).ToList(),
 				OrderDirection.Ascending => queryResults.OrderBy(x => x.Timestamp).ToList(),
 				_ => queryResults

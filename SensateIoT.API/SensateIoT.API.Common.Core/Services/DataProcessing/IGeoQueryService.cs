@@ -18,12 +18,12 @@ namespace SensateIoT.API.Common.Core.Services.DataProcessing
 	public interface IGeoQueryService
 	{
 		IList<MeasurementsQueryResult> GetMeasurementsNear(List<MeasurementsQueryResult> measurements,
-		                                                   GeoJsonPoint coords,
-		                                                   int radius = 100,
-		                                                   int skip = -1,
-		                                                   int limit = -1,
-		                                                   OrderDirection order = OrderDirection.None, 
-		                                                   CancellationToken ct = default
+														   GeoJsonPoint coords,
+														   int radius = 100,
+														   int skip = -1,
+														   int limit = -1,
+														   OrderDirection order = OrderDirection.None,
+														   CancellationToken ct = default
 		);
 	}
 }

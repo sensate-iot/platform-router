@@ -153,7 +153,7 @@ namespace SensateIoT.API.DataApi.Controllers
 					Latitude = latitude.Value,
 					Longitude = longitude.Value
 				};
-					
+
 				data = await this.m_measurements
 					.GetMeasurementsNearAsync(sensor, start, end, coords, maxDist, skip, limit, orderDirection)
 					.AwaitBackground();
