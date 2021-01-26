@@ -2,7 +2,7 @@
 
 ![header1] ![header2] ![header3]
 
-Sensate is an opensource Internet of Things data broker. It enables
+Sensate IoT is an opensource Internet of Things data broker. It enables
 simplified management of devices, data and data analysis through a
 well documented RESTful API. The backend scales extremely well, both
 vertically and horizontally. High availability and performance is
@@ -10,16 +10,14 @@ ensured through clever use of caches and document stores.
 
 [header1]: https://github.com/sensate-iot/SensateService/workflows/Docker/badge.svg "Docker Build"
 [header2]: https://github.com/sensate-iot/SensateService/workflows/Format%20check/badge.svg ".NET format"
-[header3]: https://img.shields.io/badge/version-v1.0.0-informational "Sensate IoT version"
+[header3]: https://img.shields.io/badge/version-v1.1.0-informational "Sensate IoT version"
 
 ## Sensor communication
 
 Sensors can communicate in one of two ways with the sensate servers:
 
 * MQTT (with or without TLS)
-* HTTP
-	* REST call or
-	* Websockets
+* HTTP gateway
 
 In both cases, a pseudo model in JSON format is expected by the Sensate backend:
 

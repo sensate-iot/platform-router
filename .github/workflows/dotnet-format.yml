@@ -6,25 +6,82 @@ on:
       - master
       - feature/**
       - release/**
+      - hotfix/**
   pull_request:
     branches: 
       - master
       - develop
 jobs:
-  dotnet-format:
+  dotnet-format-api:
     runs-on: windows-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
 
-      - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@v1.4.0
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: "3.1.100"
+          dotnet-version: "5.0.x"
       - run: |
           dotnet tool install -g dotnet-format
-          echo "::add-path::$HOME/.dotnet/tools"
+          echo "$HOME/.dotnet/tools" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
 
       - name: Run dotnet format
         run: |
-          dotnet format --check
+          dotnet format --check SensateIoT.API
+
+  dotnet-format-common:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "5.0.x"
+      - run: |
+          dotnet tool install -g dotnet-format
+          echo "$HOME/.dotnet/tools" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
+
+      - name: Run dotnet format
+        run: |
+          dotnet format --check SensateIoT.Common
+
+  dotnet-format-network:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "5.0.x"
+      - run: |
+          dotnet tool install -g dotnet-format
+          echo "$HOME/.dotnet/tools" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
+
+      - name: Run dotnet format
+        working-directory: ${{env.working-directory}}
+        run: |
+          dotnet format --check SensateIoT.Platform/SensateIoT.Platform.Network
+
+  dotnet-format-ingress:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "5.0.x"
+      - run: |
+          dotnet tool install -g dotnet-format
+          echo "$HOME/.dotnet/tools" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
+
+      - name: Run dotnet format
+        working-directory: ${{env.working-directory}}
+        run: |
+          dotnet format --check SensateIoT.Platform/SensateIoT.Platform.Ingress

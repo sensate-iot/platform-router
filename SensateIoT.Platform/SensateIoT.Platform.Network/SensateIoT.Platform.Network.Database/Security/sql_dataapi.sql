@@ -1,0 +1,1 @@
+GRANT db_dataapi TO sql_dataapi;

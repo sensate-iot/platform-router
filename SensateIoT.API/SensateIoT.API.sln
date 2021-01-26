@@ -1,0 +1,92 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30709.132
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.API.Common.ApiCore", "SensateIoT.API.Common.ApiCore\SensateIoT.API.Common.ApiCore.csproj", "{EEF28DC7-1C6A-48A0-A9B7-A78A1D3534EE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.API.Common.Config", "SensateIoT.API.Common.Config\SensateIoT.API.Common.Config.csproj", "{58F270C1-2083-45C2-8CAC-418FF4C4163A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.API.Common.Core", "SensateIoT.API.Common.Core\SensateIoT.API.Common.Core.csproj", "{47534059-B44F-49CD-9EF1-7FB7AA2AAD3D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.API.Common.Data", "SensateIoT.API.Common.Data\SensateIoT.API.Common.Data.csproj", "{82280411-9EEF-45F8-BB17-465B17DE9992}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.API.Common.IdentityData", "SensateIoT.API.Common.IdentityData\SensateIoT.API.Common.IdentityData.csproj", "{54B20F89-4297-4D43-BE58-030BFD827D09}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.API.Common.SqlSetup", "SensateIoT.API.Common.SqlSetup\SensateIoT.API.Common.SqlSetup.csproj", "{9C32C07B-65EE-42E1-9A5B-41E1209B26EC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.API.DashboardApi", "SensateIoT.API.DashboardApi\SensateIoT.API.DashboardApi.csproj", "{B23C6C1D-5B5B-4141-9921-CDBCDE3D928E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.API.AuthApi", "SensateIoT.API.AuthApi\SensateIoT.API.AuthApi.csproj", "{981D12DC-D129-4A7C-BCDB-33BB2CB4DDD1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.API.DataApi", "SensateIoT.API.DataApi\SensateIoT.API.DataApi.csproj", "{81B033C2-96B5-49C3-A7AC-4464AD6DCEA1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CA89A3CF-3425-41E8-A2C5-319FA3E54C2E}"
+	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
+		..\CHANGELOG.md = ..\CHANGELOG.md
+		..\CODE_OF_CONDUCT.md = ..\CODE_OF_CONDUCT.md
+		..\CODESTYLE.md = ..\CODESTYLE.md
+		..\CONTRIBUTING.md = ..\CONTRIBUTING.md
+		..\COPYING = ..\COPYING
+		..\README.md = ..\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build Automation", "Build Automation", "{11FF8E4E-D035-4D2F-AF52-5A8C918B298C}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\docker-authapi.yml = ..\.github\workflows\docker-authapi.yml
+		..\.github\workflows\docker-dashboardapi.yml = ..\.github\workflows\docker-dashboardapi.yml
+		..\.github\workflows\docker-dataapi.yml = ..\.github\workflows\docker-dataapi.yml
+		..\.github\workflows\dotnet-format.yml = ..\.github\workflows\dotnet-format.yml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EEF28DC7-1C6A-48A0-A9B7-A78A1D3534EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEF28DC7-1C6A-48A0-A9B7-A78A1D3534EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEF28DC7-1C6A-48A0-A9B7-A78A1D3534EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEF28DC7-1C6A-48A0-A9B7-A78A1D3534EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58F270C1-2083-45C2-8CAC-418FF4C4163A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58F270C1-2083-45C2-8CAC-418FF4C4163A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58F270C1-2083-45C2-8CAC-418FF4C4163A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58F270C1-2083-45C2-8CAC-418FF4C4163A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47534059-B44F-49CD-9EF1-7FB7AA2AAD3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47534059-B44F-49CD-9EF1-7FB7AA2AAD3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47534059-B44F-49CD-9EF1-7FB7AA2AAD3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47534059-B44F-49CD-9EF1-7FB7AA2AAD3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82280411-9EEF-45F8-BB17-465B17DE9992}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82280411-9EEF-45F8-BB17-465B17DE9992}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82280411-9EEF-45F8-BB17-465B17DE9992}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82280411-9EEF-45F8-BB17-465B17DE9992}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54B20F89-4297-4D43-BE58-030BFD827D09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54B20F89-4297-4D43-BE58-030BFD827D09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54B20F89-4297-4D43-BE58-030BFD827D09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54B20F89-4297-4D43-BE58-030BFD827D09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C32C07B-65EE-42E1-9A5B-41E1209B26EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C32C07B-65EE-42E1-9A5B-41E1209B26EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C32C07B-65EE-42E1-9A5B-41E1209B26EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C32C07B-65EE-42E1-9A5B-41E1209B26EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B23C6C1D-5B5B-4141-9921-CDBCDE3D928E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B23C6C1D-5B5B-4141-9921-CDBCDE3D928E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B23C6C1D-5B5B-4141-9921-CDBCDE3D928E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B23C6C1D-5B5B-4141-9921-CDBCDE3D928E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{981D12DC-D129-4A7C-BCDB-33BB2CB4DDD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{981D12DC-D129-4A7C-BCDB-33BB2CB4DDD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{981D12DC-D129-4A7C-BCDB-33BB2CB4DDD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{981D12DC-D129-4A7C-BCDB-33BB2CB4DDD1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81B033C2-96B5-49C3-A7AC-4464AD6DCEA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81B033C2-96B5-49C3-A7AC-4464AD6DCEA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81B033C2-96B5-49C3-A7AC-4464AD6DCEA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81B033C2-96B5-49C3-A7AC-4464AD6DCEA1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3095C2B4-D05F-41D8-BEF3-9F710D94A0A9}
+	EndGlobalSection
+EndGlobal

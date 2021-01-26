@@ -1,0 +1,24 @@
+{
+  "web": {
+    "port": "web__port",
+    "secret": "web__secret",
+    "timeout": "web__timeout"
+  },
+  "mongodb": {
+    "connectionString": "mongodb__connectionString"
+  },
+  "postgresql": {
+    "connectionString": "postgresql__connectionString"
+  },
+  "mqtt": {
+    "username": "mqtt__username",
+    "password": "mqtt__password",
+    "ssl": "mqtt__ssl",
+    "port": "mqtt__port",
+    "host": "mqtt__host",
+    "bulkMeasurementTopic": "mqtt__bulkMeasurementTopic",
+    "bulkMessageTopic": "mqtt__bulkMessageTopic",
+    "bulkControlMessageTopic": "mqtt__bulkControlMessageTopic"
+  },
+  "id": "id"
+}

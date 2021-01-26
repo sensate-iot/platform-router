@@ -1,0 +1,18 @@
+/*
+ * Router gRPC service response.
+ *
+ * @author Michel Megens
+ * @email  michel@michelmegens.net
+ */
+
+syntax = "proto3";
+
+package sensateiot;
+option csharp_namespace = "SensateIoT.Platform.Network.Contracts.RPC";
+
+message RoutingResponse
+{
+	bytes ResponseID = 1;
+	int32 Count = 3;
+	string Message = 2;
+}

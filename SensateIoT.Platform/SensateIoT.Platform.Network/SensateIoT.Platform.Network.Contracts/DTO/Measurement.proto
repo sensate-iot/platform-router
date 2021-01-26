@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package sensateiot;
+option csharp_namespace = "SensateIoT.Platform.Network.Contracts.DTO";
+
+import "google/protobuf/timestamp.proto";
+
+message DataPoint {
+	double Value = 1;
+	string Unit = 2;
+	double Accuracy = 3;
+	double Precision = 4;
+	string Key = 5;
+}
+
+message Measurement {
+	repeated DataPoint Datapoints = 1;
+	double Latitude = 2;
+	double Longitude = 3;
+	google.protobuf.Timestamp PlatformTime = 4;
+	google.protobuf.Timestamp Timestamp = 5;
+	string SensorID = 6;
+}
+
+message MeasurementData {
+	repeated Measurement Measurements = 1;
+}

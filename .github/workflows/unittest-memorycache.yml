@@ -1,4 +1,4 @@
-name: SensateService Caching Unit test
+name: Caching Unit Test
 on:
   push:
       # Publish `master` as Docker `latest` image.
@@ -7,9 +7,14 @@ on:
         - develop
         - feature/**
         - release/**
+        - hotfix/**
       # Publish `v1.2.3` tags as releases.
       tags:
         - v*
+  pull_request:
+    branches: 
+      - master
+      - develop
 
 jobs:
   build-ubuntu:
@@ -19,10 +24,10 @@ jobs:
       - name: Clone source
         uses: actions/checkout@v1
 
-      - name: Install .NET Core SDK 3.1
+      - name: Install .NET SDK 5.0
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 3.1.x
+          dotnet-version: 5.0.x
 
       - name: "Build unit tests"
-        run: dotnet test Common/SensateService.Common.Caching.Tests
+        run: dotnet test SensateIoT.Common/SensateIoT.Common.Caching.Tests
