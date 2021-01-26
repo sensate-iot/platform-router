@@ -3,7 +3,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>AuthApi</UserSecretsId>
     <Authors>Sensate IoT</Authors>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
     <ServerGarbageCollection>true</ServerGarbageCollection>
     <RootNamespace>SensateIoT.API.AuthApi</RootNamespace>
     <AssemblyName>SensateIoT.API.AuthApi</AssemblyName>
