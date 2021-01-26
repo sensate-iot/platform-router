@@ -117,7 +117,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(typeof(Response<GatewayResponse>), StatusCodes.Status202Accepted)]
-		public async Task<IActionResult> Messages(Message message)
+		public async Task<IActionResult> Messages([FromBody] Message message)
 		{
 			var response = new Response<GatewayResponse>();
 
@@ -138,7 +138,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(typeof(Response<GatewayResponse>), StatusCodes.Status202Accepted)]
-		public async Task<IActionResult> Measurements(Measurement measurement)
+		public async Task<IActionResult> Measurements([FromBody] Measurement measurement)
 		{
 			var response = new Response<GatewayResponse>();
 
@@ -203,6 +203,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		{
 			try {
 				var buffer = new byte[Convert.ToInt32(this.Request.ContentLength)];
+				this.Request.Body.Position = 0;
 
 				await this.Request.Body.ReadAsync(buffer, 0, buffer.Length, CancellationToken.None).ConfigureAwait(false);
 				return Encoding.UTF8.GetString(buffer);
