@@ -33,12 +33,12 @@ jobs:
       - name: Get assembly version
         run: |
           PROJ=$BASE_PATH/SensateIoT.Platform.Network.API.csproj
-          VERSION=$(pwsh -command "Scripts/Deployment/Get-AssemblyVersion.ps1 $PROJ")
+          VERSION=$(pwsh -command "Tools/Deployment/Get-AssemblyVersion.ps1 $PROJ")
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Check DockerHub
         run: |
-          DOCKERTAG=$(pwsh -command "Scripts/Deployment/Check-DockerTag.ps1 $IMAGE_ID $VERSION")
+          DOCKERTAG=$(pwsh -command "Tools/Deployment/Check-DockerTag.ps1 $IMAGE_ID $VERSION")
           echo "TAG=$DOCKERTAG" >> $GITHUB_ENV
 
       - name: Push staging image
