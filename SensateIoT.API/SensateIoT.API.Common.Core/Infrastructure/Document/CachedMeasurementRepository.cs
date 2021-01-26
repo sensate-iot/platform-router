@@ -61,26 +61,13 @@ namespace SensateIoT.API.Common.Core.Infrastructure.Document
 			return data == null ? null : JsonConvert.DeserializeObject<IEnumerable<MeasurementsQueryResult>>(data);
 		}
 
-		public override async Task DeleteBySensorAsync(Sensor sensor, CancellationToken ct = default)
-		{
-			string key;
-
-			key = $"measurements::{sensor.InternalId}";
-			var tasks = new[] {
-				this._cache.RemoveAsync(key),
-				base.DeleteBySensorAsync(sensor, ct)
-			};
-
-			await Task.WhenAll(tasks).AwaitBackground();
-		}
-
 		public override async Task DeleteBetweenAsync(Sensor sensor, DateTime start, DateTime end, CancellationToken ct = default)
 		{
 			string key;
 
 			key = $"{sensor.InternalId}::{start.ToString(CultureInfo.InvariantCulture)}::{end.ToString(CultureInfo.InvariantCulture)}";
 			var tasks = new[] {
-				this._cache.RemoveAsync(key),
+				this._cache.RemoveAsync(key, ct),
 				base.DeleteBetweenAsync(sensor, start, end, ct)
 			};
 
@@ -118,7 +105,10 @@ namespace SensateIoT.API.Common.Core.Infrastructure.Document
 		public override async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsNearAsync(Sensor sensor,
 			DateTime start,
 			DateTime end, GeoJsonPoint coords,
-			int max = 100, int skip = -1, int limit = -1, OrderDirection order = OrderDirection.None,
+			int max = 100, 
+			int skip = -1,
+			int limit = -1,
+			OrderDirection order = OrderDirection.None,
 			CancellationToken ct = default)
 		{
 			IEnumerable<MeasurementsQueryResult> measurements;
@@ -144,7 +134,6 @@ namespace SensateIoT.API.Common.Core.Infrastructure.Document
 
 			return list;
 		}
-
 
 		public override async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsBetweenAsync(
 			IEnumerable<Sensor> sensors,
