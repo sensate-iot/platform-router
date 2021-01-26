@@ -105,7 +105,7 @@ namespace SensateIoT.API.Common.Core.Infrastructure.Document
 		public override async Task<IEnumerable<MeasurementsQueryResult>> GetMeasurementsNearAsync(Sensor sensor,
 			DateTime start,
 			DateTime end, GeoJsonPoint coords,
-			int max = 100, 
+			int max = 100,
 			int skip = -1,
 			int limit = -1,
 			OrderDirection order = OrderDirection.None,

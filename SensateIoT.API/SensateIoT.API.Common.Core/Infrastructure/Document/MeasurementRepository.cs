@@ -125,7 +125,7 @@ namespace SensateIoT.API.Common.Core.Infrastructure.Document
 			IEnumerable<Sensor> sensors,
 			DateTime start, DateTime end, GeoJsonPoint coords,
 			int max = 100,
-			int skip = -1, 
+			int skip = -1,
 			int limit = -1,
 			OrderDirection order = OrderDirection.None,
 			CancellationToken ct = default
@@ -139,7 +139,7 @@ namespace SensateIoT.API.Common.Core.Infrastructure.Document
 			Sensor sensor, DateTime start,
 			DateTime end, GeoJsonPoint coords,
 			int max = 100,
-			int skip = -1, 
+			int skip = -1,
 			int limit = -1,
 			OrderDirection order = OrderDirection.None,
 			CancellationToken ct = default)
