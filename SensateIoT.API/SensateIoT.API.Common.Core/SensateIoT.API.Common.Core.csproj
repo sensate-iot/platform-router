@@ -30,7 +30,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="SensateIoT.Common.Caching" Version="1.0.0" />
+    <PackageReference Include="SensateIoT.Common.Caching" Version="1.0.1" />
     <PackageReference Include="Google.Protobuf" Version="3.14.0" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="5.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="5.0.2" />
