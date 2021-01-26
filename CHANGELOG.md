@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.1.0] - 26-01-2021
 ### Added
 - Network:
   - Network project setup
@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - API:
   - Refactor SensateService into SensateIoT.API
   - Upgrade API's to .NET 5
+  - Improve swagger documentation
 
 ### Removed
 - Trigger administration (moved to network project)
