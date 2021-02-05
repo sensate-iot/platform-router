@@ -1,6 +1,6 @@
 {
   "name": "live-data-service",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "LiveDataService",
   "main": "dist/src/live-data-service.js",
   "scripts": {
@@ -21,7 +21,7 @@
     "@types/async": "^2.4.2",
     "@types/express": "^4.17.8",
     "@types/jsonwebtoken": "^8.5.0",
-    "@types/mongodb": "^3.5.27",
+    "@types/mongodb": "^3.6.6",
     "@types/mongoose": "^5.10.3",
     "@types/node": "^8.10.64",
     "@types/pg": "^7.14.9",
@@ -32,12 +32,12 @@
   },
   "dependencies": {
     "async": "^2.6.3",
+    "config": "^3.3.3",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.0",
-    "config": "^3.3.3",
-    "mongoose": "^5.11.12",
+    "mongoose": "^5.11.15",
     "mqtt": "^3.0.0",
     "pg": "^8.5.1",
     "pg-hstore": "^2.3.3",
