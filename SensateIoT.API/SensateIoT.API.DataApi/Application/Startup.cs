@@ -6,6 +6,8 @@
  */
 
 using System;
+using System.Collections.Generic;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+
 using SensateIoT.API.Common.ApiCore.Init;
 using SensateIoT.API.Common.ApiCore.Middleware;
 using SensateIoT.API.Common.Config.Config;
@@ -133,6 +136,10 @@ namespace SensateIoT.API.DataApi.Application
 
 			app.UseSwagger(c => {
 				c.RouteTemplate = "data/swagger/{documentName}/swagger.json";
+
+				c.PreSerializeFilters.Add((swagger, httpReq) => {
+					swagger.Servers = new List<OpenApiServer> { new OpenApiServer { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}" } };
+				});
 			});
 
 			app.UseSwaggerUI(c => {
