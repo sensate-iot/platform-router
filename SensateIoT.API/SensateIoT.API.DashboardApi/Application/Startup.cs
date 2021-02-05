@@ -6,6 +6,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -90,7 +91,6 @@ namespace SensateIoT.API.DashboardApi.Application
 				});
 			});
 
-
 			services.AddRouting();
 			services.AddControllers().AddNewtonsoftJson();
 		}
@@ -113,6 +113,10 @@ namespace SensateIoT.API.DashboardApi.Application
 
 			app.UseSwagger(c => {
 				c.RouteTemplate = "stats/swagger/{documentName}/swagger.json";
+
+				c.PreSerializeFilters.Add((swagger, httpReq) => {
+					swagger.Servers = new List<OpenApiServer> { new OpenApiServer { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}" } };
+				});
 			});
 
 			app.UseSwaggerUI(c => {
