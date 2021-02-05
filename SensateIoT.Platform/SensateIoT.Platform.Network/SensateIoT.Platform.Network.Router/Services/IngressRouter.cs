@@ -46,7 +46,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 
 			using(this.m_duration.NewTimer()) {
 				this.m_logger.LogDebug("Received measurement routing request from sensor {sensorId}.",
-				                       request.SensorID);
+									   request.SensorID);
 
 				try {
 					var count = 0;
@@ -66,7 +66,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 					};
 				} catch(FormatException) {
 					this.m_logger.LogWarning("Received messages from an invalid sensor (ID): {sensorID}",
-					                         request.SensorID);
+											 request.SensorID);
 
 					response = new RoutingResponse {
 						Count = 0,
@@ -103,7 +103,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 					};
 				} catch(FormatException) {
 					this.m_logger.LogWarning("Received messages from an invalid sensor (ID): {sensorID}",
-					                         request.SensorID);
+											 request.SensorID);
 
 					response = new RoutingResponse {
 						Count = 0,
