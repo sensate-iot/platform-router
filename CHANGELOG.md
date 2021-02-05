@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Updated
 - Sensor creation flow: publish sensor keys on the MQTT broker
 
+### Added
+- Ingress router request metrics
+- Egress router request metrics
+
 ## [1.1.2] - 26-01-2021
 ### Updated
 - Script directory name
