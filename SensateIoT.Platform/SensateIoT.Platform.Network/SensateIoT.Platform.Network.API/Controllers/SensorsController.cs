@@ -240,7 +240,12 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			var cache = this.m_cache.RemoveAsync(this.GenerateCacheKey(null, 0, 10, true));
 			await this.m_keys.CreateSensorKeyAsync(sensor).ConfigureAwait(false);
 			await this.m_sensors.CreateAsync(sensor).ConfigureAwait(false);
-			await this.m_mqtt.PublishCommandAsync(CommandType.AddSensor, sensor.InternalId.ToString()).ConfigureAwait(false);
+
+			await Task.WhenAll(
+				this.m_mqtt.PublishCommandAsync(CommandType.AddSensor, sensor.InternalId.ToString()),
+				this.m_mqtt.PublishCommandAsync(CommandType.AddKey, sensor.Secret)
+			).ConfigureAwait(false);
+
 			await cache.ConfigureAwait(false);
 
 			return this.CreatedAtAction(nameof(this.Get), new { Id = sensor.InternalId }, new Response<Sensor>(sensor));
