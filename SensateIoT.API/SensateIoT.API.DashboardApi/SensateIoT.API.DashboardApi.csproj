@@ -22,7 +22,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.2" />
-    <PackageReference Include="swashbuckle.aspnetcore" Version="5.6.3" />
+    <PackageReference Include="swashbuckle.aspnetcore" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
