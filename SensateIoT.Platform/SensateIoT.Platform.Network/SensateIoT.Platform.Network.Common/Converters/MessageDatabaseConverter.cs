@@ -27,7 +27,7 @@ namespace SensateIoT.Platform.Network.Common.Converters
 				PlatformTimestamp = msg.PlatformTime.ToDateTime(),
 				SensorId = ObjectId.Parse(msg.SensorID),
 				Location = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(new GeoJson2DGeographicCoordinates(msg.Longitude, msg.Latitude)),
-				Encoding = (MessageEncoding) msg.Encoding
+				Encoding = (MessageEncoding)msg.Encoding
 			}).ToList();
 		}
 	}
