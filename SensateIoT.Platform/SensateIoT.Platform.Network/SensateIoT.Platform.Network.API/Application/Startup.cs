@@ -166,7 +166,10 @@ namespace SensateIoT.Platform.Network.API.Application
 				c.RouteTemplate = "network/swagger/{documentName}/swagger.json";
 
 				c.PreSerializeFilters.Add((swagger, httpReq) => {
-					swagger.Servers = new List<OpenApiServer> { new OpenApiServer { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}" } };
+					swagger.Servers = new List<OpenApiServer> {
+						new OpenApiServer { Url = $"http://{httpReq.Host.Value}" },
+						new OpenApiServer { Url = $"https://{httpReq.Host.Value}" }
+					};
 				});
 			});
 
