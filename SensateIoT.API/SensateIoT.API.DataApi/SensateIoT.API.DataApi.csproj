@@ -4,7 +4,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>SensateService</UserSecretsId>
     <Authors>Michel Megens</Authors>
-    <Version>1.2.1</Version>
+    <Version>1.2.2</Version>
     <ServerGarbageCollection>true</ServerGarbageCollection>
     <RootNamespace>SensateIoT.API.DataApi</RootNamespace>
     <AssemblyName>SensateIoT.API.DataApi</AssemblyName>
