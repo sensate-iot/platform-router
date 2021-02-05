@@ -3,7 +3,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>AuthApi</UserSecretsId>
     <Authors>Sensate IoT</Authors>
-    <Version>1.1.2</Version>
+    <Version>1.2.0</Version>
     <ServerGarbageCollection>true</ServerGarbageCollection>
     <RootNamespace>SensateIoT.API.AuthApi</RootNamespace>
     <AssemblyName>SensateIoT.API.AuthApi</AssemblyName>
@@ -27,7 +27,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="5.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.0.0" />
   </ItemGroup>
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.2" />
