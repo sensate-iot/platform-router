@@ -36,7 +36,6 @@
     <None Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Settings\appsettings.json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SensateIoT.API.Common.ApiCore\SensateIoT.API.Common.ApiCore.csproj" />
