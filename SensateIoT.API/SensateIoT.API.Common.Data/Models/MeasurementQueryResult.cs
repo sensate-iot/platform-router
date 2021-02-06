@@ -7,9 +7,11 @@
 
 using System;
 using System.Collections.Generic;
+
 using MongoDB.Bson;
 using MongoDB.Driver.GeoJsonObjectModel;
 using Newtonsoft.Json;
+
 using SensateIoT.API.Common.Data.Converters;
 
 namespace SensateIoT.API.Common.Data.Models
@@ -18,6 +20,7 @@ namespace SensateIoT.API.Common.Data.Models
 	{
 		[JsonIgnore]
 		public ObjectId _id { get; set; }
+		[JsonConverter(typeof(ObjectIdJsonConverter))]
 		public ObjectId SensorId { get; set; }
 		public DateTime Timestamp { get; set; }
 		[JsonConverter(typeof(GeoJsonPointJsonConverter))]
