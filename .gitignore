@@ -41,10 +41,5 @@ MqttHandler/settings/
 **/.idea/**/contentModel.xml
 **/.idea/**/modules.xml
 
-AuthService/build/
-AuthService/cmake-build-debug-win32
-AuthService/cmake-build-debug-win64
-AuthService/cmake-build-release
-AuthService/cmake-vs
-AuthService/[Oo]ut
-AuthService/settings/sensors*
+generated/
+SensateIoT.Platform.Network.TriggerService/appsettings.Development.json
