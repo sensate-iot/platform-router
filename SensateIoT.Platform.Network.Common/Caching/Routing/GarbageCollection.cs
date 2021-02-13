@@ -8,9 +8,9 @@
 using System;
 using System.Runtime;
 
-namespace SensateIoT.Platform.Network.Common.Caching.Memory
+namespace SensateIoT.Platform.Network.Common.Caching.Routing
 {
-	public static class GarbageCollection
+	internal static class GarbageCollection
 	{
 		public static void Collect()
 		{

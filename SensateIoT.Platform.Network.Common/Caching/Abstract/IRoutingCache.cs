@@ -1,5 +1,5 @@
 ﻿/*
- * Object cache to store routing information related to sensors and messages.
+ * Routing cache interface.
  *
  * @author Michel Megens
  * @email  michel@michelmegens.net
@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 using MongoDB.Bson;
 
@@ -19,26 +18,26 @@ using Sensor = SensateIoT.Platform.Network.Data.DTO.Sensor;
 
 namespace SensateIoT.Platform.Network.Common.Caching.Abstract
 {
-	public interface IDataCache : IDisposable
+	public interface IRoutingCache : IDisposable
 	{
-		Sensor GetSensor(ObjectId id);
-		void Append(IEnumerable<Sensor> sensors);
-		void Append(IEnumerable<Account> accounts);
-		void Append(IEnumerable<Tuple<string, ApiKey>> keys);
-		void Append(Sensor sensor);
-		void Append(Account account);
-		void Append(string key, ApiKey keyObject);
+		Sensor this[ObjectId id] { get; set; }
 
-		void Clear();
-		void RemoveSensor(ObjectId sensorID);
-		void RemoveAccount(Guid accountID);
+		void Load(IEnumerable<Sensor> sensors);
+		void Load(IEnumerable<Account> accounts);
+		void Load(IEnumerable<Tuple<string, ApiKey>> keys);
+		void Append(Account account);
+		void Append(string key, ApiKey apikey);
+
+		void RemoveSensor(ObjectId id);
+		void RemoveAccount(Guid id);
 		void RemoveApiKey(string key);
-		Task ScanCachesAsync();
 
 		void AddLiveDataRoute(LiveDataRoute route);
 		void RemoveLiveDataRoute(LiveDataRoute route);
-		void SyncLiveData(ICollection<LiveDataRoute> data);
+		void SyncLiveDataRoutes(ICollection<LiveDataRoute> data);
 		void SetLiveDataRemotes(IEnumerable<LiveDataHandler> remotes);
-		void FlushLiveData();
+		void FlushLiveDataRoutes();
+
+		void Flush();
 	}
 }

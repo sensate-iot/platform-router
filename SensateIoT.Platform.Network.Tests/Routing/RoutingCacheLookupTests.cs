@@ -7,21 +7,21 @@
 
 using System;
 using System.Collections.Generic;
+
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using MongoDB.Bson;
 using Moq;
 
 using SensateIoT.Platform.Network.Common.Caching.Abstract;
-using SensateIoT.Platform.Network.Common.Caching.Object;
+using SensateIoT.Platform.Network.Common.Caching.Routing;
 using SensateIoT.Platform.Network.Data.DTO;
 
-namespace SensateIoT.Platform.Network.Tests.Object
+namespace SensateIoT.Platform.Network.Tests.Routing
 {
 	[TestClass]
-	public class DataCacheTests
+	public class RoutingCacheLookupTests
 	{
 		private ObjectId m_goodSensorID;
 		private ObjectId m_bannedUserSensorID;
@@ -33,7 +33,22 @@ namespace SensateIoT.Platform.Network.Tests.Object
 		public void CanGetAValidSensor()
 		{
 			using var cache = this.buildCache();
-			Assert.IsNotNull(cache.GetSensor(this.m_goodSensorID));
+			Assert.IsNotNull(cache[this.m_goodSensorID]);
+		}
+
+		[TestMethod]
+		public void CannotLookupWithInvalidID()
+		{
+			var cache = this.buildCache();
+			Assert.ThrowsException<ArgumentException>(() => cache[ObjectId.Empty]);
+		}
+
+
+		[TestMethod]
+		public void ReturnsNullWhenNotFound()
+		{
+			using var cache = this.buildCache();
+			Assert.IsNull(cache[ObjectId.GenerateNewId()]);
 		}
 
 		[TestMethod]
@@ -42,7 +57,7 @@ namespace SensateIoT.Platform.Network.Tests.Object
 			using var cache = this.buildCache();
 
 			this.AddBannedUser(cache);
-			Assert.IsNull(cache.GetSensor(this.m_bannedUserSensorID));
+			Assert.IsNull(cache[this.m_bannedUserSensorID]);
 		}
 
 		[TestMethod]
@@ -51,7 +66,7 @@ namespace SensateIoT.Platform.Network.Tests.Object
 			using var cache = this.buildCache();
 
 			this.AddBillingLockedUser(cache);
-			Assert.IsNull(cache.GetSensor(this.m_billingLockedSensorID));
+			Assert.IsNull(cache[this.m_billingLockedSensorID]);
 		}
 
 		[TestMethod]
@@ -60,7 +75,8 @@ namespace SensateIoT.Platform.Network.Tests.Object
 			using var cache = this.buildCache();
 
 			this.AddReadOnlySensor(cache);
-			Assert.IsNull(cache.GetSensor(this.m_readOnlySensorID));
+			var s = cache[this.m_readOnlySensorID];
+			Assert.IsNull(s);
 		}
 
 		[TestMethod]
@@ -69,14 +85,13 @@ namespace SensateIoT.Platform.Network.Tests.Object
 			using var cache = this.buildCache();
 
 			this.AddRevokedSensor(cache);
-			Assert.IsNull(cache.GetSensor(this.m_revokedSensorID));
+			Assert.IsNull(cache[this.m_revokedSensorID]);
 		}
 
-		private IDataCache buildCache()
+		private IRoutingCache buildCache()
 		{
-			var logger = new Mock<ILogger<DataCache>>();
-			var options = Options.Create(new DataCacheOptions { Timeout = TimeSpan.FromMinutes(1) });
-			var cache = new DataCache(options, logger.Object);
+			var logger = new Mock<ILogger<RoutingCache>>();
+			var cache = new RoutingCache(logger.Object);
 
 			for(var idx = 0; idx < 10; idx++) {
 				var accountID = Guid.NewGuid();
@@ -108,7 +123,7 @@ namespace SensateIoT.Platform.Network.Tests.Object
 					AccountID = accountID,
 				};
 
-				cache.Append(sensor);
+				cache[sensor.ID] = sensor;
 				cache.Append(account);
 				cache.Append(apiKey, key);
 			}
@@ -116,7 +131,7 @@ namespace SensateIoT.Platform.Network.Tests.Object
 			return cache;
 		}
 
-		private void AddBannedUser(IDataCache cache)
+		private void AddBannedUser(IRoutingCache cache)
 		{
 			var accountID = Guid.NewGuid();
 			var sensorID = ObjectId.GenerateNewId();
@@ -147,16 +162,16 @@ namespace SensateIoT.Platform.Network.Tests.Object
 				AccountID = accountID,
 			};
 
-			cache.Append(sensor);
+			cache[sensor.ID] = sensor;
 			cache.Append(account);
 			cache.Append(apiKey, key);
 		}
 
-		private void AddBillingLockedUser(IDataCache cache)
+		private void AddBillingLockedUser(IRoutingCache cache)
 		{
 			var accountID = Guid.NewGuid();
 			var sensorID = ObjectId.GenerateNewId();
-			var apiKey = $"BillingLocked";
+			var apiKey = "BillingLocked";
 			this.m_billingLockedSensorID = sensorID;
 
 			var sensor = new Sensor {
@@ -183,12 +198,12 @@ namespace SensateIoT.Platform.Network.Tests.Object
 				AccountID = accountID,
 			};
 
-			cache.Append(sensor);
+			cache[sensor.ID] = sensor;
 			cache.Append(account);
 			cache.Append(apiKey, key);
 		}
 
-		private void AddReadOnlySensor(IDataCache cache)
+		private void AddReadOnlySensor(IRoutingCache cache)
 		{
 			var accountID = Guid.NewGuid();
 			var sensorID = ObjectId.GenerateNewId();
@@ -219,12 +234,12 @@ namespace SensateIoT.Platform.Network.Tests.Object
 				AccountID = accountID,
 			};
 
-			cache.Append(sensor);
+			cache[sensor.ID] = sensor;
 			cache.Append(account);
 			cache.Append(apiKey, key);
 		}
 
-		private void AddRevokedSensor(IDataCache cache)
+		private void AddRevokedSensor(IRoutingCache cache)
 		{
 			var accountID = Guid.NewGuid();
 			var sensorID = ObjectId.GenerateNewId();
@@ -255,7 +270,7 @@ namespace SensateIoT.Platform.Network.Tests.Object
 				AccountID = accountID,
 			};
 
-			cache.Append(sensor);
+			cache[sensor.ID] = sensor;
 			cache.Append(account);
 			cache.Append(apiKey, key);
 		}

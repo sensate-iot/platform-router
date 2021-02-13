@@ -20,10 +20,10 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 {
 	public class CacheTimeoutScanService : TimedBackgroundService
 	{
-		private readonly IDataCache m_cache;
+		private readonly IRoutingCache m_cache;
 		private readonly ILogger<CacheTimeoutScanService> m_logger;
 
-		public CacheTimeoutScanService(IDataCache cache, ILogger<CacheTimeoutScanService> logger, IOptions<DataReloadSettings> settings) :
+		public CacheTimeoutScanService(IRoutingCache cache, ILogger<CacheTimeoutScanService> logger, IOptions<DataReloadSettings> settings) :
 			base(settings.Value.TimeoutScanInterval, settings.Value.TimeoutScanInterval)
 		{
 			this.m_cache = cache;
@@ -35,10 +35,11 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 			this.m_logger.LogInformation("Starting cache clean up!");
 
 			var sw = Stopwatch.StartNew();
-			await this.m_cache.ScanCachesAsync().ConfigureAwait(false);
+			this.m_cache.Flush();
 			sw.Stop();
 
 			this.m_logger.LogInformation("Finished sensor timeout scan in {milliseconds}ms.", sw.ElapsedMilliseconds);
+			await Task.CompletedTask;
 		}
 	}
 }

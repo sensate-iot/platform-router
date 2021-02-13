@@ -21,9 +21,9 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 	public class LiveDataReloadService : TimedBackgroundService
 	{
 		private readonly ILogger<LiveDataReloadService> m_logger;
-		private readonly IDataCache m_cache;
+		private readonly IRoutingCache m_cache;
 
-		public LiveDataReloadService(IDataCache cache,
+		public LiveDataReloadService(IRoutingCache cache,
 									 IOptions<DataReloadSettings> settings,
 									 ILogger<LiveDataReloadService> logger) : base(TimeSpan.FromSeconds(5), settings.Value.LiveDataReloadInterval)
 		{
@@ -34,7 +34,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 		public override Task ExecuteAsync(CancellationToken token)
 		{
 			this.m_logger.LogInformation("Flushing live data routes.");
-			this.m_cache.FlushLiveData();
+			this.m_cache.FlushLiveDataRoutes();
 			this.m_logger.LogInformation("Finished flushing live data routes.");
 			return Task.CompletedTask;
 		}

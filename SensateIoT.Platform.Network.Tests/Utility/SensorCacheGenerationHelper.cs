@@ -5,23 +5,40 @@
 using System;
 using System.Collections.Generic;
 
+using Microsoft.Extensions.Logging;
+
+using Moq;
 using MongoDB.Bson;
 
 using SensateIoT.Platform.Network.Common.Caching.Abstract;
-using SensateIoT.Platform.Network.Common.Caching.Object;
+using SensateIoT.Platform.Network.Common.Caching.Routing;
 using SensateIoT.Platform.Network.Data.DTO;
+using SensateIoT.Platform.Network.Data.Models;
+using ApiKey = SensateIoT.Platform.Network.Data.DTO.ApiKey;
+using Sensor = SensateIoT.Platform.Network.Data.DTO.Sensor;
 
 namespace SensateIoT.Platform.Network.Tests.Utility
 {
-	public class SensorCacheGenerationHelper
+	public static class SensorCacheGenerationHelper
 	{
-		public static Tuple<List<ObjectId>, ISensorCache> BuildSensors()
+		public static Tuple<List<ObjectId>, IRoutingCache> BuildSensors()
 		{
-			var cache = new SensorCache(100, TimeSpan.FromMinutes(5));
+			var loggerMoq = new Mock<ILogger<RoutingCache>>();
+			var cache = new RoutingCache(loggerMoq.Object);
 			var list = new List<ObjectId>();
-			var opts = new CacheEntryOptions {
-				Size = 1
-			};
+
+			cache.SetLiveDataRemotes(new[] {
+				new LiveDataHandler {
+					Enabled = true,
+					ID = 1,
+					Name = "s1"
+				},
+				new LiveDataHandler {
+					Enabled = true,
+					ID = 1,
+					Name = "s2"
+				}
+			});
 
 			for(var idx = 0; idx < 10; idx++) {
 				var sensor = new Sensor {
@@ -32,11 +49,25 @@ namespace SensateIoT.Platform.Network.Tests.Utility
 					ID = ObjectId.GenerateNewId()
 				};
 
+				var account = new Account {
+					HasBillingLockout = false,
+					ID = sensor.AccountID,
+					IsBanned = false
+				};
+
+				var key = new ApiKey {
+					AccountID = sensor.AccountID,
+					IsReadOnly = false,
+					IsRevoked = false
+				};
+
 				list.Add(sensor.ID);
-				cache.Add(sensor.ID, sensor, opts);
+				cache[sensor.ID] = sensor;
+				cache.Append(account);
+				cache.Append(sensor.SensorKey, key);
 			}
 
-			return new Tuple<List<ObjectId>, ISensorCache>(list, cache);
+			return new Tuple<List<ObjectId>, IRoutingCache>(list, cache);
 		}
 
 		public static IList<LiveDataRoute> GenerateRoutes(IList<ObjectId> objectIds)

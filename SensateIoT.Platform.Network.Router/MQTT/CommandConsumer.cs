@@ -8,26 +8,27 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-
+using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
 
 using SensateIoT.Platform.Network.Common.Caching.Abstract;
-using SensateIoT.Platform.Network.Common.Caching.Realtime;
+using SensateIoT.Platform.Network.Common.Caching.Routing;
 using SensateIoT.Platform.Network.Common.MQTT;
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Enums;
 
 namespace SensateIoT.Platform.Network.Router.MQTT
 {
+	[UsedImplicitly]
 	public class CommandConsumer : IMqttHandler
 	{
 		private readonly ILogger<CommandConsumer> m_logger;
 		private readonly DataUpdateHandler m_handler;
 		private readonly LiveDataRouteUpdateHandler m_liveUpdater;
 
-		public CommandConsumer(IServiceProvider provider, IDataCache cache, ILogger<CommandConsumer> logger)
+		public CommandConsumer(IServiceProvider provider, IRoutingCache cache, ILogger<CommandConsumer> logger)
 		{
 			this.m_logger = logger;
 			this.m_handler = new DataUpdateHandler(cache, provider);
@@ -57,7 +58,7 @@ namespace SensateIoT.Platform.Network.Router.MQTT
 				break;
 
 			default:
-				throw new ArgumentOutOfRangeException();
+				throw new ArgumentException($"Command not known ({cmd.Cmd:G})", nameof(message));
 			}
 		}
 	}

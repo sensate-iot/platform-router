@@ -14,9 +14,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using Prometheus;
-
 using SensateIoT.Platform.Network.Common.Caching.Abstract;
-using SensateIoT.Platform.Network.Common.Caching.Object;
+using SensateIoT.Platform.Network.Common.Caching.Routing;
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
 using SensateIoT.Platform.Network.Common.Collections.Local;
 using SensateIoT.Platform.Network.Common.Collections.Remote;
@@ -52,8 +51,6 @@ namespace SensateIoT.Platform.Network.Router.Application
 			this.Configuration.GetSection("Mqtt").Bind(mqtt);
 
 			var reload = this.Configuration.GetValue<int>("Cache:DataReloadInterval");
-			var capacity = this.Configuration.GetValue<int>("Cache:Capacity");
-			var timeout = this.Configuration.GetValue<int>("Cache:Timeout");
 			var privatemqtt = mqtt.InternalBroker;
 			var publicmqtt = mqtt.PublicBroker;
 
@@ -66,11 +63,6 @@ namespace SensateIoT.Platform.Network.Router.Application
 				opts.DataReloadInterval = TimeSpan.FromSeconds(reload);
 				opts.LiveDataReloadInterval = TimeSpan.FromSeconds(this.Configuration.GetValue<int>("Cache:LiveDataReloadInterval"));
 				opts.TimeoutScanInterval = TimeSpan.FromSeconds(this.Configuration.GetValue<int>("Cache:TimeoutScanInterval"));
-			});
-
-			services.Configure<DataCacheOptions>(opts => {
-				opts.Capacity = capacity;
-				opts.Timeout = TimeSpan.FromSeconds(timeout);
 			});
 
 			services.Configure<QueueSettings>(s => {
@@ -119,7 +111,7 @@ namespace SensateIoT.Platform.Network.Router.Application
 			services.AddSingleton<IPublicRemoteQueue, PublicMqttQueue>();
 			services.AddSingleton<IAuthorizationService, AuthorizationService>();
 			services.AddSingleton<IRemoteStorageQueue, RemoteStorageQueue>();
-			services.AddSingleton<IDataCache, DataCache>();
+			services.AddSingleton<IRoutingCache, RoutingCache>();
 
 			services.AddSingleton<IHostedService, DataReloadService>();
 			services.AddSingleton<IHostedService, CacheTimeoutScanService>();

@@ -10,19 +10,20 @@ using System.Collections.Generic;
 using System.Linq;
 
 using MongoDB.Bson;
+
 using Newtonsoft.Json;
 
 using SensateIoT.Platform.Network.Common.Caching.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Enums;
 
-namespace SensateIoT.Platform.Network.Common.Caching.Realtime
+namespace SensateIoT.Platform.Network.Common.Caching.Routing
 {
 	public class LiveDataRouteUpdateHandler
 	{
-		private readonly IDataCache m_cache;
+		private readonly IRoutingCache m_cache;
 
-		public LiveDataRouteUpdateHandler(IDataCache cache)
+		public LiveDataRouteUpdateHandler(IRoutingCache cache)
 		{
 			this.m_cache = cache;
 		}
@@ -60,7 +61,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Realtime
 					Target = raw.Target
 				});
 
-				this.m_cache.SyncLiveData(list.ToList());
+				this.m_cache.SyncLiveDataRoutes(list.ToList());
 				break;
 
 			default:
@@ -71,13 +72,25 @@ namespace SensateIoT.Platform.Network.Common.Caching.Realtime
 
 	internal class InternalLiveDataRoute
 	{
-		public string SensorID { get; set; }
-		public string Target { get; set; }
+		public InternalLiveDataRoute(string sensorId, string target)
+		{
+			this.SensorID = sensorId;
+			this.Target = target;
+		}
+
+		public string SensorID { get; }
+		public string Target { get; }
 	}
 
 	internal class InternalLiveDataSyncList
 	{
-		public string Target { get; set; }
-		public IEnumerable<string> Sensors { get; set; }
+		public InternalLiveDataSyncList(IEnumerable<string> sensors, string target)
+		{
+			this.Sensors = sensors;
+			this.Target = target;
+		}
+
+		public string Target { get; }
+		public IEnumerable<string> Sensors { get; }
 	}
 }

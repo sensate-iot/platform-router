@@ -19,14 +19,14 @@ using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Enums;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
 
-namespace SensateIoT.Platform.Network.Common.Caching.Realtime
+namespace SensateIoT.Platform.Network.Common.Caching.Routing
 {
 	public class DataUpdateHandler
 	{
-		private readonly IDataCache m_cache;
+		private readonly IRoutingCache m_cache;
 		private readonly IServiceProvider m_provider;
 
-		public DataUpdateHandler(IDataCache cache, IServiceProvider provider)
+		public DataUpdateHandler(IRoutingCache cache, IServiceProvider provider)
 		{
 			this.m_cache = cache;
 			this.m_provider = provider;
@@ -96,8 +96,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Realtime
 				}
 			};
 
-
-			this.m_cache.Append(sensor);
+			this.m_cache[sensorId] = sensor;
 		}
 	}
 }

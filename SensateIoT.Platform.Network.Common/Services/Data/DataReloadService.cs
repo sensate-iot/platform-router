@@ -29,12 +29,12 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 	{
 		private readonly IServiceProvider m_provider;
 		private readonly IInternalRemoteQueue m_queue;
-		private readonly IDataCache m_cache;
+		private readonly IRoutingCache m_cache;
 		private readonly ILogger<DataReloadService> m_logger;
 
 		public DataReloadService(IServiceProvider provider,
 											IInternalRemoteQueue internalRemote,
-											IDataCache cache,
+											IRoutingCache cache,
 											IOptions<DataReloadSettings> settings,
 											ILogger<DataReloadService> logger) : base(settings.Value.StartDelay, settings.Value.DataReloadInterval)
 		{
@@ -48,8 +48,8 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 		{
 			await this.ReloadLiveDataHandlers(token).ConfigureAwait(false);
 			await this.ReloadAccounts(token).ConfigureAwait(false);
-			await this.ReloadApiKeys(token).ConfigureAwait(false);
 			await this.ReloadSensors(token).ConfigureAwait(false);
+			await this.ReloadApiKeys(token).ConfigureAwait(false);
 		}
 
 		private async Task ReloadAccounts(CancellationToken token)
@@ -64,7 +64,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 			var accounts = rawAccounts.ToList();
 
 			this.m_logger.LogInformation("Bulk loaded {accountCount} accounts.", accounts.Count);
-			this.m_cache.Append(accounts);
+			this.m_cache.Load(accounts);
 			sw.Stop();
 
 			this.m_logger.LogInformation("Finished account reload at {reloadEnd}. Reload took {duration}ms.",
@@ -83,7 +83,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 			var keys = rawKeys.ToList();
 
 			this.m_logger.LogInformation("Bulk loaded {keyCount} sensor keys.", keys.Count);
-			this.m_cache.Append(keys);
+			this.m_cache.Load(keys);
 			sw.Stop();
 
 			this.m_logger.LogInformation("Finished API key reload at {reloadEnd}. Reload took {duration}ms.",
@@ -149,7 +149,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 				sensor.TriggerInformation.Add(route);
 			}
 
-			this.m_cache.Append(dict.Values);
+			this.m_cache.Load(dict.Values);
 			sw.Stop();
 			this.m_logger.LogInformation("Finished sensor reload at {reloadEnd}. Reload took {duration}ms.", DateTime.UtcNow, sw.ElapsedMilliseconds);
 		}

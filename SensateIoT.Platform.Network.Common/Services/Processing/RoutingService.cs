@@ -38,7 +38,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 		 *		4 Forward to storage.
 		 */
 
-		private readonly IDataCache m_cache;
+		private readonly IRoutingCache m_cache;
 		private readonly IMessageQueue m_messages;
 		private readonly IInternalRemoteQueue m_internalRemote;
 		private readonly IRemoteStorageQueue m_storageQueue;
@@ -53,7 +53,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 		private const int DequeueCount = 1000;
 		private const string FormatNeedle = "$id";
 
-		public RoutingService(IDataCache cache,
+		public RoutingService(IRoutingCache cache,
 							  IMessageQueue queue,
 							  IInternalRemoteQueue internalRemote,
 							  IPublicRemoteQueue publicRemote,
@@ -95,25 +95,32 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 
 				this.m_logger.LogInformation("Routing {count} messages.", messages.Count);
 
-				var result = Parallel.ForEach(messages, message => {
-					var sensor = this.m_cache.GetSensor(message.SensorID);
-
-					if(sensor == null) {
-						this.m_dropCounter.Inc();
-						this.m_logger.LogDebug("Dropped message for sensor {sensorId} due to invalid sensor or account.",
-											   message.SensorID.ToString());
-						return;
-					}
-
-					var evt = this.RouteMessage(message, sensor);
-					this.m_counter.Inc();
-					this.m_eventsQueue.EnqueueEvent(evt);
-				});
+				var result = Parallel.ForEach(messages, this.Process);
 
 				if(!result.IsCompleted) {
 					this.m_logger.LogWarning("Unable to complete routing messages! Break called at iteration: {iteration}.", result.LowestBreakIteration);
 				}
 			} while(!token.IsCancellationRequested);
+		}
+
+		private void Process(IPlatformMessage message)
+		{
+			try {
+				var sensor = this.m_cache[message.SensorID];
+
+				if(sensor == null) {
+					this.m_dropCounter.Inc();
+					this.m_logger.LogDebug("Dropped message for sensor {sensorId} due to invalid sensor or account.",
+										   message.SensorID.ToString());
+					return;
+				}
+
+				var evt = this.RouteMessage(message, sensor);
+				this.m_counter.Inc();
+				this.m_eventsQueue.EnqueueEvent(evt);
+			} catch(ArgumentException ex) {
+				this.m_logger.LogWarning(ex, "Unable to process message!");
+			}
 		}
 
 		private NetworkEvent RouteMessage(IPlatformMessage message, Sensor sensor)
