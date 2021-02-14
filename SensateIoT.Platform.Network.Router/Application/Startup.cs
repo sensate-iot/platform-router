@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using Prometheus;
+
 using SensateIoT.Platform.Network.Common.Caching.Abstract;
 using SensateIoT.Platform.Network.Common.Caching.Routing;
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
@@ -50,6 +51,7 @@ namespace SensateIoT.Platform.Network.Router.Application
 			this.Configuration.GetSection("Database").Bind(db);
 			this.Configuration.GetSection("Mqtt").Bind(mqtt);
 
+			var id = this.Configuration.GetValue<string>("ApplicationId");
 			var reload = this.Configuration.GetValue<int>("Cache:DataReloadInterval");
 			var privatemqtt = mqtt.InternalBroker;
 			var publicmqtt = mqtt.PublicBroker;
@@ -87,7 +89,7 @@ namespace SensateIoT.Platform.Network.Router.Application
 				options.Port = privatemqtt.Port;
 				options.Username = privatemqtt.Username;
 				options.Password = privatemqtt.Password;
-				options.Id = Guid.NewGuid().ToString();
+				options.Id = $"router-{id}";
 			});
 
 			services.AddMqttService(options => {
@@ -96,7 +98,7 @@ namespace SensateIoT.Platform.Network.Router.Application
 				options.Port = publicmqtt.Port;
 				options.Username = publicmqtt.Username;
 				options.Password = publicmqtt.Password;
-				options.Id = Guid.NewGuid().ToString();
+				options.Id = $"router-{id}-{Guid.NewGuid():N}";
 			});
 
 			services.AddScoped<ITriggerRepository, TriggerRepository>();

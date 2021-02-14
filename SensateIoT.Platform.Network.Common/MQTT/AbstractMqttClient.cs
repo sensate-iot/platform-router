@@ -32,6 +32,7 @@ namespace SensateIoT.Platform.Network.Common.MQTT
 		private readonly int _port;
 		private readonly string _share;
 		private readonly IServiceProvider _provider;
+		private readonly string _id;
 		private bool _disconnected;
 
 		private readonly ConcurrentDictionary<string, Type> _handlers;
@@ -40,8 +41,13 @@ namespace SensateIoT.Platform.Network.Common.MQTT
 		private IMqttClientOptions _client_options;
 		protected readonly ILogger _logger;
 
-		protected AbstractMqttClient(string host, int port, bool ssl, string share,
-									  ILogger logger, IServiceProvider provider)
+		protected AbstractMqttClient(string host,
+									 int port,
+									 bool ssl,
+									 string share,
+									 string id,
+									 ILogger logger,
+									 IServiceProvider provider)
 		{
 			this._host = host;
 			this._port = port;
@@ -51,6 +57,11 @@ namespace SensateIoT.Platform.Network.Common.MQTT
 			this._provider = provider;
 			this._share = share;
 			this._handlers = new ConcurrentDictionary<string, Type>();
+			this._id = id;
+
+			if(string.IsNullOrEmpty(id)) {
+				this._id = Guid.NewGuid().ToString();
+			}
 		}
 
 		public void MapTopicHandler<T>(string topic) where T : IMqttHandler
@@ -75,7 +86,7 @@ namespace SensateIoT.Platform.Network.Common.MQTT
 
 			this.Client = factory.CreateMqttClient();
 			builder = new MqttClientOptionsBuilder()
-				.WithClientId(Guid.NewGuid().ToString())
+				.WithClientId(this._id)
 				.WithTcpServer(this._host, this._port)
 				.WithCleanSession();
 
@@ -106,7 +117,7 @@ namespace SensateIoT.Platform.Network.Common.MQTT
 		{
 			var tfb = new MqttTopicFilterBuilder()
 				.WithTopic(topic)
-				.WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtMostOnce);
+				.WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce);
 			var build = tfb.Build();
 			var opts = new MqttClientSubscribeOptionsBuilder()
 				.WithTopicFilter(build);
@@ -122,7 +133,7 @@ namespace SensateIoT.Platform.Network.Common.MQTT
 			}
 		}
 
-		protected virtual async Task OnMessageAsync(string topic, string msg)
+		private async Task OnMessageAsync(string topic, string msg)
 		{
 			IMqttHandler handler;
 

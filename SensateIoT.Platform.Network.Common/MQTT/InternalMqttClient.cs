@@ -24,7 +24,7 @@ namespace SensateIoT.Platform.Network.Common.MQTT
 		private readonly InternalMqttServiceOptions _options;
 
 		public InternalMqttClient(IOptions<InternalMqttServiceOptions> options, ILogger<InternalMqttClient> logger, IServiceProvider sp) :
-			base(options.Value.Host, options.Value.Port, options.Value.Ssl, options.Value.TopicShare, logger, sp)
+			base(options.Value.Host, options.Value.Port, options.Value.Ssl, options.Value.TopicShare, options.Value.Id, logger, sp)
 		{
 			this._options = options.Value;
 		}
