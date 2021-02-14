@@ -30,4 +30,4 @@ jobs:
           dotnet-version: 5.0.x
 
       - name: "Build unit tests"
-        run: dotnet test SensateIoT.Platform/SensateIoT.Platform.Network/SensateIoT.Platform.Network.Tests/SensateIoT.Platform.Network.Tests.csproj
+        run: dotnet test SensateIoT.Platform.Network.Tests/SensateIoT.Platform.Network.Tests.csproj
