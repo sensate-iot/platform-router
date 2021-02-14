@@ -13,10 +13,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 using MongoDB.Bson;
-
+using SensateIoT.Platform.Network.API.Abstract;
 using SensateIoT.Platform.Network.API.Attributes;
 using SensateIoT.Platform.Network.API.DTO;
 using SensateIoT.Platform.Network.Data.DTO;
+using SensateIoT.Platform.Network.Data.Enums;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
 using Message = SensateIoT.Platform.Network.Data.Models.Message;
@@ -29,14 +30,17 @@ namespace SensateIoT.Platform.Network.API.Controllers
 	public class TriggersController : AbstractApiController
 	{
 		private readonly ITriggerRepository m_triggers;
+		private readonly ICommandPublisher m_mqtt;
 
 		public TriggersController(IHttpContextAccessor ctx,
 								  ISensorRepository sensors,
 								  ISensorLinkRepository links,
 								  ITriggerRepository triggers,
+								  ICommandPublisher publisher,
 								  IApiKeyRepository keys) : base(ctx, sensors, links, keys)
 		{
 			this.m_triggers = triggers;
+			this.m_mqtt = publisher;
 		}
 
 		[HttpPost]
@@ -80,6 +84,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 
 			trigger.Type = type;
 			await this.m_triggers.CreateAsync(trigger).ConfigureAwait(false);
+			await this.m_mqtt.PublishCommandAsync(CommandType.AddSensor, raw.SensorId).ConfigureAwait(false);
 
 			return this.CreatedAtAction(nameof(this.GetById), new { triggerId = trigger.ID },
 										new Response<Trigger>(trigger));
@@ -129,6 +134,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			}
 
 			await this.m_triggers.DeleteAsync(trigger.ID).ConfigureAwait(false);
+			await this.m_mqtt.PublishCommandAsync(CommandType.AddSensor, sensor.InternalId.ToString()).ConfigureAwait(false);
 			return this.NoContent();
 		}
 
@@ -162,6 +168,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 
 			try {
 				await this.m_triggers.RemoveActionAsync(trigger, channel.Value).ConfigureAwait(false);
+				await this.m_mqtt.PublishCommandAsync(CommandType.AddSensor, sensor.InternalId.ToString()).ConfigureAwait(false);
 			} catch(ArgumentException) {
 				return this.NotFound();
 			}
@@ -210,6 +217,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 
 			try {
 				await this.m_triggers.AddActionAsync(trigger, action).ConfigureAwait(false);
+				await this.m_mqtt.PublishCommandAsync(CommandType.AddSensor, trigger.SensorID).ConfigureAwait(false);
 			} catch(FormatException ex) {
 				var response = new Response<string>();
 
@@ -253,6 +261,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 			}
 
 			await this.m_triggers.AddActionsAsync(trigger, actions).ConfigureAwait(false);
+			await this.m_mqtt.PublishCommandAsync(CommandType.AddSensor, trigger.SensorID).ConfigureAwait(false);
 			return this.CreatedAtAction(nameof(this.GetById), new { triggerId = trigger.ID }, new Response<Trigger>(trigger));
 		}
 
