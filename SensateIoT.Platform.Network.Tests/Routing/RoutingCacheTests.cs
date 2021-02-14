@@ -71,6 +71,12 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 				TriggerInformation = s.TriggerInformation
 			};
 
+			sensor.TriggerInformation ??= new List<SensorTrigger>();
+			sensor.TriggerInformation.Add(new SensorTrigger {
+				HasActions = true,
+				IsTextTrigger = true
+			});
+
 			cache.Item2.Append("ABC", new ApiKey {
 				AccountID = sensor.AccountID,
 				IsReadOnly = false,
@@ -83,6 +89,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 			Assert.AreEqual(1, s.LiveDataRouting.Count);
 			Assert.AreEqual("s1", s.LiveDataRouting.First().Target);
 			Assert.AreEqual("ABC", s.SensorKey);
+			Assert.AreEqual(1, s.TriggerInformation.Count);
 		}
 
 
