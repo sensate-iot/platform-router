@@ -27,7 +27,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Abstract
 		Task<ApiKey> GetApiKeyAsync(string key, CancellationToken ct = default);
 		Task<IEnumerable<Sensor>> GetSensorsAsync(CancellationToken ct = default);
 		Task<Sensor> GetSensorsByIDAsync(ObjectId sensorID, CancellationToken ct = default);
-		Task<TriggerRoutingInfo> GetTriggerInfoAsync(ObjectId sensorID, CancellationToken ct);
+		Task<IEnumerable<TriggerRoutingInfo>> GetTriggerInfoAsync(ObjectId sensorID, CancellationToken ct);
 		Task<IEnumerable<TriggerRoutingInfo>> GetTriggerInfoAsync(CancellationToken ct);
 	}
 }

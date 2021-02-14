@@ -204,9 +204,9 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			};
 		}
 
-		public async Task<TriggerRoutingInfo> GetTriggerInfoAsync(ObjectId sensorID, CancellationToken ct)
+		public async Task<IEnumerable<TriggerRoutingInfo>> GetTriggerInfoAsync(ObjectId sensorID, CancellationToken ct)
 		{
-			var result = new TriggerRoutingInfo();
+			var result = new List<TriggerRoutingInfo>();
 
 			await using var cmd = this.m_networkContext.Database.GetDbConnection().CreateCommand();
 			if(cmd.Connection.State != ConnectionState.Open) {
@@ -218,12 +218,15 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			cmd.Parameters.Add(new NpgsqlParameter("id", DbType.String) { Value = sensorID.ToString() });
 
 			await using var reader = await cmd.ExecuteReaderAsync(ct).ConfigureAwait(false);
-			if(await reader.ReadAsync(ct)) {
-				result = new TriggerRoutingInfo {
+
+			while(await reader.ReadAsync(ct)) {
+				var record = new TriggerRoutingInfo {
 					SensorID = ObjectId.Parse(reader.GetString(0)),
 					ActionCount = reader.GetInt64(1),
 					TextTrigger = reader.GetBoolean(2)
 				};
+
+				result.Add(record);
 			}
 
 			return result;

@@ -6,7 +6,7 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -89,12 +89,10 @@ namespace SensateIoT.Platform.Network.Common.Caching.Routing
 			var sensor = await routingRepo.GetSensorsByIDAsync(sensorId, ct).ConfigureAwait(false);
 			await triggers.ConfigureAwait(false);
 
-			sensor.TriggerInformation = new List<SensorTrigger> {
-				new SensorTrigger {
-					HasActions = triggers.Result.ActionCount > 0,
-					IsTextTrigger = triggers.Result.TextTrigger
-				}
-			};
+			sensor.TriggerInformation = triggers.Result.Select(x => new SensorTrigger {
+				HasActions = x.ActionCount > 0,
+				IsTextTrigger = x.TextTrigger
+			}).ToList();
 
 			this.m_cache[sensorId] = sensor;
 		}
