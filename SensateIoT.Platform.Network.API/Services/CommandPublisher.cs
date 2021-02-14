@@ -36,8 +36,7 @@ namespace SensateIoT.Platform.Network.API.Services
 		public async Task PublishCommandAsync(CommandType type, string argument, CancellationToken ct = default)
 		{
 			var obj = new JObject {
-				[Commands.CommandKey] = type switch
-				{
+				[Commands.CommandKey] = type switch {
 					CommandType.FlushKey => Commands.FlushKey,
 					CommandType.FlushSensor => Commands.FlushSensor,
 					CommandType.FlushUser => Commands.FlushUser,

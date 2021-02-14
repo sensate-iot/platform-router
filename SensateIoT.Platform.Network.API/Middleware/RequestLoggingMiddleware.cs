@@ -64,8 +64,7 @@ namespace SensateIoT.Platform.Network.API.Middleware
 
 		private static RequestMethod ToRequestMethod(string method)
 		{
-			return method.ToUpper() switch
-			{
+			return method.ToUpper() switch {
 				"GET" => RequestMethod.HttpGet,
 				"POST" => RequestMethod.HttpPost,
 				"PUT" => RequestMethod.HttpPut,
