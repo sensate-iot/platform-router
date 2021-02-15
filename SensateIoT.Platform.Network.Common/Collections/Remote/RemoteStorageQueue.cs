@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 
 using Google.Protobuf;
+using Prometheus;
 
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
 using SensateIoT.Platform.Network.Common.Collections.Local;
@@ -35,6 +36,7 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 		private readonly IInternalMqttClient m_client;
 		private readonly IQueue<Message> m_messages;
 		private readonly IQueue<Measurement> m_measurements;
+		private readonly Gauge m_gauge;
 
 		public RemoteStorageQueue(IOptions<QueueSettings> options, IInternalMqttClient client)
 		{
@@ -44,6 +46,7 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 			this.m_client = client;
 			this.m_messages = new Deque<Message>();
 			this.m_measurements = new Deque<Measurement>();
+			this.m_gauge = Metrics.CreateGauge("router_storage_messages_queued", "Number of messages in the storage queue.");
 		}
 
 		public void Enqueue(IPlatformMessage message)
@@ -53,12 +56,15 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 			} else {
 				this.m_messages.Add(message as Message);
 			}
+
+			this.m_gauge.Inc();
 		}
 
 		public async Task FlushMessagesAsync()
 		{
 			var publishes = new ConcurrentBag<Task>();
 
+			this.m_gauge.Set(0D);
 			var measurements = this.m_measurements.DequeueRange(int.MaxValue).ToList();
 			var messages = this.m_messages.DequeueRange(int.MaxValue).ToList();
 

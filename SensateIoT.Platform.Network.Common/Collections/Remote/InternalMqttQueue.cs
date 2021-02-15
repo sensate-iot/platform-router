@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using Google.Protobuf;
 
 using Microsoft.Extensions.Options;
+using Prometheus;
 
 using SensateIoT.Platform.Network.Common.Converters;
 using SensateIoT.Platform.Network.Common.Helpers;
@@ -52,6 +53,9 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 		private readonly string m_measurementLiveDataTopic;
 		private readonly string m_controlMessageLiveDataTopic;
 
+		private readonly Gauge m_gaugeTriggerSerivce;
+		private readonly Gauge m_gaugeLiveDataService;
+
 		private readonly IInternalMqttClient m_client;
 
 		public InternalMqttQueue(IOptions<QueueSettings> options, IInternalMqttClient client)
@@ -76,6 +80,8 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 			this.m_measurementLock = new SpinLockWrapper();
 			this.m_messageLock = new SpinLockWrapper();
 			this.m_client = client;
+			this.m_gaugeTriggerSerivce = Metrics.CreateGauge("router_trigger_messages_queued", "Number of messages in the trigger queue.");
+			this.m_gaugeLiveDataService = Metrics.CreateGauge("router_livedata_messages_queued", "Number of messages in the live data queue.");
 		}
 
 		public void EnqueueToMessageTriggerService(IPlatformMessage message)
@@ -84,6 +90,7 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 
 			try {
 				this.m_triggerMessages.Messages.Add(MessageProtobufConverter.Convert(message as Message));
+				this.m_gaugeTriggerSerivce.Inc();
 			} finally {
 				this.m_measurementLock.Unlock();
 			}
@@ -95,6 +102,7 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 
 			try {
 				this.m_triggerMeasurements.Measurements.Add(MeasurementProtobufConverter.Convert(message as Data.DTO.Measurement));
+				this.m_gaugeTriggerSerivce.Inc();
 			} finally {
 				this.m_measurementLock.Unlock();
 			}
@@ -106,6 +114,7 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 
 			try {
 				this.m_measurementQueues[target.Target].Measurements.Add(MeasurementProtobufConverter.Convert(message as Data.DTO.Measurement));
+				this.m_gaugeLiveDataService.Inc();
 			} finally {
 				this.m_liveDataLock.Unlock();
 			}
@@ -117,6 +126,7 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 
 			try {
 				this.m_textMessageQueues[target.Target].Messages.Add(MessageProtobufConverter.Convert(message as Message));
+				this.m_gaugeLiveDataService.Inc();
 			} finally {
 				this.m_liveDataLock.Unlock();
 			}
@@ -128,6 +138,7 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 
 			try {
 				this.m_controlMessageQueues[target.Target].Messages.Add(ControlMessageProtobufConverter.Convert(message as ControlMessage));
+				this.m_gaugeLiveDataService.Inc();
 			} finally {
 				this.m_liveDataLock.Unlock();
 			}
@@ -149,6 +160,7 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 				messages = this.m_textMessageQueues;
 				controlMessages = this.m_controlMessageQueues;
 
+				this.m_gaugeLiveDataService.Set(0D);
 				this.m_measurementQueues = new Dictionary<string, MeasurementData>();
 				this.m_textMessageQueues = new Dictionary<string, TextMessageData>();
 				this.m_controlMessageQueues = new Dictionary<string, ControlMessageData>();
@@ -228,6 +240,7 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 				measurements = this.m_triggerMeasurements;
 				messages = this.m_triggerMessages;
 
+				this.m_gaugeTriggerSerivce.Set(0D);
 				this.m_triggerMeasurements = new MeasurementData();
 				this.m_triggerMessages = new TextMessageData();
 			} finally {

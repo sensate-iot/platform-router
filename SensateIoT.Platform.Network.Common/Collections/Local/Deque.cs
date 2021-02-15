@@ -240,7 +240,7 @@ namespace SensateIoT.Platform.Network.Common.Collections.Local
 			return returnValue;
 		}
 
-		public IEnumerable<TValue> DequeueRange(int count)
+		public virtual IEnumerable<TValue> DequeueRange(int count)
 		{
 			TValue[] result;
 
