@@ -14,7 +14,7 @@ env:
   IMAGE_ID: sensateiot/router
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-  BASE_PATH: SensateIoT.Platform/SensateIoT.Platform.Network/SensateIoT.Platform.Network.Router
+  BASE_PATH: SensateIoT.Platform.Network.Router
 
 jobs:
   push-router:
@@ -25,7 +25,7 @@ jobs:
 
       - name: Build image
         run: |
-          docker build SensateIoT.Platform/SensateIoT.Platform.Network --file $BASE_PATH/Dockerfile --tag $IMAGE_NAME
+          docker build . --file $BASE_PATH/Dockerfile --tag $IMAGE_NAME
 
       - name: Log into registry
         run: echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin
