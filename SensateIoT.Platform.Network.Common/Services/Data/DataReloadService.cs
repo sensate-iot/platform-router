@@ -138,9 +138,9 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 					IsTextTrigger = info.TextTrigger
 				};
 
-				var sensor = dict[info.SensorID];
+				var loaded = dict.TryGetValue(info.SensorID, out var sensor);
 
-				if(sensor == null) {
+				if(!loaded || sensor == null) {
 					this.m_logger.LogWarning("Found trigger route for a non-existing sensor. Sensor ID: {sensorID}.", info.SensorID.ToString());
 					continue;
 				}
