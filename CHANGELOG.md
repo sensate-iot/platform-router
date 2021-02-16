@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Routing cache
 - Internal queue metrics
 
+### Updated
+- Command subscription QoS levels (from 1 to 3)
+- Load tests for new caches
+
 ### Removed
 - Ingress projects
 - API projects (except the network API)
