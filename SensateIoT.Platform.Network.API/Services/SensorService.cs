@@ -104,7 +104,8 @@ namespace SensateIoT.Platform.Network.API.Services
 			var sensorList = sensors.ToList();
 			var idList = sensorList.Select(x => x.InternalId).ToList();
 
-			var sensorTask = Task.WhenAll(this.m_sensors.DeleteAsync(idList, ct),
+			var sensorTask = Task.WhenAll(
+				this.m_sensors.DeleteAsync(idList, ct),
 				this.m_messages.DeleteBySensorId(idList, ct),
 				this.m_measurements.DeleteBySensorId(idList, ct),
 				this.m_control.DeleteBySensorIds(idList, ct)
