@@ -12,7 +12,6 @@ import * as WebSocket from "ws";
 import { ISensorAuthRequest } from "../requests/sensorauthrequest";
 import { IWebSocketRequest } from "../requests/request";
 import * as jwt from "jsonwebtoken";
-import { SensorLinksClient } from "./sensorlinksclient";
 import { Pool } from "pg";
 
 // ReSharper disable once UnusedLocalImport
@@ -32,7 +31,6 @@ export class WebSocketClient {
     private readonly sensors: Map<string, SensorModel>;
     private readonly socket: WebSocket;
     private authorized: boolean;
-    private readonly client: SensorLinksClient;
     private userId: string;
 
     public constructor(
@@ -50,7 +48,6 @@ export class WebSocketClient {
         this.sensors = new Map<string, SensorModel>();
         this.socket.onmessage = this.onMessage.bind(this);
         this.authorized = false;
-        this.client = new SensorLinksClient(pool);
         this.userId = "";
     }
 
@@ -182,19 +179,13 @@ export class WebSocketClient {
         }
 
         auth.sensorSecret = sensor.Secret;
+        const json = JSON.stringify(auth);
 
-        const computed = createHash("sha256").update(JSON.stringify(auth)).digest("hex");
+        const computed = createHash("sha256").update(json).digest("hex");
 
         if (computed !== hash) {
-            const links = await this.client.getSensorLinks(auth.sensorId);
-            const match = links.find((value) => {
-                return value.UserId === this.userId;
-            });
-
-            if (match === null || match === undefined) {
-                this.socket.close();
-                return;
-            }
+            console.log(`Unable to authorize sensor ${sensor._id}. Expected ${computed}. Received: ${hash}.`)
+            return;
         }
 
         this.sensors.set(auth.sensorId, sensor);

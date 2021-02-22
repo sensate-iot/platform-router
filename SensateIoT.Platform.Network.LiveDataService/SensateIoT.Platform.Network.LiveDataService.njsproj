@@ -70,7 +70,6 @@
     </TypeScriptCompile>
     <TypeScriptCompile Include="src\clients\auditlogsclient.ts" />
     <TypeScriptCompile Include="src\clients\mqttclient.ts" />
-    <TypeScriptCompile Include="src\clients\sensorlinksclient.ts" />
     <TypeScriptCompile Include="src\clients\websocketclient.ts" />
     <TypeScriptCompile Include="src\commands\command.ts">
       <SubType>Code</SubType>

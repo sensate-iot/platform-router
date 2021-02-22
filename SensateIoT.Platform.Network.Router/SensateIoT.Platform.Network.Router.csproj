@@ -3,9 +3,9 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <ServerGarbageCollection>true</ServerGarbageCollection>
-    <Version>1.2.0</Version>
-    <AssemblyVersion>1.2.0.0</AssemblyVersion>
-    <FileVersion>1.2.0.0</FileVersion>
+    <Version>1.2.1</Version>
+    <AssemblyVersion>1.2.1.0</AssemblyVersion>
+    <FileVersion>1.2.1.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.14.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.15.1" />
     <PackageReference Include="Grpc" Version="2.35.0" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.35.0" />
     <PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.35.0" />
