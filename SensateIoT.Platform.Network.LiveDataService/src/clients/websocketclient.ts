@@ -182,19 +182,14 @@ export class WebSocketClient {
         }
 
         auth.sensorSecret = sensor.Secret;
+        const json = JSON.stringify(auth);
+        console.log(json);
 
-        const computed = createHash("sha256").update(JSON.stringify(auth)).digest("hex");
+        const computed = createHash("sha256").update(json).digest("hex");
 
         if (computed !== hash) {
-            const links = await this.client.getSensorLinks(auth.sensorId);
-            const match = links.find((value) => {
-                return value.UserId === this.userId;
-            });
-
-            if (match === null || match === undefined) {
-                this.socket.close();
-                return;
-            }
+            console.log(`Unable to authorize sensor ${sensor._id}. Expected ${computed}. Received: ${hash}.`)
+            return;
         }
 
         this.sensors.set(auth.sensorId, sensor);
