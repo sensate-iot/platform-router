@@ -148,6 +148,7 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 			var lon = m.Location.Coordinates.Longitude.ToString(CultureInfo.InvariantCulture);
 			var lat = m.Location.Coordinates.Latitude.ToString(CultureInfo.InvariantCulture);
 
+			body = body.Replace("$timestamp", m.Timestamp.ToString("O"));
 			body = body.Replace("$precision", precision);
 			body = body.Replace("$accuracy", accuracy);
 			body = body.Replace("$lon", lon);

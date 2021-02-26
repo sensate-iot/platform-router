@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -93,44 +92,6 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		{
 			var builder = Builders<ControlMessage>.Filter;
 			var filter = builder.In(x => x.SensorId, sensorIds);
-
-			await this._collection.DeleteManyAsync(filter, ct).ConfigureAwait(false);
-		}
-
-		public async Task<long> CountAsync(IList<Sensor> sensors, DateTime start, DateTime end, int skip = -1, int limit = -1,
-										   CancellationToken ct = default)
-		{
-			var ids = sensors.Select(x => x.InternalId);
-			var builder = Builders<ControlMessage>.Filter;
-			var filter = builder.In(x => x.SensorId, ids) &
-						 builder.Gte(x => x.Timestamp, start) &
-						 builder.Lte(x => x.Timestamp, end);
-
-			return await this._collection.CountDocumentsAsync(filter, cancellationToken: ct).ConfigureAwait(false);
-		}
-
-		public async Task<ControlMessage> GetAsync(string messageId, CancellationToken ct = default)
-		{
-			var builder = Builders<ControlMessage>.Filter;
-			var filters = builder.Eq(x => x.SensorId.ToString(), messageId);
-			var msg = await this._collection.FindAsync(filters, cancellationToken: ct).ConfigureAwait(false);
-			return await msg.FirstOrDefaultAsync(ct).ConfigureAwait(false);
-		}
-
-		public async Task DeleteBySensorAsync(Sensor sensor, CancellationToken ct = default)
-		{
-			var builder = Builders<ControlMessage>.Filter;
-			var filter = builder.Eq(x => x.SensorId, sensor.InternalId);
-
-			await this._collection.DeleteManyAsync(filter, ct).ConfigureAwait(false);
-		}
-
-		public async Task DeleteBySensorAsync(Sensor sensor, DateTime start, DateTime end, CancellationToken ct = default)
-		{
-			var builder = Builders<ControlMessage>.Filter;
-			var filter = builder.Eq(x => x.SensorId, sensor.InternalId) &
-						 builder.Gte(x => x.Timestamp, start) &
-						 builder.Lte(x => x.Timestamp, end);
 
 			await this._collection.DeleteManyAsync(filter, ct).ConfigureAwait(false);
 		}

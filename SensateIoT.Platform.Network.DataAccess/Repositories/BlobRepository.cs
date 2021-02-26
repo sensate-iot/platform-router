@@ -10,21 +10,18 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Microsoft.EntityFrameworkCore;
-
 using MongoDB.Bson;
 using NpgsqlTypes;
 
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
-using SensateIoT.Platform.Network.DataAccess.Contexts;
 using SensateIoT.Platform.Network.DataAccess.Extensions;
 
 namespace SensateIoT.Platform.Network.DataAccess.Repositories
 {
 	public class BlobRepository : IBlobRepository
 	{
-		private readonly NetworkContext m_ctx;
+		private readonly INetworkingDbContext m_ctx;
 
 		private const string DeleteBlobBySensorID = "networkapi_deleteblobsbysensorid";
 		private const string SelectBlobByID = "networkapi_selectblobbyid";
@@ -35,14 +32,14 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		private const string DeleteBlobByName = "networkapi_deleteblobsbyname";
 		private const string CreateBlob = "networkapi_createblob";
 
-		public BlobRepository(NetworkContext ctx)
+		public BlobRepository(INetworkingDbContext ctx)
 		{
 			this.m_ctx = ctx;
 		}
 
 		public async Task DeleteAsync(ObjectId sensor, CancellationToken ct = default)
 		{
-			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Connection);
 
 			builder.WithFunction(DeleteBlobBySensorID);
 			builder.WithParameter("sensorid", sensor.ToString(), NpgsqlDbType.Varchar);
@@ -52,7 +49,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task<Blob> CreateAsync(Blob blob, CancellationToken ct)
 		{
-			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Connection);
 
 			builder.WithFunction(CreateBlob);
 			builder.WithParameter("sensorid", blob.SensorID, NpgsqlDbType.Varchar);
@@ -79,7 +76,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task<Blob> GetAsync(long blobId, CancellationToken ct = default)
 		{
-			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Connection);
 
 			builder.WithFunction(SelectBlobByID);
 			builder.WithParameter("id", blobId, NpgsqlDbType.Bigint);
@@ -103,7 +100,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task<IEnumerable<Blob>> GetRangeAsync(IList<Sensor> sensors, int skip = -1, int limit = -1, CancellationToken ct = default)
 		{
-			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Connection);
 
 			builder.WithFunction(SelectBlobs);
 			var sensorids = sensors.Select(x => x.InternalId.ToString());
@@ -145,7 +142,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task<Blob> GetAsync(string sensorId, string fileName, CancellationToken ct = default)
 		{
-			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Connection);
 
 			builder.WithFunction(SelectBlobByName);
 			builder.WithParameter("sensorid", sensorId, NpgsqlDbType.Varchar);
@@ -170,7 +167,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task<IEnumerable<Blob>> GetAsync(string sensorId, int skip = -1, int limit = -1, CancellationToken ct = default)
 		{
-			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Connection);
 
 			builder.WithFunction(SelectBlobsBySensorID);
 
@@ -200,7 +197,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task<Blob> DeleteAsync(string sensorId, string fileName, CancellationToken ct = default)
 		{
-			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Connection);
 
 			builder.WithFunction(DeleteBlobByName);
 			builder.WithParameter("sensorid", sensorId, NpgsqlDbType.Varchar);
@@ -224,7 +221,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task<bool> DeleteAsync(long id, CancellationToken ct = default)
 		{
-			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Connection);
 
 			builder.WithFunction(DeleteBlobByID);
 			builder.WithParameter("id", id, NpgsqlDbType.Bigint);
