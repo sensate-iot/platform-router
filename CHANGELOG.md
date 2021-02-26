@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.2] - 26-02-2021
+### Added
+- Timestamp variable to trigger message's
+- Data contexts using native Npgsql functionality
+
+### Updated
+- Retarget the authorization context to Npgsql
+- Retarget the networking context to Npgsql
+- Logging package references
+- Hosting package references
+
+### Removed
+- Remove references to Entity Framework Core
+- Unused code
+
 ## [1.4.1] - 22-02-2021
 ### Updated
 - Package dependency's
