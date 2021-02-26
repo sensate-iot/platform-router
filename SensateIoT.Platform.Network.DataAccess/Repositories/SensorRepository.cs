@@ -11,8 +11,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Microsoft.EntityFrameworkCore;
-
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -30,11 +28,11 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 	public class SensorRepository : ISensorRepository
 	{
 		private readonly IMongoCollection<Sensor> m_sensors;
-		private readonly NetworkContext m_network;
+		private readonly INetworkingDbContext m_network;
 
 		private const string NetworkApi_DeleteBySensorIds = "NetworkApi_DeleteBySensorIds";
 
-		public SensorRepository(MongoDBContext ctx, NetworkContext network)
+		public SensorRepository(MongoDBContext ctx, INetworkingDbContext network)
 		{
 			this.m_sensors = ctx.Sensors;
 			this.m_network = network;
@@ -166,7 +164,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task DeleteAsync(IEnumerable<ObjectId> sensorIds, CancellationToken ct = default)
 		{
-			using var builder = StoredProcedureBuilder.Create(this.m_network.Database.GetDbConnection());
+			using var builder = StoredProcedureBuilder.Create(this.m_network.Connection);
 			var sensorIdList = sensorIds.ToList();
 
 			var idlist = string.Join(',', sensorIdList.Select(x => x.ToString()));

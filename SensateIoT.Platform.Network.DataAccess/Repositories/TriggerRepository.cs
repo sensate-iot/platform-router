@@ -13,8 +13,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Microsoft.EntityFrameworkCore;
-
 using MongoDB.Bson;
 
 using Npgsql;
@@ -23,7 +21,6 @@ using NpgsqlTypes;
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
-using SensateIoT.Platform.Network.DataAccess.Contexts;
 using SensateIoT.Platform.Network.DataAccess.Extensions;
 
 using TriggerAction = SensateIoT.Platform.Network.Data.Models.TriggerAction;
@@ -32,7 +29,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 {
 	public class TriggerRepository : ITriggerRepository
 	{
-		private readonly NetworkContext m_ctx;
+		private readonly INetworkingDbContext m_ctx;
 
 		private const string TriggerService_GetTriggersBySensorID = "triggerservice_gettriggersbysensorid";
 		private const string NetworkApi_CreateTrigger = "networkapi_createtrigger";
@@ -44,7 +41,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		private const string NetworkApi_SelectTriggersBySensorID = "networkapi_selecttriggerbysensorid";
 		private const string NetworkApi_DeleteTriggerAction = "networkapi_deletetriggeraction";
 
-		public TriggerRepository(NetworkContext ctx)
+		public TriggerRepository(INetworkingDbContext ctx)
 		{
 			this.m_ctx = ctx;
 		}
@@ -53,8 +50,9 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		{
 			var result = new List<Data.DTO.TriggerAction>();
 
-			await using var cmd = this.m_ctx.Database.GetDbConnection().CreateCommand();
-			if(cmd.Connection.State != ConnectionState.Open) {
+			await using var cmd = this.m_ctx.Connection.CreateCommand();
+
+			if(cmd.Connection != null && cmd.Connection.State != ConnectionState.Open) {
 				await cmd.Connection.OpenAsync(ct).ConfigureAwait(false);
 			}
 
@@ -98,7 +96,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task StoreTriggerInvocation(TriggerInvocation invocation, CancellationToken ct)
 		{
-			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Connection);
 
 			builder.WithParameter("triggerid", invocation.TriggerID, NpgsqlDbType.Bigint);
 			builder.WithParameter("actionid", invocation.ActionID, NpgsqlDbType.Bigint);
@@ -112,7 +110,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task<IEnumerable<Trigger>> GetAsync(string sensorId, TriggerType type, CancellationToken ct = default)
 		{
-			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Connection);
 
 			builder.WithParameter("sensorid", sensorId, NpgsqlDbType.Varchar);
 			builder.WithFunction(NetworkApi_SelectTriggersBySensorID);
@@ -125,7 +123,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task<Trigger> GetAsync(long id, CancellationToken ct = default)
 		{
-			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Connection);
 
 			builder.WithParameter("id", id, NpgsqlDbType.Bigint);
 			builder.WithFunction(NetworkApi_SelectTriggerByID);
@@ -206,7 +204,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task RemoveActionAsync(Trigger trigger, TriggerChannel channel, CancellationToken ct = default)
 		{
-			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Connection);
 
 			builder.WithParameter("triggerid", trigger.ID, NpgsqlDbType.Bigint);
 			builder.WithParameter("channel", (int)channel, NpgsqlDbType.Integer);
@@ -229,7 +227,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task AddActionAsync(Trigger trigger, TriggerAction action, CancellationToken ct = default)
 		{
-			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Connection);
 
 			builder.WithParameter("triggerid", trigger.ID, NpgsqlDbType.Bigint);
 			builder.WithParameter("channel", (int)action.Channel, NpgsqlDbType.Integer);
@@ -254,7 +252,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task DeleteAsync(long id, CancellationToken ct = default)
 		{
-			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Connection);
 
 			builder.WithParameter("id", id, NpgsqlDbType.Bigint);
 			builder.WithFunction(NetworkApi_DeleteTriggerByID);
@@ -265,7 +263,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task DeleteBySensorAsync(string sensorId, CancellationToken ct = default)
 		{
-			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Connection);
 
 			builder.WithParameter("sensorid", sensorId, NpgsqlDbType.Varchar);
 			builder.WithFunction(NetworkApi_DeleteTriggersBySensorID);
@@ -276,7 +274,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task CreateAsync(Trigger trigger, CancellationToken ct = default)
 		{
-			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Connection);
 
 			builder.WithParameter("sensorid", trigger.SensorID, NpgsqlDbType.Varchar);
 			builder.WithParameter("keyvalue", trigger.KeyValue, NpgsqlDbType.Varchar);

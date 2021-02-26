@@ -61,8 +61,9 @@ namespace SensateIoT.Platform.Network.API.Application
 			var privatemqtt = mqtt.InternalBroker;
 
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
-			services.AddAuthorizationContext(db.SensateIoT.ConnectionString);
-			services.AddNetworkingContext(db.Networking.ConnectionString);
+			services.AddConnectionStrings(db.Networking.ConnectionString, db.SensateIoT.ConnectionString);
+			services.AddAuthorizationContext();
+			services.AddNetworkingContext();
 			services.AddDistributedCaches<PaginationResponse<Sensor>>(cache.Host, cache.Port);
 			services.AddCors();
 

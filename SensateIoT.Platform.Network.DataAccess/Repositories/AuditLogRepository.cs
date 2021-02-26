@@ -8,31 +8,28 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-using Microsoft.EntityFrameworkCore;
-
 using NpgsqlTypes;
 
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
-using SensateIoT.Platform.Network.DataAccess.Contexts;
 using SensateIoT.Platform.Network.DataAccess.Extensions;
 
 namespace SensateIoT.Platform.Network.DataAccess.Repositories
 {
 	public class AuditLogRepository : IAuditLogRepository
 	{
-		private readonly AuthorizationContext m_ctx;
+		private readonly IAuthorizationDbContext m_ctx;
 
 		private const string NetworkApi_CreateAuditLog = "networkapi_createauditlog";
 
-		public AuditLogRepository(AuthorizationContext ctx)
+		public AuditLogRepository(IAuthorizationDbContext ctx)
 		{
 			this.m_ctx = ctx;
 		}
 
 		public async Task CreateAsync(AuditLog log, CancellationToken ct = default)
 		{
-			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Connection);
 
 			builder.WithParameter("route", log.Route, NpgsqlDbType.Text);
 			builder.WithParameter("method", (int)log.Method, NpgsqlDbType.Integer);
