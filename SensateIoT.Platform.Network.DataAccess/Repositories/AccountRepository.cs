@@ -13,14 +13,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Microsoft.EntityFrameworkCore;
-
 using Npgsql;
 using NpgsqlTypes;
 
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
-using SensateIoT.Platform.Network.DataAccess.Contexts;
 using SensateIoT.Platform.Network.DataAccess.Extensions;
 
 namespace SensateIoT.Platform.Network.DataAccess.Repositories
@@ -31,16 +28,16 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		private const string NetworkApi_GetAccountByEmail = "networkapi_selectuserbyemail";
 		private const string NetworkApi_GetAccountsByID = "networkapi_selectusersbyid";
 
-		private readonly AuthorizationContext m_ctx;
+		private readonly IAuthorizationDbContext m_authorization;
 
-		public AccountRepository(AuthorizationContext ctx)
+		public AccountRepository(IAuthorizationDbContext authorization)
 		{
-			this.m_ctx = ctx;
+			this.m_authorization = authorization;
 		}
 
 		public async Task<User> GetAccountAsync(Guid accountGuid, CancellationToken ct = default)
 		{
-			await using var cmd = this.m_ctx.Database.GetDbConnection().CreateCommand();
+			await using var cmd = this.m_authorization.Connection.CreateCommand();
 			if(cmd.Connection.State != ConnectionState.Open) {
 				await cmd.Connection.OpenAsync(ct).ConfigureAwait(false);
 			}
@@ -86,7 +83,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task<User> GetAccountByEmailAsync(string emailAddress, CancellationToken ct = default)
 		{
-			await using var cmd = this.m_ctx.Database.GetDbConnection().CreateCommand();
+			await using var cmd = this.m_authorization.Connection.CreateCommand();
 			if(cmd.Connection.State != ConnectionState.Open) {
 				await cmd.Connection.OpenAsync(ct).ConfigureAwait(false);
 			}
@@ -110,7 +107,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 				return users;
 			}
 
-			await using var cmd = this.m_ctx.Database.GetDbConnection().CreateCommand();
+			await using var cmd = this.m_authorization.Connection.CreateCommand();
 			if(cmd.Connection.State != ConnectionState.Open) {
 				await cmd.Connection.OpenAsync(ct).ConfigureAwait(false);
 			}

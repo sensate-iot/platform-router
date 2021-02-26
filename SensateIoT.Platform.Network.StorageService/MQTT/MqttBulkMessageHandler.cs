@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 
+using JetBrains.Annotations;
 using Prometheus;
 
 using SensateIoT.Platform.Network.Common.Converters;
@@ -25,6 +26,7 @@ using SensateIoT.Platform.Network.DataAccess.Abstract;
 
 namespace SensateIoT.Platform.Network.StorageService.MQTT
 {
+	[UsedImplicitly]
 	public class MqttBulkMessageHandler : IMqttHandler
 	{
 		private readonly ILogger<MqttBulkMessageHandler> m_logger;

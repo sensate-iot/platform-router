@@ -5,9 +5,10 @@
  * @email  michel.megens@sonatolabs.com
  */
 
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
+using SensateIoT.Platform.Network.Common.Settings;
+using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Config;
 using SensateIoT.Platform.Network.DataAccess.Contexts;
 
@@ -26,14 +27,22 @@ namespace SensateIoT.Platform.Network.Common.Init
 			services.AddSingleton<MongoDBContext>();
 		}
 
-		public static void AddAuthorizationContext(this IServiceCollection services, string conn)
+		public static void AddAuthorizationContext(this IServiceCollection services)
 		{
-			services.AddDbContextPool<AuthorizationContext>(options => { options.UseNpgsql(conn); }, 128);
+			services.AddScoped<IAuthorizationDbContext, AuthorizationDbContext>();
 		}
 
-		public static void AddNetworkingContext(this IServiceCollection services, string conn)
+		public static void AddNetworkingContext(this IServiceCollection services)
 		{
-			services.AddDbContextPool<NetworkContext>(options => { options.UseNpgsql(conn); }, 128);
+			services.AddScoped<INetworkingDbContext, NetworkingDbContext>();
+		}
+
+		public static void AddConnectionStrings(this IServiceCollection services, string networking, string authorization)
+		{
+			services.Configure<DatabaseSettings>(opts => {
+				opts.NetworkingDbConnectionString = networking;
+				opts.AuthorizationDbConnectionString = authorization;
+			});
 		}
 	}
 }

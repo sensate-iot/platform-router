@@ -57,8 +57,9 @@ namespace SensateIoT.Platform.Network.Router.Application
 			var publicmqtt = mqtt.PublicBroker;
 
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
-			services.AddAuthorizationContext(db.SensateIoT.ConnectionString);
-			services.AddNetworkingContext(db.Networking.ConnectionString);
+			services.AddConnectionStrings(db.Networking.ConnectionString, db.SensateIoT.ConnectionString);
+			services.AddAuthorizationContext();
+			services.AddNetworkingContext();
 
 			services.Configure<DataReloadSettings>(opts => {
 				opts.StartDelay = TimeSpan.FromSeconds(1);

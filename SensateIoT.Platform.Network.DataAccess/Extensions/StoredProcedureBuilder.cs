@@ -16,12 +16,12 @@ using NpgsqlTypes;
 
 namespace SensateIoT.Platform.Network.DataAccess.Extensions
 {
-	public class StoredProcedureBuilder : IDisposable
+	public sealed class StoredProcedureBuilder : IDisposable
 	{
 		private readonly DbCommand m_cmd;
 		private bool m_disposed;
 
-		internal StoredProcedureBuilder(DbConnection connection)
+		private StoredProcedureBuilder(DbConnection connection)
 		{
 			this.m_disposed = false;
 			this.m_cmd = connection.CreateCommand();
@@ -35,7 +35,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Extensions
 
 		public async Task<DbDataReader> ExecuteAsync(CancellationToken ct = default)
 		{
-			if(this.m_cmd.Connection.State != ConnectionState.Open) {
+			if(this.m_cmd.Connection!.State != ConnectionState.Open) {
 				await this.m_cmd.Connection.OpenAsync(ct).ConfigureAwait(false);
 			}
 
@@ -53,7 +53,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Extensions
 			return new StoredProcedureBuilder(connection);
 		}
 
-		protected virtual void Dispose(bool disposing)
+		private void Dispose(bool disposing)
 		{
 			if(this.m_disposed) {
 				return;
@@ -69,7 +69,6 @@ namespace SensateIoT.Platform.Network.DataAccess.Extensions
 		public void Dispose()
 		{
 			this.Dispose(true);
-			GC.SuppressFinalize(this);
 		}
 	}
 }

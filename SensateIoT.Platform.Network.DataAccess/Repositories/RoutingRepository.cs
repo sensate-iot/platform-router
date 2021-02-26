@@ -11,9 +11,9 @@ using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson;
 using MongoDB.Driver;
+
 using Npgsql;
 using NpgsqlTypes;
 
@@ -28,8 +28,8 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 {
 	public class RoutingRepository : IRoutingRepository
 	{
-		private readonly AuthorizationContext m_ctx;
-		private readonly NetworkContext m_networkContext;
+		private readonly IAuthorizationDbContext m_ctx;
+		private readonly INetworkingDbContext m_networkContext;
 		private readonly IMongoCollection<Data.Models.Sensor> m_sensors;
 
 		private const string Router_GetAccounts = "router_getaccounts";
@@ -39,7 +39,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		private const string Router_GetSensorKeys = "router_getsensorkeys";
 		private const string Router_GetSensorKey = "router_getsensorkey";
 
-		public RoutingRepository(AuthorizationContext ctx, NetworkContext tctx, MongoDBContext mctx)
+		public RoutingRepository(IAuthorizationDbContext ctx, INetworkingDbContext tctx, MongoDBContext mctx)
 		{
 			this.m_ctx = ctx;
 			this.m_networkContext = tctx;
@@ -50,8 +50,8 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		{
 			var result = new List<Account>();
 
-			await using var cmd = this.m_ctx.Database.GetDbConnection().CreateCommand();
-			if(cmd.Connection.State != ConnectionState.Open) {
+			await using var cmd = this.m_ctx.Connection.CreateCommand();
+			if(cmd.Connection != null && cmd.Connection.State != ConnectionState.Open) {
 				await cmd.Connection.OpenAsync(ct).ConfigureAwait(false);
 			}
 
@@ -76,8 +76,8 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		{
 			Account result;
 
-			await using var cmd = this.m_ctx.Database.GetDbConnection().CreateCommand();
-			if(cmd.Connection.State != ConnectionState.Open) {
+			await using var cmd = this.m_ctx.Connection.CreateCommand();
+			if(cmd.Connection != null && cmd.Connection.State != ConnectionState.Open) {
 				await cmd.Connection.OpenAsync(ct).ConfigureAwait(false);
 			}
 
@@ -105,8 +105,8 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		{
 			var result = new List<Tuple<string, ApiKey>>();
 
-			await using var cmd = this.m_ctx.Database.GetDbConnection().CreateCommand();
-			if(cmd.Connection.State != ConnectionState.Open) {
+			await using var cmd = this.m_ctx.Connection.CreateCommand();
+			if(cmd.Connection != null && cmd.Connection.State != ConnectionState.Open) {
 				await cmd.Connection.OpenAsync(ct).ConfigureAwait(false);
 			}
 
@@ -132,8 +132,8 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		{
 			ApiKey result;
 
-			await using var cmd = this.m_ctx.Database.GetDbConnection().CreateCommand();
-			if(cmd.Connection.State != ConnectionState.Open) {
+			await using var cmd = this.m_ctx.Connection.CreateCommand();
+			if(cmd.Connection != null && cmd.Connection.State != ConnectionState.Open) {
 				await cmd.Connection.OpenAsync(ct).ConfigureAwait(false);
 			}
 
@@ -208,8 +208,8 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		{
 			var result = new List<TriggerRoutingInfo>();
 
-			await using var cmd = this.m_networkContext.Database.GetDbConnection().CreateCommand();
-			if(cmd.Connection.State != ConnectionState.Open) {
+			await using var cmd = this.m_networkContext.Connection.CreateCommand();
+			if(cmd.Connection != null && cmd.Connection.State != ConnectionState.Open) {
 				await cmd.Connection.OpenAsync(ct).ConfigureAwait(false);
 			}
 
@@ -236,8 +236,8 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		{
 			var result = new List<TriggerRoutingInfo>();
 
-			await using var cmd = this.m_networkContext.Database.GetDbConnection().CreateCommand();
-			if(cmd.Connection.State != ConnectionState.Open) {
+			await using var cmd = this.m_networkContext.Connection.CreateCommand();
+			if(cmd.Connection != null && cmd.Connection.State != ConnectionState.Open) {
 				await cmd.Connection.OpenAsync(ct).ConfigureAwait(false);
 			}
 

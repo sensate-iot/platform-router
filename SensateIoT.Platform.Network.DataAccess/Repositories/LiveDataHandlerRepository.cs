@@ -10,21 +10,18 @@ using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Microsoft.EntityFrameworkCore;
-
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
-using SensateIoT.Platform.Network.DataAccess.Contexts;
 
 namespace SensateIoT.Platform.Network.DataAccess.Repositories
 {
 	public class LiveDataHandlerRepository : ILiveDataHandlerRepository
 	{
-		private readonly NetworkContext m_ctx;
+		private readonly INetworkingDbContext m_ctx;
 
 		private const string Router_GetLiveDataHandlers = "router_getlivedatahandlers";
 
-		public LiveDataHandlerRepository(NetworkContext ctx)
+		public LiveDataHandlerRepository(INetworkingDbContext ctx)
 		{
 			this.m_ctx = ctx;
 		}
@@ -33,8 +30,8 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		{
 			var result = new List<LiveDataHandler>();
 
-			using(var cmd = this.m_ctx.Database.GetDbConnection().CreateCommand()) {
-				if(cmd.Connection.State != ConnectionState.Open) {
+			using(var cmd = this.m_ctx.Connection.CreateCommand()) {
+				if(cmd.Connection != null && cmd.Connection.State != ConnectionState.Open) {
 					await cmd.Connection.OpenAsync(ct).ConfigureAwait(false);
 				}
 

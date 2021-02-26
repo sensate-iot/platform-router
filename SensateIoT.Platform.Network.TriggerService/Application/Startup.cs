@@ -55,8 +55,9 @@ namespace SensateIoT.Platform.Network.TriggerService.Application
 
 			var privatemqtt = mqtt.InternalBroker;
 
-			services.AddAuthorizationContext(db.SensateIoT.ConnectionString);
-			services.AddNetworkingContext(db.Networking.ConnectionString);
+			services.AddConnectionStrings(db.Networking.ConnectionString, db.SensateIoT.ConnectionString);
+			services.AddAuthorizationContext();
+			services.AddNetworkingContext();
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.Configure<TimeoutConfig>(this.Configuration.GetSection("Timeouts"));
 

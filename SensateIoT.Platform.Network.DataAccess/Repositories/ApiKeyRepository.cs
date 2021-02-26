@@ -5,12 +5,9 @@
  * @email  michel@michelmegens.net
  */
 
-using System;
 using System.Threading.Tasks;
 using System.Data;
 using System.Threading;
-
-using Microsoft.EntityFrameworkCore;
 
 using Npgsql;
 using NpgsqlTypes;
@@ -18,16 +15,15 @@ using NpgsqlTypes;
 using SensateIoT.Platform.Network.Data.Enums;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
-using SensateIoT.Platform.Network.DataAccess.Contexts;
+using SensateIoT.Platform.Network.DataAccess.Extensions;
 
 using CommandType = System.Data.CommandType;
-using SensateIoT.Platform.Network.DataAccess.Extensions;
 
 namespace SensateIoT.Platform.Network.DataAccess.Repositories
 {
 	public class ApiKeyRepository : IApiKeyRepository
 	{
-		private readonly AuthorizationContext m_ctx;
+		private readonly IAuthorizationDbContext m_ctx;
 
 		private const string NetworkApi_GetApiKeyByKey = "networkapi_selectapikeybykey";
 		private const string NetworkApi_DeleteSensorKey = "networkapi_deletesensorkey";
@@ -35,7 +31,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		private const string NetworkApi_IncrementRequestCount = "networkapi_incrementrequestcount";
 		private const string NetworkApi_CreateSensorKey = "networkapi_createsensorkey";
 
-		public ApiKeyRepository(AuthorizationContext ctx)
+		public ApiKeyRepository(IAuthorizationDbContext ctx)
 		{
 			this.m_ctx = ctx;
 		}
@@ -44,7 +40,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		{
 			ApiKey apikey;
 
-			await using var cmd = this.m_ctx.Database.GetDbConnection().CreateCommand();
+			await using var cmd = this.m_ctx.Connection.CreateCommand();
 			if(cmd.Connection.State != ConnectionState.Open) {
 				await cmd.Connection.OpenAsync(ct).ConfigureAwait(false);
 			}
@@ -76,7 +72,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task DeleteAsync(string key, CancellationToken ct = default)
 		{
-			await using var cmd = this.m_ctx.Database.GetDbConnection().CreateCommand();
+			await using var cmd = this.m_ctx.Connection.CreateCommand();
 			if(cmd.Connection.State != ConnectionState.Open) {
 				await cmd.Connection.OpenAsync(ct).ConfigureAwait(false);
 			}
@@ -94,7 +90,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		{
 			ApiKey apikey;
 
-			await using var cmd = this.m_ctx.Database.GetDbConnection().CreateCommand();
+			await using var cmd = this.m_ctx.Connection.CreateCommand();
 			if(cmd.Connection.State != ConnectionState.Open) {
 				await cmd.Connection.OpenAsync(ct).ConfigureAwait(false);
 			}
@@ -131,7 +127,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		{
 			ApiKey apikey;
 
-			await using var cmd = this.m_ctx.Database.GetDbConnection().CreateCommand();
+			await using var cmd = this.m_ctx.Connection.CreateCommand();
 			if(cmd.Connection.State != ConnectionState.Open) {
 				await cmd.Connection.OpenAsync(ct).ConfigureAwait(false);
 			}
@@ -166,7 +162,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		public async Task IncrementRequestCountAsync(string key, CancellationToken ct = default)
 		{
-			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Database.GetDbConnection());
+			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Connection);
 
 			builder.WithParameter("key", key, NpgsqlDbType.Text);
 			builder.WithFunction(NetworkApi_IncrementRequestCount);

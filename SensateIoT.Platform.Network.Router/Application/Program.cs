@@ -60,7 +60,7 @@ namespace SensateIoT.Platform.Network.Router.Application
 					config.AddConfiguration(conf);
 				})
 				.ConfigureWebHostDefaults(webBuilder => {
-					webBuilder.UseStartup<Startup>().UseKestrel(options => options.ConfigureEndpoints());
+					webBuilder.UseStartup<Startup>().UseKestrel();
 				});
 		}
 
