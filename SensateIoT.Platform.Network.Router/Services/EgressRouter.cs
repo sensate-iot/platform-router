@@ -13,6 +13,8 @@ using Microsoft.Extensions.Logging;
 
 using Google.Protobuf;
 using Grpc.Core;
+
+using JetBrains.Annotations;
 using Prometheus;
 
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
@@ -21,6 +23,7 @@ using SensateIoT.Platform.Network.Contracts.RPC;
 
 namespace SensateIoT.Platform.Network.Router.Services
 {
+	[UsedImplicitly]
 	public class EgressRouter : Contracts.Services.EgressRouter.EgressRouterBase
 	{
 		private readonly IMessageQueue m_queue;
