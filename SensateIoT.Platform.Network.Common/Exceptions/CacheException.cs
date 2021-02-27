@@ -13,24 +13,9 @@ namespace SensateIoT.Platform.Network.Common.Exceptions
 	{
 		public object Key { get; }
 
-		public CacheException()
-		{ }
-
-		public CacheException(string message) : base(message)
-		{ }
-
-		public CacheException(object key) : base($"Generic cache exception (key: {key}).")
-		{
-			this.Key = key;
-		}
-
 		public CacheException(object key, string message) : base(message)
 		{
 			this.Key = key;
-		}
-
-		public CacheException(string message, Exception innerException) : base(message, innerException)
-		{
 		}
 	}
 }
