@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.3] - 28-02-2021
+### Added
+- Storage histogram
+- Router command statistics/monitoring
+- Trigger execution histogram
+
+### Updated
+- Improved router configuration
+- Git ignore definition
+- Live data service dependency's
+- Development configurations
+
+### Removed
+- Remove unused code
+- Remove unused configuration
+
 ## [1.4.2] - 26-02-2021
 ### Added
 - Timestamp variable to trigger message's
