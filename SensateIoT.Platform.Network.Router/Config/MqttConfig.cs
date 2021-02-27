@@ -1,4 +1,11 @@
-﻿namespace SensateIoT.Platform.Network.Router.Config
+﻿/*
+ * MQTT configuration.
+ *
+ * @author Michel Megens
+ * @email  michel@michelmegens.net
+ */
+
+namespace SensateIoT.Platform.Network.Router.Config
 {
 	public class MqttConfig
 	{

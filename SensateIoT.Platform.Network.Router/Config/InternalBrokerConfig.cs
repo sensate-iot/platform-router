@@ -5,8 +5,11 @@
  * @email  michel@michelmegens.net
  */
 
+using JetBrains.Annotations;
+
 namespace SensateIoT.Platform.Network.Router.Config
 {
+	[UsedImplicitly]
 	public class InternalBrokerConfig
 	{
 		public string Username { get; set; }
