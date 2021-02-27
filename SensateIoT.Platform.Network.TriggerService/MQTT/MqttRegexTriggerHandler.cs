@@ -37,6 +37,7 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 		private readonly ITriggerActionExecutionService m_exec;
 		private readonly Counter m_messageCounter;
 		private readonly Counter m_matchCounter;
+		private readonly Histogram m_duration;
 
 		public MqttRegexTriggerHandler(
 			ILogger<MqttRegexTriggerHandler> logger,
@@ -51,31 +52,17 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 			this.m_exec = exec;
 			this.m_matchCounter = Metrics.CreateCounter("triggerservice_messages_matched_total", "Total amount of measurements that matched a trigger.");
 			this.m_messageCounter = Metrics.CreateCounter("triggerservice_messages_received_total", "Total amount of messages received.");
-		}
-
-		private IEnumerable<InternalBulkMessageQueue> Decompress(string data)
-		{
-			var bytes = Convert.FromBase64String(data);
-			using var to = new MemoryStream();
-			using var from = new MemoryStream(bytes);
-			using var gzip = new GZipStream(@from, CompressionMode.Decompress);
-
-			gzip.CopyTo(to);
-			var final = to.ToArray();
-			var protoMessages = TextMessageData.Parser.ParseFrom(final);
-			var messages =
-				from message in protoMessages.Messages
-				group message by message.SensorID into g
-				select new InternalBulkMessageQueue {
-					SensorID = ObjectId.Parse(g.Key),
-					Messages = g.Select(MessageProtobufConverter.Convert).ToList()
-				};
-
-			this.m_logger.LogInformation("Received {count} measurements.", protoMessages.Messages.Count);
-			return messages;
+			this.m_duration = Metrics.CreateHistogram("triggerservice_message_storage_duration_seconds", "Histogram of message storage duration.");
 		}
 
 		public async Task OnMessageAsync(string topic, string message, CancellationToken ct = default)
+		{
+			using(this.m_duration.NewTimer()) {
+				await this.HandleMessageAsync(message, ct).ConfigureAwait(false);
+			}
+		}
+
+		private async Task HandleMessageAsync(string message, CancellationToken ct = default)
 		{
 			this.m_logger.LogDebug("Trigger messages received.");
 			var tasks = new List<Task>();
@@ -110,6 +97,28 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 			}
 
 			this.m_logger.LogDebug("Messages handled.");
+		}
+
+		private IEnumerable<InternalBulkMessageQueue> Decompress(string data)
+		{
+			var bytes = Convert.FromBase64String(data);
+			using var to = new MemoryStream();
+			using var from = new MemoryStream(bytes);
+			using var gzip = new GZipStream(@from, CompressionMode.Decompress);
+
+			gzip.CopyTo(to);
+			var final = to.ToArray();
+			var protoMessages = TextMessageData.Parser.ParseFrom(final);
+			var messages =
+				from message in protoMessages.Messages
+				group message by message.SensorID into g
+				select new InternalBulkMessageQueue {
+					SensorID = ObjectId.Parse(g.Key),
+					Messages = g.Select(MessageProtobufConverter.Convert).ToList()
+				};
+
+			this.m_logger.LogInformation("Received {count} measurements.", protoMessages.Messages.Count);
+			return messages;
 		}
 
 		private async Task ExecuteActionsAsync(IEnumerable<TriggerAction> actions, Message msg)
