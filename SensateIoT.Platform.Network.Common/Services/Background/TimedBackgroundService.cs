@@ -14,7 +14,6 @@ namespace SensateIoT.Platform.Network.Common.Services.Background
 	public abstract class TimedBackgroundService : BackgroundService
 	{
 		private Timer _timer;
-		private long _millis;
 
 		private readonly TimeSpan m_startDelay;
 		private readonly TimeSpan m_interval;
@@ -27,7 +26,6 @@ namespace SensateIoT.Platform.Network.Common.Services.Background
 
 		public override Task StartAsync(CancellationToken cancellationToken)
 		{
-			this._millis = 0L;
 			this._timer = new Timer(this.Invoke, null, this.m_startDelay, this.m_interval);
 
 			return Task.CompletedTask;
@@ -41,7 +39,6 @@ namespace SensateIoT.Platform.Network.Common.Services.Background
 
 		private async void Invoke(object arg)
 		{
-			Interlocked.Add(ref this._millis, Convert.ToInt64(this.m_interval.TotalMilliseconds));
 			await this.ExecuteAsync(this.m_stoppingCts.Token);
 		}
 	}
