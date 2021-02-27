@@ -34,6 +34,7 @@ namespace SensateIoT.Platform.Network.StorageService.MQTT
 		private readonly IMeasurementRepository m_measurements;
 		private readonly ISensorStatisticsRepository m_stats;
 		private readonly Counter m_storageCounter;
+		private readonly Histogram m_duration;
 
 		public MqttBulkMeasurementHandler(IMeasurementRepository measurements, ISensorStatisticsRepository stats, ILogger<MqttBulkMeasurementHandler> logger)
 		{
@@ -41,25 +42,33 @@ namespace SensateIoT.Platform.Network.StorageService.MQTT
 			this.m_measurements = measurements;
 			this.m_stats = stats;
 			this.m_storageCounter = Metrics.CreateCounter("storageservice_messages_stored_total", "Total number of messages stored.");
+			this.m_duration = Metrics.CreateHistogram("storageservice_measurement_storage_duration_seconds", "Histogram of measurement storage duration.");
 		}
 
 		public async Task OnMessageAsync(string topic, string message, CancellationToken ct)
 		{
 			try {
-				var measurementMap = MeasurementDatabaseConverter.Convert(this.DeserializeMeasurements(message));
-				var stats = measurementMap.Select(m => new StatisticsUpdate(RequestMethod.Any, m.Value.Count, m.Key));
-				var count = measurementMap.Aggregate(0L, (l, pair) => l + pair.Value.Count);
-
-				this.m_storageCounter.Inc(count);
-
-				await Task.WhenAll(
-					this.m_measurements.StoreAsync(measurementMap, ct),
-					this.IncrementStatistics(stats.ToList(), ct)
-				).ConfigureAwait(false);
+				using(this.m_duration.NewTimer()) {
+					await this.HandleMessage(message, ct).ConfigureAwait(false);
+				}
 			} catch(Exception ex) {
 				this.m_logger.LogInformation($"Error: {ex.Message}");
 				this.m_logger.LogInformation($"Received a buggy MQTT message: {message}");
 			}
+		}
+
+		private async Task HandleMessage(string message, CancellationToken ct)
+		{
+			var measurementMap = MeasurementDatabaseConverter.Convert(this.DeserializeMeasurements(message));
+			var stats = measurementMap.Select(m => new StatisticsUpdate(RequestMethod.Any, m.Value.Count, m.Key));
+			var count = measurementMap.Aggregate(0L, (l, pair) => l + pair.Value.Count);
+
+			this.m_storageCounter.Inc(count);
+
+			await Task.WhenAll(
+				this.m_measurements.StoreAsync(measurementMap, ct),
+				this.IncrementStatistics(stats.ToList(), ct)
+			).ConfigureAwait(false);
 		}
 
 		private MeasurementData DeserializeMeasurements(string data)
