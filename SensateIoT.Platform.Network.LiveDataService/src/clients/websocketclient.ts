@@ -12,7 +12,6 @@ import * as WebSocket from "ws";
 import { ISensorAuthRequest } from "../requests/sensorauthrequest";
 import { IWebSocketRequest } from "../requests/request";
 import * as jwt from "jsonwebtoken";
-import { Pool } from "pg";
 
 // ReSharper disable once UnusedLocalImport
 import moment from "moment";
@@ -41,8 +40,7 @@ export class WebSocketClient {
         private readonly timeout: number,
         private readonly type: ClientType,
         private readonly mqtt: MqttClient,
-        socket: WebSocket,
-        pool: Pool
+        socket: WebSocket
     ) {
         this.socket = socket;
         this.sensors = new Map<string, SensorModel>();
@@ -51,83 +49,59 @@ export class WebSocketClient {
         this.userId = "";
     }
 
-    private async createLog() {
-        let route = "";
-
-        if (this.type === ClientType.MeasurementClient) {
-            route = "/live/v1/measurements";
-        }
-
-        if (this.type === ClientType.MeasurementClient) {
-            route = "/live/v1/messages";
-        }
-
-        if (this.type === ClientType.ControlMessageClient) {
-            route = "/live/v1/control";
-        }
-
-        const log: AuditLog = {
-            timestamp: new Date(),
-            authorId: this.userId,
-            route: route,
-            method: RequestMethod.WebSocket,
-            ipAddress: this.remote 
-        };
-
-        await this.logs.createEntry(log);
-    }
-
-    private async onMessage(data: WebSocket.MessageEvent) {
-        const req = JSON.parse(data.data.toString()) as IWebSocketRequest<any>;
-
-        if (req === null || req === undefined) {
-            return;
-        }
-
-        if ((req.request !== "auth" && req.request !== "auth-apikey") && !this.authorized) {
-            console.log(`Received unauthorized request: ${req.request}`);
-            return;
-        }
-
-        switch (req.request) {
-            case "subscribe":
-                await this.subscribe(req);
-                break;
-
-            case "unsubscribe":
-                this.unsubscribe(req);
-                break;
-
-            case "auth-apikey":
-                console.debug("Received API key authorization request.")
-                const authRequest = req as IWebSocketRequest<IApiKeyAuthenticationRequest>;
-                this.userId = await this.keys.validateApiKey(authRequest.data.user, authRequest.data.apikey);
-                this.authorized = this.userId != null;
-                this.createLog();
-                break;
-
-            case "keepalive":
-                this.ping(req);
-                break;
-
-            case "auth":
-                this.authorized = await this.auth(req);
-                break;
-
-            default:
-                console.log(`Invalid request: ${req.request}`);
-                break;
-        }
-    }
-
-    private async auth(req: IWebSocketRequest<string>) {
-        const result = await this.verifyRequest(req.data);
-        this.createLog();
-        return result;
-    }
-
     public getUserId(): string {
         return this.userId;
+    }
+  
+    public getConnectedSensors(): string[] {
+        const sensorIds: string[] = [];
+
+        this.sensors.forEach((k, v) => {
+            sensorIds.push(v);
+        });
+
+        return sensorIds;
+    }
+
+    public isServicing(id: string) {
+        return this.sensors.has(id);
+    }
+
+    public compareSocket(other: WebSocket) {
+        return other === this.socket;
+    }
+
+    public process(data: string) {
+        if (!this.authorized) {
+            console.log("Unable to write live data to unauthorized client!")
+            return;
+        }
+
+        console.log(`Writing data for user ${this.userId}.`);
+        this.socket.send(data);
+    }
+
+    public async authorize(token: string) {
+        this.authorized = await this.verifyRequest(token);
+        await this.createLog();
+    }
+
+    private verifyRequest(token: string) {
+        if (token === null || token === undefined) {
+            return false;
+        }
+
+        return new Promise<boolean>((resolve) => {
+            jwt.verify(token, this.secret, (err, obj: any) => {
+                if (err) {
+                    resolve(false);
+                    return;
+                }
+
+                this.userId = obj.sub;
+                resolve(true);
+            });
+        });
     }
 
     private ping(req: IWebSocketRequest<PingRequest>) {
@@ -202,58 +176,72 @@ export class WebSocketClient {
         this.mqtt.publish(Application.config.mqtt.routerCommandTopic, stringifyCommand(cmd));
     }
 
-    public getConnectedSensors(): string[] {
-        const sensorIds: string[] = [];
+    private async createLog() {
+        let route = "";
 
-        this.sensors.forEach((k, v) => {
-            sensorIds.push(v);
-        });
+        if (this.type === ClientType.MeasurementClient) {
+            route = "/live/v1/measurements";
+        }
 
-        return sensorIds;
+        if (this.type === ClientType.MeasurementClient) {
+            route = "/live/v1/messages";
+        }
+
+        if (this.type === ClientType.ControlMessageClient) {
+            route = "/live/v1/control";
+        }
+
+        const log: AuditLog = {
+            timestamp: new Date(),
+            authorId: this.userId,
+            route: route,
+            method: RequestMethod.WebSocket,
+            ipAddress: this.remote 
+        };
+
+        await this.logs.createEntry(log);
     }
 
-    public isServicing(id: string) {
-        return this.sensors.has(id);
-    }
+    private async onMessage(data: WebSocket.MessageEvent) {
+        const req = JSON.parse(data.data.toString()) as IWebSocketRequest<any>;
 
-    public compareSocket(other: WebSocket) {
-        return other === this.socket;
-    }
-
-    public process(data: string) {
-        if (!this.authorized) {
-            console.log("Unable to write live data to unauthorized client!")
+        if (req === null || req === undefined) {
             return;
         }
 
-        console.log(`Writing data for user ${this.userId}.`);
-        this.socket.send(data);
-    }
-
-    public async authorize(token: string) {
-        this.authorized = await this.verifyRequest(token);
-        await this.createLog();
-    }
-
-    public isAuthorized() {
-        return this.authorized;
-    }
-
-    private verifyRequest(token: string) {
-        if (token === null || token === undefined) {
-            return false;
+        if ((req.request !== "auth" && req.request !== "auth-apikey") && !this.authorized) {
+            console.log(`Received unauthorized request: ${req.request}`);
+            return;
         }
 
-        return new Promise<boolean>((resolve) => {
-            jwt.verify(token, this.secret, (err, obj: any) => {
-                if (err) {
-                    resolve(false);
-                    return;
-                }
+        switch (req.request) {
+            case "subscribe":
+                await this.subscribe(req);
+                break;
 
-                this.userId = obj.sub;
-                resolve(true);
-            });
-        });
+            case "unsubscribe":
+                this.unsubscribe(req);
+                break;
+
+            case "auth-apikey":
+                console.debug("Received API key authorization request.")
+                const authRequest = req as IWebSocketRequest<IApiKeyAuthenticationRequest>;
+                this.userId = await this.keys.validateApiKey(authRequest.data.user, authRequest.data.apikey);
+                this.authorized = this.userId != null;
+                this.createLog();
+                break;
+
+            case "keepalive":
+                this.ping(req);
+                break;
+
+            case "auth":
+                await this.authorize(req.data);
+                break;
+
+            default:
+                console.log(`Invalid request: ${req.request}`);
+                break;
+        }
     }
 }

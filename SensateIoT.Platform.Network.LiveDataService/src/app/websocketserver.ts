@@ -222,8 +222,7 @@ export class WebSocketServer {
             this.timeout,
             type,
             this.mqtt,
-            socket,
-            this.pool);
+            socket);
 
         const hdr = request.headers["authorization"];
         console.log(`New client connection from ${ip}!`);
