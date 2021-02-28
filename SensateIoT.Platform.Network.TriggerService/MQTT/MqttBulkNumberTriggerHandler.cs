@@ -13,7 +13,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
+using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -34,6 +34,7 @@ using DataPoint = SensateIoT.Platform.Network.Data.DTO.DataPoint;
 
 namespace SensateIoT.Platform.Network.TriggerService.MQTT
 {
+	[UsedImplicitly]
 	public class MqttBulkNumberTriggerHandler : IMqttHandler
 	{
 		private readonly IServiceProvider m_provider;
@@ -41,6 +42,7 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 		private readonly IDataPointMatchingService m_matcher;
 		private readonly Counter m_measurementCounter;
 		private readonly Counter m_matchCounter;
+		private readonly Histogram m_duration;
 
 		public MqttBulkNumberTriggerHandler(IServiceProvider provider,
 											IDataPointMatchingService matcher,
@@ -52,6 +54,7 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 
 			this.m_matchCounter = Metrics.CreateCounter("triggerservice_measurements_matched_total", "Total amount of measurements that matched a trigger.");
 			this.m_measurementCounter = Metrics.CreateCounter("triggerservice_measurements_received_total", "Total amount of measurements received.");
+			this.m_duration = Metrics.CreateHistogram("triggerservice_measurement_storage_duration_seconds", "Histogram of measurement handling duration.");
 		}
 
 		private IEnumerable<InternalBulkMeasurements> Decompress(string data)
@@ -87,6 +90,13 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 		}
 
 		public async Task OnMessageAsync(string topic, string message, CancellationToken ct)
+		{
+			using(this.m_duration.NewTimer()) {
+				await this.HandleMessageAsync(message, ct).ConfigureAwait(false);
+			}
+		}
+
+		private async Task HandleMessageAsync(string message, CancellationToken ct)
 		{
 			this.logger.LogDebug("Measurement received.");
 			var tasks = new List<Task>();

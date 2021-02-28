@@ -21,12 +21,12 @@ export class ApiKeyClient {
                         console.log(`Found API key for user ${userid}.`);
                         resolve(res.rows[0].UserId);
                     } else {
-                        console.log(`API key authorization failed. Found ${res.rowCount} results.`)
+                        console.warn(`API key authorization failed. Found ${res.rowCount} results.`)
                         resolve(null);
                     }
                 }).catch(error => {
-                    console.log(`Unable to complete API key validation for user: ${userid}.`)
-                    console.log(error);
+                    console.error(`Unable to complete API key validation for user: ${userid}.`)
+                    console.error(error);
                 });
             });
         });

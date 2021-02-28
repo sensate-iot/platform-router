@@ -32,21 +32,25 @@ namespace SensateIoT.Platform.Network.StorageService.MQTT
 		private readonly ILogger<MqttBulkMessageHandler> m_logger;
 		private readonly IMessageRepository m_messages;
 		private readonly Counter m_storageCounter;
+		private readonly Histogram m_duration;
 
 		public MqttBulkMessageHandler(IMessageRepository message, ILogger<MqttBulkMessageHandler> logger)
 		{
 			this.m_logger = logger;
 			this.m_messages = message;
 			this.m_storageCounter = Metrics.CreateCounter("storageservice_messages_stored_total", "Total number of messages stored.");
+			this.m_duration = Metrics.CreateHistogram("storageservice_message_storage_duration_seconds", "Histogram of message storage duration.");
 		}
 
 		public async Task OnMessageAsync(string topic, string message, CancellationToken ct)
 		{
 			try {
-				var databaseMessages = this.Decompress(message).ToList();
+				using(this.m_duration.NewTimer()) {
+					var databaseMessages = this.Decompress(message).ToList();
 
-				this.m_storageCounter.Inc(databaseMessages.Count);
-				await this.m_messages.CreateRangeAsync(databaseMessages, ct).ConfigureAwait(false);
+					this.m_storageCounter.Inc(databaseMessages.Count);
+					await this.m_messages.CreateRangeAsync(databaseMessages, ct).ConfigureAwait(false);
+				}
 			} catch(Exception ex) {
 				this.m_logger.LogWarning("Unable to store message: {exception} " +
 										 "Message content: {message}. " +

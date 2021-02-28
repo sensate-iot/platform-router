@@ -106,7 +106,7 @@ namespace SensateIoT.Platform.Network.Router.Application
 			services.AddScoped<IRoutingRepository, RoutingRepository>();
 			services.AddScoped<ILiveDataHandlerRepository, LiveDataHandlerRepository>();
 
-
+			services.AddSingleton<CommandCounter>();
 			services.AddSingleton<IQueue<IPlatformMessage>, Deque<IPlatformMessage>>();
 			services.AddSingleton<IMessageQueue, MessageQueue>();
 			services.AddSingleton<IRemoteNetworkEventQueue, RemoteNetworkEventQueue>();

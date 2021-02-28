@@ -27,18 +27,22 @@ namespace SensateIoT.Platform.Network.Router.MQTT
 		private readonly ILogger<CommandConsumer> m_logger;
 		private readonly DataUpdateHandler m_handler;
 		private readonly LiveDataRouteUpdateHandler m_liveUpdater;
+		private readonly CommandCounter m_counter;
 
-		public CommandConsumer(IServiceProvider provider, IRoutingCache cache, ILogger<CommandConsumer> logger)
+		public CommandConsumer(IServiceProvider provider, CommandCounter counter, IRoutingCache cache, ILogger<CommandConsumer> logger)
 		{
 			this.m_logger = logger;
 			this.m_handler = new DataUpdateHandler(cache, provider);
 			this.m_liveUpdater = new LiveDataRouteUpdateHandler(cache);
+			this.m_counter = counter;
 		}
 
 		public async Task OnMessageAsync(string topic, string message, CancellationToken ct = default)
 		{
 			var cmd = JsonConvert.DeserializeObject<Command>(message);
+
 			this.m_logger.LogInformation("Received command: {command}. Argument: {argument}.", cmd.Cmd, cmd.Arguments);
+			this.m_counter.Counter.Inc();
 
 			switch(cmd.Cmd) {
 			case CommandType.FlushUser:
