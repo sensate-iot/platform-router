@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 
+using JetBrains.Annotations;
 using MongoDB.Bson;
 using Prometheus;
 
@@ -29,6 +30,7 @@ using SensateIoT.Platform.Network.TriggerService.Services;
 
 namespace SensateIoT.Platform.Network.TriggerService.MQTT
 {
+	[UsedImplicitly]
 	public class MqttRegexTriggerHandler : IMqttHandler
 	{
 		private readonly ILogger<MqttRegexTriggerHandler> m_logger;
