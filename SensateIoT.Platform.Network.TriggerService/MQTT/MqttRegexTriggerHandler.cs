@@ -52,7 +52,7 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 			this.m_exec = exec;
 			this.m_matchCounter = Metrics.CreateCounter("triggerservice_messages_matched_total", "Total amount of measurements that matched a trigger.");
 			this.m_messageCounter = Metrics.CreateCounter("triggerservice_messages_received_total", "Total amount of messages received.");
-			this.m_duration = Metrics.CreateHistogram("triggerservice_message_storage_duration_seconds", "Histogram of message storage duration.");
+			this.m_duration = Metrics.CreateHistogram("triggerservice_message_handle_duration_seconds", "Histogram of message handling duration.");
 		}
 
 		public async Task OnMessageAsync(string topic, string message, CancellationToken ct = default)
