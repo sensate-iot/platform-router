@@ -36,7 +36,7 @@ export class WebSocketServer {
     private readonly apikeys: ApiKeyClient;
 
     public constructor(expr: express.Express,
-        private readonly pool: Pool,
+        pool: Pool,
         private readonly timeout: number,
         private readonly secret: string,
         private readonly mqtt: MqttClient
