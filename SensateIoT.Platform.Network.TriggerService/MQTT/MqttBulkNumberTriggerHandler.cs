@@ -101,7 +101,7 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 			this.logger.LogDebug("Measurement received.");
 			var tasks = new List<Task>();
 
-			var measurements = Decompress(message).ToList();
+			var measurements = this.Decompress(message).ToList();
 			using var scope = this.m_provider.CreateScope();
 			var triggersdb = scope.ServiceProvider.GetRequiredService<ITriggerRepository>();
 			var triggers = await triggersdb.GetTriggerServiceActions(measurements.Select(x => x.SensorID), ct).ConfigureAwait(false);

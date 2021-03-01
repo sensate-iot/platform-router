@@ -69,7 +69,7 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 			this.m_logger.LogDebug("Trigger messages received.");
 			var tasks = new List<Task>();
 
-			var messages = Decompress(message).ToList();
+			var messages = this.Decompress(message).ToList();
 			var triggers = await this.m_repo.GetTriggerServiceActions(messages.Select(x => x.SensorID), ct).ConfigureAwait(false);
 			var triggerMap = triggers
 				.GroupBy(x => x.SensorID, x => x)
