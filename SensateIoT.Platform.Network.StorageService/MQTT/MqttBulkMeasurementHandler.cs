@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -47,14 +48,20 @@ namespace SensateIoT.Platform.Network.StorageService.MQTT
 
 		public async Task OnMessageAsync(string topic, string message, CancellationToken ct)
 		{
+			var sw = Stopwatch.StartNew();
+
 			try {
+
 				using(this.m_duration.NewTimer()) {
 					await this.HandleMessage(message, ct).ConfigureAwait(false);
 				}
+
 			} catch(Exception ex) {
 				this.m_logger.LogInformation($"Error: {ex.Message}");
 				this.m_logger.LogInformation($"Received a buggy MQTT message: {message}");
 			}
+			sw.Stop();
+			this.m_logger.LogInformation("Storage attempt of measurements took {timespan}.", sw.Elapsed.ToString("c"));
 		}
 
 		private async Task HandleMessage(string message, CancellationToken ct)

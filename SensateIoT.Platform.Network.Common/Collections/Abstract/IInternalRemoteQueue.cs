@@ -7,12 +7,11 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
 using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Models;
 
-namespace SensateIoT.Platform.Network.Common.Collections.Remote
+namespace SensateIoT.Platform.Network.Common.Collections.Abstract
 {
 	public interface IInternalRemoteQueue
 	{

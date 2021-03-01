@@ -8,6 +8,8 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 
+using JetBrains.Annotations;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -18,6 +20,7 @@ using SensateIoT.Platform.Network.DataAccess.Abstract;
 
 namespace SensateIoT.Platform.Network.API.Middleware
 {
+	[UsedImplicitly]
 	public class RequestLoggingMiddleware
 	{
 		private readonly RequestDelegate _next;
@@ -29,6 +32,7 @@ namespace SensateIoT.Platform.Network.API.Middleware
 			this.m_logger = logger;
 		}
 
+		[UsedImplicitly]
 		public async Task Invoke(HttpContext ctx)
 		{
 			var sw = Stopwatch.StartNew();
@@ -40,13 +44,15 @@ namespace SensateIoT.Platform.Network.API.Middleware
 				userId = null;
 			}
 
-			var auditRepo = ctx.RequestServices.GetRequiredService<IAuditLogRepository>();
-			await auditRepo.CreateAsync(new AuditLog {
-				Address = ctx.Request.HttpContext.Connection.RemoteIpAddress,
-				AuthorId = userId,
-				Method = ToRequestMethod(ctx.Request.Method),
-				Route = ctx.Request.Path + ctx.Request.QueryString.ToString()
-			});
+			if(!ctx.Request.Path.StartsWithSegments("/network/v1/gateway")) {
+				var auditRepo = ctx.RequestServices.GetRequiredService<IAuditLogRepository>();
+				await auditRepo.CreateAsync(new AuditLog {
+					Address = ctx.Request.HttpContext.Connection.RemoteIpAddress,
+					AuthorId = userId,
+					Method = ToRequestMethod(ctx.Request.Method),
+					Route = ctx.Request.Path + ctx.Request.QueryString.ToString()
+				});
+			}
 
 			await this._next(ctx).ConfigureAwait(false);
 

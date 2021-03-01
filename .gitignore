@@ -20,6 +20,7 @@ mono_crash.*
 docker-compose-dev.yaml
 docker-compose-staging.yaml
 SensateIoT.Platform.Network.LiveDataService/generated
+SensateIoT.Platform.Network.TriggerService/appsettings.Development.json
 [Pp]roperties
 
 # Build results
@@ -40,8 +41,6 @@ bld/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
-# Uncomment if you have tasks that create the project's static files in wwwroot
-#wwwroot/
 
 # Visual Studio 2017 auto generated files
 Generated\ Files/
