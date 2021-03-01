@@ -15,7 +15,7 @@ using Google.Protobuf;
 
 using Microsoft.Extensions.Options;
 using Prometheus;
-
+using SensateIoT.Platform.Network.Common.Collections.Abstract;
 using SensateIoT.Platform.Network.Common.Converters;
 using SensateIoT.Platform.Network.Common.Helpers;
 using SensateIoT.Platform.Network.Common.MQTT;
