@@ -8,7 +8,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SensateIoT.Platform.Network.Common.Collections.Remote
+namespace SensateIoT.Platform.Network.Common.Collections.Abstract
 {
 	public interface IRemoteNetworkEventQueue
 	{

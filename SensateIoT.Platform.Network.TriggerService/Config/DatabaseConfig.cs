@@ -5,6 +5,8 @@
  * @email  michel.megens@sonatolabs.com
  */
 
+using JetBrains.Annotations;
+
 namespace SensateIoT.Platform.Network.TriggerService.Config
 {
 	public class DatabaseConfig
@@ -14,6 +16,7 @@ namespace SensateIoT.Platform.Network.TriggerService.Config
 		public MongoDBConfig MongoDB { get; set; }
 	}
 
+	[UsedImplicitly]
 	public class MongoDBConfig
 	{
 		public string DatabaseName { get; set; }
@@ -21,6 +24,7 @@ namespace SensateIoT.Platform.Network.TriggerService.Config
 		public int MaxConnections { get; set; }
 	}
 
+	[UsedImplicitly]
 	public class PgSQLConfig
 	{
 		public string ConnectionString { get; set; }

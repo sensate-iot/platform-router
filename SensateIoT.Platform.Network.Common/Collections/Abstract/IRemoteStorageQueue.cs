@@ -8,7 +8,7 @@
 using System.Threading.Tasks;
 using SensateIoT.Platform.Network.Data.Abstract;
 
-namespace SensateIoT.Platform.Network.Common.Collections.Remote
+namespace SensateIoT.Platform.Network.Common.Collections.Abstract
 {
 	public interface IRemoteStorageQueue
 	{

@@ -5,6 +5,8 @@
  * @email  michel.megens@sonatolabs.com
  */
 
+using JetBrains.Annotations;
+
 namespace SensateIoT.Platform.Network.TriggerService.Config
 {
 	public class MailConfig
@@ -16,6 +18,7 @@ namespace SensateIoT.Platform.Network.TriggerService.Config
 		public SendGridConfig SendGrid { get; set; }
 	}
 
+	[UsedImplicitly]
 	public class SmtpConfig
 	{
 		public string Username { get; set; }
@@ -25,6 +28,7 @@ namespace SensateIoT.Platform.Network.TriggerService.Config
 		public short Port { get; set; }
 	}
 
+	[UsedImplicitly]
 	public class SendGridConfig
 	{
 		public string Username { get; set; }

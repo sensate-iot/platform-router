@@ -54,7 +54,7 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 
 			this.m_matchCounter = Metrics.CreateCounter("triggerservice_measurements_matched_total", "Total amount of measurements that matched a trigger.");
 			this.m_measurementCounter = Metrics.CreateCounter("triggerservice_measurements_received_total", "Total amount of measurements received.");
-			this.m_duration = Metrics.CreateHistogram("triggerservice_measurement_storage_duration_seconds", "Histogram of measurement handling duration.");
+			this.m_duration = Metrics.CreateHistogram("triggerservice_measurement_handle_duration_seconds", "Histogram of measurement handling duration.");
 		}
 
 		private IEnumerable<InternalBulkMeasurements> Decompress(string data)
@@ -101,7 +101,7 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 			this.logger.LogDebug("Measurement received.");
 			var tasks = new List<Task>();
 
-			var measurements = Decompress(message).ToList();
+			var measurements = this.Decompress(message).ToList();
 			using var scope = this.m_provider.CreateScope();
 			var triggersdb = scope.ServiceProvider.GetRequiredService<ITriggerRepository>();
 			var triggers = await triggersdb.GetTriggerServiceActions(measurements.Select(x => x.SensorID), ct).ConfigureAwait(false);

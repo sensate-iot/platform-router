@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 
+using JetBrains.Annotations;
 using MongoDB.Bson;
 using Prometheus;
 
@@ -29,6 +30,7 @@ using SensateIoT.Platform.Network.TriggerService.Services;
 
 namespace SensateIoT.Platform.Network.TriggerService.MQTT
 {
+	[UsedImplicitly]
 	public class MqttRegexTriggerHandler : IMqttHandler
 	{
 		private readonly ILogger<MqttRegexTriggerHandler> m_logger;
@@ -52,7 +54,7 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 			this.m_exec = exec;
 			this.m_matchCounter = Metrics.CreateCounter("triggerservice_messages_matched_total", "Total amount of measurements that matched a trigger.");
 			this.m_messageCounter = Metrics.CreateCounter("triggerservice_messages_received_total", "Total amount of messages received.");
-			this.m_duration = Metrics.CreateHistogram("triggerservice_message_storage_duration_seconds", "Histogram of message storage duration.");
+			this.m_duration = Metrics.CreateHistogram("triggerservice_message_handle_duration_seconds", "Histogram of message handling duration.");
 		}
 
 		public async Task OnMessageAsync(string topic, string message, CancellationToken ct = default)
@@ -67,7 +69,7 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 			this.m_logger.LogDebug("Trigger messages received.");
 			var tasks = new List<Task>();
 
-			var messages = Decompress(message).ToList();
+			var messages = this.Decompress(message).ToList();
 			var triggers = await this.m_repo.GetTriggerServiceActions(messages.Select(x => x.SensorID), ct).ConfigureAwait(false);
 			var triggerMap = triggers
 				.GroupBy(x => x.SensorID, x => x)

@@ -49,6 +49,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Migrations", "Migrations", "{2D648956-50F4-46FB-ABDC-93EC6DA2B69F}"
 	ProjectSection(SolutionItems) = preProject
 		Migrations\Networking.1.0.0.sql = Migrations\Networking.1.0.0.sql
+		Migrations\Networking.1.1.0.sql = Migrations\Networking.1.1.0.sql
 		Migrations\SensateIoT.1.1.0.sql = Migrations\SensateIoT.1.1.0.sql
 	EndProjectSection
 EndProject
@@ -79,6 +80,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Security", "Security", "{1B
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions", "Functions", "{26F5E93B-2D0D-4B46-A23F-C05FAE2DD481}"
 	ProjectSection(SolutionItems) = preProject
+		SensateIoT.Platform.Network.Database\public\Functions\Admin_TruncateTriggerInvocations.sql = SensateIoT.Platform.Network.Database\public\Functions\Admin_TruncateTriggerInvocations.sql
 		SensateIoT.Platform.Network.Database\public\Functions\DataApi_SelectInvocationCount.sql = SensateIoT.Platform.Network.Database\public\Functions\DataApi_SelectInvocationCount.sql
 		SensateIoT.Platform.Network.Database\public\Functions\DataApi_SelectSensorLinkBySensorID.sql = SensateIoT.Platform.Network.Database\public\Functions\DataApi_SelectSensorLinkBySensorID.sql
 		SensateIoT.Platform.Network.Database\public\Functions\DataApi_SelectSensorLinkByUserID.sql = SensateIoT.Platform.Network.Database\public\Functions\DataApi_SelectSensorLinkByUserID.sql

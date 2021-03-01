@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -44,6 +45,8 @@ namespace SensateIoT.Platform.Network.StorageService.MQTT
 
 		public async Task OnMessageAsync(string topic, string message, CancellationToken ct)
 		{
+			var sw = Stopwatch.StartNew();
+
 			try {
 				using(this.m_duration.NewTimer()) {
 					var databaseMessages = this.Decompress(message).ToList();
@@ -51,11 +54,15 @@ namespace SensateIoT.Platform.Network.StorageService.MQTT
 					this.m_storageCounter.Inc(databaseMessages.Count);
 					await this.m_messages.CreateRangeAsync(databaseMessages, ct).ConfigureAwait(false);
 				}
+
 			} catch(Exception ex) {
 				this.m_logger.LogWarning("Unable to store message: {exception} " +
 										 "Message content: {message}. " +
 										 "Stack trace: ", ex.Message, message, ex.StackTrace);
 			}
+
+			sw.Stop();
+			this.m_logger.LogInformation("Storage attempt of messages took {timespan}.", sw.Elapsed.ToString("c"));
 		}
 
 		private IEnumerable<Message> Decompress(string data)
