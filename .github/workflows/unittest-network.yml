@@ -17,8 +17,7 @@ on:
       - develop
 
 jobs:
-  build-ubuntu:
-    name: "Ubuntu"
+  network-unit-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Clone source
