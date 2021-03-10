@@ -18,7 +18,6 @@ using Microsoft.Extensions.Options;
 
 using SensateIoT.Platform.Network.Common.Caching.Abstract;
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
-using SensateIoT.Platform.Network.Common.Collections.Remote;
 using SensateIoT.Platform.Network.Common.Services.Background;
 using SensateIoT.Platform.Network.Common.Settings;
 using SensateIoT.Platform.Network.Data.DTO;
@@ -32,6 +31,8 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 		private readonly IInternalRemoteQueue m_queue;
 		private readonly IRoutingCache m_cache;
 		private readonly ILogger<DataReloadService> m_logger;
+		private bool m_loaded;
+		private readonly DataReloadSettings m_settings;
 
 		public DataReloadService(IServiceProvider provider,
 											IInternalRemoteQueue internalRemote,
@@ -43,14 +44,26 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 			this.m_queue = internalRemote;
 			this.m_logger = logger;
 			this.m_cache = cache;
+			this.m_loaded = false;
+			this.m_settings = settings.Value;
 		}
 
 		public override async Task ExecuteAsync(CancellationToken token)
 		{
 			await this.ReloadLiveDataHandlers(token).ConfigureAwait(false);
-			await this.ReloadAccounts(token).ConfigureAwait(false);
-			await this.ReloadSensors(token).ConfigureAwait(false);
-			await this.ReloadApiKeys(token).ConfigureAwait(false);
+
+			if(this.CanReload()) {
+				await this.ReloadAccounts(token).ConfigureAwait(false);
+				await this.ReloadSensors(token).ConfigureAwait(false);
+				await this.ReloadApiKeys(token).ConfigureAwait(false);
+
+				this.m_loaded = true;
+			}
+		}
+
+		private bool CanReload()
+		{
+			return !this.m_loaded || this.m_settings.EnableReload;
 		}
 
 		private async Task ReloadAccounts(CancellationToken token)
