@@ -23,7 +23,7 @@ using SensateIoT.Platform.Network.DataAccess.Extensions;
 
 namespace SensateIoT.Platform.Network.DataAccess.Repositories
 {
-	public class TriggerRepository : ITriggerRepository 
+	public class TriggerRepository : ITriggerRepository
 	{
 		private readonly INetworkingDbContext m_ctx;
 
