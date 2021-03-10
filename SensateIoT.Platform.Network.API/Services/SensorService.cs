@@ -14,6 +14,7 @@ using System.Threading;
 using SensateIoT.Platform.Network.Adapters.Abstract;
 using SensateIoT.Platform.Network.API.Abstract;
 using SensateIoT.Platform.Network.API.DTO;
+using SensateIoT.Platform.Network.Data.Enums;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
 
@@ -30,6 +31,7 @@ namespace SensateIoT.Platform.Network.API.Services
 		private readonly IBlobService m_blobService;
 		private readonly IControlMessageRepository m_control;
 		private readonly ITriggerAdministrationRepository m_triggers;
+		private readonly ICommandPublisher m_commandPublisher;
 
 		public SensorService(
 			ISensorRepository sensors,
@@ -40,9 +42,11 @@ namespace SensateIoT.Platform.Network.API.Services
 			IMessageRepository messages,
 			IApiKeyRepository keys,
 			IBlobService blobService,
-			IBlobRepository blobs
-			)
+			IBlobRepository blobs,
+			ICommandPublisher mqtt
+		)
 		{
+			this.m_commandPublisher = mqtt;
 			this.m_links = links;
 			this.m_sensors = sensors;
 			this.m_control = control;
@@ -99,6 +103,21 @@ namespace SensateIoT.Platform.Network.API.Services
 			await this.DeleteAsync(sensors, ct).ConfigureAwait(false);
 		}
 
+		private Task PublishSensorDeleteCommands(IEnumerable<Sensor> sensors, CancellationToken ct)
+		{
+			var tasks = new List<Task>();
+
+			foreach(var sensor in sensors) {
+				var t1 = this.m_commandPublisher.PublishCommandAsync(CommandType.FlushSensor, sensor.InternalId.ToString(), ct);
+				var t2 = this.m_commandPublisher.PublishCommandAsync(CommandType.FlushKey, sensor.Secret, ct);
+
+				tasks.Add(t1);
+				tasks.Add(t2);
+			}
+
+			return Task.WhenAll(tasks);
+		}
+
 		private async Task DeleteAsync(IEnumerable<Sensor> sensors, CancellationToken ct)
 		{
 			var sensorList = sensors.ToList();
@@ -117,8 +136,11 @@ namespace SensateIoT.Platform.Network.API.Services
 				tasks.Add(this.m_blobService.RemoveAsync(id.ToString(), ct));
 			}
 
+			var pubs = this.PublishSensorDeleteCommands(sensorList, ct);
+
 			await Task.WhenAll(tasks).ConfigureAwait(false);
 			await sensorTask.ConfigureAwait(false);
+			await pubs.ConfigureAwait(false);
 		}
 
 		public async Task<PaginationResult<Sensor>> GetSensorsAsync(User user, int skip = 0, int limit = 0, CancellationToken token = default)
