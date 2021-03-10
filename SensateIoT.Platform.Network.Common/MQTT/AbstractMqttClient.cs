@@ -19,7 +19,6 @@ using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Client.Options;
 using MQTTnet.Client.Subscribing;
-using MQTTnet.Protocol;
 
 using SensateIoT.Platform.Network.Common.Services.Background;
 
@@ -117,7 +116,7 @@ namespace SensateIoT.Platform.Network.Common.MQTT
 		{
 			var tfb = new MqttTopicFilterBuilder()
 				.WithTopic(topic)
-				.WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce);
+				.WithAtMostOnceQoS();
 			var build = tfb.Build();
 			var opts = new MqttClientSubscribeOptionsBuilder()
 				.WithTopicFilter(build);
@@ -142,7 +141,7 @@ namespace SensateIoT.Platform.Network.Common.MQTT
 				this._handlers.TryGetValue(this._share + topic, out handlerType);
 			}
 
-			handler = scope.ServiceProvider.GetRequiredService(handlerType) as IMqttHandler;
+			handler = scope.ServiceProvider.GetRequiredService(handlerType!) as IMqttHandler;
 
 			if(handler == null)
 				return;
