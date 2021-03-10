@@ -1,4 +1,4 @@
-CREATE FUNCTION networkapi_createinvocation(
+CREATE FUNCTION triggerservice_createinvocation(
     triggerid BIGINT,
     actionid BIGINT,
     timestmp TIMESTAMP

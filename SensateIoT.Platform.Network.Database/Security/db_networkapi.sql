@@ -2,7 +2,6 @@ CREATE ROLE db_networkapi;
 
 GRANT EXECUTE ON FUNCTION networkapi_createaction(bigint,integer,character varying,text) TO db_networkapi;
 GRANT EXECUTE ON FUNCTION networkapi_createblob(character varying,text,text,integer,integer) TO db_networkapi;
-GRANT EXECUTE ON FUNCTION networkapi_createinvocation(bigint,bigint,timestamp without time zone) TO db_networkapi;
 GRANT EXECUTE ON FUNCTION networkapi_createsensorlink(character varying,uuid) TO db_networkapi;
 GRANT EXECUTE ON FUNCTION networkapi_createtrigger(character varying,character varying,numeric,numeric,text,integer) TO db_networkapi;
 GRANT EXECUTE ON FUNCTION networkapi_deleteblobbyid(bigint) TO db_networkapi;
