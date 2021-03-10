@@ -81,7 +81,7 @@ namespace SensateIoT.Platform.Network.API.Application
 			services.Configure<BlobOptions>(this.m_configuration.GetSection("Storage"));
 			services.Configure<MetricsOptions>(this.m_configuration.GetSection("HttpServer:Metrics"));
 
-			services.AddScoped<ITriggerRepository, TriggerRepository>();
+			services.AddScoped<ITriggerAdministrationRepository, TriggerAdministrationRepository>();
 			services.AddScoped<IMessageRepository, MessageRepository>();
 			services.AddScoped<IControlMessageRepository, ControlMessageRepository>();
 			services.AddScoped<IMeasurementRepository, MeasurementRepository>();

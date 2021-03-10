@@ -42,7 +42,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		private readonly ISensorService m_sensorService;
 		private readonly ICommandPublisher m_mqtt;
 		private readonly IAccountRepository m_accounts;
-		private readonly ITriggerRepository m_triggers;
+		private readonly ITriggerAdministrationRepository m_triggers;
 		private readonly IDistributedCache<PaginationResponse<Sensor>> m_cache;
 		private readonly Random m_rng;
 
@@ -53,7 +53,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 								 ISensorRepository sensors,
 								 ILogger<SensorsController> logger,
 								 ISensorLinkRepository links,
-								 ITriggerRepository triggers,
+								 ITriggerAdministrationRepository triggers,
 								 ISensorService sensorService,
 								 IAccountRepository accounts,
 								 IApiKeyRepository keys,

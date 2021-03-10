@@ -29,13 +29,13 @@ namespace SensateIoT.Platform.Network.API.Services
 		private readonly IBlobRepository m_blobs;
 		private readonly IBlobService m_blobService;
 		private readonly IControlMessageRepository m_control;
-		private readonly ITriggerRepository m_triggers;
+		private readonly ITriggerAdministrationRepository m_triggers;
 
 		public SensorService(
 			ISensorRepository sensors,
 			ISensorLinkRepository links,
 			IMeasurementRepository measurements,
-			ITriggerRepository triggers,
+			ITriggerAdministrationRepository triggers,
 			IControlMessageRepository control,
 			IMessageRepository messages,
 			IApiKeyRepository keys,

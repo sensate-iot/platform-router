@@ -102,7 +102,6 @@ namespace SensateIoT.Platform.Network.Router.Application
 				options.Id = $"router-{id}-{Guid.NewGuid():N}";
 			});
 
-			services.AddScoped<ITriggerRepository, TriggerRepository>();
 			services.AddScoped<IRoutingRepository, RoutingRepository>();
 			services.AddScoped<ILiveDataHandlerRepository, LiveDataHandlerRepository>();
 
