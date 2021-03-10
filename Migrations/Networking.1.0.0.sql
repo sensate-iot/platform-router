@@ -168,6 +168,7 @@ BEGIN
 		"Blobs"."FileSize";
 END;
 $$;
+
 CREATE FUNCTION networkapi_createinvocation(
     triggerid BIGINT,
     actionid BIGINT,
@@ -197,6 +198,7 @@ BEGIN
         "TriggerInvocations"."Timestamp";
 END
 $$;
+
 CREATE FUNCTION networkapi_createsensorlink(sensorid VARCHAR(24), userid UUID)
     RETURNS TABLE(
         "SensorID" VARCHAR(24),
@@ -214,6 +216,7 @@ BEGIN
         "SensorLinks"."UserId"::UUID;
 END
 $$;
+
 CREATE FUNCTION networkapi_createtrigger(
     sensorid VARCHAR(24),
     keyvalue VARCHAR(32),
@@ -258,6 +261,7 @@ BEGIN
         "Triggers"."Type";
 END
 $$;
+
 CREATE FUNCTION networkapi_deleteblobbyid(id BIGINT)
     RETURNS TABLE(
        	"ID" BIGINT,
@@ -285,6 +289,7 @@ BEGIN
 		   "Blobs"."FileSize";
 END;
 $$;
+
 CREATE FUNCTION networkapi_deleteblobsbysensorid(sensorid VARCHAR(24))
     RETURNS TABLE(
        	"ID" BIGINT,
@@ -312,6 +317,7 @@ BEGIN
 		   "Blobs"."FileSize";
 END;
 $$;
+
 CREATE FUNCTION networkapi_deleteblobsbyname(sensorid VARCHAR(24), filename TEXT)
     RETURNS TABLE(
        	"ID" BIGINT,
@@ -340,6 +346,7 @@ BEGIN
 		   "Blobs"."FileSize";
 END;
 $$;
+
 CREATE FUNCTION networkapi_deletesensorlink(sensorid VARCHAR(24), userid UUID)
     RETURNS TABLE(
         "SensorID" VARCHAR(24),
@@ -357,6 +364,7 @@ BEGIN
         "SensorLinks"."UserId"::UUID;
 END
 $$;
+
 CREATE FUNCTION networkapi_deletesensorlinkbysensorid(sensorid VARCHAR(24))
     RETURNS TABLE("SensorID" VARCHAR(24), "UserID" UUID)
     LANGUAGE plpgsql
@@ -394,6 +402,7 @@ BEGIN
 	    "TriggerActions"."Message";
 END
 $$;
+
 CREATE FUNCTION networkapi_deletetriggerbyid(id BIGINT)
     RETURNS TABLE(
         "ID" BIGINT,
@@ -421,6 +430,7 @@ BEGIN
 	    "Triggers"."Type";
 END
 $$;
+
 CREATE FUNCTION networkapi_deletetriggersbysensorid(sensorid VARCHAR(24))
     RETURNS TABLE(
         "ID" BIGINT,
@@ -448,6 +458,7 @@ BEGIN
 	    "Triggers"."Type";
 END
 $$;
+
 CREATE FUNCTION networkapi_selectblobbyid(id BIGINT)
     RETURNS TABLE(
        	"ID" BIGINT,
@@ -474,6 +485,7 @@ BEGIN
 	WHERE b."ID" = id;
 END;
 $$;
+
 CREATE FUNCTION networkapi_selectblobbyname(sensorid VARCHAR(24), filename TEXT)
     RETURNS TABLE(
        	"ID" BIGINT,
@@ -501,6 +513,7 @@ BEGIN
 	      b."FileName" = filename;
 END;
 $$;
+
 CREATE FUNCTION networkapi_selectblobs(idlist TEXT, offst INTEGER DEFAULT NULL, lim INTEGER DEFAULT NULL)
     RETURNS TABLE(
        	"ID" BIGINT,
@@ -531,6 +544,7 @@ BEGIN
 	LIMIT lim;
 END;
 $$;
+
 CREATE FUNCTION networkapi_selectblobsbysensorid(sensorid VARCHAR(24), offst INTEGER DEFAULT NULL, lim INTEGER DEFAULT NULL)
     RETURNS TABLE(
        	"ID" BIGINT,
@@ -559,6 +573,7 @@ BEGIN
 	LIMIT lim;
 END;
 $$;
+
 CREATE FUNCTION networkapi_selectsensorlinkbysensorid(sensorid VARCHAR(24))
     RETURNS TABLE(
         "SensorID" VARCHAR(24),
@@ -574,6 +589,7 @@ BEGIN
     WHERE "SensorLinks"."SensorId" = sensorid;
 END
 $$;
+
 CREATE FUNCTION networkapi_selectsensorlinkbyuserid(userid UUID)
     RETURNS TABLE(
         "SensorID" VARCHAR(24),
@@ -589,6 +605,7 @@ BEGIN
     WHERE "SensorLinks"."UserId" = userid::TEXT;
 END
 $$;
+
 CREATE FUNCTION networkapi_selecttriggerbyid(id BIGINT)
     RETURNS TABLE(
         "ID" BIGINT,
@@ -624,6 +641,7 @@ BEGIN
 	WHERE "Triggers"."ID" = id;
 END
 $$;
+
 CREATE FUNCTION networkapi_selecttriggerbysensorid(sensorid VARCHAR(24))
     RETURNS TABLE(
         "ID" BIGINT,
