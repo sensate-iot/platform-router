@@ -29,13 +29,13 @@ namespace SensateIoT.Platform.Network.API.Controllers
 	[Route("network/v1/[controller]")]
 	public class TriggersController : AbstractApiController
 	{
-		private readonly ITriggerRepository m_triggers;
+		private readonly ITriggerAdministrationRepository m_triggers;
 		private readonly ICommandPublisher m_mqtt;
 
 		public TriggersController(IHttpContextAccessor ctx,
 								  ISensorRepository sensors,
 								  ISensorLinkRepository links,
-								  ITriggerRepository triggers,
+								  ITriggerAdministrationRepository triggers,
 								  ICommandPublisher publisher,
 								  IApiKeyRepository keys) : base(ctx, sensors, links, keys)
 		{

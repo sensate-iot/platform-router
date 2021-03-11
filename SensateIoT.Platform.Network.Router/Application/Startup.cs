@@ -63,7 +63,10 @@ namespace SensateIoT.Platform.Network.Router.Application
 
 			services.Configure<DataReloadSettings>(opts => {
 				opts.StartDelay = TimeSpan.FromSeconds(1);
-				opts.DataReloadInterval = TimeSpan.FromSeconds(reload);
+				opts.EnableReload = this.Configuration.GetValue<bool>("Cache:EnableReload");
+
+				/* Default to 30 minutes for live data handler reload */
+				opts.DataReloadInterval = reload == 0 ? TimeSpan.FromMinutes(30) : TimeSpan.FromSeconds(reload);
 				opts.LiveDataReloadInterval = TimeSpan.FromSeconds(this.Configuration.GetValue<int>("Cache:LiveDataReloadInterval"));
 				opts.TimeoutScanInterval = TimeSpan.FromSeconds(this.Configuration.GetValue<int>("Cache:TimeoutScanInterval"));
 			});
@@ -102,7 +105,6 @@ namespace SensateIoT.Platform.Network.Router.Application
 				options.Id = $"router-{id}-{Guid.NewGuid():N}";
 			});
 
-			services.AddScoped<ITriggerRepository, TriggerRepository>();
 			services.AddScoped<IRoutingRepository, RoutingRepository>();
 			services.AddScoped<ILiveDataHandlerRepository, LiveDataHandlerRepository>();
 

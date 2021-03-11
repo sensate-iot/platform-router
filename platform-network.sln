@@ -50,6 +50,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Migrations", "Migrations", 
 	ProjectSection(SolutionItems) = preProject
 		Migrations\Networking.1.0.0.sql = Migrations\Networking.1.0.0.sql
 		Migrations\Networking.1.1.0.sql = Migrations\Networking.1.1.0.sql
+		Migrations\Networking.1.2.0.sql = Migrations\Networking.1.2.0.sql
 		Migrations\SensateIoT.1.1.0.sql = Migrations\SensateIoT.1.1.0.sql
 	EndProjectSection
 EndProject
@@ -88,7 +89,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions", "Functions", "{
 		SensateIoT.Platform.Network.Database\public\Functions\Generic_GetBlobs.sql = SensateIoT.Platform.Network.Database\public\Functions\Generic_GetBlobs.sql
 		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_CreateAction.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_CreateAction.sql
 		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_CreateBlob.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_CreateBlob.sql
-		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_CreateInvocation.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_CreateInvocation.sql
 		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_CreateSensorLink.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_CreateSensorLink.sql
 		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_CreateTrigger.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_CreateTrigger.sql
 		SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteBlobByID.sql = SensateIoT.Platform.Network.Database\public\Functions\NetworkApi_DeleteBlobByID.sql
@@ -111,6 +111,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions", "Functions", "{
 		SensateIoT.Platform.Network.Database\public\Functions\Router_GetLiveDataHandlers.sql = SensateIoT.Platform.Network.Database\public\Functions\Router_GetLiveDataHandlers.sql
 		SensateIoT.Platform.Network.Database\public\Functions\Router_GetTriggers.sql = SensateIoT.Platform.Network.Database\public\Functions\Router_GetTriggers.sql
 		SensateIoT.Platform.Network.Database\public\Functions\Router_GetTriggersById.sql = SensateIoT.Platform.Network.Database\public\Functions\Router_GetTriggersById.sql
+		SensateIoT.Platform.Network.Database\public\Functions\TriggerService_CreateInvocation.sql = SensateIoT.Platform.Network.Database\public\Functions\TriggerService_CreateInvocation.sql
 		SensateIoT.Platform.Network.Database\public\Functions\TriggerService_GetTriggersBySensorID.sql = SensateIoT.Platform.Network.Database\public\Functions\TriggerService_GetTriggersBySensorID.sql
 	EndProjectSection
 EndProject
