@@ -1,5 +1,3 @@
-DROP FUNCTION networkapi_createinvocation(triggerid BIGINT, actionid BIGINT, timestmp TIMESTAMP);
-
 CREATE FUNCTION triggerservice_createinvocation(
     triggerid BIGINT,
     actionid BIGINT,
@@ -30,4 +28,5 @@ BEGIN
 END
 $$;
 
+DROP FUNCTION networkapi_createinvocation(triggerid BIGINT, actionid BIGINT, timestmp TIMESTAMP);
 GRANT EXECUTE ON FUNCTION triggerservice_createinvocation(bigint,bigint,timestamp without time zone) TO db_triggerservice;
