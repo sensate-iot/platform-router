@@ -10,7 +10,7 @@ using SensateIoT.Platform.Network.Data.DTO;
 
 using TriggerAction = SensateIoT.Platform.Network.Data.DTO.TriggerAction;
 
-namespace SensateIoT.Platform.Network.TriggerService.Services
+namespace SensateIoT.Platform.Network.TriggerService.Abstract
 {
 	public interface IDataPointMatchingService
 	{

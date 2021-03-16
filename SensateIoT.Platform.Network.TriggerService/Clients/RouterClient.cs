@@ -17,6 +17,7 @@ using Microsoft.Extensions.Options;
 using SensateIoT.Platform.Network.Contracts.Services;
 using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.Models;
+using SensateIoT.Platform.Network.TriggerService.Abstract;
 using SensateIoT.Platform.Network.TriggerService.Settings;
 
 namespace SensateIoT.Platform.Network.TriggerService.Clients

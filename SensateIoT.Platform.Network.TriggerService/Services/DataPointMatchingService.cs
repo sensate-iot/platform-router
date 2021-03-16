@@ -7,8 +7,11 @@
 
 using System;
 using System.Collections.Generic;
+
 using Microsoft.Extensions.Options;
+
 using SensateIoT.Platform.Network.Data.DTO;
+using SensateIoT.Platform.Network.TriggerService.Abstract;
 using SensateIoT.Platform.Network.TriggerService.Config;
 
 namespace SensateIoT.Platform.Network.TriggerService.Services

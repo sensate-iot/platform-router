@@ -19,7 +19,7 @@ using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
-using SensateIoT.Platform.Network.TriggerService.Clients;
+using SensateIoT.Platform.Network.TriggerService.Abstract;
 
 using TriggerAction = SensateIoT.Platform.Network.Data.DTO.TriggerAction;
 

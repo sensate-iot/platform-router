@@ -4,10 +4,11 @@
  * @author Michel Megens
  * @email  michel@michelmegens.net
  */
+
 using System.Collections.Generic;
 using SensateIoT.Platform.Network.Data.DTO;
 
-namespace SensateIoT.Platform.Network.TriggerService.Services
+namespace SensateIoT.Platform.Network.TriggerService.Abstract
 {
 	public interface IRegexMatchingService
 	{

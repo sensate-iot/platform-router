@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 
 using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
+using SensateIoT.Platform.Network.TriggerService.Abstract;
 
 namespace SensateIoT.Platform.Network.TriggerService.Services
 {

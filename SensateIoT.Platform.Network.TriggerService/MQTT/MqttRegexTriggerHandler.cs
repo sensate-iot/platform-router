@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
@@ -66,37 +67,37 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 
 		private async Task HandleMessageAsync(string message)
 		{
-			this.m_logger.LogDebug("Trigger messages received.");
+			this.m_logger.LogInformation("Trigger messages received.");
 
+			var sw = Stopwatch.StartNew();
 			var messages = this.Decompress(message).ToList();
 			this.m_messageCounter.Inc(messages.Count);
-			var tasks = messages.Select(this.HandleMeasurement).ToList();
 
 			try {
-				await Task.WhenAll(tasks);
+				foreach(var internalMessage in messages) {
+					await this.HandleMeasurement(internalMessage).ConfigureAwait(false);
+				}
 			} catch(Exception ex) {
 				this.m_logger.LogError(ex, "Unable to handle a trigger.");
 			}
 
-			this.m_logger.LogDebug("Messages handled.");
+			sw.Stop();
+			this.m_logger.LogInformation("Messages handled. Processing took {duration:c}.", sw.Elapsed);
 		}
 
-		private Task HandleMeasurement(InternalBulkMessageQueue measurements)
+		private async Task HandleMeasurement(InternalBulkMessageQueue measurements)
 		{
 			var actions = this.m_cache.Lookup(measurements.SensorID);
-			var tasks = new List<Task>();
 
 			if(actions == null) {
-				return Task.CompletedTask;
+				return;
 			}
 
 			foreach(var m in measurements.Messages) {
 				this.m_matchCounter.Inc();
 				var matched = this.m_regexMatcher.Match(m, actions).ToList();
-				tasks.Add(this.ExecuteActionsAsync(matched, m));
+				await this.ExecuteActionsAsync(matched, m).ConfigureAwait(false);
 			}
-
-			return Task.WhenAll(tasks);
 		}
 
 		private IEnumerable<InternalBulkMessageQueue> Decompress(string data)
@@ -104,7 +105,7 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 			var bytes = Convert.FromBase64String(data);
 			using var to = new MemoryStream();
 			using var from = new MemoryStream(bytes);
-			using var gzip = new GZipStream(@from, CompressionMode.Decompress);
+			using var gzip = new GZipStream(from, CompressionMode.Decompress);
 
 			gzip.CopyTo(to);
 			var final = to.ToArray();
