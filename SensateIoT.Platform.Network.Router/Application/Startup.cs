@@ -17,7 +17,6 @@ using Prometheus;
 using JetBrains.Annotations;
 
 using SensateIoT.Platform.Network.Common.Init;
-using SensateIoT.Platform.Network.Common.Services.Processing;
 using SensateIoT.Platform.Network.Router.Config;
 using SensateIoT.Platform.Network.Router.Init;
 using SensateIoT.Platform.Network.Router.MQTT;
@@ -50,7 +49,6 @@ namespace SensateIoT.Platform.Network.Router.Application
 			services.AddMqttBrokers(this.Configuration);
 
 			services.AddSingleton<CommandCounter>();
-			services.AddSingleton<IAuthorizationService, AuthorizationService>();
 
 			services.AddGrpc();
 			services.AddGrpcReflection();

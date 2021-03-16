@@ -23,6 +23,7 @@ namespace SensateIoT.Platform.Network.Router.Init
 			services.AddSingleton<IHostedService, RoutingPublishService>();
 			services.AddSingleton<IHostedService, ActuatorPublishService>();
 			services.AddSingleton<IHostedService, MetricsService>();
+			services.AddSingleton<IAuthorizationService, AuthorizationService>();
 
 			services.Configure<MetricsOptions>(configuration.GetSection("HttpServer:Metrics"));
 			services.Configure<DataReloadSettings>(opts => {
