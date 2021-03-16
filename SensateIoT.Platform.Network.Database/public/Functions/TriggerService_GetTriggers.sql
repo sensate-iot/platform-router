@@ -1,4 +1,11 @@
-CREATE FUNCTION triggerservice_gettriggersbysensorid(id VARCHAR(24))
+---
+--- Select triggers and last invocations based.
+---
+--- @author Michel Megens
+--- @email  michel@michelmegens.net
+---
+
+CREATE FUNCTION triggerservice_gettriggers()
     RETURNS TABLE(
 		"TriggerID" BIGINT,
 		"ActionID" BIGINT,
@@ -39,7 +46,6 @@ BEGIN
 		FROM "TriggerInvocations" AS tinv
 		GROUP BY tinv."ActionID"
 	) inv ON inv."ActionID" = ta."ID"
-	WHERE t."SensorID" = id
 	ORDER BY ta."ID";
 END;
 $$;
