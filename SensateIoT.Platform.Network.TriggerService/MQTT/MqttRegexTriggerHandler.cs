@@ -24,7 +24,7 @@ using SensateIoT.Platform.Network.Common.Converters;
 using SensateIoT.Platform.Network.Common.MQTT;
 using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.DTO;
-using SensateIoT.Platform.Network.DataAccess.Abstract;
+using SensateIoT.Platform.Network.TriggerService.Abstract;
 using SensateIoT.Platform.Network.TriggerService.DTO;
 using SensateIoT.Platform.Network.TriggerService.Services;
 
@@ -34,24 +34,24 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 	public class MqttRegexTriggerHandler : IMqttHandler
 	{
 		private readonly ILogger<MqttRegexTriggerHandler> m_logger;
-		private readonly ITriggerRepository m_repo;
 		private readonly IRegexMatchingService m_regexMatcher;
 		private readonly ITriggerActionExecutionService m_exec;
+		private readonly ITriggerActionCache m_cache;
 		private readonly Counter m_messageCounter;
 		private readonly Counter m_matchCounter;
 		private readonly Histogram m_duration;
 
 		public MqttRegexTriggerHandler(
 			ILogger<MqttRegexTriggerHandler> logger,
-			ITriggerRepository triggers,
 			IRegexMatchingService matcher,
-			ITriggerActionExecutionService exec
+			ITriggerActionExecutionService exec,
+			ITriggerActionCache cache
 		)
 		{
 			this.m_logger = logger;
-			this.m_repo = triggers;
 			this.m_regexMatcher = matcher;
 			this.m_exec = exec;
+			this.m_cache = cache;
 			this.m_matchCounter = Metrics.CreateCounter("triggerservice_messages_matched_total", "Total amount of measurements that matched a trigger.");
 			this.m_messageCounter = Metrics.CreateCounter("triggerservice_messages_received_total", "Total amount of messages received.");
 			this.m_duration = Metrics.CreateHistogram("triggerservice_message_handle_duration_seconds", "Histogram of message handling duration.");
@@ -60,37 +60,17 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 		public async Task OnMessageAsync(string topic, string message, CancellationToken ct = default)
 		{
 			using(this.m_duration.NewTimer()) {
-				await this.HandleMessageAsync(message, ct).ConfigureAwait(false);
+				await this.HandleMessageAsync(message).ConfigureAwait(false);
 			}
 		}
 
-		private async Task HandleMessageAsync(string message, CancellationToken ct = default)
+		private async Task HandleMessageAsync(string message)
 		{
 			this.m_logger.LogDebug("Trigger messages received.");
-			var tasks = new List<Task>();
 
 			var messages = this.Decompress(message).ToList();
-			var triggers = await this.m_repo.GetTriggerServiceActions(messages.Select(x => x.SensorID), ct).ConfigureAwait(false);
-			var triggerMap = triggers
-				.GroupBy(x => x.SensorID, x => x)
-				.ToDictionary(x => x.Key, x => x.ToList());
-
 			this.m_messageCounter.Inc(messages.Count);
-
-			foreach(var metaMessages in messages) {
-				var actions = triggerMap[metaMessages.SensorID];
-
-				if(actions == null) {
-					continue;
-				}
-
-				foreach(var m in metaMessages.Messages) {
-					this.m_matchCounter.Inc();
-
-					var matched = this.m_regexMatcher.Match(m, actions);
-					tasks.Add(this.ExecuteActionsAsync(matched, m));
-				}
-			}
+			var tasks = messages.Select(this.HandleMeasurement).ToList();
 
 			try {
 				await Task.WhenAll(tasks);
@@ -99,6 +79,24 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 			}
 
 			this.m_logger.LogDebug("Messages handled.");
+		}
+
+		private Task HandleMeasurement(InternalBulkMessageQueue measurements)
+		{
+			var actions = this.m_cache.Lookup(measurements.SensorID);
+			var tasks = new List<Task>();
+
+			if(actions == null) {
+				return Task.CompletedTask;
+			}
+
+			foreach(var m in measurements.Messages) {
+				this.m_matchCounter.Inc();
+				var matched = this.m_regexMatcher.Match(m, actions).ToList();
+				tasks.Add(this.ExecuteActionsAsync(matched, m));
+			}
+
+			return Task.WhenAll(tasks);
 		}
 
 		private IEnumerable<InternalBulkMessageQueue> Decompress(string data)
@@ -119,7 +117,7 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 					Messages = g.Select(MessageProtobufConverter.Convert).ToList()
 				};
 
-			this.m_logger.LogInformation("Received {count} measurements.", protoMessages.Messages.Count);
+			this.m_logger.LogInformation("Received {count} messages.", protoMessages.Messages.Count);
 			return messages;
 		}
 

@@ -21,6 +21,8 @@ using SensateIoT.Platform.Network.Common.Services.Metrics;
 using SensateIoT.Platform.Network.Common.Settings;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Repositories;
+using SensateIoT.Platform.Network.TriggerService.Abstract;
+using SensateIoT.Platform.Network.TriggerService.Caching;
 using SensateIoT.Platform.Network.TriggerService.Clients;
 using SensateIoT.Platform.Network.TriggerService.Config;
 using SensateIoT.Platform.Network.TriggerService.MQTT;
@@ -112,7 +114,7 @@ namespace SensateIoT.Platform.Network.TriggerService.Application
 
 				services.AddScoped<ITextSendService, TwillioTextSendService>();
 			} else {
-				Console.WriteLine("Text message provider not configured!");
+				throw new InvalidOperationException("Text provider not configured!");
 			}
 
 			services.AddScoped<IControlMessageRepository, ControlMessageRepository>();
@@ -120,10 +122,14 @@ namespace SensateIoT.Platform.Network.TriggerService.Application
 			services.AddScoped<IRoutingRepository, RoutingRepository>();
 			services.AddScoped<IControlMessageRepository, ControlMessageRepository>();
 			services.AddScoped<ITriggerActionExecutionService, TriggerActionExecutionService>();
+
 			services.AddSingleton<IDataPointMatchingService, DataPointMatchingService>();
 			services.AddSingleton<IRegexMatchingService, RegexMatchingService>();
 			services.AddSingleton<IRouterClient, RouterClient>();
 			services.AddSingleton<IEmailSender, SmtpMailer>();
+			services.AddSingleton<ITriggerActionCache, TriggerActionCache>();
+
+			services.AddHostedService<TriggerActionReloadService>();
 
 			services.AddHttpClient();
 			services.AddMqttHandlers();
@@ -138,6 +144,7 @@ namespace SensateIoT.Platform.Network.TriggerService.Application
 
 			provider.MapInternalMqttTopic<MqttBulkNumberTriggerHandler>(@private.BulkMeasurementTopic);
 			provider.MapInternalMqttTopic<MqttRegexTriggerHandler>(@private.BulkMessageTopic);
+			provider.MapInternalMqttTopic<CommandConsumer>(@private.CommandTopic);
 		}
 	}
 }

@@ -13,19 +13,20 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+
+using JetBrains.Annotations;
+using Prometheus;
 
 using MongoDB.Bson;
 using MongoDB.Driver.GeoJsonObjectModel;
 
-using Prometheus;
-
 using SensateIoT.Platform.Network.Common.MQTT;
 using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.DTO;
-using SensateIoT.Platform.Network.DataAccess.Abstract;
+using SensateIoT.Platform.Network.TriggerService.Abstract;
 using SensateIoT.Platform.Network.TriggerService.DTO;
 using SensateIoT.Platform.Network.TriggerService.Services;
 
@@ -92,45 +93,45 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 		public async Task OnMessageAsync(string topic, string message, CancellationToken ct)
 		{
 			using(this.m_duration.NewTimer()) {
-				await this.HandleMessageAsync(message, ct).ConfigureAwait(false);
+				await this.HandleMessageAsync(message).ConfigureAwait(false);
 			}
 		}
 
-		private async Task HandleMessageAsync(string message, CancellationToken ct)
+		private async Task HandleMessageAsync(string message)
 		{
 			this.logger.LogDebug("Measurement received.");
-			var tasks = new List<Task>();
 
 			var measurements = this.Decompress(message).ToList();
 			using var scope = this.m_provider.CreateScope();
-			var triggersdb = scope.ServiceProvider.GetRequiredService<ITriggerRepository>();
-			var triggers = await triggersdb.GetTriggerServiceActions(measurements.Select(x => x.SensorID), ct).ConfigureAwait(false);
-			var triggerMap = triggers
-				.GroupBy(x => x.SensorID, x => x)
-				.ToDictionary(x => x.Key, x => x.ToList());
-			var exec = scope.ServiceProvider.GetRequiredService<ITriggerActionExecutionService>();
 
 			this.m_measurementCounter.Inc(measurements.Count);
-
-			foreach(var metaMeasurement in measurements) {
-				var actions = triggerMap[metaMeasurement.SensorID];
-
-				if(actions == null) {
-					continue;
-				}
-
-				foreach(var m in metaMeasurement.Measurements) {
-					foreach(var keyValuePair in m.Data) {
-						this.m_matchCounter.Inc();
-						var matched = this.m_matcher.Match(keyValuePair.Key, keyValuePair.Value, actions).ToList();
-						tasks.Add(ExecuteActionsAsync(exec, matched, keyValuePair.Value, m));
-					}
-				}
-			}
+			var tasks = measurements.Select(metaMeasurement => this.HandleMeasurement(scope, metaMeasurement)).ToList();
 
 			await Task.WhenAll(tasks);
 
 			this.logger.LogDebug("Measurement handled.");
+		}
+
+		private Task HandleMeasurement(IServiceScope scope, InternalBulkMeasurements measurements)
+		{
+			var triggersdb = scope.ServiceProvider.GetRequiredService<ITriggerActionCache>();
+			var actions = triggersdb.Lookup(measurements.SensorID);
+			var exec = scope.ServiceProvider.GetRequiredService<ITriggerActionExecutionService>();
+			var tasks = new List<Task>();
+
+			if(actions == null) {
+				return Task.CompletedTask;
+			}
+
+			foreach(var m in measurements.Measurements) {
+				foreach(var keyValuePair in m.Data) {
+					this.m_matchCounter.Inc();
+					var matched = this.m_matcher.Match(keyValuePair.Key, keyValuePair.Value, actions).ToList();
+					tasks.Add(ExecuteActionsAsync(exec, matched, keyValuePair.Value, m));
+				}
+			}
+
+			return Task.WhenAll(tasks);
 		}
 
 		private static Task ExecuteActionsAsync(ITriggerActionExecutionService exec, IEnumerable<TriggerAction> actions, DataPoint dp, SingleMeasurement m)
