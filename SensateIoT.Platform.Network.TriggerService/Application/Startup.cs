@@ -63,6 +63,7 @@ namespace SensateIoT.Platform.Network.TriggerService.Application
 			services.AddDocumentStore(db.MongoDB.ConnectionString, db.MongoDB.DatabaseName, db.MongoDB.MaxConnections);
 			services.Configure<TimeoutConfig>(this.Configuration.GetSection("Timeouts"));
 
+			services.Configure<MqttConfig>(this.Configuration.GetSection("Mqtt"));
 			services.Configure<MetricsOptions>(this.Configuration.GetSection("HttpServer:Metrics"));
 			services.AddHostedService<MetricsService>();
 

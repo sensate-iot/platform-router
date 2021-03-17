@@ -17,18 +17,22 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
+using Google.Protobuf;
 using JetBrains.Annotations;
+using Microsoft.Extensions.Options;
 using Prometheus;
 
 using MongoDB.Bson;
 using MongoDB.Driver.GeoJsonObjectModel;
 
+using SensateIoT.Platform.Network.Common.Converters;
+using SensateIoT.Platform.Network.Common.Helpers;
 using SensateIoT.Platform.Network.Common.MQTT;
 using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.TriggerService.Abstract;
+using SensateIoT.Platform.Network.TriggerService.Config;
 using SensateIoT.Platform.Network.TriggerService.DTO;
-using SensateIoT.Platform.Network.TriggerService.Services;
 
 using Convert = System.Convert;
 using DataPoint = SensateIoT.Platform.Network.Data.DTO.DataPoint;
@@ -41,17 +45,24 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 		private readonly IServiceProvider m_provider;
 		private readonly ILogger<MqttBulkNumberTriggerHandler> logger;
 		private readonly IDataPointMatchingService m_matcher;
+		private readonly IInternalMqttClient m_client;
+		private readonly string m_eventTopic;
+
 		private readonly Counter m_measurementCounter;
 		private readonly Counter m_matchCounter;
 		private readonly Histogram m_duration;
 
 		public MqttBulkNumberTriggerHandler(IServiceProvider provider,
 											IDataPointMatchingService matcher,
+											IInternalMqttClient client,
+											IOptions<MqttConfig> options,
 											ILogger<MqttBulkNumberTriggerHandler> logger)
 		{
 			this.m_provider = provider;
 			this.logger = logger;
 			this.m_matcher = matcher;
+			this.m_client = client;
+			this.m_eventTopic = options.Value.InternalBroker.TriggerEventTopic;
 
 			this.m_matchCounter = Metrics.CreateCounter("triggerservice_measurements_matched_total", "Total amount of measurements that matched a trigger.");
 			this.m_measurementCounter = Metrics.CreateCounter("triggerservice_measurements_received_total", "Total amount of measurements received.");
@@ -105,21 +116,29 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 
 			this.m_measurementCounter.Inc(measurements.Count);
 			var tasks = measurements.Select(this.HandleMeasurement).ToList();
-			await Task.WhenAll(tasks);
+			var results = await Task.WhenAll(tasks).ConfigureAwait(false);
+
+			var data = new TriggerEventData();
+
+			foreach(var triggerLists in results) {
+				foreach(var triggerEvents in triggerLists) {
+					data.Events.AddRange(triggerEvents);
+				}
+			}
 
 			this.logger.LogDebug("Measurement handled.");
 		}
 
-		private Task HandleMeasurement(InternalBulkMeasurements measurements)
+		private Task<List<TriggerEvent>[]> HandleMeasurement(InternalBulkMeasurements measurements)
 		{
 			using var scope = this.m_provider.CreateScope();
 			var triggersdb = scope.ServiceProvider.GetRequiredService<ITriggerActionCache>();
 			var actions = triggersdb.Lookup(measurements.SensorID);
 			var exec = scope.ServiceProvider.GetRequiredService<ITriggerActionExecutionService>();
-			var tasks = new List<Task>();
+			var tasks = new List<Task<List<TriggerEvent>>>();
 
 			if(actions == null) {
-				return Task.CompletedTask;
+				return Task.FromResult<List<TriggerEvent>[]>(null);
 			}
 
 			foreach(var m in measurements.Measurements) {
@@ -133,16 +152,20 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 			return Task.WhenAll(tasks);
 		}
 
-		private static Task ExecuteActionsAsync(ITriggerActionExecutionService exec, IEnumerable<TriggerAction> actions, DataPoint dp, SingleMeasurement m)
+		private static async Task<List<TriggerEvent>> ExecuteActionsAsync(ITriggerActionExecutionService exec, IEnumerable<TriggerAction> actions, DataPoint dp, SingleMeasurement m)
 		{
 			var tasks = new List<Task>();
+			List<TriggerEvent> events = new List<TriggerEvent>();
 
 			foreach(var action in actions) {
 				var result = Replace(action.Message, dp, m);
+
 				tasks.Add(exec.ExecuteAsync(action, result));
+				events.Add(TriggerActionEventConverter.Convert(action));
 			}
 
-			return Task.WhenAll(tasks);
+			await Task.WhenAll(tasks).ConfigureAwait(false);
+			return events;
 		}
 
 		private static string Replace(string message, DataPoint dp, SingleMeasurement m)
@@ -165,6 +188,14 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 			body = body.Replace("$lat", lat);
 
 			return body;
+		}
+
+		private async Task PublishAsync(IMessage protoEvents)
+		{
+			await using var measurementStream = new MemoryStream();
+			protoEvents.WriteTo(measurementStream);
+			var data = measurementStream.ToArray().Compress();
+			await this.m_client.PublishOnAsync(this.m_eventTopic, data, false).ConfigureAwait(false);
 		}
 	}
 }

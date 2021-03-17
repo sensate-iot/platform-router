@@ -73,6 +73,7 @@ BEGIN
 	INNER JOIN "Triggers" AS t ON t."ID" = ta."TriggerID"
 	ORDER BY ta."ID";
 END;
+$$;
 
 
 GRANT EXECUTE ON FUNCTION triggerservice_gettriggers() TO db_triggerservice;
