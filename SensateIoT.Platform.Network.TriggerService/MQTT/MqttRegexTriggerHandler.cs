@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 using JetBrains.Annotations;
+using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Bson;
 using Prometheus;
 
@@ -27,7 +28,6 @@ using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.TriggerService.Abstract;
 using SensateIoT.Platform.Network.TriggerService.DTO;
-using SensateIoT.Platform.Network.TriggerService.Services;
 
 namespace SensateIoT.Platform.Network.TriggerService.MQTT
 {
@@ -36,8 +36,8 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 	{
 		private readonly ILogger<MqttRegexTriggerHandler> m_logger;
 		private readonly IRegexMatchingService m_regexMatcher;
-		private readonly ITriggerActionExecutionService m_exec;
 		private readonly ITriggerActionCache m_cache;
+		private readonly IServiceProvider m_provider;
 		private readonly Counter m_messageCounter;
 		private readonly Counter m_matchCounter;
 		private readonly Histogram m_duration;
@@ -45,14 +45,14 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 		public MqttRegexTriggerHandler(
 			ILogger<MqttRegexTriggerHandler> logger,
 			IRegexMatchingService matcher,
-			ITriggerActionExecutionService exec,
+			IServiceProvider provider,
 			ITriggerActionCache cache
 		)
 		{
 			this.m_logger = logger;
 			this.m_regexMatcher = matcher;
-			this.m_exec = exec;
 			this.m_cache = cache;
+			this.m_provider = provider;
 			this.m_matchCounter = Metrics.CreateCounter("triggerservice_messages_matched_total", "Total amount of measurements that matched a trigger.");
 			this.m_messageCounter = Metrics.CreateCounter("triggerservice_messages_received_total", "Total amount of messages received.");
 			this.m_duration = Metrics.CreateHistogram("triggerservice_message_handle_duration_seconds", "Histogram of message handling duration.");
@@ -93,10 +93,13 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 				return;
 			}
 
+			using var scope = this.m_provider.CreateScope();
+			var exec = scope.ServiceProvider.GetRequiredService<ITriggerActionExecutionService>();
+
 			foreach(var m in measurements.Messages) {
 				this.m_matchCounter.Inc();
 				var matched = this.m_regexMatcher.Match(m, actions).ToList();
-				await this.ExecuteActionsAsync(matched, m).ConfigureAwait(false);
+				await ExecuteActionsAsync(exec, matched, m).ConfigureAwait(false);
 			}
 		}
 
@@ -122,11 +125,11 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 			return messages;
 		}
 
-		private async Task ExecuteActionsAsync(IEnumerable<TriggerAction> actions, Message msg)
+		private static async Task ExecuteActionsAsync(ITriggerActionExecutionService exec, IEnumerable<TriggerAction> actions, Message msg)
 		{
 			foreach(var action in actions) {
 				var result = Replace(action.Message, msg);
-				await this.m_exec.ExecuteAsync(action, result).ConfigureAwait(false);
+				await exec.ExecuteAsync(action, result).ConfigureAwait(false);
 			}
 		}
 

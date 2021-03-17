@@ -102,18 +102,17 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 			this.logger.LogDebug("Measurement received.");
 
 			var measurements = this.Decompress(message).ToList();
-			using var scope = this.m_provider.CreateScope();
 
 			this.m_measurementCounter.Inc(measurements.Count);
-			var tasks = measurements.Select(metaMeasurement => this.HandleMeasurement(scope, metaMeasurement)).ToList();
-
+			var tasks = measurements.Select(this.HandleMeasurement).ToList();
 			await Task.WhenAll(tasks);
 
 			this.logger.LogDebug("Measurement handled.");
 		}
 
-		private Task HandleMeasurement(IServiceScope scope, InternalBulkMeasurements measurements)
+		private Task HandleMeasurement(InternalBulkMeasurements measurements)
 		{
+			using var scope = this.m_provider.CreateScope();
 			var triggersdb = scope.ServiceProvider.GetRequiredService<ITriggerActionCache>();
 			var actions = triggersdb.Lookup(measurements.SensorID);
 			var exec = scope.ServiceProvider.GetRequiredService<ITriggerActionExecutionService>();
