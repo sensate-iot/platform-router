@@ -40,7 +40,7 @@ namespace SensateIoT.Platform.Network.StorageService.MQTT
 
 		public MqttBulkMessageHandler(IMessageRepository message,
 									  ISensorStatisticsRepository stats,
-		                              ILogger<MqttBulkMessageHandler> logger)
+									  ILogger<MqttBulkMessageHandler> logger)
 		{
 			this.m_logger = logger;
 			this.m_stats = stats;
@@ -62,7 +62,7 @@ namespace SensateIoT.Platform.Network.StorageService.MQTT
 					this.m_storageCounter.Inc(databaseMessages.Count);
 					this.m_logger.LogInformation("Attempting to store {count} messages.", databaseMessages.Count);
 					await Task.WhenAll(this.m_messages.CreateRangeAsync(databaseMessages, ct),
-					                   this.IncrementStatistics(stats, ct)).ConfigureAwait(false);
+									   this.IncrementStatistics(stats, ct)).ConfigureAwait(false);
 
 				}
 
