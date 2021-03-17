@@ -52,6 +52,7 @@ namespace SensateIoT.Platform.Network.StorageService.MQTT
 					var databaseMessages = this.Decompress(message).ToList();
 
 					this.m_storageCounter.Inc(databaseMessages.Count);
+					this.m_logger.LogInformation("Attempting to store {count} messages.", databaseMessages.Count);
 					await this.m_messages.CreateRangeAsync(databaseMessages, ct).ConfigureAwait(false);
 				}
 
@@ -70,7 +71,7 @@ namespace SensateIoT.Platform.Network.StorageService.MQTT
 			var bytes = Convert.FromBase64String(data);
 			using var to = new MemoryStream();
 			using var from = new MemoryStream(bytes);
-			using var gzip = new GZipStream(@from, CompressionMode.Decompress);
+			using var gzip = new GZipStream(from, CompressionMode.Decompress);
 
 			gzip.CopyTo(to);
 			var final = to.ToArray();

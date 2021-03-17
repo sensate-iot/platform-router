@@ -71,6 +71,7 @@ namespace SensateIoT.Platform.Network.StorageService.MQTT
 			var count = measurementMap.Aggregate(0L, (l, pair) => l + pair.Value.Count);
 
 			this.m_storageCounter.Inc(count);
+			this.m_logger.LogInformation("Attempting to store {count} measurements.", count);
 
 			await Task.WhenAll(
 				this.m_measurements.StoreAsync(measurementMap, ct),
