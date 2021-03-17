@@ -126,6 +126,7 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 				}
 			}
 
+			await this.PublishAsync(data).ConfigureAwait(false);
 			this.logger.LogDebug("Measurement handled.");
 		}
 
@@ -155,7 +156,7 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 		private static async Task<List<TriggerEvent>> ExecuteActionsAsync(ITriggerActionExecutionService exec, IEnumerable<TriggerAction> actions, DataPoint dp, SingleMeasurement m)
 		{
 			var tasks = new List<Task>();
-			List<TriggerEvent> events = new List<TriggerEvent>();
+			var events = new List<TriggerEvent>();
 
 			foreach(var action in actions) {
 				var result = Replace(action.Message, dp, m);
