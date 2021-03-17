@@ -17,7 +17,6 @@ using Prometheus;
 using SensateIoT.Platform.Network.Adapters.Abstract;
 using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
-using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Network.TriggerService.Abstract;
 
@@ -127,13 +126,6 @@ namespace SensateIoT.Platform.Network.TriggerService.Services
 			default:
 				throw new ArgumentOutOfRangeException(nameof(TriggerAction.Channel));
 			}
-
-			action.LastInvocation = DateTime.UtcNow;
-			await this.m_triggerRepo.StoreTriggerInvocation(new TriggerInvocation {
-				Timestamp = action.LastInvocation,
-				ActionID = action.ActionID,
-				TriggerID = action.TriggerID
-			});
 		}
 	}
 }

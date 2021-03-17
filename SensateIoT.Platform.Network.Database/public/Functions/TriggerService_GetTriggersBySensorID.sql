@@ -10,8 +10,7 @@ CREATE FUNCTION triggerservice_gettriggersbysensorid(id VARCHAR(24))
 		"Type" INTEGER,
 		"Channel" INTEGER,
 		"Target" VARCHAR(255),
-		"Message" TEXT,
-		"LastInvocation" TIMESTAMP
+		"Message" TEXT
     )
     LANGUAGE plpgsql
 AS
@@ -30,15 +29,9 @@ BEGIN
 		t."Type",
 		ta."Channel",
 		ta."Target",
-		ta."Message",
-		inv."Timestamp"
+		ta."Message"
 	FROM "TriggerActions" AS ta
 	INNER JOIN "Triggers" AS t ON t."ID" = ta."TriggerID"
-	LEFT JOIN (
-		SELECT tinv."ActionID", MAX(tinv."Timestamp") AS "Timestamp"
-		FROM "TriggerInvocations" AS tinv
-		GROUP BY tinv."ActionID"
-	) inv ON inv."ActionID" = ta."ID"
 	WHERE t."SensorID" = id
 	ORDER BY ta."ID";
 END;

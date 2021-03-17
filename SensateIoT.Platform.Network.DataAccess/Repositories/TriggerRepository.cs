@@ -5,7 +5,6 @@
  * @email  michel@michelmegens.net
  */
 
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading;
@@ -16,9 +15,7 @@ using Npgsql;
 using NpgsqlTypes;
 
 using SensateIoT.Platform.Network.Data.DTO;
-using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
-using SensateIoT.Platform.Network.DataAccess.Extensions;
 
 using TriggerAction = SensateIoT.Platform.Network.Data.DTO.TriggerAction;
 
@@ -30,7 +27,6 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 		private const string TriggerService_GetTriggersBySensorID = "triggerservice_gettriggersbysensorid";
 		private const string TriggerService_GetTriggers = "triggerservice_gettriggers";
-		private const string TriggerService_CreateInvocation = "triggerservice_createinvocation";
 
 		public TriggerRepository(INetworkingDbContext ctx)
 		{
@@ -61,8 +57,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 					Type = (TriggerType)reader.GetFieldValue<int>(7),
 					Channel = (TriggerChannel)reader.GetFieldValue<int>(8),
 					Target = !await reader.IsDBNullAsync(9, ct) ? reader.GetString(9) : null,
-					Message = !await reader.IsDBNullAsync(10, ct) ? reader.GetString(10) : null,
-					LastInvocation = !await reader.IsDBNullAsync(11, ct) ? reader.GetDateTime(11) : DateTime.MinValue
+					Message = !await reader.IsDBNullAsync(10, ct) ? reader.GetString(10) : null
 				};
 
 				if(await reader.IsDBNullAsync(4, ct)) {
@@ -111,8 +106,7 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 					Type = (TriggerType)reader.GetFieldValue<int>(7),
 					Channel = (TriggerChannel)reader.GetFieldValue<int>(8),
 					Target = !await reader.IsDBNullAsync(9, ct) ? reader.GetString(9) : null,
-					Message = !await reader.IsDBNullAsync(10, ct) ? reader.GetString(10) : null,
-					LastInvocation = !await reader.IsDBNullAsync(11, ct) ? reader.GetDateTime(11) : DateTime.MinValue
+					Message = !await reader.IsDBNullAsync(10, ct) ? reader.GetString(10) : null
 				};
 
 				if(await reader.IsDBNullAsync(4, ct)) {
@@ -132,20 +126,6 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 
 			return result;
 
-		}
-
-		public async Task StoreTriggerInvocation(TriggerInvocation invocation, CancellationToken ct)
-		{
-			using var builder = StoredProcedureBuilder.Create(this.m_ctx.Connection);
-
-			builder.WithParameter("triggerid", invocation.TriggerID, NpgsqlDbType.Bigint);
-			builder.WithParameter("actionid", invocation.ActionID, NpgsqlDbType.Bigint);
-			builder.WithParameter("timestmp", invocation.Timestamp, NpgsqlDbType.Timestamp);
-
-			builder.WithFunction(TriggerService_CreateInvocation);
-
-			var reader = await builder.ExecuteAsync(ct).ConfigureAwait(false);
-			await reader.DisposeAsync().ConfigureAwait(false);
 		}
 	}
 }

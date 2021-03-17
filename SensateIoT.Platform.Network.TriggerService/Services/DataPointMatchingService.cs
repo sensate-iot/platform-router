@@ -70,15 +70,6 @@ namespace SensateIoT.Platform.Network.TriggerService.Services
 					continue;
 				}
 
-				/*
-				 * Validate timestamps
-				 */
-				var expiry = action.LastInvocation.Add(this.GetTimeout(action));
-
-				if(expiry > DateTime.UtcNow) {
-					continue;
-				}
-
 				list.Add(action);
 			}
 
