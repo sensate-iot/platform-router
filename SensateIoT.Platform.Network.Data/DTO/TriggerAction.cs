@@ -24,6 +24,5 @@ namespace SensateIoT.Platform.Network.Data.DTO
 		public TriggerChannel Channel { get; set; }
 		public string Target { get; set; }
 		public string Message { get; set; }
-		public DateTime LastInvocation { get; set; }
 	}
 }

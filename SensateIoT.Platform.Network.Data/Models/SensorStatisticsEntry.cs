@@ -27,6 +27,6 @@ namespace SensateIoT.Platform.Network.Data.Models
 		public DateTime Date { get; set; }
 		[BsonRequired]
 		public int Measurements { get; set; }
-		public RequestMethod Method { get; set; }
+		public StatisticsType Method { get; set; }
 	}
 }

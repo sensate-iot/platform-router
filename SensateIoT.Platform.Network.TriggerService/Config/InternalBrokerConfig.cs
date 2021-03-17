@@ -16,6 +16,7 @@ namespace SensateIoT.Platform.Network.TriggerService.Config
 		public short Port { get; set; }
 		public string BulkMeasurementTopic { get; set; }
 		public string BulkMessageTopic { get; set; }
-		public string ActuatorTopicFormat { get; set; }
+		public string CommandTopic { get; set; }
+		public string TriggerEventTopic { get; set; }
 	}
 }

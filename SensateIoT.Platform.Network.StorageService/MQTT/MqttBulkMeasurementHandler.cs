@@ -67,10 +67,11 @@ namespace SensateIoT.Platform.Network.StorageService.MQTT
 		private async Task HandleMessage(string message, CancellationToken ct)
 		{
 			var measurementMap = MeasurementDatabaseConverter.Convert(this.DeserializeMeasurements(message));
-			var stats = measurementMap.Select(m => new StatisticsUpdate(RequestMethod.Any, m.Value.Count, m.Key));
+			var stats = measurementMap.Select(m => new StatisticsUpdate(StatisticsType.MessageStorage, m.Value.Count, m.Key));
 			var count = measurementMap.Aggregate(0L, (l, pair) => l + pair.Value.Count);
 
 			this.m_storageCounter.Inc(count);
+			this.m_logger.LogInformation("Attempting to store {count} measurements.", count);
 
 			await Task.WhenAll(
 				this.m_measurements.StoreAsync(measurementMap, ct),
@@ -83,7 +84,7 @@ namespace SensateIoT.Platform.Network.StorageService.MQTT
 			var bytes = Convert.FromBase64String(data);
 			using var to = new MemoryStream();
 			using var from = new MemoryStream(bytes);
-			using var gzip = new GZipStream(@from, CompressionMode.Decompress);
+			using var gzip = new GZipStream(from, CompressionMode.Decompress);
 
 			gzip.CopyTo(to);
 			var final = to.ToArray();
@@ -99,7 +100,7 @@ namespace SensateIoT.Platform.Network.StorageService.MQTT
 
 			for(var idx = 0; idx < data.Count; idx++) {
 				var entry = data.ElementAt(idx);
-				tasks[idx] = this.m_stats.IncrementManyAsync(entry.SensorId, entry.Method, entry.Count, token);
+				tasks[idx] = this.m_stats.IncrementManyAsync(entry.SensorId, entry.Type, entry.Count, token);
 			}
 
 			await Task.WhenAll(tasks).ConfigureAwait(false);

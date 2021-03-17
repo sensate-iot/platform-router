@@ -30,16 +30,9 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			this._stats = context.SensorStatistics;
 		}
 
-		public async Task DeleteBySensorAsync(Sensor sensor, CancellationToken ct = default)
-		{
-			var filter = Builders<SensorStatisticsEntry>.Filter
-				.Eq(x => x.InternalId, sensor.InternalId);
-			await this._stats.DeleteManyAsync(filter, ct).ConfigureAwait(false);
-		}
-
 		#region Entry creation
 
-		public async Task IncrementManyAsync(ObjectId sensorId, RequestMethod method, int num, CancellationToken token)
+		public async Task IncrementManyAsync(ObjectId sensorId, StatisticsType method, int num, CancellationToken token)
 		{
 			var update = Builders<SensorStatisticsEntry>.Update;
 			var opts = new UpdateOptions { IsUpsert = true };

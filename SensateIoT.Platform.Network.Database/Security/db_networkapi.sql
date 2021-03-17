@@ -27,5 +27,4 @@ GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE "Blobs" TO db_networkapi;
 GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE "SensorLinks" TO db_networkapi;
 GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE "TriggerActions" TO db_networkapi;
 GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE "Triggers" TO db_networkapi;
-GRANT SELECT, UPDATE, DELETE ON TABLE "TriggerInvocations" TO db_networkapi;
 GRANT SELECT ON TABLE "LiveDataHandlers" TO db_networkapi;

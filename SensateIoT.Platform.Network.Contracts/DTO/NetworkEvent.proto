@@ -7,6 +7,9 @@
 
 syntax = "proto3";
 
+package sensateiot;
+option csharp_namespace = "SensateIoT.Platform.Network.Contracts.DTO";
+
 enum NetworkEventType
 {
 	MessageRouted = 0;

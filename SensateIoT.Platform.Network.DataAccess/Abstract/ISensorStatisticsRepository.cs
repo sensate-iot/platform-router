@@ -16,6 +16,6 @@ namespace SensateIoT.Platform.Network.DataAccess.Abstract
 {
 	public interface ISensorStatisticsRepository
 	{
-		Task IncrementManyAsync(ObjectId sensorId, RequestMethod method, int num, CancellationToken token = default);
+		Task IncrementManyAsync(ObjectId sensorId, StatisticsType method, int num, CancellationToken token = default);
 	}
 }

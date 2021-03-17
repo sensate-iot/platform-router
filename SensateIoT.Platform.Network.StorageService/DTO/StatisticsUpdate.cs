@@ -13,13 +13,13 @@ namespace SensateIoT.Platform.Network.StorageService.DTO
 	internal class StatisticsUpdate
 	{
 		public int Count { get; }
-		public RequestMethod Method { get; }
+		public StatisticsType Type { get; }
 		public ObjectId SensorId { get; }
 
-		public StatisticsUpdate(RequestMethod method, int count, ObjectId sensorId)
+		public StatisticsUpdate(StatisticsType type, int count, ObjectId sensorId)
 		{
 			this.SensorId = sensorId;
-			this.Method = method;
+			this.Type = type;
 			this.Count = count;
 		}
 	}

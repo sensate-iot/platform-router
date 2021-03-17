@@ -7,6 +7,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using SensateIoT.Platform.Network.Contracts.DTO;
 
 namespace SensateIoT.Platform.Network.Common.Collections.Abstract
 {
