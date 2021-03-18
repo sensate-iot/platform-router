@@ -24,9 +24,9 @@ namespace SensateIoT.Platform.Network.Data.Models
 		[BsonRequired, JsonConverter(typeof(ObjectIdJsonConverter))]
 		public ObjectId SensorId { get; set; }
 		[BsonRequired]
-		public DateTime Date { get; set; }
+		public DateTime Timestamp { get; set; }
 		[BsonRequired]
-		public int Measurements { get; set; }
-		public StatisticsType Method { get; set; }
+		public int Count { get; set; }
+		public StatisticsType Type { get; set; }
 	}
 }

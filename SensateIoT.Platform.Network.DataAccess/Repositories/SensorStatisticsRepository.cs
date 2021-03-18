@@ -36,12 +36,12 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 		{
 			var update = Builders<SensorStatisticsEntry>.Update;
 			var opts = new UpdateOptions { IsUpsert = true };
-			var updateDefinition = update.Inc(x => x.Measurements, num)
-				.SetOnInsert(x => x.Method, method);
+			var updateDefinition = update.Inc(x => x.Count, num)
+				.SetOnInsert(x => x.Type, method);
 
 			try {
 				await this._stats.UpdateOneAsync(x => x.SensorId == sensorId &&
-														   x.Date == DateTime.Now.ThisHour() && x.Method == method,
+														   x.Timestamp == DateTime.Now.ThisHour() && x.Type == method,
 					updateDefinition, opts, token).ConfigureAwait(false);
 			} catch(Exception ex) {
 				throw new DataException("Unable to update measurement statistics!", ex);
