@@ -52,7 +52,7 @@ namespace SensateIoT.Platform.Network.StorageService.MQTT
 			gzip.CopyTo(to);
 			var final = to.ToArray();
 			var triggerEventData = TriggerEventData.Parser.ParseFrom(final);
-			this.m_logger.LogInformation("Storing {count} messages!", triggerEventData.Events.Count);
+			this.m_logger.LogInformation("Storing {count} trigger events!", triggerEventData.Events.Count);
 
 			return triggerEventData.Events;
 		}

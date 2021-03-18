@@ -64,7 +64,7 @@ namespace SensateIoT.Platform.Network.StorageService.MQTT
 			gzip.CopyTo(to);
 			var final = to.ToArray();
 			var networkEventData = NetworkEventData.Parser.ParseFrom(final);
-			this.m_logger.LogInformation("Storing {count} messages!", networkEventData.Events.Count);
+			this.m_logger.LogInformation("Storing {count} network events!", networkEventData.Events.Count);
 
 			return networkEventData.Events;
 		}
