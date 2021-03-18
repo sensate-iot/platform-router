@@ -67,7 +67,7 @@ namespace SensateIoT.Platform.Network.StorageService.MQTT
 		private async Task HandleMessage(string message, CancellationToken ct)
 		{
 			var measurementMap = MeasurementDatabaseConverter.Convert(this.DeserializeMeasurements(message));
-			var stats = measurementMap.Select(m => new StatisticsUpdate(StatisticsType.MessageStorage, m.Value.Count, m.Key));
+			var stats = measurementMap.Select(m => new StatisticsUpdate(StatisticsType.MeasurementStorage, m.Value.Count, m.Key));
 			var count = measurementMap.Aggregate(0L, (l, pair) => l + pair.Value.Count);
 
 			this.m_storageCounter.Inc(count);
