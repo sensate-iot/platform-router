@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Statistics logging
 - Logging in the Storage Service
 - Router initialization routine
+- The database function `generic_getblobs`
 
 ### Removed
 - Unused code
