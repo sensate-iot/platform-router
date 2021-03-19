@@ -1,5 +1,7 @@
 # Sensate IoT - Network
 
+![header1] ![header2] ![header3]
+
 This is the core network solution for the Sensate IoT data platform. This
 solution contains all network infrastructure services:
 
@@ -37,3 +39,7 @@ This solution contains serveral services that add value to a message or measurem
 - automation via the trigger service;
 - persistance via the storage service;
 - real-time updates via the live data service.
+
+[header1]: https://github.com/sensate-iot/platform-network/workflows/Docker/badge.svg "Docker Build"
+[header2]: https://github.com/sensate-iot/platform-network/workflows/Format%20check/badge.svg ".NET format"
+[header3]: https://img.shields.io/badge/version-v1.5.0-informational "Sensate IoT version"
