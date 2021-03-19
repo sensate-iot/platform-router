@@ -121,8 +121,6 @@ GRANT EXECUTE ON FUNCTION triggerservice_gettriggers() TO db_triggerservice;
 GRANT EXECUTE ON FUNCTION triggerservice_gettriggersbysensorid(id VARCHAR(24)) TO db_triggerservice;
 
 DROP FUNCTION triggerservice_createinvocation(triggerid BIGINT, actionid BIGINT, timestmp TIMESTAMP);
-DROP FUNCTION router_gettriggersbyid(id varchar(24));
 DROP FUNCTION public.admin_truncatetriggerinvocations();
-DROP FUNCTION router_gettriggersbyid(id varchar(24));
 DROP FUNCTION dataapi_selectinvocationcount(idlist TEXT);
 DROP TABLE "TriggerInvocations";
