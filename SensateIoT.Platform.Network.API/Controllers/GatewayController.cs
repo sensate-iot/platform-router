@@ -74,7 +74,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		[ProducesResponseType(StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status201Created)]
 		[ProducesResponseType(typeof(Blob), StatusCodes.Status201Created)]
-		public async Task<IActionResult> CreateBlob([FromForm] FileUploadForm upload)
+		public async Task<IActionResult> CreateBlobAsync([FromForm] FileUploadForm upload)
 		{
 			var file = upload.File;
 
@@ -117,7 +117,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(typeof(Response<GatewayResponse>), StatusCodes.Status202Accepted)]
-		public async Task<IActionResult> Messages([FromBody] Message message)
+		public async Task<IActionResult> EnqueueMessageAsync([FromBody] Message message)
 		{
 			var response = new Response<GatewayResponse>();
 
@@ -138,7 +138,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(typeof(Response<GatewayResponse>), StatusCodes.Status202Accepted)]
-		public async Task<IActionResult> Measurements([FromBody] Measurement measurement)
+		public async Task<IActionResult> EnqueueMeasurement([FromBody] Measurement measurement)
 		{
 			var response = new Response<GatewayResponse>();
 
@@ -159,7 +159,7 @@ namespace SensateIoT.Platform.Network.API.Controllers
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(typeof(Response<GatewayResponse>), StatusCodes.Status202Accepted)]
-		public async Task<IActionResult> ControlMessages([FromBody] ActuatorMessage message)
+		public async Task<IActionResult> EnqueueControlMessageAsync([FromBody] ActuatorMessage message)
 		{
 			var response = new Response<GatewayResponse>();
 

@@ -6,10 +6,9 @@
  */
 
 using System.Threading.Tasks;
-
 using SensateIoT.Platform.Network.Data.DTO;
 
-namespace SensateIoT.Platform.Network.TriggerService.Services
+namespace SensateIoT.Platform.Network.TriggerService.Abstract
 {
 	public interface ITriggerActionExecutionService
 	{

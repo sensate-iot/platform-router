@@ -7,26 +7,30 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
+using Google.Protobuf;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 using JetBrains.Annotations;
 using MongoDB.Bson;
 using Prometheus;
 
 using SensateIoT.Platform.Network.Common.Converters;
+using SensateIoT.Platform.Network.Common.Helpers;
 using SensateIoT.Platform.Network.Common.MQTT;
 using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.DTO;
-using SensateIoT.Platform.Network.DataAccess.Abstract;
+using SensateIoT.Platform.Network.TriggerService.Abstract;
+using SensateIoT.Platform.Network.TriggerService.Config;
 using SensateIoT.Platform.Network.TriggerService.DTO;
-using SensateIoT.Platform.Network.TriggerService.Services;
 
 namespace SensateIoT.Platform.Network.TriggerService.MQTT
 {
@@ -34,24 +38,31 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 	public class MqttRegexTriggerHandler : IMqttHandler
 	{
 		private readonly ILogger<MqttRegexTriggerHandler> m_logger;
-		private readonly ITriggerRepository m_repo;
 		private readonly IRegexMatchingService m_regexMatcher;
-		private readonly ITriggerActionExecutionService m_exec;
+		private readonly ITriggerActionCache m_cache;
+		private readonly IServiceProvider m_provider;
+		private readonly IInternalMqttClient m_client;
+		private readonly string m_eventsTopic;
+
 		private readonly Counter m_messageCounter;
 		private readonly Counter m_matchCounter;
 		private readonly Histogram m_duration;
 
 		public MqttRegexTriggerHandler(
 			ILogger<MqttRegexTriggerHandler> logger,
-			ITriggerRepository triggers,
 			IRegexMatchingService matcher,
-			ITriggerActionExecutionService exec
+			IServiceProvider provider,
+			IInternalMqttClient client,
+			IOptions<MqttConfig> options,
+			ITriggerActionCache cache
 		)
 		{
 			this.m_logger = logger;
-			this.m_repo = triggers;
 			this.m_regexMatcher = matcher;
-			this.m_exec = exec;
+			this.m_client = client;
+			this.m_eventsTopic = options.Value.InternalBroker.TriggerEventTopic;
+			this.m_cache = cache;
+			this.m_provider = provider;
 			this.m_matchCounter = Metrics.CreateCounter("triggerservice_messages_matched_total", "Total amount of measurements that matched a trigger.");
 			this.m_messageCounter = Metrics.CreateCounter("triggerservice_messages_received_total", "Total amount of messages received.");
 			this.m_duration = Metrics.CreateHistogram("triggerservice_message_handle_duration_seconds", "Histogram of message handling duration.");
@@ -60,45 +71,58 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 		public async Task OnMessageAsync(string topic, string message, CancellationToken ct = default)
 		{
 			using(this.m_duration.NewTimer()) {
-				await this.HandleMessageAsync(message, ct).ConfigureAwait(false);
+				await this.HandleMessageAsync(message).ConfigureAwait(false);
 			}
 		}
 
-		private async Task HandleMessageAsync(string message, CancellationToken ct = default)
+		private async Task HandleMessageAsync(string message)
 		{
-			this.m_logger.LogDebug("Trigger messages received.");
-			var tasks = new List<Task>();
+			this.m_logger.LogInformation("Trigger messages received.");
 
+			var sw = Stopwatch.StartNew();
 			var messages = this.Decompress(message).ToList();
-			var triggers = await this.m_repo.GetTriggerServiceActions(messages.Select(x => x.SensorID), ct).ConfigureAwait(false);
-			var triggerMap = triggers
-				.GroupBy(x => x.SensorID, x => x)
-				.ToDictionary(x => x.Key, x => x.ToList());
-
 			this.m_messageCounter.Inc(messages.Count);
 
-			foreach(var metaMessages in messages) {
-				var actions = triggerMap[metaMessages.SensorID];
-
-				if(actions == null) {
-					continue;
-				}
-
-				foreach(var m in metaMessages.Messages) {
-					this.m_matchCounter.Inc();
-
-					var matched = this.m_regexMatcher.Match(m, actions);
-					tasks.Add(this.ExecuteActionsAsync(matched, m));
-				}
-			}
-
 			try {
-				await Task.WhenAll(tasks);
+				var results = await Task.WhenAll(messages.Select(this.HandleMeasurement));
+				var data = new TriggerEventData();
+
+				foreach(var triggerLists in results) {
+					foreach(var triggerEvents in triggerLists) {
+						data.Events.AddRange(triggerEvents);
+					}
+				}
+
+				if(data.Events.Count > 0) {
+					await this.PublishAsync(data).ConfigureAwait(false);
+				}
 			} catch(Exception ex) {
 				this.m_logger.LogError(ex, "Unable to handle a trigger.");
 			}
 
-			this.m_logger.LogDebug("Messages handled.");
+			sw.Stop();
+			this.m_logger.LogInformation("Messages handled. Processing took {duration:c}.", sw.Elapsed);
+		}
+
+		private Task<List<TriggerEvent>[]> HandleMeasurement(InternalBulkMessageQueue measurements)
+		{
+			var actions = this.m_cache.Lookup(measurements.SensorID);
+			var tasks = new List<Task<List<TriggerEvent>>>();
+
+			if(actions == null) {
+				return Task.FromResult<List<TriggerEvent>[]>(null);
+			}
+
+			using var scope = this.m_provider.CreateScope();
+			var exec = scope.ServiceProvider.GetRequiredService<ITriggerActionExecutionService>();
+
+			foreach(var m in measurements.Messages) {
+				this.m_matchCounter.Inc();
+				var matched = this.m_regexMatcher.Match(m, actions).ToList();
+				tasks.Add(ExecuteActionsAsync(exec, matched, m));
+			}
+
+			return Task.WhenAll(tasks);
 		}
 
 		private IEnumerable<InternalBulkMessageQueue> Decompress(string data)
@@ -106,7 +130,7 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 			var bytes = Convert.FromBase64String(data);
 			using var to = new MemoryStream();
 			using var from = new MemoryStream(bytes);
-			using var gzip = new GZipStream(@from, CompressionMode.Decompress);
+			using var gzip = new GZipStream(from, CompressionMode.Decompress);
 
 			gzip.CopyTo(to);
 			var final = to.ToArray();
@@ -119,16 +143,25 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 					Messages = g.Select(MessageProtobufConverter.Convert).ToList()
 				};
 
-			this.m_logger.LogInformation("Received {count} measurements.", protoMessages.Messages.Count);
+			this.m_logger.LogInformation("Received {count} messages.", protoMessages.Messages.Count);
 			return messages;
 		}
 
-		private async Task ExecuteActionsAsync(IEnumerable<TriggerAction> actions, Message msg)
+		private static async Task<List<TriggerEvent>> ExecuteActionsAsync(ITriggerActionExecutionService exec, IEnumerable<TriggerAction> actions, Message msg)
 		{
+			var events = new List<TriggerEvent>();
+			var tasks = new List<Task>();
+
 			foreach(var action in actions) {
 				var result = Replace(action.Message, msg);
-				await this.m_exec.ExecuteAsync(action, result).ConfigureAwait(false);
+
+				tasks.Add(exec.ExecuteAsync(action, result));
+				events.Add(TriggerActionEventConverter.Convert(action));
 			}
+
+			await Task.WhenAll(tasks).ConfigureAwait(false);
+
+			return events;
 		}
 
 		private static string Replace(string message, Message msg)
@@ -146,5 +179,14 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 
 			return body;
 		}
+
+		private async Task PublishAsync(IMessage protoEvents)
+		{
+			await using var measurementStream = new MemoryStream();
+			protoEvents.WriteTo(measurementStream);
+			var data = measurementStream.ToArray().Compress();
+			await this.m_client.PublishOnAsync(this.m_eventsTopic, data, false).ConfigureAwait(false);
+		}
+
 	}
 }

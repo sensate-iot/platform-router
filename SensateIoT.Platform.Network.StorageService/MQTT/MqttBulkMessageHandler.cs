@@ -22,8 +22,10 @@ using Prometheus;
 using SensateIoT.Platform.Network.Common.Converters;
 using SensateIoT.Platform.Network.Common.MQTT;
 using SensateIoT.Platform.Network.Contracts.DTO;
+using SensateIoT.Platform.Network.Data.Enums;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
+using SensateIoT.Platform.Network.StorageService.DTO;
 
 namespace SensateIoT.Platform.Network.StorageService.MQTT
 {
@@ -32,12 +34,16 @@ namespace SensateIoT.Platform.Network.StorageService.MQTT
 	{
 		private readonly ILogger<MqttBulkMessageHandler> m_logger;
 		private readonly IMessageRepository m_messages;
+		private readonly ISensorStatisticsRepository m_stats;
 		private readonly Counter m_storageCounter;
 		private readonly Histogram m_duration;
 
-		public MqttBulkMessageHandler(IMessageRepository message, ILogger<MqttBulkMessageHandler> logger)
+		public MqttBulkMessageHandler(IMessageRepository message,
+									  ISensorStatisticsRepository stats,
+									  ILogger<MqttBulkMessageHandler> logger)
 		{
 			this.m_logger = logger;
+			this.m_stats = stats;
 			this.m_messages = message;
 			this.m_storageCounter = Metrics.CreateCounter("storageservice_messages_stored_total", "Total number of messages stored.");
 			this.m_duration = Metrics.CreateHistogram("storageservice_message_storage_duration_seconds", "Histogram of message storage duration.");
@@ -50,9 +56,14 @@ namespace SensateIoT.Platform.Network.StorageService.MQTT
 			try {
 				using(this.m_duration.NewTimer()) {
 					var databaseMessages = this.Decompress(message).ToList();
+					var stats = databaseMessages
+						.Select(m => new StatisticsUpdate(StatisticsType.MessageStorage, 1, m.SensorId)).ToList();
 
 					this.m_storageCounter.Inc(databaseMessages.Count);
-					await this.m_messages.CreateRangeAsync(databaseMessages, ct).ConfigureAwait(false);
+					this.m_logger.LogInformation("Attempting to store {count} messages.", databaseMessages.Count);
+					await Task.WhenAll(this.m_messages.CreateRangeAsync(databaseMessages, ct),
+									   this.IncrementStatistics(stats, ct)).ConfigureAwait(false);
+
 				}
 
 			} catch(Exception ex) {
@@ -70,13 +81,25 @@ namespace SensateIoT.Platform.Network.StorageService.MQTT
 			var bytes = Convert.FromBase64String(data);
 			using var to = new MemoryStream();
 			using var from = new MemoryStream(bytes);
-			using var gzip = new GZipStream(@from, CompressionMode.Decompress);
+			using var gzip = new GZipStream(from, CompressionMode.Decompress);
 
 			gzip.CopyTo(to);
 			var final = to.ToArray();
 			var protoMeasurements = TextMessageData.Parser.ParseFrom(final);
 			this.m_logger.LogInformation("Storing {count} messages!", protoMeasurements.Messages.Count);
 			return MessageDatabaseConverter.Convert(protoMeasurements);
+		}
+
+		private async Task IncrementStatistics(ICollection<StatisticsUpdate> data, CancellationToken token)
+		{
+			var tasks = new Task[data.Count];
+
+			for(var idx = 0; idx < data.Count; idx++) {
+				var entry = data.ElementAt(idx);
+				tasks[idx] = this.m_stats.IncrementManyAsync(entry.SensorId, entry.Type, entry.Count, token);
+			}
+
+			await Task.WhenAll(tasks).ConfigureAwait(false);
 		}
 	}
 }

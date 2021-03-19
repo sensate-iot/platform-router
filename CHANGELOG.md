@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Added
+- Caching of trigger actions in the Trigger Service
+- Additional statistics types
+
+### Updated
+- Statistics logging
+- Logging in the Storage Service
+- Router initialization routine
+- The database function `generic_getblobs`
+
+### Removed
+- Unused code
+- TriggerInvocations table
+- TriggerInvocation pgsql functions
+
 ## [1.5.0] - 11-03-2021
 ### Added
 - Ability to disable data reloads in the message router

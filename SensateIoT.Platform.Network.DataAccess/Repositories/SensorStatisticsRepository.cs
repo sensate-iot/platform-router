@@ -30,25 +30,18 @@ namespace SensateIoT.Platform.Network.DataAccess.Repositories
 			this._stats = context.SensorStatistics;
 		}
 
-		public async Task DeleteBySensorAsync(Sensor sensor, CancellationToken ct = default)
-		{
-			var filter = Builders<SensorStatisticsEntry>.Filter
-				.Eq(x => x.InternalId, sensor.InternalId);
-			await this._stats.DeleteManyAsync(filter, ct).ConfigureAwait(false);
-		}
-
 		#region Entry creation
 
-		public async Task IncrementManyAsync(ObjectId sensorId, RequestMethod method, int num, CancellationToken token)
+		public async Task IncrementManyAsync(ObjectId sensorId, StatisticsType method, int num, CancellationToken token)
 		{
 			var update = Builders<SensorStatisticsEntry>.Update;
 			var opts = new UpdateOptions { IsUpsert = true };
-			var updateDefinition = update.Inc(x => x.Measurements, num)
-				.SetOnInsert(x => x.Method, method);
+			var updateDefinition = update.Inc(x => x.Count, num)
+				.SetOnInsert(x => x.Type, method);
 
 			try {
 				await this._stats.UpdateOneAsync(x => x.SensorId == sensorId &&
-														   x.Date == DateTime.Now.ThisHour() && x.Method == method,
+														   x.Timestamp == DateTime.Now.ThisHour() && x.Type == method,
 					updateDefinition, opts, token).ConfigureAwait(false);
 			} catch(Exception ex) {
 				throw new DataException("Unable to update measurement statistics!", ex);

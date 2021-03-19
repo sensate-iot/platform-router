@@ -20,6 +20,7 @@ using SensateIoT.Platform.Network.Common.Collections.Local;
 using SensateIoT.Platform.Network.Common.Helpers;
 using SensateIoT.Platform.Network.Common.MQTT;
 using SensateIoT.Platform.Network.Common.Settings;
+using SensateIoT.Platform.Network.Contracts.DTO;
 
 namespace SensateIoT.Platform.Network.Common.Collections.Remote
 {

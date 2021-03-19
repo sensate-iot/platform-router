@@ -5,8 +5,6 @@
  * @email  michel.megens@sonatolabs.com
  */
 
-using System;
-using System.Reflection;
 using System.IO;
 
 using Microsoft.Extensions.Configuration;
@@ -52,8 +50,6 @@ namespace SensateIoT.Platform.Network.StorageService.Application
 
 		public static void Main(string[] args)
 		{
-			Console.WriteLine($"Starting StorageClient {Assembly.GetExecutingAssembly().GetName().Version}");
-
 			var program = new ApplicationHost(CreateHost(args));
 			program.Run();
 		}
