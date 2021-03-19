@@ -2,11 +2,17 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.6</TargetFramework>
-    <Version>1.0.1</Version>
-    <AssemblyVersion>1.0.1.0</AssemblyVersion>
-    <FileVersion>1.0.1.0</FileVersion>
+    <Version>1.1.0</Version>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
     <Description>Message contracts for the Sensate IoT Network services.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseFile>COPYING</PackageLicenseFile>
+    <PackageIcon>sensate.png</PackageIcon>
+    <RepositoryUrl>https://github.com/sensate-iot/platform-network</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Authors>Sensate IoT</Authors>
+    <Company>Sensate IoT</Company>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -22,6 +28,14 @@
     <None Remove="RPC\RoutingResponse.proto" />
     <None Remove="Services\EgressRouter.proto" />
     <None Remove="Services\IngressRouter.proto" />
+    <None Include="..\COPYING">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="..\sensate.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
