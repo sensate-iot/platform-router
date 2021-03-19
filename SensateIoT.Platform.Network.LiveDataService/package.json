@@ -1,6 +1,6 @@
 {
   "name": "live-data-service",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "description": "Live data service project.",
   "main": "dist/src/live-data-service.js",
   "scripts": {
