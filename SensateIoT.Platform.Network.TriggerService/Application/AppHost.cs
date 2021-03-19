@@ -6,9 +6,11 @@
  */
 
 using System;
+using System.Reflection;
 using System.Threading;
-
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace SensateIoT.Platform.Network.TriggerService.Application
 {
@@ -32,9 +34,13 @@ namespace SensateIoT.Platform.Network.TriggerService.Application
 
 		public void Run()
 		{
+			var logger = this.m_host.Services.GetRequiredService<ILogger<AppHost>>();
+			logger.LogInformation($"Starting {Assembly.GetExecutingAssembly().GetName().Name} {Assembly.GetExecutingAssembly().GetName().Version}");
+
 			this.m_host.RunAsync();
 			this._reset.WaitOne();
-			Console.WriteLine("Stopping TriggerService!");
+
+			logger.LogInformation($"Stopping {Assembly.GetExecutingAssembly().GetName().Name} {Assembly.GetExecutingAssembly().GetName().Version}");
 		}
 	}
 }

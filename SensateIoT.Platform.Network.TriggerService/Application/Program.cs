@@ -5,9 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
-using System;
 using System.IO;
-using System.Reflection;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -52,8 +50,6 @@ namespace SensateIoT.Platform.Network.TriggerService.Application
 
 		public static void Main(string[] args)
 		{
-			Console.WriteLine($"Starting TriggerService {Assembly.GetExecutingAssembly().GetName().Version}");
-
 			var program = new AppHost(CreateHost(args));
 			program.Run();
 		}
