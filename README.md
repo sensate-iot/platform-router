@@ -42,4 +42,4 @@ This solution contains serveral services that add value to a message or measurem
 
 [header1]: https://github.com/sensate-iot/platform-network/workflows/Docker/badge.svg "Docker Build"
 [header2]: https://github.com/sensate-iot/platform-network/workflows/Format%20check/badge.svg ".NET format"
-[header3]: https://img.shields.io/badge/version-v1.5.0-informational "Sensate IoT version"
+[header3]: https://img.shields.io/badge/version-v1.6.0-informational "Sensate IoT version"
