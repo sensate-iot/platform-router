@@ -20,14 +20,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="DTO\ControlMessage.proto" />
-    <None Remove="DTO\Measurement.proto" />
-    <None Remove="DTO\Message.proto" />
-    <None Remove="DTO\NetworkEvent.proto" />
-    <None Remove="DTO\TriggerEvent.proto" />
-    <None Remove="RPC\RoutingResponse.proto" />
-    <None Remove="Services\EgressRouter.proto" />
-    <None Remove="Services\IngressRouter.proto" />
     <None Include="..\COPYING">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
