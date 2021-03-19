@@ -93,7 +93,9 @@ namespace SensateIoT.Platform.Network.TriggerService.MQTT
 					}
 				}
 
-				await this.PublishAsync(data).ConfigureAwait(false);
+				if(data.Events.Count > 0) {
+					await this.PublishAsync(data).ConfigureAwait(false);
+				}
 			} catch(Exception ex) {
 				this.m_logger.LogError(ex, "Unable to handle a trigger.");
 			}

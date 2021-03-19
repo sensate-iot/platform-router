@@ -149,7 +149,7 @@ namespace SensateIoT.Platform.Network.Common.MQTT
 			try {
 				await handler.OnMessageAsync(topic, msg).ConfigureAwait(false);
 			} catch(Exception ex) {
-				this._logger.LogWarning($"Unable to handle MQTT message: {ex.Message}");
+				this._logger.LogWarning(ex, "Unable to handle MQTT message.");
 			}
 		}
 

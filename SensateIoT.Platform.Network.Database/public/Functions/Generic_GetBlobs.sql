@@ -3,7 +3,7 @@ CREATE FUNCTION generic_getblobs(idlist TEXT,
                                       "end" TIMESTAMP,
                                       ofst INTEGER DEFAULT NULL,
                                       lim INTEGER DEFAULT NULL,
-                                      direction VARCHAR(3) DEFAULT 'ASC'
+                                      direction VARCHAR(12) DEFAULT 'ASC'
                                       )
     RETURNS TABLE(
         "ID" BIGINT,
@@ -31,7 +31,7 @@ BEGIN
 	           'ORDER BY "Timestamp" %s ' ||
 	           'OFFSET %s ' ||
 	           'LIMIT %s',
-	        direction, lim, ofst)
+	        direction, ofst, lim)
     USING start, "end", sensorIds;
 END
 $$;

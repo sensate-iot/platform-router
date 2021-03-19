@@ -11,15 +11,13 @@ namespace SensateIoT.Platform.Network.Data.Enums
 	{
 		HttpGet,
 		HttpPost,
-		HttpPatch,
-		HttpPut,
-		HttpDelete,
 		Email,
 		SMS,
 		LiveData,
 		MQTT,
 		ControlMessage,
 		MeasurementStorage,
-		MessageStorage
+		MessageStorage,
+		MessageRouted
 	}
 }

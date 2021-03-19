@@ -92,6 +92,8 @@ namespace SensateIoT.Platform.Network.StorageService.Application
 
 			provider.MapInternalMqttTopic<MqttBulkMeasurementHandler>(@private.BulkMeasurementTopic);
 			provider.MapInternalMqttTopic<MqttBulkMessageHandler>(@private.BulkMessageTopic);
+			provider.MapInternalMqttTopic<MqttNetworkEventConsumer>(@private.NetworkEventQueueTopic);
+			provider.MapInternalMqttTopic<MqttTriggerEventConsumer>(@private.TriggerEventQueueTopic);
 		}
 	}
 }
