@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Added
+- Exception handing to services
+- Fatal to the background service when exceptions are not handled
+- Timestamps to the live data service log statements
+
+### Updated
+- Access modifier of the background servic execute method
+- Live data service logging statements
+
 ## [1.6.0] - 16-03-2021
 ### Added
 - Caching of trigger actions in the Trigger Service
