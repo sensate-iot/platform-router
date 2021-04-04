@@ -38,7 +38,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 											IInternalRemoteQueue internalRemote,
 											IRoutingCache cache,
 											IOptions<DataReloadSettings> settings,
-											ILogger<DataReloadService> logger) : base(settings.Value.StartDelay, settings.Value.DataReloadInterval)
+											ILogger<DataReloadService> logger) : base(settings.Value.StartDelay, settings.Value.DataReloadInterval, logger)
 		{
 			this.m_provider = provider;
 			this.m_queue = internalRemote;
@@ -48,7 +48,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 			this.m_settings = settings.Value;
 		}
 
-		public override async Task ExecuteAsync(CancellationToken token)
+		protected override async Task ExecuteAsync(CancellationToken token)
 		{
 			await this.ReloadLiveDataHandlers(token).ConfigureAwait(false);
 

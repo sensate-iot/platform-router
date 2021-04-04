@@ -25,14 +25,14 @@ namespace SensateIoT.Platform.Network.API.Services
 		public BatchRoutingService(IMeasurementAuthorizationService measurements,
 								   IMessageAuthorizationService messages,
 								   ILogger<BatchRoutingService> logger) :
-			base(TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(500))
+			base(TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(500), logger)
 		{
 			this.m_measurements = measurements;
 			this.m_messages = messages;
 			this.m_logger = logger;
 		}
 
-		public override async Task ExecuteAsync(CancellationToken token)
+		protected override async Task ExecuteAsync(CancellationToken token)
 		{
 			try {
 				await Task.WhenAll(this.m_measurements.ProcessAsync(), this.m_messages.ProcessAsync())

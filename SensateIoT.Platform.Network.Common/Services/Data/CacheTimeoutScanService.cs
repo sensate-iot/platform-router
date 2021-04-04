@@ -24,13 +24,13 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 		private readonly ILogger<CacheTimeoutScanService> m_logger;
 
 		public CacheTimeoutScanService(IRoutingCache cache, ILogger<CacheTimeoutScanService> logger, IOptions<DataReloadSettings> settings) :
-			base(settings.Value.TimeoutScanInterval, settings.Value.TimeoutScanInterval)
+			base(settings.Value.TimeoutScanInterval, settings.Value.TimeoutScanInterval, logger)
 		{
 			this.m_cache = cache;
 			this.m_logger = logger;
 		}
 
-		public override async Task ExecuteAsync(CancellationToken token)
+		protected override async Task ExecuteAsync(CancellationToken token)
 		{
 			this.m_logger.LogInformation("Starting cache clean up!");
 

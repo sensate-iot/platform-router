@@ -46,7 +46,7 @@ namespace SensateIoT.Platform.Network.Common.MQTT
 									 string share,
 									 string id,
 									 ILogger logger,
-									 IServiceProvider provider)
+									 IServiceProvider provider) : base(logger)
 		{
 			this._host = host;
 			this._port = port;

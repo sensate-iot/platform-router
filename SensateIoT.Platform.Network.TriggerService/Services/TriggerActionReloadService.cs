@@ -23,14 +23,14 @@ namespace SensateIoT.Platform.Network.TriggerService.Services
 										  IServiceProvider provider,
 										  ITriggerActionCache cache,
 										  ILogger<TriggerActionReloadService> logger) :
-			base(settings.Value.StartDelay, settings.Value.Interval)
+			base(settings.Value.StartDelay, settings.Value.Interval, logger)
 		{
 			this.m_logger = logger;
 			this.m_cache = cache;
 			this.m_provider = provider;
 		}
 
-		public override async Task ExecuteAsync(CancellationToken token)
+		protected override async Task ExecuteAsync(CancellationToken token)
 		{
 			this.m_logger.LogInformation("Loading trigger actions from database.");
 			var sw = Stopwatch.StartNew();

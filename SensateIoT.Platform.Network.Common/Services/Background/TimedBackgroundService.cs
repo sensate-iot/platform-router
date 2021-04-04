@@ -8,6 +8,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace SensateIoT.Platform.Network.Common.Services.Background
 {
@@ -18,7 +19,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Background
 		private readonly TimeSpan m_startDelay;
 		private readonly TimeSpan m_interval;
 
-		protected TimedBackgroundService(TimeSpan startDelay, TimeSpan interval)
+		protected TimedBackgroundService(TimeSpan startDelay, TimeSpan interval, ILogger logger) : base(logger)
 		{
 			this.m_startDelay = startDelay;
 			this.m_interval = interval;

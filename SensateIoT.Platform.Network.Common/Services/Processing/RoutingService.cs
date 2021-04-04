@@ -63,7 +63,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 							  IRemoteNetworkEventQueue events,
 							  IAuthorizationService auth,
 							  IOptions<RoutingPublishSettings> settings,
-							  ILogger<RoutingService> logger)
+							  ILogger<RoutingService> logger) : base(logger)
 		{
 			this.m_settings = settings.Value;
 			this.m_messages = queue;
@@ -79,7 +79,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 			this.m_counter = Prometheus.Metrics.CreateCounter("router_messages_routed_total", "Total number of measurements/messages routed.");
 		}
 
-		public override async Task ExecuteAsync(CancellationToken token)
+		protected override async Task ExecuteAsync(CancellationToken token)
 		{
 			do {
 				if(this.m_messages.Count <= 0) {
