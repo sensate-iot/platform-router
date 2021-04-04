@@ -33,7 +33,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 			this.m_eventQueue = remoteEvents;
 		}
 
-		public override async Task ExecuteAsync(CancellationToken token)
+		protected override async Task ExecuteAsync(CancellationToken token)
 		{
 			await Task.WhenAll(this.m_internalRemote.FlushAsync(),
 							   this.m_internalRemote.FlushLiveDataAsync(),

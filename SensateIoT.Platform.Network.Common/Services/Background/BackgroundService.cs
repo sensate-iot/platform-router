@@ -24,7 +24,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Background
 			this.m_stoppingCts = new CancellationTokenSource();
 		}
 
-		public abstract Task ExecuteAsync(CancellationToken token);
+		protected abstract Task ExecuteAsync(CancellationToken token);
 
 		public virtual Task StartAsync(CancellationToken cancellationToken)
 		{

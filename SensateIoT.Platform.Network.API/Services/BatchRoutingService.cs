@@ -32,7 +32,7 @@ namespace SensateIoT.Platform.Network.API.Services
 			this.m_logger = logger;
 		}
 
-		public override async Task ExecuteAsync(CancellationToken token)
+		protected override async Task ExecuteAsync(CancellationToken token)
 		{
 			try {
 				await Task.WhenAll(this.m_measurements.ProcessAsync(), this.m_messages.ProcessAsync())

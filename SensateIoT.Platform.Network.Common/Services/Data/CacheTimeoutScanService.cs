@@ -30,7 +30,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 			this.m_logger = logger;
 		}
 
-		public override async Task ExecuteAsync(CancellationToken token)
+		protected override async Task ExecuteAsync(CancellationToken token)
 		{
 			this.m_logger.LogInformation("Starting cache clean up!");
 

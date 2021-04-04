@@ -29,7 +29,7 @@ namespace SensateIoT.Platform.Network.Common.MQTT
 			this._options = options.Value;
 		}
 
-		public override async Task ExecuteAsync(CancellationToken token)
+		protected override async Task ExecuteAsync(CancellationToken token)
 		{
 			await this.Connect(this._options.Username, this._options.Password).ConfigureAwait(false);
 		}

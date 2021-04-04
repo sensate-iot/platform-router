@@ -48,7 +48,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 			this.m_settings = settings.Value;
 		}
 
-		public override async Task ExecuteAsync(CancellationToken token)
+		protected override async Task ExecuteAsync(CancellationToken token)
 		{
 			await this.ReloadLiveDataHandlers(token).ConfigureAwait(false);
 

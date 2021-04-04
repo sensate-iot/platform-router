@@ -47,7 +47,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Metrics
 			this.m_logger = logger;
 		}
 
-		public override Task ExecuteAsync(CancellationToken token)
+		protected override Task ExecuteAsync(CancellationToken token)
 		{
 			this.m_logger.LogInformation("Starting metrics server on http://{hostname}:{port}/{endpoint}",
 										 this.m_options.Hostname,

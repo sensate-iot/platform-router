@@ -31,7 +31,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 			this.m_cache = cache;
 		}
 
-		public override Task ExecuteAsync(CancellationToken token)
+		protected override Task ExecuteAsync(CancellationToken token)
 		{
 			this.m_logger.LogInformation("Flushing live data routes.");
 			this.m_cache.FlushLiveDataRoutes();

@@ -30,7 +30,7 @@ namespace SensateIoT.Platform.Network.TriggerService.Services
 			this.m_provider = provider;
 		}
 
-		public override async Task ExecuteAsync(CancellationToken token)
+		protected override async Task ExecuteAsync(CancellationToken token)
 		{
 			this.m_logger.LogInformation("Loading trigger actions from database.");
 			var sw = Stopwatch.StartNew();
