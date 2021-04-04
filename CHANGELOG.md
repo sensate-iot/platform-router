@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Updated
 - Access modifier of the background servic execute method
 - Live data service logging statements
+- Project dependency's
 
 ## [1.6.0] - 16-03-2021
 ### Added
