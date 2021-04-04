@@ -25,7 +25,7 @@ namespace SensateIoT.Platform.Network.API.Services
 		public BatchRoutingService(IMeasurementAuthorizationService measurements,
 								   IMessageAuthorizationService messages,
 								   ILogger<BatchRoutingService> logger) :
-			base(TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(500))
+			base(TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(500), logger)
 		{
 			this.m_measurements = measurements;
 			this.m_messages = messages;

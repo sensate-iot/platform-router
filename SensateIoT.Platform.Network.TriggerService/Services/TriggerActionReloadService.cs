@@ -23,7 +23,7 @@ namespace SensateIoT.Platform.Network.TriggerService.Services
 										  IServiceProvider provider,
 										  ITriggerActionCache cache,
 										  ILogger<TriggerActionReloadService> logger) :
-			base(settings.Value.StartDelay, settings.Value.Interval)
+			base(settings.Value.StartDelay, settings.Value.Interval, logger)
 		{
 			this.m_logger = logger;
 			this.m_cache = cache;

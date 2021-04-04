@@ -9,9 +9,10 @@ using System.Threading;
 using System;
 using System.Threading.Tasks;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
-using SensateIoT.Platform.Network.Common.Collections.Remote;
 using SensateIoT.Platform.Network.Common.Services.Background;
 using SensateIoT.Platform.Network.Common.Settings;
 
@@ -22,7 +23,8 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 		private readonly IPublicRemoteQueue m_remote;
 
 		public ActuatorPublishService(IPublicRemoteQueue remote,
-									IOptions<RoutingPublishSettings> options) : base(TimeSpan.FromSeconds(5), options.Value.PublicInterval)
+									IOptions<RoutingPublishSettings> options,
+									ILogger<ActuatorPublishService> logger) : base(TimeSpan.FromSeconds(5), options.Value.PublicInterval, logger)
 		{
 			this.m_remote = remote;
 		}

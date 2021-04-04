@@ -63,7 +63,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 							  IRemoteNetworkEventQueue events,
 							  IAuthorizationService auth,
 							  IOptions<RoutingPublishSettings> settings,
-							  ILogger<RoutingService> logger)
+							  ILogger<RoutingService> logger) : base(logger)
 		{
 			this.m_settings = settings.Value;
 			this.m_messages = queue;

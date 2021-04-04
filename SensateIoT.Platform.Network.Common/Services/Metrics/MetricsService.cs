@@ -24,7 +24,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Metrics
 		private readonly ILogger<MetricsService> m_logger;
 		private readonly MetricsOptions m_options;
 
-		public MetricsService(IOptions<MetricsOptions> options, ILogger<MetricsService> logger)
+		public MetricsService(IOptions<MetricsOptions> options, ILogger<MetricsService> logger) : base(logger)
 		{
 			var hostname = options.Value.Hostname;
 

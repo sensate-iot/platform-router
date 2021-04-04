@@ -38,7 +38,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Data
 											IInternalRemoteQueue internalRemote,
 											IRoutingCache cache,
 											IOptions<DataReloadSettings> settings,
-											ILogger<DataReloadService> logger) : base(settings.Value.StartDelay, settings.Value.DataReloadInterval)
+											ILogger<DataReloadService> logger) : base(settings.Value.StartDelay, settings.Value.DataReloadInterval, logger)
 		{
 			this.m_provider = provider;
 			this.m_queue = internalRemote;
