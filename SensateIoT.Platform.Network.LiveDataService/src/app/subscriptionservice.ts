@@ -22,6 +22,7 @@ export class SubscriptionService {
         }
 
         existing.add();
+        console.debug(`Subscription: ${JSON.stringify(existing)}.`);
 
         return rv;
     }
@@ -46,6 +47,8 @@ export class SubscriptionService {
         }
 
         subscription.remove();
+
+        console.debug(`Subscription: ${JSON.stringify(subscription)}.`);
 
         if (!subscription.empty()) {
             return true;

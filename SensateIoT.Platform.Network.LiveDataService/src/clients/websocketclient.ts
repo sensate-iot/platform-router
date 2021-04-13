@@ -89,6 +89,7 @@ export class WebSocketClient {
     }
 
     public unsubscribeAll() {
+        console.log(`Unsubscribing all ${this.sensors.size} sensors.`)
         this.sensors.forEach(s => {
             this.unsubscribe(s);
         })
@@ -125,6 +126,8 @@ export class WebSocketClient {
             return;
         }
 
+        console.log("Updating routers.");
+
         const cmd: Command<LiveSensorCommand> = {
             cmd: "removelivedatasensor",
             arguments: {
@@ -146,6 +149,17 @@ export class WebSocketClient {
             return;
         }
 
+        const result = await this.authorizeSensor(auth);
+
+        if (!result) {
+            return;
+        }
+
+        this.sensors.add(auth.sensorId);
+        this.updateSubscription(auth);
+    }
+
+    private async authorizeSensor(auth: ISensorAuthRequest) {
         // ReSharper disable once TsResolvedFromInaccessibleModule
         const date = moment(auth.timestamp).utc(true);
         date.add(this.timeout, "ms");
@@ -154,14 +168,14 @@ export class WebSocketClient {
         if (moment.utc().isSameOrAfter(date)) {
             this.socket.close();
             console.log(`Authorization request to late (ID: ${auth.sensorId})`);
-            return;
+            return false;
         }
 
         const hash = auth.sensorSecret;
         const sensor = await Sensor.findById(new Types.ObjectId(auth.sensorId));
 
         if (sensor === null || sensor === undefined) {
-            return;
+            return false;
         }
 
         auth.sensorSecret = sensor.Secret;
@@ -171,20 +185,21 @@ export class WebSocketClient {
 
         if (computed !== hash) {
             console.log(`Unable to authorize sensor ${sensor._id}. Expected ${computed}. Received: ${hash}.`)
-            return;
+            return false;
         }
 
-        this.updateSubscription(auth, sensor);
+        console.log(`Sensor {${auth.sensorId}}{${sensor.Owner}} authorized!`);
+        return true;
     }
 
-    private updateSubscription(request: ISensorAuthRequest, sensor: SensorModel) {
+    private updateSubscription(request: ISensorAuthRequest) {
         const result = this.subscriptions.addSensor(request.sensorId);
 
         if (result) {
             return;
         }
 
-        console.log(`Sensor {${request.sensorId}}{${sensor.Owner}} authorized!`);
+        console.log("Updating the message router.");
 
         const cmd: Command<LiveSensorCommand> = {
             cmd: "addlivedatasensor",

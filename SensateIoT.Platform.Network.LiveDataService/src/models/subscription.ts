@@ -8,7 +8,7 @@
 export class Subscription {
     private count: number;
 
-    public Subscription() {
+    public constructor() {
         this.count = 0;
     }
 
