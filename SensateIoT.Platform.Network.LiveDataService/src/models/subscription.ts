@@ -8,10 +8,9 @@
 import { SensorModel } from "../models/sensor";
 
 export class Subscription {
-    public sensor: SensorModel;
-    public count: number;
+    private count: number;
 
-    public Subscription() {
+    public Subscription(sensor: SensorModel) {
         this.count = 0;
     }
 
