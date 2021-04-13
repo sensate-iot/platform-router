@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Added
+- Subscription count tracking
+- Log scopes to the Live Data Service log template
+
+### Updated
+- Project dependency's
+- Live Data Service log statement template
+
 ## [1.6.1] - 04-04-2021
 ### Added
 - Exception handing to services
