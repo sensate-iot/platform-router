@@ -63,6 +63,9 @@
     <TypeScriptCompile Include="src\app\live-data-service.ts" />
     <TypeScriptCompile Include="src\app\mongodb.ts" />
     <TypeScriptCompile Include="src\app\postgresql.ts" />
+    <TypeScriptCompile Include="src\app\subscriptionservice.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="src\app\util.ts" />
     <TypeScriptCompile Include="src\app\websocketserver.ts" />
     <TypeScriptCompile Include="src\clients\apikeyclient.ts">
