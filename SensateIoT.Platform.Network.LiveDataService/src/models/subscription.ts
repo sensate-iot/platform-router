@@ -5,7 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
-import { Sensor, SensorModel } from "../models/sensor";
+import { SensorModel } from "../models/sensor";
 
 export class Subscription {
     public sensor: SensorModel;
