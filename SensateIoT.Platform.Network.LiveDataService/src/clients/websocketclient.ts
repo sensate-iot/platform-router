@@ -5,7 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
-import { Sensor, SensorModel } from "../models/sensor";
+import { Sensor } from "../models/sensor";
 import { Types } from "mongoose";
 import {createHash} from "crypto";
 import * as WebSocket from "ws";
