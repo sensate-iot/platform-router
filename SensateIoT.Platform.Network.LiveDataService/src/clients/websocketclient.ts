@@ -25,9 +25,10 @@ import { Command, stringifyCommand } from "../commands/command";
 import { LiveSensorCommand } from "../commands/livesensorcommand";
 import { Application } from "../app/app";
 import { PingRequest } from "../requests/pingrequest";
+import { Subscription } from "../models/subscription";
 
 export class WebSocketClient {
-    private readonly sensors: Map<string, SensorModel>;
+    private readonly sensors: Map<string, Subscription>;
     private readonly socket: WebSocket;
     private authorized: boolean;
     private userId: string;
@@ -43,7 +44,7 @@ export class WebSocketClient {
         socket: WebSocket
     ) {
         this.socket = socket;
-        this.sensors = new Map<string, SensorModel>();
+        this.sensors = new Map<string, Subscription>();
         this.socket.onmessage = this.onMessage.bind(this);
         this.authorized = false;
         this.userId = "";
@@ -56,8 +57,8 @@ export class WebSocketClient {
     public getConnectedSensors(): string[] {
         const sensorIds: string[] = [];
 
-        this.sensors.forEach((k, v) => {
-            sensorIds.push(v);
+        this.sensors.forEach((_, key) => {
+            sensorIds.push(key);
         });
 
         return sensorIds;
@@ -115,6 +116,20 @@ export class WebSocketClient {
             return;
         }
 
+        console.log(`Unsubscribing sensor ${req.data.sensorId}`);
+        const subscription = this.sensors.get(req.data.sensorId);
+
+        if (subscription === undefined) {
+            console.error(`Unexpected empty subscription found for sensor ${req.data.sensorId}.`)
+            return;
+        }
+
+        subscription.remove();
+
+        if (!subscription.empty()) {
+            return;
+        }
+
         console.log(`Removing sensor: ${req.data.sensorId}`);
         this.sensors.delete(req.data.sensorId);
 
@@ -162,13 +177,24 @@ export class WebSocketClient {
             return;
         }
 
-        this.sensors.set(auth.sensorId, sensor);
-        console.log(`Sensor {${auth.sensorId}}{${sensor.Owner}} authorized!`);
+        this.updateSubscription(auth, sensor);
+    }
+
+    private updateSubscription(request: ISensorAuthRequest, sensor: SensorModel) {
+        let existing = this.sensors.get(request.sensorId);
+
+        if (existing == undefined) {
+            existing = new Subscription();
+            this.sensors.set(request.sensorId, existing);
+        }
+
+        existing.add();
+        console.log(`Sensor {${request.sensorId}}{${sensor.Owner}} authorized!`);
 
         const cmd: Command<LiveSensorCommand> = {
             cmd: "addlivedatasensor",
             arguments: {
-                sensorId: auth.sensorId,
+                sensorId: request.sensorId,
                 target: Application.config.id
             }
         }
