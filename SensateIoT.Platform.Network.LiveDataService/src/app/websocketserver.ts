@@ -22,8 +22,8 @@ import { MqttClient } from "../clients/mqttclient";
 import { Command, stringifyCommand } from "../commands/command";
 import { SyncLiveDataSensorsCommand } from "../commands/synclivedatasensorscommand";
 import { Application } from "./app";
-import { LiveSensorCommand } from "../commands/livesensorcommand";
 import { BulkControlMessage } from "../models/controlmessage";
+import { SubscriptionService } from "./subscriptionservice";
 
 export class WebSocketServer {
     private readonly server: http.Server;
@@ -34,6 +34,7 @@ export class WebSocketServer {
     private readonly controlClients: WebSocketClient[];
     private readonly auditlogs: AuditLogsClient;
     private readonly apikeys: ApiKeyClient;
+    private readonly subcriptions: SubscriptionService;
 
     public constructor(expr: express.Express,
         pool: Pool,
@@ -41,6 +42,7 @@ export class WebSocketServer {
         private readonly secret: string,
         private readonly mqtt: MqttClient
     ) {
+        this.subcriptions = new SubscriptionService();
         const server = http.createServer(expr);
         this.server = server;
         this.wss = new WebSocket.Server({ noServer: true });
@@ -57,25 +59,12 @@ export class WebSocketServer {
 
     private publicationHandler(): void {
         console.log("Updating message routers!");
-        let sensors: string[] = [];
-
-        this.measurementClients.forEach(m => {
-            sensors = sensors.concat(m.getConnectedSensors());
-        });
-
-        this.messageClients.forEach(m => {
-            sensors = sensors.concat(m.getConnectedSensors());
-        });
-
-        this.controlClients.forEach(m => {
-            sensors = sensors.concat(m.getConnectedSensors());
-        });
 
         const cmd: Command<SyncLiveDataSensorsCommand> = {
             cmd: "synclivedatasensors",
             arguments: {
                 target: Application.config.id,
-                sensors: sensors
+                sensors: this.subcriptions.getSubscribers()
             }
         }
 
@@ -156,49 +145,24 @@ export class WebSocketServer {
         return false;
     }
 
-    private removeSensors(sensors: string[]) {
-        if (sensors.length === 0) {
-            return;
-        }
-
-        sensors.forEach(s => {
-            const cmd: Command<LiveSensorCommand> = {
-                cmd: "removelivedatasensor",
-                arguments: {
-                    sensorId: s,
-                    target: Application.config.id
-                }
-            }
-
-            this.mqtt.publish(Application.config.mqtt.routerCommandTopic, stringifyCommand(cmd));
-        });
-    }
-
     private destroyConnection(ws: WebSocket) {
-        let sensors: string[] = [];
-
-        sensors = WebSocketServer.removeClient(this.measurementClients, ws);
-        this.removeSensors(sensors);
-
-        sensors = WebSocketServer.removeClient(this.messageClients, ws);
-        this.removeSensors(sensors);
-
-        sensors = WebSocketServer.removeClient(this.controlClients, ws);
-        this.removeSensors(sensors);
+        WebSocketServer.removeClient(this.measurementClients, ws);
+        WebSocketServer.removeClient(this.messageClients, ws);
+        WebSocketServer.removeClient(this.controlClients, ws);
     }
 
     private static removeClient(clients: WebSocketClient[], ws: WebSocket) {
-        let sensors: string[] = [];
-
-        clients.forEach((info, index) => {
+        clients.every((info, index) => {
             if (info.compareSocket(ws)) {
                 console.log("Removing web socket!");
                 const client = clients.splice(index, 1);
-                sensors = client[0].getConnectedSensors();
-            }
-        });
+                client[0].unsubscribeAll();
 
-        return sensors;
+                return false; /* Stop iterating */
+            }
+
+            return true;
+        });
     }
 
     private static getIpFromRequest(request: any): string {
@@ -215,6 +179,7 @@ export class WebSocketServer {
         const ip = WebSocketServer.getIpFromRequest(request);
 
         const client = new WebSocketClient(
+            this.subcriptions,
             this.auditlogs,
             this.apikeys,
             this.secret,

@@ -25,15 +25,16 @@ import { Command, stringifyCommand } from "../commands/command";
 import { LiveSensorCommand } from "../commands/livesensorcommand";
 import { Application } from "../app/app";
 import { PingRequest } from "../requests/pingrequest";
-import { Subscription } from "../models/subscription";
+import { SubscriptionService } from "../app/subscriptionservice";
 
 export class WebSocketClient {
-    private readonly sensors: Map<string, Subscription>;
+    private readonly sensors: Set<string>;
     private readonly socket: WebSocket;
     private authorized: boolean;
     private userId: string;
 
     public constructor(
+        private readonly subscriptions: SubscriptionService,
         private readonly logs: AuditLogsClient,
         private readonly keys: ApiKeyClient,
         private readonly secret: string,
@@ -44,7 +45,7 @@ export class WebSocketClient {
         socket: WebSocket
     ) {
         this.socket = socket;
-        this.sensors = new Map<string, Subscription>();
+        this.sensors = new Set<string>();
         this.socket.onmessage = this.onMessage.bind(this);
         this.authorized = false;
         this.userId = "";
@@ -87,6 +88,12 @@ export class WebSocketClient {
         await this.createLog();
     }
 
+    public unsubscribeAll() {
+        this.sensors.forEach(s => {
+            this.unsubscribe(s);
+        })
+    }
+
     private verifyRequest(token: string) {
         if (token === null || token === undefined) {
             return false;
@@ -111,32 +118,17 @@ export class WebSocketClient {
         this.socket.send(JSON.stringify(req.data));
     }
 
-    private unsubscribe(req: IWebSocketRequest<ISensorAuthRequest>) {
-        if (!this.sensors.has(req.data.sensorId)) {
+    private unsubscribe(id: string) {
+        this.sensors.delete(id);
+
+        if (this.subscriptions.removeSensor(id)) {
             return;
         }
-
-        console.log(`Unsubscribing sensor ${req.data.sensorId}`);
-        const subscription = this.sensors.get(req.data.sensorId);
-
-        if (subscription === undefined) {
-            console.error(`Unexpected empty subscription found for sensor ${req.data.sensorId}.`)
-            return;
-        }
-
-        subscription.remove();
-
-        if (!subscription.empty()) {
-            return;
-        }
-
-        console.log(`Removing sensor: ${req.data.sensorId}`);
-        this.sensors.delete(req.data.sensorId);
 
         const cmd: Command<LiveSensorCommand> = {
             cmd: "removelivedatasensor",
             arguments: {
-                sensorId: req.data.sensorId,
+                sensorId: id,
                 target: Application.config.id
             }
         }
@@ -148,6 +140,11 @@ export class WebSocketClient {
         const auth = req.data;
 
         console.log(`Auth request: ${auth.sensorId} with ${auth.sensorSecret} at ${auth.timestamp}`);
+
+        if (this.sensors.has(auth.sensorId)) {
+            console.log(`Not subscribing ${auth.sensorId}: sensor already subscribed via this client.`);
+            return;
+        }
 
         // ReSharper disable once TsResolvedFromInaccessibleModule
         const date = moment(auth.timestamp).utc(true);
@@ -181,14 +178,12 @@ export class WebSocketClient {
     }
 
     private updateSubscription(request: ISensorAuthRequest, sensor: SensorModel) {
-        let existing = this.sensors.get(request.sensorId);
+        const result = this.subscriptions.addSensor(request.sensorId);
 
-        if (existing == undefined) {
-            existing = new Subscription();
-            this.sensors.set(request.sensorId, existing);
+        if (result) {
+            return;
         }
 
-        existing.add();
         console.log(`Sensor {${request.sensorId}}{${sensor.Owner}} authorized!`);
 
         const cmd: Command<LiveSensorCommand> = {
@@ -246,7 +241,8 @@ export class WebSocketClient {
                 break;
 
             case "unsubscribe":
-                this.unsubscribe(req);
+                const r = req as IWebSocketRequest<ISensorAuthRequest>;
+                this.unsubscribe(r.data.sensorId);
                 break;
 
             case "auth-apikey":
