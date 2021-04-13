@@ -43,7 +43,7 @@ function setEnvironment() {
     setupDebug();
     setupError();
 
-    if (env === 'production') {
+    if (env === 'production' || env === 'Production') {
         console.debug = function () { };
     }
 }
