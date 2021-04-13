@@ -6,7 +6,7 @@
 #
 
 # Build stage
-FROM node:15.6.0-alpine AS builder
+FROM node:14-alpine AS builder
 
 WORKDIR /usr/src/app
 
@@ -18,7 +18,7 @@ COPY SensateIoT.Platform.Network.LiveDataService/src ./src
 RUN npm ci --quit && mkdir generated && npm run generate-js-docker && npm run generate-ts && npm run build
 
 # Production stage
-FROM node:15.6.0-alpine
+FROM node:14-alpine
 WORKDIR /app
 
 ENV NODE_ENV=production

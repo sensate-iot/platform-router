@@ -11,7 +11,7 @@ function setupInfo() {
 
     console.log = function () {
         const args = [].slice.call(arguments);
-        const ts = `[${getTimestamp()}]: `;
+        const ts = `[${getTimestamp()}][INFO]: `;
         origLog.apply(console.log, [ts].concat(args));
     }
 }
@@ -21,7 +21,7 @@ function setupDebug() {
 
     console.debug = function () {
         const args = [].slice.call(arguments);
-        const ts = `[${getTimestamp()}]: `;
+        const ts = `[${getTimestamp()}][DEBUG]: `;
         origLog.apply(console.debug, [ts].concat(args));
     }
 }
@@ -31,7 +31,7 @@ function setupError() {
 
     console.error = function () {
         const args = [].slice.call(arguments);
-        const ts = `[${getTimestamp()}]: `;
+        const ts = `[${getTimestamp()}][ERROR]: `;
         origLog.apply(console.error, [ts].concat(args));
     }
 }
