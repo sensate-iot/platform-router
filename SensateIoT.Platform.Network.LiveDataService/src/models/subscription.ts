@@ -5,12 +5,10 @@
  * @email  michel@michelmegens.net
  */
 
-import { SensorModel } from "../models/sensor";
-
 export class Subscription {
     private count: number;
 
-    public Subscription(sensor: SensorModel) {
+    public Subscription() {
         this.count = 0;
     }
 
