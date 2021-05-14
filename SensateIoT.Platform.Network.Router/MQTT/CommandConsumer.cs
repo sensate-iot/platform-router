@@ -41,7 +41,7 @@ namespace SensateIoT.Platform.Network.Router.MQTT
 		{
 			var cmd = JsonConvert.DeserializeObject<Command>(message);
 
-			this.m_logger.LogInformation("Received command: {command}. Argument: {argument}.", cmd.Cmd, cmd.Arguments);
+			this.m_logger.LogInformation("Received command: {command} on {topic}. Argument: {argument}.", cmd.Cmd, topic, cmd.Arguments);
 			this.m_counter.Counter.Inc();
 
 			switch(cmd.Cmd) {

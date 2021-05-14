@@ -3,9 +3,8 @@ using System.Data.Common;
 
 using Microsoft.Extensions.Options;
 using Npgsql;
-
-using SensateIoT.Platform.Network.Common.Settings;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
+using SensateIoT.Platform.Network.DataAccess.Settings;
 
 namespace SensateIoT.Platform.Network.DataAccess.Contexts
 {

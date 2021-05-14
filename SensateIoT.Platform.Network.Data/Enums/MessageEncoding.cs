@@ -5,8 +5,11 @@
  * @email  michel@michelmegens.net
  */
 
-namespace SensateIoT.Platform.Network.Data.Abstract
+using JetBrains.Annotations;
+
+namespace SensateIoT.Platform.Network.Data.Enums
 {
+	[PublicAPI]
 	public enum MessageEncoding
 	{
 		None,

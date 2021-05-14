@@ -26,6 +26,7 @@ using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
 
 using ControlMessage = SensateIoT.Platform.Network.Data.DTO.ControlMessage;
+using SensateIoT.Platform.Network.Common.Collections.Local;
 
 namespace SensateIoT.Platform.Network.Common.Services.Processing
 {
