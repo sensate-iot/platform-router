@@ -31,11 +31,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Pipelines", "Pipelines", "{0CD2E884-3DA9-485F-A729-93AC8627306F}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\docker-livedataservice.yml = .github\workflows\docker-livedataservice.yml
-		.github\workflows\docker-networkapi.yml = .github\workflows\docker-networkapi.yml
 		.github\workflows\docker-router.yml = .github\workflows\docker-router.yml
-		.github\workflows\docker-storageservice.yml = .github\workflows\docker-storageservice.yml
-		.github\workflows\docker-triggerservice.yml = .github\workflows\docker-triggerservice.yml
 		.github\workflows\dotnet-format.yml = .github\workflows\dotnet-format.yml
 		.github\workflows\unittest-network.yml = .github\workflows\unittest-network.yml
 	EndProjectSection
