@@ -29,15 +29,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.Router", "SensateIoT.Platform.Network.Router\SensateIoT.Platform.Network.Router.csproj", "{18250CDA-1A64-4C23-982C-1CD0C155A46A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Migrations", "Migrations", "{2D648956-50F4-46FB-ABDC-93EC6DA2B69F}"
-	ProjectSection(SolutionItems) = preProject
-		Migrations\Networking.1.0.0.sql = Migrations\Networking.1.0.0.sql
-		Migrations\Networking.1.1.0.sql = Migrations\Networking.1.1.0.sql
-		Migrations\Networking.1.2.0.sql = Migrations\Networking.1.2.0.sql
-		Migrations\Networking.1.3.0.sql = Migrations\Networking.1.3.0.sql
-		Migrations\SensateIoT.1.1.0.sql = Migrations\SensateIoT.1.1.0.sql
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Pipelines", "Pipelines", "{0CD2E884-3DA9-485F-A729-93AC8627306F}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\docker-livedataservice.yml = .github\workflows\docker-livedataservice.yml
