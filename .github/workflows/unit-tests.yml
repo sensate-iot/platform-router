@@ -1,4 +1,4 @@
-name: Network unit tests
+name: Unit tests
 on:
   push:
       # Publish `master` as Docker `latest` image.
@@ -17,7 +17,7 @@ on:
       - develop
 
 jobs:
-  network-unit-tests:
+  routing-unit-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Clone source
