@@ -19,6 +19,7 @@ using Prometheus;
 
 using SensateIoT.Platform.Network.Common.Caching.Abstract;
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
+using SensateIoT.Platform.Network.Common.Routing.Abstract;
 using SensateIoT.Platform.Network.Common.Services.Background;
 using SensateIoT.Platform.Network.Common.Settings;
 using SensateIoT.Platform.Network.Contracts.DTO;
@@ -48,6 +49,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 		private readonly IAuthorizationService m_authService;
 		private readonly IPublicRemoteQueue m_publicRemote;
 		private readonly ILogger<RoutingService> m_logger;
+		private readonly IMessageRouter m_router;
 		private readonly RoutingPublishSettings m_settings;
 		private readonly Counter m_dropCounter;
 		private readonly Counter m_counter;
@@ -62,6 +64,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 							  IRemoteStorageQueue storage,
 							  IRemoteNetworkEventQueue events,
 							  IAuthorizationService auth,
+							  IMessageRouter router,
 							  IOptions<RoutingPublishSettings> settings,
 							  ILogger<RoutingService> logger) : base(logger)
 		{
@@ -74,6 +77,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 			this.m_authService = auth;
 			this.m_logger = logger;
 			this.m_storageQueue = storage;
+			this.m_router = router;
 
 			this.m_dropCounter = Prometheus.Metrics.CreateCounter("router_messages_dropped_total", "Total number of measurements/messages dropped.");
 			this.m_counter = Prometheus.Metrics.CreateCounter("router_messages_routed_total", "Total number of measurements/messages routed.");
@@ -97,7 +101,7 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 
 				this.m_logger.LogInformation("Routing {count} messages.", messages.Count);
 
-				var result = Parallel.ForEach(messages, this.Process);
+				var result = Parallel.ForEach(messages, this.m_router.Route);
 
 				if(!result.IsCompleted) {
 					this.m_logger.LogWarning("Unable to complete routing messages! Break called at iteration: {iteration}.", result.LowestBreakIteration);
