@@ -1,18 +1,6 @@
-# Sensate IoT - Network
+# Sensate IoT - Router 
 
 ![header1] ![header2] ![header3]
-
-This is the core network solution for the Sensate IoT data platform. This
-solution contains all network infrastructure services:
-
-- Message Router
-- Gateway + configuration API
-- Trigger service
-- Storage service
-- Live data service
-- Database definition
-
-## Router
 
 The message router is at the core of Sensate IoT and responsible for routing
 messages between various systems. The router uses the MQTT protocol to route
@@ -26,20 +14,35 @@ messages to:
 The router routes both SO (Sensor Originating, or measurements) and ST (Sensor
 Terminating, or actuator) messages.
 
-## Gateway
+## Configuration
 
-The gateway is the entry point to the platform. All other ingress services forward
-data to this gateway internally. The gateway performs message authentication. The
-authorization of messages is done by the router.
+The message router needs various settings in order to function correctly:
 
-## Services
+- Database settings:
+  - MongoDB
+  - PostgreSQL
 
-This solution contains serveral services that add value to a message or measurement:
+- Serilog configuration
+- Routing config:
+  - Trigger topic
+  - Storage topic
+  - Network event topic
+  - Actuator topic
+  - Live data topic
 
-- automation via the trigger service;
-- persistance via the storage service;
-- real-time updates via the live data service.
+- MQTT configuration
+- Metrics server
 
-[header1]: https://github.com/sensate-iot/platform-network/workflows/Docker/badge.svg "Docker Build"
-[header2]: https://github.com/sensate-iot/platform-network/workflows/Format%20check/badge.svg ".NET format"
-[header3]: https://img.shields.io/badge/version-v1.6.2-informational "Sensate IoT version"
+## Metrics
+
+The following metrics are collected from the routing service:
+
+- Message routed counts:
+  - Ingress count;
+  - Egress count;
+- Request duration;
+- Routing duration (per message).
+
+[header1]: https://github.com/sensate-iot/platform-router/workflows/Docker/badge.svg "Docker Build"
+[header2]: https://github.com/sensate-iot/platform-router/workflows/Format%20check/badge.svg ".NET format"
+[header3]: https://img.shields.io/badge/version-v1.6.2-informational "Sensate IoT Router version"
