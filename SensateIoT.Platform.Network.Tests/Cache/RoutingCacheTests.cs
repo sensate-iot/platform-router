@@ -3,14 +3,14 @@
  */
 
 using System.Collections.Generic;
+
 using System.Linq;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Tests.Utility;
 
-namespace SensateIoT.Platform.Network.Tests.Routing
+namespace SensateIoT.Platform.Network.Tests.Cache
 {
 	[TestClass]
 	public class RoutingCacheTests

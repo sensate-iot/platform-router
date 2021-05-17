@@ -18,7 +18,7 @@ using SensateIoT.Platform.Network.Common.Caching.Abstract;
 using SensateIoT.Platform.Network.Common.Caching.Routing;
 using SensateIoT.Platform.Network.Data.DTO;
 
-namespace SensateIoT.Platform.Network.Tests.Routing
+namespace SensateIoT.Platform.Network.Tests.Cache
 {
 	[TestClass]
 	public class RoutingCacheLookupTests
