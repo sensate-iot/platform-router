@@ -6,12 +6,8 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.IO.Compression;
-using System.Text;
-
-using Newtonsoft.Json;
+using System.IO;
 
 namespace SensateIoT.Platform.Network.Common.Helpers
 {
@@ -42,6 +38,5 @@ namespace SensateIoT.Platform.Network.Common.Helpers
 
 			return rv;
 		}
-
 	}
 }

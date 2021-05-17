@@ -5,6 +5,8 @@
  * @email  michel@michelmegens.net
  */
 
+using System.Linq;
+
 using Microsoft.Extensions.Logging;
 
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
@@ -37,32 +39,42 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 				return true;
 			}
 
-			this.MatchTrigger(sensor, message, networkEvent);
+			this.ProcessMessage(sensor, message, networkEvent);
 			return true;
 		}
 
-		private void MatchTrigger(Sensor sensor, IPlatformMessage message, NetworkEvent evt)
+		private void ProcessMessage(Sensor sensor, IPlatformMessage message, NetworkEvent evt)
 		{
 			var textTriggered = false;
 			var measurementTriggered = false;
+			var triggers = sensor.TriggerInformation.ToList(); // Snap shot
 
-			foreach(var info in sensor.TriggerInformation) {
-				if(info.HasActions) {
-					evt.Actions.Add(NetworkEventType.MessageTriggered);
+			foreach(var info in triggers) {
+				var done = this.MatchTrigger(message, evt, info, ref textTriggered, ref measurementTriggered);
 
-					if(!textTriggered && info.IsTextTrigger) {
-						textTriggered = true;
-						this.EnqueueToTriggerService(message, info.IsTextTrigger);
-					} else if(!measurementTriggered && !info.IsTextTrigger) {
-						measurementTriggered = true;
-						this.EnqueueToTriggerService(message, info.IsTextTrigger);
-					}
-				}
-
-				if(textTriggered && measurementTriggered) {
+				if(done) {
 					break;
 				}
 			}
+		}
+
+		private bool MatchTrigger(IPlatformMessage message, NetworkEvent evt, SensorTrigger info, ref bool textTriggered, ref bool measurementTriggered)
+		{
+			if(!info.HasActions) {
+				return textTriggered && measurementTriggered;
+			}
+
+			evt.Actions.Add(NetworkEventType.MessageTriggered);
+
+			if(!textTriggered && info.IsTextTrigger) {
+				textTriggered = true;
+				this.EnqueueToTriggerService(message, info.IsTextTrigger);
+			} else if(!measurementTriggered && !info.IsTextTrigger) {
+				measurementTriggered = true;
+				this.EnqueueToTriggerService(message, info.IsTextTrigger);
+			}
+
+			return textTriggered && measurementTriggered;
 		}
 
 		private void EnqueueToTriggerService(IPlatformMessage message, bool isText)
