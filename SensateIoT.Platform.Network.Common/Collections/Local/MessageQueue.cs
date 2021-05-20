@@ -12,12 +12,11 @@ using System.Linq;
 
 using Prometheus;
 
-using SensateIoT.Platform.Network.Common.Collections.Abstract;
 using SensateIoT.Platform.Network.Data.Abstract;
 
 namespace SensateIoT.Platform.Network.Common.Collections.Local
 {
-	public class MessageQueue : Deque<IPlatformMessage>, IMessageQueue
+	public class MessageQueue : Deque<IPlatformMessage>
 	{
 		private const int DefaultCapacity = 1 << 10;
 		private readonly Gauge m_gauge;
@@ -63,48 +62,6 @@ namespace SensateIoT.Platform.Network.Common.Collections.Local
 
 			this.m_gauge.Dec(result.Count);
 			return result;
-		}
-
-		public TimeSpan DeltaAge()
-		{
-			TimeSpan span;
-			this.m_lock.Lock();
-
-			try {
-				if(this.m_count <= 1) {
-					return TimeSpan.Zero;
-				}
-
-				var first = this.DoGetByIndex(0);
-				var last = this.DoGetByIndex(this.m_count - 1);
-
-				span = last.PlatformTimestamp - first.PlatformTimestamp;
-			} finally {
-				this.m_lock.Unlock();
-			}
-
-			return span;
-		}
-
-		public TimeSpan TopMedianDeltaAge()
-		{
-			TimeSpan span;
-			this.m_lock.Lock();
-
-			try {
-				if(this.m_count <= 1) {
-					return TimeSpan.Zero;
-				}
-
-				var top = this.DoGetByIndex(0);
-				var middle = this.DoGetByIndex(this.m_count / 2);
-
-				span = middle.PlatformTimestamp - top.PlatformTimestamp;
-			} finally {
-				this.m_lock.Unlock();
-			}
-
-			return span;
 		}
 	}
 }

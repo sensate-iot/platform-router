@@ -17,6 +17,7 @@ using SensateIoT.Platform.Network.Common.Collections.Abstract;
 using SensateIoT.Platform.Network.Common.Routing.Abstract;
 using SensateIoT.Platform.Network.Common.Services.Background;
 using SensateIoT.Platform.Network.Common.Settings;
+using SensateIoT.Platform.Network.Data.Abstract;
 
 namespace SensateIoT.Platform.Network.Common.Services.Processing
 {
@@ -31,14 +32,14 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 		 *		4 Forward to storage.
 		 */
 
-		private readonly IMessageQueue m_messages;
+		private readonly IQueue<IPlatformMessage> m_messages;
 		private readonly ILogger<RoutingService> m_logger;
 		private readonly IMessageRouter m_router;
 		private readonly RoutingPublishSettings m_settings;
 
 		private const int DequeueCount = 1000;
 
-		public RoutingService(IMessageQueue queue,
+		public RoutingService(IQueue<IPlatformMessage> queue,
 							  IMessageRouter router,
 							  IOptions<RoutingPublishSettings> settings,
 							  ILogger<RoutingService> logger) : base(logger)
