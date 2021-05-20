@@ -36,6 +36,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Pipelines", "Pipelines", "{
 		.github\workflows\unit-tests.yml = .github\workflows\unit-tests.yml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Migrations", "Migrations", "{6A769210-AEEB-470B-8A3A-454BDFC881F1}"
+	ProjectSection(SolutionItems) = preProject
+		Migrations\Networking.1.0.0.sql = Migrations\Networking.1.0.0.sql
+		Migrations\SensateIoT.1.1.0.sql = Migrations\SensateIoT.1.1.0.sql
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
