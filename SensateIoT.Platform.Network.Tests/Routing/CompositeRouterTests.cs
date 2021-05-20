@@ -62,7 +62,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 		private static IRoutingCache CreateRoutingCache()
 		{
 			var cache = new Mock<IRoutingCache>();
-			var sensor = new Sensor {ID = SensorId};
+			var sensor = new Sensor { ID = SensorId };
 
 			cache.Setup(x => x[SensorId]).Returns(sensor);
 			return cache.Object;
