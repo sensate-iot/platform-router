@@ -102,7 +102,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 			var router = CreateCompositeRouter();
 
 			var r1 = new RouterStub();
-			var r2 = new RouterStub {Exception = new InvalidOperationException() };
+			var r2 = new RouterStub { Exception = new InvalidOperationException() };
 			var r3 = new RouterStub();
 
 			router.AddRouter(r1);
