@@ -3,11 +3,11 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <Authors>Sensate IoT</Authors>
-    <Description>Sensate IoT Network common library.</Description>
-    <Version>1.1.0</Version>
+    <Description>Sensate IoT Network Router common library.</Description>
+    <Version>1.2.0</Version>
     <Copyright>Sensate IoT</Copyright>
-    <AssemblyVersion>1.1.0.0</AssemblyVersion>
-    <FileVersion>1.1.0.0</FileVersion>
+    <AssemblyVersion>1.2.0.0</AssemblyVersion>
+    <FileVersion>1.2.0.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

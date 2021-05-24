@@ -45,4 +45,4 @@ The following metrics are collected from the routing service:
 
 [header1]: https://github.com/sensate-iot/platform-router/workflows/Docker/badge.svg "Docker Build"
 [header2]: https://github.com/sensate-iot/platform-router/workflows/Format%20check/badge.svg ".NET format"
-[header3]: https://img.shields.io/badge/version-v1.6.2-informational "Sensate IoT Router version"
+[header3]: https://img.shields.io/badge/version-v1.7.0-informational "Sensate IoT Router version"
