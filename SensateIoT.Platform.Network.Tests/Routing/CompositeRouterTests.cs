@@ -10,27 +10,24 @@ using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using MongoDB.Bson;
 using Moq;
 
-using SensateIoT.Platform.Network.Common.Caching.Abstract;
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
 using SensateIoT.Platform.Network.Common.Exceptions;
 using SensateIoT.Platform.Network.Common.Routing;
 using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.DTO;
+using SensateIoT.Platform.Network.Tests.Utility;
 
 namespace SensateIoT.Platform.Network.Tests.Routing
 {
 	[TestClass]
 	public class CompositeRouterTests
 	{
-		private static ObjectId SensorId = ObjectId.GenerateNewId();
-
 		[TestMethod]
 		public void CanExecuteRouters()
 		{
-			var router = CreateCompositeRouter();
+			var router = CompositeRouterHelper.CreateCompositeRouter();
 
 			var r1 = new RouterStub();
 			var r2 = new RouterStub();
@@ -41,7 +38,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 			router.AddRouter(r3);
 
 			var msg = new Message {
-				SensorId = SensorId
+				SensorId = CompositeRouterHelper.Sensor.ID
 			};
 			router.Route(msg);
 
@@ -53,7 +50,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 		[TestMethod]
 		public void CanCancelRoutesGracefully()
 		{
-			var router = CreateCompositeRouter();
+			var router = CompositeRouterHelper.CreateCompositeRouter();
 
 			var r1 = new RouterStub();
 			var r2 = new RouterStub { Cancel = true };
@@ -64,7 +61,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 			router.AddRouter(r3);
 
 			var msg = new Message {
-				SensorId = SensorId
+				SensorId = CompositeRouterHelper.Sensor.ID
 			};
 			router.Route(msg);
 
@@ -76,7 +73,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 		[TestMethod]
 		public void CanCatchRouterExceptions()
 		{
-			var router = CreateCompositeRouter();
+			var router = CompositeRouterHelper.CreateCompositeRouter();
 
 			var r1 = new RouterStub();
 			var r2 = new RouterStub { Exception = new RouterException("TestRouter", "testing exception catching.") };
@@ -87,7 +84,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 			router.AddRouter(r3);
 
 			var msg = new Message {
-				SensorId = SensorId
+				SensorId = CompositeRouterHelper.Sensor.ID
 			};
 			router.Route(msg);
 
@@ -99,7 +96,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 		[TestMethod]
 		public void CannotCatchOtherExceptions()
 		{
-			var router = CreateCompositeRouter();
+			var router = CompositeRouterHelper.CreateCompositeRouter();
 
 			var r1 = new RouterStub();
 			var r2 = new RouterStub { Exception = new InvalidOperationException() };
@@ -110,7 +107,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 			router.AddRouter(r3);
 
 			var msg = new Message {
-				SensorId = SensorId
+				SensorId = CompositeRouterHelper.Sensor.ID
 			};
 
 			Assert.ThrowsException<InvalidOperationException>(() => router.Route(msg));
@@ -124,7 +121,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 			var queue = new Mock<IRemoteNetworkEventQueue>();
 
 			queue.Setup(x => x.EnqueueEvent(It.IsAny<NetworkEvent>())).Callback(() => count += 1);
-			var router = new CompositeRouter(CreateRoutingCache(), queue.Object, logger.Object);
+			var router = new CompositeRouter(CompositeRouterHelper.CreateRoutingCache(), queue.Object, logger.Object);
 
 			var r1 = new RouterStub();
 			var r2 = new RouterStub();
@@ -133,28 +130,11 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 			router.AddRouter(r2);
 
 			var msg = new Message {
-				SensorId = SensorId
+				SensorId = CompositeRouterHelper.Sensor.ID
 			};
 
 			router.Route(msg);
 			Assert.AreEqual(1, count);
-		}
-
-		private static IRoutingCache CreateRoutingCache()
-		{
-			var cache = new Mock<IRoutingCache>();
-			var sensor = new Sensor { ID = SensorId };
-
-			cache.Setup(x => x[SensorId]).Returns(sensor);
-			return cache.Object;
-		}
-
-		private static CompositeRouter CreateCompositeRouter()
-		{
-			var logger = new Mock<ILogger<CompositeRouter>>();
-			var queue = new Mock<IRemoteNetworkEventQueue>();
-
-			return new CompositeRouter(CreateRoutingCache(), queue.Object, logger.Object);
 		}
 	}
 }
