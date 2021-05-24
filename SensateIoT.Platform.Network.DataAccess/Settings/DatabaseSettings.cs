@@ -1,4 +1,4 @@
-﻿namespace SensateIoT.Platform.Network.Common.Settings
+﻿namespace SensateIoT.Platform.Network.DataAccess.Settings
 {
 	public class DatabaseSettings
 	{

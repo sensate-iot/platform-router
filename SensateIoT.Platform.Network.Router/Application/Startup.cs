@@ -47,6 +47,7 @@ namespace SensateIoT.Platform.Network.Router.Application
 			services.AddRoutingServices(this.Configuration);
 			services.AddBackgroundServices(this.Configuration);
 			services.AddMqttBrokers(this.Configuration);
+			services.AddMessageRouter();
 
 			services.AddSingleton<CommandCounter>();
 

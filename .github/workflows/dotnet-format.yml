@@ -29,4 +29,4 @@ jobs:
       - name: Run dotnet format
         working-directory: ${{env.working-directory}}
         run: |
-          dotnet format --check platform-network.sln
+          dotnet format --check platform-router.sln

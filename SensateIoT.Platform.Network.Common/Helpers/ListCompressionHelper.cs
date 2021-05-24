@@ -6,46 +6,13 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.IO.Compression;
-using System.Text;
-
-using Newtonsoft.Json;
+using System.IO;
 
 namespace SensateIoT.Platform.Network.Common.Helpers
 {
 	public static class ListCompressionHelper
 	{
-		public static string Compress<T>(this IList<T> values)
-		{
-			string rv;
-			MemoryStream msi, mso;
-			GZipStream gzip;
-
-			msi = null;
-			mso = null;
-
-			try {
-				var data = JsonConvert.SerializeObject(values);
-				var bytes = Encoding.UTF8.GetBytes(data);
-
-				msi = new MemoryStream(bytes);
-				mso = new MemoryStream();
-				gzip = new GZipStream(mso, CompressionMode.Compress);
-
-				msi.CopyTo(gzip);
-				gzip.Dispose();
-
-				rv = Convert.ToBase64String(mso.ToArray());
-			} finally {
-				mso?.Dispose();
-				msi?.Dispose();
-			}
-
-			return rv;
-		}
-
 		public static string Compress(this byte[] bytes)
 		{
 			string rv;
@@ -71,6 +38,5 @@ namespace SensateIoT.Platform.Network.Common.Helpers
 
 			return rv;
 		}
-
 	}
 }

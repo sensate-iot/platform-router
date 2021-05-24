@@ -20,18 +20,19 @@ using Prometheus;
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
 using SensateIoT.Platform.Network.Common.Converters;
 using SensateIoT.Platform.Network.Contracts.RPC;
+using SensateIoT.Platform.Network.Data.Abstract;
 
 namespace SensateIoT.Platform.Network.Router.Services
 {
 	[UsedImplicitly]
 	public class EgressRouter : Contracts.Services.EgressRouter.EgressRouterBase
 	{
-		private readonly IMessageQueue m_queue;
+		private readonly IQueue<IPlatformMessage> m_queue;
 		private readonly ILogger<EgressRouter> m_logger;
 		private readonly Counter m_requests;
 		private readonly Histogram m_duration;
 
-		public EgressRouter(IMessageQueue queue, ILogger<EgressRouter> logger)
+		public EgressRouter(IQueue<IPlatformMessage> queue, ILogger<EgressRouter> logger)
 		{
 			this.m_queue = queue;
 			this.m_logger = logger;

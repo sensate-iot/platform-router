@@ -6,10 +6,12 @@
  */
 
 using System;
+using JetBrains.Annotations;
 using MongoDB.Bson;
 
 namespace SensateIoT.Platform.Network.Data.Abstract
 {
+	[PublicAPI]
 	public interface IPlatformMessage
 	{
 		ObjectId SensorID { get; }

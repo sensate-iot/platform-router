@@ -9,8 +9,6 @@ namespace SensateIoT.Platform.Network.Data.DTO
 {
 	public enum RouteType
 	{
-		LiveDataSubscription,
-		HTTPPostCallback,
-		HTTPGetCallback
+		LiveDataSubscription
 	}
 }

@@ -11,14 +11,15 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 using Newtonsoft.Json;
+using JetBrains.Annotations;
+
 using SensateIoT.Platform.Network.Data.Converters;
 
 namespace SensateIoT.Platform.Network.Data.Models
 {
+	[PublicAPI]
 	public class Sensor
 	{
-		public const int SecretLength = 256;
-
 		[BsonId, BsonRequired, JsonProperty("id"), JsonConverter(typeof(ObjectIdJsonConverter))]
 		public ObjectId InternalId { get; set; }
 

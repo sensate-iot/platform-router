@@ -21,6 +21,7 @@ using SensateIoT.Platform.Network.Common.Collections.Abstract;
 using SensateIoT.Platform.Network.Common.Converters;
 using SensateIoT.Platform.Network.Common.Validators;
 using SensateIoT.Platform.Network.Contracts.RPC;
+using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
 
 namespace SensateIoT.Platform.Network.Router.Services
@@ -28,13 +29,13 @@ namespace SensateIoT.Platform.Network.Router.Services
 	[UsedImplicitly]
 	public class IngressRouter : Contracts.Services.IngressRouter.IngressRouterBase
 	{
-		private readonly IMessageQueue m_queue;
+		private readonly IQueue<IPlatformMessage> m_queue;
 		private readonly ILogger<IngressRouter> m_logger;
 		private readonly Counter m_measurementRequests;
 		private readonly Counter m_messageRequests;
 		private readonly Histogram m_duration;
 
-		public IngressRouter(IMessageQueue queue, ILogger<IngressRouter> logger)
+		public IngressRouter(IQueue<IPlatformMessage> queue, ILogger<IngressRouter> logger)
 		{
 			this.m_queue = queue;
 			this.m_logger = logger;

@@ -15,6 +15,7 @@ using MongoDB.Bson;
 using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
+using SensateIoT.Platform.Network.Data.Enums;
 
 namespace SensateIoT.Platform.Network.Common.Converters
 {

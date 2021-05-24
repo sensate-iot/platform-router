@@ -20,7 +20,7 @@ namespace SensateIoT.Platform.Network.Common.Init
 {
 	public static class MqttServiceInitExtensions
 	{
-		public static IServiceCollection AddMqttService(this IServiceCollection service, Action<MqttServiceOptions> setup)
+		public static void AddMqttService(this IServiceCollection service, Action<MqttServiceOptions> setup)
 		{
 			service.AddSingleton<MqttClient>();
 			service.AddHostedService(p => p.GetRequiredService<MqttClient>());
@@ -29,22 +29,18 @@ namespace SensateIoT.Platform.Network.Common.Init
 			if(setup != null) {
 				service.Configure(setup);
 			}
-
-			return service;
 		}
 
-		public static IServiceCollection AddMqttHandlers(this IServiceCollection service)
+		public static void AddMqttHandlers(this IServiceCollection service)
 		{
 			foreach(var etype in Assembly.GetEntryAssembly().ExportedTypes) {
 				if(etype.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IMqttHandler))) {
 					service.AddScoped(etype);
 				}
 			}
-
-			return service;
 		}
 
-		public static IServiceCollection AddInternalMqttService(this IServiceCollection services, Action<InternalMqttServiceOptions> setup)
+		public static void AddInternalMqttService(this IServiceCollection services, Action<InternalMqttServiceOptions> setup)
 		{
 			if(setup != null) {
 				services.Configure(setup);
@@ -53,8 +49,6 @@ namespace SensateIoT.Platform.Network.Common.Init
 			services.AddSingleton<InternalMqttClient>();
 			services.AddHostedService(p => p.GetRequiredService<InternalMqttClient>());
 			services.AddSingleton<IInternalMqttClient>(p => p.GetRequiredService<InternalMqttClient>());
-
-			return services;
 		}
 
 		public static void MapInternalMqttTopic<T>(this IServiceProvider sp, string topic) where T : IMqttHandler

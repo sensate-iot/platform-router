@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Added
+- Composite router implementation
+- Routers for functional domains
+- Message router abstractions (IRouter and IMessageRouter)
+- Composite router tests
+- Trigger router tests
+
+### Updated
+- Router metrics
+- Routing service
+
+### Removed
+- Migrated projects not related to message routing
+- Unused code
+
 ## [1.6.2] - 13-04-2021
 ### Added
 - Subscription count tracking
