@@ -8,7 +8,7 @@
 using System.Linq;
 
 using Microsoft.Extensions.Logging;
-
+using MongoDB.Driver;
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
 using SensateIoT.Platform.Network.Common.Exceptions;
 using SensateIoT.Platform.Network.Common.Routing.Abstract;
@@ -60,8 +60,8 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 
 		private bool MatchTrigger(IPlatformMessage message, NetworkEvent evt, SensorTrigger info, ref bool textTriggered, ref bool measurementTriggered)
 		{
-			if(!info.HasActions) {
-				return textTriggered && measurementTriggered;
+			if(!VerifySensorTrigger(message, info)) {
+				return false;
 			}
 
 			evt.Actions.Add(NetworkEventType.MessageTriggered);
@@ -75,6 +75,19 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 			}
 
 			return textTriggered && measurementTriggered;
+		}
+
+		private static bool VerifySensorTrigger(IPlatformMessage message, SensorTrigger info)
+		{
+			if(!info.HasActions) {
+				return false;
+			}
+
+			if((info.IsTextTrigger && message.Type != MessageType.Message) || (!info.IsTextTrigger && message.Type != MessageType.Measurement)) {
+				return false;
+			}
+
+			return true;
 		}
 
 		private void EnqueueToTriggerService(IPlatformMessage message, bool isText)
@@ -97,7 +110,6 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 				throw new RouterException(nameof(TriggerRouter), $"invalid message type: {message.Type:G}");
 			}
 		}
-
 
 	}
 }
