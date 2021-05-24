@@ -1,1 +1,0 @@
-GRANT db_router TO sql_router;

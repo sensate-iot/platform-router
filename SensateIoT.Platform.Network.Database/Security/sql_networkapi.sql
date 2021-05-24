@@ -1,1 +1,0 @@
-GRANT db_networkapi TO sql_networkapi;

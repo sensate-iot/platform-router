@@ -6,7 +6,7 @@
  */
 
 using System;
-
+using JetBrains.Annotations;
 using MongoDB.Bson.Serialization.Attributes;
 
 using Newtonsoft.Json;
@@ -15,7 +15,7 @@ using SensateIoT.Platform.Network.Data.Converters;
 
 namespace SensateIoT.Platform.Network.Data.Models
 {
-	[Serializable]
+	[Serializable, PublicAPI]
 	public class DataPoint
 	{
 		public string Unit { get; set; }
