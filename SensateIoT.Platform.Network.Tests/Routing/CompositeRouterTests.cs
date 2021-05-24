@@ -25,7 +25,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 	[TestClass]
 	public class CompositeRouterTests
 	{
-		public static readonly Sensor Sensor = new Sensor { ID = ObjectId.GenerateNewId() };
+		private static readonly Sensor Sensor = new Sensor { ID = ObjectId.GenerateNewId() };
 
 		[TestMethod]
 		public void CanExecuteRouters()
@@ -139,7 +139,8 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 			router.Route(msg);
 			Assert.AreEqual(1, count);
 		}
-		public static IRoutingCache CreateRoutingCache()
+
+		private static IRoutingCache CreateRoutingCache()
 		{
 			var cache = new Mock<IRoutingCache>();
 
@@ -147,7 +148,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 			return cache.Object;
 		}
 
-		public static CompositeRouter CreateCompositeRouter()
+		private static CompositeRouter CreateCompositeRouter()
 		{
 			var logger = new Mock<ILogger<CompositeRouter>>();
 			var queue = new Mock<IRemoteNetworkEventQueue>();
