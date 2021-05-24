@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Composite router implementation
 - Routers for functional domains
 - Message router abstractions (IRouter and IMessageRouter)
+- Composite router tests
+- Trigger router tests
 
 ### Updated
 - Router metrics
