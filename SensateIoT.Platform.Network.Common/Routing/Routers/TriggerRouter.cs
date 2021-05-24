@@ -8,7 +8,7 @@
 using System.Linq;
 
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
+
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
 using SensateIoT.Platform.Network.Common.Exceptions;
 using SensateIoT.Platform.Network.Common.Routing.Abstract;
