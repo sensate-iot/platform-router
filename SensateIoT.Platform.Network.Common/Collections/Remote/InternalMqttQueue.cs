@@ -84,7 +84,7 @@ namespace SensateIoT.Platform.Network.Common.Collections.Remote
 			this.m_gaugeLiveDataService = Metrics.CreateGauge("router_livedata_messages_queued", "Number of messages in the live data queue.");
 		}
 
-		public void EnqueueToMessageTriggerService(IPlatformMessage message)
+		public void EnqueueMessageToTriggerService(IPlatformMessage message)
 		{
 			this.m_measurementLock.Lock();
 

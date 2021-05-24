@@ -88,7 +88,7 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 				break;
 
 			case MessageType.Message:
-				this.m_internalRemote.EnqueueToMessageTriggerService(message);
+				this.m_internalRemote.EnqueueMessageToTriggerService(message);
 				break;
 
 			default:
