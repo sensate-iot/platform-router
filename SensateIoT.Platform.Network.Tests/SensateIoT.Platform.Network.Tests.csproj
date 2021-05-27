@@ -21,11 +21,4 @@
     <ProjectReference Include="..\SensateIoT.Platform.Network.Common\SensateIoT.Platform.Network.Common.csproj" />
     <ProjectReference Include="..\SensateIoT.Platform.Network.Data\SensateIoT.Platform.Network.Data.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Microsoft.AspNetCore.Authentication">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\dotnet\packs\Microsoft.AspNetCore.App.Ref\3.1.8\ref\netcoreapp3.1\Microsoft.AspNetCore.Authentication.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>
