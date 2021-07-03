@@ -65,14 +65,9 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 
 				var messages = this.m_messages.DequeueRange(DequeueCount).ToList();
 				messages = messages.OrderBy(x => x.SensorID).ToList();
-
 				this.m_logger.LogInformation("Routing {count} messages.", messages.Count);
 
-				var result = Parallel.ForEach(messages, this.m_router.Route);
-
-				if(!result.IsCompleted) {
-					this.m_logger.LogWarning("Unable to complete routing messages! Break called at iteration: {iteration}.", result.LowestBreakIteration);
-				}
+				this.m_router.Route(messages);
 			} while(!token.IsCancellationRequested);
 		}
 	}

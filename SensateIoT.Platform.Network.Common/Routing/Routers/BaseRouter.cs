@@ -15,7 +15,14 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 {
 	public class BaseRouter : IRouter
 	{
-		public bool Route(Sensor sensor, IPlatformMessage message, NetworkEvent networkEvent, ILogger logger)
+		private readonly ILogger<BaseRouter> m_logger;
+
+		public BaseRouter(ILogger<BaseRouter> logger)
+		{
+			this.m_logger = logger;
+		}
+
+		public bool Route(Sensor sensor, IPlatformMessage message, NetworkEvent networkEvent)
 		{
 			var result = true;
 
@@ -33,7 +40,7 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 				break;
 
 			default:
-				logger.LogWarning("Unable to determine message type of type {type}. Integer value: {integerValue}.",
+				this.m_logger.LogWarning("Unable to determine message type of type {type}. Integer value: {integerValue}.",
 				                  message.Type.ToString("G"), message.Type.ToString("D"));
 				result = false;
 				break;

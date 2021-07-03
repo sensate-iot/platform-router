@@ -20,7 +20,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 			this.Exception = null;
 		}
 
-		public bool Route(Sensor sensor, IPlatformMessage message, NetworkEvent networkEvent, ILogger logger)
+		public bool Route(Sensor sensor, IPlatformMessage message, NetworkEvent networkEvent)
 		{
 			if(this.Cancel) {
 				return false;

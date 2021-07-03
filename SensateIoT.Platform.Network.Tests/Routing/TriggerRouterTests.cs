@@ -48,7 +48,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 				IsTextTrigger = false
 			});
 
-			router.Route(sensor, measurement, evt, GetLogger());
+			router.Route(sensor, measurement, evt);
 
 			Assert.AreEqual(1, measurementCount);
 			Assert.AreEqual(0, messageCount);
@@ -77,7 +77,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 				IsTextTrigger = true
 			});
 
-			router.Route(sensor, message, evt, GetLogger());
+			router.Route(sensor, message, evt);
 
 			Assert.AreEqual(0, measurementCount);
 			Assert.AreEqual(1, messageCount);
@@ -106,7 +106,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 				IsTextTrigger = true
 			});
 
-			router.Route(sensor, message, evt, GetLogger());
+			router.Route(sensor, message, evt);
 
 			Assert.AreEqual(0, measurementCount);
 			Assert.AreEqual(0, messageCount);
@@ -134,7 +134,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 				IsTextTrigger = false
 			});
 
-			router.Route(sensor, message, evt, GetLogger());
+			router.Route(sensor, message, evt);
 
 			Assert.AreEqual(0, measurementCount);
 			Assert.AreEqual(0, messageCount);
@@ -152,12 +152,6 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 				.Callback(messageCallback);
 
 			return new TriggerRouter(queue.Object, logger.Object);
-		}
-
-		private static ILogger GetLogger()
-		{
-			var logger = new Mock<ILogger<TriggerRouter>>();
-			return logger.Object;
 		}
 	}
 }
