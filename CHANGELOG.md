@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.2] - 03-07-2021
+### Added
+- Additional validation/checks
+
+### Updated
+- Message routers
+- Project dependencies
+- Error handling
+
+### Removed
+- Incorrectly thrown exceptions
+
 ## [1.7.1] - 27-05-2021
 ### Updated
 - Project dependencies
