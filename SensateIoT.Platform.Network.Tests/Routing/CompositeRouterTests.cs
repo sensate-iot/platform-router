@@ -159,7 +159,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 
 		private static IList<IPlatformMessage> AsList(IPlatformMessage message)
 		{
-			return new List<IPlatformMessage> {message};
+			return new List<IPlatformMessage> { message };
 		}
 	}
 }

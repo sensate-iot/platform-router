@@ -41,7 +41,7 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 
 			default:
 				this.m_logger.LogWarning("Unable to determine message type of type {type}. Integer value: {integerValue}.",
-				                  message.Type.ToString("G"), message.Type.ToString("D"));
+								  message.Type.ToString("G"), message.Type.ToString("D"));
 				result = false;
 				break;
 			}
