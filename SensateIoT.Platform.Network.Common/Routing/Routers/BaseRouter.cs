@@ -5,7 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
-using SensateIoT.Platform.Network.Common.Exceptions;
+using Microsoft.Extensions.Logging;
 using SensateIoT.Platform.Network.Common.Routing.Abstract;
 using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.Abstract;
@@ -15,16 +15,31 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 {
 	public class BaseRouter : IRouter
 	{
-		public bool Route(Sensor sensor, IPlatformMessage message, NetworkEvent networkEvent)
+		public bool Route(Sensor sensor, IPlatformMessage message, NetworkEvent networkEvent, ILogger logger)
 		{
-			networkEvent.MessageType = message.Type switch {
-				MessageType.Measurement => NetworkMessageType.Measurement,
-				MessageType.Message => NetworkMessageType.Message,
-				MessageType.ControlMessage => NetworkMessageType.ControlMessage,
-				_ => throw new RouterException(nameof(BaseRouter), "unable to determine message type!")
-			};
+			var result = true;
 
-			return true;
+			switch(message.Type) {
+			case MessageType.Measurement:
+				networkEvent.MessageType = NetworkMessageType.Measurement;
+				break;
+
+			case MessageType.Message:
+				networkEvent.MessageType = NetworkMessageType.Message;
+				break;
+
+			case MessageType.ControlMessage:
+				networkEvent.MessageType = NetworkMessageType.ControlMessage;
+				break;
+
+			default:
+				logger.LogWarning("Unable to determine message type of type {type}. Integer value: {integerValue}.",
+				                  message.Type.ToString("G"), message.Type.ToString("D"));
+				result = false;
+				break;
+			}
+
+			return result;
 		}
 	}
 }

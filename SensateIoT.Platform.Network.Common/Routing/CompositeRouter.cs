@@ -52,6 +52,7 @@ namespace SensateIoT.Platform.Network.Common.Routing
 
 		public void AddRouter(IRouter router)
 		{
+			this.CheckDisposed();
 			this.m_lock.EnterWriteLock();
 
 			try {
@@ -99,7 +100,7 @@ namespace SensateIoT.Platform.Network.Common.Routing
 				bool @continue;
 
 				try {
-					@continue = router.Route(sensor, message, @event);
+					@continue = router.Route(sensor, message, @event, this.m_logger);
 				} catch(RouterException ex) {
 					@continue = false;
 					this.m_dropCounter.Inc();

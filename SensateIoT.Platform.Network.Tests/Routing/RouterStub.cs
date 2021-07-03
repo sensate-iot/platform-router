@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.Logging;
 using SensateIoT.Platform.Network.Common.Routing.Abstract;
 using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.Abstract;
@@ -19,7 +20,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 			this.Exception = null;
 		}
 
-		public bool Route(Sensor sensor, IPlatformMessage message, NetworkEvent networkEvent)
+		public bool Route(Sensor sensor, IPlatformMessage message, NetworkEvent networkEvent, ILogger logger)
 		{
 			if(this.Cancel) {
 				return false;

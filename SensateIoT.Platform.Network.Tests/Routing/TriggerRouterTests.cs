@@ -7,8 +7,10 @@
 
 using System;
 using System.Collections.Generic;
+
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using MongoDB.Bson;
 using Moq;
 
@@ -17,7 +19,7 @@ using SensateIoT.Platform.Network.Common.Routing.Routers;
 using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
-using SensateIoT.Platform.Network.Tests.Utility;
+
 using Measurement = SensateIoT.Platform.Network.Data.DTO.Measurement;
 
 namespace SensateIoT.Platform.Network.Tests.Routing
@@ -46,7 +48,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 				IsTextTrigger = false
 			});
 
-			router.Route(sensor, measurement, evt);
+			router.Route(sensor, measurement, evt, GetLogger());
 
 			Assert.AreEqual(1, measurementCount);
 			Assert.AreEqual(0, messageCount);
@@ -75,7 +77,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 				IsTextTrigger = true
 			});
 
-			router.Route(sensor, message, evt);
+			router.Route(sensor, message, evt, GetLogger());
 
 			Assert.AreEqual(0, measurementCount);
 			Assert.AreEqual(1, messageCount);
@@ -104,7 +106,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 				IsTextTrigger = true
 			});
 
-			router.Route(sensor, message, evt);
+			router.Route(sensor, message, evt, GetLogger());
 
 			Assert.AreEqual(0, measurementCount);
 			Assert.AreEqual(0, messageCount);
@@ -132,7 +134,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 				IsTextTrigger = false
 			});
 
-			router.Route(sensor, message, evt);
+			router.Route(sensor, message, evt, GetLogger());
 
 			Assert.AreEqual(0, measurementCount);
 			Assert.AreEqual(0, messageCount);
@@ -150,6 +152,12 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 				.Callback(messageCallback);
 
 			return new TriggerRouter(queue.Object, logger.Object);
+		}
+
+		private static ILogger GetLogger()
+		{
+			var logger = new Mock<ILogger<TriggerRouter>>();
+			return logger.Object;
 		}
 	}
 }

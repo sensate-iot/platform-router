@@ -29,7 +29,7 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 			this.m_logger = logger;
 		}
 
-		public bool Route(Sensor sensor, IPlatformMessage message, NetworkEvent networkEvent)
+		public bool Route(Sensor sensor, IPlatformMessage message, NetworkEvent networkEvent, ILogger logger)
 		{
 			if(message.Type == MessageType.ControlMessage) {
 				return true;

@@ -5,6 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
+using Microsoft.Extensions.Logging;
 using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
@@ -22,7 +23,7 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 			this.m_storageQueue = queue;
 		}
 
-		public bool Route(Sensor sensor, IPlatformMessage message, NetworkEvent networkEvent)
+		public bool Route(Sensor sensor, IPlatformMessage message, NetworkEvent networkEvent, ILogger logger)
 		{
 			if(!sensor.StorageEnabled || message.Type == MessageType.ControlMessage) {
 				return true;

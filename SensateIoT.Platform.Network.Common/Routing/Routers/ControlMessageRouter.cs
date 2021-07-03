@@ -44,7 +44,7 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 			this.m_logger = logger;
 		}
 
-		public bool Route(Sensor sensor, IPlatformMessage message, NetworkEvent networkEvent)
+		public bool Route(Sensor sensor, IPlatformMessage message, NetworkEvent networkEvent, ILogger logger)
 		{
 			if(message.Type != MessageType.ControlMessage) {
 				return true;
@@ -59,7 +59,6 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 			message.Timestamp = DateTime.UtcNow;
 			message.Secret = sensor.SensorKey;
 			this.m_authService.SignControlMessage(message, data);
-
 
 			if(message.Destination == ControlMessageType.Mqtt) {
 				data = JsonConvert.SerializeObject(message);
