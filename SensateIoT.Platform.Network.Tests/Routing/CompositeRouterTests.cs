@@ -6,7 +6,7 @@
  */
 
 using System;
-
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -18,6 +18,7 @@ using SensateIoT.Platform.Network.Common.Collections.Abstract;
 using SensateIoT.Platform.Network.Common.Exceptions;
 using SensateIoT.Platform.Network.Common.Routing;
 using SensateIoT.Platform.Network.Contracts.DTO;
+using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
 
 namespace SensateIoT.Platform.Network.Tests.Routing
@@ -43,7 +44,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 			var msg = new Message {
 				SensorId = Sensor.ID
 			};
-			router.Route(msg);
+			router.Route(AsList(msg));
 
 			Assert.IsTrue(r1.Executed);
 			Assert.IsTrue(r2.Executed);
@@ -66,7 +67,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 			var msg = new Message {
 				SensorId = Sensor.ID
 			};
-			router.Route(msg);
+			router.Route(AsList(msg));
 
 			Assert.IsTrue(r1.Executed);
 			Assert.IsFalse(r2.Executed);
@@ -89,7 +90,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 			var msg = new Message {
 				SensorId = Sensor.ID
 			};
-			router.Route(msg);
+			router.Route(AsList(msg));
 
 			Assert.IsTrue(r1.Executed);
 			Assert.IsFalse(r2.Executed);
@@ -113,7 +114,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 				SensorId = Sensor.ID
 			};
 
-			Assert.ThrowsException<InvalidOperationException>(() => router.Route(msg));
+			Assert.ThrowsException<InvalidOperationException>(() => router.Route(AsList(msg)));
 		}
 
 		[TestMethod]
@@ -136,7 +137,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 				SensorId = Sensor.ID
 			};
 
-			router.Route(msg);
+			router.Route(AsList(msg));
 			Assert.AreEqual(1, count);
 		}
 
@@ -154,6 +155,11 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 			var queue = new Mock<IRemoteNetworkEventQueue>();
 
 			return new CompositeRouter(CreateRoutingCache(), queue.Object, logger.Object);
+		}
+
+		private static IList<IPlatformMessage> AsList(IPlatformMessage message)
+		{
+			return new List<IPlatformMessage> { message };
 		}
 	}
 }

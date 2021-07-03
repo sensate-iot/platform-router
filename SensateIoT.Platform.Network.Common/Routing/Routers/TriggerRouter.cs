@@ -93,9 +93,6 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 		private void EnqueueToTriggerService(IPlatformMessage message, bool isText)
 		{
 			switch(message.Type) {
-			case MessageType.Measurement when isText:
-				return;
-
 			case MessageType.Measurement:
 				this.m_internalRemote.EnqueueMeasurementToTriggerService(message);
 				break;

@@ -7,7 +7,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 using Google.Protobuf;
 using Prometheus;
@@ -52,6 +54,7 @@ namespace SensateIoT.Platform.Network.Common.Routing
 
 		public void AddRouter(IRouter router)
 		{
+			this.CheckDisposed();
 			this.m_lock.EnterWriteLock();
 
 			try {
@@ -61,13 +64,21 @@ namespace SensateIoT.Platform.Network.Common.Routing
 			}
 		}
 
-		public void Route(IPlatformMessage message)
+		public void Route(IEnumerable<IPlatformMessage> messages)
 		{
 			this.CheckDisposed();
 			this.m_lock.EnterReadLock();
 
+			var messageList = messages.ToList();
+
 			try {
-				this.InternalRoute(message);
+				var result = Parallel.ForEach(messageList, this.InternalRoute);
+
+				if(!result.IsCompleted) {
+					this.m_logger.LogError("Unable to complete routing {count} messages.", messageList.Count);
+				}
+			} catch(AggregateException ex) {
+				throw ex.InnerException!;
 			} finally {
 				this.m_lock.ExitReadLock();
 			}

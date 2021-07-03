@@ -60,7 +60,6 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 			message.Secret = sensor.SensorKey;
 			this.m_authService.SignControlMessage(message, data);
 
-
 			if(message.Destination == ControlMessageType.Mqtt) {
 				data = JsonConvert.SerializeObject(message);
 				this.m_publicQueue.Enqueue(data, this.m_settings.ActuatorTopicFormat.Replace(FormatNeedle, sensor.ID.ToString()));
