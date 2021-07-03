@@ -7,8 +7,10 @@
 
 using System;
 using System.Collections.Generic;
+
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using MongoDB.Bson;
 using Moq;
 
@@ -17,7 +19,7 @@ using SensateIoT.Platform.Network.Common.Routing.Routers;
 using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
-using SensateIoT.Platform.Network.Tests.Utility;
+
 using Measurement = SensateIoT.Platform.Network.Data.DTO.Measurement;
 
 namespace SensateIoT.Platform.Network.Tests.Routing

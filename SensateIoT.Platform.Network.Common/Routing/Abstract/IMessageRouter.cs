@@ -6,6 +6,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using SensateIoT.Platform.Network.Data.Abstract;
 
 namespace SensateIoT.Platform.Network.Common.Routing.Abstract
@@ -13,6 +14,6 @@ namespace SensateIoT.Platform.Network.Common.Routing.Abstract
 	public interface IMessageRouter : IDisposable
 	{
 		void AddRouter(IRouter router);
-		void Route(IPlatformMessage message);
+		void Route(IEnumerable<IPlatformMessage> message);
 	}
 }
