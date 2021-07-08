@@ -67,28 +67,38 @@ namespace SensateIoT.Platform.Network.Common.Caching.Routing
 			this.m_lock.EnterWriteLock();
 
 			try {
-				this.m_sensors.Clear();
-
-				foreach(var sensor in sensors) {
-					this.m_sensors[sensor.ID] = sensor;
-				}
-
-				foreach(var entry in this.m_liveDataEntries) {
-					if(!this.m_sensors.TryGetValue(entry.SensorID, out var sensor)) {
-						continue;
-					}
-
-					sensor.LiveDataRouting ??= new HashSet<RoutingTarget>(new RoutingTargetEqualityComparer());
-					sensor.LiveDataRouting.Add(new RoutingTarget {
-						Target = entry.Target,
-						Type = RouteType.LiveDataSubscription
-					});
-				}
+				this.InternalLoad(sensors);
 			} finally {
 				this.m_lock.ExitWriteLock();
 			}
 
 			GarbageCollection.Collect();
+		}
+
+		private void InternalLoad(IEnumerable<Sensor> sensors)
+		{
+			this.m_sensors.Clear();
+
+			foreach(var sensor in sensors) {
+				this.m_sensors[sensor.ID] = sensor;
+			}
+
+			foreach(var entry in this.m_liveDataEntries) {
+				this.InternalLoad(entry);
+			}
+		}
+
+		private void InternalLoad(LiveDataRoute entry)
+		{
+			if(!this.m_sensors.TryGetValue(entry.SensorID, out var sensor)) {
+				return;
+			}
+
+			sensor.LiveDataRouting ??= new HashSet<RoutingTarget>(new RoutingTargetEqualityComparer());
+			sensor.LiveDataRouting.Add(new RoutingTarget {
+				Target = entry.Target,
+				Type = RouteType.LiveDataSubscription
+			});
 		}
 
 		public void Load(IEnumerable<Account> accounts)
@@ -243,26 +253,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Routing
 			this.m_lock.EnterWriteLock();
 
 			try {
-				this.m_liveSensors = new HashSet<ObjectId>();
-
-				this.m_liveDataEntries = this.m_liveDataSyncEntries;
-				this.m_liveDataSyncEntries = new HashSet<LiveDataRoute>(new LiveDataRouteEqualityComparer());
-
-				foreach(var entry in this.m_liveDataEntries) {
-					if(!this.m_sensors.TryGetValue(entry.SensorID, out var sensor)) {
-						continue;
-					}
-
-					if(this.m_liveSensors.Add(entry.SensorID)) {
-						sensor.LiveDataRouting ??= new HashSet<RoutingTarget>(new RoutingTargetEqualityComparer());
-						sensor.LiveDataRouting.RemoveWhere(x => x.Type == RouteType.LiveDataSubscription);
-					}
-
-					sensor.LiveDataRouting.Add(new RoutingTarget {
-						Target = entry.Target,
-						Type = RouteType.LiveDataSubscription
-					});
-				}
+				this.InternalFlushRoutes();
 			} finally {
 				this.m_lock.ExitWriteLock();
 			}
@@ -271,6 +262,35 @@ namespace SensateIoT.Platform.Network.Common.Caching.Routing
 		public void Flush()
 		{
 			GarbageCollection.Collect();
+		}
+
+		private void InternalFlushRoutes()
+		{
+			this.m_liveSensors = new HashSet<ObjectId>();
+
+			this.m_liveDataEntries = this.m_liveDataSyncEntries;
+			this.m_liveDataSyncEntries = new HashSet<LiveDataRoute>(new LiveDataRouteEqualityComparer());
+
+			foreach(var entry in this.m_liveDataEntries) {
+				this.FlushLiveDataRoute(entry);
+			}
+		}
+
+		private void FlushLiveDataRoute(LiveDataRoute entry)
+		{
+			if(!this.m_sensors.TryGetValue(entry.SensorID, out var sensor)) {
+				return;
+			}
+
+			if(this.m_liveSensors.Add(entry.SensorID)) {
+				sensor.LiveDataRouting ??= new HashSet<RoutingTarget>(new RoutingTargetEqualityComparer());
+				sensor.LiveDataRouting.RemoveWhere(x => x.Type == RouteType.LiveDataSubscription);
+			}
+
+			sensor.LiveDataRouting.Add(new RoutingTarget {
+				Target = entry.Target,
+				Type = RouteType.LiveDataSubscription
+			});
 		}
 
 		private void InsertSensor(ObjectId id, Sensor sensor)
@@ -285,21 +305,26 @@ namespace SensateIoT.Platform.Network.Common.Caching.Routing
 			this.m_lock.EnterWriteLock();
 
 			try {
-				this.m_sensors[sensor.ID] = sensor;
-
-				foreach(var entry in this.m_liveDataEntries) {
-					if(entry.SensorID != id || !this.m_sensors.TryGetValue(entry.SensorID, out var value)) {
-						continue;
-					}
-
-					value.LiveDataRouting ??= new HashSet<RoutingTarget>(new RoutingTargetEqualityComparer());
-					value.LiveDataRouting.Add(new RoutingTarget {
-						Target = entry.Target,
-						Type = RouteType.LiveDataSubscription
-					});
-				}
+				this.InternalInsertSensor(id, sensor);
 			} finally {
 				this.m_lock.ExitWriteLock();
+			}
+		}
+
+		private void InternalInsertSensor(ObjectId id, Sensor sensor)
+		{
+			this.m_sensors[sensor.ID] = sensor;
+
+			foreach(var entry in this.m_liveDataEntries) {
+				if(entry.SensorID != id || !this.m_sensors.TryGetValue(entry.SensorID, out var value)) {
+					continue;
+				}
+
+				value.LiveDataRouting ??= new HashSet<RoutingTarget>(new RoutingTargetEqualityComparer());
+				value.LiveDataRouting.Add(new RoutingTarget {
+					Target = entry.Target,
+					Type = RouteType.LiveDataSubscription
+				});
 			}
 		}
 
@@ -313,7 +338,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Routing
 
 			try {
 				if(!this.m_sensors.TryGetValue(id, out var sensor)) {
-					this.m_logger.LogDebug("Unable to find sensor with ID: {sensorId}.", id.ToString());
+					this.m_logger.LogWarning("Unable to find sensor with ID: {sensorId}.", id.ToString());
 					return null;
 				}
 
@@ -322,7 +347,7 @@ namespace SensateIoT.Platform.Network.Common.Caching.Routing
 
 				result = null;
 
-				if(IsValidSensor(account, key)) {
+				if(this.IsValidSensor(sensor, account, key)) {
 					this.m_logger.LogDebug("Found sensor with ID {sensorId}.", id.ToString());
 					result = sensor;
 				}
@@ -336,18 +361,34 @@ namespace SensateIoT.Platform.Network.Common.Caching.Routing
 			return result;
 		}
 
-		private static bool IsValidSensor(Account account, ApiKey key)
+		private bool IsValidSensor(Sensor sensor, Account account, ApiKey key)
 		{
-			var invalid = false;
+			bool invalid;
 
-			invalid |= account.HasBillingLockout;
-			invalid |= account.IsBanned;
-			invalid |= account.ID != key.AccountID;
+			invalid = this.ValidateAccount(sensor, account, key);
 
 			invalid |= key.IsReadOnly;
 			invalid |= key.IsRevoked;
 
 			return !invalid;
+		}
+
+		private bool ValidateAccount(Sensor sensor, Account account, ApiKey key)
+		{
+			var invalid = false;
+
+			if(account.HasBillingLockout) {
+				this.m_logger.LogInformation("Skipping sensor {sensorId} due to billing lock!", sensor.ID.ToString());
+				invalid = true;
+			}
+
+			if(account.IsBanned) {
+				this.m_logger.LogInformation("Skipping sensor because account {accountId:D} is banned!", account.ID);
+				invalid = true;
+			}
+
+			invalid |= account.ID != key.AccountID;
+			return invalid;
 		}
 
 		private void AddLiveDataRouting(LiveDataRoute route)
