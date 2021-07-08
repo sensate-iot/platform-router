@@ -68,10 +68,10 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 
 			if(!textTriggered && info.IsTextTrigger) {
 				textTriggered = true;
-				this.EnqueueToTriggerService(message, info.IsTextTrigger);
+				this.EnqueueToTriggerService(message);
 			} else if(!measurementTriggered && !info.IsTextTrigger) {
 				measurementTriggered = true;
-				this.EnqueueToTriggerService(message, info.IsTextTrigger);
+				this.EnqueueToTriggerService(message);
 			}
 
 			return textTriggered && measurementTriggered;
@@ -83,14 +83,10 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 				return false;
 			}
 
-			if((info.IsTextTrigger && message.Type != MessageType.Message) || (!info.IsTextTrigger && message.Type != MessageType.Measurement)) {
-				return false;
-			}
-
-			return true;
+			return (!info.IsTextTrigger || message.Type == MessageType.Message) && (info.IsTextTrigger || message.Type == MessageType.Measurement);
 		}
 
-		private void EnqueueToTriggerService(IPlatformMessage message, bool isText)
+		private void EnqueueToTriggerService(IPlatformMessage message)
 		{
 			switch(message.Type) {
 			case MessageType.Measurement:
