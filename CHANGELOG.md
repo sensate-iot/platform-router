@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Updated
 - Improved the routing cache
+- Improved routing service code quality
 - Improved the composite router
 
 ### Removed
