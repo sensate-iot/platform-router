@@ -88,6 +88,28 @@ namespace SensateIoT.Platform.Network.Tests.Cache
 			Assert.IsNull(cache[this.m_revokedSensorID]);
 		}
 
+		[TestMethod]
+		public void CannotGetSensorWithMissingAccount()
+		{
+			using var cache = this.buildCache();
+			var sensor = cache[this.m_goodSensorID];
+
+			sensor.AccountID = Guid.NewGuid();
+
+
+			Assert.IsNull(cache[this.m_goodSensorID]);
+		}
+
+		[TestMethod]
+		public void CannotGetSensorWithMissingApiKey()
+		{
+			using var cache = this.buildCache();
+			var sensor = cache[this.m_goodSensorID];
+
+			sensor.SensorKey = "abc";
+			Assert.IsNull(cache[this.m_goodSensorID]);
+		}
+
 		private IRoutingCache buildCache()
 		{
 			var logger = new Mock<ILogger<RoutingCache>>();

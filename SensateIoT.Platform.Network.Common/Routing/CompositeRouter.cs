@@ -103,6 +103,11 @@ namespace SensateIoT.Platform.Network.Common.Routing
 			}
 
 			this.m_logger.LogDebug("Routing message of type {type} for sensor {sensorId}.", message.Type.ToString("G"), sensor.ID.ToString());
+			this.RouteMessage(message, sensor);
+		}
+
+		private void RouteMessage(IPlatformMessage message, Sensor sensor)
+		{
 			var @event = CreateNetworkEvent(sensor);
 			message.PlatformTimestamp = DateTime.UtcNow;
 

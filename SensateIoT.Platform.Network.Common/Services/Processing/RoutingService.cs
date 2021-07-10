@@ -6,6 +6,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
@@ -53,22 +54,37 @@ namespace SensateIoT.Platform.Network.Common.Services.Processing
 		protected override async Task ExecuteAsync(CancellationToken token)
 		{
 			do {
-				if(this.m_messages.Count <= 0) {
-					try {
-						await Task.Delay(this.m_settings.InternalInterval, token);
-					} catch(OperationCanceledException) {
-						this.m_logger.LogWarning("Routing task cancelled.");
-					}
+				var messages = await this.TryDequeueMessagesAsync(token).ConfigureAwait(false);
 
+				if(messages == null) {
 					continue;
 				}
 
-				var messages = this.m_messages.DequeueRange(DequeueCount).ToList();
-				messages = messages.OrderBy(x => x.SensorID).ToList();
-				this.m_logger.LogInformation("Routing {count} messages.", messages.Count);
-
-				this.m_router.Route(messages);
+				this.ProcessMessages(messages);
 			} while(!token.IsCancellationRequested);
+		}
+
+		private void ProcessMessages(IList<IPlatformMessage> messages)
+		{
+			messages = messages.OrderBy(x => x.SensorID).ToList();
+			this.m_logger.LogInformation("Routing {count} messages.", messages.Count);
+
+			this.m_router.Route(messages);
+		}
+
+		private async Task<IList<IPlatformMessage>> TryDequeueMessagesAsync(CancellationToken token)
+		{
+			if(this.m_messages.Count <= 0) {
+				try {
+					await Task.Delay(this.m_settings.InternalInterval, token);
+				} catch(OperationCanceledException) {
+					this.m_logger.LogWarning("Routing task cancelled.");
+				}
+
+				return null;
+			}
+
+			return this.m_messages.DequeueRange(DequeueCount).ToList();
 		}
 	}
 }
