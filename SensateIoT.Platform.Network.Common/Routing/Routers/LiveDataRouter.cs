@@ -8,7 +8,7 @@
 using System.Linq;
 
 using Microsoft.Extensions.Logging;
-
+using Prometheus;
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
 using SensateIoT.Platform.Network.Common.Exceptions;
 using SensateIoT.Platform.Network.Common.Routing.Abstract;
@@ -22,11 +22,16 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 	{
 		private readonly ILogger<LiveDataRouter> m_logger;
 		private readonly IInternalRemoteQueue m_internalQueue;
+		private readonly Counter m_liveDataCounter;
+
+		public string Name => "Live Data Router";
 
 		public LiveDataRouter(ILogger<LiveDataRouter> logger, IInternalRemoteQueue queue)
 		{
 			this.m_internalQueue = queue;
 			this.m_logger = logger;
+			this.m_liveDataCounter = Metrics.CreateCounter("router_livedata_messages_routed_total",
+														   "Total number of routed live data messages.");
 		}
 
 		public bool Route(Sensor sensor, IPlatformMessage message, NetworkEvent networkEvent)
@@ -50,6 +55,7 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 
 		private bool ProcessMessage(Sensor sensor, IPlatformMessage message, NetworkEvent evt)
 		{
+			this.m_liveDataCounter.Inc();
 			evt.Actions.Add(NetworkEventType.MessageLiveData);
 			var routes = sensor.LiveDataRouting.ToList(); // Take a snapshot
 
