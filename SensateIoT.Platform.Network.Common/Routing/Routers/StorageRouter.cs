@@ -5,6 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
+using Prometheus;
 using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
@@ -16,12 +17,15 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 	public class StorageRouter : IRouter
 	{
 		private readonly IRemoteStorageQueue m_storageQueue;
+		private readonly Counter m_counter;
 
 		public string Name => "Storage Router";
 
 		public StorageRouter(IRemoteStorageQueue queue)
 		{
 			this.m_storageQueue = queue;
+			this.m_counter = Metrics.CreateCounter("router_storage_messages_routed_total",
+														   "Total number of routed storage messages.");
 		}
 
 		public bool Route(Sensor sensor, IPlatformMessage message, NetworkEvent networkEvent)
@@ -30,6 +34,7 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 				return true;
 			}
 
+			this.m_counter.Inc();
 			this.m_storageQueue.Enqueue(message);
 			networkEvent.Actions.Add(NetworkEventType.MessageStorage);
 

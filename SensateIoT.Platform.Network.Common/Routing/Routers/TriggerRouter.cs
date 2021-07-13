@@ -9,6 +9,8 @@ using System.Linq;
 
 using Microsoft.Extensions.Logging;
 
+using Prometheus;
+
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
 using SensateIoT.Platform.Network.Common.Exceptions;
 using SensateIoT.Platform.Network.Common.Routing.Abstract;
@@ -22,6 +24,7 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 	{
 		private readonly IInternalRemoteQueue m_internalRemote;
 		private readonly ILogger<TriggerRouter> m_logger;
+		private readonly Counter m_counter;
 
 		public string Name => "Trigger Router";
 
@@ -29,6 +32,8 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 		{
 			this.m_internalRemote = queue;
 			this.m_logger = logger;
+			this.m_counter = Metrics.CreateCounter("router_trigger_messages_routed_total",
+														   "Total number of routed trigger messages.");
 		}
 
 		public bool Route(Sensor sensor, IPlatformMessage message, NetworkEvent networkEvent)
@@ -47,6 +52,7 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 
 		private void ProcessMessage(Sensor sensor, IPlatformMessage message, NetworkEvent evt)
 		{
+			this.m_counter.Inc();
 			var textTriggered = false;
 			var measurementTriggered = false;
 			var triggers = sensor.TriggerInformation.ToList(); // Snap shot

@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using Newtonsoft.Json;
-
+using Prometheus;
 using SensateIoT.Platform.Network.Common.Collections.Abstract;
 using SensateIoT.Platform.Network.Common.Routing.Abstract;
 using SensateIoT.Platform.Network.Common.Services.Processing;
@@ -30,6 +30,7 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 		private readonly ILogger<ControlMessageRouter> m_logger;
 		private readonly RoutingPublishSettings m_settings;
 		private readonly IAuthorizationService m_authService;
+		private readonly Counter m_counter;
 
 		private const string FormatNeedle = "$id";
 
@@ -44,6 +45,8 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 			this.m_authService = auth;
 			this.m_settings = settings.Value;
 			this.m_logger = logger;
+			this.m_counter = Metrics.CreateCounter("router_controlmessage_messages_routed_total",
+														   "Total number of routed control messages.");
 		}
 
 		public bool Route(Sensor sensor, IPlatformMessage message, NetworkEvent networkEvent)
@@ -52,6 +55,7 @@ namespace SensateIoT.Platform.Network.Common.Routing.Routers
 				return true;
 			}
 
+			this.m_counter.Inc();
 			return this.ProcessMessage(sensor, message as ControlMessage);
 		}
 
