@@ -14,7 +14,6 @@
     <PackageReference Include="MongoDB.Bson" Version="2.13.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.13.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="SendGrid" Version="9.24.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
   </ItemGroup>
 
