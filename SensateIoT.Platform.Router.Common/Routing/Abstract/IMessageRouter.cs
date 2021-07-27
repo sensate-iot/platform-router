@@ -15,6 +15,6 @@ namespace SensateIoT.Platform.Router.Common.Routing.Abstract
 	public interface IMessageRouter : IDisposable
 	{
 		void AddRouter(IRouter router);
-		void Route(IEnumerable<IPlatformMessage> message);
+		void Route(IEnumerable<IPlatformMessage> messages);
 	}
 }

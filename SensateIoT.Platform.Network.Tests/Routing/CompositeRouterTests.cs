@@ -56,62 +56,18 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 		}
 
 		[TestMethod]
-		public void CannotRouteFromBannedAccount()
-		{
-			var account = new Account { ID = Guid.NewGuid(), HasBillingLockout = false, IsBanned = true };
-			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = account.ID };
-			var apikey = new ApiKey { AccountID = account.ID };
-			var router = CreateCompositeRouter(sensor, account, apikey);
-
-			this.TryExecuteRouter(router, sensor);
-		}
-
-		[TestMethod]
-		public void CannotRouteBillingLockedAccount()
+		public void AccountGuidMustBeValid()
 		{
 			var account = new Account { ID = Guid.NewGuid(), HasBillingLockout = true };
-			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = account.ID };
 			var apikey = new ApiKey { AccountID = account.ID };
+			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = Guid.Empty };
 			var router = CreateCompositeRouter(sensor, account, apikey);
 
 			this.TryExecuteRouter(router, sensor);
 		}
 
 		[TestMethod]
-		public void CannotRouteWithReadOnlyKey()
-		{
-			var account = new Account { ID = Guid.NewGuid() };
-			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = account.ID };
-			var apikey = new ApiKey { AccountID = account.ID, IsReadOnly = true };
-			var router = CreateCompositeRouter(sensor, account, apikey);
-
-			this.TryExecuteRouter(router, sensor);
-		}
-
-		[TestMethod]
-		public void CannotRouteWithRevokedKey()
-		{
-			var account = new Account { ID = Guid.NewGuid() };
-			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = account.ID };
-			var apikey = new ApiKey { AccountID = account.ID, IsRevoked = true };
-			var router = CreateCompositeRouter(sensor, account, apikey);
-
-			this.TryExecuteRouter(router, sensor);
-		}
-
-		[TestMethod]
-		public void CannotRouteWithoutAccount()
-		{
-			var account = new Account { ID = Guid.NewGuid(), HasBillingLockout = true };
-			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = Guid.NewGuid() };
-			var apikey = new ApiKey { AccountID = account.ID };
-			var router = CreateCompositeRouter(sensor, account, apikey);
-
-			this.TryExecuteRouter(router, sensor);
-		}
-
-		[TestMethod]
-		public void CannotRouteWithoutSensorKey()
+		public void SensorKeyCannotBeNull()
 		{
 			var account = new Account { ID = Guid.NewGuid(), HasBillingLockout = true };
 			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = account.ID };

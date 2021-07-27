@@ -21,6 +21,7 @@ namespace SensateIoT.Platform.Router.Common.Init
 		public static void AddMessageRouter(this IServiceCollection collection)
 		{
 			collection.AddSingleton<BaseRouter>();
+			collection.AddSingleton<AuthorizationRouter>();
 			collection.AddSingleton<ControlMessageRouter>();
 			collection.AddSingleton<LiveDataRouter>();
 			collection.AddSingleton<TriggerRouter>();
@@ -45,8 +46,10 @@ namespace SensateIoT.Platform.Router.Common.Init
 			var triggers = provider.GetRequiredService<TriggerRouter>();
 			var liveData = provider.GetRequiredService<LiveDataRouter>();
 			var storage = provider.GetRequiredService<StorageRouter>();
+			var auth = provider.GetRequiredService<AuthorizationRouter>();
 
 			router.AddRouter(@base);
+			router.AddRouter(auth);
 			router.AddRouter(controlMessages);
 			router.AddRouter(triggers);
 			router.AddRouter(liveData);

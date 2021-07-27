@@ -11,10 +11,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Microsoft.Extensions.Logging;
+
 using Google.Protobuf;
 using Prometheus;
-
-using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 
 using SensateIoT.Platform.Router.Common.Caching.Abstract;
 using SensateIoT.Platform.Router.Common.Collections.Abstract;
@@ -94,46 +95,14 @@ namespace SensateIoT.Platform.Router.Common.Routing
 
 		private void ProcessMessage(Sensor sensor, IPlatformMessage message)
 		{
-			if(sensor == null) {
+			if(!this.VerifySensor(message.SensorID, sensor)) {
 				this.m_dropCounter.Inc();
-				this.m_logger.LogDebug("Unable to route message for sensor: {sensorId}. Sensor not found", message.SensorID.ToString());
 				return;
 			}
 
 			this.m_logger.LogDebug("Routing message of type {type} for sensor {sensorId}", message.Type.ToString("G"), sensor.ID.ToString());
 			this.RouteMessage(message, sensor);
 		}
-
-		private bool IsValidSensor(Sensor sensor, Account account, ApiKey key)
-		{
-			bool invalid;
-
-			invalid = this.ValidateAccount(sensor, account, key);
-
-			invalid |= key.IsReadOnly;
-			invalid |= key.IsRevoked;
-
-			return !invalid;
-		}
-
-		private bool ValidateAccount(Sensor sensor, Account account, ApiKey key)
-		{
-			var invalid = false;
-
-			if(account.HasBillingLockout) {
-				this.m_logger.LogInformation("Skipping sensor {sensorId} due to billing lock", sensor.ID.ToString());
-				invalid = true;
-			}
-
-			if(account.IsBanned) {
-				this.m_logger.LogInformation("Skipping sensor because account {accountId:D} is banned", account.ID);
-				invalid = true;
-			}
-
-			invalid |= account.ID != key.AccountID;
-			return invalid;
-		}
-
 
 		private void RouteMessage(IPlatformMessage message, Sensor sensor)
 		{
@@ -142,49 +111,25 @@ namespace SensateIoT.Platform.Router.Common.Routing
 			this.m_counter.Inc();
 			message.PlatformTimestamp = DateTime.UtcNow;
 
-			if(!this.VerifySensor(sensor)) {
-				this.m_dropCounter.Inc();
-				this.m_eventQueue.EnqueueEvent(@event);
-				return;
-			}
-
 			foreach(var router in this.m_routers) {
-				bool status;
+				bool result;
 
 				try {
-					status = router.Route(sensor, message, @event);
+					result = router.Route(sensor, message, @event);
 				} catch(RouterException ex) {
-					status = false;
-					this.m_dropCounter.Inc();
+					result = false;
 					this.m_logger.LogWarning(ex, "Unable to route message for sensor {sensorId} using router {routerName}",
 											 message.SensorID.ToString(), router.Name);
 				}
 
-				if(!status) {
+				if(!result) {
+					this.m_dropCounter.Inc();
 					this.m_logger.LogDebug("Routing cancelled by the {routerName}", router.Name);
 					break;
 				}
 			}
 
 			this.m_eventQueue.EnqueueEvent(@event);
-		}
-
-		private bool VerifySensor(Sensor sensor)
-		{
-			var account = this.m_cache.GetAccount(sensor.AccountID);
-			var key = this.m_cache.GetApiKey(sensor.SensorKey);
-
-			if(account == null) {
-				this.m_logger.LogWarning("Account with ID {accountId:D} not found", sensor.AccountID);
-				return false;
-			}
-
-			if(key == null) {
-				this.m_logger.LogWarning("API key for sensor with ID {sensorId} not found", sensor.ID);
-				return false;
-			}
-
-			return this.IsValidSensor(sensor, account, key);
 		}
 
 		private static NetworkEvent CreateNetworkEvent(Sensor sensor)
@@ -196,6 +141,27 @@ namespace SensateIoT.Platform.Router.Common.Routing
 
 			evt.Actions.Add(NetworkEventType.MessageRouted);
 			return evt;
+		}
+
+		private bool VerifySensor(ObjectId sensorId, Sensor sensor)
+		{
+			if(sensor == null) {
+				this.m_logger.LogDebug("Unable to route message for sensor: {sensorId}. Sensor not found",
+									   sensorId.ToString());
+				return false;
+			}
+
+			if(sensor.AccountID == Guid.Empty) {
+				this.m_logger.LogWarning("Sensor {sensorId} has an invalid account ID", sensor.ID);
+				return false;
+			}
+
+			if(string.IsNullOrEmpty(sensor.SensorKey)) {
+				this.m_logger.LogWarning("Sensor {sensorId} has an API key", sensor.ID);
+				return false;
+			}
+
+			return true;
 		}
 
 		private void CheckDisposed()
