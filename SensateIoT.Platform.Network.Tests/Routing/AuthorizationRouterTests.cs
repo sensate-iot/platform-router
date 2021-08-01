@@ -27,7 +27,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 		public void CannotRouteFromBannedAccount()
 		{
 			var account = new Account { ID = Guid.NewGuid(), HasBillingLockout = false, IsBanned = true };
-			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = account.ID };
+			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = account.ID, SensorKey = "ABC" };
 			var apikey = new ApiKey { AccountID = account.ID };
 			var router = CreateCompositeRouter(sensor, account, apikey);
 
@@ -38,7 +38,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 		public void CannotRouteBillingLockedAccount()
 		{
 			var account = new Account { ID = Guid.NewGuid(), HasBillingLockout = true };
-			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = account.ID };
+			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = account.ID, SensorKey = "ABC" };
 			var apikey = new ApiKey { AccountID = account.ID };
 			var router = CreateCompositeRouter(sensor, account, apikey);
 
@@ -49,7 +49,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 		public void CannotRouteWithReadOnlyKey()
 		{
 			var account = new Account { ID = Guid.NewGuid() };
-			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = account.ID };
+			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = account.ID, SensorKey = "ABC" };
 			var apikey = new ApiKey { AccountID = account.ID, IsReadOnly = true };
 			var router = CreateCompositeRouter(sensor, account, apikey);
 
@@ -60,7 +60,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 		public void CannotRouteWithRevokedKey()
 		{
 			var account = new Account { ID = Guid.NewGuid() };
-			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = account.ID };
+			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = account.ID, SensorKey = "ABC" };
 			var apikey = new ApiKey { AccountID = account.ID, IsRevoked = true };
 			var router = CreateCompositeRouter(sensor, account, apikey);
 
@@ -71,7 +71,7 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 		public void CannotRouteWithoutAccount()
 		{
 			var account = new Account { ID = Guid.NewGuid(), HasBillingLockout = true };
-			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = Guid.NewGuid() };
+			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = Guid.NewGuid(), SensorKey = "ABC" };
 			var apikey = new ApiKey { AccountID = account.ID };
 			var router = CreateCompositeRouter(sensor, account, apikey);
 
@@ -82,11 +82,27 @@ namespace SensateIoT.Platform.Network.Tests.Routing
 		public void CannotRouteWithoutSensorKey()
 		{
 			var account = new Account { ID = Guid.NewGuid(), HasBillingLockout = true };
-			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = account.ID };
+			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = account.ID, SensorKey = "ABC" };
 			var router = CreateCompositeRouter(sensor, account, null);
 
 			this.TryExecuteRouter(router, sensor, account, null);
 		}
+
+		[TestMethod]
+		public void CannotExecuteWithEmptySensorKey()
+		{
+			var account = new Account { ID = Guid.NewGuid(), HasBillingLockout = true };
+			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = account.ID, SensorKey = "" };
+			var router = CreateCompositeRouter(sensor, account, null);
+			var key = new ApiKey {
+				AccountID = account.ID,
+				IsReadOnly = false,
+				IsRevoked = false
+			};
+
+			this.TryExecuteRouter(router, sensor, account, key);
+		}
+
 
 		private void TryExecuteRouter(IMessageRouter router, Sensor sensor, Account account, ApiKey key)
 		{
