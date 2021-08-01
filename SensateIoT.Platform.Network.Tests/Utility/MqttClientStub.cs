@@ -7,9 +7,8 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
-using SensateIoT.Platform.Network.Common.Helpers;
-using SensateIoT.Platform.Network.Common.MQTT;
+using SensateIoT.Platform.Router.Common.Helpers;
+using SensateIoT.Platform.Router.Common.MQTT;
 
 namespace SensateIoT.Platform.Network.Tests.Utility
 {

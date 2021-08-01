@@ -3,11 +3,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
-using SensateIoT.Platform.Network.Common.Services.Data;
-using SensateIoT.Platform.Network.Common.Services.Metrics;
-using SensateIoT.Platform.Network.Common.Services.Processing;
-using SensateIoT.Platform.Network.Common.Settings;
+using SensateIoT.Platform.Router.Common.Services.Data;
+using SensateIoT.Platform.Router.Common.Services.Metrics;
+using SensateIoT.Platform.Router.Common.Services.Processing;
+using SensateIoT.Platform.Router.Common.Settings;
 
 namespace SensateIoT.Platform.Network.Router.Init
 {

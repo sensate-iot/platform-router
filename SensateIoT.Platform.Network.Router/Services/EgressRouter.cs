@@ -16,11 +16,10 @@ using Grpc.Core;
 
 using JetBrains.Annotations;
 using Prometheus;
-
-using SensateIoT.Platform.Network.Common.Collections.Abstract;
-using SensateIoT.Platform.Network.Common.Converters;
 using SensateIoT.Platform.Network.Contracts.RPC;
 using SensateIoT.Platform.Network.Data.Abstract;
+using SensateIoT.Platform.Router.Common.Collections.Abstract;
+using SensateIoT.Platform.Router.Common.Converters;
 
 namespace SensateIoT.Platform.Network.Router.Services
 {

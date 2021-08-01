@@ -12,13 +12,12 @@ using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using MongoDB.Bson;
-using SensateIoT.Platform.Network.Common.Collections.Abstract;
-using SensateIoT.Platform.Network.Common.Collections.Remote;
-using SensateIoT.Platform.Network.Common.Settings;
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Network.Tests.Utility;
-
+using SensateIoT.Platform.Router.Common.Collections.Abstract;
+using SensateIoT.Platform.Router.Common.Collections.Remote;
+using SensateIoT.Platform.Router.Common.Settings;
 using DataPoint = SensateIoT.Platform.Network.Data.DTO.DataPoint;
 using Measurement = SensateIoT.Platform.Network.Data.DTO.Measurement;
 using Message = SensateIoT.Platform.Network.Data.DTO.Message;

@@ -1,8 +1,8 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SensateIoT.Platform.Network.Common.Init;
 using SensateIoT.Platform.Network.Router.Config;
+using SensateIoT.Platform.Router.Common.Init;
 
 namespace SensateIoT.Platform.Network.Router.Init
 {

@@ -1,9 +1,8 @@
 ﻿using System;
-
-using SensateIoT.Platform.Network.Common.Routing.Abstract;
 using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
+using SensateIoT.Platform.Router.Common.Routing.Abstract;
 
 namespace SensateIoT.Platform.Network.Tests.Routing
 {

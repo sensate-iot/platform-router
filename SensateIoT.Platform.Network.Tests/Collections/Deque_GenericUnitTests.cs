@@ -9,9 +9,9 @@ using System;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SensateIoT.Platform.Network.Common.Collections.Abstract;
-using SensateIoT.Platform.Network.Common.Collections.Local;
 using SensateIoT.Platform.Network.Tests.Utility;
+using SensateIoT.Platform.Router.Common.Collections.Abstract;
+using SensateIoT.Platform.Router.Common.Collections.Local;
 
 namespace SensateIoT.Platform.Network.Tests.Collections
 {

@@ -8,16 +8,17 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
+
 using Microsoft.Extensions.Logging;
 
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 
-using SensateIoT.Platform.Network.Common.Caching.Abstract;
-using SensateIoT.Platform.Network.Common.Caching.Routing;
-using SensateIoT.Platform.Network.Common.MQTT;
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Enums;
+using SensateIoT.Platform.Router.Common.Caching.Abstract;
+using SensateIoT.Platform.Router.Common.Caching.Routing;
+using SensateIoT.Platform.Router.Common.MQTT;
 
 namespace SensateIoT.Platform.Network.Router.MQTT
 {

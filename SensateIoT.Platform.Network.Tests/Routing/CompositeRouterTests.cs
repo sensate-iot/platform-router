@@ -12,15 +12,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using MongoDB.Bson;
 using Moq;
-
-using SensateIoT.Platform.Network.Common.Caching.Abstract;
-using SensateIoT.Platform.Network.Common.Collections.Abstract;
-using SensateIoT.Platform.Network.Common.Exceptions;
-using SensateIoT.Platform.Network.Common.Routing;
-using SensateIoT.Platform.Network.Common.Routing.Abstract;
 using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
+using SensateIoT.Platform.Router.Common.Caching.Abstract;
+using SensateIoT.Platform.Router.Common.Collections.Abstract;
+using SensateIoT.Platform.Router.Common.Exceptions;
+using SensateIoT.Platform.Router.Common.Routing;
+using SensateIoT.Platform.Router.Common.Routing.Abstract;
 
 namespace SensateIoT.Platform.Network.Tests.Routing
 {
