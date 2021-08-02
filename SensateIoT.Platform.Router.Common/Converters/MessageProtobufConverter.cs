@@ -10,9 +10,9 @@ using System.Collections.Generic;
 
 using Google.Protobuf.WellKnownTypes;
 using MongoDB.Bson;
-using SensateIoT.Platform.Network.Data.Enums;
 using SensateIoT.Platform.Router.Contracts.DTO;
 using SensateIoT.Platform.Router.Data.DTO;
+using SensateIoT.Platform.Router.Data.Enums;
 
 namespace SensateIoT.Platform.Router.Common.Converters
 {

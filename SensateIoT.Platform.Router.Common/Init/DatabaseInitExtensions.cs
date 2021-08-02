@@ -6,11 +6,10 @@
  */
 
 using Microsoft.Extensions.DependencyInjection;
-
-using SensateIoT.Platform.Network.DataAccess.Abstract;
-using SensateIoT.Platform.Network.DataAccess.Config;
-using SensateIoT.Platform.Network.DataAccess.Contexts;
-using SensateIoT.Platform.Network.DataAccess.Settings;
+using SensateIoT.Platform.Router.DataAccess.Abstract;
+using SensateIoT.Platform.Router.DataAccess.Config;
+using SensateIoT.Platform.Router.DataAccess.Contexts;
+using SensateIoT.Platform.Router.DataAccess.Settings;
 
 namespace SensateIoT.Platform.Router.Common.Init
 {

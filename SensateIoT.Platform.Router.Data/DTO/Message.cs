@@ -8,9 +8,9 @@
 using System;
 using MongoDB.Bson;
 using Newtonsoft.Json;
-using SensateIoT.Platform.Network.Data.Enums;
 using SensateIoT.Platform.Router.Data.Abstract;
 using SensateIoT.Platform.Router.Data.Converters;
+using SensateIoT.Platform.Router.Data.Enums;
 
 namespace SensateIoT.Platform.Router.Data.DTO
 {

@@ -5,7 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
-namespace SensateIoT.Platform.Network.Data.Models
+namespace SensateIoT.Platform.Router.Data.Models
 {
 	public class LiveDataHandler
 	{

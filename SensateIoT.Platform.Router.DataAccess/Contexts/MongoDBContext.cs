@@ -6,16 +6,13 @@
  */
 
 using System;
-
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-
 using MongoDB.Driver;
+using SensateIoT.Platform.Router.Data.Models;
+using SensateIoT.Platform.Router.DataAccess.Config;
 
-using SensateIoT.Platform.Network.Data.Models;
-using SensateIoT.Platform.Network.DataAccess.Config;
-
-namespace SensateIoT.Platform.Network.DataAccess.Contexts
+namespace SensateIoT.Platform.Router.DataAccess.Contexts
 {
 	public class MongoDBContext
 	{

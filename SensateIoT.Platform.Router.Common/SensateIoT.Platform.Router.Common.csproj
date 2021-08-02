@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SensateIoT.Platform.Network.DataAccess\SensateIoT.Platform.Network.DataAccess.csproj" />
+    <ProjectReference Include="..\SensateIoT.Platform.Router.DataAccess\SensateIoT.Platform.Router.DataAccess.csproj" />
     <ProjectReference Include="..\SensateIoT.Platform.Router.Data\SensateIoT.Platform.Router.Data.csproj" />
     <ProjectReference Include="..\SensateIoT.Platform.Router.Contracts\SensateIoT.Platform.Router.Contracts.csproj" />
   </ItemGroup>

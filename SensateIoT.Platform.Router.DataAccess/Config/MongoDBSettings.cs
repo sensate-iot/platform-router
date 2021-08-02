@@ -5,7 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
-namespace SensateIoT.Platform.Network.DataAccess.Config
+namespace SensateIoT.Platform.Router.DataAccess.Config
 {
 	public class MongoDBSettings
 	{

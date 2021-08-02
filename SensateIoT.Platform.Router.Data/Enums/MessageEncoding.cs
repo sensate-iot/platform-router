@@ -7,7 +7,7 @@
 
 using JetBrains.Annotations;
 
-namespace SensateIoT.Platform.Network.Data.Enums
+namespace SensateIoT.Platform.Router.Data.Enums
 {
 	[PublicAPI]
 	public enum MessageEncoding

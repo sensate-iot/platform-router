@@ -7,14 +7,15 @@
 
 using System;
 
+using JetBrains.Annotations;
+using Newtonsoft.Json;
+
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-using Newtonsoft.Json;
-using JetBrains.Annotations;
 using SensateIoT.Platform.Router.Data.Converters;
 
-namespace SensateIoT.Platform.Network.Data.Models
+namespace SensateIoT.Platform.Router.Data.Models
 {
 	[PublicAPI]
 	public class Sensor

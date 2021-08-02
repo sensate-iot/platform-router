@@ -9,12 +9,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-
 using MongoDB.Bson;
-
 using SensateIoT.Platform.Router.Data.DTO;
 
-namespace SensateIoT.Platform.Network.DataAccess.Abstract
+namespace SensateIoT.Platform.Router.DataAccess.Abstract
 {
 	public interface IRoutingRepository
 	{

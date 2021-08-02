@@ -12,11 +12,10 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Bson;
-
-using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Router.Common.Caching.Abstract;
 using SensateIoT.Platform.Router.Data.DTO;
 using SensateIoT.Platform.Router.Data.Enums;
+using SensateIoT.Platform.Router.DataAccess.Abstract;
 
 namespace SensateIoT.Platform.Router.Common.Caching.Routing
 {

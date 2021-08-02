@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data.Common;
 
-namespace SensateIoT.Platform.Network.DataAccess.Abstract
+namespace SensateIoT.Platform.Router.DataAccess.Abstract
 {
 	public interface INetworkingDbContext : IDisposable
 	{

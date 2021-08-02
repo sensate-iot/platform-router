@@ -8,10 +8,9 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using SensateIoT.Platform.Router.Data.Models;
 
-using SensateIoT.Platform.Network.Data.Models;
-
-namespace SensateIoT.Platform.Network.DataAccess.Abstract
+namespace SensateIoT.Platform.Router.DataAccess.Abstract
 {
 	public interface ILiveDataHandlerRepository
 	{

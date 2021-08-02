@@ -10,8 +10,8 @@ using System.Collections.Generic;
 
 using MongoDB.Bson;
 
-using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Router.Data.DTO;
+using SensateIoT.Platform.Router.Data.Models;
 
 using ApiKey = SensateIoT.Platform.Router.Data.DTO.ApiKey;
 using Sensor = SensateIoT.Platform.Router.Data.DTO.Sensor;

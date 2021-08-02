@@ -4,10 +4,10 @@ using System.Data.Common;
 using Microsoft.Extensions.Options;
 
 using Npgsql;
-using SensateIoT.Platform.Network.DataAccess.Abstract;
-using SensateIoT.Platform.Network.DataAccess.Settings;
+using SensateIoT.Platform.Router.DataAccess.Abstract;
+using SensateIoT.Platform.Router.DataAccess.Settings;
 
-namespace SensateIoT.Platform.Network.DataAccess.Contexts
+namespace SensateIoT.Platform.Router.DataAccess.Contexts
 {
 	public class AuthorizationDbContext : IAuthorizationDbContext
 	{

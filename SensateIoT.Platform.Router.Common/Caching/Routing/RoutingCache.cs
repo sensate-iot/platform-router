@@ -15,10 +15,12 @@ using Microsoft.Extensions.Logging;
 
 using JetBrains.Annotations;
 using MongoDB.Bson;
-using SensateIoT.Platform.Network.Data.Models;
+
 using SensateIoT.Platform.Router.Common.Caching.Abstract;
 using SensateIoT.Platform.Router.Common.Caching.Comparators;
 using SensateIoT.Platform.Router.Data.DTO;
+using SensateIoT.Platform.Router.Data.Models;
+
 using ApiKey = SensateIoT.Platform.Router.Data.DTO.ApiKey;
 using Sensor = SensateIoT.Platform.Router.Data.DTO.Sensor;
 

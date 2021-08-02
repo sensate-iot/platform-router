@@ -17,11 +17,11 @@ using MongoDB.Driver;
 using Npgsql;
 using NpgsqlTypes;
 
-using SensateIoT.Platform.Network.DataAccess.Abstract;
-using SensateIoT.Platform.Network.DataAccess.Contexts;
 using SensateIoT.Platform.Router.Data.DTO;
+using SensateIoT.Platform.Router.DataAccess.Abstract;
+using SensateIoT.Platform.Router.DataAccess.Contexts;
 
-namespace SensateIoT.Platform.Network.DataAccess.Repositories
+namespace SensateIoT.Platform.Router.DataAccess.Repositories
 {
 	public class RoutingRepository : IRoutingRepository
 	{
