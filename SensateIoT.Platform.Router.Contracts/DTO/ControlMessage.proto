@@ -1,8 +1,8 @@
 ﻿
 syntax = "proto3";
 
-package sensateiot;
-option csharp_namespace = "SensateIoT.Platform.Network.Contracts.DTO";
+package sensateiot.router;
+option csharp_namespace = "SensateIoT.Platform.Router.Contracts.DTO";
 
 import "google/protobuf/timestamp.proto";
 

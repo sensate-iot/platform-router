@@ -1,5 +1,5 @@
 ﻿/*
- * Network events.
+ * Router events.
  *
  * @author Michel Megens
  * @email  michel@michelmegens.net
@@ -7,8 +7,8 @@
 
 syntax = "proto3";
 
-package sensateiot;
-option csharp_namespace = "SensateIoT.Platform.Network.Contracts.DTO";
+package sensateiot.router;
+option csharp_namespace = "SensateIoT.Platform.Router.Contracts.DTO";
 
 enum TriggerEventType
 {

@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
 
-using SensateIoT.Platform.Network.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Router.Common.Caching.Abstract;
 using SensateIoT.Platform.Router.Common.Exceptions;
 using SensateIoT.Platform.Router.Common.Routing.Abstract;
+using SensateIoT.Platform.Router.Contracts.DTO;
 
 namespace SensateIoT.Platform.Router.Common.Routing.Routers
 {

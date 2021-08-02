@@ -16,15 +16,17 @@ using Grpc.Core;
 
 using JetBrains.Annotations;
 using Prometheus;
-using SensateIoT.Platform.Network.Contracts.RPC;
+
 using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Router.Common.Collections.Abstract;
 using SensateIoT.Platform.Router.Common.Converters;
+using SensateIoT.Platform.Router.Contracts.DTO;
+using SensateIoT.Platform.Router.Contracts.RPC;
 
 namespace SensateIoT.Platform.Network.Router.Services
 {
 	[UsedImplicitly]
-	public class EgressRouter : Contracts.Services.EgressRouter.EgressRouterBase
+	public class EgressRouter : Platform.Router.Contracts.Services.EgressRouter.EgressRouterBase
 	{
 		private readonly IQueue<IPlatformMessage> m_queue;
 		private readonly ILogger<EgressRouter> m_logger;
@@ -39,7 +41,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 			this.m_duration = Metrics.CreateHistogram("router_egress_request_duration_seconds", "Histogram of egress routing duration.");
 		}
 
-		public override Task<RoutingResponse> EnqueueBulkControlMessages(Contracts.DTO.ControlMessageData request, ServerCallContext context)
+		public override Task<RoutingResponse> EnqueueBulkControlMessages(ControlMessageData request, ServerCallContext context)
 		{
 			RoutingResponse response;
 
@@ -71,7 +73,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 			return Task.FromResult(response);
 		}
 
-		public override Task<RoutingResponse> EnqueueControlMessage(Contracts.DTO.ControlMessage request, ServerCallContext context)
+		public override Task<RoutingResponse> EnqueueControlMessage(ControlMessage request, ServerCallContext context)
 		{
 			RoutingResponse response;
 

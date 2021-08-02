@@ -16,17 +16,20 @@ using Grpc.Core;
 
 using JetBrains.Annotations;
 using Prometheus;
-using SensateIoT.Platform.Network.Contracts.RPC;
+
+using SensateIoT.Platform.Router.Contracts.RPC;
 using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Router.Common.Collections.Abstract;
 using SensateIoT.Platform.Router.Common.Converters;
 using SensateIoT.Platform.Router.Common.Validators;
+using SensateIoT.Platform.Router.Contracts.DTO;
+using Measurement = SensateIoT.Platform.Network.Data.DTO.Measurement;
 
 namespace SensateIoT.Platform.Network.Router.Services
 {
 	[UsedImplicitly]
-	public class IngressRouter : Contracts.Services.IngressRouter.IngressRouterBase
+	public class IngressRouter : Platform.Router.Contracts.Services.IngressRouter.IngressRouterBase
 	{
 		private readonly IQueue<IPlatformMessage> m_queue;
 		private readonly ILogger<IngressRouter> m_logger;
@@ -43,7 +46,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 			this.m_duration = Metrics.CreateHistogram("router_ingress_request_duration_seconds", "Histogram of egress routing duration.");
 		}
 
-		public override Task<RoutingResponse> EnqueueMeasurement(Contracts.DTO.Measurement request, ServerCallContext context)
+		public override Task<RoutingResponse> EnqueueMeasurement(Platform.Router.Contracts.DTO.Measurement request, ServerCallContext context)
 		{
 			RoutingResponse response;
 
@@ -82,7 +85,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 			return Task.FromResult(response);
 		}
 
-		public override Task<RoutingResponse> EnqueueMessage(Contracts.DTO.TextMessage request, ServerCallContext context)
+		public override Task<RoutingResponse> EnqueueMessage(TextMessage request, ServerCallContext context)
 		{
 			RoutingResponse response;
 
@@ -119,7 +122,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 			return Task.FromResult(response);
 		}
 
-		public override Task<RoutingResponse> EnqueueBulkMeasurements(Contracts.DTO.MeasurementData request, ServerCallContext context)
+		public override Task<RoutingResponse> EnqueueBulkMeasurements(MeasurementData request, ServerCallContext context)
 		{
 			RoutingResponse response;
 
@@ -159,7 +162,7 @@ namespace SensateIoT.Platform.Network.Router.Services
 			return Task.FromResult(response);
 		}
 
-		public override Task<RoutingResponse> EnqueueBulkMessages(Contracts.DTO.TextMessageData request, ServerCallContext context)
+		public override Task<RoutingResponse> EnqueueBulkMessages(TextMessageData request, ServerCallContext context)
 		{
 			RoutingResponse response;
 

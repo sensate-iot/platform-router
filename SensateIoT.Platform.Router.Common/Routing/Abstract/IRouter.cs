@@ -5,7 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
-using SensateIoT.Platform.Network.Contracts.DTO;
+using SensateIoT.Platform.Router.Contracts.DTO;
 using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
 

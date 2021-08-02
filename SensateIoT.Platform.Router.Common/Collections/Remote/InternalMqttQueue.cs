@@ -15,7 +15,7 @@ using Microsoft.Extensions.Options;
 
 using Google.Protobuf;
 using Prometheus;
-using SensateIoT.Platform.Network.Contracts.DTO;
+
 using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Models;
@@ -24,6 +24,8 @@ using SensateIoT.Platform.Router.Common.Converters;
 using SensateIoT.Platform.Router.Common.Helpers;
 using SensateIoT.Platform.Router.Common.MQTT;
 using SensateIoT.Platform.Router.Common.Settings;
+using SensateIoT.Platform.Router.Contracts.DTO;
+
 using ControlMessage = SensateIoT.Platform.Network.Data.DTO.ControlMessage;
 using Message = SensateIoT.Platform.Network.Data.DTO.Message;
 
