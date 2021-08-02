@@ -9,12 +9,13 @@ using Microsoft.Extensions.Logging;
 
 using Moq;
 using MongoDB.Bson;
-using SensateIoT.Platform.Network.Data.DTO;
+
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Router.Common.Caching.Abstract;
 using SensateIoT.Platform.Router.Common.Caching.Routing;
-using ApiKey = SensateIoT.Platform.Network.Data.DTO.ApiKey;
-using Sensor = SensateIoT.Platform.Network.Data.DTO.Sensor;
+using SensateIoT.Platform.Router.Data.DTO;
+
+using Sensor = SensateIoT.Platform.Router.Data.DTO.Sensor;
 
 namespace SensateIoT.Platform.Network.Tests.Utility
 {

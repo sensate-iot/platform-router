@@ -14,12 +14,12 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Router.Common.Caching.Abstract;
 using SensateIoT.Platform.Router.Common.Collections.Abstract;
 using SensateIoT.Platform.Router.Common.Services.Background;
 using SensateIoT.Platform.Router.Common.Settings;
+using SensateIoT.Platform.Router.Data.DTO;
 
 namespace SensateIoT.Platform.Router.Common.Services.Data
 {

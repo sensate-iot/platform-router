@@ -3,7 +3,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Repositories;
 using SensateIoT.Platform.Router.Common.Caching.Abstract;
@@ -13,6 +12,7 @@ using SensateIoT.Platform.Router.Common.Collections.Local;
 using SensateIoT.Platform.Router.Common.Collections.Remote;
 using SensateIoT.Platform.Router.Common.Services.Processing;
 using SensateIoT.Platform.Router.Common.Settings;
+using SensateIoT.Platform.Router.Data.Abstract;
 
 namespace SensateIoT.Platform.Network.Router.Init
 {

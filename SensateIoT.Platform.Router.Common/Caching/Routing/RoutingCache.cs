@@ -10,15 +10,17 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using JetBrains.Annotations;
+
 using Microsoft.Extensions.Logging;
+
+using JetBrains.Annotations;
 using MongoDB.Bson;
-using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.Data.Models;
 using SensateIoT.Platform.Router.Common.Caching.Abstract;
 using SensateIoT.Platform.Router.Common.Caching.Comparators;
-using ApiKey = SensateIoT.Platform.Network.Data.DTO.ApiKey;
-using Sensor = SensateIoT.Platform.Network.Data.DTO.Sensor;
+using SensateIoT.Platform.Router.Data.DTO;
+using ApiKey = SensateIoT.Platform.Router.Data.DTO.ApiKey;
+using Sensor = SensateIoT.Platform.Router.Data.DTO.Sensor;
 
 namespace SensateIoT.Platform.Router.Common.Caching.Routing
 {

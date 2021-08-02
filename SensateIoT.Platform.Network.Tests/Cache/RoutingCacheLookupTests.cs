@@ -13,9 +13,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using MongoDB.Bson;
 using Moq;
-using SensateIoT.Platform.Network.Data.DTO;
+
 using SensateIoT.Platform.Router.Common.Caching.Abstract;
 using SensateIoT.Platform.Router.Common.Caching.Routing;
+using SensateIoT.Platform.Router.Data.DTO;
 
 namespace SensateIoT.Platform.Network.Tests.Cache
 {

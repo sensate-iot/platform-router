@@ -10,12 +10,12 @@ using System;
 using MongoDB.Bson;
 using Newtonsoft.Json;
 
-using SensateIoT.Platform.Network.Data.Abstract;
-using SensateIoT.Platform.Network.Data.Converters;
+using SensateIoT.Platform.Router.Data.Abstract;
+using SensateIoT.Platform.Router.Data.Converters;
 
-using DataPointMap = System.Collections.Generic.IDictionary<string, SensateIoT.Platform.Network.Data.DTO.DataPoint>;
+using DataPointMap = System.Collections.Generic.IDictionary<string, SensateIoT.Platform.Router.Data.DTO.DataPoint>;
 
-namespace SensateIoT.Platform.Network.Data.DTO
+namespace SensateIoT.Platform.Router.Data.DTO
 {
 	public class Measurement : IPlatformMessage
 	{

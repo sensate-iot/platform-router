@@ -21,5 +21,6 @@
     <ProjectReference Include="..\SensateIoT.Platform.Network.Common\SensateIoT.Platform.Router.Common.csproj" />
     <ProjectReference Include="..\SensateIoT.Platform.Network.Data\SensateIoT.Platform.Network.Data.csproj" />
     <ProjectReference Include="..\SensateIoT.Platform.Router.Common\SensateIoT.Platform.Router.Common.csproj" />
+    <ProjectReference Include="..\SensateIoT.Platform.Router.Data\SensateIoT.Platform.Router.Data.csproj" />
   </ItemGroup>
 </Project>

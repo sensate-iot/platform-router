@@ -12,16 +12,14 @@ using Microsoft.Extensions.Options;
 
 using Newtonsoft.Json;
 using Prometheus;
-
-using SensateIoT.Platform.Network.Data.Abstract;
-using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Router.Common.Collections.Abstract;
 using SensateIoT.Platform.Router.Common.Routing.Abstract;
 using SensateIoT.Platform.Router.Common.Services.Processing;
 using SensateIoT.Platform.Router.Common.Settings;
 using SensateIoT.Platform.Router.Contracts.DTO;
-
-using ControlMessage = SensateIoT.Platform.Network.Data.DTO.ControlMessage;
+using SensateIoT.Platform.Router.Data.Abstract;
+using SensateIoT.Platform.Router.Data.DTO;
+using ControlMessage = SensateIoT.Platform.Router.Data.DTO.ControlMessage;
 
 namespace SensateIoT.Platform.Router.Common.Routing.Routers
 {

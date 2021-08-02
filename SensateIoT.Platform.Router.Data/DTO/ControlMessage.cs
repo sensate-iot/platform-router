@@ -3,15 +3,13 @@
  */
 
 using System;
-
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
+using SensateIoT.Platform.Router.Data.Abstract;
+using SensateIoT.Platform.Router.Data.Converters;
 
-using SensateIoT.Platform.Network.Data.Abstract;
-using SensateIoT.Platform.Network.Data.Converters;
-
-namespace SensateIoT.Platform.Network.Data.DTO
+namespace SensateIoT.Platform.Router.Data.DTO
 {
 	public class ControlMessage : IPlatformMessage
 	{

@@ -5,7 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
-namespace SensateIoT.Platform.Network.Data.DTO
+namespace SensateIoT.Platform.Router.Data.DTO
 {
 	public class RoutingTarget
 	{

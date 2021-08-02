@@ -6,12 +6,11 @@
  */
 
 using Prometheus;
-
-using SensateIoT.Platform.Network.Data.Abstract;
-using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Router.Common.Collections.Abstract;
 using SensateIoT.Platform.Router.Common.Routing.Abstract;
 using SensateIoT.Platform.Router.Contracts.DTO;
+using SensateIoT.Platform.Router.Data.Abstract;
+using SensateIoT.Platform.Router.Data.DTO;
 
 namespace SensateIoT.Platform.Router.Common.Routing.Routers
 {

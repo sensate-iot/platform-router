@@ -14,13 +14,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson;
 using Moq;
 
-using SensateIoT.Platform.Network.Data.Abstract;
-using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Router.Common.Collections.Abstract;
 using SensateIoT.Platform.Router.Common.Routing.Routers;
 using SensateIoT.Platform.Router.Contracts.DTO;
+using SensateIoT.Platform.Router.Data.Abstract;
+using SensateIoT.Platform.Router.Data.DTO;
 
-using Measurement = SensateIoT.Platform.Network.Data.DTO.Measurement;
+using Measurement = SensateIoT.Platform.Router.Data.DTO.Measurement;
 
 namespace SensateIoT.Platform.Network.Tests.Routing
 {

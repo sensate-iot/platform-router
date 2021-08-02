@@ -5,7 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
-namespace SensateIoT.Platform.Network.Data.Abstract
+namespace SensateIoT.Platform.Router.Data.Abstract
 {
 	public enum MessageType
 	{

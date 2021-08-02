@@ -6,7 +6,7 @@
  */
 
 using System;
-using SensateIoT.Platform.Network.Data.DTO;
+using SensateIoT.Platform.Router.Data.DTO;
 
 namespace SensateIoT.Platform.Router.Common.Validators
 {

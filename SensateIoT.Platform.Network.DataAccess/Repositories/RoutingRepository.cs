@@ -17,12 +17,9 @@ using MongoDB.Driver;
 using Npgsql;
 using NpgsqlTypes;
 
-using SensateIoT.Platform.Network.Data.DTO;
 using SensateIoT.Platform.Network.DataAccess.Abstract;
 using SensateIoT.Platform.Network.DataAccess.Contexts;
-
-using ApiKey = SensateIoT.Platform.Network.Data.DTO.ApiKey;
-using Sensor = SensateIoT.Platform.Network.Data.DTO.Sensor;
+using SensateIoT.Platform.Router.Data.DTO;
 
 namespace SensateIoT.Platform.Network.DataAccess.Repositories
 {

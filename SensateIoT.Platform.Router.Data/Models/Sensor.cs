@@ -12,8 +12,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 using Newtonsoft.Json;
 using JetBrains.Annotations;
-
-using SensateIoT.Platform.Network.Data.Converters;
+using SensateIoT.Platform.Router.Data.Converters;
 
 namespace SensateIoT.Platform.Network.Data.Models
 {

@@ -14,11 +14,11 @@ using Microsoft.Extensions.Logging;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 
-using SensateIoT.Platform.Network.Data.DTO;
-using SensateIoT.Platform.Network.Data.Enums;
 using SensateIoT.Platform.Router.Common.Caching.Abstract;
 using SensateIoT.Platform.Router.Common.Caching.Routing;
 using SensateIoT.Platform.Router.Common.MQTT;
+using SensateIoT.Platform.Router.Data.DTO;
+using SensateIoT.Platform.Router.Data.Enums;
 
 namespace SensateIoT.Platform.Network.Router.MQTT
 {

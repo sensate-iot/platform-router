@@ -6,7 +6,7 @@
  */
 
 using System.Threading.Tasks;
-using SensateIoT.Platform.Network.Data.Abstract;
+using SensateIoT.Platform.Router.Data.Abstract;
 
 namespace SensateIoT.Platform.Router.Common.Collections.Abstract
 {

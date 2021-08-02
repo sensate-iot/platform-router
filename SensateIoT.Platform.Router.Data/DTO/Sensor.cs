@@ -7,10 +7,9 @@
 
 using System;
 using System.Collections.Generic;
-
 using MongoDB.Bson;
 
-namespace SensateIoT.Platform.Network.Data.DTO
+namespace SensateIoT.Platform.Router.Data.DTO
 {
 	public class Sensor
 	{

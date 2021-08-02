@@ -9,7 +9,7 @@
 using System;
 using Newtonsoft.Json;
 
-namespace SensateIoT.Platform.Network.Data.Converters
+namespace SensateIoT.Platform.Router.Data.Converters
 {
 	public class DecimalJsonConverter : JsonConverter
 	{

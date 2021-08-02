@@ -8,11 +8,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using MongoDB.Bson;
 using Newtonsoft.Json;
-using SensateIoT.Platform.Network.Data.DTO;
-using SensateIoT.Platform.Network.Data.Enums;
+
 using SensateIoT.Platform.Router.Common.Caching.Abstract;
+using SensateIoT.Platform.Router.Data.DTO;
+using SensateIoT.Platform.Router.Data.Enums;
 
 namespace SensateIoT.Platform.Router.Common.Caching.Routing
 {

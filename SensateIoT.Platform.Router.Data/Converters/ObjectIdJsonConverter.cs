@@ -13,7 +13,7 @@ using MongoDB.Bson;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace SensateIoT.Platform.Network.Data.Converters
+namespace SensateIoT.Platform.Router.Data.Converters
 {
 	public class ObjectIdJsonConverter : JsonConverter
 	{

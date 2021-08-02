@@ -9,7 +9,7 @@ using System;
 using JetBrains.Annotations;
 using MongoDB.Bson;
 
-namespace SensateIoT.Platform.Network.Data.Abstract
+namespace SensateIoT.Platform.Router.Data.Abstract
 {
 	[PublicAPI]
 	public interface IPlatformMessage

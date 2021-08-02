@@ -14,7 +14,7 @@ using MongoDB.Bson;
 
 using SensateIoT.Platform.Router.Contracts.DTO;
 
-using Measurement = SensateIoT.Platform.Network.Data.DTO.Measurement;
+using Measurement = SensateIoT.Platform.Router.Data.DTO.Measurement;
 
 namespace SensateIoT.Platform.Router.Common.Converters
 {
@@ -75,7 +75,7 @@ namespace SensateIoT.Platform.Router.Common.Converters
 		public static Measurement Convert(Contracts.DTO.Measurement measurement)
 		{
 			return new Measurement {
-				Data = measurement.Datapoints.ToDictionary(x => x.Key, x => new Network.Data.DTO.DataPoint {
+				Data = measurement.Datapoints.ToDictionary(x => x.Key, x => new Data.DTO.DataPoint {
 					Value = System.Convert.ToDecimal(x.Value),
 					Accuracy = x.Accuracy,
 					Precision = x.Precision,

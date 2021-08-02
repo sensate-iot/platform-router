@@ -7,7 +7,8 @@
 
 using System;
 using System.Collections.Generic;
-using SensateIoT.Platform.Network.Data.Abstract;
+
+using SensateIoT.Platform.Router.Data.Abstract;
 
 namespace SensateIoT.Platform.Router.Common.Routing.Abstract
 {

@@ -13,11 +13,11 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SensateIoT.Platform.Network.Data.Abstract;
 using SensateIoT.Platform.Router.Common.Collections.Abstract;
 using SensateIoT.Platform.Router.Common.Routing.Abstract;
 using SensateIoT.Platform.Router.Common.Services.Background;
 using SensateIoT.Platform.Router.Common.Settings;
+using SensateIoT.Platform.Router.Data.Abstract;
 
 namespace SensateIoT.Platform.Router.Common.Services.Processing
 {

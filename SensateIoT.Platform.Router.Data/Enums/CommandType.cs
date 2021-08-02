@@ -5,7 +5,7 @@
  * @email  michel@michelmegens.net
  */
 
-namespace SensateIoT.Platform.Network.Data.Enums
+namespace SensateIoT.Platform.Router.Data.Enums
 {
 	public enum CommandType
 	{

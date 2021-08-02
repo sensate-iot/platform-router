@@ -7,7 +7,7 @@
 
 using System;
 
-namespace SensateIoT.Platform.Network.Data.DTO
+namespace SensateIoT.Platform.Router.Data.DTO
 {
 	public class ApiKey
 	{

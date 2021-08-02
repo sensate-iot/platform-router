@@ -12,10 +12,7 @@ using System.Threading.Tasks;
 
 using MongoDB.Bson;
 
-using SensateIoT.Platform.Network.Data.DTO;
-
-using ApiKey = SensateIoT.Platform.Network.Data.DTO.ApiKey;
-using Sensor = SensateIoT.Platform.Network.Data.DTO.Sensor;
+using SensateIoT.Platform.Router.Data.DTO;
 
 namespace SensateIoT.Platform.Network.DataAccess.Abstract
 {
