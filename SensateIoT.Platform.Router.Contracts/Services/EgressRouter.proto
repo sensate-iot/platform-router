@@ -1,0 +1,20 @@
+﻿/*
+ * Egress router gRPC service definition.
+ *
+ * @author Michel Megens
+ * @email  michel@michelmegens.net
+ */
+
+syntax = "proto3";
+
+package sensateiot.router;
+option csharp_namespace = "SensateIoT.Platform.Router.Contracts.Services";
+
+import "DTO/ControlMessage.proto";
+import "RPC/RoutingResponse.proto";
+
+service EgressRouter
+{
+	rpc EnqueueControlMessage(ControlMessage) returns (RoutingResponse);
+	rpc EnqueueBulkControlMessages(ControlMessageData) returns (RoutingResponse);
+}
