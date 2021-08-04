@@ -20,7 +20,7 @@ using SensateIoT.Platform.Router.Common.MQTT;
 using SensateIoT.Platform.Router.Data.DTO;
 using SensateIoT.Platform.Router.Data.Enums;
 
-namespace SensateIoT.Platform.Network.Router.MQTT
+namespace SensateIoT.Platform.Router.Service.MQTT
 {
 	[UsedImplicitly]
 	public class CommandConsumer : IMqttHandler

@@ -9,24 +9,24 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using Microsoft.Extensions.Logging;
-
 using Google.Protobuf;
 using Grpc.Core;
 
 using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
 using Prometheus;
 
-using SensateIoT.Platform.Router.Contracts.RPC;
 using SensateIoT.Platform.Router.Common.Collections.Abstract;
 using SensateIoT.Platform.Router.Common.Converters;
 using SensateIoT.Platform.Router.Common.Validators;
 using SensateIoT.Platform.Router.Contracts.DTO;
+using SensateIoT.Platform.Router.Contracts.RPC;
 using SensateIoT.Platform.Router.Data.Abstract;
 using SensateIoT.Platform.Router.Data.DTO;
+
 using Measurement = SensateIoT.Platform.Router.Data.DTO.Measurement;
 
-namespace SensateIoT.Platform.Network.Router.Services
+namespace SensateIoT.Platform.Router.Service.Services
 {
 	[UsedImplicitly]
 	public class IngressRouter : Platform.Router.Contracts.Services.IngressRouter.IngressRouterBase

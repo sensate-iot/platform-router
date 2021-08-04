@@ -5,7 +5,7 @@
  * @email  michel.megens@sonatolabs.com
  */
 
-namespace SensateIoT.Platform.Network.Router.Config
+namespace SensateIoT.Platform.Router.Service.Config
 {
 	public class DatabaseConfig
 	{

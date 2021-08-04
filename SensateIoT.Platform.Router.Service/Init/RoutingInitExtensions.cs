@@ -3,6 +3,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+
 using SensateIoT.Platform.Router.Common.Caching.Abstract;
 using SensateIoT.Platform.Router.Common.Caching.Routing;
 using SensateIoT.Platform.Router.Common.Collections.Abstract;
@@ -14,7 +15,7 @@ using SensateIoT.Platform.Router.Data.Abstract;
 using SensateIoT.Platform.Router.DataAccess.Abstract;
 using SensateIoT.Platform.Router.DataAccess.Repositories;
 
-namespace SensateIoT.Platform.Network.Router.Init
+namespace SensateIoT.Platform.Router.Service.Init
 {
 	public static class RoutingInitExtensions
 	{

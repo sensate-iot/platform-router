@@ -16,13 +16,14 @@ using Grpc.Core;
 
 using JetBrains.Annotations;
 using Prometheus;
+
 using SensateIoT.Platform.Router.Common.Collections.Abstract;
 using SensateIoT.Platform.Router.Common.Converters;
 using SensateIoT.Platform.Router.Contracts.DTO;
 using SensateIoT.Platform.Router.Contracts.RPC;
 using SensateIoT.Platform.Router.Data.Abstract;
 
-namespace SensateIoT.Platform.Network.Router.Services
+namespace SensateIoT.Platform.Router.Service.Services
 {
 	[UsedImplicitly]
 	public class EgressRouter : Platform.Router.Contracts.Services.EgressRouter.EgressRouterBase

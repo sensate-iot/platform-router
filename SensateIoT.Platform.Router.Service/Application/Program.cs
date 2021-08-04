@@ -6,8 +6,8 @@
  */
 
 using System;
-using System.Reflection;
 using System.IO;
+using System.Reflection;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -16,7 +16,7 @@ using Microsoft.Extensions.Logging;
 
 using Serilog;
 
-namespace SensateIoT.Platform.Network.Router.Application
+namespace SensateIoT.Platform.Router.Service.Application
 {
 	public class Program
 	{

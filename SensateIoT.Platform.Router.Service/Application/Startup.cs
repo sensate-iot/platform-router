@@ -15,13 +15,14 @@ using Microsoft.Extensions.Hosting;
 
 using Prometheus;
 using JetBrains.Annotations;
-using SensateIoT.Platform.Network.Router.Config;
-using SensateIoT.Platform.Network.Router.Init;
-using SensateIoT.Platform.Network.Router.MQTT;
-using SensateIoT.Platform.Network.Router.Services;
-using SensateIoT.Platform.Router.Common.Init;
 
-namespace SensateIoT.Platform.Network.Router.Application
+using SensateIoT.Platform.Router.Common.Init;
+using SensateIoT.Platform.Router.Service.Config;
+using SensateIoT.Platform.Router.Service.Init;
+using SensateIoT.Platform.Router.Service.MQTT;
+using SensateIoT.Platform.Router.Service.Services;
+
+namespace SensateIoT.Platform.Router.Service.Application
 {
 	public class Startup
 	{

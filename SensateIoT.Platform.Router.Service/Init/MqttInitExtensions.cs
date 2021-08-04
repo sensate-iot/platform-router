@@ -1,10 +1,12 @@
 ﻿using System;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SensateIoT.Platform.Network.Router.Config;
-using SensateIoT.Platform.Router.Common.Init;
 
-namespace SensateIoT.Platform.Network.Router.Init
+using SensateIoT.Platform.Router.Common.Init;
+using SensateIoT.Platform.Router.Service.Config;
+
+namespace SensateIoT.Platform.Router.Service.Init
 {
 	public static class MqttInitExtensions
 	{

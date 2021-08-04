@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Serilog;
 
-namespace SensateIoT.Platform.Network.Router.Application
+namespace SensateIoT.Platform.Router.Service.Application
 {
 	internal static class LoggingUtility
 	{

@@ -1,6 +1,6 @@
 ﻿using Prometheus;
 
-namespace SensateIoT.Platform.Network.Router.MQTT
+namespace SensateIoT.Platform.Router.Service.MQTT
 {
 	public class CommandCounter
 	{
