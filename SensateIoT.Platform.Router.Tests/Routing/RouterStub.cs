@@ -5,7 +5,7 @@ using SensateIoT.Platform.Router.Contracts.DTO;
 using SensateIoT.Platform.Router.Data.Abstract;
 using SensateIoT.Platform.Router.Data.DTO;
 
-namespace SensateIoT.Platform.Network.Tests.Routing
+namespace SensateIoT.Platform.Router.Tests.Routing
 {
 	public class RouterStub : IRouter
 	{

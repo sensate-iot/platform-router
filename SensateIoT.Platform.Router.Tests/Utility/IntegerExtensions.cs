@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SensateIoT.Platform.Network.Tests.Utility
+namespace SensateIoT.Platform.Router.Tests.Utility
 {
 	public static class IntegerExtensions
 	{

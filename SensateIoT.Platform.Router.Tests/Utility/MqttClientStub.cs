@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using SensateIoT.Platform.Router.Common.Helpers;
 using SensateIoT.Platform.Router.Common.MQTT;
 
-namespace SensateIoT.Platform.Network.Tests.Utility
+namespace SensateIoT.Platform.Router.Tests.Utility
 {
 	public class MqttClientStub : IInternalMqttClient
 	{

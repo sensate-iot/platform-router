@@ -8,10 +8,9 @@
 using System;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SensateIoT.Platform.Router.Tests.Utility;
 
-using SensateIoT.Platform.Network.Tests.Utility;
-
-namespace SensateIoT.Platform.Network.Tests.Collections
+namespace SensateIoT.Platform.Router.Tests.Collections
 {
 	[TestClass]
 	public class Deque_LookupUnitTests

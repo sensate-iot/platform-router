@@ -15,7 +15,7 @@ using SensateIoT.Platform.Router.Common.Routing.Routers;
 using SensateIoT.Platform.Router.Data.Abstract;
 using SensateIoT.Platform.Router.Data.DTO;
 
-namespace SensateIoT.Platform.Network.Tests.Routing
+namespace SensateIoT.Platform.Router.Tests.Routing
 {
 	[TestClass]
 	public class AuthorizationRouterTests

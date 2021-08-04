@@ -9,11 +9,11 @@ using System;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SensateIoT.Platform.Network.Tests.Utility;
 using SensateIoT.Platform.Router.Common.Collections.Abstract;
 using SensateIoT.Platform.Router.Common.Collections.Local;
+using SensateIoT.Platform.Router.Tests.Utility;
 
-namespace SensateIoT.Platform.Network.Tests.Collections
+namespace SensateIoT.Platform.Router.Tests.Collections
 {
 	[TestClass]
 	public class Deque_GenericUnitTests

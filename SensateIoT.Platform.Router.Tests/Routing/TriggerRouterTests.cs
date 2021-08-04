@@ -22,7 +22,7 @@ using SensateIoT.Platform.Router.Data.DTO;
 
 using Measurement = SensateIoT.Platform.Router.Data.DTO.Measurement;
 
-namespace SensateIoT.Platform.Network.Tests.Routing
+namespace SensateIoT.Platform.Router.Tests.Routing
 {
 	[TestClass]
 	public class TriggerRouterTests

@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Router.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Router.Common", "SensateIoT.Platform.Router.Common\SensateIoT.Platform.Router.Common.csproj", "{C6DF3F42-4160-49AD-B095-633573B3A655}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Network.Tests", "SensateIoT.Platform.Network.Tests\SensateIoT.Platform.Network.Tests.csproj", "{759F0161-8102-442B-9535-4620E2B75415}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Router.Tests", "SensateIoT.Platform.Router.Tests\SensateIoT.Platform.Router.Tests.csproj", "{759F0161-8102-442B-9535-4620E2B75415}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensateIoT.Platform.Router.Service", "SensateIoT.Platform.Router.Service\SensateIoT.Platform.Router.Service.csproj", "{18250CDA-1A64-4C23-982C-1CD0C155A46A}"
 EndProject
