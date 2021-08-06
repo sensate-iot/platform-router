@@ -14,7 +14,7 @@ env:
   IMAGE_ID: sensateiot/router
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-  BASE_PATH: SensateIoT.Platform.Network.Router
+  BASE_PATH: SensateIoT.Platform.Router.Service
 
 jobs:
   push-router:
@@ -32,7 +32,7 @@ jobs:
 
       - name: Get assembly version
         run: |
-          PROJ=$BASE_PATH/SensateIoT.Platform.Network.Router.csproj
+          PROJ=$BASE_PATH/SensateIoT.Platform.Router.Service.csproj
           VERSION=$(pwsh -command "Tools/Deployment/Get-AssemblyVersion.ps1 $PROJ")
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 

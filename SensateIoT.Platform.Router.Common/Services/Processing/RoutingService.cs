@@ -1,0 +1,89 @@
+﻿/*
+ * Routing service.
+ *
+ * @author Michel Megens
+ * @email  michel@michelmegens.net
+ */
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using SensateIoT.Platform.Router.Common.Collections.Abstract;
+using SensateIoT.Platform.Router.Common.Routing.Abstract;
+using SensateIoT.Platform.Router.Common.Services.Background;
+using SensateIoT.Platform.Router.Common.Settings;
+using SensateIoT.Platform.Router.Data.Abstract;
+
+namespace SensateIoT.Platform.Router.Common.Services.Processing
+{
+	public class RoutingService : BackgroundService
+	{
+		/*
+		 * Route messages through the platform:
+		 *
+		 *		1 Check validity;
+		 *		2 Trigger routing;
+		 *		3 Live data routing;
+		 *		4 Forward to storage.
+		 */
+
+		private readonly IQueue<IPlatformMessage> m_messages;
+		private readonly ILogger<RoutingService> m_logger;
+		private readonly IMessageRouter m_router;
+		private readonly RoutingPublishSettings m_settings;
+
+		private const int DequeueCount = 1000;
+
+		public RoutingService(IQueue<IPlatformMessage> queue,
+							  IMessageRouter router,
+							  IOptions<RoutingPublishSettings> settings,
+							  ILogger<RoutingService> logger) : base(logger)
+		{
+			this.m_settings = settings.Value;
+			this.m_messages = queue;
+			this.m_logger = logger;
+			this.m_router = router;
+		}
+
+		protected override async Task ExecuteAsync(CancellationToken token)
+		{
+			do {
+				var messages = await this.TryDequeueMessagesAsync(token).ConfigureAwait(false);
+
+				if(messages == null) {
+					continue;
+				}
+
+				this.ProcessMessages(messages);
+			} while(!token.IsCancellationRequested);
+		}
+
+		private void ProcessMessages(IList<IPlatformMessage> messages)
+		{
+			messages = messages.OrderBy(x => x.SensorID).ToList();
+			this.m_logger.LogInformation("Routing {count} messages.", messages.Count);
+
+			this.m_router.Route(messages);
+		}
+
+		private async Task<IList<IPlatformMessage>> TryDequeueMessagesAsync(CancellationToken token)
+		{
+			if(this.m_messages.Count <= 0) {
+				try {
+					await Task.Delay(this.m_settings.InternalInterval, token);
+				} catch(OperationCanceledException) {
+					this.m_logger.LogWarning("Routing task cancelled.");
+				}
+
+				return null;
+			}
+
+			return this.m_messages.DequeueRange(DequeueCount).ToList();
+		}
+	}
+}
