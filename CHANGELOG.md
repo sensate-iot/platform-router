@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.7.6] - 05-12-2021
 ### Added
-- Add additional logging to the authorization router
+- Additional logging to the authorization router
 
 ### Updated
 - Project dependecies
