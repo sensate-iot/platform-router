@@ -25,8 +25,13 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 		{
 			var account = this.m_cache.GetAccount(sensor.AccountID);
 			var key = this.m_cache.GetApiKey(sensor.SensorKey);
+			var result = this.VerifySensor(sensor) && this.IsValidSensor(sensor, account, key);
 
-			return this.VerifySensor(sensor) && this.IsValidSensor(sensor, account, key);
+			if(!result) {
+				this.m_logger.LogInformation("Dropping message for sensor {sensorId}: authorization failed", sensor.ID.ToString());
+			}
+
+			return result;
 		}
 
 		private bool ValidateAccount(Sensor sensor, Account account, ApiKey key)
