@@ -21,7 +21,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: "5.0.x"
+          dotnet-version: "6.0.x"
       - run: |
           dotnet tool install -g dotnet-format
           echo "$HOME/.dotnet/tools" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
@@ -29,4 +29,4 @@ jobs:
       - name: Run dotnet format
         working-directory: ${{env.working-directory}}
         run: |
-          dotnet format --check platform-router.sln
+          dotnet format --verify-no-changes platform-router.sln
