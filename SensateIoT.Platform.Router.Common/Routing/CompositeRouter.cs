@@ -79,6 +79,7 @@ namespace SensateIoT.Platform.Router.Common.Routing
 					this.m_logger.LogError("Unable to complete routing {count} messages", messageList.Count);
 				}
 			} catch(AggregateException ex) {
+				this.m_logger.LogError(ex, "Unable to route {count} messages", messageList.Count);
 				throw ex.InnerException!;
 			} finally {
 				this.m_lock.ExitReadLock();
@@ -115,6 +116,7 @@ namespace SensateIoT.Platform.Router.Common.Routing
 				bool result;
 
 				try {
+					this.m_logger.LogDebug("Routing message to the {routerName}", router.Name);
 					result = router.Route(sensor, message, @event);
 				} catch(RouterException ex) {
 					result = false;
@@ -123,13 +125,22 @@ namespace SensateIoT.Platform.Router.Common.Routing
 				}
 
 				if(!result) {
-					this.m_dropCounter.Inc();
-					this.m_logger.LogDebug("Routing cancelled by the {routerName}", router.Name);
+					this.LogDroppedMessage(router, @event);
 					break;
 				}
+
+				this.m_logger.LogDebug("Routing by the {routerName} finished", router.Name);
 			}
 
+			@event.Actions.Add(NetworkEventType.MessageRouted);
 			this.m_eventQueue.EnqueueEvent(@event);
+		}
+
+		private void LogDroppedMessage(IRouter router, NetworkEvent evt)
+		{
+			this.m_dropCounter.Inc();
+			this.m_logger.LogDebug("Routing cancelled by the {routerName}", router.Name);
+			evt.Actions.Add(NetworkEventType.MessageDropped);
 		}
 
 		private static NetworkEvent CreateNetworkEvent(Sensor sensor)
@@ -139,14 +150,13 @@ namespace SensateIoT.Platform.Router.Common.Routing
 				AccountID = ByteString.CopyFrom(sensor.AccountID.ToByteArray())
 			};
 
-			evt.Actions.Add(NetworkEventType.MessageRouted);
 			return evt;
 		}
 
 		private bool VerifySensor(ObjectId sensorId, Sensor sensor)
 		{
 			if(sensor == null) {
-				this.m_logger.LogDebug("Unable to route message for sensor: {sensorId}. Sensor not found",
+				this.m_logger.LogWarning("Unable to route message for sensor: {sensorId}. Sensor not found",
 									   sensorId.ToString());
 				return false;
 			}
@@ -157,7 +167,7 @@ namespace SensateIoT.Platform.Router.Common.Routing
 			}
 
 			if(string.IsNullOrEmpty(sensor.SensorKey)) {
-				this.m_logger.LogWarning("Sensor {sensorId} has an API key", sensor.ID);
+				this.m_logger.LogWarning("Sensor {sensorId} has no API key", sensor.ID);
 				return false;
 			}
 
