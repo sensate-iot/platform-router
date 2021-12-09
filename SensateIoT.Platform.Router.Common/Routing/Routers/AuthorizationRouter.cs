@@ -62,6 +62,10 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 			invalid |= key.IsReadOnly;
 			invalid |= key.IsRevoked;
 
+			if(key.IsReadOnly || key.IsRevoked) {
+				this.m_logger.LogWarning("Dropping messaage for sensor {sensorId}, sensor key is invalid", sensor.ID.ToString());
+			}
+
 			return !invalid;
 		}
 
