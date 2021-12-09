@@ -103,11 +103,6 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 			case MessageType.Message:
 				this.m_internalRemote.EnqueueMessageToTriggerService(message);
 				break;
-
-			default:
-				this.m_logger.LogError("Received invalid message type. Unable to route message to trigger service. " +
-									   "The received type is: {type}", message.Type);
-				throw new RouterException(nameof(TriggerRouter), $"invalid message type: {message.Type:G}");
 			}
 		}
 
