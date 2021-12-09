@@ -51,7 +51,6 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 
 		private void ProcessMessage(Sensor sensor, IPlatformMessage message, NetworkEvent evt)
 		{
-			this.m_counter.Inc();
 			var textTriggered = false;
 			var measurementTriggered = false;
 			var triggers = sensor.TriggerInformation.ToList(); // Snap shot
@@ -101,6 +100,8 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 
 		private void EnqueueToTriggerService(IPlatformMessage message)
 		{
+			this.m_counter.Inc();
+
 			switch(message.Type) {
 			case MessageType.Measurement:
 				this.m_internalRemote.EnqueueMeasurementToTriggerService(message);
