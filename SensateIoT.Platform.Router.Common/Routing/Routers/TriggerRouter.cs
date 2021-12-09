@@ -31,8 +31,7 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 		{
 			this.m_internalRemote = queue;
 			this.m_logger = logger;
-			this.m_counter = Metrics.CreateCounter("router_trigger_messages_routed_total",
-														   "Total number of routed trigger messages.");
+			this.m_counter = Metrics.CreateCounter("router_trigger_messages_routed_total", "Total number of routed trigger messages.");
 		}
 
 		public bool Route(Sensor sensor, IPlatformMessage message, NetworkEvent networkEvent)
