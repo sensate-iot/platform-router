@@ -6,6 +6,8 @@
  */
 
 using Microsoft.Extensions.Logging;
+
+using SensateIoT.Platform.Router.Common.Exceptions;
 using SensateIoT.Platform.Router.Common.Routing.Abstract;
 using SensateIoT.Platform.Router.Contracts.DTO;
 using SensateIoT.Platform.Router.Data.Abstract;
@@ -26,8 +28,6 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 
 		public bool Route(Sensor sensor, IPlatformMessage message, NetworkEvent networkEvent)
 		{
-			var result = true;
-
 			switch(message.Type) {
 			case MessageType.Measurement:
 				networkEvent.MessageType = NetworkMessageType.Measurement;
@@ -44,11 +44,10 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 			default:
 				this.m_logger.LogWarning("Unable to determine message type of type {type}. Integer value: {integerValue}.",
 								  message.Type.ToString("G"), message.Type.ToString("D"));
-				result = false;
-				break;
+				throw new RouterException(this.Name, $"invalid message type {message.Type}");
 			}
 
-			return result;
+			return true;
 		}
 	}
 }
