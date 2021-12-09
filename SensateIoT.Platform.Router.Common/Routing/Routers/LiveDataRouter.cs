@@ -60,7 +60,6 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 			var routes = sensor.LiveDataRouting.ToList(); // Take a snapshot
 
 			foreach(var info in routes) {
-				this.m_logger.LogDebug("Routing message to live data client: {clientId}.", info.Target);
 				this.EnqueueTo(message, info);
 			}
 
