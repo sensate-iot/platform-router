@@ -47,9 +47,7 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 				return this.ProcessMessage(sensor, message, networkEvent);
 
 			default:
-				this.m_logger.LogError("Received invalid message type. Unable to route to live data service. " +
-									   "The received type is: {type}", message.Type);
-				throw new RouterException(nameof(LiveDataRouter), $"unable to route message of type {message.Type:G}");
+				throw new RouterException(this.Name, $"unable to route message of type {message.Type:G}");
 			}
 		}
 
