@@ -39,12 +39,12 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 			var invalid = false;
 
 			if(account.HasBillingLockout) {
-				this.m_logger.LogInformation("Skipping sensor {sensorId} due to billing lock", sensor.ID.ToString());
+				this.m_logger.LogInformation("Skipping sensor {sensorId} due to billing lock on account {accountId:D}", sensor.ID.ToString(), account.ID);
 				invalid = true;
 			}
 
 			if(account.IsBanned) {
-				this.m_logger.LogInformation("Skipping sensor because account {accountId:D} is banned", account.ID);
+				this.m_logger.LogInformation("Skipping sensor {sensorId} because account {accountId:D} is banned", sensor.ID.ToString(), account.ID);
 				invalid = true;
 			}
 
