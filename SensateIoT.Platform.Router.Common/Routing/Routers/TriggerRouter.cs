@@ -42,6 +42,7 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 			}
 
 			if(sensor.TriggerInformation == null || sensor.TriggerInformation.Count <= 0) {
+				this.m_logger.LogDebug($"Skipping the trigger router for sensor {sensor.ID}: no triggers available");
 				return true;
 			}
 
