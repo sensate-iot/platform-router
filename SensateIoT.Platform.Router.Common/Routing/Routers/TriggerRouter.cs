@@ -67,7 +67,7 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 
 		private bool MatchTrigger(IPlatformMessage message, NetworkEvent evt, SensorTrigger info, ref bool textTriggered, ref bool measurementTriggered)
 		{
-			if(!VerifySensorTrigger(message, info)) {
+			if(!this.VerifySensorTrigger(message, info)) {
 				return false;
 			}
 
@@ -81,12 +81,18 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 				this.EnqueueToTriggerService(message);
 			}
 
-			return textTriggered && measurementTriggered;
+			if(textTriggered && measurementTriggered) {
+				this.m_logger.LogDebug($"Skipping trigger for {message.SensorID}: already queued");
+				return true;
+			}
+
+			return false;
 		}
 
-		private static bool VerifySensorTrigger(IPlatformMessage message, SensorTrigger info)
+		private bool VerifySensorTrigger(IPlatformMessage message, SensorTrigger info)
 		{
 			if(!info.HasActions) {
+				this.m_logger.LogDebug($"Skipping message from sensor {message.SensorID}: no actions available");
 				return false;
 			}
 
