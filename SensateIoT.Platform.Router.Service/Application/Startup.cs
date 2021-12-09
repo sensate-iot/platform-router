@@ -54,6 +54,12 @@ namespace SensateIoT.Platform.Router.Service.Application
 			services.AddGrpc();
 			services.AddGrpcReflection();
 			services.AddMqttHandlers();
+
+			services.AddRouting(opts => {
+				opts.LowercaseUrls = true;
+				opts.LowercaseQueryStrings = true;
+			});
+			services.AddControllers();
 		}
 
 		[UsedImplicitly]
