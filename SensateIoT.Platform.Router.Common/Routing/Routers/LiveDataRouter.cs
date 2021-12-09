@@ -71,13 +71,16 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 		{
 			switch(message.Type) {
 			case MessageType.ControlMessage:
+				this.m_logger.LogDebug("Queueing control message to {target}", target.Target);
 				this.m_internalQueue.EnqueueControlMessageToTarget(message, target);
 				break;
 			case MessageType.Message:
+				this.m_logger.LogDebug("Queueing message to {target}", target.Target);
 				this.m_internalQueue.EnqueueMessageToTarget(message, target);
 				break;
 
 			case MessageType.Measurement:
+				this.m_logger.LogDebug("Queueing measurement to {target}", target.Target);
 				this.m_internalQueue.EnqueueMeasurementToTarget(message, target);
 				break;
 			}
