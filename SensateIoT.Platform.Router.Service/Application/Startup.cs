@@ -17,6 +17,7 @@ using Prometheus;
 using JetBrains.Annotations;
 
 using SensateIoT.Platform.Router.Common.Init;
+using SensateIoT.Platform.Router.Common.Settings;
 using SensateIoT.Platform.Router.Service.Config;
 using SensateIoT.Platform.Router.Service.Init;
 using SensateIoT.Platform.Router.Service.MQTT;
@@ -48,6 +49,7 @@ namespace SensateIoT.Platform.Router.Service.Application
 			services.AddBackgroundServices(this.Configuration);
 			services.AddMqttBrokers(this.Configuration);
 			services.AddMessageRouter();
+			services.Configure<HealthCheckSettings>(this.Configuration.GetSection("HealthChecks"));
 
 			services.AddSingleton<CommandCounter>();
 
