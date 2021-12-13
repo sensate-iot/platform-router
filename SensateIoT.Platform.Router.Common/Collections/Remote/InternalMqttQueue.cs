@@ -9,7 +9,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Options;
@@ -72,9 +71,9 @@ namespace SensateIoT.Platform.Router.Common.Collections.Remote
 			this.m_messageTriggerTopic = options.Value.TriggerQueueTemplate.Replace("$type", "messages");
 			this.m_measurementTriggerTopic = options.Value.TriggerQueueTemplate.Replace("$type", "measurements");
 
+			this.m_controlMessageLiveDataTopic = options.Value.LiveDataQueueTemplate.Replace("$type", "control");
 			this.m_messageLiveDataTopic = options.Value.LiveDataQueueTemplate.Replace("$type", "messages");
 			this.m_measurementLiveDataTopic = options.Value.LiveDataQueueTemplate.Replace("$type", "measurements");
-			this.m_controlMessageLiveDataTopic = options.Value.LiveDataQueueTemplate.Replace("$type", "control");
 
 			this.m_triggerMeasurements = new MeasurementData();
 			this.m_triggerMessages = new TextMessageData();
@@ -88,7 +87,6 @@ namespace SensateIoT.Platform.Router.Common.Collections.Remote
 		}
 
 		public int LiveDataQueueLength => this.GetLiveDataQueueSize();
-
 		public int TriggerQueueLength => this.GetTriggerQueueLength();
 
 		public void EnqueueMessageToTriggerService(IPlatformMessage message)
