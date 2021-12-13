@@ -3,7 +3,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
+using SensateIoT.Platform.Router.Common.Services.Abstract;
 using SensateIoT.Platform.Router.Common.Services.Data;
 using SensateIoT.Platform.Router.Common.Services.Metrics;
 using SensateIoT.Platform.Router.Common.Services.Processing;

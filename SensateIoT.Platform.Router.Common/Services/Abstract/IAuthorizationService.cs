@@ -7,7 +7,7 @@
 
 using SensateIoT.Platform.Router.Data.DTO;
 
-namespace SensateIoT.Platform.Router.Common.Services.Processing
+namespace SensateIoT.Platform.Router.Common.Services.Abstract
 {
 	public interface IAuthorizationService
 	{
