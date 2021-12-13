@@ -15,6 +15,9 @@ namespace SensateIoT.Platform.Router.Common.Collections.Abstract
 {
 	public interface IInternalRemoteQueue
 	{
+		public int LiveDataQueueLength { get; }
+		public int TriggerQueueLength { get; }
+
 		void EnqueueMessageToTriggerService(IPlatformMessage message);
 		void EnqueueMeasurementToTriggerService(IPlatformMessage message);
 		void EnqueueMeasurementToTarget(IPlatformMessage message, RoutingTarget target);

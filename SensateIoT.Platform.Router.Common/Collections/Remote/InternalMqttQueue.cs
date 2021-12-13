@@ -9,12 +9,14 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Options;
 
 using Google.Protobuf;
 using Prometheus;
+
 using SensateIoT.Platform.Router.Common.Collections.Abstract;
 using SensateIoT.Platform.Router.Common.Converters;
 using SensateIoT.Platform.Router.Common.Helpers;
@@ -24,6 +26,7 @@ using SensateIoT.Platform.Router.Contracts.DTO;
 using SensateIoT.Platform.Router.Data.Abstract;
 using SensateIoT.Platform.Router.Data.DTO;
 using SensateIoT.Platform.Router.Data.Models;
+
 using ControlMessage = SensateIoT.Platform.Router.Data.DTO.ControlMessage;
 using Measurement = SensateIoT.Platform.Router.Data.DTO.Measurement;
 using Message = SensateIoT.Platform.Router.Data.DTO.Message;
@@ -83,6 +86,10 @@ namespace SensateIoT.Platform.Router.Common.Collections.Remote
 			this.m_gaugeTriggerSerivce = Metrics.CreateGauge("router_trigger_messages_queued", "Number of messages in the trigger queue.");
 			this.m_gaugeLiveDataService = Metrics.CreateGauge("router_livedata_messages_queued", "Number of messages in the live data queue.");
 		}
+
+		public int LiveDataQueueLength => this.GetLiveDataQueueSize();
+
+		public int TriggerQueueLength => this.GetTriggerQueueLength();
 
 		public void EnqueueMessageToTriggerService(IPlatformMessage message)
 		{
@@ -150,10 +157,7 @@ namespace SensateIoT.Platform.Router.Common.Collections.Remote
 			IDictionary<string, MeasurementData> measurements;
 			IDictionary<string, ControlMessageData> controlMessages;
 
-			this.m_liveDataLock.Lock();
-			this.m_measurementLock.Lock();
-			this.m_messageLock.Lock();
-			this.m_controlLock.Lock();
+			this.AcquireLiveDataLocks();
 
 			try {
 				measurements = this.m_measurementQueues;
@@ -171,10 +175,7 @@ namespace SensateIoT.Platform.Router.Common.Collections.Remote
 					this.m_controlMessageQueues.Add(handler, new ControlMessageData());
 				}
 			} finally {
-				this.m_controlLock.Unlock();
-				this.m_messageLock.Unlock();
-				this.m_measurementLock.Unlock();
-				this.m_liveDataLock.Unlock();
+				this.ReleaseLiveDataLocks();
 			}
 
 			await this.PublishLiveData(controlMessages, messages, measurements).ConfigureAwait(false);
@@ -252,6 +253,72 @@ namespace SensateIoT.Platform.Router.Common.Collections.Remote
 				this.PublishData(this.m_messageTriggerTopic, messages),
 				this.PublishData(this.m_measurementTriggerTopic, measurements)
 			).ConfigureAwait(false);
+		}
+
+		private int GetLiveDataQueueSize()
+		{
+			int size;
+			this.AcquireLiveDataLocks();
+
+			try {
+				size = this.UnzipQueueSize();
+			} finally {
+				this.ReleaseLiveDataLocks();
+			}
+
+			return size;
+		}
+
+		private int GetTriggerQueueLength()
+		{
+			var size = 0;
+			this.m_measurementLock.Lock();
+			this.m_messageLock.Lock();
+
+			try {
+				size += this.m_triggerMeasurements.Measurements.Count;
+				size += this.m_triggerMessages.Messages.Count;
+			} finally {
+				this.m_messageLock.Unlock();
+				this.m_measurementLock.Unlock();
+			}
+
+			return size;
+		}
+
+		private void AcquireLiveDataLocks()
+		{
+			this.m_liveDataLock.Lock();
+			this.m_measurementLock.Lock();
+			this.m_messageLock.Lock();
+			this.m_controlLock.Lock();
+		}
+
+		private void ReleaseLiveDataLocks()
+		{
+			this.m_controlLock.Unlock();
+			this.m_messageLock.Unlock();
+			this.m_measurementLock.Unlock();
+			this.m_liveDataLock.Unlock();
+		}
+
+		private int UnzipQueueSize()
+		{
+			var total = 0;
+
+			foreach(var (_, value) in this.m_measurementQueues) {
+				total += value.Measurements.Count;
+			}
+
+			foreach(var (_, value) in this.m_textMessageQueues) {
+				total += value.Messages.Count;
+			}
+
+			foreach(var (_, value) in this.m_controlMessageQueues) {
+				total += value.Messages.Count;
+			}
+
+			return total;
 		}
 
 		private Task PublishData(string topic, IMessage messages)
