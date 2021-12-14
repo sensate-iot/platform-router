@@ -12,6 +12,7 @@ namespace SensateIoT.Platform.Router.Common.Collections.Abstract
 {
 	public interface IRemoteStorageQueue
 	{
+		int Count { get; }
 		void Enqueue(IPlatformMessage message);
 		Task FlushMessagesAsync();
 	}
