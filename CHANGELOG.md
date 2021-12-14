@@ -7,11 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleasaed]
 ### Added
 - Additional logging to various routers
+- Input queue processing to the composite router
 
 ### Updated
 - Project dependencies
 - Confusing log lines
 - Router metric logging
+- Control flow of the composite router
 
 ### Removed
 - Duplicate logging
