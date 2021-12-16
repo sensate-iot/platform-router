@@ -11,6 +11,7 @@ namespace SensateIoT.Platform.Router.Common.MQTT
 {
 	public interface IPublicMqttClient
 	{
+		bool IsConnected { get; }
 		Task PublishOnAsync(string topic, string message, bool retain);
 	}
 }
