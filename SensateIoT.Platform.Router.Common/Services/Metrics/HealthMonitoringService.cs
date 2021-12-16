@@ -3,6 +3,7 @@
 using Microsoft.Extensions.Options;
 
 using SensateIoT.Platform.Router.Common.Collections.Abstract;
+using SensateIoT.Platform.Router.Common.MQTT;
 using SensateIoT.Platform.Router.Common.Services.Abstract;
 using SensateIoT.Platform.Router.Common.Settings;
 using SensateIoT.Platform.Router.Data.Abstract;
@@ -15,17 +16,23 @@ namespace SensateIoT.Platform.Router.Common.Services.Metrics
 		private readonly IPublicRemoteQueue m_publicQueue;
 		private readonly IQueue<IPlatformMessage> m_inputQueue;
 		private readonly HealthCheckSettings m_settings;
+		private readonly IPublicMqttClient m_publicMqttClient;
+		private readonly IInternalMqttClient m_internalMqttClient;
 
 		public bool IsHealthy => this.GetHealthStatus();
 
 		public HealthMonitoringService(IQueue<IPlatformMessage> inputQueue,
 		                               IInternalRemoteQueue @internal,
 		                               IPublicRemoteQueue @public,
+									   IPublicMqttClient publicClient,
+									   IInternalMqttClient internalClient,
 		                               IOptions<HealthCheckSettings> settings)
 		{
 			this.m_internalRemoteQueues = @internal;
 			this.m_publicQueue = @public;
 			this.m_inputQueue = inputQueue;
+			this.m_internalMqttClient = internalClient;
+			this.m_publicMqttClient = publicClient;
 			this.m_settings = settings.Value;
 		}
 
@@ -33,6 +40,25 @@ namespace SensateIoT.Platform.Router.Common.Services.Metrics
 		{
 			var result = new List<string>();
 
+			this.UpdateQueueReasons(result);
+			this.UpdateMqttReasons(result);
+
+			return result;
+		}
+
+		private void UpdateMqttReasons(ICollection<string> reasons)
+		{
+			if(!this.m_internalMqttClient.IsConnected) {
+				reasons.Add("Internal MQTT client is disconnected");
+			}
+
+			if(!this.m_publicMqttClient.IsConnected) {
+				reasons.Add("Public MQTT client is disconnected");
+			}
+		}
+
+		private void UpdateQueueReasons(ICollection<string> result)
+		{
 			if(!this.CheckLiveDataQueues()) {
 				result.Add("Live Data Service queue out of bounds");
 			}
@@ -48,14 +74,12 @@ namespace SensateIoT.Platform.Router.Common.Services.Metrics
 			if(!this.CheckInputQueue()) {
 				result.Add("Router input queue is out of bounds");
 			}
-
-			return result;
 		}
 
 		private bool GetHealthStatus()
 		{
 			return this.CheckLiveDataQueues() && this.CheckTriggerQueues() && this.CheckPublicMqttQueue() &&
-			       this.CheckInputQueue();
+			       this.CheckInputQueue() && this.m_internalMqttClient.IsConnected && this.m_publicMqttClient.IsConnected;
 		}
 
 		private bool CheckInputQueue()
