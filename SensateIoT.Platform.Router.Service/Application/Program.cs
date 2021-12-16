@@ -58,7 +58,7 @@ namespace SensateIoT.Platform.Router.Service.Application
 						builder.AddDebug();
 					}
 				})
-				.ConfigureAppConfiguration((ctx, config) => {
+				.ConfigureAppConfiguration((_, config) => {
 					config.AddConfiguration(conf);
 				})
 				.ConfigureWebHostDefaults(webBuilder => {
