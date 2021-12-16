@@ -6,5 +6,6 @@
 		public int? LiveDataServiceQueueLimit { get; set; }
 		public int? TriggerServiceQueueLimit { get; set; }
 		public int? PublicMqttQueueLimit { get; set; }
+		public int? InputQueueLimit { get; set; }
 	}
 }

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using SensateIoT.Platform.Router.Common.Collections.Abstract;
 using SensateIoT.Platform.Router.Common.Services.Abstract;
 using SensateIoT.Platform.Router.Common.Settings;
+using SensateIoT.Platform.Router.Data.Abstract;
 
 namespace SensateIoT.Platform.Router.Common.Services.Metrics
 {
@@ -12,14 +13,19 @@ namespace SensateIoT.Platform.Router.Common.Services.Metrics
 	{
 		private readonly IInternalRemoteQueue m_internalRemoteQueues;
 		private readonly IPublicRemoteQueue m_publicQueue;
+		private readonly IQueue<IPlatformMessage> m_inputQueue;
 		private readonly HealthCheckSettings m_settings;
 
 		public bool IsHealthy => this.GetHealthStatus();
 
-		public HealthMonitoringService(IInternalRemoteQueue @internal, IPublicRemoteQueue @public, IOptions<HealthCheckSettings> settings)
+		public HealthMonitoringService(IQueue<IPlatformMessage> inputQueue,
+		                               IInternalRemoteQueue @internal,
+		                               IPublicRemoteQueue @public,
+		                               IOptions<HealthCheckSettings> settings)
 		{
 			this.m_internalRemoteQueues = @internal;
 			this.m_publicQueue = @public;
+			this.m_inputQueue = inputQueue;
 			this.m_settings = settings.Value;
 		}
 
@@ -27,16 +33,20 @@ namespace SensateIoT.Platform.Router.Common.Services.Metrics
 		{
 			var result = new List<string>();
 
-			if(this.CheckLiveDataQueues()) {
+			if(!this.CheckLiveDataQueues()) {
 				result.Add("Live Data Service queue out of bounds");
 			}
 
-			if(this.CheckTriggerQueues()) {
+			if(!this.CheckTriggerQueues()) {
 				result.Add("Trigger Service queue out of bounds");
 			}
 
-			if(this.CheckPublicMqttQueue()) {
+			if(!this.CheckPublicMqttQueue()) {
 				result.Add("Public MQTT queue is out of bounds");
+			}
+
+			if(!this.CheckInputQueue()) {
+				result.Add("Router input queue is out of bounds");
 			}
 
 			return result;
@@ -44,7 +54,14 @@ namespace SensateIoT.Platform.Router.Common.Services.Metrics
 
 		private bool GetHealthStatus()
 		{
-			return this.CheckLiveDataQueues() && this.CheckTriggerQueues() && this.CheckPublicMqttQueue();
+			return this.CheckLiveDataQueues() && this.CheckTriggerQueues() && this.CheckPublicMqttQueue() &&
+			       this.CheckInputQueue();
+		}
+
+		private bool CheckInputQueue()
+		{
+			var limit = this.m_settings.InputQueueLimit ?? this.m_settings.DefaultQueueLimit;
+			return this.m_inputQueue.Count <= limit;
 		}
 
 		private bool CheckPublicMqttQueue()
