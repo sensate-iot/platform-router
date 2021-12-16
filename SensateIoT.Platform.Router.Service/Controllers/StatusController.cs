@@ -27,7 +27,7 @@ namespace SensateIoT.Platform.Router.Service.Controllers
 			if(this.m_monitoringService.IsHealthy) {
 				result = this.NoContent();
 			} else {
-				result = this.StatusCode((int) HttpStatusCode.InternalServerError, this.GetErrorExplanation());
+				result = this.StatusCode((int)HttpStatusCode.InternalServerError, this.GetErrorExplanation());
 			}
 
 			return result;

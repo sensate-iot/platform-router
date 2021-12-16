@@ -22,11 +22,11 @@ namespace SensateIoT.Platform.Router.Common.Services.Metrics
 		public bool IsHealthy => this.GetHealthStatus();
 
 		public HealthMonitoringService(IQueue<IPlatformMessage> inputQueue,
-		                               IInternalRemoteQueue @internal,
-		                               IPublicRemoteQueue @public,
+									   IInternalRemoteQueue @internal,
+									   IPublicRemoteQueue @public,
 									   IPublicMqttClient publicClient,
 									   IInternalMqttClient internalClient,
-		                               IOptions<HealthCheckSettings> settings)
+									   IOptions<HealthCheckSettings> settings)
 		{
 			this.m_internalRemoteQueues = @internal;
 			this.m_publicQueue = @public;
@@ -79,7 +79,7 @@ namespace SensateIoT.Platform.Router.Common.Services.Metrics
 		private bool GetHealthStatus()
 		{
 			return this.CheckLiveDataQueues() && this.CheckTriggerQueues() && this.CheckPublicMqttQueue() &&
-			       this.CheckInputQueue() && this.m_internalMqttClient.IsConnected && this.m_publicMqttClient.IsConnected;
+				   this.CheckInputQueue() && this.m_internalMqttClient.IsConnected && this.m_publicMqttClient.IsConnected;
 		}
 
 		private bool CheckInputQueue()
