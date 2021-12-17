@@ -13,7 +13,9 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+
 using SensateIoT.Platform.Router.Common.Collections.Abstract;
+using SensateIoT.Platform.Router.Common.Exceptions;
 using SensateIoT.Platform.Router.Common.Routing.Abstract;
 using SensateIoT.Platform.Router.Common.Services.Background;
 using SensateIoT.Platform.Router.Common.Settings;
@@ -32,20 +34,15 @@ namespace SensateIoT.Platform.Router.Common.Services.Processing
 		 *		4 Forward to storage.
 		 */
 
-		private readonly IQueue<IPlatformMessage> m_messages;
 		private readonly ILogger<RoutingService> m_logger;
 		private readonly IMessageRouter m_router;
 		private readonly RoutingPublishSettings m_settings;
 
-		private const int DequeueCount = 1000;
-
-		public RoutingService(IQueue<IPlatformMessage> queue,
-							  IMessageRouter router,
+		public RoutingService(IMessageRouter router,
 							  IOptions<RoutingPublishSettings> settings,
 							  ILogger<RoutingService> logger) : base(logger)
 		{
 			this.m_settings = settings.Value;
-			this.m_messages = queue;
 			this.m_logger = logger;
 			this.m_router = router;
 		}
@@ -53,37 +50,33 @@ namespace SensateIoT.Platform.Router.Common.Services.Processing
 		protected override async Task ExecuteAsync(CancellationToken token)
 		{
 			do {
-				var messages = await this.TryDequeueMessagesAsync(token).ConfigureAwait(false);
-
-				if(messages == null) {
-					continue;
-				}
-
-				this.ProcessMessages(messages);
+				var result = this.ExecuteRouter();
+				await this.WaitForRouterIf(result, token).ConfigureAwait(false);
 			} while(!token.IsCancellationRequested);
 		}
 
-		private void ProcessMessages(IList<IPlatformMessage> messages)
+		private bool ExecuteRouter()
 		{
-			messages = messages.OrderBy(x => x.SensorID).ToList();
-			this.m_logger.LogInformation("Routing {count} messages.", messages.Count);
-
-			this.m_router.Route(messages);
-		}
-
-		private async Task<IList<IPlatformMessage>> TryDequeueMessagesAsync(CancellationToken token)
-		{
-			if(this.m_messages.Count <= 0) {
-				try {
-					await Task.Delay(this.m_settings.InternalInterval, token);
-				} catch(OperationCanceledException) {
-					this.m_logger.LogWarning("Routing task cancelled.");
-				}
-
-				return null;
+			try {
+				return this.m_router.TryRoute();
+			} catch(RouterException exception) {
+				this.m_logger.LogError(exception, "Routing error!");
 			}
 
-			return this.m_messages.DequeueRange(DequeueCount).ToList();
+			return true;
+		}
+
+		private async Task WaitForRouterIf(bool result, CancellationToken token)
+		{
+			if(result) {
+				return;
+			}
+
+			try {
+				await Task.Delay(this.m_settings.InternalInterval, token);
+			} catch(OperationCanceledException) {
+				this.m_logger.LogWarning("Routing task cancelled.");
+			}
 		}
 	}
 }

@@ -242,46 +242,55 @@ namespace SensateIoT.Platform.Router.Common.Collections.Local
 
 		public virtual IEnumerable<TValue> DequeueRange(int count)
 		{
-			TValue[] result;
+			IEnumerable<TValue> result;
 
 			this.CheckDisposed();
 			this.VerifyDequeueCount(count);
 			this.m_lock.Lock();
 
 			try {
-				if(this.m_count <= 0) {
-					return new List<TValue>();
-				}
-
-				if(count < 0) {
-					count = int.MaxValue;
-				}
-
-				count = Math.Min(count, this.m_count);
-				result = new TValue[count];
-
-				if(this.IsSplit()) {
-					var partition = Math.Min(this.m_data.Length - this.m_offset, count);
-					var remaining = count;
-
-					Array.Copy(this.m_data, this.m_offset, result, 0, partition);
-					Array.Clear(this.m_data, this.m_offset, partition);
-
-					remaining -= partition;
-
-					if(remaining > 0) {
-						Array.Copy(this.m_data, 0, result, partition, remaining);
-						Array.Clear(this.m_data, 0, remaining);
-					}
-				} else {
-					Array.Copy(this.m_data, this.m_offset, result, 0, count);
-				}
-
-				this.m_offset = (this.m_offset + count) & (this.m_data.Length - 1);
-				this.m_count -= count;
+				result = this.InternalDequeueRange(count);
 			} finally {
 				this.m_lock.Unlock();
 			}
+
+			return result ?? Array.Empty<TValue>();
+		}
+
+		private IEnumerable<TValue> InternalDequeueRange(int count)
+		{
+			TValue[] result;
+
+			if(this.m_count <= 0) {
+				return null;
+			}
+
+			if(count < 0) {
+				count = int.MaxValue;
+			}
+
+			count = Math.Min(count, this.m_count);
+			result = new TValue[count];
+
+			if(this.IsSplit()) {
+				var partition = Math.Min(this.m_data.Length - this.m_offset, count);
+				var remaining = count;
+
+				Array.Copy(this.m_data, this.m_offset, result, 0, partition);
+				Array.Clear(this.m_data, this.m_offset, partition);
+
+				remaining -= partition;
+
+				if(remaining > 0) {
+					Array.Copy(this.m_data, 0, result, partition, remaining);
+					Array.Clear(this.m_data, 0, remaining);
+				}
+			} else {
+				Array.Copy(this.m_data, this.m_offset, result, 0, count);
+			}
+
+			this.m_offset = (this.m_offset + count) & (this.m_data.Length - 1);
+			this.m_count -= count;
 
 			return result;
 		}

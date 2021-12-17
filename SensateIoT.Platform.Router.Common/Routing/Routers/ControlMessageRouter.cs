@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 
 using Newtonsoft.Json;
 using Prometheus;
+
 using SensateIoT.Platform.Router.Common.Collections.Abstract;
 using SensateIoT.Platform.Router.Common.Routing.Abstract;
 using SensateIoT.Platform.Router.Common.Services.Processing;
@@ -19,6 +20,7 @@ using SensateIoT.Platform.Router.Common.Settings;
 using SensateIoT.Platform.Router.Contracts.DTO;
 using SensateIoT.Platform.Router.Data.Abstract;
 using SensateIoT.Platform.Router.Data.DTO;
+
 using ControlMessage = SensateIoT.Platform.Router.Data.DTO.ControlMessage;
 
 namespace SensateIoT.Platform.Router.Common.Routing.Routers
@@ -44,8 +46,7 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 			this.m_authService = auth;
 			this.m_settings = settings.Value;
 			this.m_logger = logger;
-			this.m_counter = Metrics.CreateCounter("router_controlmessage_messages_routed_total",
-														   "Total number of routed control messages.");
+			this.m_counter = Metrics.CreateCounter("router_controlmessage_messages_routed_total", "Total number of routed control messages.");
 		}
 
 		public bool Route(Sensor sensor, IPlatformMessage message, NetworkEvent networkEvent)
@@ -61,6 +62,7 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 		private bool ProcessMessage(Sensor sensor, ControlMessage message)
 		{
 			var data = JsonConvert.SerializeObject(message, Formatting.None);
+
 			message.Timestamp = DateTime.UtcNow;
 			message.Secret = sensor.SensorKey;
 			this.m_authService.SignControlMessage(message, data);

@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleasaed]
+### Added
+- Additional logging to various routers
+- Input queue processing to the composite router
+
+### Updated
+- Project dependencies
+- Confusing log lines
+- Router metric logging
+- Control flow of the composite router
+
+### Removed
+- Duplicate logging
+- Code paths that cannot be executed
+
 ## [1.7.6] - 05-12-2021
 ### Added
 - Additional logging to the authorization router

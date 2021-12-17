@@ -10,8 +10,8 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 
 using Prometheus;
+
 using SensateIoT.Platform.Router.Common.Collections.Abstract;
-using SensateIoT.Platform.Router.Common.Exceptions;
 using SensateIoT.Platform.Router.Common.Routing.Abstract;
 using SensateIoT.Platform.Router.Contracts.DTO;
 using SensateIoT.Platform.Router.Data.Abstract;
@@ -31,8 +31,7 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 		{
 			this.m_internalRemote = queue;
 			this.m_logger = logger;
-			this.m_counter = Metrics.CreateCounter("router_trigger_messages_routed_total",
-														   "Total number of routed trigger messages.");
+			this.m_counter = Metrics.CreateCounter("router_trigger_messages_routed_total", "Total number of routed trigger messages.");
 		}
 
 		public bool Route(Sensor sensor, IPlatformMessage message, NetworkEvent networkEvent)
@@ -42,6 +41,7 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 			}
 
 			if(sensor.TriggerInformation == null || sensor.TriggerInformation.Count <= 0) {
+				this.m_logger.LogDebug($"Skipping the trigger router for sensor {sensor.ID}: no triggers available");
 				return true;
 			}
 
@@ -51,7 +51,6 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 
 		private void ProcessMessage(Sensor sensor, IPlatformMessage message, NetworkEvent evt)
 		{
-			this.m_counter.Inc();
 			var textTriggered = false;
 			var measurementTriggered = false;
 			var triggers = sensor.TriggerInformation.ToList(); // Snap shot
@@ -67,7 +66,7 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 
 		private bool MatchTrigger(IPlatformMessage message, NetworkEvent evt, SensorTrigger info, ref bool textTriggered, ref bool measurementTriggered)
 		{
-			if(!VerifySensorTrigger(message, info)) {
+			if(!this.VerifySensorTrigger(message, info)) {
 				return false;
 			}
 
@@ -81,12 +80,18 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 				this.EnqueueToTriggerService(message);
 			}
 
-			return textTriggered && measurementTriggered;
+			if(textTriggered && measurementTriggered) {
+				this.m_logger.LogDebug($"Skipping trigger for {message.SensorID}: already queued");
+				return true;
+			}
+
+			return false;
 		}
 
-		private static bool VerifySensorTrigger(IPlatformMessage message, SensorTrigger info)
+		private bool VerifySensorTrigger(IPlatformMessage message, SensorTrigger info)
 		{
 			if(!info.HasActions) {
+				this.m_logger.LogDebug($"Skipping message from sensor {message.SensorID}: no actions available");
 				return false;
 			}
 
@@ -95,6 +100,8 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 
 		private void EnqueueToTriggerService(IPlatformMessage message)
 		{
+			this.m_counter.Inc();
+
 			switch(message.Type) {
 			case MessageType.Measurement:
 				this.m_internalRemote.EnqueueMeasurementToTriggerService(message);
@@ -103,11 +110,6 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 			case MessageType.Message:
 				this.m_internalRemote.EnqueueMessageToTriggerService(message);
 				break;
-
-			default:
-				this.m_logger.LogError("Received invalid message type. Unable to route message to trigger service. " +
-									   "The received type is: {type}", message.Type);
-				throw new RouterException(nameof(TriggerRouter), $"invalid message type: {message.Type:G}");
 			}
 		}
 
