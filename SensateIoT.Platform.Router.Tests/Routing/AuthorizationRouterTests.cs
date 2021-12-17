@@ -9,6 +9,7 @@ using Moq;
 
 using SensateIoT.Platform.Router.Common.Caching.Abstract;
 using SensateIoT.Platform.Router.Common.Collections.Abstract;
+using SensateIoT.Platform.Router.Common.Collections.Local;
 using SensateIoT.Platform.Router.Common.Routing;
 using SensateIoT.Platform.Router.Common.Routing.Abstract;
 using SensateIoT.Platform.Router.Common.Routing.Routers;
@@ -20,8 +21,8 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 	[TestClass]
 	public class AuthorizationRouterTests
 	{
-		private static readonly Sensor Sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = Guid.NewGuid(), SensorKey = "Abcd" };
-		private static readonly Account Account = new Account { ID = Sensor.AccountID };
+		private static readonly Sensor Sensor = new() { ID = ObjectId.GenerateNewId(), AccountID = Guid.NewGuid(), SensorKey = "Abcd" };
+		private static readonly Account Account = new() { ID = Sensor.AccountID };
 
 		[TestMethod]
 		public void CannotRouteFromBannedAccount()
@@ -29,9 +30,10 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 			var account = new Account { ID = Guid.NewGuid(), HasBillingLockout = false, IsBanned = true };
 			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = account.ID, SensorKey = "ABC" };
 			var apikey = new ApiKey { AccountID = account.ID };
-			var router = CreateCompositeRouter(sensor, account, apikey);
+			var messageQueue = new MessageQueue(10);
+			var router = CreateCompositeRouter(sensor, account, apikey, messageQueue);
 
-			this.TryExecuteRouter(router, sensor, account, apikey);
+			this.TryExecuteRouter(router, sensor, account, apikey, messageQueue);
 		}
 
 		[TestMethod]
@@ -40,9 +42,10 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 			var account = new Account { ID = Guid.NewGuid(), HasBillingLockout = true };
 			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = account.ID, SensorKey = "ABC" };
 			var apikey = new ApiKey { AccountID = account.ID };
-			var router = CreateCompositeRouter(sensor, account, apikey);
+			var messageQueue = new MessageQueue(10);
+			var router = CreateCompositeRouter(sensor, account, apikey, messageQueue);
 
-			this.TryExecuteRouter(router, sensor, account, apikey);
+			this.TryExecuteRouter(router, sensor, account, apikey, messageQueue);
 		}
 
 		[TestMethod]
@@ -51,9 +54,10 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 			var account = new Account { ID = Guid.NewGuid() };
 			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = account.ID, SensorKey = "ABC" };
 			var apikey = new ApiKey { AccountID = account.ID, IsReadOnly = true };
-			var router = CreateCompositeRouter(sensor, account, apikey);
+			var messageQueue = new MessageQueue(10);
+			var router = CreateCompositeRouter(sensor, account, apikey, messageQueue);
 
-			this.TryExecuteRouter(router, sensor, account, apikey);
+			this.TryExecuteRouter(router, sensor, account, apikey, messageQueue);
 		}
 
 		[TestMethod]
@@ -62,9 +66,10 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 			var account = new Account { ID = Guid.NewGuid() };
 			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = account.ID, SensorKey = "ABC" };
 			var apikey = new ApiKey { AccountID = account.ID, IsRevoked = true };
-			var router = CreateCompositeRouter(sensor, account, apikey);
+			var messageQueue = new MessageQueue(10);
+			var router = CreateCompositeRouter(sensor, account, apikey, messageQueue);
 
-			this.TryExecuteRouter(router, sensor, account, apikey);
+			this.TryExecuteRouter(router, sensor, account, apikey, messageQueue);
 		}
 
 		[TestMethod]
@@ -73,9 +78,10 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 			var account = new Account { ID = Guid.NewGuid(), HasBillingLockout = true };
 			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = Guid.NewGuid(), SensorKey = "ABC" };
 			var apikey = new ApiKey { AccountID = account.ID };
-			var router = CreateCompositeRouter(sensor, account, apikey);
+			var messageQueue = new MessageQueue(10);
+			var router = CreateCompositeRouter(sensor, account, apikey, messageQueue);
 
-			this.TryExecuteRouter(router, sensor, account, apikey);
+			this.TryExecuteRouter(router, sensor, account, apikey, messageQueue);
 		}
 
 		[TestMethod]
@@ -83,9 +89,10 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 		{
 			var account = new Account { ID = Guid.NewGuid(), HasBillingLockout = true };
 			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = account.ID, SensorKey = "ABC" };
-			var router = CreateCompositeRouter(sensor, account, null);
+			var messageQueue = new MessageQueue(10);
+			var router = CreateCompositeRouter(sensor, account, null, messageQueue);
 
-			this.TryExecuteRouter(router, sensor, account, null);
+			this.TryExecuteRouter(router, sensor, account, null, messageQueue);
 		}
 
 		[TestMethod]
@@ -93,18 +100,19 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 		{
 			var account = new Account { ID = Guid.NewGuid(), HasBillingLockout = true };
 			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = account.ID, SensorKey = "" };
-			var router = CreateCompositeRouter(sensor, account, null);
+			var messageQueue = new MessageQueue(10);
+			var router = CreateCompositeRouter(sensor, account, null, messageQueue);
 			var key = new ApiKey {
 				AccountID = account.ID,
 				IsReadOnly = false,
 				IsRevoked = false
 			};
 
-			this.TryExecuteRouter(router, sensor, account, key);
+			this.TryExecuteRouter(router, sensor, account, key, messageQueue);
 		}
 
 
-		private void TryExecuteRouter(IMessageRouter router, Sensor sensor, Account account, ApiKey key)
+		private void TryExecuteRouter(IMessageRouter router, Sensor sensor, Account account, ApiKey key, IQueue<IPlatformMessage> queue)
 		{
 			var r1 = new RouterStub();
 			var r2 = new RouterStub();
@@ -119,12 +127,13 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 			var msg = new Message {
 				SensorId = sensor.ID
 			};
-
-			router.Route(AsList(msg));
+			queue.Add(msg);
+			var result = router.TryRoute();
 
 			Assert.IsFalse(r1.Executed);
 			Assert.IsFalse(r2.Executed);
 			Assert.IsFalse(r3.Executed);
+			Assert.IsFalse(result);
 		}
 
 		private static IList<IPlatformMessage> AsList(IPlatformMessage message)
@@ -142,12 +151,12 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 			return cache.Object;
 		}
 
-		private static CompositeRouter CreateCompositeRouter(Sensor sensor, Account account, ApiKey key)
+		private static CompositeRouter CreateCompositeRouter(Sensor sensor, Account account, ApiKey key, IQueue<IPlatformMessage> inputQueue)
 		{
 			var logger = new Mock<ILogger<CompositeRouter>>();
 			var queue = new Mock<IRemoteNetworkEventQueue>();
 
-			return new CompositeRouter(CreateRoutingCache(sensor, account, key), queue.Object, logger.Object);
+			return new CompositeRouter(CreateRoutingCache(sensor, account, key), inputQueue, queue.Object, logger.Object);
 		}
 
 		private static AuthorizationRouter CreateAuthorizationRouter(Action measurementCallback, Action messageCallback, Sensor s, Account a, ApiKey key)

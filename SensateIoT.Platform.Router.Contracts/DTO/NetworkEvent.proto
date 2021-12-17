@@ -16,6 +16,7 @@ enum NetworkEventType
 	MessageStorage = 1;
 	MessageTriggered = 2;
 	MessageLiveData = 3;
+	MessageDropped = 4;
 }
 
 enum NetworkMessageType

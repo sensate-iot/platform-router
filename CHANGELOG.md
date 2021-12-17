@@ -4,14 +4,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [Unreleasaed]
 ### Added
+- Additional logging to various routers
+- Input queue processing to the composite router
 - Health check controller
 - Application monitoring service
 
 ### Updated
+- Project dependencies
+- Confusing log lines
+- Router metric logging
+- Control flow of the composite router
 - Internal queue interfaces
 - MQTT stream interfaces
+
+### Removed
+- Duplicate logging
+- Code paths that cannot be executed
 
 ## [1.7.6] - 05-12-2021
 ### Added

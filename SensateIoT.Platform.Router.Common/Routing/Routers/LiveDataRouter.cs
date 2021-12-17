@@ -47,9 +47,7 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 				return this.ProcessMessage(sensor, message, networkEvent);
 
 			default:
-				this.m_logger.LogError("Received invalid message type. Unable to route to live data service. " +
-									   "The received type is: {type}", message.Type);
-				throw new RouterException(nameof(LiveDataRouter), $"unable to route message of type {message.Type:G}");
+				throw new RouterException(this.Name, $"unable to route message of type {message.Type:G}");
 			}
 		}
 
@@ -60,7 +58,6 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 			var routes = sensor.LiveDataRouting.ToList(); // Take a snapshot
 
 			foreach(var info in routes) {
-				this.m_logger.LogDebug("Routing message to live data client: {clientId}.", info.Target);
 				this.EnqueueTo(message, info);
 			}
 
@@ -71,13 +68,16 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 		{
 			switch(message.Type) {
 			case MessageType.ControlMessage:
+				this.m_logger.LogDebug("Queueing control message to {target}", target.Target);
 				this.m_internalQueue.EnqueueControlMessageToTarget(message, target);
 				break;
 			case MessageType.Message:
+				this.m_logger.LogDebug("Queueing message to {target}", target.Target);
 				this.m_internalQueue.EnqueueMessageToTarget(message, target);
 				break;
 
 			case MessageType.Measurement:
+				this.m_logger.LogDebug("Queueing measurement to {target}", target.Target);
 				this.m_internalQueue.EnqueueMeasurementToTarget(message, target);
 				break;
 			}
