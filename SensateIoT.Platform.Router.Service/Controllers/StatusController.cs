@@ -1,6 +1,8 @@
 ﻿using System.Net;
+
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
+
 using SensateIoT.Platform.Router.Common.Services.Abstract;
 using SensateIoT.Platform.Router.Contracts.DTO;
 
@@ -25,8 +27,11 @@ namespace SensateIoT.Platform.Router.Service.Controllers
 			IActionResult result;
 
 			if(this.m_monitoringService.IsHealthy) {
+				this.m_logger.LogInformation("Health check result OK");
 				result = this.NoContent();
 			} else {
+				var explained = this.m_monitoringService.GetHealthStatusExplanation();
+				this.m_logger.LogError("Health check failed: [{reasons}]", string.Join(", ", explained));
 				result = this.StatusCode((int)HttpStatusCode.InternalServerError, this.GetErrorExplanation());
 			}
 
