@@ -5,7 +5,7 @@ namespace SensateIoT.Platform.Router.Contracts.DTO
 {
 	public class GenericResponse<TValue>
 	{
-		public Guid Id { get; set; }
+		public Guid Id { get; }
 		public TValue Data { get; set; }
 		public IEnumerable<string> Errors { get; set; }
 
