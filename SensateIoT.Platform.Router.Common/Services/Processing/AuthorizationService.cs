@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
+using SensateIoT.Platform.Router.Common.Services.Abstract;
 using SensateIoT.Platform.Router.Data.DTO;
 
 namespace SensateIoT.Platform.Router.Common.Services.Processing

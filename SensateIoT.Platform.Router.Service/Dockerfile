@@ -19,6 +19,7 @@ COPY --from=build-env /build/binaries /app
 COPY SensateIoT.Platform.Router.Service/appsettings.json /app/appsettings.json
 
 EXPOSE 80
+EXPOSE 81
 EXPOSE 8080
 WORKDIR /app
-ENTRYPOINT ["/app/SensateIoT.Platform.Router.Service", "--urls", "http://*:80"]
+ENTRYPOINT ["/app/SensateIoT.Platform.Router.Service"]

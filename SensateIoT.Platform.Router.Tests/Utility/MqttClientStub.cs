@@ -23,6 +23,8 @@ namespace SensateIoT.Platform.Router.Tests.Utility
 			this.m_publishCounts = new Dictionary<string, int>();
 		}
 
+		public bool IsConnected => true;
+
 		public Task PublishOnAsync(string topic, string message, bool retain)
 		{
 			this.m_lock.Lock();

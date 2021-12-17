@@ -39,6 +39,8 @@ namespace SensateIoT.Platform.Router.Common.MQTT
 		private IMqttClientOptions _client_options;
 		protected readonly ILogger _logger;
 
+		public bool IsConnected => this.Client.IsConnected && !this._disconnected;
+
 		protected AbstractMqttClient(string host,
 									 int port,
 									 bool ssl,
@@ -167,8 +169,9 @@ namespace SensateIoT.Platform.Router.Common.MQTT
 
 		private async void OnDisconnect_HandlerAsync()
 		{
-			if(this._disconnected)
+			if(this._disconnected) {
 				return;
+			}
 
 			await Task.Delay(TimeSpan.FromSeconds(5D));
 

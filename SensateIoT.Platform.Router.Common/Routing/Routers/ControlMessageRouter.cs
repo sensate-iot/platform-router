@@ -15,6 +15,7 @@ using Prometheus;
 
 using SensateIoT.Platform.Router.Common.Collections.Abstract;
 using SensateIoT.Platform.Router.Common.Routing.Abstract;
+using SensateIoT.Platform.Router.Common.Services.Abstract;
 using SensateIoT.Platform.Router.Common.Services.Processing;
 using SensateIoT.Platform.Router.Common.Settings;
 using SensateIoT.Platform.Router.Contracts.DTO;

@@ -17,6 +17,9 @@ using Prometheus;
 using JetBrains.Annotations;
 
 using SensateIoT.Platform.Router.Common.Init;
+using SensateIoT.Platform.Router.Common.Services.Abstract;
+using SensateIoT.Platform.Router.Common.Services.Metrics;
+using SensateIoT.Platform.Router.Common.Settings;
 using SensateIoT.Platform.Router.Service.Config;
 using SensateIoT.Platform.Router.Service.Init;
 using SensateIoT.Platform.Router.Service.MQTT;
@@ -49,11 +52,20 @@ namespace SensateIoT.Platform.Router.Service.Application
 			services.AddMqttBrokers(this.Configuration);
 			services.AddMessageRouter();
 
+			services.Configure<HealthCheckSettings>(this.Configuration.GetSection("HealthChecks"));
+			services.AddSingleton<IHealthMonitoringService, HealthMonitoringService>();
+
 			services.AddSingleton<CommandCounter>();
 
 			services.AddGrpc();
 			services.AddGrpcReflection();
 			services.AddMqttHandlers();
+
+			services.AddRouting(opts => {
+				opts.LowercaseUrls = true;
+				opts.LowercaseQueryStrings = true;
+			});
+			services.AddControllers();
 		}
 
 		[UsedImplicitly]
@@ -74,6 +86,7 @@ namespace SensateIoT.Platform.Router.Service.Application
 			app.UseEndpoints(endpoints => {
 				endpoints.MapGrpcService<IngressRouter>();
 				endpoints.MapGrpcService<EgressRouter>();
+				endpoints.MapControllers();
 
 				if(env.IsDevelopment()) {
 					endpoints.MapGrpcReflectionService();

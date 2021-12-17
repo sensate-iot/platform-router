@@ -14,6 +14,7 @@ using Microsoft.Extensions.Options;
 
 using Google.Protobuf;
 using Prometheus;
+
 using SensateIoT.Platform.Router.Common.Collections.Abstract;
 using SensateIoT.Platform.Router.Common.Collections.Local;
 using SensateIoT.Platform.Router.Common.Converters;
@@ -22,6 +23,7 @@ using SensateIoT.Platform.Router.Common.MQTT;
 using SensateIoT.Platform.Router.Common.Settings;
 using SensateIoT.Platform.Router.Data.Abstract;
 using SensateIoT.Platform.Router.Data.DTO;
+
 using Measurement = SensateIoT.Platform.Router.Data.DTO.Measurement;
 
 namespace SensateIoT.Platform.Router.Common.Collections.Remote
@@ -46,6 +48,8 @@ namespace SensateIoT.Platform.Router.Common.Collections.Remote
 			this.m_measurements = new Deque<Measurement>();
 			this.m_gauge = Metrics.CreateGauge("router_storage_messages_queued", "Number of messages in the storage queue.");
 		}
+
+		public int Count => this.m_messages.Count + this.m_measurements.Count;
 
 		public void Enqueue(IPlatformMessage message)
 		{
