@@ -14,6 +14,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
+using SensateIoT.Platform.Router.Service.Init;
+
 using Serilog;
 
 namespace SensateIoT.Platform.Router.Service.Application
@@ -56,11 +58,11 @@ namespace SensateIoT.Platform.Router.Service.Application
 						builder.AddDebug();
 					}
 				})
-				.ConfigureAppConfiguration((ctx, config) => {
+				.ConfigureAppConfiguration((_, config) => {
 					config.AddConfiguration(conf);
 				})
 				.ConfigureWebHostDefaults(webBuilder => {
-					webBuilder.UseStartup<Startup>().UseKestrel();
+					webBuilder.UseStartup<Startup>().UseKestrel(opts => opts.ConfigureEndpoints());
 				});
 		}
 

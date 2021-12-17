@@ -35,6 +35,8 @@ namespace SensateIoT.Platform.Router.Common.Collections.Remote
 			this.m_queue = new Deque<RemoteQueueMessage>(1024);
 		}
 
+		public int QueueLength => this.m_queue.Count;
+
 		public void Enqueue(string data, string target)
 		{
 			this.m_queue.Add(new RemoteQueueMessage {

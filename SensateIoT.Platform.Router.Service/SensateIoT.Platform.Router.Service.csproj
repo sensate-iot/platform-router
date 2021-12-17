@@ -3,9 +3,9 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <ServerGarbageCollection>true</ServerGarbageCollection>
-    <Version>1.7.6</Version>
-    <AssemblyVersion>1.7.6.0</AssemblyVersion>
-    <FileVersion>1.7.6.0</FileVersion>
+    <Version>1.8.0</Version>
+    <AssemblyVersion>1.8.0.0</AssemblyVersion>
+    <FileVersion>1.8.0.0</FileVersion>
     <Copyright>Sensate IoT</Copyright>
     <Company>Sensate IoT</Company>
     <Authors>Sensate IoT</Authors>
@@ -23,8 +23,9 @@
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.19.1" />
     <PackageReference Include="Grpc" Version="2.42.0" />
-    <PackageReference Include="Grpc.AspNetCore" Version="2.40.0" />
-    <PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.40.0" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.41.0" />
+    <PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.41.0" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
     <PackageReference Include="prometheus-net.AspNetCore" Version="5.0.2" />
     <PackageReference Include="prometheus-net.AspNetCore.Grpc" Version="5.0.2" />
     <PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
