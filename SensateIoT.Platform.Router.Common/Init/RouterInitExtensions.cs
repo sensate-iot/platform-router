@@ -13,6 +13,7 @@ using SensateIoT.Platform.Router.Common.Collections.Abstract;
 using SensateIoT.Platform.Router.Common.Routing;
 using SensateIoT.Platform.Router.Common.Routing.Abstract;
 using SensateIoT.Platform.Router.Common.Routing.Routers;
+using SensateIoT.Platform.Router.Data.Abstract;
 
 namespace SensateIoT.Platform.Router.Common.Init
 {
@@ -30,8 +31,9 @@ namespace SensateIoT.Platform.Router.Common.Init
 			collection.AddSingleton(provider => {
 				var cache = provider.GetRequiredService<IRoutingCache>();
 				var queue = provider.GetRequiredService<IRemoteNetworkEventQueue>();
+				var inputQueue = provider.GetRequiredService<IQueue<IPlatformMessage>>();
 				var logger = provider.GetRequiredService<ILogger<CompositeRouter>>();
-				var router = new CompositeRouter(cache, queue, logger) as IMessageRouter;
+				var router = new CompositeRouter(cache, inputQueue, queue, logger) as IMessageRouter;
 
 				AddRouters(router, provider);
 

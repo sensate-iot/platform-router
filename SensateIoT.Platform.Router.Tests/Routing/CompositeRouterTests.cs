@@ -16,6 +16,7 @@ using Moq;
 
 using SensateIoT.Platform.Router.Common.Caching.Abstract;
 using SensateIoT.Platform.Router.Common.Collections.Abstract;
+using SensateIoT.Platform.Router.Common.Collections.Local;
 using SensateIoT.Platform.Router.Common.Exceptions;
 using SensateIoT.Platform.Router.Common.Routing;
 using SensateIoT.Platform.Router.Common.Routing.Abstract;
@@ -28,14 +29,18 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 	[TestClass]
 	public class CompositeRouterTests
 	{
-		private static readonly Sensor Sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = Guid.NewGuid(), SensorKey = "Abcd" };
-		private static readonly Account Account = new Account { ID = Sensor.AccountID };
-		private static readonly ApiKey ApiKey = new ApiKey { AccountID = Sensor.AccountID };
+		private static readonly Sensor Sensor = new() { ID = ObjectId.GenerateNewId(), AccountID = Guid.NewGuid(), SensorKey = "Abcd" };
+		private static readonly Account Account = new() { ID = Sensor.AccountID };
+		private static readonly ApiKey ApiKey = new() { AccountID = Sensor.AccountID };
 
 		[TestMethod]
 		public void CanExecuteRouters()
 		{
-			var router = CreateCompositeRouter(Sensor, Account, ApiKey);
+			var msg = new Message {
+				SensorId = Sensor.ID
+			};
+
+			var router = CreateCompositeRouter(Sensor, Account, ApiKey, CreateQueueWithMessage(msg));
 
 			var r1 = new RouterStub();
 			var r2 = new RouterStub();
@@ -45,14 +50,12 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 			router.AddRouter(r2);
 			router.AddRouter(r3);
 
-			var msg = new Message {
-				SensorId = Sensor.ID
-			};
-			router.Route(AsList(msg));
+			var result = router.TryRoute();
 
 			Assert.IsTrue(r1.Executed);
 			Assert.IsTrue(r2.Executed);
 			Assert.IsTrue(r3.Executed);
+			Assert.IsFalse(result);
 		}
 
 		[TestMethod]
@@ -61,9 +64,10 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 			var account = new Account { ID = Guid.NewGuid(), HasBillingLockout = true };
 			var apikey = new ApiKey { AccountID = account.ID };
 			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = Guid.Empty };
-			var router = CreateCompositeRouter(sensor, account, apikey);
+			var queue = new MessageQueue(10);
+			var router = CreateCompositeRouter(sensor, account, apikey, queue);
 
-			this.TryExecuteRouter(router, sensor);
+			TryExecuteRouter(router, sensor, queue);
 		}
 
 		[TestMethod]
@@ -71,15 +75,19 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 		{
 			var account = new Account { ID = Guid.NewGuid(), HasBillingLockout = true };
 			var sensor = new Sensor { ID = ObjectId.GenerateNewId(), AccountID = account.ID };
-			var router = CreateCompositeRouter(sensor, account, null);
+			var queue = new MessageQueue(10);
+			var router = CreateCompositeRouter(sensor, account, null, queue);
 
-			this.TryExecuteRouter(router, sensor);
+			TryExecuteRouter(router, sensor, queue);
 		}
 
 		[TestMethod]
 		public void SensorCannotBeNull()
 		{
-			var router = CreateCompositeRouter(Sensor, Account, ApiKey);
+			var msg = new Message {
+				SensorId = ObjectId.GenerateNewId()
+			};
+			var router = CreateCompositeRouter(Sensor, Account, ApiKey, CreateQueueWithMessage(msg));
 
 			var r1 = new RouterStub();
 			var r2 = new RouterStub();
@@ -88,19 +96,15 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 			router.AddRouter(r1);
 			router.AddRouter(r2);
 			router.AddRouter(r3);
-
-			var msg = new Message {
-				SensorId = ObjectId.GenerateNewId()
-			};
-
-			router.Route(AsList(msg));
+			var result = router.TryRoute();
 
 			Assert.IsFalse(r1.Executed);
 			Assert.IsFalse(r2.Executed);
 			Assert.IsFalse(r3.Executed);
+			Assert.IsFalse(result);
 		}
 
-		private void TryExecuteRouter(IMessageRouter router, Sensor sensor)
+		private static void TryExecuteRouter(IMessageRouter router, Sensor sensor, IQueue<IPlatformMessage> queue)
 		{
 			var r1 = new RouterStub();
 			var r2 = new RouterStub();
@@ -113,18 +117,23 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 			var msg = new Message {
 				SensorId = sensor.ID
 			};
+			queue.Add(msg);
 
-			router.Route(AsList(msg));
+			var result = router.TryRoute();
 
 			Assert.IsFalse(r1.Executed);
 			Assert.IsFalse(r2.Executed);
 			Assert.IsFalse(r3.Executed);
+			Assert.IsFalse(result);
 		}
 
 		[TestMethod]
 		public void CanCancelRoutesGracefully()
 		{
-			var router = CreateCompositeRouter(Sensor, Account, ApiKey);
+			var msg = new Message {
+				SensorId = Sensor.ID
+			};
+			var router = CreateCompositeRouter(Sensor, Account, ApiKey, CreateQueueWithMessage(msg));
 
 			var r1 = new RouterStub();
 			var r2 = new RouterStub { Cancel = true };
@@ -134,20 +143,21 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 			router.AddRouter(r2);
 			router.AddRouter(r3);
 
-			var msg = new Message {
-				SensorId = Sensor.ID
-			};
-			router.Route(AsList(msg));
+			var result = router.TryRoute();
 
 			Assert.IsTrue(r1.Executed);
 			Assert.IsFalse(r2.Executed);
 			Assert.IsFalse(r3.Executed);
+			Assert.IsFalse(result);
 		}
 
 		[TestMethod]
 		public void CanCatchRouterExceptions()
 		{
-			var router = CreateCompositeRouter(Sensor, Account, ApiKey);
+			var msg = new Message {
+				SensorId = Sensor.ID
+			};
+			var router = CreateCompositeRouter(Sensor, Account, ApiKey, CreateQueueWithMessage(msg));
 
 			var r1 = new RouterStub();
 			var r2 = new RouterStub { Exception = new RouterException("TestRouter", "testing exception catching.") };
@@ -156,21 +166,21 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 			router.AddRouter(r1);
 			router.AddRouter(r2);
 			router.AddRouter(r3);
-
-			var msg = new Message {
-				SensorId = Sensor.ID
-			};
-			router.Route(AsList(msg));
+			var result = router.TryRoute();
 
 			Assert.IsTrue(r1.Executed);
 			Assert.IsFalse(r2.Executed);
 			Assert.IsFalse(r3.Executed);
+			Assert.IsFalse(result);
 		}
 
 		[TestMethod]
 		public void CannotCatchOtherExceptions()
 		{
-			var router = CreateCompositeRouter(Sensor, Account, ApiKey);
+			var msg = new Message {
+				SensorId = Sensor.ID
+			};
+			var router = CreateCompositeRouter(Sensor, Account, ApiKey, CreateQueueWithMessage(msg));
 
 			var r1 = new RouterStub();
 			var r2 = new RouterStub { Exception = new InvalidOperationException() };
@@ -179,12 +189,7 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 			router.AddRouter(r1);
 			router.AddRouter(r2);
 			router.AddRouter(r3);
-
-			var msg = new Message {
-				SensorId = Sensor.ID
-			};
-
-			Assert.ThrowsException<InvalidOperationException>(() => router.Route(AsList(msg)));
+			Assert.ThrowsException<InvalidOperationException>(() => router.TryRoute());
 		}
 
 		[TestMethod]
@@ -193,22 +198,22 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 			var count = 0;
 			var logger = new Mock<ILogger<CompositeRouter>>();
 			var queue = new Mock<IRemoteNetworkEventQueue>();
+			var msg = new Message {
+				SensorId = Sensor.ID
+			};
 
 			queue.Setup(x => x.EnqueueEvent(It.IsAny<NetworkEvent>())).Callback(() => count += 1);
-			var router = new CompositeRouter(CreateRoutingCache(Sensor, Account, ApiKey), queue.Object, logger.Object);
+			var router = new CompositeRouter(CreateRoutingCache(Sensor, Account, ApiKey), CreateQueueWithMessage(msg), queue.Object, logger.Object);
 
 			var r1 = new RouterStub();
 			var r2 = new RouterStub();
 
 			router.AddRouter(r1);
 			router.AddRouter(r2);
+			var result = router.TryRoute();
 
-			var msg = new Message {
-				SensorId = Sensor.ID
-			};
-
-			router.Route(AsList(msg));
 			Assert.AreEqual(1, count);
+			Assert.IsFalse(result);
 		}
 
 		private static IRoutingCache CreateRoutingCache(Sensor sensor, Account account, ApiKey key)
@@ -221,17 +226,20 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 			return cache.Object;
 		}
 
-		private static CompositeRouter CreateCompositeRouter(Sensor sensor, Account account, ApiKey key)
+		private static CompositeRouter CreateCompositeRouter(Sensor sensor, Account account, ApiKey key, IQueue<IPlatformMessage> inputQueue)
 		{
 			var logger = new Mock<ILogger<CompositeRouter>>();
 			var queue = new Mock<IRemoteNetworkEventQueue>();
 
-			return new CompositeRouter(CreateRoutingCache(sensor, account, key), queue.Object, logger.Object);
+			return new CompositeRouter(CreateRoutingCache(sensor, account, key), inputQueue, queue.Object, logger.Object);
 		}
 
-		private static IList<IPlatformMessage> AsList(IPlatformMessage message)
+		private static IQueue<IPlatformMessage> CreateQueueWithMessage(IPlatformMessage message)
 		{
-			return new List<IPlatformMessage> { message };
+			var queue = new MessageQueue(10);
+
+			queue.Add(message);
+			return queue;
 		}
 	}
 }

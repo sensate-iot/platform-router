@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,9 +30,13 @@ namespace SensateIoT.Platform.Router.Common.Routing
 {
 	public sealed class CompositeRouter : IMessageRouter
 	{
+		private const int DequeueBatchSize = 1000;
+		private const string RouterName = "Composite Router";
+
 		private readonly IList<IRouter> m_routers;
 		private readonly ReaderWriterLockSlim m_lock;
 		private readonly IRoutingCache m_cache;
+		private readonly IQueue<IPlatformMessage> m_messageQueue;
 		private readonly IRemoteNetworkEventQueue m_eventQueue;
 		private readonly ILogger<CompositeRouter> m_logger;
 		private readonly Counter m_counter;
@@ -40,12 +45,16 @@ namespace SensateIoT.Platform.Router.Common.Routing
 
 		private bool m_disposed;
 
-		public CompositeRouter(IRoutingCache cache, IRemoteNetworkEventQueue queue, ILogger<CompositeRouter> logger)
+		public CompositeRouter(IRoutingCache cache,
+							   IQueue<IPlatformMessage> messageQueue,
+							   IRemoteNetworkEventQueue eventQueue,
+							   ILogger<CompositeRouter> logger)
 		{
 			this.m_routers = new List<IRouter>();
 			this.m_lock = new ReaderWriterLockSlim();
 			this.m_cache = cache;
-			this.m_eventQueue = queue;
+			this.m_eventQueue = eventQueue;
+			this.m_messageQueue = messageQueue;
 			this.m_logger = logger;
 			this.m_disposed = false;
 			this.m_dropCounter = Metrics.CreateCounter("router_messages_dropped_total", "Total number of measurements/messages dropped.");
@@ -65,25 +74,53 @@ namespace SensateIoT.Platform.Router.Common.Routing
 			}
 		}
 
-		public void Route(IEnumerable<IPlatformMessage> messages)
+		public bool TryRoute()
 		{
 			this.CheckDisposed();
+
+			var sw = Stopwatch.StartNew();
+			var result = this.ProcessMessages();
+			sw.Stop();
+
+			if(result) {
+				this.m_logger.LogInformation("Processed batch of messages in {duration:c}", sw.Elapsed);
+			}
+
+			return result;
+		}
+
+		private bool ProcessMessages()
+		{
+			bool returnValue;
+			var messages = this.m_messageQueue.DequeueRange(DequeueBatchSize)
+				.OrderBy(m => m.SensorID).ToList();
+
+			if(messages.Count <= 0) {
+				return false;
+			}
+
+			this.m_logger.LogInformation("Routing {messageCount} messages", messages.Count);
 			this.m_lock.EnterReadLock();
 
-			var messageList = messages.ToList();
-
 			try {
-				var result = Parallel.ForEach(messageList, this.InternalRoute);
+				var result = Parallel.ForEach(messages, this.InternalRoute);
+				returnValue = this.m_messageQueue.Count > 0;
 
 				if(!result.IsCompleted) {
-					this.m_logger.LogError("Unable to complete routing {count} messages", messageList.Count);
+					throw new RouterException(RouterName, $"routing did not complete for {messages.Count} messages");
 				}
 			} catch(AggregateException ex) {
-				this.m_logger.LogError(ex, "Unable to route {count} messages", messageList.Count);
-				throw ex.InnerException!;
+				if(ex.InnerException != null) {
+					throw ex.InnerException!;
+				}
+
+				this.m_logger.LogError(ex, "Unable to route {messageCount} messages", messages.Count);
+				returnValue = false;
 			} finally {
 				this.m_lock.ExitReadLock();
 			}
+
+			return returnValue;
 		}
 
 		private void InternalRoute(IPlatformMessage message)
