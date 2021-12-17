@@ -185,6 +185,15 @@ namespace SensateIoT.Platform.Router.Common.Collections.Remote
 		{
 			var publishes = new ConcurrentBag<Task>();
 
+			this.ProcessMeasurements(measurements, publishes);
+			this.ProcessMessages(messages, publishes);
+			this.ProcessControlMessages(control, publishes);
+
+			await Task.WhenAll(publishes).ConfigureAwait(false);
+		}
+
+		private void ProcessMeasurements(IDictionary<string, MeasurementData> measurements, ConcurrentBag<Task> publishes)
+		{
 			Parallel.ForEach(measurements, async kvp => {
 				if(kvp.Value.Measurements.Count <= 0) {
 					return;
@@ -197,7 +206,10 @@ namespace SensateIoT.Platform.Router.Common.Collections.Remote
 
 				publishes.Add(this.m_client.PublishOnAsync(topic, data, false));
 			});
+		}
 
+		private void ProcessMessages(IDictionary<string, TextMessageData> messages, ConcurrentBag<Task> publishes)
+		{
 			Parallel.ForEach(messages, async kvp => {
 				if(kvp.Value.Messages.Count <= 0) {
 					return;
@@ -210,7 +222,10 @@ namespace SensateIoT.Platform.Router.Common.Collections.Remote
 
 				publishes.Add(this.m_client.PublishOnAsync(topic, data, false));
 			});
+		}
 
+		private void ProcessControlMessages(IDictionary<string, ControlMessageData> control, ConcurrentBag<Task> publishes)
+		{
 			Parallel.ForEach(control, async kvp => {
 				if(kvp.Value.Messages.Count <= 0) {
 					return;
@@ -223,8 +238,6 @@ namespace SensateIoT.Platform.Router.Common.Collections.Remote
 
 				publishes.Add(this.m_client.PublishOnAsync(topic, data, false));
 			});
-
-			await Task.WhenAll(publishes).ConfigureAwait(false);
 		}
 
 		public async Task FlushAsync()
