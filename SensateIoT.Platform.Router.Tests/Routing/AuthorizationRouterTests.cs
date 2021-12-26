@@ -164,7 +164,7 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 
 		private static AuthorizationRouter CreateAuthorizationRouter(Action measurementCallback, Action messageCallback, Sensor s, Account a, ApiKey key)
 		{
-			var queue = new Mock<IInternalRemoteQueue>();
+			var queue = new Mock<IRemoteTriggerQueue>();
 			var logger = new Mock<ILogger<AuthorizationRouter>>();
 
 			queue.Setup(x => x.EnqueueMeasurementToTriggerService(It.IsAny<IPlatformMessage>()))

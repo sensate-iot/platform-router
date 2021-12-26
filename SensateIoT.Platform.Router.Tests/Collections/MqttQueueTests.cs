@@ -50,7 +50,7 @@ namespace SensateIoT.Platform.Router.Tests.Collections
 				Target = "Remote"
 			});
 
-			queue.FlushLiveDataAsync();
+			queue.FlushAsync();
 			Assert.AreEqual(1, ClientStub.GetPublishCount("sensateiot/internal/messages/Local/bulk"));
 			Assert.AreEqual(1, ClientStub.GetPublishCount("sensateiot/internal/messages/Remote/bulk"));
 		}
@@ -78,13 +78,13 @@ namespace SensateIoT.Platform.Router.Tests.Collections
 				Data = new Dictionary<string, DataPoint>()
 			}, new RoutingTarget() { Target = "Local" });
 
-			queue.FlushLiveDataAsync();
+			queue.FlushAsync();
 			Assert.AreEqual(1, ClientStub.GetPublishCount("sensateiot/internal/measurements/Local/bulk"));
 		}
 
-		internal static MqttClientStub ClientStub = new MqttClientStub();
+		private static readonly MqttClientStub ClientStub = new();
 
-		internal static IInternalRemoteQueue BuildRemoteQueue()
+		private static IInternalRemoteQueue BuildRemoteQueue()
 		{
 			var settings = new QueueSettings {
 				LiveDataQueueTemplate = "sensateiot/internal/$type/$target/bulk",
