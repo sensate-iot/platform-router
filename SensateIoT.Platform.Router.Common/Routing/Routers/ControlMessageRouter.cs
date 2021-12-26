@@ -30,7 +30,7 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 	{
 		private readonly IPublicRemoteQueue m_publicQueue;
 		private readonly ILogger<ControlMessageRouter> m_logger;
-		private readonly RoutingPublishSettings m_settings;
+		private readonly RoutingQueueSettings m_settings;
 		private readonly IAuthorizationService m_authService;
 		private readonly Counter m_counter;
 
@@ -39,7 +39,7 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 		public string Name => "Control Message Router";
 
 		public ControlMessageRouter(IPublicRemoteQueue remote,
-									IOptions<RoutingPublishSettings> settings,
+									IOptions<RoutingQueueSettings> settings,
 									ILogger<ControlMessageRouter> logger,
 									IAuthorizationService auth)
 		{

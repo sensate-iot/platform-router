@@ -34,10 +34,11 @@ namespace SensateIoT.Platform.Router.Service.Init
 			services.AddSingleton<IRoutingCache, RoutingCache>();
 			services.AddSingleton<IHostedService, RoutingService>();
 
-			services.Configure<RoutingPublishSettings>(s => {
+			services.Configure<RoutingQueueSettings>(s => {
 				s.InternalInterval = TimeSpan.FromMilliseconds(configuration.GetValue<int>("Routing:InternalPublishInterval"));
 				s.PublicInterval = TimeSpan.FromMilliseconds(configuration.GetValue<int>("Routing:PublicPublishInterval"));
 				s.ActuatorTopicFormat = configuration.GetValue<string>("Routing:ActuatorTopicFormat");
+				s.DequeueBatchSize = configuration.GetValue<int>("Routing:DequeueBatchSize");
 			});
 		}
 

@@ -25,7 +25,7 @@ namespace SensateIoT.Platform.Router.Common.Services.Processing
 		public RoutingPublishService(IInternalRemoteQueue internalRemote,
 									 IRemoteStorageQueue remoteStorage,
 									 IRemoteNetworkEventQueue remoteEvents,
-									 IOptions<RoutingPublishSettings> options,
+									 IOptions<RoutingQueueSettings> options,
 									 ILogger<RoutingPublishService> logger) : base(TimeSpan.FromSeconds(5), options.Value.InternalInterval, logger)
 		{
 			this.m_internalRemote = internalRemote;

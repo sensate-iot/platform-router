@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using MongoDB.Bson;
@@ -13,6 +14,7 @@ using SensateIoT.Platform.Router.Common.Collections.Local;
 using SensateIoT.Platform.Router.Common.Routing;
 using SensateIoT.Platform.Router.Common.Routing.Abstract;
 using SensateIoT.Platform.Router.Common.Routing.Routers;
+using SensateIoT.Platform.Router.Common.Settings;
 using SensateIoT.Platform.Router.Data.Abstract;
 using SensateIoT.Platform.Router.Data.DTO;
 
@@ -155,8 +157,9 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 		{
 			var logger = new Mock<ILogger<CompositeRouter>>();
 			var queue = new Mock<IRemoteNetworkEventQueue>();
+			var options = Options.Create(new RoutingQueueSettings());
 
-			return new CompositeRouter(CreateRoutingCache(sensor, account, key), inputQueue, queue.Object, logger.Object);
+			return new CompositeRouter(CreateRoutingCache(sensor, account, key), inputQueue, queue.Object, options, logger.Object);
 		}
 
 		private static AuthorizationRouter CreateAuthorizationRouter(Action measurementCallback, Action messageCallback, Sensor s, Account a, ApiKey key)
