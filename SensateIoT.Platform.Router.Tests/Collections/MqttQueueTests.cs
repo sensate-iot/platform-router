@@ -92,7 +92,7 @@ namespace SensateIoT.Platform.Router.Tests.Collections
 			};
 
 
-			var remote = new RemoteRemoteLiveDataQueue(new OptionsWrapper<QueueSettings>(settings), ClientStub);
+			var remote = new RemoteLiveDataQueue(new OptionsWrapper<QueueSettings>(settings), ClientStub);
 
 			remote.SyncLiveDataHandlers(new[] {
 				new LiveDataHandler {
