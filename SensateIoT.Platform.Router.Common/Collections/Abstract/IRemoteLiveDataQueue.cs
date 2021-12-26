@@ -14,7 +14,7 @@ using SensateIoT.Platform.Router.Data.Models;
 
 namespace SensateIoT.Platform.Router.Common.Collections.Abstract
 {
-	public interface IInternalRemoteQueue
+	public interface IRemoteLiveDataQueue
 	{
 		public int Count { get; }
 

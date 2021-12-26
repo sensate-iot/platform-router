@@ -84,7 +84,7 @@ namespace SensateIoT.Platform.Router.Tests.Collections
 
 		private static readonly MqttClientStub ClientStub = new();
 
-		private static IInternalRemoteQueue BuildRemoteQueue()
+		private static IRemoteLiveDataQueue BuildRemoteQueue()
 		{
 			var settings = new QueueSettings {
 				LiveDataQueueTemplate = "sensateiot/internal/$type/$target/bulk",
@@ -92,7 +92,7 @@ namespace SensateIoT.Platform.Router.Tests.Collections
 			};
 
 
-			var remote = new InternalMqttQueue(new OptionsWrapper<QueueSettings>(settings), ClientStub);
+			var remote = new RemoteRemoteLiveDataQueue(new OptionsWrapper<QueueSettings>(settings), ClientStub);
 
 			remote.SyncLiveDataHandlers(new[] {
 				new LiveDataHandler {

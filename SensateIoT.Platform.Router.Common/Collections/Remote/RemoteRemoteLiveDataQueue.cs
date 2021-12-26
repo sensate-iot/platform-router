@@ -32,7 +32,7 @@ using Message = SensateIoT.Platform.Router.Data.DTO.Message;
 
 namespace SensateIoT.Platform.Router.Common.Collections.Remote
 {
-	public class InternalMqttQueue : IInternalRemoteQueue
+	public class RemoteRemoteLiveDataQueue : IRemoteLiveDataQueue
 	{
 		private IDictionary<string, TextMessageData> m_textMessageQueues;
 		private IDictionary<string, MeasurementData> m_measurementQueues;
@@ -53,7 +53,7 @@ namespace SensateIoT.Platform.Router.Common.Collections.Remote
 
 		private readonly IInternalMqttClient m_client;
 
-		public InternalMqttQueue(IOptions<QueueSettings> options, IInternalMqttClient client)
+		public RemoteRemoteLiveDataQueue(IOptions<QueueSettings> options, IInternalMqttClient client)
 		{
 			this.m_liveDataLock = new SpinLockWrapper();
 			this.m_liveDataHandlers = new HashSet<string>();

@@ -20,19 +20,19 @@ namespace SensateIoT.Platform.Router.Common.Services.Processing
 {
 	public class RoutingPublishService : TimedBackgroundService
 	{
-		private readonly IInternalRemoteQueue m_internalRemote;
+		private readonly IRemoteLiveDataQueue m_liveDataQueue;
 		private readonly IRemoteTriggerQueue m_triggerQueue;
 		private readonly IRemoteStorageQueue m_remoteStorageQueue;
 		private readonly IRemoteNetworkEventQueue m_eventQueue;
 
-		public RoutingPublishService(IInternalRemoteQueue internalRemote,
+		public RoutingPublishService(IRemoteLiveDataQueue liveDataQueue,
 									 IRemoteTriggerQueue triggerQueue,
 									 IRemoteStorageQueue remoteStorage,
 									 IRemoteNetworkEventQueue remoteEvents,
 									 IOptions<RoutingQueueSettings> options,
 									 ILogger<RoutingPublishService> logger) : base(TimeSpan.FromSeconds(5), options.Value.InternalInterval, logger)
 		{
-			this.m_internalRemote = internalRemote;
+			this.m_liveDataQueue = liveDataQueue;
 			this.m_remoteStorageQueue = remoteStorage;
 			this.m_eventQueue = remoteEvents;
 			this.m_triggerQueue = triggerQueue;
@@ -40,7 +40,7 @@ namespace SensateIoT.Platform.Router.Common.Services.Processing
 
 		protected override async Task ExecuteAsync(CancellationToken token)
 		{
-			await Task.WhenAll(this.m_internalRemote.FlushAsync(),
+			await Task.WhenAll(this.m_liveDataQueue.FlushAsync(),
 							   this.m_triggerQueue.FlushAsync(),
 							   this.m_eventQueue.FlushEventsAsync(),
 							   this.m_remoteStorageQueue.FlushMessagesAsync()).ConfigureAwait(false);

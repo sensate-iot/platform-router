@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 
 using Google.Protobuf;
 using Prometheus;
+
 using SensateIoT.Platform.Router.Common.Collections.Abstract;
 using SensateIoT.Platform.Router.Common.Converters;
 using SensateIoT.Platform.Router.Common.Helpers;

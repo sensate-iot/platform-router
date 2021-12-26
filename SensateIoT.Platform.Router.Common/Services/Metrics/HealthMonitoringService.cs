@@ -12,7 +12,7 @@ namespace SensateIoT.Platform.Router.Common.Services.Metrics
 {
 	public class HealthMonitoringService : IHealthMonitoringService
 	{
-		private readonly IInternalRemoteQueue m_internalRemoteQueues;
+		private readonly IRemoteLiveDataQueue m_liveDataQueues;
 		private readonly IPublicRemoteQueue m_publicQueue;
 		private readonly IQueue<IPlatformMessage> m_inputQueue;
 		private readonly HealthCheckSettings m_settings;
@@ -24,13 +24,13 @@ namespace SensateIoT.Platform.Router.Common.Services.Metrics
 
 		public HealthMonitoringService(IQueue<IPlatformMessage> inputQueue,
 									   IRemoteTriggerQueue triggerQueue,
-									   IInternalRemoteQueue @internal,
+									   IRemoteLiveDataQueue @internal,
 									   IPublicRemoteQueue @public,
 									   IPublicMqttClient publicClient,
 									   IInternalMqttClient internalClient,
 									   IOptions<HealthCheckSettings> settings)
 		{
-			this.m_internalRemoteQueues = @internal;
+			this.m_liveDataQueues = @internal;
 			this.m_publicQueue = @public;
 			this.m_inputQueue = inputQueue;
 			this.m_internalMqttClient = internalClient;
@@ -100,7 +100,7 @@ namespace SensateIoT.Platform.Router.Common.Services.Metrics
 		private bool CheckLiveDataQueues()
 		{
 			var limit = this.m_settings.LiveDataServiceQueueLimit ?? this.m_settings.DefaultQueueLimit;
-			return this.m_internalRemoteQueues.Count <= limit;
+			return this.m_liveDataQueues.Count <= limit;
 		}
 
 		private bool CheckTriggerQueues()
