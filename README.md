@@ -22,16 +22,18 @@ The message router needs various settings in order to function correctly:
   - MongoDB
   - PostgreSQL
 
-- Serilog configuration
 - Routing config:
   - Trigger topic
   - Storage topic
   - Network event topic
   - Actuator topic
   - Live data topic
+  - Publish interval
+  - Routing batch size
 
 - MQTT configuration
 - Metrics server
+- Serilog configuration
 
 ## Metrics
 
