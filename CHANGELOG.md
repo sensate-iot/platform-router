@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.1] - 26-12-2021
+### Added
+- Remote trigger queue implementation
+- Remote live data queue
+
+### Updated
+- Message processing by the composite router
+- Health monitoring service (use the new queue's)
+- Project dependencies
+
+### Removed
+- The `InternalRemoteQueue` (refactored into the `RemoteLiveDataQueue`)
+
 ## [1.8.0] - 17-12-2021
 ### Added
 - Additional logging to various routers

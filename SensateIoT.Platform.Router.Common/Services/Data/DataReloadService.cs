@@ -26,20 +26,20 @@ namespace SensateIoT.Platform.Router.Common.Services.Data
 	public class DataReloadService : TimedBackgroundService
 	{
 		private readonly IServiceProvider m_provider;
-		private readonly IInternalRemoteQueue m_queue;
+		private readonly IRemoteLiveDataQueue m_queue;
 		private readonly IRoutingCache m_cache;
 		private readonly ILogger<DataReloadService> m_logger;
 		private bool m_loaded;
 		private readonly DataReloadSettings m_settings;
 
 		public DataReloadService(IServiceProvider provider,
-											IInternalRemoteQueue internalRemote,
+											IRemoteLiveDataQueue liveDataQueue,
 											IRoutingCache cache,
 											IOptions<DataReloadSettings> settings,
 											ILogger<DataReloadService> logger) : base(settings.Value.StartDelay, settings.Value.DataReloadInterval, logger)
 		{
 			this.m_provider = provider;
-			this.m_queue = internalRemote;
+			this.m_queue = liveDataQueue;
 			this.m_logger = logger;
 			this.m_cache = cache;
 			this.m_loaded = false;

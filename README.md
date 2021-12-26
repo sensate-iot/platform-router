@@ -22,16 +22,21 @@ The message router needs various settings in order to function correctly:
   - MongoDB
   - PostgreSQL
 
-- Serilog configuration
 - Routing config:
   - Trigger topic
   - Storage topic
   - Network event topic
   - Actuator topic
   - Live data topic
+  - Publish interval
+  - Routing batch size
 
 - MQTT configuration
+  - Internal MQTT broker
+  - Public MQTT broker
+
 - Metrics server
+- Serilog configuration
 
 ## Metrics
 
@@ -45,4 +50,4 @@ The following metrics are collected from the routing service:
 
 [header1]: https://github.com/sensate-iot/platform-router/workflows/Docker/badge.svg "Docker Build"
 [header2]: https://github.com/sensate-iot/platform-router/workflows/Format%20check/badge.svg ".NET format"
-[header3]: https://img.shields.io/badge/version-v1.8.0-informational "Sensate IoT Router version"
+[header3]: https://img.shields.io/badge/version-v1.8.1-informational "Sensate IoT Router version"

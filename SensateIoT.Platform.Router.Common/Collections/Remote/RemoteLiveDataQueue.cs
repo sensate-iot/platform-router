@@ -32,7 +32,7 @@ using Message = SensateIoT.Platform.Router.Data.DTO.Message;
 
 namespace SensateIoT.Platform.Router.Common.Collections.Remote
 {
-	public class InternalMqttQueue : IInternalRemoteQueue
+	public class RemoteLiveDataQueue : IRemoteLiveDataQueue
 	{
 		private IDictionary<string, TextMessageData> m_textMessageQueues;
 		private IDictionary<string, MeasurementData> m_measurementQueues;
@@ -45,22 +45,15 @@ namespace SensateIoT.Platform.Router.Common.Collections.Remote
 		private SpinLockWrapper m_messageLock;
 		private SpinLockWrapper m_controlLock;
 
-		private MeasurementData m_triggerMeasurements;
-		private TextMessageData m_triggerMessages;
-
-		private readonly string m_messageTriggerTopic;
-		private readonly string m_measurementTriggerTopic;
-
 		private readonly string m_messageLiveDataTopic;
 		private readonly string m_measurementLiveDataTopic;
 		private readonly string m_controlMessageLiveDataTopic;
 
-		private readonly Gauge m_gaugeTriggerSerivce;
 		private readonly Gauge m_gaugeLiveDataService;
 
 		private readonly IInternalMqttClient m_client;
 
-		public InternalMqttQueue(IOptions<QueueSettings> options, IInternalMqttClient client)
+		public RemoteLiveDataQueue(IOptions<QueueSettings> options, IInternalMqttClient client)
 		{
 			this.m_liveDataLock = new SpinLockWrapper();
 			this.m_liveDataHandlers = new HashSet<string>();
@@ -68,50 +61,18 @@ namespace SensateIoT.Platform.Router.Common.Collections.Remote
 			this.m_measurementQueues = new Dictionary<string, MeasurementData>();
 			this.m_controlMessageQueues = new Dictionary<string, ControlMessageData>();
 
-			this.m_messageTriggerTopic = options.Value.TriggerQueueTemplate.Replace("$type", "messages");
-			this.m_measurementTriggerTopic = options.Value.TriggerQueueTemplate.Replace("$type", "measurements");
-
 			this.m_controlMessageLiveDataTopic = options.Value.LiveDataQueueTemplate.Replace("$type", "control");
 			this.m_messageLiveDataTopic = options.Value.LiveDataQueueTemplate.Replace("$type", "messages");
 			this.m_measurementLiveDataTopic = options.Value.LiveDataQueueTemplate.Replace("$type", "measurements");
-
-			this.m_triggerMeasurements = new MeasurementData();
-			this.m_triggerMessages = new TextMessageData();
 
 			this.m_controlLock = new SpinLockWrapper();
 			this.m_measurementLock = new SpinLockWrapper();
 			this.m_messageLock = new SpinLockWrapper();
 			this.m_client = client;
-			this.m_gaugeTriggerSerivce = Metrics.CreateGauge("router_trigger_messages_queued", "Number of messages in the trigger queue.");
 			this.m_gaugeLiveDataService = Metrics.CreateGauge("router_livedata_messages_queued", "Number of messages in the live data queue.");
 		}
 
-		public int LiveDataQueueLength => this.GetLiveDataQueueSize();
-		public int TriggerQueueLength => this.GetTriggerQueueLength();
-
-		public void EnqueueMessageToTriggerService(IPlatformMessage message)
-		{
-			this.m_measurementLock.Lock();
-
-			try {
-				this.m_triggerMessages.Messages.Add(MessageProtobufConverter.Convert(message as Message));
-				this.m_gaugeTriggerSerivce.Inc();
-			} finally {
-				this.m_measurementLock.Unlock();
-			}
-		}
-
-		public void EnqueueMeasurementToTriggerService(IPlatformMessage message)
-		{
-			this.m_measurementLock.Lock();
-
-			try {
-				this.m_triggerMeasurements.Measurements.Add(MeasurementProtobufConverter.Convert(message as Measurement));
-				this.m_gaugeTriggerSerivce.Inc();
-			} finally {
-				this.m_measurementLock.Unlock();
-			}
-		}
+		public int Count => this.GetLiveDataQueueSize();
 
 		public void EnqueueMeasurementToTarget(IPlatformMessage message, RoutingTarget target)
 		{
@@ -149,7 +110,7 @@ namespace SensateIoT.Platform.Router.Common.Collections.Remote
 			}
 		}
 
-		public async Task FlushLiveDataAsync()
+		public async Task FlushAsync()
 		{
 			IDictionary<string, TextMessageData> messages;
 			IDictionary<string, MeasurementData> measurements;
@@ -240,32 +201,6 @@ namespace SensateIoT.Platform.Router.Common.Collections.Remote
 			});
 		}
 
-		public async Task FlushAsync()
-		{
-			MeasurementData measurements;
-			TextMessageData messages;
-
-			this.m_measurementLock.Lock();
-			this.m_messageLock.Lock();
-
-			try {
-				measurements = this.m_triggerMeasurements;
-				messages = this.m_triggerMessages;
-
-				this.m_gaugeTriggerSerivce.Set(0D);
-				this.m_triggerMeasurements = new MeasurementData();
-				this.m_triggerMessages = new TextMessageData();
-			} finally {
-				this.m_messageLock.Unlock();
-				this.m_measurementLock.Unlock();
-			}
-
-			await Task.WhenAll(
-				this.PublishData(this.m_messageTriggerTopic, messages),
-				this.PublishData(this.m_measurementTriggerTopic, measurements)
-			).ConfigureAwait(false);
-		}
-
 		private int GetLiveDataQueueSize()
 		{
 			int size;
@@ -275,23 +210,6 @@ namespace SensateIoT.Platform.Router.Common.Collections.Remote
 				size = this.UnzipQueueSize();
 			} finally {
 				this.ReleaseLiveDataLocks();
-			}
-
-			return size;
-		}
-
-		private int GetTriggerQueueLength()
-		{
-			var size = 0;
-			this.m_measurementLock.Lock();
-			this.m_messageLock.Lock();
-
-			try {
-				size += this.m_triggerMeasurements.Measurements.Count;
-				size += this.m_triggerMessages.Messages.Count;
-			} finally {
-				this.m_messageLock.Unlock();
-				this.m_measurementLock.Unlock();
 			}
 
 			return size;
@@ -332,27 +250,9 @@ namespace SensateIoT.Platform.Router.Common.Collections.Remote
 			return total;
 		}
 
-		private Task PublishData(string topic, IMessage messages)
-		{
-			var size = messages.CalculateSize();
-
-			if(size == 0) {
-				return Task.CompletedTask;
-			}
-
-			using var stream = new MemoryStream();
-			messages.WriteTo(stream);
-			var data = stream.ToArray().Compress();
-
-			return this.m_client.PublishOnAsync(topic, data, false);
-		}
-
 		public void SyncLiveDataHandlers(IEnumerable<LiveDataHandler> handlers)
 		{
-			this.m_liveDataLock.Lock();
-			this.m_measurementLock.Lock();
-			this.m_messageLock.Lock();
-			this.m_controlLock.Lock();
+			this.AcquireLiveDataLocks();
 
 			try {
 				var names = handlers.Select(x => x.Name).ToList();
@@ -373,10 +273,7 @@ namespace SensateIoT.Platform.Router.Common.Collections.Remote
 					this.m_controlMessageQueues.TryAdd(handler, new ControlMessageData());
 				}
 			} finally {
-				this.m_controlLock.Unlock();
-				this.m_messageLock.Unlock();
-				this.m_measurementLock.Unlock();
-				this.m_liveDataLock.Unlock();
+				this.ReleaseLiveDataLocks();
 			}
 		}
 	}

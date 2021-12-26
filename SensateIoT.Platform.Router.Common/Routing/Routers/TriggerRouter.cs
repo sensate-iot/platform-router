@@ -21,13 +21,13 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 {
 	public class TriggerRouter : IRouter
 	{
-		private readonly IInternalRemoteQueue m_internalRemote;
+		private readonly IRemoteTriggerQueue m_internalRemote;
 		private readonly ILogger<TriggerRouter> m_logger;
 		private readonly Counter m_counter;
 
 		public string Name => "Trigger Router";
 
-		public TriggerRouter(IInternalRemoteQueue queue, ILogger<TriggerRouter> logger)
+		public TriggerRouter(IRemoteTriggerQueue queue, ILogger<TriggerRouter> logger)
 		{
 			this.m_internalRemote = queue;
 			this.m_logger = logger;
