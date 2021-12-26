@@ -32,6 +32,9 @@ The message router needs various settings in order to function correctly:
   - Routing batch size
 
 - MQTT configuration
+  - Internal MQTT broker
+  - Public MQTT broker
+
 - Metrics server
 - Serilog configuration
 
