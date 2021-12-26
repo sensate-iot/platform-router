@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Updated
 - Message processing by the composite router
 - Health monitoring service (use the new queue's)
+- Project dependencies
 
 ### Removed
 - The `InternalRemoteQueue` (refactored into the `RemoteLiveDataQueue`)
