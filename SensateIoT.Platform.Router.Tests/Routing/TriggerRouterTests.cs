@@ -143,7 +143,7 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 
 		private static TriggerRouter CreateTriggerRouter(Action measurementCallback, Action messageCallback)
 		{
-			var queue = new Mock<IInternalRemoteQueue>();
+			var queue = new Mock<IRemoteTriggerQueue>();
 			var logger = new Mock<ILogger<TriggerRouter>>();
 
 			queue.Setup(x => x.EnqueueMeasurementToTriggerService(It.IsAny<IPlatformMessage>()))

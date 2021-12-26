@@ -22,7 +22,7 @@ namespace SensateIoT.Platform.Router.Common.Services.Processing
 		private readonly IPublicRemoteQueue m_remote;
 
 		public ActuatorPublishService(IPublicRemoteQueue remote,
-									IOptions<RoutingPublishSettings> options,
+									IOptions<RoutingQueueSettings> options,
 									ILogger<ActuatorPublishService> logger) : base(TimeSpan.FromSeconds(5), options.Value.PublicInterval, logger)
 		{
 			this.m_remote = remote;

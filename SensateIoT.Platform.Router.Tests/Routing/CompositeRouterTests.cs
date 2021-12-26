@@ -7,8 +7,9 @@
 
 using System;
 using System.Collections.Generic;
-
+using System.Threading;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using MongoDB.Bson;
@@ -20,6 +21,7 @@ using SensateIoT.Platform.Router.Common.Collections.Local;
 using SensateIoT.Platform.Router.Common.Exceptions;
 using SensateIoT.Platform.Router.Common.Routing;
 using SensateIoT.Platform.Router.Common.Routing.Abstract;
+using SensateIoT.Platform.Router.Common.Settings;
 using SensateIoT.Platform.Router.Contracts.DTO;
 using SensateIoT.Platform.Router.Data.Abstract;
 using SensateIoT.Platform.Router.Data.DTO;
@@ -50,7 +52,7 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 			router.AddRouter(r2);
 			router.AddRouter(r3);
 
-			var result = router.TryRoute();
+			var result = router.TryRoute(CancellationToken.None);
 
 			Assert.IsTrue(r1.Executed);
 			Assert.IsTrue(r2.Executed);
@@ -96,7 +98,7 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 			router.AddRouter(r1);
 			router.AddRouter(r2);
 			router.AddRouter(r3);
-			var result = router.TryRoute();
+			var result = router.TryRoute(CancellationToken.None);
 
 			Assert.IsFalse(r1.Executed);
 			Assert.IsFalse(r2.Executed);
@@ -143,7 +145,7 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 			router.AddRouter(r2);
 			router.AddRouter(r3);
 
-			var result = router.TryRoute();
+			var result = router.TryRoute(CancellationToken.None);
 
 			Assert.IsTrue(r1.Executed);
 			Assert.IsFalse(r2.Executed);
@@ -166,7 +168,7 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 			router.AddRouter(r1);
 			router.AddRouter(r2);
 			router.AddRouter(r3);
-			var result = router.TryRoute();
+			var result = router.TryRoute(CancellationToken.None);
 
 			Assert.IsTrue(r1.Executed);
 			Assert.IsFalse(r2.Executed);
@@ -189,13 +191,14 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 			router.AddRouter(r1);
 			router.AddRouter(r2);
 			router.AddRouter(r3);
-			Assert.ThrowsException<InvalidOperationException>(() => router.TryRoute());
+			Assert.ThrowsException<InvalidOperationException>(() => router.TryRoute(CancellationToken.None));
 		}
 
 		[TestMethod]
 		public void EnqueuesNetworkEvents()
 		{
 			var count = 0;
+			var options = Options.Create(new RoutingQueueSettings());
 			var logger = new Mock<ILogger<CompositeRouter>>();
 			var queue = new Mock<IRemoteNetworkEventQueue>();
 			var msg = new Message {
@@ -203,14 +206,14 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 			};
 
 			queue.Setup(x => x.EnqueueEvent(It.IsAny<NetworkEvent>())).Callback(() => count += 1);
-			var router = new CompositeRouter(CreateRoutingCache(Sensor, Account, ApiKey), CreateQueueWithMessage(msg), queue.Object, logger.Object);
+			var router = new CompositeRouter(CreateRoutingCache(Sensor, Account, ApiKey), CreateQueueWithMessage(msg), queue.Object, options, logger.Object);
 
 			var r1 = new RouterStub();
 			var r2 = new RouterStub();
 
 			router.AddRouter(r1);
 			router.AddRouter(r2);
-			var result = router.TryRoute();
+			var result = router.TryRoute(CancellationToken.None);
 
 			Assert.AreEqual(1, count);
 			Assert.IsFalse(result);
@@ -230,8 +233,9 @@ namespace SensateIoT.Platform.Router.Tests.Routing
 		{
 			var logger = new Mock<ILogger<CompositeRouter>>();
 			var queue = new Mock<IRemoteNetworkEventQueue>();
+			var options = Options.Create(new RoutingQueueSettings());
 
-			return new CompositeRouter(CreateRoutingCache(sensor, account, key), inputQueue, queue.Object, logger.Object);
+			return new CompositeRouter(CreateRoutingCache(sensor, account, key), inputQueue, queue.Object, options, logger.Object);
 		}
 
 		private static IQueue<IPlatformMessage> CreateQueueWithMessage(IPlatformMessage message)

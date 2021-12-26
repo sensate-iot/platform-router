@@ -6,20 +6,16 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-using SensateIoT.Platform.Router.Common.Collections.Abstract;
 using SensateIoT.Platform.Router.Common.Exceptions;
 using SensateIoT.Platform.Router.Common.Routing.Abstract;
 using SensateIoT.Platform.Router.Common.Services.Background;
 using SensateIoT.Platform.Router.Common.Settings;
-using SensateIoT.Platform.Router.Data.Abstract;
 
 namespace SensateIoT.Platform.Router.Common.Services.Processing
 {
@@ -36,10 +32,10 @@ namespace SensateIoT.Platform.Router.Common.Services.Processing
 
 		private readonly ILogger<RoutingService> m_logger;
 		private readonly IMessageRouter m_router;
-		private readonly RoutingPublishSettings m_settings;
+		private readonly RoutingQueueSettings m_settings;
 
 		public RoutingService(IMessageRouter router,
-							  IOptions<RoutingPublishSettings> settings,
+							  IOptions<RoutingQueueSettings> settings,
 							  ILogger<RoutingService> logger) : base(logger)
 		{
 			this.m_settings = settings.Value;
@@ -50,17 +46,19 @@ namespace SensateIoT.Platform.Router.Common.Services.Processing
 		protected override async Task ExecuteAsync(CancellationToken token)
 		{
 			do {
-				var result = this.ExecuteRouter();
+				var result = this.ExecuteRouter(token);
 				await this.WaitForRouterIf(result, token).ConfigureAwait(false);
 			} while(!token.IsCancellationRequested);
 		}
 
-		private bool ExecuteRouter()
+		private bool ExecuteRouter(CancellationToken token)
 		{
 			try {
-				return this.m_router.TryRoute();
+				return this.m_router.TryRoute(token);
 			} catch(RouterException exception) {
 				this.m_logger.LogError(exception, "Routing error!");
+			} catch(OperationCanceledException exception) {
+				this.m_logger.LogCritical(exception, "Unable to continue routing");
 			}
 
 			return true;
@@ -68,7 +66,7 @@ namespace SensateIoT.Platform.Router.Common.Services.Processing
 
 		private async Task WaitForRouterIf(bool result, CancellationToken token)
 		{
-			if(result) {
+			if(result || token.IsCancellationRequested) {
 				return;
 			}
 

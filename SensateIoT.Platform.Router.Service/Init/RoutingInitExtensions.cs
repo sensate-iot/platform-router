@@ -34,10 +34,11 @@ namespace SensateIoT.Platform.Router.Service.Init
 			services.AddSingleton<IRoutingCache, RoutingCache>();
 			services.AddSingleton<IHostedService, RoutingService>();
 
-			services.Configure<RoutingPublishSettings>(s => {
+			services.Configure<RoutingQueueSettings>(s => {
 				s.InternalInterval = TimeSpan.FromMilliseconds(configuration.GetValue<int>("Routing:InternalPublishInterval"));
 				s.PublicInterval = TimeSpan.FromMilliseconds(configuration.GetValue<int>("Routing:PublicPublishInterval"));
 				s.ActuatorTopicFormat = configuration.GetValue<string>("Routing:ActuatorTopicFormat");
+				s.DequeueBatchSize = configuration.GetValue<int>("Routing:DequeueBatchSize");
 			});
 		}
 
@@ -46,7 +47,8 @@ namespace SensateIoT.Platform.Router.Service.Init
 			// Routing queues
 			services.AddSingleton<IQueue<IPlatformMessage>, MessageQueue>();
 			services.AddSingleton<IRemoteNetworkEventQueue, RemoteNetworkEventQueue>();
-			services.AddSingleton<IInternalRemoteQueue, InternalMqttQueue>();
+			services.AddSingleton<IRemoteLiveDataQueue, RemoteLiveDataQueue>();
+			services.AddSingleton<IRemoteTriggerQueue, RemoteTriggerQueue>();
 			services.AddSingleton<IPublicRemoteQueue, PublicMqttQueue>();
 			services.AddSingleton<IRemoteStorageQueue, RemoteStorageQueue>();
 

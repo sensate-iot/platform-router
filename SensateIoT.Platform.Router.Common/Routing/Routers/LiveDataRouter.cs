@@ -9,6 +9,7 @@ using System.Linq;
 
 using Microsoft.Extensions.Logging;
 using Prometheus;
+
 using SensateIoT.Platform.Router.Common.Collections.Abstract;
 using SensateIoT.Platform.Router.Common.Exceptions;
 using SensateIoT.Platform.Router.Common.Routing.Abstract;
@@ -21,12 +22,12 @@ namespace SensateIoT.Platform.Router.Common.Routing.Routers
 	public class LiveDataRouter : IRouter
 	{
 		private readonly ILogger<LiveDataRouter> m_logger;
-		private readonly IInternalRemoteQueue m_internalQueue;
+		private readonly IRemoteLiveDataQueue m_internalQueue;
 		private readonly Counter m_liveDataCounter;
 
 		public string Name => "Live Data Router";
 
-		public LiveDataRouter(ILogger<LiveDataRouter> logger, IInternalRemoteQueue queue)
+		public LiveDataRouter(ILogger<LiveDataRouter> logger, IRemoteLiveDataQueue queue)
 		{
 			this.m_internalQueue = queue;
 			this.m_logger = logger;
