@@ -6,7 +6,6 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

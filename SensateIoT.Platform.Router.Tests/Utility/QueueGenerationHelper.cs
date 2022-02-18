@@ -9,7 +9,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SensateIoT.Platform.Router.Common.Collections.Abstract;
 using SensateIoT.Platform.Router.Common.Collections.Local;
-using SensateIoT.Platform.Router.Data.Abstract;
 
 namespace SensateIoT.Platform.Router.Tests.Utility
 {

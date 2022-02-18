@@ -1,3 +1,4 @@
+root = true
 
 [*.{c,c++,cc,cp,cpp,cs,cu,cuh,cxx,h,hh,hpp,hxx,inc,inl,ino,ipp,mpp,proto,tpp}]
 indent_style=tab
@@ -15,23 +16,24 @@ indent_style=space
 indent_size=2
 tab_width=2
 
-[*]
-
-
-
+[*.cs]
 # Microsoft .NET properties
 csharp_indent_switch_labels=false
+
 csharp_new_line_before_catch=false
 csharp_new_line_before_else=false
 csharp_new_line_before_finally=false
 csharp_new_line_before_members_in_object_initializers=false
-csharp_new_line_before_open_brace=types,local_functions,methods
 csharp_new_line_between_query_expression_clauses=true
-csharp_preferred_modifier_order=public, private, protected, internal, new, abstract, virtual, sealed, override, static, readonly, extern, unsafe, volatile, async:suggestion
-csharp_space_after_keywords_in_control_flow_statements=false
+csharp_new_line_before_open_brace=types,methods,local_functions
+
 csharp_style_var_elsewhere=true:suggestion
 csharp_style_var_for_built_in_types=true:suggestion
 csharp_style_var_when_type_is_apparent=true:suggestion
+
+csharp_space_after_keywords_in_control_flow_statements=false
+csharp_preferred_modifier_order=public, private, protected, internal, new, abstract, virtual, sealed, override, static, readonly, extern, unsafe, volatile, async:suggestion
+
 dotnet_style_parentheses_in_arithmetic_binary_operators=never_if_unnecessary:none
 dotnet_style_parentheses_in_other_binary_operators=never_if_unnecessary:none
 dotnet_style_parentheses_in_relational_binary_operators=never_if_unnecessary:none
@@ -43,6 +45,74 @@ dotnet_style_qualification_for_method=true:suggestion
 dotnet_style_qualification_for_property=true:suggestion
 dotnet_style_require_accessibility_modifiers=for_non_interface_members:suggestion
 
+# Static fields are PascalCase
+dotnet_naming_rule.non_private_static_fields_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.non_private_static_fields_should_be_pascal_case.symbols = non_private_static_fields
+dotnet_naming_rule.non_private_static_fields_should_be_pascal_case.style = non_private_static_field_style
+
+dotnet_naming_symbols.non_private_static_fields.applicable_kinds = field
+dotnet_naming_symbols.non_private_static_fields.applicable_accessibilities = public, protected, private, internal, protected_internal, private_protected
+dotnet_naming_symbols.non_private_static_fields.required_modifiers = static
+
+dotnet_naming_style.non_private_static_field_style.capitalization = pascal_case
+
+# Non-private readonly fields are PascalCase
+dotnet_naming_rule.non_private_readonly_fields_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.non_private_readonly_fields_should_be_pascal_case.symbols = non_private_readonly_fields
+dotnet_naming_rule.non_private_readonly_fields_should_be_pascal_case.style = non_private_readonly_field_style
+
+dotnet_naming_symbols.non_private_readonly_fields.applicable_kinds = field
+dotnet_naming_symbols.non_private_readonly_fields.applicable_accessibilities = public, internal, protected_internal, private_protected
+dotnet_naming_symbols.non_private_readonly_fields.required_modifiers = readonly
+
+dotnet_naming_style.non_private_readonly_field_style.capitalization = pascal_case
+
+# Constants are PascalCase
+dotnet_naming_rule.constants_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.constants_should_be_pascal_case.symbols = constants
+dotnet_naming_rule.constants_should_be_pascal_case.style = constant_style
+
+dotnet_naming_symbols.constants.applicable_kinds = field, local
+dotnet_naming_symbols.constants.required_modifiers = const
+
+dotnet_naming_style.constant_style.capitalization = pascal_case
+
+# Instance fields are camelCase and start with _
+dotnet_naming_rule.instance_fields_should_be_camel_case.severity = suggestion
+dotnet_naming_rule.instance_fields_should_be_camel_case.symbols = instance_fields
+dotnet_naming_rule.instance_fields_should_be_camel_case.style = instance_field_style
+
+dotnet_naming_symbols.instance_fields.applicable_kinds = field
+
+dotnet_naming_style.instance_field_style.capitalization = camel_case
+dotnet_naming_style.instance_field_style.required_prefix = _
+
+# Locals and parameters are camelCase
+dotnet_naming_rule.locals_should_be_camel_case.severity = suggestion
+dotnet_naming_rule.locals_should_be_camel_case.symbols = locals_and_parameters
+dotnet_naming_rule.locals_should_be_camel_case.style = camel_case_style
+
+dotnet_naming_symbols.locals_and_parameters.applicable_kinds = parameter, local
+
+dotnet_naming_style.camel_case_style.capitalization = camel_case
+
+# Local functions are PascalCase
+dotnet_naming_rule.local_functions_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.local_functions_should_be_pascal_case.symbols = local_functions
+dotnet_naming_rule.local_functions_should_be_pascal_case.style = local_function_style
+
+dotnet_naming_symbols.local_functions.applicable_kinds = local_function
+
+dotnet_naming_style.local_function_style.capitalization = pascal_case
+
+# By default, name items with PascalCase
+dotnet_naming_rule.members_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.members_should_be_pascal_case.symbols = all_members
+dotnet_naming_rule.members_should_be_pascal_case.style = pascal_case_style
+
+dotnet_naming_symbols.all_members.applicable_kinds = *
+
+dotnet_naming_style.pascal_case_style.capitalization = pascal_case
 
 # ReSharper inspection severities
 resharper_arrange_redundant_parentheses_highlighting=hint
@@ -108,3 +178,22 @@ resharper_place_linq_into_on_new_line=false
 resharper_place_simple_embedded_statement_on_same_line=false
 resharper_wrap_before_linq_expression=true
 resharper_wrap_linq_expressions=chop_always
+
+[*.{cs,vb}]
+dotnet_code_quality_unused_parameters=all:warning
+end_of_line=crlf
+indent_size=4
+insert_final_newline=true
+
+dotnet_diagnostic.AV1500.max_statement_count = 10
+dotnet_diagnostic.AV1561.max_constructor_parameter_count = 5
+dotnet_diagnostic.AV1250.severity=silent
+dotnet_diagnostic.AV1535.severity=silent
+dotnet_diagnostic.AV1135.severity=silent
+dotnet_diagnostic.AV1561.max_parameter_count = 5
+dotnet_diagnostic.IDE0005.severity=warning
+dotnet_diagnostic.IDE0035.severity=warning
+dotnet_diagnostic.IDE0051.severity=warning
+dotnet_diagnostic.IDE0060.severity=warning
+csharp_style_prefer_switch_expression=true:warning
+dotnet_diagnostic.S1006.severity=silent
